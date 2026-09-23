@@ -8,12 +8,14 @@
 --screenshot ไฟล์.png           ถ่ายภาพหน้าจอแล้วปิดเอง
 --software                      วาดด้วย CPU แทน GPU
 --fullscreen                    เต็มจอ (ใช้บน Pi) · ออกด้วย Ctrl+Alt+Q
+--greeter "คำสั่งเซสชัน"          เป็นหน้า login จริงผ่าน greetd (การ์ด 0003) เช่น --greeter labwc
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import shlex
 import sys
 from pathlib import Path
 
@@ -31,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--screenshot", type=Path)
     p.add_argument("--software", action="store_true")
     p.add_argument("--fullscreen", action="store_true")
+    p.add_argument("--greeter", metavar="SESSION_CMD")
     a = p.parse_args(argv)
 
     if a.screenshot and "QT_QPA_PLATFORM" not in os.environ:
@@ -44,6 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         signup_step=a.signup_step,
         software=a.software or bool(a.screenshot),
         fullscreen=a.fullscreen and not a.screenshot,
+        greeter_session=shlex.split(a.greeter) if a.greeter else None,
     )
     app, engine, warnings = uiapp.build(opts, sys.argv[:1])
     if not engine.rootObjects():

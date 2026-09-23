@@ -16,7 +16,11 @@ Rectangle {
 
     function submit(user, pw) {
         error = login.signIn(user, pw)
-        if (error === "") AppState.open("workspace")
+        // รหัสผ่านไม่ค้างอยู่ในช่องหลังส่ง (การ์ด 0003 H3)
+        pwField.text = ""
+        foundPw.text = ""
+        // โหมด greeter: เข้าได้แล้ว Python ปิดหน้าต่างเอง แล้ว greetd เริ่มเซสชันของผู้ใช้
+        if (error === "" && !login.greeterMode) AppState.open("workspace")
     }
 
     readonly property var status: ({
@@ -204,7 +208,10 @@ Rectangle {
             size: Theme.fontSmall; color: Theme.inkFaint; oneLine: true
             Layout.fillWidth: true
         }
-        AppButton { text: "สมัครบัญชี"; kind: "secondary"; iconPath: Icons.userPlus; onClicked: AppState.go("signup") }
+        // สมัครจากหน้า login จริงยังสร้างบัญชีจริงไม่ได้ (ต้องใช้สิทธิ์ root · การ์ดแยก) จึงไม่ให้กรอกแล้วหายเงียบ
+        AppButton { text: "สมัครบัญชี"; kind: "secondary"; iconPath: Icons.userPlus; enabled: !login.greeterMode
+                    onClicked: AppState.go("signup")
+                    ToolTip.visible: hovered && !enabled; ToolTip.text: "ยังไม่พร้อม: สร้างบัญชีจริงจากหน้านี้ยังไม่ได้" }
         AppButton { text: "ภาษา: ไทย"; kind: "secondary"; iconPath: Icons.globe; enabled: false }
         AppButton { text: "ปิดเครื่อง"; kind: "secondary"; iconPath: Icons.power; enabled: false
                     ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม (เฟส 1)" }

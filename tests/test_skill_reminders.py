@@ -88,6 +88,22 @@ class SchedulerTest(unittest.TestCase):
         self.assertTrue(rm.tick(self.s, wrong_clock).clock_went_back)
         self.assertFalse(rm.tick(self.s, NOW + timedelta(minutes=1)).clock_went_back)
 
+    def test_idle_ticks_do_not_write_every_time(self):
+        # รอบตรวจทุก 30 วิ ต้องไม่เขียน microSD ทุกรอบ (H4) · เขียนเมื่อมีนัดถึงเวลา หรือห่างเกิน SEEN_EVERY
+        self.s.add(rm.Reminder("ไกลมาก", NOW + timedelta(days=30)), NOW)
+        path = self.s.path
+        before = path.stat().st_mtime_ns
+        for i in range(1, 19):  # 9 นาที
+            rm.tick(self.s, NOW + timedelta(seconds=30 * i))
+        self.assertEqual(path.stat().st_mtime_ns, before)
+        rm.tick(self.s, NOW + rm.SEEN_EVERY)
+        self.assertEqual(rm.ReminderStore(path).last_seen, NOW + rm.SEEN_EVERY)
+
+    def test_due_always_saved_immediately(self):
+        self.s.add(rm.Reminder("กินยา", NOW + timedelta(minutes=1)), NOW)
+        rm.tick(self.s, NOW + timedelta(minutes=1))
+        self.assertTrue(rm.ReminderStore(self.s.path).items[0].fired)
+
     def test_upcoming_sorted(self):
         self.s.add(rm.Reminder("สอง", NOW + timedelta(hours=2)), NOW)
         self.s.add(rm.Reminder("หนึ่ง", NOW + timedelta(hours=1)), NOW)

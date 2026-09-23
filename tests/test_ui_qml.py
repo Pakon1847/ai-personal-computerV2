@@ -31,6 +31,8 @@ CASES = [
     {"screen": "signup", "signup_step": 3, "theme": "dark"},
     *(({"screen": "shell", "page": p} for p in uiapp.PAGES) if uiapp else ()),
     {"screen": "shell", "page": "workspace", "theme": "dark"},
+    # หน้า login จริงผ่าน greetd (การ์ด 0003) · ใส่ dev/demo มาด้วยเพื่อตรวจว่าถูกปิดทิ้ง
+    {"screen": "login", "greeter_session": ["labwc"], "dev": True, "demo_scan": "found"},
 ]
 
 
@@ -51,6 +53,10 @@ class QmlLoadTest(unittest.TestCase):
                     settle()
                     self.assertTrue(engine.rootObjects(), "โหลดไม่ขึ้น")
                     self.assertEqual(warnings, [])
+                    if case.get("greeter_session"):
+                        ctx = engine.rootContext()
+                        self.assertFalse(ctx.contextProperty("devMode"), "greeter ต้องไม่มีโหมดพัฒนา")
+                        self.assertEqual(ctx.contextProperty("login").scanState, "unavailable")
                     for root in engine.rootObjects():
                         root.close()
                     engine.deleteLater()

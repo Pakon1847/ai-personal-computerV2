@@ -39,6 +39,7 @@ class Options:
     software: bool = False  # วาดด้วย CPU (ใช้ตอนเทสต์ และเครื่องที่ไม่มี GPU)
     settings_path: Path | None = None
     fullscreen: bool = False  # เต็มจอบน Pi · ออกได้ด้วย Ctrl+Alt+Q เสมอ
+    greeter_session: list[str] | None = None  # โหมด greeter: คำสั่งเซสชันที่ greetd เริ่มหลังเข้าได้
 
 
 def load_fonts() -> list[str]:
@@ -73,10 +74,15 @@ def build(opts: Options, argv: list[str] | None = None):
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
-        "login": LoginController(opts.dev, opts.demo_scan),
+        # โหมด greeter ห้ามมีทางลัดของโหมดพัฒนาหรือสถานะสาธิตเด็ดขาด
+        "login": LoginController(
+            opts.dev and not opts.greeter_session,
+            None if opts.greeter_session else opts.demo_scan,
+            greeter_session=opts.greeter_session,
+        ),
         "signup": SignupController(),
         "filesBrowser": FilesBrowser(),
-        "skills": SkillsController(),
+        "skills": SkillsController(run_timer=not opts.greeter_session),
     }
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():
@@ -84,7 +90,8 @@ def build(opts: Options, argv: list[str] | None = None):
     ctx.setContextProperty("startScreen", opts.screen if opts.screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
     ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 5)))
-    ctx.setContextProperty("devMode", opts.dev or opts.demo_scan is not None)
+    dev = (opts.dev or opts.demo_scan is not None) and not opts.greeter_session
+    ctx.setContextProperty("devMode", dev)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))

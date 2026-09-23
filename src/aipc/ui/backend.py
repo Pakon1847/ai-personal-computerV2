@@ -203,9 +203,13 @@ class LoginController(QObject):
     changed = Signal()
     STATES = ("unavailable", "scanning", "found", "unknown", "manual")
 
-    def __init__(self, dev_mode: bool, demo_scan: str | None = None):
+    def __init__(self, dev_mode: bool, demo_scan: str | None = None,
+                 greeter_session: list[str] | None = None, connect=None):  # fmt: skip
         super().__init__()
         self._dev = dev_mode
+        # โหมด greeter (การ์ด 0003): greetd รันหน้านี้ก่อนมีใครเข้าเครื่อง · PAM ของ OS ตรวจรหัสผ่าน
+        self._session = greeter_session
+        self._connect = connect
         self._state = demo_scan if demo_scan in self.STATES else "unavailable"
         self._demo = demo_scan in self.STATES
 
@@ -216,6 +220,10 @@ class LoginController(QObject):
     @Property(bool, notify=changed)
     def demo(self) -> bool:
         return self._demo
+
+    @Property(bool, constant=True)
+    def greeterMode(self) -> bool:  # noqa: N802
+        return self._session is not None
 
     @Property(str, notify=changed)
     def foundName(self) -> str:  # noqa: N802
@@ -234,9 +242,32 @@ class LoginController(QObject):
         ยังไม่มีการตรวจรหัสผ่านจริง: โหมดพัฒนาให้ผ่านเพื่อเดินหน้าจอต่อ (มีแถบเตือน)
         นอกโหมดพัฒนาต้องปฏิเสธเสมอ ห้ามให้ผ่านโดยไม่ได้ตรวจ
         """
+        if self._session is not None:
+            return self._greetd_sign_in(username, password)
         if self._dev:
             return ""
-        return "ยังเข้าสู่ระบบจริงไม่ได้: ตัวเชื่อม greetd/PAM อยู่ในเฟส 1"
+        return "ยังเข้าสู่ระบบจริงไม่ได้ในหน้าต่างนี้ · หน้า Login จริงคือโหมด greeter (การ์ด 0003)"
+
+    def _greetd_sign_in(self, username: str, password: str) -> str:
+        from PySide6.QtCore import QCoreApplication, QTimer
+
+        from aipc.login import greetd
+
+        try:
+            g = (self._connect or greetd.Greetd.connect)()
+        except (OSError, greetd.ProtocolError) as e:
+            return f"ติดต่อ greetd ไม่ได้ ({e}) · เข้าเครื่องทางสำรองด้วย Ctrl+Alt+F2"
+        try:
+            r = greetd.login(g, username.strip(), password, self._session)
+        except (OSError, greetd.ProtocolError) as e:
+            return f"greetd ตอบผิดปกติ ({e}) · ลองอีกครั้ง หรือใช้ Ctrl+Alt+F2"
+        finally:
+            g.close()
+        if not r.ok:
+            return "\n".join([*r.notes, r.message])
+        # greetd จะเริ่มเซสชันของผู้ใช้หลัง greeter ปิดตัวเอง
+        QTimer.singleShot(0, QCoreApplication.quit)
+        return ""
 
 
 class SignupController(QObject):
@@ -289,7 +320,8 @@ class SkillsController(QObject):
     reminderDue = Signal("QVariantMap")  # noqa: N815
     remindersChanged = Signal()  # noqa: N815
 
-    def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None):
+    def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
+                 run_timer: bool = True):  # fmt: skip
         super().__init__()
         from aipc.skills import actions, manifest, reminders
 
@@ -309,7 +341,8 @@ class SkillsController(QObject):
                 r.fired = True  # รายงานครั้งเดียวว่าพลาด ไม่เตือนซ้ำเมื่อถึงรอบตรวจ
             self._store.save(now)
         self._timer = QTimer(self, interval=self.TICK_MS, timeout=self.tick)
-        self._timer.start()
+        if run_timer:  # หน้า greeter (ยังไม่มีใครเข้าเครื่อง) ไม่มีนัดของใครให้เตือน และไม่เขียนไฟล์
+            self._timer.start()
 
     def _badge(self, skill, reason: str) -> dict:
         return {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}

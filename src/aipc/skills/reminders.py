@@ -22,6 +22,9 @@ from pathlib import Path
 
 VERSION = 1
 CLOCK_SLACK = timedelta(minutes=1)
+# บันทึก "เวลาล่าสุดที่เห็น" ห่างกันอย่างน้อยเท่านี้ · เดิมบันทึกทุกรอบ 30 วิ = เขียน microSD 2,880 ครั้ง/วัน (H4)
+# ค่าที่หยาบลงทำให้ตรวจนาฬิกาถอยหลังไวน้อยลงเท่านั้น ไม่มีทางทำให้เตือนผิด
+SEEN_EVERY = timedelta(minutes=10)
 
 
 def default_path() -> Path:
@@ -160,7 +163,8 @@ def tick(store: ReminderStore, now: datetime) -> Tick:
     due = [r for r in store.items if not r.fired and r.alert_at <= now]
     for r in due:
         r.fired = True
-    if due or not back:
+    stale = store.last_seen is None or now - store.last_seen >= SEEN_EVERY
+    if due or (stale and not back):
         store.save(now)
     return Tick(due, back)
 
