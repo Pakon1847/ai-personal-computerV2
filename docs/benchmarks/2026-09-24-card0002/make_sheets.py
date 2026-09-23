@@ -34,7 +34,7 @@ def shoot(screen: str, page: str, theme: str, scale: float):
     win = engine.rootObjects()[0]
     shot = (f"{screen}/{page}", win.grabWindow(), list(warnings))
     win.close()
-    engine.deleteLater()
+    uiapp.shutdown(engine)
     QCoreApplication.processEvents()
     return shot
 

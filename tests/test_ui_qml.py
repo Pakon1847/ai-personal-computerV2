@@ -80,7 +80,7 @@ class QmlLoadTest(unittest.TestCase):
                         self.assertFalse(win.property("quitKeyEnabled"), "ปิด Ctrl+Alt+Q")
                     for root in engine.rootObjects():
                         root.close()
-                    engine.deleteLater()
+                    uiapp.shutdown(engine)
                     QCoreApplication.processEvents()
 
 
@@ -116,7 +116,7 @@ class ChatInputTest(unittest.TestCase):
             self.assertEqual(chat_input.property("text"), "")
             self.assertEqual(warnings, [])
             win.close()
-            engine.deleteLater()
+            uiapp.shutdown(engine)
 
 
 def find_all(root, name):
@@ -138,7 +138,7 @@ class ShellCardTest(unittest.TestCase):
 
         def close():
             win.close()
-            engine.deleteLater()
+            uiapp.shutdown(engine)
             QCoreApplication.processEvents()
 
         self.addCleanup(close)
