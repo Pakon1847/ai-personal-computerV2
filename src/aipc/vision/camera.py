@@ -36,6 +36,19 @@ def log_path() -> Path:
     return Path(base) / "aipc" / "face-scans.log"
 
 
+def find_camera(root: Path) -> int | None:
+    """เลขของกล้องตัวแรกที่ไม่ใช่โหนดของชิป (เกณฑ์เดียวกับ aipc.doctor) · ไม่มี = None."""
+    from aipc.doctor.hardware import SOC_VIDEO_NODES
+
+    devs = sorted((root / "sys/class/video4linux").glob("video*"),
+                  key=lambda d: int(d.name.removeprefix("video") or 0))  # fmt: skip
+    for dev in devs:
+        name = (dev / "name").read_text().strip() if (dev / "name").exists() else ""
+        if name and not name.startswith(SOC_VIDEO_NODES):
+            return int(dev.name.removeprefix("video"))
+    return None
+
+
 def open_camera(index: int | None = None):
     """เปิดกล้อง USB/CSI ตัวแรกที่ไม่ใช่โหนดของชิป (ใช้ตัวตรวจเดียวกับ aipc.doctor)."""
     import cv2
@@ -43,13 +56,9 @@ def open_camera(index: int | None = None):
     if index is None:
         index = 0
         if sys.platform.startswith("linux"):
-            from aipc.doctor.hardware import SOC_VIDEO_NODES
-
-            for dev in sorted(Path("/sys/class/video4linux").glob("video*")):
-                name = (dev / "name").read_text().strip() if (dev / "name").exists() else ""
-                if name and not name.startswith(SOC_VIDEO_NODES):
-                    index = int(dev.name.removeprefix("video"))
-                    break
+            index = find_camera(Path("/"))
+            if index is None:
+                raise RuntimeError("ไม่พบกล้อง (มีแต่โหนดวิดีโอของชิป) · ต่อกล้อง USB แล้วลองใหม่")
     api = cv2.CAP_V4L2 if sys.platform.startswith("linux") else cv2.CAP_ANY
     cap = cv2.VideoCapture(index, api)
     if not cap.isOpened():

@@ -100,6 +100,21 @@ class CameraFlowTest(unittest.TestCase):
         self.assertIn("อ่าน 4 เฟรม", self.out[0])
         self.assertIn("ไม่พบใบหน้า", self.out[1])
 
+    def test_find_camera_skips_soc_nodes(self):
+        root = self.dir
+        nodes = {"video10": "bcm2835-codec-decode", "video2": "Web Camera: Web Camera",
+                 "video3": "Web Camera: Web Camera"}  # fmt: skip
+        for dev, name in nodes.items():
+            (root / "sys/class/video4linux" / dev).mkdir(parents=True)
+            (root / "sys/class/video4linux" / dev / "name").write_text(name + "\n")
+        self.assertEqual(camera.find_camera(root), 2, "video2 ต้องมาก่อน video10 (เรียงเป็นตัวเลข)")
+
+    def test_find_camera_none_when_only_soc(self):
+        d = self.dir / "sys/class/video4linux/video10"
+        d.mkdir(parents=True)
+        (d / "name").write_text("bcm2835-isp\n")
+        self.assertIsNone(camera.find_camera(self.dir))
+
 
 if __name__ == "__main__":
     unittest.main()
