@@ -34,6 +34,7 @@ Rectangle {
 
     // ---------- แถบบน ----------
     RowLayout {
+        id: topBar
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -46,15 +47,26 @@ Rectangle {
     }
 
     // ---------- กลางจอ ----------
+    // อยู่ระหว่างแถบบนกับแถบล่างเสมอ · ตัวอักษรใหญ่ (สูงสุด 200%) จนยาวเกินจอ → เลื่อนได้ ไม่ทับแถบล่าง
+    PageScroll {
+        id: middle
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: topBar.bottom
+        anchors.bottom: bottomBar.top
+        anchors.bottomMargin: 8
+        contentHeight: Math.max(height, col.implicitHeight)
+
     ColumnLayout {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: 44
+        id: col
+        x: (middle.width - width) / 2
+        width: Math.min(implicitWidth, middle.width - 32)
         spacing: 0
 
         AppText {
             Layout.alignment: Qt.AlignHCenter
-            text: system.clock; size: Theme.px(60); strong: true; oneLine: true
+            // นาฬิกาใหญ่อยู่แล้ว ขยายตามตัวอักษรได้ไม่เกิน 84 px · ที่เหลือให้ช่องพิมพ์ ไม่ต้องเลื่อนหา
+            text: system.clock; size: Math.min(Theme.px(60), 84); strong: true; oneLine: true
         }
         AppText {
             Layout.alignment: Qt.AlignHCenter
@@ -66,7 +78,9 @@ Rectangle {
             id: cam
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 18
-            implicitWidth: 200; implicitHeight: 200; radius: 100
+            // ตัวอักษรใหญ่ → วงเล็กลง เหลือที่ให้ช่องพิมพ์ (ความกว้างจอเท่าเดิม)
+            implicitWidth: Theme.fontScale > 1.5 ? 112 : Theme.fontScale > 1.2 ? 160 : 200
+            implicitHeight: implicitWidth; radius: implicitWidth / 2
             color: Theme.camera
             border.width: 4
             border.color: root.scan === "found" ? Theme.scanFound
@@ -163,10 +177,10 @@ Rectangle {
             Layout.topMargin: 16
             visible: root.typing
             spacing: 8
-            AppField { id: userField; Layout.preferredWidth: 220; placeholder: "ชื่อผู้ใช้"; mono: true }
+            AppField { id: userField; Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5)); placeholder: "ชื่อผู้ใช้"; mono: true }
             AppField {
                 id: pwField
-                Layout.preferredWidth: 220
+                Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5))
                 placeholder: "รหัสผ่าน"; password: true; emphasis: true
                 field.onAccepted: root.submit(userField.text, text)
             }
@@ -193,9 +207,11 @@ Rectangle {
             ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม (เฟส 1)"
         }
     }
+    }
 
     // ---------- แถบล่าง ----------
     RowLayout {
+        id: bottomBar
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -205,7 +221,7 @@ Rectangle {
         spacing: 8
         AppText {
             text: "ใบหน้าช่วยหาบัญชี ส่วนรหัสผ่านคือกุญแจเปิดข้อมูลของคุณ"
-            size: Theme.fontSmall; color: Theme.inkFaint; oneLine: true
+            size: Theme.fontSmall; color: Theme.inkFaint
             Layout.fillWidth: true
         }
         // สมัครจากหน้า login จริงยังสร้างบัญชีจริงไม่ได้ (ต้องใช้สิทธิ์ root · การ์ดแยก) จึงไม่ให้กรอกแล้วหายเงียบ

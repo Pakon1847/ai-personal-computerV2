@@ -107,5 +107,60 @@ class ChatInputTest(unittest.TestCase):
             engine.deleteLater()
 
 
+def find_all(root, name):
+    return [o for o in root.findChildren(QObject) if o.objectName() == name]
+
+
+@unittest.skipIf(uiapp is None, "ไม่มี PySide6")
+class ShellCardTest(unittest.TestCase):
+    """เกณฑ์การ์ด 0002 ข้อ 8: ไฟกล้อง/ไมค์ทุกหน้า และการ์ดนัดถัดไปจาก upcoming จริง."""
+
+    def open_shell(self, page="workspace"):
+        tmp = tempfile.mkdtemp(prefix="aipc-shell-")
+        os.environ["XDG_DATA_HOME"] = tmp  # ไฟล์นัดใหม่เปล่า ๆ ต่อเทสต์ ไม่ปนกับเทสต์อื่น
+        opts = uiapp.Options(screen="shell", page=page, software=True,
+                             settings_path=Path(tmp) / "ui.json")  # fmt: skip
+        app, engine, warnings = uiapp.build(opts)
+        settle()
+        win = engine.rootObjects()[0]
+
+        def close():
+            win.close()
+            engine.deleteLater()
+            QCoreApplication.processEvents()
+
+        self.addCleanup(close)
+        return engine, win, warnings
+
+    def test_camera_and_mic_indicators_on_every_page(self):
+        # H3: ไฟกล้อง/ไมค์ต้องเห็นตลอด ไม่ว่าอยู่หน้าไหนของ Shell
+        for page in uiapp.PAGES:
+            with self.subTest(page=page):
+                _, win, warnings = self.open_shell(page)
+                for name in ("cameraIndicator", "micIndicator"):
+                    found = find_all(win, name)
+                    self.assertEqual(len(found), 1, name)
+                    self.assertTrue(found[0].property("visible"), name)
+                    self.assertTrue(found[0].property("text"), name)
+                self.assertEqual(warnings, [])
+
+    def test_next_reminder_card_empty_then_real(self):
+        engine, win, warnings = self.open_shell()
+        skills = engine.rootContext().contextProperty("skills")
+        what = find_all(win, "nextReminderWhat")[0]
+        when = find_all(win, "nextReminderWhen")[0]
+        self.assertEqual(what.property("text"), "ยังไม่มีนัด")
+        self.assertFalse(when.property("visible"))
+
+        card = skills.handle("เตือนส่งรายงานพรุ่งนี้บ่ายสอง")
+        skills.confirm(card["confirmToken"], True)
+        settle(100)
+        self.assertEqual(what.property("text"), skills.upcoming[0]["what"])
+        self.assertIn("ส่งรายงาน", what.property("text"))
+        self.assertTrue(when.property("visible"))
+        self.assertEqual(when.property("text"), skills.upcoming[0]["when"])
+        self.assertEqual(warnings, [])
+
+
 if __name__ == "__main__":
     unittest.main()

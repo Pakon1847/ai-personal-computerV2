@@ -14,7 +14,8 @@ ColumnLayout {
 
     GridLayout {
         Layout.fillWidth: true
-        columns: 3
+        // ตัวอักษรใหญ่ → 2 คอลัมน์ การ์ดกว้างขึ้น ข้อความไม่ต้องตัด (การ์ด 0002 ข้อ 6)
+        columns: Theme.fontScale > 1.4 ? 2 : 3
         columnSpacing: 12
         rowSpacing: 12
         Repeater {
@@ -22,26 +23,28 @@ ColumnLayout {
             Card {
                 required property var modelData
                 Layout.fillWidth: true
-                Layout.preferredHeight: 112
+                Layout.preferredWidth: 1   // คอลัมน์กว้างเท่ากันไม่ว่าข้อความยาวแค่ไหน
+                Layout.fillHeight: true
+                // สูงตามข้อความจริง · ข้อความรายละเอียดแสดงครบ ไม่ตัดท้ายด้วย … (เดิมตัดที่ 2 บรรทัด)
+                implicitHeight: Math.max(112, cardCol.implicitHeight + 28)
                 radius: Theme.radiusCard
                 ColumnLayout {
-                    anchors.fill: parent
+                    id: cardCol
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
                     anchors.margins: 14
                     spacing: 6
                     RowLayout {
                         Layout.fillWidth: true
-                        AppText { text: parent.parent.parent.modelData.title; strong: true; oneLine: true; Layout.fillWidth: true; elide: Text.ElideRight }
-                        Chip { text: parent.parent.parent.modelData.status; kind: parent.parent.parent.modelData.level }
+                        AppText { text: parent.parent.parent.modelData.title; strong: true; Layout.fillWidth: true }
+                        Chip { Layout.alignment: Qt.AlignTop; text: parent.parent.parent.modelData.status; kind: parent.parent.parent.modelData.level }
                     }
                     AppText {
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
                         text: parent.parent.modelData.detail
                         size: Theme.fontSmall
                         color: Theme.inkMuted
-                        elide: Text.ElideRight
-                        maximumLineCount: 2
-                        verticalAlignment: Text.AlignTop
                     }
                 }
             }

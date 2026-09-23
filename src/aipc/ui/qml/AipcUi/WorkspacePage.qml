@@ -204,6 +204,7 @@ Item {
                         text: skills.reminderWarning; color: Theme.warnInk; size: Theme.fontSmall
                     }
                     AppText {
+                        objectName: "nextReminderWhat"
                         visible: skills.reminderWarning === ""
                         Layout.fillWidth: true
                         text: skills.upcoming.length > 0 ? skills.upcoming[0].what : "ยังไม่มีนัด"
@@ -213,7 +214,7 @@ Item {
                     RowLayout {
                         visible: skills.reminderWarning === ""
                         spacing: 8
-                        Chip { visible: skills.upcoming.length > 0; text: skills.upcoming.length > 0 ? skills.upcoming[0].when : ""; kind: "accent" }
+                        Chip { objectName: "nextReminderWhen"; visible: skills.upcoming.length > 0; text: skills.upcoming.length > 0 ? skills.upcoming[0].when : ""; kind: "accent" }
                         AppText {
                             text: skills.upcoming.length > 1 ? "และอีก " + (skills.upcoming.length - 1) + " นัด"
                                 : skills.upcoming.length === 0 ? "ลองพิมพ์ “เตือน…” ในช่องด้านบน" : ""

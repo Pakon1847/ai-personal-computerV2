@@ -21,7 +21,8 @@ ColumnLayout {
     TextField {
         id: input
         Layout.fillWidth: true
-        implicitHeight: 48
+        // สูงอย่างน้อย 48 และสูงตามตัวอักษรเมื่อขยาย 150–200% ไม่ให้ตัวอักษรชนขอบ (BRIEF 5.7)
+        implicitHeight: Math.max(48, Math.ceil(font.pixelSize * 1.9))
         echoMode: root.password ? TextInput.Password : TextInput.Normal
         font.family: root.mono ? Theme.mono : Theme.family
         font.pixelSize: Theme.px(17)
