@@ -83,6 +83,32 @@ RowLayout {
             }
             Rectangle { Layout.fillWidth: true; height: 1; color: Theme.line }
 
+            // นัดที่พลาดขณะปิดเครื่อง/ไม่ได้เข้าใช้ และคำเตือนเรื่องไฟล์/นาฬิกา (การ์ด 0001, H2)
+            Rectangle {
+                id: notice
+                property bool dismissed: false
+                readonly property string missedText: skills.missed.length === 0 ? ""
+                    : "พลาดการเตือน " + skills.missed.length + " รายการขณะไม่ได้ใช้เครื่อง: "
+                      + skills.missed.map(r => r.what + " (" + r.when + ")").join(" · ")
+                readonly property string message: [missedText, skills.reminderWarning].filter(t => t !== "").join("\n")
+                visible: message !== "" && !dismissed
+                Layout.fillWidth: true
+                Layout.margins: 12
+                Layout.bottomMargin: 0
+                implicitHeight: noticeRow.implicitHeight + 20
+                radius: Theme.radiusCard
+                color: Theme.warnSoft
+                RowLayout {
+                    id: noticeRow
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 10
+                    Icon { path: Icons.alert; color: Theme.warnInk; Layout.alignment: Qt.AlignTop }
+                    AppText { text: notice.message; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
+                    AppButton { text: "รับทราบ"; kind: "secondary"; onClicked: notice.dismissed = true }
+                }
+            }
+
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -93,7 +119,7 @@ RowLayout {
                     anchors.centerIn: parent
                     width: 560
                     title: "ยังไม่มีโมเดลภาษา แต่สกิลที่โค้ดทำงานหลักใช้ได้แล้ว"
-                    detail: "ลองพิมพ์: “เปิดยูทูบ” · “ปรับเสียงสี่สิบ” · “เปิดหน้าตั้งค่า” · “ทำไมเครื่องช้า” — การคุยทั่วไป แปล และจดนัด รอโมเดลในเครื่อง (ADR-007)"
+                    detail: "ลองพิมพ์: “เปิดยูทูบ” · “ปรับเสียงสี่สิบ” · “ทำไมเครื่องช้า” · “เตือนส่งรายงานพรุ่งนี้บ่ายสอง” — การคุยทั่วไปและการแปล รอโมเดลในเครื่อง (ADR-007)"
                 }
 
                 ListView {

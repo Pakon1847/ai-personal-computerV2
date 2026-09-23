@@ -51,4 +51,13 @@ Rectangle {
             }
         }
     }
+
+    // การเตือนนัดหมายลอยอยู่มุมขวาบน เหนือทุกหน้า
+    ReminderToast {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.topMargin: 56
+        anchors.rightMargin: 16
+        z: 10
+    }
 }

@@ -284,16 +284,32 @@ class SkillsController(QObject):
         "camera": "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)",
     }
     LEVEL = {"ok": "ok", "warn": "warn", "danger": "danger", "neutral": "neutral"}
+    TICK_MS = 30_000  # การ์ด 0001 หัวข้อ 7: ตรวจนัดทุก 30 วินาที
 
-    def __init__(self, executor=None, root: Path = Path("/")):
+    reminderDue = Signal("QVariantMap")  # noqa: N815
+    remindersChanged = Signal()  # noqa: N815
+
+    def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None):
         super().__init__()
-        from aipc.skills import actions, manifest
+        from aipc.skills import actions, manifest, reminders
 
         self._skills = manifest.load_builtin()
         self._exec = executor or actions.Executor()
         self._root = root
         self._pending: dict[str, object] = {}
         self._counter = 0
+        self._now = clock or (lambda: datetime.now().astimezone())
+        self._store = reminders.ReminderStore(reminders_path)
+        now = self._now()
+        broken = self._store.broken
+        self._missed = [] if broken else reminders.missed_since_last_session(self._store, now)
+        self._clock_back = reminders.clock_went_back(self._store, now)
+        if self._missed:
+            for r in self._missed:
+                r.fired = True  # รายงานครั้งเดียวว่าพลาด ไม่เตือนซ้ำเมื่อถึงรอบตรวจ
+            self._store.save(now)
+        self._timer = QTimer(self, interval=self.TICK_MS, timeout=self.tick)
+        self._timer.start()
 
     def _badge(self, skill, reason: str) -> dict:
         return {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}
@@ -313,6 +329,76 @@ class SkillsController(QObject):
     @Property(bool, constant=True)
     def simulated(self) -> bool:
         return self._exec.dry_run
+
+    # ---------- นัดหมาย (การ์ดออกแบบ 0001) ----------
+
+    @staticmethod
+    def _when_text(dt) -> str:
+        return f"{thaidate.short_date(dt)} {dt.year + thaidate.BE_OFFSET} · {dt:%H:%M} น."
+
+    def _reminder_dict(self, r) -> dict:
+        return {"id": r.id, "what": r.what, "when": self._when_text(r.when)}
+
+    @Property("QVariantList", notify=remindersChanged)
+    def upcoming(self) -> list:
+        return [self._reminder_dict(r) for r in self._store.upcoming(self._now())]
+
+    @Property("QVariantList", constant=True)
+    def missed(self) -> list:
+        return [self._reminder_dict(r) for r in self._missed]
+
+    @Property(str, constant=True)
+    def reminderWarning(self) -> str:  # noqa: N802
+        if self._store.broken:
+            return "อ่านไฟล์นัดหมายไม่ได้ (ไฟล์และสำเนาเสียทั้งคู่) · ยังไม่ได้เขียนทับ รอคุณตัดสิน"
+        if self._clock_back:
+            return "นาฬิกาเครื่องอาจไม่ถูก (เวลาถอยหลังจากที่เคยเห็น) · การเตือนอาจคลาดเคลื่อน"
+        if self._store.recovered_from_backup:
+            return "ไฟล์นัดหมายเสีย จึงใช้สำเนาล่าสุดแทน · นัดที่เพิ่งเพิ่มอาจหาย"
+        return ""
+
+    @Slot()
+    def tick(self) -> None:
+        from aipc.skills import reminders
+
+        if self._store.broken:
+            return
+        t = reminders.tick(self._store, self._now())
+        for r in t.due:
+            self.reminderDue.emit(self._reminder_dict(r))
+        if t.due:
+            self.remindersChanged.emit()
+
+    def _reminder_card(self, route, text: str) -> dict:
+        from aipc.skills import reminders, when
+
+        card = {
+            "kind": "reminder",
+            "badge": self._badge(route.skill, route.reason),
+            "title": "",
+            "chips": [],
+            "lines": [],
+            "confirmToken": "",
+            "page": "",
+        }
+        if self._store.broken:
+            card["title"] = "จดนัดไม่ได้ตอนนี้"
+            card["lines"] = [self.reminderWarning]
+            return card
+        w = when.parse(text, self._now().replace(tzinfo=None))
+        if w.at is None or not w.confident:
+            card["title"] = "ยังจดนัดนี้ไม่ได้"
+            card["lines"] = [w.problem, "ลองระบุให้ชัด เช่น “พรุ่งนี้ 14:00 ส่งรายงาน”"]
+            return card
+        self._counter += 1
+        token = f"r{self._counter}"
+        self._pending[token] = reminders.Reminder(w.what, reminders.aware(w.at))
+        card["title"] = f"บันทึกนัด “{w.what}” ใช่ไหม"
+        card["chips"] = [{"text": self._when_text(w.at), "kind": "accent"}]
+        card["lines"] = [f"ตีความเอง: {a}" for a in w.assumptions]
+        card["lines"].append("วันที่คำนวณด้วยโค้ด ไม่ใช่ให้ AI เดา · ไม่ถูกให้กด “ไม่ใช่” แล้วพิมพ์ใหม่")
+        card["confirmToken"] = token
+        return card
 
     def _run_plan(self, plan) -> dict:
         out = self._exec.execute(plan)
@@ -361,6 +447,8 @@ class SkillsController(QObject):
             else:
                 card.update(self._run_plan(r.command.plan))
                 card["chips"].append({"text": risk, "kind": "neutral"})
+        elif r.kind == "skill" and r.skill.id == "reminder":
+            return self._reminder_card(r, text)
         elif r.kind == "skill" and r.skill.id == "machine-status":
             card["badge"] = self._badge(r.skill, r.reason)
             d = machine.ask(self._root)
@@ -394,10 +482,23 @@ class SkillsController(QObject):
             "confirmToken": "",
             "page": "",
         }
+        from aipc.skills import reminders
+
         if plan is None:
             card["title"] = "คำสั่งนี้หมดอายุแล้ว"
         elif not yes:
             card["title"] = "ยกเลิกแล้ว ไม่ได้ทำอะไร"
+        elif isinstance(plan, reminders.Reminder):
+            try:
+                self._store.add(plan, self._now())
+            except (OSError, reminders.Unreadable) as e:
+                card["title"] = f"บันทึกไม่สำเร็จ: {e}"
+                return card
+            self.remindersChanged.emit()
+            card["kind"] = "reminder"
+            card["title"] = f"บันทึกแล้ว: {plan.what}"
+            card["chips"] = [{"text": self._when_text(plan.when), "kind": "ok"}]
+            card["lines"] = ["จะเตือนตอนถึงเวลาขณะใช้เครื่องอยู่ · ถ้าปิดเครื่องอยู่ จะแจ้งตอนเข้าใช้ครั้งถัดไป"]
         else:
             card.update(self._run_plan(plan))
         return card

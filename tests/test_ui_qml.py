@@ -11,6 +11,8 @@ import unittest
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+# ไม่ให้เทสต์เขียนนัดหมายลง home จริงของผู้ใช้
+os.environ["XDG_DATA_HOME"] = tempfile.mkdtemp(prefix="aipc-test-")
 
 try:
     from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer

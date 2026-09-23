@@ -10,6 +10,9 @@ Item {
     property bool filled: false
     implicitWidth: 20
     implicitHeight: 20
+    // วาดลง texture ก่อน: ตัวเรนเดอร์แบบ CPU ไม่ตัด Shape ตาม clip ของ ListView ทำให้ไอคอนหลุดกรอบ
+    layer.enabled: true
+    layer.smooth: true
 
     Shape {
         width: 24

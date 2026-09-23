@@ -1,0 +1,98 @@
+import json
+import tempfile
+import unittest
+from datetime import datetime, timedelta
+from pathlib import Path
+
+from aipc.skills import reminders as rm
+
+NOW = datetime(2026, 9, 23, 10, 0).astimezone()
+
+
+class StoreTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp.name) / "aipc" / "reminders.json"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_round_trip(self):
+        s = rm.ReminderStore(self.path)
+        s.add(rm.Reminder("ส่งรายงาน", NOW + timedelta(days=1)), NOW)
+        again = rm.ReminderStore(self.path)
+        self.assertEqual([r.what for r in again.items], ["ส่งรายงาน"])
+        self.assertEqual(again.items[0].when, NOW + timedelta(days=1))
+        self.assertFalse(self.path.with_name("reminders.json.tmp").exists())
+
+    def test_corrupt_file_recovers_from_backup(self):
+        s = rm.ReminderStore(self.path)
+        s.add(rm.Reminder("หนึ่ง", NOW + timedelta(hours=1)), NOW)
+        s.add(rm.Reminder("สอง", NOW + timedelta(hours=2)), NOW)  # .bak = รุ่นที่มี "หนึ่ง"
+        self.path.write_text("{เสีย", encoding="utf-8")
+        again = rm.ReminderStore(self.path)
+        self.assertTrue(again.recovered_from_backup)
+        self.assertEqual([r.what for r in again.items], ["หนึ่ง"])
+
+    def test_both_broken_refuses_to_overwrite(self):
+        self.path.parent.mkdir(parents=True)
+        self.path.write_text("{เสีย", encoding="utf-8")
+        self.path.with_name("reminders.json.bak").write_text("{เสียด้วย", encoding="utf-8")
+        s = rm.ReminderStore(self.path)
+        self.assertTrue(s.broken)
+        with self.assertRaises(rm.Unreadable):
+            s.add(rm.Reminder("ใหม่", NOW), NOW)
+        self.assertEqual(self.path.read_text(encoding="utf-8"), "{เสีย")  # ไม่ถูกเขียนทับ
+
+    def test_file_is_plain_json_with_timezone(self):
+        s = rm.ReminderStore(self.path)
+        s.add(rm.Reminder("ส่งรายงาน", NOW), NOW)
+        data = json.loads(self.path.read_text(encoding="utf-8"))
+        self.assertEqual(data["version"], 1)
+        self.assertIn("+", data["reminders"][0]["when"][19:] + "+")  # มีเขตเวลา
+
+    def test_delete(self):
+        s = rm.ReminderStore(self.path)
+        r = s.add(rm.Reminder("ลบฉัน", NOW), NOW)
+        self.assertTrue(s.delete(r.id, NOW))
+        self.assertEqual(rm.ReminderStore(self.path).items, [])
+
+
+class SchedulerTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.s = rm.ReminderStore(Path(self.tmp.name) / "r.json")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_fires_once_at_time(self):
+        self.s.add(rm.Reminder("กินยา", NOW + timedelta(minutes=30)), NOW)
+        self.assertEqual(rm.tick(self.s, NOW + timedelta(minutes=29)).due, [])
+        due = rm.tick(self.s, NOW + timedelta(minutes=30)).due
+        self.assertEqual([r.what for r in due], ["กินยา"])
+        self.assertEqual(rm.tick(self.s, NOW + timedelta(minutes=31)).due, [])  # ไม่เตือนซ้ำ
+
+    def test_remind_before(self):
+        self.s.add(rm.Reminder("ประชุม", NOW + timedelta(hours=1), remind_before_min=30), NOW)
+        self.assertEqual(len(rm.tick(self.s, NOW + timedelta(minutes=30)).due), 1)
+
+    def test_missed_while_logged_out(self):
+        self.s.add(rm.Reminder("ส่งงาน", NOW + timedelta(hours=1)), NOW)
+        later = NOW + timedelta(hours=5)  # เปิดเครื่องใหม่หลังเลยเวลา
+        self.assertEqual([r.what for r in rm.missed_since_last_session(self.s, later)], ["ส่งงาน"])
+
+    def test_clock_went_back(self):
+        self.s.add(rm.Reminder("อะไรก็ได้", NOW + timedelta(days=1)), NOW)
+        wrong_clock = NOW - timedelta(days=365)  # ไฟดับแล้วนาฬิกากลับไปปีก่อน
+        self.assertTrue(rm.tick(self.s, wrong_clock).clock_went_back)
+        self.assertFalse(rm.tick(self.s, NOW + timedelta(minutes=1)).clock_went_back)
+
+    def test_upcoming_sorted(self):
+        self.s.add(rm.Reminder("สอง", NOW + timedelta(hours=2)), NOW)
+        self.s.add(rm.Reminder("หนึ่ง", NOW + timedelta(hours=1)), NOW)
+        self.assertEqual([r.what for r in self.s.upcoming(NOW)], ["หนึ่ง", "สอง"])
+
+
+if __name__ == "__main__":
+    unittest.main()
