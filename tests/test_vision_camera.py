@@ -115,6 +115,25 @@ class CameraFlowTest(unittest.TestCase):
         (d / "name").write_text("bcm2835-isp\n")
         self.assertIsNone(camera.find_camera(self.dir))
 
+    def test_scan_against_participants_logs_subject(self):
+        folder = self.dir / "participants"
+        for pid, seed in (("P01", 1), ("P02", 2)):
+            v = matching.l2_normalize(np.random.default_rng(seed).normal(size=128))
+            store.FaceStore(folder / f"{pid}.json").save(v, 6, "t", store.Consent("t"))
+        (folder / "P03.json").write_text("{", encoding="utf-8")  # ไฟล์เสีย ต้องข้ามพร้อมบอก
+        templates = camera.load_templates(folder, out=self.out.append)
+        self.assertEqual(sorted(templates), ["P01", "P02"])
+        self.assertIn("P03.json", self.out[0])
+        sc = FakeScanner(scan_result=pipeline.ScanResult("P02", "matched", 0.7, 0.1, 5, 5, {}, 1.0))
+        log = self.dir / "scans.log"
+        with mock.patch.object(camera, "log_path", return_value=log):
+            camera.cmd_scan(FakeCap(50), sc, self.fs, 2, 5, out=self.out.append,
+                            templates=templates, subject="P01")  # fmt: skip
+        self.assertEqual(sorted(sc.templates), ["P01", "P02"])
+        lines = log.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(len(lines), 2)
+        self.assertIn('"subject": "P01"', lines[0])
+
 
 if __name__ == "__main__":
     unittest.main()

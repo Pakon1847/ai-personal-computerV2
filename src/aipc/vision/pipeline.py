@@ -202,15 +202,17 @@ class ScanLog:
     มีแค่: เวลา, ผล, คะแนน, เหตุผล, จำนวนเฟรม, เวลาต่อขั้น · ชื่อบัญชีบันทึกเฉพาะเมื่อจับคู่ได้
     """
 
-    FIELDS = ("time", "result", "account", "score", "second", "reason", "frames_used",
+    FIELDS = ("time", "subject", "result", "account", "score", "second", "reason", "frames_used",
               "frames_seen", "total_ms", "timings_ms")  # fmt: skip
 
     def __init__(self, path: Path):
         self.path = path
 
-    def write(self, res: ScanResult) -> dict:
+    def write(self, res: ScanResult, subject: str | None = None) -> dict:
+        """subject = รหัสผู้ที่กำลังสแกนจริง (เฉพาะตอนทดสอบ เช่น P01) · ใช้หา FRR/จับผิดคน."""
         entry = {
             "time": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "subject": subject,
             "result": "matched" if res.account else "rejected",
             "account": res.account,
             "score": round(res.score, 4),

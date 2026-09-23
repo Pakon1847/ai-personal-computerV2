@@ -113,18 +113,37 @@ def cmd_enroll(cap, scanner, fs: store.FaceStore, seconds: float, ask=input, out
     return 0
 
 
-def cmd_scan(cap, scanner, fs: store.FaceStore, times: int, seconds: float, out=print) -> int:
-    stored = fs.load()
-    if stored is None:
-        out(fs.problem or "ยังไม่ได้ลงทะเบียนใบหน้า · ใช้คำสั่ง enroll ก่อน")
+def load_templates(folder: Path, out=print) -> dict:
+    """แม่แบบทุกคนในโฟลเดอร์ทดสอบ (<รหัส>.json) → {รหัส: เวกเตอร์} · ไฟล์ที่ใช้ไม่ได้ข้ามพร้อมบอก."""
+    templates = {}
+    for p in sorted(folder.glob("*.json")):
+        fs = store.FaceStore(p)
+        s = fs.load()
+        if s is None:
+            out(f"ข้าม {p.name}: {fs.problem}")
+        else:
+            templates[p.stem] = s.vector
+    return templates
+
+
+def cmd_scan(cap, scanner, fs: store.FaceStore, times: int, seconds: float, out=print,
+             templates: dict | None = None, subject: str | None = None) -> int:  # fmt: skip
+    """templates = None → เทียบแม่แบบของตัวเอง (1:1) · มี → เทียบทุกคนในชุดทดสอบ (1:N)."""
+    if templates is None:
+        stored = fs.load()
+        if stored is None:
+            out(fs.problem or "ยังไม่ได้ลงทะเบียนใบหน้า · ใช้คำสั่ง enroll ก่อน")
+            return 1
+        templates = {getpass.getuser(): stored.vector}
+    if not templates:
+        out("ไม่มีแม่แบบให้เทียบ")
         return 1
-    who = getpass.getuser()
     log = pipeline.ScanLog(log_path())
     for i in range(times):
         t0 = time.perf_counter()
-        res = scanner.scan(frames(cap, seconds), {who: stored.vector})
+        res = scanner.scan(frames(cap, seconds), templates)
         wall = (time.perf_counter() - t0) * 1000
-        log.write(res)
+        log.write(res, subject)
         verdict = f"รู้จัก: {res.account}" if res.account else f"ไม่ผ่าน: {res.advice}"
         out(f"[{i + 1}/{times}] {verdict} · คะแนน {res.score:.3f} · {res.frames_used} เฟรม · "
             f"เวลาจริง {wall:.0f} ms")  # fmt: skip
@@ -139,12 +158,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seconds", type=float, default=5.0, help="เวลาสูงสุดต่อครั้ง")
     ap.add_argument("--times", type=int, default=10, help="จำนวนครั้งที่สแกน")
     ap.add_argument("--config", type=Path)
+    # สำหรับแผนทดสอบกับคนจริง (docs/evaluation/face-protocol.md) · ไม่ใช้ในการใช้งานปกติ
+    ap.add_argument("--id", help="enroll: เก็บแม่แบบเป็น <รหัส>.json ในโฟลเดอร์ --against (เช่น P01)")
+    ap.add_argument("--against", type=Path, help="โฟลเดอร์แม่แบบของผู้เข้าร่วมทดสอบ (1:N)")
+    ap.add_argument("--who", help="scan: รหัสผู้ที่กำลังสแกนจริง บันทึกลง log")
     a = ap.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")
 
-    fs = store.FaceStore()
+    if a.id and not a.against:
+        print("--id ต้องใช้คู่กับ --against <โฟลเดอร์ทดสอบ>")
+        return 2
+    fs = store.FaceStore(a.against / f"{a.id}.json") if a.id else store.FaceStore()
     if a.action == "delete":
         print("ลบแม่แบบใบหน้าแล้ว" if fs.delete() else "ไม่มีแม่แบบใบหน้าให้ลบ")
         return 0
@@ -160,7 +186,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_check(cap, scanner, a.seconds)
         if a.action == "enroll":
             return cmd_enroll(cap, scanner, fs, max(a.seconds, 15.0))
-        return cmd_scan(cap, scanner, fs, a.times, a.seconds)
+        templates = load_templates(a.against) if a.against and not a.id else None
+        return cmd_scan(cap, scanner, fs, a.times, a.seconds, templates=templates, subject=a.who)
     finally:
         cap.release()
 
