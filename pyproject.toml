@@ -16,6 +16,9 @@ dev = ["ruff>=0.6"]
 # หน้าจอ: ใช้ PySide6-Essentials (มี Qt Quick/QML ครบ) แทน PySide6 เต็ม เพราะเล็กกว่ามาก
 # ประหยัดพื้นที่บน microSD ของ Pi · ต้องใช้ glibc >= 2.39 บน aarch64 (BRIEF หัวข้อ 2)
 ui = ["PySide6-Essentials>=6.8"]
+# ใบหน้า (การ์ด 0005): OpenCV รุ่น headless (ไม่มี GUI ของตัวเอง เล็กกว่า) รัน YuNet/SFace/PAD ได้ในตัว
+# ไม่ใช้ onnxruntime/FastAPI เพื่อไม่เพิ่ม RAM และพอร์ตบน Pi (H4) · numpy มากับ OpenCV อยู่แล้ว
+vision = ["opencv-python-headless>=4.10", "numpy>=1.26"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
