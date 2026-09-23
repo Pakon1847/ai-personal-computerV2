@@ -11,8 +11,20 @@ import unittest
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-# ไม่ให้เทสต์เขียนนัดหมายลง home จริงของผู้ใช้
-os.environ["XDG_DATA_HOME"] = tempfile.mkdtemp(prefix="aipc-test-")
+_OLD_DATA_HOME = os.environ.get("XDG_DATA_HOME")
+
+
+def setUpModule():
+    # ไม่ให้เทสต์เขียนนัดหมายลง home จริงของผู้ใช้ · ตั้งเฉพาะช่วงเทสต์ไฟล์นี้ แล้วคืนค่าเดิม
+    # (เดิมตั้งตอน import ค้างทั้งโปรเซส → เทสต์ไฟล์อื่นหาโมเดลที่ดาวน์โหลดไว้ไม่เจอ)
+    os.environ["XDG_DATA_HOME"] = tempfile.mkdtemp(prefix="aipc-test-")
+
+
+def tearDownModule():
+    if _OLD_DATA_HOME is None:
+        os.environ.pop("XDG_DATA_HOME", None)
+    else:
+        os.environ["XDG_DATA_HOME"] = _OLD_DATA_HOME
 
 try:
     from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer
