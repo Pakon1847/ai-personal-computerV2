@@ -12,29 +12,29 @@ QtObject {
     readonly property string mono: "IBM Plex Mono"
 
     // --- สี: พื้นและเส้น ---
-    readonly property color bg: dark ? "#121417" : "#F4F3EF"
-    readonly property color surface: dark ? "#1B1E23" : "#FFFFFF"
-    readonly property color surface2: dark ? "#22262C" : "#F9F8F5"
-    readonly property color line: dark ? "#32373E" : "#E2E0D9"
-    readonly property color lineSoft: dark ? "#292D33" : "#EEECE6"
-    readonly property color lineStrong: dark ? "#4A5059" : "#C9C6BD"
+    readonly property color bg: dark ? "#0F1115" : "#F6F7F9"
+    readonly property color surface: dark ? "#171A20" : "#FFFFFF"
+    readonly property color surface2: dark ? "#1F232B" : "#EEF0F4"
+    readonly property color line: dark ? "#2C313A" : "#E3E6EC"
+    readonly property color lineSoft: dark ? "#242830" : "#ECEEF2"
+    readonly property color lineStrong: dark ? "#454C58" : "#C9CDD6"
     // --- ตัวอักษร ---
-    readonly property color ink: dark ? "#ECEAE4" : "#1B1E23"
-    readonly property color inkMuted: dark ? "#B9BDC4" : "#4F5561"
-    readonly property color inkFaint: dark ? "#9CA2AA" : "#646A75"
-    readonly property color inkFill: dark ? "#ECEAE4" : "#1B1E23"
-    readonly property color textOnInk: dark ? "#121417" : "#FFFFFF"
-    // --- สีหลัก (teal) ---
-    readonly property color accent: dark ? "#7FD1CB" : "#0E6B66"
+    readonly property color ink: dark ? "#ECEEF2" : "#15171C"
+    readonly property color inkMuted: dark ? "#B4BAC5" : "#4B5160"
+    readonly property color inkFaint: dark ? "#9AA1AD" : "#636978"
+    readonly property color inkFill: dark ? "#ECEEF2" : "#15171C"
+    readonly property color textOnInk: dark ? "#0F1115" : "#FFFFFF"
+    // --- สีหลัก (คราม) · การ์ด 0002: teal เดิมใกล้สีเขียว "ในเครื่อง/ผ่าน" เกินไป จึงเปลี่ยนเป็นครามที่ไม่ชนสีความหมาย ---
+    readonly property color accent: dark ? "#A5B4FC" : "#4338CA"
     readonly property color accentFill: accent
-    readonly property color textOnAccent: dark ? "#0B2E2C" : "#FFFFFF"
-    readonly property color accentSoft: dark ? "#173634" : "#E3F0EE"
-    readonly property color accentInk: dark ? "#A8E3DE" : "#0B524E"
-    readonly property color bubbleInk: dark ? "#DDF3F0" : "#0B2E2C"
+    readonly property color textOnAccent: dark ? "#1E1B4B" : "#FFFFFF"
+    readonly property color accentSoft: dark ? "#25264A" : "#ECEBFB"
+    readonly property color accentInk: dark ? "#C7D2FE" : "#3730A3"
+    readonly property color bubbleInk: dark ? "#E0E7FF" : "#1E1B4B"
     // --- ความหมาย: เขียว = ในเครื่อง/ผ่าน, ส้ม = ออกนอกเครื่อง/เตือน, แดง = อันตราย ---
-    readonly property color ok: dark ? "#5BBF60" : "#2F7D32"
-    readonly property color okSoft: dark ? "#1B2F1C" : "#E6F2E6"
-    readonly property color okInk: dark ? "#A3DCA6" : "#1F5E22"
+    readonly property color ok: dark ? "#6CCB7E" : "#1F7A3A"
+    readonly property color okSoft: dark ? "#16291B" : "#E4F2E8"
+    readonly property color okInk: dark ? "#A7E0B2" : "#17602D"
     readonly property color warn: dark ? "#F0B45C" : "#8A5300"
     readonly property color warnFill: warn
     readonly property color textOnWarn: dark ? "#2B1A00" : "#FFFFFF"
@@ -46,10 +46,11 @@ QtObject {
     readonly property color dangerSoft: dark ? "#3B1D1A" : "#FBE7E5"
     readonly property color dangerInk: dark ? "#F6B8B0" : "#7A1810"
     // กรอบกล้องเป็นสีเข้มเสมอทั้งสองธีม เพื่อให้เห็นภาพชัด
-    readonly property color camera: "#2A2E34"
+    readonly property color camera: "#1D2027"
     readonly property color cameraText: "#F4F3EF"
     readonly property color scanFound: "#3FB950"
     readonly property color scanUnknown: "#E8A33D"
+    readonly property color scanLine: "#A5B4FC"
 
     // --- ขนาดตัวอักษร (คูณด้วย fontScale ทั้งหมด) · ต่ำสุด 13 ---
     function px(n) { return Math.round(n * fontScale) }
@@ -65,7 +66,7 @@ QtObject {
     readonly property real lineHeight: 1.0
 
     // --- ระยะ มุม และขนาดกดได้ ---
-    readonly property int radiusControl: 8
+    readonly property int radiusControl: 8     // ช่องเล็ก เช่น checkbox · ปุ่มและช่องพิมพ์เป็นทรงแคปซูล (สูง/2)
     readonly property int radiusCard: 12
     readonly property int radiusLarge: 16
     readonly property int touch: 44        // ปุ่มและแถวที่กดได้สูงอย่างน้อย 44

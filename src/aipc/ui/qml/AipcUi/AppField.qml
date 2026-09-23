@@ -27,11 +27,11 @@ ColumnLayout {
         font.pixelSize: Theme.px(17)
         color: Theme.ink
         placeholderTextColor: Theme.inkFaint
-        leftPadding: 14
-        rightPadding: 14
-        Accessible.name: root.label
+        leftPadding: 20
+        rightPadding: 20
+        Accessible.name: root.label !== "" ? root.label : root.placeholder
         background: Rectangle {
-            radius: Theme.radiusControl
+            radius: height / 2
             color: Theme.surface
             border.width: (root.emphasis || input.activeFocus) ? 2 : 1
             border.color: (root.emphasis || input.activeFocus) ? Theme.accent : Theme.lineStrong

@@ -13,7 +13,7 @@ Button {
 
     readonly property color fillColor: ({
         primary: Theme.accentFill, warn: Theme.warnFill, danger: Theme.dangerFill,
-        ink: Theme.inkFill, secondary: Theme.surface, outline: Theme.surface, ghost: "transparent"
+        ink: Theme.inkFill, secondary: Theme.surface2, outline: "transparent", ghost: "transparent"
     })[kind]
     readonly property color textColor: ({
         primary: Theme.textOnAccent, warn: Theme.textOnWarn, danger: Theme.textOnDanger, ink: Theme.textOnInk,
@@ -27,12 +27,14 @@ Button {
     font.pixelSize: Theme.px(15)
     font.weight: (kind === "secondary" || kind === "ghost") ? Font.Normal : Font.DemiBold
     hoverEnabled: true
+    // ปุ่มที่ยังใช้ไม่ได้ต้องดูต่างจากปุ่มที่ใช้ได้ชัด ๆ ทั้งพื้นและตัวอักษร (H5)
+    opacity: enabled ? 1.0 : 0.45
 
     background: Rectangle {
-        radius: Theme.radiusControl
+        radius: height / 2   // ทรงแคปซูล (การ์ด 0002)
         color: control.fillColor
-        opacity: control.enabled ? (control.down ? 0.85 : 1.0) : 0.45
-        border.width: control.kind === "outline" ? 2 : (control.kind === "secondary" ? 1 : 0)
+        opacity: control.down ? 0.85 : 1.0
+        border.width: control.kind === "outline" ? 2 : 0
         border.color: control.kind === "outline" ? Theme.accent : Theme.lineStrong
         // กรอบ focus ชัด ๆ เมื่อใช้คีย์บอร์ด (BRIEF 5.7: ใช้คีย์บอร์ดได้ทั้งระบบ เห็นตำแหน่ง focus ชัด)
         Rectangle {
