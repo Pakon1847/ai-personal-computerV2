@@ -20,7 +20,8 @@ Button {
         secondary: Theme.ink, outline: Theme.accent, ghost: Theme.accent
     })[kind]
 
-    implicitHeight: Theme.touch
+    // สูงอย่างน้อย 44 (กดง่าย) และสูงตามตัวอักษรเมื่อขยาย 150–200% ไม่ให้ข้อความล้นปุ่ม
+    implicitHeight: Math.max(Theme.touch, (contentItem ? contentItem.implicitHeight : 0) + 14)
     leftPadding: text === "" ? 12 : 18
     rightPadding: text === "" ? 12 : 18
     font.family: Theme.family

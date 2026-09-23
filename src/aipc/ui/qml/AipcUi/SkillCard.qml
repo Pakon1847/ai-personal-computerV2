@@ -11,10 +11,8 @@ Rectangle {
 
     readonly property bool hasBadge: info.badge !== undefined && info.badge.name !== undefined
     implicitHeight: col.implicitHeight + 28
-    radius: Theme.radiusCard
-    color: Theme.surface2
-    border.width: 1
-    border.color: Theme.line
+    radius: Theme.radiusLarge
+    color: Theme.surface
 
     ColumnLayout {
         id: col

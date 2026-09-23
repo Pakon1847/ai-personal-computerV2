@@ -1,63 +1,63 @@
-// แถบนำทางซ้าย · หกหน้าหลักตาม BRIEF 5.7 ข้อ 2 + กล่องผู้ใช้ด้านล่าง
+// แถบนำทางแบบราง กว้าง 76 px (การ์ด 0002) · หกหน้าหลักตาม BRIEF 5.7 ข้อ 2 · ผู้ใช้ ปิดบัง ออก อยู่ล่างสุด
+// เดิมกว้าง 232 px + รายการบทสนทนา 264 px กินจอ 39% · รางนี้คืนพื้นที่ให้เนื้อหา (BRIEF 5.7 ข้อ 5)
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 Rectangle {
-    implicitWidth: 232
+    // กว้าง 76 ที่ 100% และกว้างขึ้นตามขนาดตัวอักษร (ไม่เกิน 1.8 เท่า) ป้ายใต้ไอคอนจะได้ไม่ถูกตัดจนอ่านไม่ออก
+    implicitWidth: Math.round(76 * Math.min(Theme.fontScale, 1.8))
     color: Theme.surface
-    Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Theme.line }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 12
         anchors.topMargin: 16
+        anchors.bottomMargin: 16
         spacing: 4
 
-        BrandMark { Layout.leftMargin: 8; Layout.bottomMargin: 12 }
-        NavItem { text: "ผู้ช่วย AI"; iconPath: Icons.chat; pageName: "workspace" }
-        NavItem { text: "ไฟล์ของฉัน"; iconPath: Icons.folder; pageName: "files" }
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: 14
+            Layout.preferredWidth: 40; Layout.preferredHeight: 40; radius: 12
+            color: Theme.accentFill
+            Accessible.name: "AI PC"
+            AppText { anchors.centerIn: parent; text: "AI"; strong: true; oneLine: true; color: Theme.textOnAccent; size: Theme.px(15) }
+        }
+        NavItem { text: "ผู้ช่วย AI"; shortText: "ผู้ช่วย"; iconPath: Icons.chat; pageName: "workspace" }
+        NavItem { text: "ไฟล์ของฉัน"; shortText: "ไฟล์"; iconPath: Icons.folder; pageName: "files" }
         NavItem { text: "Skill"; iconPath: Icons.sparkle; pageName: "skills" }
-        NavItem { text: "ความเป็นส่วนตัว"; iconPath: Icons.shield; pageName: "privacy" }
-        NavItem { text: "สุขภาพเครื่อง"; iconPath: Icons.activity; pageName: "health" }
+        NavItem { text: "ความเป็นส่วนตัว"; shortText: "ส่วนตัว"; iconPath: Icons.shield; pageName: "privacy" }
+        NavItem { text: "สุขภาพเครื่อง"; shortText: "เครื่อง"; iconPath: Icons.activity; pageName: "health" }
         NavItem { text: "ตั้งค่า"; iconPath: Icons.sliders; pageName: "settings" }
         Item { Layout.fillHeight: true }
 
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: userCol.implicitHeight + 24
-            radius: Theme.radiusCard
-            color: Theme.bg
-            ColumnLayout {
-                id: userCol
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
-                RowLayout {
-                    spacing: 10
-                    Avatar { name: system.userName; size: 36 }
-                    ColumnLayout {
-                        spacing: 0
-                        AppText { text: system.userName; strong: true; oneLine: true }
-                        AppText { text: AppState.devMode ? "โหมดพัฒนา" : "ผู้ใช้ของเครื่องนี้"; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true }
-                    }
-                }
-                RowLayout {
-                    spacing: 6
-                    AppButton {
-                        Layout.fillWidth: true
-                        text: "ปิดบัง"; kind: "secondary"; iconPath: Icons.eyeOff
-                        enabled: false
-                        ToolTip.visible: hovered
-                        ToolTip.text: "ยังไม่พร้อม: ตัวปิดบังใช้ ext-session-lock (เฟส 2)"
-                    }
-                    AppButton {
-                        Layout.fillWidth: true
-                        text: "ออก"; kind: "secondary"; iconPath: Icons.logout
-                        onClicked: AppState.go("login")
-                    }
-                }
-            }
+        AppButton {
+            Layout.alignment: Qt.AlignHCenter
+            kind: "ghost"; iconPath: Icons.eyeOff
+            enabled: false
+            Accessible.name: "ปิดบังหน้าจอ"
+            ToolTip.visible: hovered
+            ToolTip.text: "ปิดบังหน้าจอ · ยังไม่พร้อม: ใช้ ext-session-lock (เฟส 2)"
+        }
+        AppButton {
+            objectName: "logoutButton"
+            Layout.alignment: Qt.AlignHCenter
+            kind: "ghost"; iconPath: Icons.logout
+            Accessible.name: "ออกจากระบบ"
+            ToolTip.visible: hovered
+            ToolTip.text: "ออกจากระบบ"
+            onClicked: AppState.go("login")
+        }
+        Avatar {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 6
+            name: system.userName
+            size: 40
+            Layout.preferredWidth: 40
+            Layout.preferredHeight: 40
+            HoverHandler { id: who }
+            ToolTip.visible: who.hovered
+            ToolTip.text: system.userName + (AppState.devMode ? " · โหมดพัฒนา" : "")
         }
     }
 }

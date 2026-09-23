@@ -42,6 +42,18 @@ def clock(dt: datetime) -> str:
     return dt.strftime("%H:%M")
 
 
+def greeting(dt: datetime) -> str:
+    """คำทักตามช่วงเวลา: เช้า 05–11 · บ่าย 12–16 · เย็น 17–19 · ค่ำ 20–04."""
+    h = dt.hour
+    if 5 <= h < 12:
+        return "สวัสดีตอนเช้า"
+    if 12 <= h < 17:
+        return "สวัสดีตอนบ่าย"
+    if 17 <= h < 20:
+        return "สวัสดีตอนเย็น"
+    return "สวัสดีตอนค่ำ"
+
+
 def long_date(dt: datetime) -> str:
     """เช่น 'วันพุธที่ 23 กันยายน 2569'."""
     return f"วัน{DAYS[dt.weekday()]}ที่ {dt.day} {MONTHS[dt.month - 1]} {dt.year + BE_OFFSET}"

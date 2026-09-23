@@ -19,6 +19,7 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 from aipc.accounts import validation
 from aipc.bench import machine
 from aipc.doctor import hardware
+from aipc.skills import machine as skill_machine
 from aipc.ui import files, settings, thaidate
 
 
@@ -73,6 +74,7 @@ class SystemStatus(QObject):
         self._temp: float | None = None
         self._free_gb: float | None = None
         self._camera = False
+        self._network: bool | None = None
         self._clock = QTimer(self, interval=1000, timeout=self._tick)
         self._clock.start()
         self._probe = QTimer(self, interval=10_000, timeout=self.refresh)
@@ -86,6 +88,7 @@ class SystemStatus(QObject):
     @Slot()
     def refresh(self) -> None:
         self._temp = machine.cpu_temp_c(self._root)
+        self._network = skill_machine.has_default_route(self._root)
         try:
             self._free_gb = shutil.disk_usage(Path.home()).free / 1e9
         except OSError:
@@ -112,6 +115,19 @@ class SystemStatus(QObject):
     @Property(str, notify=changed)
     def longDate(self) -> str:  # noqa: N802
         return thaidate.long_date(self._now)
+
+    @Property(str, notify=changed)
+    def greeting(self) -> str:
+        return thaidate.greeting(self._now)
+
+    @Property(str, notify=changed)
+    def networkState(self) -> str:  # noqa: N802
+        """on = มีเส้นทางออกนอกเครื่อง · off = ไม่ได้ต่อ · unknown = อ่านไม่ได้ (ไม่เดา)."""
+        return {True: "on", False: "off"}.get(self._network, "unknown")
+
+    @Property(int, notify=healthChanged)
+    def healthIssues(self) -> int:  # noqa: N802
+        return sum(1 for c in self._checks if c["level"] in ("warn", "danger"))
 
     @Property(str, notify=changed)
     def tempText(self) -> str:  # noqa: N802

@@ -1,44 +1,41 @@
 // แถบสถานะด้านบน (BRIEF 5.7 ข้อ 3) · ทุกค่ามาจากเครื่องจริงผ่าน system (Python)
-// ค่าที่ยังไม่มีระบบรองรับ (โมเดล ไมค์ backup) บอกว่า "ยังไม่เชื่อมต่อ" ไม่แต่งตัวเลขขึ้นมา
+// ต้องมีครบ: เครือข่าย · โมเดลและงานเบื้องหลัง · ไฟกล้อง/ไมค์ · พื้นที่ · ความร้อน · backup
+// ค่าที่ยังไม่มีระบบรองรับ (โมเดล ไมค์ backup) บอกว่า "ยังไม่…" ไม่แต่งตัวเลขขึ้นมา (H5)
+// ตัวอักษรใหญ่ (>125%) ป้ายรองเหลือแค่ไอคอน+tooltip · **กล้องกับไมค์แสดงข้อความเต็มเสมอ** (H3)
 import QtQuick
 import QtQuick.Layouts
 
-Rectangle {
-    implicitHeight: 44
-    color: Theme.surface
-    Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: Theme.line }
+Item {
+    id: bar
+    implicitHeight: Math.max(56, row.implicitHeight + 16)
+    readonly property bool tight: Theme.fontScale > 1.25
 
     RowLayout {
+        id: row
         anchors.fill: parent
-        anchors.leftMargin: 16
+        anchors.leftMargin: 24
         anchors.rightMargin: 16
-        spacing: 8
+        spacing: 6
 
-        AppText { text: system.clock + " · " + system.shortDate; strong: true; oneLine: true; Layout.preferredWidth: 150 }
-        Chip { text: "โมเดล: ยังไม่เชื่อมต่อ"; iconPath: Icons.cpu }
-        Chip { text: "งานเบื้องหลัง: ไม่มี" }
+        AppText { text: system.clock + " · " + system.shortDate; strong: true; oneLine: true }
         Item { Layout.fillWidth: true }
         Chip {
-            text: system.cameraPresent ? "พบกล้อง" : "ไม่พบกล้อง"
+            objectName: "networkIndicator"
+            text: ({ on: "เครือข่าย: ต่ออยู่", off: "ออฟไลน์", unknown: "เครือข่าย: ไม่รู้" })[system.networkState]
+            kind: system.networkState === "off" ? "warn" : "neutral"
+            iconPath: Icons.globe
+            compact: bar.tight
+        }
+        Chip {
+            objectName: "cameraIndicator"
+            text: system.cameraPresent ? "กล้องพร้อม · ไม่ได้ใช้" : "ไม่พบกล้อง"
             iconPath: system.cameraPresent ? Icons.camera : Icons.cameraOff
-            kind: "neutral"
         }
-        Chip { text: "ไมค์ปิด"; iconPath: Icons.mic }
-        Rectangle { width: 1; height: 20; color: Theme.line }
-        RowLayout {
-            spacing: 6
-            Icon { path: Icons.hdd; color: Theme.inkMuted; width: 16; height: 16 }
-            AppText { text: system.storageText; color: Theme.inkMuted; size: Theme.fontSmall; oneLine: true }
-        }
-        RowLayout {
-            spacing: 6
-            Icon { path: Icons.thermo; color: Theme.inkMuted; width: 16; height: 16 }
-            AppText { text: system.tempText; color: Theme.inkMuted; size: Theme.fontSmall; oneLine: true }
-        }
-        RowLayout {
-            spacing: 6
-            Icon { path: Icons.archive; color: Theme.inkMuted; width: 16; height: 16 }
-            AppText { text: "สำรอง: ยังไม่ตั้งค่า"; color: Theme.inkMuted; size: Theme.fontSmall; oneLine: true }
-        }
+        Chip { objectName: "micIndicator"; text: "ไมค์ปิด"; iconPath: Icons.mic }
+        Chip { text: "โมเดล: ยังไม่เชื่อมต่อ"; iconPath: Icons.cpu; kind: "warn"; compact: bar.tight }
+        Chip { text: "งาน: ไม่มี"; iconPath: Icons.activity; compact: bar.tight; Accessible.name: "งานเบื้องหลัง: ไม่มี" }
+        Chip { text: system.storageText; iconPath: Icons.hdd; compact: bar.tight }
+        Chip { text: system.tempText; iconPath: Icons.thermo; compact: bar.tight; Accessible.name: "อุณหภูมิ " + system.tempText }
+        Chip { text: "สำรอง: ยังไม่ตั้ง"; iconPath: Icons.archive; compact: bar.tight; Accessible.name: "สำรองข้อมูล: ยังไม่ตั้งค่า" }
     }
 }

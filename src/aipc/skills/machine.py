@@ -54,6 +54,24 @@ def mem_available_mb(root: Path = Path("/")) -> int | None:
     return None
 
 
+def has_default_route(root: Path = Path("/")) -> bool | None:
+    """มีเส้นทางออกนอกเครื่อง (default route) ไหม · อ่านตาราง route เท่านั้น ไม่ส่งข้อมูลออกไปไหน (H3).
+
+    True = ต่อเครือข่ายอยู่ (ไม่ได้แปลว่าถึงอินเทอร์เน็ตแน่ ๆ) · False = ไม่ได้ต่อ · None = อ่านไม่ได้
+    """
+    try:
+        lines = (root / "proc/net/route").read_text(encoding="utf-8").splitlines()[1:]
+    except OSError:
+        return None
+    for line in lines:
+        cols = line.split()
+        # คอลัมน์: Iface Destination Gateway Flags ...
+        # Destination 00000000 = default · Flags bit 1 = UP
+        if len(cols) > 3 and cols[1] == "00000000" and int(cols[3], 16) & 1:
+            return True
+    return False
+
+
 def diagnose(checks: list[hw.Check], temp_c: float | None, avail_mb: int | None) -> Diagnosis:
     """ตัดสินจากค่าที่ได้รับเท่านั้น · แยกออกจากการอ่านค่า เพื่อเทสต์ด้วยสถานะจำลองได้ครบทุกแบบ."""
     by_id = {c.id: c for c in checks}

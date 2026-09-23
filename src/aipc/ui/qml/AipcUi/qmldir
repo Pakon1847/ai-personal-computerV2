@@ -30,3 +30,4 @@ ShellScreen 1.0 ShellScreen.qml
 SkillCard 1.0 SkillCard.qml
 SkillsPage 1.0 SkillsPage.qml
 ReminderToast 1.0 ReminderToast.qml
+PageScroll 1.0 PageScroll.qml
