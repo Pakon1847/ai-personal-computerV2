@@ -12,6 +12,7 @@
 | [`docs/BRIEF.md`](docs/BRIEF.md) | ระบบต้องทำอะไร (ความต้องการ — ไม่มีสถานะ) |
 | [`docs/STATUS.md`](docs/STATUS.md) | **ตอนนี้อะไรทำได้แล้วแค่ไหน พร้อมหลักฐาน** (ที่เดียว) |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | เฟสและเกณฑ์ออกจากเฟส |
+| [`docs/SKILLS.md`](docs/SKILLS.md) | Skill ชุดแรก 6 ตัว: ทำงานยังไง และเกณฑ์ผ่าน |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | สิ่งที่ *มีอยู่จริง* ตอนนี้ต่อกันยังไง |
 | [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) | ป้องกันภัยอะไร ไม่ป้องกันอะไร (T1–T9) |
 | [`docs/adr/`](docs/adr/) | การตัดสินใจทีละเรื่อง |
