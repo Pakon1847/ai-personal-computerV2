@@ -28,6 +28,8 @@ docs/benchmarks/**/*.wav
 # ข้อยกเว้นที่ตั้งใจเก็บ (ไม่มีภาพ/เสียงของคน):
 # โมเดลเล็กที่ไลเซนส์อนุญาตให้แจกต่อ + ที่มา/ไลเซนส์ (การ์ด 0005, models/NOTICE.md) · SFace 37 MB ยังไม่เข้า git
 !src/aipc/vision/models/
-!src/aipc/vision/models/*.onnx
+!src/aipc/vision/models/face_detection_yunet_2023mar.onnx
+!src/aipc/vision/models/2.7_80x80_MiniFASNetV2.onnx
+!src/aipc/vision/models/4_0_0_80x80_MiniFASNetV1SE.onnx
 # ภาพหน้าจอ UI เป็นหลักฐานการ์ด 0002 (ไม่มีใบหน้า)
 !docs/benchmarks/2026-09-24-card0002/*.png
