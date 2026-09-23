@@ -60,6 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.screenshot:
         uiapp.screenshot(engine, a.screenshot)
     code = app.exec()
+    uiapp.shutdown(engine)
     for w in warnings:
         print("QML:", w, file=sys.stderr)
     return code

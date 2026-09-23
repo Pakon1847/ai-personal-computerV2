@@ -104,6 +104,20 @@ def build(opts: Options, argv: list[str] | None = None):
     return app, engine, warnings
 
 
+def shutdown(engine) -> None:
+    """ปิดตามลำดับ: ลบ engine (และหน้าจอ QML ทั้งหมดที่เป็นลูกของมัน) ก่อน แล้วค่อยปล่อย backend.
+
+    ถ้าปล่อยให้ Python เก็บกวาดเอง ลำดับไม่แน่นอน · บน Pi backend ถูกทำลายก่อน หน้าจอที่ยังค้าง
+    อ่านค่าไม่ได้ → TypeError "... of null" หลายสิบบรรทัดทุกครั้งที่ปิด (บนวินโดวส์ไม่เกิด)
+    """
+    import shiboken6
+
+    backends = getattr(engine, "_backends", {})
+    if shiboken6.isValid(engine):
+        shiboken6.delete(engine)
+    backends.clear()
+
+
 def screenshot(engine, path: Path, delay_ms: int = 600) -> None:
     """ถ่ายภาพหน้าต่างแล้วปิดแอป · ใช้ทำภาพประกอบเล่มและตรวจหน้าตาโดยไม่ต้องมีจอ."""
 
