@@ -18,7 +18,13 @@ log() {
   logger -t aipc-session -- "$*" 2>/dev/null || true
 }
 # labwc ตั้ง LABWC_PID ให้โปรแกรมที่มันเปิด · ไม่มีค่า (เช่นในเทสต์) = ถือว่ายังอยู่
-labwc_alive() { [ -z "${LABWC_PID:-}" ] || kill -0 "$LABWC_PID" 2>/dev/null; }
+# โปรเซสที่จบแล้วแต่ยังไม่ถูกเก็บ (zombie, สถานะ Z) kill -0 ยังผ่าน → ต้องดูสถานะด้วย
+labwc_alive() {
+  [ -z "${LABWC_PID:-}" ] && return 0
+  local st
+  st="$(ps -o stat= -p "$LABWC_PID" 2>/dev/null)" || return 1
+  [ -n "$st" ] && [ "${st:0:1}" != "Z" ]
+}
 
 recent=""   # เวลาที่ล่มในช่วง WINDOW วินาทีล่าสุด คั่นด้วยช่องว่าง
 while labwc_alive; do
