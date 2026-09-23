@@ -14,3 +14,6 @@ NotReady 1.0 NotReady.qml
 BrandMark 1.0 BrandMark.qml
 LoginScreen 1.0 LoginScreen.qml
 FaceRing 1.0 FaceRing.qml
+SignupSteps 1.0 SignupSteps.qml
+SignupFlow 1.0 SignupFlow.qml
+AppCheck 1.0 AppCheck.qml

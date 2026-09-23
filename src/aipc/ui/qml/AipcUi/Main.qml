@@ -38,6 +38,6 @@ ApplicationWindow {
     }
 
     Component { id: loginPage; LoginScreen {} }
-    Component { id: signupPage; LoginScreen {} }
+    Component { id: signupPage; SignupFlow {} }
     Component { id: shellPage; LoginScreen {} }
 }

@@ -59,7 +59,10 @@ QtObject {
     readonly property int fontHeading: px(20)
     readonly property int fontTitle: px(28)
     readonly property int fontDisplay: px(36)
-    readonly property real lineHeight: 1.4   // กันสระบน/ล่างของภาษาไทยถูกตัด (BRIEF 5.7 ข้อ 4)
+    // BRIEF 5.7 ข้อ 4 ขอระยะบรรทัด >= 1.4 เท่าของขนาดตัวอักษร กันสระบน/ล่างถูกตัด
+    // วัดแล้ว IBM Plex Sans Thai มีระยะบรรทัดของตัวเอง 1.62 เท่า (lineSpacing 26 px ที่ 16 px)
+    // Qt คูณจากค่านั้น จึงใช้ 1.0 = ได้ 1.62 เท่าอยู่แล้ว · ถ้าใส่ 1.4 จะกลายเป็น 2.3 เท่าและล้นจอ
+    readonly property real lineHeight: 1.0
 
     // --- ระยะ มุม และขนาดกดได้ ---
     readonly property int radiusControl: 8

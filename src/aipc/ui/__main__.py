@@ -26,6 +26,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--theme", choices=("light", "dark"))
     p.add_argument("--dev", action="store_true")
     p.add_argument("--demo-scan", choices=("found", "scanning", "unknown", "manual"))
+    p.add_argument("--signup-step", type=int, default=0, help="0–5 เปิดหน้าสมัครที่ขั้นนี้")
     p.add_argument("--screenshot", type=Path)
     p.add_argument("--software", action="store_true")
     a = p.parse_args(argv)
@@ -33,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.screenshot and "QT_QPA_PLATFORM" not in os.environ:
         os.environ["QT_QPA_PLATFORM"] = "offscreen"  # ถ่ายภาพได้โดยไม่เปิดหน้าต่างจริง
     opts = uiapp.Options(
-        a.screen, a.page, a.theme, a.dev, a.demo_scan, a.software or bool(a.screenshot)
+        a.screen, a.page, a.theme, a.dev, a.demo_scan, a.signup_step, a.software or bool(a.screenshot)
     )
     app, engine, warnings = uiapp.build(opts, sys.argv[:1])
     if not engine.rootObjects():

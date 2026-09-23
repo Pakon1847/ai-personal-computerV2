@@ -25,6 +25,8 @@ CASES = [
     {"screen": "login", "demo_scan": "found"},
     {"screen": "login", "demo_scan": "unknown"},
     {"screen": "login", "demo_scan": "manual", "theme": "dark"},
+    *({"screen": "signup", "signup_step": n, "dev": True} for n in range(6)),
+    {"screen": "signup", "signup_step": 3, "theme": "dark"},
 ]
 
 

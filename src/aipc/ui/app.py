@@ -28,6 +28,7 @@ class Options:
     theme: str | None = None
     dev: bool = False
     demo_scan: str | None = None
+    signup_step: int = 0  # เปิดหน้าสมัครที่ขั้นนี้เลย (ใช้ถ่ายภาพ/ทดสอบ)
     software: bool = False  # วาดด้วย CPU (ใช้ตอนเทสต์ และเครื่องที่ไม่มี GPU)
     settings_path: Path | None = None
 
@@ -72,6 +73,7 @@ def build(opts: Options, argv: list[str] | None = None):
         ctx.setContextProperty(name, obj)
     ctx.setContextProperty("startScreen", opts.screen if opts.screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
+    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 5)))
     ctx.setContextProperty("devMode", opts.dev or opts.demo_scan is not None)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))
