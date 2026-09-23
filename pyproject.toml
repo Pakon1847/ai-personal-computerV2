@@ -21,7 +21,7 @@ ui = ["PySide6-Essentials>=6.8"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-aipc = ["ui/qml/AipcUi/*", "ui/fonts/*"]
+aipc = ["ui/qml/AipcUi/*", "ui/fonts/*", "skills/builtin/*.json"]
 
 [tool.ruff]
 line-length = 100
