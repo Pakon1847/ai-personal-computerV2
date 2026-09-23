@@ -48,7 +48,8 @@ SFACE = ModelFile(
     "face_recognition_sface/face_recognition_sface_2021dec.onnx",
 )
 
-# รุ่น int8 (quantized) ของ SFace จาก OpenCV Zoo · เล็กกว่า 4 เท่า · ทดลองว่าเร็วขึ้นบน Pi แค่ไหน (การ์ด 0005 ข้อ 8)
+# รุ่น int8 (quantized) ของ SFace จาก OpenCV Zoo · เล็กกว่า 4 เท่า
+# ทดลองว่าเร็วขึ้นบน Pi แค่ไหน (การ์ด 0005 ข้อ 8)
 # embedding คนละแบบกับ fp32 → แม่แบบที่ลงทะเบียนด้วยรุ่นหนึ่งใช้กับอีกรุ่นไม่ได้ (store ตรวจ sha256 ให้)
 SFACE_INT8 = ModelFile(
     "face_recognition_sface_2021dec_int8.onnx",

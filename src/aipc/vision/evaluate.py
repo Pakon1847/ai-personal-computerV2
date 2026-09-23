@@ -151,6 +151,10 @@ def run_pairs(a, cfg, det, emb) -> dict:
     }
 
 
+def model_hashes(sface: str) -> dict:
+    return {m.name: m.sha256 for m in (models.YUNET, models.SFACE_VARIANTS[sface])}
+
+
 def machine_text(cv2) -> str:
     return f"{sys.platform} · Python {sys.version.split()[0]} · OpenCV {cv2.__version__}"
 
@@ -244,7 +248,7 @@ def main(argv: list[str] | None = None) -> int:
         res = {"dataset": a.name or a.folder.name, "commit": commit,
                "date": datetime.now().astimezone().isoformat(timespec="seconds"),
                "machine": machine_text(cv2),
-               "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE_VARIANTS[a.sface])},
+               "models_sha256": model_hashes(a.sface),
                **run_pairs(a, cfg, det, emb)}  # fmt: skip
         text = json.dumps(res, ensure_ascii=False, indent=2)
         (a.out / "metrics.json").write_text(text + "\n", encoding="utf-8", newline="\n")
@@ -301,7 +305,7 @@ def main(argv: list[str] | None = None) -> int:
         "date": datetime.now().astimezone().isoformat(timespec="seconds"),
         "commit": commit,
         "machine": machine_text(cv2),
-        "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE_VARIANTS[a.sface])},
+        "models_sha256": model_hashes(a.sface),
         "people": len(ids), "images": total, "images_used": len(files),
         "failure_to_acquire": round(no_face / total, 4) if total else None,
         "quality_gate_pass_rate": round(gate_pass / len(files), 4) if files else None,
