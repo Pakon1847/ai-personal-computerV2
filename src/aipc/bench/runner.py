@@ -17,7 +17,7 @@ import json
 import subprocess
 import time
 from collections.abc import Callable
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from aipc.bench import machine
@@ -40,6 +40,8 @@ class RunRecord:
     temp_before_c: float | None
     temp_after_c: float | None
     throttled_after: int | None
+    # ค่าที่งานรายงานเอง นอกจากเวลา เช่น tok/s ของ llama-bench · งานที่ไม่รายงานอะไรก็ว่างไว้
+    metrics: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass
@@ -67,8 +69,11 @@ def throttled_during(before: int | None, after: int | None) -> bool:
     return bool(after & SINCE_BOOT_MASK & ~old)
 
 
+Task = Callable[[], "dict[str, float] | None"]
+
+
 def measure(
-    task: Callable[[], None],
+    task: Task,
     *,
     warmup: int = MIN_WARMUP,
     runs: int = MIN_RUNS,
@@ -83,7 +88,7 @@ def measure(
     for i in range(warmup + runs):
         temp_before = s.temp()
         start = s.clock()
-        task()
+        metrics = task() or {}
         elapsed = s.clock() - start
         records.append(
             RunRecord(
@@ -93,19 +98,26 @@ def measure(
                 temp_before_c=temp_before,
                 temp_after_c=s.temp(),
                 throttled_after=s.throttled(),
+                metrics=dict(metrics),
             )
         )
     return records
 
 
-def command_task(args: list[str]) -> Callable[[], None]:
+def command_task(args: list[str], parse: Callable[[str], dict[str, float]] | None = None) -> Task:
     """ทำให้คำสั่งภายนอก (เช่น llama-bench) กลายเป็นงานที่ measure() จับเวลาได้.
 
+    parse = ฟังก์ชันแปลงข้อความที่โปรแกรมพิมพ์ออกมาเป็นตัวเลข (เช่น tok/s)
+    ไม่ใส่ = วัดแค่เวลา และทิ้งข้อความที่พิมพ์ออกมา
     คำสั่งล้ม → หยุดทั้งชุด เพราะเวลาของคำสั่งที่ล้มไม่ใช่เวลาของงานที่ตั้งใจวัด
     """
 
-    def task() -> None:
-        subprocess.run(args, check=True, stdout=subprocess.DEVNULL)
+    def task() -> dict[str, float] | None:
+        if parse is None:
+            subprocess.run(args, check=True, stdout=subprocess.DEVNULL)
+            return None
+        done = subprocess.run(args, check=True, capture_output=True, text=True)
+        return parse(done.stdout)
 
     return task
 
@@ -175,15 +187,24 @@ def write_report(
         if p.exists():
             raise FileExistsError(f"{p} มีอยู่แล้ว — ผลเก่าคือหลักฐาน ห้ามเขียนทับ")
 
-    measured = [r.seconds for r in records if r.phase == "measured"]
-    summary = summarize(measured)
+    measured = [r for r in records if r.phase == "measured"]
+    summary = summarize([r.seconds for r in measured])
+    metric_names = sorted({k for r in measured for k in r.metrics})
+    metric_summaries = {
+        k: summarize([r.metrics[k] for r in measured if k in r.metrics]) for k in metric_names
+    }
     verdict = judge(info, records, throttled_before)
 
+    # CSV แบนเป็นคอลัมน์เดียวต่อค่า เปิดด้วย Excel/LibreOffice ได้ตรง ๆ
     with paths["csv"].open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=list(asdict(records[0]).keys()))
+        base = [k for k in asdict(records[0]) if k != "metrics"]
+        all_metrics = sorted({k for r in records for k in r.metrics})  # รวม warm-up ด้วย
+        writer = csv.DictWriter(f, fieldnames=base + all_metrics)
         writer.writeheader()
         for r in records:
-            writer.writerow(asdict(r))
+            row = {k: v for k, v in asdict(r).items() if k != "metrics"}
+            row.update(r.metrics)
+            writer.writerow(row)
 
     payload = {
         "name": name,
@@ -193,11 +214,13 @@ def write_report(
         "machine": info.to_dict(),
         "throttled_before": throttled_before,
         "summary_seconds": asdict(summary),
+        "summary_metrics": {k: asdict(v) for k, v in metric_summaries.items()},
         "verdict": asdict(verdict),
     }
     paths["json"].write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     paths["md"].write_text(
-        render_markdown(name, info, summary, verdict, meta, files, command), encoding="utf-8"
+        render_markdown(name, info, summary, verdict, meta, files, command, metric_summaries),
+        encoding="utf-8",
     )
     return paths
 
@@ -210,6 +233,7 @@ def render_markdown(
     meta: dict[str, str],
     files: dict[str, str],
     command: list[str] | None,
+    metric_summaries: dict[str, Summary] | None = None,
 ) -> str:
     lines = [f"# {name}", ""]
     if verdict.evidence_level4:
@@ -228,6 +252,23 @@ def render_markdown(
         f"p95 คำนวณแบบ nearest-rank · เมื่อ n = {summary.n} p95 คือลำดับที่ "
         f"{-(-95 * summary.n // 100)} จาก {summary.n} ของค่าที่เรียงแล้ว",
         "",
+    ]
+    if metric_summaries:
+        lines += [
+            "## ค่าที่โปรแกรมรายงาน (ไม่รวม warm-up)",
+            "",
+            "| ค่า | n | median | p95 | min | max |",
+            "|---|---|---|---|---|---|",
+        ]
+        for k, m in metric_summaries.items():
+            nums = (m.median, m.p95, m.minimum, m.maximum)
+            lines.append(f"| {k} | {m.n} | " + " | ".join(f"{x:.4g}" for x in nums) + " |")
+        lines += [
+            "",
+            'ค่าที่ "ยิ่งสูงยิ่งดี" (เช่น tok/s) ให้ดู min แทน p95 — p95 ของ tok/s คือรอบที่เร็ว ไม่ใช่รอบที่แย่',
+            "",
+        ]
+    lines += [
         "## เครื่อง",
         "",
         f"- บอร์ด: {info.board_model or '—'} ({info.board_class})",

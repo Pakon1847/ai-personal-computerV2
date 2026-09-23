@@ -21,3 +21,6 @@ datasets/
 docs/benchmarks/**/*.jpg
 docs/benchmarks/**/*.png
 docs/benchmarks/**/*.wav
+
+# ไฟล์ย้าย repo ไป/กลับ Pi (docs/runbooks/pi-phase0.md)
+*.bundle
