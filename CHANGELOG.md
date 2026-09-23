@@ -7,3 +7,4 @@
 - เฟส 0.3: ตัวตรวจฮาร์ดแวร์ `python -m aipc.doctor` แบบอ่านอย่างเดียว (บอร์ด, RAM, ไฟเลี้ยง, พัดลม, RTC, OS, glibc, ที่เก็บ, fscrypt, กล้อง, เสียง) · อ่านไม่ได้ = "ไม่รู้" ไม่ใช่ "ผ่าน"
 - เฟส 0.4: ตัวตรวจช่องโหว่ image `python -m aipc.doctor --audit` (sudo ไม่ใส่รหัส, กลุ่ม sudo/adm/video, บริการเข้าถึงระยะไกล, พอร์ตที่เปิดรับจากนอกเครื่อง, สิทธิ์โหนดกล้อง, สิทธิ์ home, KillUserProcesses/linger, swap บนดิสก์)
 - เฟส 0.7 (เครื่องมือ): `python -m aipc.spikes.llm` ห่อ llama-bench วัด pp/tg tok/s แยกกัน, เวลา prefill 200 token เทียบเกณฑ์ BRIEF 5.4, RAM สูงสุด และโหมด soak · runner รองรับค่าที่โปรแกรมรายงานเอง (metrics) · runbook สำหรับรันบน Pi
+- เฟส 0.6 (เครื่องมือ): spike PostgreSQL peer auth + FORCE RLS 15 กรณี (`spikes/pg-rls/run.sh`) เริ่มในโหมดดูอย่างเดียว มี --cleanup · เกณฑ์ตัดสินประกาศใน ADR-004 ก่อนวัด

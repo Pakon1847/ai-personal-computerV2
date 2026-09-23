@@ -93,6 +93,19 @@ L=$(git -C ~/llama.cpp rev-parse --short HEAD)
 **ต้อง commit ก่อนวัดทุกครั้ง** ไม่งั้นรายงานจะบอกว่า "มีไฟล์ค้างแก้" และไม่นับเป็นระดับ 4
 (ไฟล์โมเดลไม่นับ เพราะ `models/` ถูก ignore)
 
+## 5.1 Spike PostgreSQL + RLS (ADR-004) — ทำบน Pi 4 ได้
+
+เป็นเรื่องความถูกต้อง ไม่ใช่ความเร็ว จึงรันบน Pi 4 ได้ แล้วค่อยยืนยันซ้ำบน Pi 5
+
+```bash
+sudo apt install -y postgresql
+bash spikes/pg-rls/run.sh            # ดูก่อนว่าจะทำอะไร (ไม่ทำอะไรจริง)
+bash spikes/pg-rls/run.sh --apply    # สร้างผู้ใช้ทดสอบ 2 คน + ฐานข้อมูลทดสอบ แล้วรัน 15 กรณี
+bash spikes/pg-rls/run.sh --cleanup  # ลบของทดสอบทั้งหมด
+```
+
+ไม่แก้ pg_hba.conf (ถ้าไม่มีบรรทัด peer สคริปต์จะหยุดเอง) · ถ้าไม่อยากเก็บ PostgreSQL ไว้บนเครื่องหลังทดสอบ: `sudo apt remove postgresql`
+
 ## 6. ส่งผลกลับ
 
 ```bash
