@@ -23,6 +23,7 @@
 | RAM โปรเซสหลังโหลดโมเดล | 217 MB (เพิ่มจากโมเดล ≈ 129 MB) | (Pi 4) | เดียวกัน |
 | โหลดโมเดลทั้งหมด | 612 ms | (Pi 4) | เดียวกัน |
 | เวลาต่อภาพ (ตรวจ+align+embedding) | median 8.3 ms | เครื่องพัฒนา | face-lfw |
+| SFace int8 แทน fp32 | embedding 184.3 vs 57.5 ms (**ช้ากว่า 3.2×**) · LFW 99.17% vs 99.35% · RAM 145 vs 217 MB → ใช้ fp32 | (Pi 4) | [face-sface-int8](../benchmarks/2026-09-24-face-sface-int8/README.md) |
 
 **ยังไม่มี:** เวลาทั้งกระบวนการกับกล้องจริง (เกณฑ์ BRIEF median ≤ 1.5 วิ) · FRR/จับผิดคน/BPCER/APCER กับคนจริง → [แผนทดสอบ](face-protocol.md)
 
