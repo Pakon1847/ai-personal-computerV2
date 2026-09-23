@@ -16,3 +16,6 @@
 - สกิล 3 นัดหมาย: worker เป็น `code` (v1.1) ให้ตรงของจริง · LLM ช่วยประโยคยากภายหลัง
 - `install-greeter.sh`: ถาม YES ก่อนเริ่มทุกขั้น · คืน lightdm ไว้ก่อนจนถึงขั้นสลับ · หาเซสชัน rpd-labwc/LXDE-pi-labwc เองเมื่อ lightdm.conf ไม่ระบุ
 - แก้: `aipc.doctor` นับโหนดวิดีโอของชิป (bcm2835-codec/isp, rpi-hevc-dec, pispbe) เป็นกล้อง → ไฟกล้องบอก "กล้องพร้อม" บน Pi 4 ที่ไม่มีกล้อง · ตอนนี้อ่านชื่อจาก `/sys/class/video4linux` · ไม่มีกล้อง = เตือน · อ่านชื่อไม่ได้ = ไม่รู้ (ไม่เดาว่าเป็นกล้อง)
+- เซสชัน V2 ([การ์ด 0004](docs/design/0004-v2-session.md)): หลัง login เข้าหน้าจอ V2 เต็มจอ ไม่มีเดสก์ท็อป Pi · `aipc.ui --session` · "ออก" จบเซสชันจริง · ล่มแล้วเปิดใหม่ (3 ครั้ง/นาทีแล้วกลับหน้า Login) · labwc ค่าตั้งของเรา (Alt+Tab เท่านั้น, แป้น us/th) · `install-greeter.sh --session v2` · ติดตั้งและทดสอบบน Pi 4 แล้ว
+- แก้: ไฟล์สกิล builtin/*.json ไม่ถูกติดตั้งเมื่อไม่ใช่ `pip install -e` (เทสต์ package-data ใหม่)
+- แก้: `aipc.doctor --audit` ไม่เห็น Raspberry Pi Connect ที่ Imager เปิดเป็นบริการรายผู้ใช้

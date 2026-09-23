@@ -1,6 +1,6 @@
 # การ์ดออกแบบ 0004: หลัง login เข้าหน้าจอ V2 เลย ไม่ใช่เดสก์ท็อปของ Pi
 
-- **สถานะ:** อนุมัติแล้ว 2026-09-24 (Pakon) · กำลังสร้าง · Pakon สั่ง 2026-09-24 "ไม่ต้องการให้ผู้ใช้ใช้ Desktop ของ Pi อยากให้เข้าของผมเอง"
+- **สถานะ:** อนุมัติแล้ว 2026-09-24 (Pakon) · สร้างแล้ว ติดตั้งบน Pi 4 แล้ว · ผ่านบน Pi 4: รีบูต 3 ครั้ง, รหัสผิด/ถูกผ่าน greetd, ไม่มีแถบงาน Pi, ล่มแล้วเปิดใหม่, "ออก" กลับหน้า Login · **รอ Pakon ทดสอบที่ตัวเครื่อง:** พิมพ์รหัสในหน้า Login, กดปุ่ม "ออก", เปิดยูทูบแล้ว Alt+Tab · Pakon สั่ง 2026-09-24 "ไม่ต้องการให้ผู้ใช้ใช้ Desktop ของ Pi อยากให้เข้าของผมเอง"
 - **ข้อกำหนดที่อ้าง:** BRIEF หัวข้อ 7 (แผนผัง: labwc → AIPC Shell) · BRIEF 5.7 (Shield/Lock ใช้ ext-session-lock บน labwc) · DESIGN.md H2 H3 H4 H5 · การ์ด 0003 (greetd)
 
 ## 1. ปัญหาที่แก้ และใครใช้
@@ -34,8 +34,8 @@
 
 ```
 greetd → หน้า Login (ผ่าน PAM) → aipc-session (ผู้ใช้คนนั้น)
-                                    └ labwc -C /opt/aipc-v2/session/labwc
-                                        └ autostart: aipc-shell-loop
+                                    └ labwc -C /opt/aipc-v2/scripts/pi/session/labwc
+                                        └ -S aipc-shell-loop (ตัวนี้จบ = labwc จบ)
                                             └ python -m aipc.ui --session --fullscreen
                                                (ล่ม → เปิดใหม่ · ล่ม 3 ครั้ง/นาที → labwc --exit)
                                         กด "ออก" → labwc --exit → กลับหน้า Login
@@ -43,13 +43,13 @@ greetd → หน้า Login (ผ่าน PAM) → aipc-session (ผู้ใ�
 
 ## 5. ข้อมูล
 
-ไม่เก็บอะไรใหม่ · ค่าตั้ง labwc เป็นของระบบ อยู่ที่ `/opt/aipc-v2/session/labwc/` (root เป็นเจ้าของ ผู้ใช้แก้ไม่ได้)
+ไม่เก็บอะไรใหม่ · ค่าตั้ง labwc เป็นของระบบ อยู่ที่ `/opt/aipc-v2/scripts/pi/session/labwc/` (root เป็นเจ้าของ ผู้ใช้แก้ไม่ได้)
 
 ## 6. รอยต่อ
 
 - `aipc.ui --session` — โหมดเซสชันจริง: เริ่มที่ Shell · ไม่มีหน้า Login/สมัครในแอป · ไม่มีแถบโหมดพัฒนา · Ctrl+Alt+Q ปิดใช้ · ปุ่ม "ออก" เรียก `SessionController.logout()`
 - `SessionController.logout()` (Python) → รัน `labwc --exit` (จบเซสชัน greetd จะกลับหน้า Login เอง) · ทดสอบด้วยตัวรันปลอม
-- `scripts/pi/aipc-session` — คำสั่งเซสชันที่ greetd เรียก (แทน `/usr/bin/labwc-pi`)
+- `scripts/pi/session/aipc-session` — คำสั่งเซสชันที่ greetd เรียก (แทน `/usr/bin/labwc-pi`)
 - `install-greeter.sh --session v2` เปลี่ยนคำสั่งเซสชันใน config.toml (สำรองไฟล์เดิมเหมือนเดิม · `--rollback` ใช้ได้เหมือนเดิม)
 
 ## 7. กรณีที่ต้องคิดไว้ก่อน
@@ -59,7 +59,22 @@ greetd → หน้า Login (ผ่าน PAM) → aipc-session (ผู้ใ�
 - ผู้ใช้ปิดหน้าต่าง V2 เอง → ถือเป็นล่ม → เปิดใหม่
 - ทางเข้าสำรองสำหรับ Pakon (ผู้พัฒนา): SSH และ Ctrl+Alt+Fn+2 ยังใช้ได้ · เดสก์ท็อป Pi ยังติดตั้งอยู่ เพียงไม่ถูกเลือก
 - ผู้ดูแลต้องการเดสก์ท็อป Pi จริง ๆ → `install-greeter.sh --session /usr/bin/labwc-pi` (ไม่ลบ ไม่ถอนอะไร)
-- ตัวแปรสภาพแวดล้อมที่ labwc ต้องการเมื่อเริ่มจาก greetd: **ยังไม่รู้** → ดูจาก log บน Pi 4 ในการทดสอบครั้งแรก
+- ตัวแปรสภาพแวดล้อมที่ labwc ต้องการเมื่อเริ่มจาก greetd: ใช้ค่าเดียวกับ `/usr/bin/labwc-pi` (WLR_DRM_FORCE_LIBLIFTOFF, pixman ถ้าไม่มี MMU) · ผ่านบน Pi 4 แล้ว
+- พิมพ์ไทย: แป้น us,th สลับด้วย Alt+Shift (ค่าตั้งใน `labwc/environment`) · **ยังไม่ได้ทดสอบพิมพ์จริง**
+
+## ผลบน Pi 4 (2026-09-24, commit 8a37d43–404ae10)
+
+| เกณฑ์ | ผล |
+|---|---|
+| รีบูต 3 ครั้ง ขึ้นหน้า Login ของ V2 | ผ่าน 3/3 (ตรวจผ่าน SSH: greetd active, lightdm inactive, มีโปรเซส greeter) |
+| รหัสผิด / ถูก ผ่าน greetd (ตัวต่อ `aipc.login.greetd` เดียวกับหน้า Login) | ผิด → "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" · ถูก → เซสชัน V2 |
+| เห็น Shell ภายใน 10 วินาที ไม่มีแถบงาน Pi | ผ่าน · โปรเซสหน้าจอเริ่มภายใน ~2 วินาทีหลัง greeter ปิด · ภาพหน้าจอ 1920×1080 ไม่มี wf-panel/pcmanfm |
+| kill หน้าจอ V2 → เปิดใหม่เอง | ผ่าน · log: "หน้าจอ V2 จบด้วยรหัส 137 · เปิดใหม่ (ครั้งที่ 1)" |
+| "ออก" (`labwc --exit` แบบเดียวกับปุ่ม) → กลับหน้า Login | ผ่าน · ไม่เหลือโปรเซส labwc/หน้าจอ V2 |
+| RAM | หน้าจอ V2 ~172 MB · labwc ~95 MB (Pi 4, ค่าครั้งเดียว ไม่ใช่ผลวัดตาม BRIEF 9) |
+| กดปุ่มจริง / พิมพ์จริง / Alt+Tab จากเบราว์เซอร์ | **ยังไม่ได้ทดสอบ** (ต้องมีคนที่ตัวเครื่อง) |
+
+บั๊กที่เจอระหว่างทดสอบและแก้แล้ว: ไฟล์สกิลไม่ถูกติดตั้งไป `/opt` (package-data) · สคริปต์วนเปิดนับ labwc ที่เป็น zombie ว่ายังอยู่
 
 ## 8. ต้นทุนบน Pi
 

@@ -63,6 +63,8 @@ python3 -m venv .venv && ./.venv/bin/pip install -e ".[ui]"
 ```bash
 ./scripts/pi/install-greeter.sh                # ดูก่อน · ไม่เปลี่ยนอะไร · อ่านว่าเซสชันถูกตัวไหม
 sudo ./scripts/pi/install-greeter.sh --apply   # ทำจริง · จะถามให้พิมพ์ YES ยืนยันขั้นที่ 3
+# หลัง login เข้าหน้าจอ V2 เลย ไม่ใช่เดสก์ท็อป Pi (การ์ด 0004) — ที่ใช้อยู่บน Pi 4 ตอนนี้:
+sudo ./scripts/pi/install-greeter.sh --apply --session v2
 sudo reboot
 ```
 
