@@ -1,0 +1,16 @@
+module AipcUi
+singleton Theme 1.0 Theme.qml
+singleton Icons 1.0 Icons.qml
+singleton AppState 1.0 AppState.qml
+Icon 1.0 Icon.qml
+AppText 1.0 AppText.qml
+AppButton 1.0 AppButton.qml
+AppField 1.0 AppField.qml
+Chip 1.0 Chip.qml
+Card 1.0 Card.qml
+Avatar 1.0 Avatar.qml
+DevBanner 1.0 DevBanner.qml
+NotReady 1.0 NotReady.qml
+BrandMark 1.0 BrandMark.qml
+LoginScreen 1.0 LoginScreen.qml
+FaceRing 1.0 FaceRing.qml

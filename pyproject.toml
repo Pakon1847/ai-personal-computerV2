@@ -13,9 +13,15 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["ruff>=0.6"]
+# หน้าจอ: ใช้ PySide6-Essentials (มี Qt Quick/QML ครบ) แทน PySide6 เต็ม เพราะเล็กกว่ามาก
+# ประหยัดพื้นที่บน microSD ของ Pi · ต้องใช้ glibc >= 2.39 บน aarch64 (BRIEF หัวข้อ 2)
+ui = ["PySide6-Essentials>=6.8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+aipc = ["ui/qml/AipcUi/*", "ui/fonts/*"]
 
 [tool.ruff]
 line-length = 100

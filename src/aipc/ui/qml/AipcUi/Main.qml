@@ -1,0 +1,43 @@
+// หน้าต่างหลัก · สลับหน้า login / signup / shell ตาม AppState.screen
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import AipcUi
+
+ApplicationWindow {
+    id: win
+    width: 1280
+    height: 720
+    minimumWidth: 1280   // ขนาดจอเล็กสุดที่ออกแบบไว้
+    minimumHeight: 720
+    visible: true
+    title: "AI PC"
+    color: Theme.bg
+    font.family: Theme.family
+
+    // ผูกธีมกับค่าที่ผู้ใช้ตั้ง (อยู่ใน Python) · เปลี่ยนในหน้าตั้งค่าแล้วทั้งจอเปลี่ยนทันที
+    Binding { target: Theme; property: "dark"; value: uiSettings.theme === "dark" }
+    Binding { target: Theme; property: "fontScale"; value: uiSettings.fontScale }
+
+    Component.onCompleted: {
+        AppState.devMode = devMode
+        AppState.page = startPage
+        AppState.screen = startScreen
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
+        DevBanner { Layout.fillWidth: true }
+        Loader {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            sourceComponent: AppState.screen === "signup" ? signupPage
+                           : AppState.screen === "shell" ? shellPage : loginPage
+        }
+    }
+
+    Component { id: loginPage; LoginScreen {} }
+    Component { id: signupPage; LoginScreen {} }
+    Component { id: shellPage; LoginScreen {} }
+}
