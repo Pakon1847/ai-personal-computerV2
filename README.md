@@ -36,7 +36,7 @@
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 ```
 
 บน Raspberry Pi ใช้ `./.venv/bin/python` แทน · รายละเอียดใน [`docs/TESTING.md`](docs/TESTING.md)

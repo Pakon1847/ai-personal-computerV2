@@ -3,7 +3,7 @@
 ## เทสต์ของโค้ด (ระดับ 3)
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 .\.venv\Scripts\python.exe -m ruff check .
 .\.venv\Scripts\python.exe -m ruff format --check .
 ```
@@ -20,6 +20,7 @@
 ```bash
 ./.venv/bin/python -m aipc.doctor          # ดูผล (อ่านอย่างเดียว ไม่แก้อะไร)
 ./.venv/bin/python -m aipc.doctor --save   # เก็บผลเป็นหลักฐานใน docs/benchmarks/
+sudo ./.venv/bin/python -m aipc.doctor --audit --save   # ตรวจช่องโหว่ image (sudo เพื่ออ่าน /etc/sudoers ได้ — ยังอ่านอย่างเดียว)
 ```
 
 ผลแต่ละข้อเป็น ผ่าน / เตือน / ไม่ผ่าน / **ไม่รู้** · "ไม่รู้" = อ่านค่าไม่ได้ ไม่ได้แปลว่าผ่าน
