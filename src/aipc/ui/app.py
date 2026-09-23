@@ -38,6 +38,7 @@ class Options:
     signup_step: int = 0  # เปิดหน้าสมัครที่ขั้นนี้เลย (ใช้ถ่ายภาพ/ทดสอบ)
     software: bool = False  # วาดด้วย CPU (ใช้ตอนเทสต์ และเครื่องที่ไม่มี GPU)
     settings_path: Path | None = None
+    fullscreen: bool = False  # เต็มจอบน Pi · ออกได้ด้วย Ctrl+Alt+Q เสมอ
 
 
 def load_fonts() -> list[str]:
@@ -84,6 +85,7 @@ def build(opts: Options, argv: list[str] | None = None):
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
     ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 5)))
     ctx.setContextProperty("devMode", opts.dev or opts.demo_scan is not None)
+    ctx.setContextProperty("startFullscreen", opts.fullscreen)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))
     return app, engine, warnings

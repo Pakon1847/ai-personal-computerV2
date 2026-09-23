@@ -11,6 +11,7 @@ ApplicationWindow {
     minimumWidth: 1280   // ขนาดจอเล็กสุดที่ออกแบบไว้
     minimumHeight: 720
     visible: true
+    visibility: startFullscreen ? Window.FullScreen : Window.Windowed
     title: "AI PC"
     color: Theme.bg
     font.family: Theme.family
@@ -23,6 +24,13 @@ ApplicationWindow {
         AppState.devMode = devMode
         AppState.page = startPage
         AppState.screen = startScreen
+    }
+
+    // ทางออกที่ใช้ได้ทุกหน้าเสมอ · หน้าต่างเต็มจอที่ออกไม่ได้ = ขังผู้ใช้ไว้ในเครื่อง
+    Shortcut {
+        sequence: "Ctrl+Alt+Q"
+        context: Qt.ApplicationShortcut
+        onActivated: Qt.quit()
     }
 
     ColumnLayout {

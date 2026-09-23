@@ -7,6 +7,7 @@
 --demo-scan found|scanning|unknown|manual   ดูหน้าตาสถานะการสแกนหน้า (เปิดโหมดพัฒนาด้วย)
 --screenshot ไฟล์.png           ถ่ายภาพหน้าจอแล้วปิดเอง
 --software                      วาดด้วย CPU แทน GPU
+--fullscreen                    เต็มจอ (ใช้บน Pi) · ออกด้วย Ctrl+Alt+Q
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--signup-step", type=int, default=0, help="0–5 เปิดหน้าสมัครที่ขั้นนี้")
     p.add_argument("--screenshot", type=Path)
     p.add_argument("--software", action="store_true")
+    p.add_argument("--fullscreen", action="store_true")
     a = p.parse_args(argv)
 
     if a.screenshot and "QT_QPA_PLATFORM" not in os.environ:
@@ -41,6 +43,7 @@ def main(argv: list[str] | None = None) -> int:
         demo_scan=a.demo_scan,
         signup_step=a.signup_step,
         software=a.software or bool(a.screenshot),
+        fullscreen=a.fullscreen and not a.screenshot,
     )
     app, engine, warnings = uiapp.build(opts, sys.argv[:1])
     if not engine.rootObjects():
