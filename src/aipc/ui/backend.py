@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import getpass
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -18,7 +19,7 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 from aipc.accounts import validation
 from aipc.bench import machine
 from aipc.doctor import hardware
-from aipc.ui import settings, thaidate
+from aipc.ui import files, settings, thaidate
 
 
 class UiSettings(QObject):
@@ -127,6 +128,68 @@ class SystemStatus(QObject):
     @Property("QVariantList", notify=healthChanged)
     def checks(self) -> list:
         return self._checks
+
+    @Property(str, constant=True)
+    def userName(self) -> str:  # noqa: N802
+        """ชื่อ Linux user ที่รันหน้าจออยู่จริง (ยังไม่ใช่บัญชีจาก greetd ซึ่งอยู่ในเฟส 1)."""
+        return getpass.getuser()
+
+
+class FilesBrowser(QObject):
+    """หน้า "ไฟล์ของฉัน" · อ่านไฟล์จริงใน home แบบอ่านอย่างเดียว ออกนอก home ไม่ได้."""
+
+    changed = Signal()
+
+    def __init__(self, root: Path | None = None):
+        super().__init__()
+        self._root = root or Path.home()
+        self._rel = ""
+        self._entries: list[dict] = []
+        self._error = ""
+        self._load()
+
+    def _load(self) -> None:
+        try:
+            self._entries = [e.to_dict() for e in files.list_dir(self._root, self._rel)]
+            self._error = ""
+        except (OSError, files.OutsideHome) as e:
+            self._entries, self._error = [], f"เปิดโฟลเดอร์นี้ไม่ได้: {e}"
+        self.changed.emit()
+
+    @Property("QVariantList", notify=changed)
+    def entries(self) -> list:
+        return self._entries
+
+    @Property(str, notify=changed)
+    def location(self) -> str:
+        return "ไฟล์ของฉัน" + ("".join(" / " + p for p in Path(self._rel).parts) if self._rel else "")
+
+    @Property(bool, notify=changed)
+    def canGoUp(self) -> bool:  # noqa: N802
+        return self._rel != ""
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Property(str, notify=changed)
+    def quotaText(self) -> str:  # noqa: N802
+        try:
+            du = shutil.disk_usage(self._root)
+        except OSError:
+            return "—"
+        return f"ว่าง {du.free / 1e9:.0f} จาก {du.total / 1e9:.0f} GB"
+
+    @Slot(str)
+    def open(self, name: str) -> None:
+        self._rel = str(Path(self._rel) / name) if self._rel else name
+        self._load()
+
+    @Slot()
+    def up(self) -> None:
+        parent = str(Path(self._rel).parent)
+        self._rel = "" if parent == "." else parent
+        self._load()
 
 
 class LoginController(QObject):

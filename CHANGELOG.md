@@ -8,3 +8,4 @@
 - เฟส 0.4: ตัวตรวจช่องโหว่ image `python -m aipc.doctor --audit` (sudo ไม่ใส่รหัส, กลุ่ม sudo/adm/video, บริการเข้าถึงระยะไกล, พอร์ตที่เปิดรับจากนอกเครื่อง, สิทธิ์โหนดกล้อง, สิทธิ์ home, KillUserProcesses/linger, swap บนดิสก์)
 - เฟส 0.7 (เครื่องมือ): `python -m aipc.spikes.llm` ห่อ llama-bench วัด pp/tg tok/s แยกกัน, เวลา prefill 200 token เทียบเกณฑ์ BRIEF 5.4, RAM สูงสุด และโหมด soak · runner รองรับค่าที่โปรแกรมรายงานเอง (metrics) · runbook สำหรับรันบน Pi
 - เฟส 0.6 (เครื่องมือ): spike PostgreSQL peer auth + FORCE RLS 15 กรณี (`spikes/pg-rls/run.sh`) เริ่มในโหมดดูอย่างเดียว มี --cleanup · เกณฑ์ตัดสินประกาศใน ADR-004 ก่อนวัด
+- หน้าจอ: `python -m aipc.ui` ตามบอร์ดออกแบบ · Theme.qml ธีมสว่าง/มืด · ฟอนต์ IBM Plex Sans Thai มากับแอป · Login ที่สแกนหน้า (ยังไม่มีระบบใบหน้า จึงบอกตรง ๆ) · สมัครบัญชี 5 ขั้นพร้อมตรวจฟอร์มจริง · Shell พร้อมแถบสถานะและหน้าสุขภาพเครื่องที่อ่านค่าจริง, ไฟล์ของฉันแบบอ่านอย่างเดียว, ตั้งค่าธีม/ขนาดตัวอักษรที่บันทึกจริง

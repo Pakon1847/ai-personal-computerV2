@@ -13,7 +13,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 try:
-    from PySide6.QtCore import QCoreApplication, QEventLoop, QTimer
+    from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer
 
     from aipc.ui import app as uiapp
 except ImportError:  # pragma: no cover
@@ -27,6 +27,8 @@ CASES = [
     {"screen": "login", "demo_scan": "manual", "theme": "dark"},
     *({"screen": "signup", "signup_step": n, "dev": True} for n in range(6)),
     {"screen": "signup", "signup_step": 3, "theme": "dark"},
+    *(({"screen": "shell", "page": p} for p in uiapp.PAGES) if uiapp else ()),
+    {"screen": "shell", "page": "workspace", "theme": "dark"},
 ]
 
 
@@ -51,6 +53,41 @@ class QmlLoadTest(unittest.TestCase):
                         root.close()
                     engine.deleteLater()
                     QCoreApplication.processEvents()
+
+
+@unittest.skipIf(uiapp is None, "ไม่มี PySide6")
+class ChatInputTest(unittest.TestCase):
+    """BRIEF 5.4 ข้อ 7: Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่."""
+
+    def test_enter_sends_and_shift_enter_adds_newline(self):
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+
+        with tempfile.TemporaryDirectory() as tmp:
+            opts = uiapp.Options(screen="shell", software=True, settings_path=Path(tmp) / "ui.json")
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            win = engine.rootObjects()[0]
+            chat_input = win.findChild(QObject, "chatInput")
+            chat_list = win.findChild(QObject, "chatList")
+            chat_input.forceActiveFocus()
+            settle(100)
+
+            chat_input.setProperty("text", "บรรทัดแรก")
+            chat_input.setProperty("cursorPosition", len("บรรทัดแรก"))
+            QTest.keyClick(win, Qt.Key.Key_Return, Qt.KeyboardModifier.ShiftModifier)
+            settle(100)
+            self.assertEqual(chat_list.property("count"), 0, "Shift+Enter ต้องไม่ส่ง")
+            self.assertIn(chr(10), chat_input.property("text").replace(chr(0x2029), chr(10)))
+
+            QTest.keyClick(win, Qt.Key.Key_Return)
+            settle(100)
+            # ข้อความของผู้ใช้ 1 + ประกาศจากระบบว่ายังไม่มีโมเดล 1
+            self.assertEqual(chat_list.property("count"), 2, "Enter ต้องส่ง")
+            self.assertEqual(chat_input.property("text"), "")
+            self.assertEqual(warnings, [])
+            win.close()
+            engine.deleteLater()
 
 
 if __name__ == "__main__":

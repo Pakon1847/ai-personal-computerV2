@@ -39,5 +39,5 @@ ApplicationWindow {
 
     Component { id: loginPage; LoginScreen {} }
     Component { id: signupPage; SignupFlow {} }
-    Component { id: shellPage; LoginScreen {} }
+    Component { id: shellPage; ShellScreen {} }
 }

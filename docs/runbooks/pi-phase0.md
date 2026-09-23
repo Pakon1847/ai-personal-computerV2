@@ -106,6 +106,20 @@ bash spikes/pg-rls/run.sh --cleanup  # ลบของทดสอบทั้�
 
 ไม่แก้ pg_hba.conf (ถ้าไม่มีบรรทัด peer สคริปต์จะหยุดเอง) · ถ้าไม่อยากเก็บ PostgreSQL ไว้บนเครื่องหลังทดสอบ: `sudo apt remove postgresql`
 
+## 5.2 เปิดหน้าจอของระบบบน Pi
+
+```bash
+sudo apt install -y libthai0 libxkbcommon0 libegl1   # libthai = ตัดคำไทยให้ถูก (BRIEF 5.7 ข้อ 4)
+./.venv/bin/python -m pip install -e ".[ui]"          # PySide6-Essentials ต้องใช้ glibc >= 2.39 (Trixie มี)
+./.venv/bin/python -m aipc.ui                         # หน้า Login จริง (ยังไม่มีระบบใบหน้า/รหัสผ่านจริง)
+./.venv/bin/python -m aipc.ui --dev                   # เดินหน้าจอได้ครบ มีแถบเตือนโหมดพัฒนา
+./.venv/bin/python -m aipc.ui --screen shell --page health   # ดูผลตรวจเครื่องบนหน้าจอ
+```
+
+ถ่ายภาพหน้าจอไว้ใส่เล่มโดยไม่ต้องมีจอ: `--screenshot docs/benchmarks/<ชื่อ>.png` (ภาพ .png ไม่เข้า git ตาม .gitignore — เก็บแยก)
+
+สิ่งที่ต้องดูบน Pi: ข้อความไทยยาว ๆ ตัดบรรทัดตามคำไหม (ถ้าตัดกลางคำ = ไม่มี libthai) · หน้าจอลื่นไหม (ยังไม่วัด fps)
+
 ## 6. ส่งผลกลับ
 
 ```bash

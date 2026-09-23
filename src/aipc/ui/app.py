@@ -12,7 +12,13 @@ from PySide6.QtGui import QFontDatabase, QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
-from aipc.ui.backend import LoginController, SignupController, SystemStatus, UiSettings
+from aipc.ui.backend import (
+    FilesBrowser,
+    LoginController,
+    SignupController,
+    SystemStatus,
+    UiSettings,
+)
 
 HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
@@ -67,6 +73,7 @@ def build(opts: Options, argv: list[str] | None = None):
         "system": SystemStatus(),
         "login": LoginController(opts.dev, opts.demo_scan),
         "signup": SignupController(),
+        "filesBrowser": FilesBrowser(),
     }
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():

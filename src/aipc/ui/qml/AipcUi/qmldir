@@ -17,3 +17,13 @@ FaceRing 1.0 FaceRing.qml
 SignupSteps 1.0 SignupSteps.qml
 SignupFlow 1.0 SignupFlow.qml
 AppCheck 1.0 AppCheck.qml
+StatusBar 1.0 StatusBar.qml
+NavItem 1.0 NavItem.qml
+Sidebar 1.0 Sidebar.qml
+PageHeader 1.0 PageHeader.qml
+WorkspacePage 1.0 WorkspacePage.qml
+FilesPage 1.0 FilesPage.qml
+HealthPage 1.0 HealthPage.qml
+SettingsPage 1.0 SettingsPage.qml
+PlannedPage 1.0 PlannedPage.qml
+ShellScreen 1.0 ShellScreen.qml

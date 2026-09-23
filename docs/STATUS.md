@@ -43,6 +43,7 @@
 | 0.4 ตัวตรวจช่องโหว่ image `aipc.doctor --audit` (อ่านอย่างเดียว 8 ข้อ) | 3 | 51 เทสต์ผ่านบนวินโดวส์ 2026-09-23 (2 เทสต์สิทธิ์ไฟล์ข้ามบนวินโดวส์ รันได้บน Pi เท่านั้น) · **ยังไม่เคยรันบน Pi** · ชื่อ unit ของ VNC/Pi Connect ยังไม่ได้ยืนยันกับ image จริง · ยังไม่อ่าน ACL ของโหนดกล้อง |
 | 0.7 เครื่องมือ spike LLM `aipc.spikes.llm` (pp/tg tok/s, prefill 200 token, RAM สูงสุด, soak 10 นาที) | 3 | 58 เทสต์ผ่านบนวินโดวส์ 2026-09-23 (`tests/test_spike_llm.py`) · **ยังไม่ได้วัดจริง** · ชื่อฟิลด์ JSON ของ llama-bench ยังไม่ได้เทียบกับของจริง · ขั้นตอน: [runbooks/pi-phase0.md](runbooks/pi-phase0.md) |
 | 0.6 spike PostgreSQL peer auth + FORCE RLS (`spikes/pg-rls/`) | 2 | สคริปต์ + SQL, ตรวจ syntax แล้ว (`bash -n`) · **ยังไม่เคยรันจริงที่ไหนเลย** — รันบน Pi 4 ตาม runbook ข้อ 5.1 · เกณฑ์ตัดสินอยู่ใน [ADR-004](adr/0004-db-permissions.md) |
+| หน้าจอ QML (`aipc.ui`): Login 5 สถานะ, สมัครบัญชี 5 ขั้น, Shell 6 หน้า, ธีมสว่าง/มืด | 3 (หน้าตา) · 2 (การทำงาน) | 95 เทสต์ผ่านบนวินโดวส์ 2026-09-23 รวมเทสต์โหลดทุกหน้าจอแบบ offscreen ไม่มี warning และเทสต์ Enter/Shift+Enter · **ยังไม่เคยรันบน Pi** · สิ่งที่ยังไม่มี backend จริงดูตาราง "อะไรจริง อะไรยังไม่มี" ใน [ARCHITECTURE](ARCHITECTURE.md) |
 | ADR-014 ไลเซนส์ | ตัดสินแล้ว | [adr/0014-licensing.md](adr/0014-licensing.md) |
 | ข้อต้องมีทุกข้อใน BRIEF หัวข้อ 5 | 1 | [BRIEF.md](BRIEF.md) (spec เท่านั้น ยังไม่มีโค้ด) |
 
