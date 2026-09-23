@@ -15,6 +15,7 @@ from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 from aipc.ui.backend import (
     FilesBrowser,
     LoginController,
+    SessionController,
     SignupController,
     SkillsController,
     SystemStatus,
@@ -40,6 +41,7 @@ class Options:
     settings_path: Path | None = None
     fullscreen: bool = False  # เต็มจอบน Pi · ออกได้ด้วย Ctrl+Alt+Q เสมอ
     greeter_session: list[str] | None = None  # โหมด greeter: คำสั่งเซสชันที่ greetd เริ่มหลังเข้าได้
+    session: bool = False  # เซสชันจริงหลัง login (การ์ด 0004): เริ่มที่ Shell · ออก = จบเซสชัน
 
 
 def load_fonts() -> list[str]:
@@ -71,26 +73,30 @@ def build(opts: Options, argv: list[str] | None = None):
     engine.addImportPath(str(QML_DIR))
 
     # เก็บ backend ไว้บน engine ด้วย ไม่งั้น Python จะเก็บกวาดทิ้งขณะหน้าจอยังใช้อยู่
+    # เซสชันจริงกับ greeter: ไม่มีโหมดพัฒนา/สาธิต · เซสชันจริงเริ่มที่ Shell เสมอ (login ผ่าน greetd แล้ว)
+    real = bool(opts.greeter_session) or opts.session
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
         # โหมด greeter ห้ามมีทางลัดของโหมดพัฒนาหรือสถานะสาธิตเด็ดขาด
         "login": LoginController(
-            opts.dev and not opts.greeter_session,
-            None if opts.greeter_session else opts.demo_scan,
+            opts.dev and not real,
+            None if real else opts.demo_scan,
             greeter_session=opts.greeter_session,
         ),
         "signup": SignupController(),
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(run_timer=not opts.greeter_session),
+        "session": SessionController(opts.session and not opts.greeter_session),
     }
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():
         ctx.setContextProperty(name, obj)
-    ctx.setContextProperty("startScreen", opts.screen if opts.screen in SCREENS else "login")
+    screen = "shell" if opts.session else opts.screen
+    ctx.setContextProperty("startScreen", screen if screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
     ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 5)))
-    dev = (opts.dev or opts.demo_scan is not None) and not opts.greeter_session
+    dev = (opts.dev or opts.demo_scan is not None) and not real
     ctx.setContextProperty("devMode", dev)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)
 

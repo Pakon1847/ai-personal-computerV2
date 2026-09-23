@@ -44,9 +44,11 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             kind: "ghost"; iconPath: Icons.logout
             Accessible.name: "ออกจากระบบ"
-            ToolTip.visible: hovered
-            ToolTip.text: "ออกจากระบบ"
-            onClicked: AppState.go("login")
+            // ออกไม่สำเร็จ → ข้อความค้างให้เห็น ไม่เงียบ (H2)
+            ToolTip.visible: hovered || session.error !== ""
+            ToolTip.text: session.error !== "" ? session.error : "ออกจากระบบ"
+            // เซสชันจริง: จบเซสชันทั้งหมดแล้ว greetd กลับหน้า Login (การ์ด 0004) · หน้าต่างพัฒนา: สลับหน้าในแอป
+            onClicked: if (!session.active) AppState.go("login"); else session.logout()
         }
         Avatar {
             Layout.alignment: Qt.AlignHCenter

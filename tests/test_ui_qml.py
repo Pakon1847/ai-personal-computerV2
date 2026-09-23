@@ -33,6 +33,8 @@ CASES = [
     {"screen": "shell", "page": "workspace", "theme": "dark"},
     # หน้า login จริงผ่าน greetd (การ์ด 0003) · ใส่ dev/demo มาด้วยเพื่อตรวจว่าถูกปิดทิ้ง
     {"screen": "login", "greeter_session": ["labwc"], "dev": True, "demo_scan": "found"},
+    # เซสชันจริงหลัง login (การ์ด 0004) · ขอ login/dev มาแต่ต้องได้ Shell ไม่มีโหมดพัฒนา
+    {"screen": "login", "session": True, "dev": True, "demo_scan": "found"},
 ]
 
 
@@ -57,6 +59,13 @@ class QmlLoadTest(unittest.TestCase):
                         ctx = engine.rootContext()
                         self.assertFalse(ctx.contextProperty("devMode"), "greeter ต้องไม่มีโหมดพัฒนา")
                         self.assertEqual(ctx.contextProperty("login").scanState, "unavailable")
+                    if case.get("session"):
+                        ctx = engine.rootContext()
+                        self.assertFalse(ctx.contextProperty("devMode"), "เซสชันจริงต้องไม่มีโหมดพัฒนา")
+                        self.assertEqual(ctx.contextProperty("startScreen"), "shell")
+                        self.assertTrue(ctx.contextProperty("session").active)
+                        win = engine.rootObjects()[0]
+                        self.assertFalse(win.property("quitKeyEnabled"), "ปิด Ctrl+Alt+Q")
                     for root in engine.rootObjects():
                         root.close()
                     engine.deleteLater()

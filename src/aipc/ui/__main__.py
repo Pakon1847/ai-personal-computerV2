@@ -9,6 +9,8 @@
 --software                      วาดด้วย CPU แทน GPU
 --fullscreen                    เต็มจอ (ใช้บน Pi) · ออกด้วย Ctrl+Alt+Q
 --greeter "คำสั่งเซสชัน"          เป็นหน้า login จริงผ่าน greetd (การ์ด 0003) เช่น --greeter labwc
+--session                       เซสชันจริงหลัง login (การ์ด 0004): เริ่มที่ Shell · "ออก" จบเซสชัน
+                                · ไม่มีโหมดพัฒนา · Ctrl+Alt+Q ใช้ไม่ได้ (ไม่มีอะไรให้กลับไป)
 """
 
 from __future__ import annotations
@@ -34,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--software", action="store_true")
     p.add_argument("--fullscreen", action="store_true")
     p.add_argument("--greeter", metavar="SESSION_CMD")
+    p.add_argument("--session", action="store_true")
     a = p.parse_args(argv)
 
     if a.screenshot and "QT_QPA_PLATFORM" not in os.environ:
@@ -48,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
         software=a.software or bool(a.screenshot),
         fullscreen=a.fullscreen and not a.screenshot,
         greeter_session=shlex.split(a.greeter) if a.greeter else None,
+        session=a.session,
     )
     app, engine, warnings = uiapp.build(opts, sys.argv[:1])
     if not engine.rootObjects():

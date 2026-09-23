@@ -4,7 +4,8 @@
 #   ./scripts/pi/install-greeter.sh                   ดูว่าจะทำอะไร (ไม่เปลี่ยนอะไรเลย)
 #   sudo ./scripts/pi/install-greeter.sh --apply      ทำจริง (ถามยืนยันเรื่องทางเข้าสำรองก่อน)
 #   sudo ./scripts/pi/install-greeter.sh --rollback   กลับไปใช้หน้า login เดิมของ Raspberry Pi OS (lightdm)
-#   ตัวเลือก: --session "คำสั่ง"  เซสชันที่จะเริ่มหลังเข้าได้ (ค่าเริ่มต้น: อ่านจาก lightdm.conf)
+#   ตัวเลือก: --session "คำสั่ง"  เซสชันที่จะเริ่มหลังเข้าได้ (ค่าเริ่มต้น: อ่านจาก lightdm.conf = เดสก์ท็อป Pi)
+#             --session v2       หน้าจอ V2 เป็นทั้งเซสชัน ไม่มีเดสก์ท็อป Pi (การ์ด 0004)
 #
 # ทำอะไร: ติดตั้ง greetd + cage (apt) · คัดลอกแอปไปที่ /opt/aipc-v2 ให้ผู้ใช้ _greetd อ่านได้
 #         · เขียน /etc/greetd/config.toml (สำรองของเดิมก่อน) · ปิด lightdm เปิด greetd · **ไม่รีบูตให้**
@@ -28,6 +29,11 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DEST=/opt/aipc-v2
 CONF=/etc/greetd/config.toml
 STAMP="$(date +%Y%m%d-%H%M%S)"
+# การ์ด 0004: เซสชันของ V2 เอง (labwc + ค่าตั้งของเรา + หน้าจอ V2) · ไฟล์อยู่ในแอปที่คัดลอกไป $DEST
+if [ "$SESSION" = "v2" ]; then
+  SESSION="$DEST/scripts/pi/session/aipc-session"
+  [ -x "$SRC/scripts/pi/session/aipc-session" ] || { echo "หยุด: ไม่มี scripts/pi/session/aipc-session ใน $SRC" >&2; exit 1; }
+fi
 
 say() { printf '%s\n' "$*"; }
 need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย sudo" >&2; exit 1; }; }

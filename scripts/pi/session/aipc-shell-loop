@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# เปิดหน้าจอ V2 และเปิดใหม่เมื่อล่ม (การ์ด 0004, H2)
+#
+# - หน้าจอ V2 จบเอง (ล่ม หรือผู้ใช้ปิดหน้าต่าง) → เปิดใหม่
+# - ล่มครบ AIPC_MAX_CRASHES ครั้ง ภายใน AIPC_CRASH_WINDOW วินาที → เลิก · labwc (-S) จบตาม
+#   → greetd กลับหน้า Login (ไม่ปล่อยจอดำค้าง)
+# - labwc จบแล้ว (ผู้ใช้กด "ออก") → เลิกทันที ไม่เปิดใหม่
+# ค่าที่เปลี่ยนได้ (ใช้ในเทสต์): AIPC_SHELL_CMD AIPC_MAX_CRASHES AIPC_CRASH_WINDOW
+set -u
+HERE="$(dirname "$(readlink -f "$0")")"
+APP="$(cd "$HERE/../../.." && pwd)"
+CMD="${AIPC_SHELL_CMD:-$APP/.venv/bin/python -m aipc.ui --session --fullscreen}"
+MAX="${AIPC_MAX_CRASHES:-3}"
+WINDOW="${AIPC_CRASH_WINDOW:-60}"
+
+log() {
+  printf 'aipc-session: %s\n' "$*" >&2
+  logger -t aipc-session -- "$*" 2>/dev/null || true
+}
+# labwc ตั้ง LABWC_PID ให้โปรแกรมที่มันเปิด · ไม่มีค่า (เช่นในเทสต์) = ถือว่ายังอยู่
+labwc_alive() { [ -z "${LABWC_PID:-}" ] || kill -0 "$LABWC_PID" 2>/dev/null; }
+
+recent=""   # เวลาที่ล่มในช่วง WINDOW วินาทีล่าสุด คั่นด้วยช่องว่าง
+while labwc_alive; do
+  $CMD
+  code=$?
+  labwc_alive || break
+  now="$(date +%s)"
+  kept=""
+  for t in $recent; do
+    [ $((now - t)) -lt "$WINDOW" ] && kept="$kept $t"
+  done
+  recent="$kept $now"
+  n=$(wc -w <<<"$recent")
+  if [ "$n" -ge "$MAX" ]; then
+    log "หน้าจอ V2 ล่ม $n ครั้งใน $WINDOW วินาที (ครั้งล่าสุดรหัส $code) · จบเซสชัน กลับหน้า Login"
+    exit 1
+  fi
+  log "หน้าจอ V2 จบด้วยรหัส $code · เปิดใหม่ (ครั้งที่ $n)"
+  sleep 1
+done
+exit 0

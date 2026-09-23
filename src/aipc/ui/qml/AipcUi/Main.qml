@@ -26,8 +26,11 @@ ApplicationWindow {
         AppState.screen = startScreen
     }
 
-    // ทางออกที่ใช้ได้ทุกหน้าเสมอ · หน้าต่างเต็มจอที่ออกไม่ได้ = ขังผู้ใช้ไว้ในเครื่อง
+    // ทางออกของหน้าต่างพัฒนา · หน้าต่างเต็มจอที่ออกไม่ได้ = ขังผู้ใช้ไว้ในเครื่อง
+    // ในเซสชันจริง (การ์ด 0004) ปิดไว้: หน้าจอนี้คือทั้งเซสชัน ปิดแล้วเหลือจอว่าง · ทางออกคือปุ่ม "ออก"
+    readonly property bool quitKeyEnabled: !session.active
     Shortcut {
+        enabled: win.quitKeyEnabled
         sequence: "Ctrl+Alt+Q"
         context: Qt.ApplicationShortcut
         onActivated: Qt.quit()

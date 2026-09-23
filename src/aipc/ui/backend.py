@@ -286,6 +286,54 @@ class LoginController(QObject):
         return ""
 
 
+class SessionController(QObject):
+    """เซสชันจริงของผู้ใช้ (การ์ด 0004): หน้าจอ V2 คือทั้งเซสชัน ไม่มีเดสก์ท็อปของ Pi.
+
+    active = รันจาก aipc-session หลัง login ผ่าน greetd แล้ว · ไม่ active = หน้าต่างพัฒนาตามเดิม
+    "ออก" ในเซสชันจริงต้องจบเซสชันทั้งหมด (H3) ไม่ใช่แค่สลับไปหน้า Login ในแอป
+    ซึ่งจะทิ้งโปรเซสของผู้ใช้ค้างไว้ · จบด้วย `labwc --exit` แล้ว greetd กลับหน้า Login เอง
+    """
+
+    changed = Signal()
+    EXIT_CMD = ["labwc", "--exit"]
+
+    def __init__(self, active: bool, runner=None):
+        super().__init__()
+        self._active = active
+        self._run = runner or _run_quiet
+        self._error = ""
+
+    @Property(bool, constant=True)
+    def active(self) -> bool:
+        return self._active
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Slot(result=bool)
+    def logout(self) -> bool:
+        """คืน True เมื่อสั่งจบเซสชันแล้ว · False = ไม่ได้อยู่ในเซสชันจริง หรือสั่งไม่สำเร็จ (ดู error)."""
+        if not self._active:
+            return False
+        code = self._run(self.EXIT_CMD)
+        if code != 0:
+            # ไม่ปิดเงียบ ๆ (H2): ผู้ใช้ต้องรู้ว่ายังไม่ได้ออก
+            self._error = f"ออกจากระบบไม่สำเร็จ (labwc --exit ตอบ {code}) · ลองอีกครั้ง"
+            self.changed.emit()
+            return False
+        return True
+
+
+def _run_quiet(args: list[str]) -> int:
+    import subprocess
+
+    try:
+        return subprocess.run(args, check=False, capture_output=True, timeout=10).returncode
+    except (OSError, subprocess.TimeoutExpired):
+        return 127
+
+
 class SignupController(QObject):
     """กฎตรวจฟอร์มสมัคร · เรียกกฎชุดเดียวกับที่ตัวสร้างบัญชีจริงจะใช้ (aipc.accounts.validation)."""
 

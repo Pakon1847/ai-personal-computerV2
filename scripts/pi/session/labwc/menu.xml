@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- เมนูว่าง (การ์ด 0004) · กันเมนูค่าเริ่มต้นของ labwc ที่มี Terminal / Exit -->
+<openbox_menu>
+  <menu id="root-menu" label="" />
+  <menu id="client-menu" label="" />
+</openbox_menu>

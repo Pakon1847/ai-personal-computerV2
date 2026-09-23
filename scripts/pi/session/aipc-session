@@ -1,0 +1,17 @@
+#!/bin/sh
+# คำสั่งเซสชันที่ greetd เริ่มหลัง login ผ่าน (การ์ด 0004) · แทน /usr/bin/labwc-pi (เดสก์ท็อปของ Pi)
+#
+# เปิด labwc ด้วยค่าตั้งของเราเอง (-C) = ไม่มีแถบงาน ไอคอน เมนู หรือคีย์ลัดเปิด terminal ของ Pi
+# -S = รัน aipc-shell-loop และเมื่อตัวนั้นจบ labwc ก็จบ → greetd กลับหน้า Login
+# ออกจากระบบ: หน้าจอ V2 เรียก `labwc --exit`
+HERE="$(dirname "$(readlink -f "$0")")"
+
+# ค่าเดียวกับ /usr/bin/labwc-pi ของ Raspberry Pi OS (trixie) เพื่อให้วาดจอได้แบบเดียวกัน
+if command -v raspi-config >/dev/null 2>&1 && raspi-config nonint is_pi; then
+  export WLR_DRM_FORCE_LIBLIFTOFF=1
+  raspi-config nonint gpu_has_mmu || export WLR_RENDERER=pixman
+fi
+export XDG_CURRENT_DESKTOP=labwc:wlroots
+export XDG_SESSION_DESKTOP=aipc
+
+exec labwc -C "$HERE/labwc" -S "$HERE/aipc-shell-loop"

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ค่าตั้ง labwc ของเซสชัน V2 (การ์ด 0004)
+  มีคีย์ลัดแค่สลับหน้าต่าง (กลับจากเบราว์เซอร์ที่สกิล 4 เปิด) · ไม่มีคีย์เปิด terminal/เมนู/ปิดเครื่องของ Pi
+  labwc โหลดคีย์ลัดค่าเริ่มต้นเฉพาะเมื่อไม่ได้กำหนดเลย หรือใส่ <default /> → ที่นี่กำหนดเอง จึงไม่มีค่าเริ่มต้น
+-->
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <theme>
+    <name>PiXtrix</name>
+    <titlebar>
+      <layout>:iconify,max,close</layout>
+    </titlebar>
+  </theme>
+
+  <keyboard>
+    <numlock>off</numlock>
+    <keybind key="A-Tab">
+      <action name="NextWindow" />
+    </keybind>
+    <keybind key="A-S-Tab">
+      <action name="PreviousWindow" />
+    </keybind>
+  </keyboard>
+
+  <mouse>
+    <!-- คลิกที่หน้าต่าง = เลือกหน้าต่างนั้น · ไม่มีเมนูคลิกขวาบนพื้นหลัง -->
+    <context name="Client">
+      <mousebind button="Left" action="Press"><action name="Focus" /><action name="Raise" /></mousebind>
+      <mousebind button="Right" action="Press"><action name="Focus" /><action name="Raise" /></mousebind>
+    </context>
+    <context name="Title">
+      <mousebind button="Left" action="Press"><action name="Focus" /><action name="Raise" /></mousebind>
+      <mousebind button="Left" action="Drag"><action name="Move" /></mousebind>
+    </context>
+    <context name="Iconify">
+      <mousebind button="Left" action="Click"><action name="Iconify" /></mousebind>
+    </context>
+    <context name="Maximize">
+      <mousebind button="Left" action="Click"><action name="ToggleMaximize" /></mousebind>
+    </context>
+    <context name="Close">
+      <mousebind button="Left" action="Click"><action name="Close" /></mousebind>
+    </context>
+  </mouse>
+</openbox_config>
