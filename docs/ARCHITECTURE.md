@@ -10,6 +10,22 @@
 | `aipc.doctor` | ตรวจฮาร์ดแวร์และช่องโหว่ image แบบอ่านอย่างเดียว |
 | `aipc.spikes.llm`, `spikes/pg-rls/` | spike ของ ADR-007 และ ADR-004 |
 
+## เปิดเครื่องถึงหน้าจอ V2 (การ์ด 0003, 0004 · ติดตั้งบน Pi 4 แล้ว)
+
+```text
+เปิดเครื่อง → systemd → greetd ─► cage -s ─► aipc.ui --greeter <เซสชัน>     (ผู้ใช้ _greetd, /opt/aipc-v2)
+                          │  socket $GREETD_SOCK  (aipc.login.greetd: create_session → answer → start)
+                          │  PAM ของ OS ตรวจรหัสผ่าน · โค้ดเราไม่ตรวจเอง
+                          ▼ ผ่าน
+          scripts/pi/session/aipc-session  (ผู้ใช้คนนั้น)
+             └ labwc -C session/labwc (ค่าตั้งของเรา: Alt+Tab เท่านั้น, เมนูว่าง, แป้น us/th สลับด้วย ~)
+                 └ -S aipc-shell-loop ─► aipc.ui --session --fullscreen
+                        ล่ม → เปิดใหม่ · ล่ม 3 ครั้ง/60 วิ → จบเซสชัน
+                 "ออก" ─► labwc --exit ─► greetd กลับหน้า Login
+```
+
+ติดตั้ง/ย้อนกลับ: `scripts/pi/install-greeter.sh [--apply] [--session v2] | --rollback` · ทางเข้าสำรอง: SSH, tty2
+
 ## Skill (`aipc.skills`)
 
 ```text
@@ -22,6 +38,19 @@
 ```
 
 ไฟล์สกิลเป็นข้อมูล ผ่านตัวตรวจ `manifest.validate` ก่อนใช้เสมอ · Action และสิทธิ์ที่ขอได้ถูกกำหนดในโค้ดของระบบเท่านั้น
+
+## ใบหน้า (`aipc.vision` · การ์ด 0005 · ยังไม่ต่อหน้าจอ)
+
+```text
+กล้อง ─► models.Detector (YuNet) ─► quality.check ─► models.Liveness (MiniFASNet ×2) ─► align.crop 112×112
+      ─► models.Embedder (SFace) ─► matching.average (3–5 เฟรม) ─► matching.match (threshold + margin)
+pipeline.FaceScanner: process (ต่อเฟรม, จับเวลาทุกขั้น) · scan (1:N) · enroll (ตรง/ซ้าย/ขวา)
+store.FaceStore: แม่แบบ 128 ค่า + ความยินยอม + sha256 โมเดล · ~/.local/share/aipc/face-template.json (0600)
+pipeline.ScanLog: ~/.local/state/aipc/face-scans.log (ไม่มีภาพ ไม่มี embedding)
+```
+
+โมเดลโหลดผ่าน OpenCV อย่างเดียว ตรวจ sha256 ทุกครั้ง (`models/NOTICE.md`) · SFace ดาวน์โหลดด้วย `python -m aipc.vision.models fetch`
+เครื่องมือ: `aipc.vision.camera` (ทดลองกับกล้อง) · `aipc.vision.evaluate` (FAR/FRR/EER/ROC/DET) · `aipc.vision.bench` (เวลา/RAM)
 
 ## หน้าจอ (`aipc.ui`)
 
@@ -56,8 +85,9 @@ qml/AipcUi/Main.qml  ── AppState.screen ──►  LoginScreen      backend.
 | ช่องพิมพ์แชท | Enter/Shift+Enter/IME ทำงานจริง · ทุกข้อความผ่านตัวคัดสกิล — สั่งงานเครื่อง ถามเครื่อง และจดนัดใช้ได้จริง · **คุยทั่วไป/แปล ไม่มีโมเดลตอบ** |
 | นัดหมาย | แปลงวันเวลาด้วยโค้ด ยืนยันก่อนบันทึก เก็บที่ `~/.local/share/aipc/reminders.json` (atomic + .bak) · เตือนเด้งบนจอทุกรอบ 30 วิ · แจ้งนัดที่พลาดตอนเข้าใช้ · **ยังไม่มีหน้ารายการ/ลบนัด ไม่มีเสียงเตือน ไม่มีนัดซ้ำ** · ที่เก็บจริงรอ ADR-004 |
 | สั่งงานเครื่อง | บน Linux รัน `xdg-open` / `gtk-launch` / `wpctl` จริง (แบบ list ไม่ผ่าน shell) · **บนวินโดวส์เป็นแบบจำลอง และการ์ดเขียนว่า "จำลอง"** |
-| เข้าสู่ระบบ | **ไม่มีการตรวจรหัสผ่าน** · นอกโหมดพัฒนาปฏิเสธเสมอ |
-| สแกนหน้า, ลงทะเบียนใบหน้า | **ไม่มี** · หน้าจอบอกว่ายังไม่พร้อม · ดูหน้าตาได้ด้วย `--demo-scan` |
+| เข้าสู่ระบบ | โหมด greeter (`--greeter`): ส่งให้ greetd/PAM ตรวจจริง · หน้าต่างพัฒนา: ปฏิเสธเสมอนอกโหมดพัฒนา |
+| หลังเข้าระบบ | โหมดเซสชัน (`--session`): เริ่มที่ Shell, "ออก" จบเซสชันจริง, ไม่มีโหมดพัฒนา |
+| สแกนหน้า, ลงทะเบียนใบหน้า | แกนมีแล้วใน `aipc.vision` (ใช้จาก terminal ได้) · **หน้าจอยังไม่ได้ต่อ** · วงกล้องยังบอก "ยังไม่พร้อม" · ดูหน้าตาได้ด้วย `--demo-scan` |
 | หน้า Skill | รายการจากไฟล์สกิลจริง พร้อมบอกว่าตัวไหนใช้ได้ ตัวไหนยังขาดอะไร · **นำเข้า/ให้ AI ช่วยสร้าง ยังไม่มี** |
 | ปิดบัง/ล็อก, ความเป็นส่วนตัว, เสียง | **ไม่มี** · หน้าจอบอกว่ายังไม่พร้อมและอยู่เฟสไหน |
 
