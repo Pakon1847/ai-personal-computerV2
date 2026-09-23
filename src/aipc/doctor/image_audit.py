@@ -25,6 +25,10 @@ REMOTE_UNITS = [
     "vncserver-x11-serviced.service",
     "rpi-connect.service",
 ]
+# Raspberry Pi Connect (แชร์หน้าจอ/เชลล์ระยะไกล) ไม่ใช่บริการของระบบ แต่เป็นบริการ "รายผู้ใช้"
+# ที่ Raspberry Pi Imager เปิดให้บัญชีแรก · `systemctl is-enabled` ของระบบจึงตอบ not-found
+# ยืนยันกับ Pi 4 trixie 2026-09-24: ลิงก์อยู่ที่ ~/.config/systemd/user/default.target.wants/
+USER_REMOTE_UNITS = ["rpi-connect.service", "rpi-connect-wayvnc.service", "wayvnc.service"]
 LOOPBACK6 = "00000000000000000000000001000000"
 
 
@@ -106,12 +110,36 @@ def check_privileged_groups(root: Path) -> Check:
     )
 
 
-def check_remote_services(run: Runner) -> Check:
+def user_remote_units(root: Path) -> list[str]:
+    """บริการระยะไกลที่เปิดรายผู้ใช้ · อ่านลิงก์ใน *.wants/ (ไม่ต้องเรียก systemctl --user ของแต่ละคน).
+
+    home ของคนอื่นเป็น 0700 → ถ้ารันโดยไม่ใช้ sudo จะเห็นแค่ของตัวเอง
+    """
+    dirs = [_p(root, "/etc/systemd/user")]
+    try:
+        dirs += [h / ".config/systemd/user" for h in sorted(_p(root, "/home").iterdir())]
+    except OSError:
+        pass
+    found = []
+    for d in dirs:
+        for unit in USER_REMOTE_UNITS:
+            try:
+                hits = list(d.glob(f"*.wants/{unit}"))
+            except OSError:
+                continue
+            if hits:
+                owner = "ทุกผู้ใช้" if d.parts[-3:-1] == ("etc", "systemd") else d.parts[-4]
+                found.append(f"{unit} (ผู้ใช้: {owner})")
+    return found
+
+
+def check_remote_services(run: Runner, root: Path = Path("/")) -> Check:
     enabled = []
     for unit in REMOTE_UNITS:
         state = run(["systemctl", "is-enabled", unit])
         if state in ("enabled", "enabled-runtime", "static", "alias"):
             enabled.append(f"{unit} ({state})")
+    enabled += user_remote_units(root)
     if run(["systemctl", "--version"]) is None:
         return Check("remote", "บริการเข้าถึงระยะไกล", UNKNOWN, "เรียก systemctl ไม่ได้")
     if enabled:
@@ -264,7 +292,7 @@ def run_all(root: Path = Path("/"), run: Runner = run_command) -> list[Check]:
     return [
         check_sudo_nopasswd(root),
         check_privileged_groups(root),
-        check_remote_services(run),
+        check_remote_services(run, root),
         check_listening(root),
         check_camera_nodes(root),
         check_home_permissions(root),

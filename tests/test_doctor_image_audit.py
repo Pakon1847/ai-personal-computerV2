@@ -61,6 +61,23 @@ class RemoteServicesTest(unittest.TestCase):
     def test_no_systemctl_is_unknown(self):
         self.assertEqual(audit.check_remote_services(lambda a: None).status, UNKNOWN)
 
+    def test_per_user_pi_connect_warns(self):
+        # Pi 4 trixie จริง: Imager เปิด Pi Connect ให้บัญชีแรกแบบรายผู้ใช้ · systemctl ของระบบตอบ not-found
+        m = FakeMachine()
+        wants = m.root / "home/pakon1847/.config/systemd/user/default.target.wants"
+        wants.mkdir(parents=True)
+        (wants / "rpi-connect.service").write_text("")
+        (wants / "rpi-connect-wayvnc.service").write_text("")
+
+        def run(args):
+            return "systemd 257" if args == ["systemctl", "--version"] else "not-found"
+
+        c = audit.check_remote_services(run, m.root)
+        m.close()
+        self.assertEqual(c.status, WARN)
+        self.assertIn("rpi-connect.service (ผู้ใช้: pakon1847)", c.detail)
+        self.assertIn("rpi-connect-wayvnc.service", c.detail)
+
 
 class PortsTest(unittest.TestCase):
     HEADER = "  sl  local_address rem_address   st tx_queue rx_queue\n"
