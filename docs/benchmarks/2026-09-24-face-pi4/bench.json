@@ -1,0 +1,50 @@
+{
+  "machine": "aarch64 · Raspberry Pi 4 Model B Rev 1.4",
+  "python": "3.13.5",
+  "opencv": "5.0.0",
+  "images": 200,
+  "rounds_counted": 5,
+  "warmup_rounds": 1,
+  "per_frame_ms": {
+    "detect": {
+      "median": 14.6,
+      "p95": 17.3
+    },
+    "quality": {
+      "median": 1.2,
+      "p95": 1.5
+    },
+    "liveness": {
+      "median": 11.1,
+      "p95": 14.1
+    },
+    "align": {
+      "median": 0.8,
+      "p95": 0.9
+    },
+    "embed": {
+      "median": 60.2,
+      "p95": 80.5
+    },
+    "total": {
+      "median": 88.2,
+      "p95": 113.3
+    }
+  },
+  "model_load_ms": 611.6,
+  "peak_rss_mb": {
+    "before_models": 88.734375,
+    "after_models": 217.296875,
+    "end": 217.296875
+  },
+  "cpu_temp_c_per_round": [
+    63.783,
+    68.166,
+    69.627,
+    72.062,
+    71.575,
+    72.062
+  ],
+  "throttled": 0,
+  "note": "ต่อเฟรมเดียว · การสแกนจริงใช้ 3–5 เฟรม + เวลาเปิดกล้อง · ภาพจากไฟล์ ไม่ใช่กล้อง"
+}
