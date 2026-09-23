@@ -96,5 +96,67 @@ class HardwareTest(unittest.TestCase):
         self.assertTrue(set(passed) <= {"storage", "glibc"}, passed)
 
 
+# โหนดวิดีโอของ Pi 4 ที่ไม่ได้ต่อกล้อง (คัดจาก /sys/class/video4linux บนเครื่องจริง 2026-09-24)
+PI4_SOC_NODES = {
+    "video10": "bcm2835-codec-decode", "video11": "bcm2835-codec-encode",
+    "video12": "bcm2835-codec-isp", "video13": "bcm2835-isp-output0",
+    "video14": "bcm2835-isp-capture0", "video15": "bcm2835-isp-capture1",
+    "video16": "bcm2835-isp-stats2", "video18": "bcm2835-codec-image_fx",
+    "video19": "rpi-hevc-dec", "video20": "bcm2835-isp-output0",
+    "video21": "bcm2835-isp-capture0", "video22": "bcm2835-isp-capture1",
+    "video23": "bcm2835-isp-stats2", "video31": "bcm2835-codec-encode_image",
+}
+
+
+class CameraTest(unittest.TestCase):
+    """บั๊กที่เจอบน Pi 4: นับโหนดของชิปเป็นกล้อง ทำให้ไฟกล้องบอก "กล้องพร้อม" ทั้งที่ไม่มีกล้อง."""
+
+    def setUp(self):
+        self.m = FakeMachine()
+
+    def tearDown(self):
+        self.m.close()
+
+    def node(self, dev: str, name: str | None):
+        self.m.write(f"/dev/{dev}", "")
+        if name is not None:
+            self.m.write(f"/sys/class/video4linux/{dev}/name", name + "\n")
+
+    def test_pi4_without_camera_is_not_a_camera(self):
+        for dev, name in PI4_SOC_NODES.items():
+            self.node(dev, name)
+        c = hw.check_camera(self.m.root)
+        self.assertEqual(c.status, hw.WARN)
+        self.assertIn("ไม่พบกล้อง", c.detail)
+        self.assertIn("14", c.detail)
+
+    def test_csi_camera_among_soc_nodes_passes(self):
+        for dev, name in PI4_SOC_NODES.items():
+            self.node(dev, name)
+        self.node("video0", "unicam-image")
+        c = hw.check_camera(self.m.root)
+        self.assertEqual(c.status, hw.PASS)
+        self.assertIn("video0 (unicam-image)", c.detail)
+        self.assertNotIn("bcm2835", c.detail)
+
+    def test_usb_webcam_passes(self):
+        self.node("video0", "HD Webcam C270")
+        self.assertEqual(hw.check_camera(self.m.root).status, hw.PASS)
+
+    def test_pi5_isp_is_not_a_camera(self):
+        self.node("video20", "pispbe-input")
+        self.node("video19", "rpi-hevc-dec")
+        self.assertEqual(hw.check_camera(self.m.root).status, hw.WARN)
+
+    def test_unreadable_name_is_unknown_not_camera(self):
+        self.node("video0", None)
+        c = hw.check_camera(self.m.root)
+        self.assertEqual(c.status, hw.UNKNOWN)
+        self.assertIn("อ่านชื่อ", c.detail)
+
+    def test_no_video_nodes_is_unknown(self):
+        self.assertEqual(hw.check_camera(self.m.root).status, hw.UNKNOWN)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -236,16 +236,46 @@ def check_fscrypt_kernel(root: Path) -> Check:
     )
 
 
+# /dev/video* ไม่ได้แปลว่ากล้อง · ชิปของ Pi สร้างโหนดวิดีโอของตัวเองไว้ถอดรหัสวิดีโอและแต่งภาพ (ISP)
+# เสมอ แม้ไม่ได้ต่อกล้อง — Pi 4 ที่ไม่มีกล้องมี 14 ตัว (ตรวจจากเครื่องจริง 2026-09-24)
+# ชื่ออยู่ใน /sys/class/video4linux/videoN/name · ตัวที่ขึ้นต้นด้วยชื่อเหล่านี้ไม่นับเป็นกล้อง
+SOC_VIDEO_NODES = (
+    "bcm2835-codec",  # Pi 4: ตัวถอด/เข้ารหัสวิดีโอ (ยืนยันแล้วบน Pi 4)
+    "bcm2835-isp",  # Pi 4: ISP (ยืนยันแล้วบน Pi 4)
+    "rpi-hevc-dec",  # Pi 4/5: ตัวถอด HEVC (ยืนยันแล้วบน Pi 4)
+    "pispbe",  # Pi 5: ISP back end (จากเอกสาร ยังไม่ได้ยืนยันกับ Pi 5 ของเรา)
+)
+
+
 def check_camera(root: Path) -> Check:
     try:
         videos = sorted(p.name for p in _p(root, "/dev").glob("video*"))
     except OSError:
         videos = []
-    if videos:
+    if not videos:
+        return Check("camera", "กล้อง", UNKNOWN, "ไม่เจอ /dev/video*")
+
+    cameras, unnamed = [], []
+    for v in videos:
+        name = _read(root, f"/sys/class/video4linux/{v}/name")
+        if name is None:
+            unnamed.append(v)
+        elif not name.startswith(SOC_VIDEO_NODES):
+            cameras.append(f"{v} ({name})")
+    if cameras:
+        return Check("camera", "กล้อง", PASS, f"เจอกล้อง: {', '.join(cameras[:4])}")
+    if unnamed:
+        # อ่านชื่อไม่ได้ = ไม่รู้ว่าเป็นกล้องหรือของชิป · ไม่เดาว่าเป็นกล้อง (H5)
         return Check(
-            "camera", "กล้อง", PASS, f"เจออุปกรณ์วิดีโอ {len(videos)} ตัว: {', '.join(videos[:6])}"
+            "camera", "กล้อง", UNKNOWN, f"เจอ {', '.join(unnamed[:4])} แต่อ่านชื่ออุปกรณ์ไม่ได้"
         )
-    return Check("camera", "กล้อง", UNKNOWN, "ไม่เจอ /dev/video*")
+    return Check(
+        "camera",
+        "กล้อง",
+        WARN,
+        f"ไม่พบกล้อง · โหนดวิดีโอ {len(videos)} ตัวเป็นของชิป (ถอดรหัสวิดีโอ/ISP) ไม่ใช่กล้อง",
+        "ต่อกล้องแล้วตรวจด้วย `rpicam-hello --list-cameras` หรือ `v4l2-ctl --list-devices`",
+    )
 
 
 def check_audio(root: Path) -> Check:
