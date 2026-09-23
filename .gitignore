@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+
+# ความลับ ห้ามเข้า git
+.env
+.env.*
+*.key
+*.pem
+
+# โมเดลและข้อมูลดิบที่เป็นภาพ/เสียงของคน (BRIEF 5.1: เก็บแยกนอกเครื่องใช้งาน)
+models/
+datasets/
+*.gguf
+*.onnx
+*.wav
+docs/benchmarks/**/*.jpg
+docs/benchmarks/**/*.png
+docs/benchmarks/**/*.wav

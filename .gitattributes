@@ -1,0 +1,4 @@
+# สคริปต์และไฟล์ที่ Pi อ่าน ต้องขึ้นบรรทัดแบบ Linux (LF) เสมอ ไม่งั้น bash บน Pi อ่านไม่ออก
+* text=auto eol=lf
+*.jpg binary
+*.png binary
