@@ -1,0 +1,6 @@
+// กฎผังแป้นเพิ่มของเซสชัน V2 (การ์ด 0004) · โหลดผ่าน XKB_CONFIG_EXTRA_PATH ที่ aipc-session ตั้ง
+// ใช้กฎมาตรฐานของระบบทั้งหมด แล้วเพิ่มตัวเลือกเดียว: aipc:grave_toggle
+! include %S/evdev
+
+! option = symbols
+  aipc:grave_toggle = +aipc(grave_toggle)

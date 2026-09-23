@@ -1,8 +1,8 @@
 # สภาพแวดล้อมของเซสชัน V2 (การ์ด 0004) · ค่าจาก /etc/xdg/labwc/environment ของ Pi เฉพาะที่ใช้
 XKB_DEFAULT_MODEL=pc105
-# แป้นอังกฤษ + ไทย (เกษมณี) · สลับด้วย Alt+Shift
+# แป้นอังกฤษ + ไทย (เกษมณี) · สลับด้วยปุ่ม ~ แบบ Windows (ไฟล์ xkb/ ของเรา) หรือ Alt+Shift
 XKB_DEFAULT_LAYOUT=us,th
-XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
+XKB_DEFAULT_OPTIONS=aipc:grave_toggle,grp:alt_shift_toggle
 XCURSOR_THEME=PiXtrix
 XCURSOR_SIZE=24
 LABWC_FALLBACK_OUTPUT=NOOP-1

@@ -1,0 +1,10 @@
+// ปุ่ม ` (ซ้ายของเลข 1) สลับไทย/อังกฤษ แบบ Windows · Pakon เลือก 2026-09-24
+// ตัวเลือกมาตรฐานของ xkb ไม่มีปุ่มนี้ จึงเขียนเอง
+// กด Shift ค้าง = ตัวเดิมของปุ่ม (อังกฤษ ~ · ไทย %) · ตัว ` เองพิมพ์ไม่ได้ เหมือนบน Windows
+partial alphanumeric_keys
+xkb_symbols "grave_toggle" {
+    key <TLDE> {
+        symbols[Group1] = [ ISO_Next_Group, asciitilde ],
+        symbols[Group2] = [ ISO_Next_Group, percent ]
+    };
+};

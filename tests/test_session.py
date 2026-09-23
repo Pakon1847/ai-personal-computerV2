@@ -87,6 +87,62 @@ class ShellLoopTest(unittest.TestCase):
         self.assertEqual((code, runs), (0, 1))
 
 
+def _xkb():
+    import ctypes
+    import ctypes.util
+
+    name = ctypes.util.find_library("xkbcommon")
+    return ctypes.CDLL(name) if name else None
+
+
+@unittest.skipUnless(sys.platform.startswith("linux") and _xkb(), "ต้องมี libxkbcommon (Linux)")
+class KeymapTest(unittest.TestCase):
+    """คอมไพล์ผังแป้นจริงด้วย libxkbcommon ตัวเดียวกับที่ labwc ใช้ · ผิดตรงนี้ = labwc ใช้แป้นผิด."""
+
+    TLDE, AC01 = 49, 38  # keycode ของปุ่ม ` และปุ่ม a (evdev + 8)
+    ISO_NEXT_GROUP, THAI_FOFAN = 0xFE08, 0x0DBF
+
+    FIELDS = ("rules", "model", "layout", "variant", "options")
+
+    def env(self) -> dict[str, str]:
+        text = (LOOP.parent / "labwc" / "environment").read_text(encoding="utf-8")
+        pairs = (ln.partition("=") for ln in text.splitlines() if ln and ln[0] != "#")
+        return {k: v for k, _, v in pairs}
+
+    def keysym(self, key: int, group: int, level: int = 0) -> int | None:
+        import ctypes as c
+
+        os.environ["XKB_CONFIG_EXTRA_PATH"] = str(LOOP.parent / "xkb")  # เหมือน aipc-session
+        x, conf = _xkb(), self.env()
+
+        class Names(c.Structure):
+            _fields_ = [(n, c.c_char_p) for n in self.FIELDS]
+
+        x.xkb_context_new.restype = c.c_void_p
+        x.xkb_keymap_new_from_names.restype = c.c_void_p
+        x.xkb_keymap_new_from_names.argtypes = [c.c_void_p, c.POINTER(Names), c.c_int]
+        x.xkb_keymap_key_get_syms_by_level.argtypes = [
+            c.c_void_p, c.c_uint32, c.c_uint32, c.c_uint32, c.POINTER(c.POINTER(c.c_uint32)),
+        ]  # fmt: skip
+        values = ["evdev", conf["XKB_DEFAULT_MODEL"], conf["XKB_DEFAULT_LAYOUT"], "",
+                  conf["XKB_DEFAULT_OPTIONS"]]  # fmt: skip
+        names = Names(*(v.encode() for v in values))
+        km = x.xkb_keymap_new_from_names(x.xkb_context_new(0), c.byref(names), 0)
+        self.assertTrue(km, "คอมไพล์ผังแป้นไม่ผ่าน → labwc จะใช้แป้นผิด")
+        syms = c.POINTER(c.c_uint32)()
+        n = x.xkb_keymap_key_get_syms_by_level(km, key, group, level, c.byref(syms))
+        return syms[0] if n else None
+
+    def test_grave_switches_language_in_both_layouts(self):
+        self.assertEqual(self.keysym(self.TLDE, 0), self.ISO_NEXT_GROUP, "อังกฤษ → ไทย")
+        self.assertEqual(self.keysym(self.TLDE, 1), self.ISO_NEXT_GROUP, "ไทย → อังกฤษ")
+        self.assertEqual(self.keysym(self.TLDE, 0, level=1), ord("~"), "Shift+` = ~")
+
+    def test_thai_layout_still_types_thai(self):
+        self.assertEqual(self.keysym(self.AC01, 1), self.THAI_FOFAN, "ปุ่ม a ฝั่งไทย = ฟ")
+        self.assertEqual(self.keysym(self.AC01, 0), ord("a"))
+
+
 class SessionConfigTest(unittest.TestCase):
     """ค่าตั้ง labwc ของเซสชันต้องไม่มีทางหลุดไปเดสก์ท็อป/terminal ของ Pi."""
 

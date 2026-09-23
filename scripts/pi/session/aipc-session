@@ -13,5 +13,7 @@ if command -v raspi-config >/dev/null 2>&1 && raspi-config nonint is_pi; then
 fi
 export XDG_CURRENT_DESKTOP=labwc:wlroots
 export XDG_SESSION_DESKTOP=aipc
+# ผังแป้นเพิ่มของเรา (ปุ่ม ~ สลับไทย/อังกฤษ) · libxkbcommon ค้นที่นี่ก่อนที่ของระบบ
+export XKB_CONFIG_EXTRA_PATH="$HERE/xkb"
 
 exec labwc -C "$HERE/labwc" -S "$HERE/aipc-shell-loop"
