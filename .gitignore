@@ -35,3 +35,4 @@ docs/benchmarks/**/*.wav
 !docs/benchmarks/2026-09-24-card0002/*.png
 # กราฟผลประเมินใบหน้า (ไม่มีภาพคน)
 !docs/benchmarks/2026-09-24-face-lfw/*.png
+!docs/benchmarks/2026-09-24-face-lfw-standard/*.png

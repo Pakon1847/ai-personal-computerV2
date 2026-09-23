@@ -1,13 +1,14 @@
 {
   "dataset": "LFW pairs.txt (มาตรฐาน)",
-  "commit": "8913cf8",
-  "date": "2026-09-24T04:11:27+07:00",
+  "commit": "83dd7f8",
+  "date": "2026-09-24T04:15:28+07:00",
   "machine": "win32 · Python 3.13.14 · OpenCV 5.0.0",
   "models_sha256": {
     "face_detection_yunet_2023mar.onnx": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
     "face_recognition_sface_2021dec.onnx": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79"
   },
   "protocol": "LFW pairs.txt · 10-fold · threshold จาก 9 fold ที่เหลือ",
+  "face_pick": "centre",
   "pairs": {
     "genuine": 3000,
     "impostor": 3000,
@@ -15,8 +16,8 @@
   },
   "images": 7701,
   "no_face_images": 0,
-  "accuracy_mean": 0.98933,
-  "accuracy_std": 0.00423,
+  "accuracy_mean": 0.9935,
+  "accuracy_std": 0.00369,
   "fold_thresholds": [
     0.3095,
     0.3095,
@@ -29,6 +30,6 @@
     0.3095,
     0.3095
   ],
-  "eer": 0.014,
-  "eer_threshold": 0.2793
+  "eer": 0.008,
+  "eer_threshold": 0.3008
 }
