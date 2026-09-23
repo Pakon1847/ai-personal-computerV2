@@ -1,6 +1,11 @@
 // กฎผังแป้นเพิ่มของเซสชัน V2 (การ์ด 0004) · โหลดผ่าน XKB_CONFIG_EXTRA_PATH ที่ aipc-session ตั้ง
 // ใช้กฎมาตรฐานของระบบทั้งหมด แล้วเพิ่มตัวเลือกเดียว: aipc:grave_toggle
+// ต้องแยกตามผังแป้น (layout[1] = อังกฤษ, layout[2] = ไทย) เพราะ symbols ที่ใส่โดยไม่ระบุผัง
+// มีผลแค่ผังแรก (เจอจากเทสต์บน Pi 4: ฝั่งไทยกดแล้วได้ _ แทนที่จะสลับกลับ)
 ! include %S/evdev
 
-! option = symbols
-  aipc:grave_toggle = +aipc(grave_toggle)
+! layout[1] option = symbols
+  * aipc:grave_toggle = +aipc(grave_toggle_latin):1
+
+! layout[2] option = symbols
+  * aipc:grave_toggle = +aipc(grave_toggle_thai):2

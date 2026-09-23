@@ -137,6 +137,7 @@ class KeymapTest(unittest.TestCase):
         self.assertEqual(self.keysym(self.TLDE, 0), self.ISO_NEXT_GROUP, "อังกฤษ → ไทย")
         self.assertEqual(self.keysym(self.TLDE, 1), self.ISO_NEXT_GROUP, "ไทย → อังกฤษ")
         self.assertEqual(self.keysym(self.TLDE, 0, level=1), ord("~"), "Shift+` = ~")
+        self.assertEqual(self.keysym(self.TLDE, 1, level=1), ord("%"), "ไทย Shift+` = %")
 
     def test_thai_layout_still_types_thai(self):
         self.assertEqual(self.keysym(self.AC01, 1), self.THAI_FOFAN, "ปุ่ม a ฝั่งไทย = ฟ")
