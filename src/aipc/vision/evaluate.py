@@ -226,6 +226,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limit-people", type=int, default=0, help="ใช้แค่ N คนแรก (ทดลองเร็ว ๆ)")
     ap.add_argument("--pick", choices=("largest", "centre"), default="largest",
                     help="เลือกหน้าไหนเมื่อภาพมีหลายหน้า (LFW ใช้ centre)")  # fmt: skip
+    ap.add_argument("--sface", choices=("fp32", "int8"), default="fp32", help="รุ่นของ SFace")
     ap.add_argument("--pairs", type=Path, help="pairs.txt ของ LFW → ใช้วิธีมาตรฐาน 6,000 คู่ 10 fold")
     a = ap.parse_args(argv)
     # คอนโซลวินโดวส์ภาษาไทยใช้ cp874 ที่ไม่มีบางตัวอักษร (เช่น ·) → พิมพ์เป็น UTF-8 แทนการล่มตอนท้าย
@@ -239,11 +240,11 @@ def main(argv: list[str] | None = None) -> int:
     commit = git_commit()
     cfg = config.load(a.config)
     if a.pairs:
-        det, emb = models.Detector(cfg.min_detect_score), models.Embedder()
+        det, emb = models.Detector(cfg.min_detect_score), models.Embedder(a.sface)
         res = {"dataset": a.name or a.folder.name, "commit": commit,
                "date": datetime.now().astimezone().isoformat(timespec="seconds"),
                "machine": machine_text(cv2),
-               "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE)},
+               "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE_VARIANTS[a.sface])},
                **run_pairs(a, cfg, det, emb)}  # fmt: skip
         text = json.dumps(res, ensure_ascii=False, indent=2)
         (a.out / "metrics.json").write_text(text + "\n", encoding="utf-8", newline="\n")
@@ -252,7 +253,7 @@ def main(argv: list[str] | None = None) -> int:
     people = list_people(a.folder)
     if a.limit_people:
         people = dict(list(people.items())[: a.limit_people])
-    det, emb = models.Detector(cfg.min_detect_score), models.Embedder()
+    det, emb = models.Detector(cfg.min_detect_score), models.Embedder(a.sface)
 
     files, vecs, ids, per_image_ms = [], [], {}, []
     no_face = gate_pass = total = 0
@@ -300,7 +301,7 @@ def main(argv: list[str] | None = None) -> int:
         "date": datetime.now().astimezone().isoformat(timespec="seconds"),
         "commit": commit,
         "machine": machine_text(cv2),
-        "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE)},
+        "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE_VARIANTS[a.sface])},
         "people": len(ids), "images": total, "images_used": len(files),
         "failure_to_acquire": round(no_face / total, 4) if total else None,
         "quality_gate_pass_rate": round(gate_pass / len(files), 4) if files else None,

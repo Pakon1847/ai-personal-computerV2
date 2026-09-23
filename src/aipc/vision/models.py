@@ -48,6 +48,16 @@ SFACE = ModelFile(
     "face_recognition_sface/face_recognition_sface_2021dec.onnx",
 )
 
+# รุ่น int8 (quantized) ของ SFace จาก OpenCV Zoo · เล็กกว่า 4 เท่า · ทดลองว่าเร็วขึ้นบน Pi แค่ไหน (การ์ด 0005 ข้อ 8)
+# embedding คนละแบบกับ fp32 → แม่แบบที่ลงทะเบียนด้วยรุ่นหนึ่งใช้กับอีกรุ่นไม่ได้ (store ตรวจ sha256 ให้)
+SFACE_INT8 = ModelFile(
+    "face_recognition_sface_2021dec_int8.onnx",
+    "2b0e941e6f16cc048c20aee0c8e31f569118f65d702914540f7bfdc14048d78a",
+    "https://media.githubusercontent.com/media/opencv/opencv_zoo/main/models/"
+    "face_recognition_sface/face_recognition_sface_2021dec_int8.onnx",
+)
+SFACE_VARIANTS = {"fp32": SFACE, "int8": SFACE_INT8}
+
 
 class ModelError(RuntimeError):
     """โมเดลใช้ไม่ได้ (ไม่มีไฟล์ / sha256 ไม่ตรง) · ผู้เรียกต้องบอกผู้ใช้ว่าใบหน้ายังใช้ไม่ได้."""
@@ -119,10 +129,11 @@ class Detector:
 class Embedder:
     """SFace: รับหน้าที่ align แล้ว 112×112 (จาก aipc.vision.align.crop) คืนเวกเตอร์ 128 ตัว."""
 
-    def __init__(self):
+    def __init__(self, variant: str = "fp32"):
         import cv2
 
-        self._net = cv2.FaceRecognizerSF.create(str(locate(SFACE)), "")
+        self.model = SFACE_VARIANTS[variant]
+        self._net = cv2.FaceRecognizerSF.create(str(locate(self.model)), "")
 
     def embed(self, aligned: np.ndarray) -> np.ndarray:
         return self._net.feature(aligned).reshape(-1).astype(np.float32)
@@ -178,7 +189,7 @@ class Liveness:
 
 def main(argv: list[str]) -> int:
     if argv[:1] == ["fetch"]:
-        print(fetch())
+        print(fetch(SFACE_VARIANTS[argv[1]] if len(argv) > 1 else SFACE))
         return 0
     if argv[:1] == ["check"]:
         ok = True
@@ -189,7 +200,7 @@ def main(argv: list[str]) -> int:
                 ok = False
                 print("ไม่ผ่าน", e)
         return 0 if ok else 1
-    print("ใช้: python -m aipc.vision.models fetch | check")
+    print("ใช้: python -m aipc.vision.models fetch [fp32|int8] | check")
     return 2
 
 

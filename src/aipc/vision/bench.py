@@ -44,6 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limit", type=int, default=200, help="จำนวนภาพ")
     ap.add_argument("--rounds", type=int, default=5, help="จำนวนรอบที่นับ (ไม่รวม warm-up 1 รอบ)")
     ap.add_argument("--out", type=Path)
+    ap.add_argument("--sface", choices=("fp32", "int8"), default="fp32", help="รุ่นของ SFace")
     a = ap.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
@@ -56,7 +57,8 @@ def main(argv: list[str] | None = None) -> int:
     images = [img for img in (cv2.imread(str(p)) for p in paths) if img is not None]
     rss_before = peak_rss_mb()
     t = time.perf_counter()
-    det, live, emb = models.Detector(cfg.min_detect_score), models.Liveness(), models.Embedder()
+    det, live = models.Detector(cfg.min_detect_score), models.Liveness()
+    emb = models.Embedder(a.sface)
     load_ms = (time.perf_counter() - t) * 1000
     rss_models = peak_rss_mb()
 
@@ -88,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
     res = {
         "machine": f"{platform.machine()} · {machine.board_model() or platform.platform()}",
         "python": sys.version.split()[0], "opencv": cv2.__version__,
-        "images": len(images), "rounds_counted": a.rounds, "warmup_rounds": 1,
+        "sface": a.sface, "images": len(images), "rounds_counted": a.rounds, "warmup_rounds": 1,
         "per_frame_ms": {k: {"median": round(statistics.median(v), 1), "p95": pct(v, 95)}
                          for k, v in steps.items() if v},
         "model_load_ms": round(load_ms, 1),
