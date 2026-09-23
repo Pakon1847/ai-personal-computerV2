@@ -61,11 +61,17 @@ fi
 
 # เซสชันหลังเข้าได้: ใช้ตัวเดียวกับที่ lightdm ใช้อยู่ ถ้าไม่ได้บอกมา
 if [ -z "$SESSION" ]; then
+  # ภาพ OS ที่เพิ่งลงอาจไม่มีบรรทัดนี้ (lightdm.conf มีแค่ #user-session=default) → ใช้ชื่อมาตรฐานของ Pi OS
+  # trixie = rpd-labwc · bookworm = LXDE-pi-labwc (ยืนยันจาก raspi-config do_wayland และแพ็กเกจ rpd-wayland-core)
   NAME="$(grep -E '^\s*user-session\s*=' /etc/lightdm/lightdm.conf 2>/dev/null | tail -1 | cut -d= -f2 | tr -d ' ' || true)"
-  FILE="/usr/share/wayland-sessions/$NAME.desktop"
-  if [ -n "$NAME" ] && [ -f "$FILE" ]; then
-    SESSION="$(grep -E '^Exec=' "$FILE" | head -1 | cut -d= -f2-)"
-  fi
+  for n in "$NAME" rpd-labwc LXDE-pi-labwc; do
+    FILE="/usr/share/wayland-sessions/$n.desktop"
+    if [ -n "$n" ] && [ -f "$FILE" ]; then
+      SESSION="$(grep -E '^Exec=' "$FILE" | head -1 | cut -d= -f2-)"
+      say "ใช้เซสชันจาก $FILE"
+      break
+    fi
+  done
 fi
 if [ -z "$SESSION" ]; then
   say "หยุด: หาเซสชันเดสก์ท็อปไม่เจอ · เลือกจากรายการนี้แล้วรันใหม่ด้วย --session \"Exec ของตัวที่เลือก\":"
@@ -75,12 +81,27 @@ fi
 case "$SESSION" in *\"*|*\'*) say "หยุด: คำสั่งเซสชันมีเครื่องหมายคำพูด ใส่ใน config ไม่ได้อย่างปลอดภัย"; exit 1 ;; esac
 say "เซสชันหลังเข้าได้: $SESSION"
 
+# ---------- ยืนยันทางเข้าสำรองก่อนเริ่มทำอะไร ----------
+if [ "$MODE" = "apply" ]; then
+  say ""
+  say "ก่อนเปลี่ยนหน้า login: เคยลองกด Ctrl+Alt+F2 แล้ว login ในหน้าจอตัวหนังสือได้ใช่ไหม"
+  say "(ถ้าหน้า Login ใหม่มีปัญหา จะใช้ทางนี้เข้าไปรัน --rollback)"
+  read -r -p "พิมพ์ YES ถ้าใช่: " ANSWER
+  [ "$ANSWER" = "YES" ] || { say "ยกเลิก · ยังไม่ได้เปลี่ยนอะไร"; exit 1; }
+fi
+
 # ---------- 1. แพ็กเกจ ----------
 say ""; say "1) greetd + cage"
 MISSING=()
 command -v greetd >/dev/null || MISSING+=(greetd)
 command -v cage >/dev/null || MISSING+=(cage)
 if [ "${#MISSING[@]}" -gt 0 ]; then do_ apt-get install -y "${MISSING[@]}"; else say "   มีครบแล้ว"; fi
+# แพ็กเกจ greetd อาจเปิดตัวเองตอนติดตั้ง → คืนให้ lightdm เป็นหน้า login ไว้ก่อนจนถึงขั้นที่ 4
+# (ถ้าขั้น 2–3 พังกลางทาง เครื่องยังบูตเข้าหน้า login เดิมได้ ไม่ใช่ greetd ที่ยังไม่ได้ตั้งค่า)
+if [ "$MODE" = "apply" ]; then
+  systemctl disable greetd 2>/dev/null || true
+  systemctl enable lightdm
+fi
 
 # ---------- 2. แอปที่ /opt/aipc-v2 ----------
 say ""; say "2) คัดลอกแอป (เฉพาะไฟล์ที่ commit แล้ว: $(git -C "$SRC" rev-parse --short HEAD)) ไปที่ $DEST"
@@ -111,11 +132,6 @@ printf '%s\n' "$NEW" | sed 's/^/   /'
 # ---------- ยืนยันทางเข้าสำรองก่อนเปลี่ยนหน้า login ----------
 if [ "$MODE" = "apply" ]; then
   getent passwd _greetd >/dev/null || { say "หยุด: ไม่มีผู้ใช้ _greetd (แพ็กเกจ greetd ควรสร้างให้)"; exit 1; }
-  say ""
-  say "ก่อนเปลี่ยนหน้า login: เคยลองกด Ctrl+Alt+F2 แล้ว login ในหน้าจอตัวหนังสือได้ใช่ไหม"
-  say "(ถ้าหน้า Login ใหม่มีปัญหา จะใช้ทางนี้เข้าไปรัน --rollback)"
-  read -r -p "พิมพ์ YES ถ้าใช่: " ANSWER
-  [ "$ANSWER" = "YES" ] || { say "ยกเลิก · ขั้น 1–2 ทำไปแล้วแต่ยังไม่เปลี่ยนหน้า login"; exit 1; }
   [ -f "$CONF" ] && cp -a "$CONF" "$CONF.before-aipc-$STAMP" && say "+ สำรอง $CONF.before-aipc-$STAMP"
   mkdir -p "$(dirname "$CONF")"
   printf '%s\n' "$NEW" > "$CONF"

@@ -57,6 +57,9 @@ python3 -m venv .venv && ./.venv/bin/pip install -e ".[ui]"
 
 ## ขั้นที่ 4 · ให้หน้า Login ของ V2 เป็นหน้า login จริง
 
+> ภาพ OS ตั้งแต่ 2026-04-13 **ไม่มี sudo แบบไม่ใส่รหัสผ่านแล้ว** — `sudo` จะถามรหัสผ่าน เป็นเรื่องปกติ
+> เซสชันเดสก์ท็อปที่สคริปต์เลือก: `/usr/share/wayland-sessions/rpd-labwc.desktop` → `Exec=/usr/bin/labwc-pi` (trixie)
+
 ```bash
 ./scripts/pi/install-greeter.sh                # ดูก่อน · ไม่เปลี่ยนอะไร · อ่านว่าเซสชันถูกตัวไหม
 sudo ./scripts/pi/install-greeter.sh --apply   # ทำจริง · จะถามให้พิมพ์ YES ยืนยันขั้นที่ 3
