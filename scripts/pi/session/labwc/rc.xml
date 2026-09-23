@@ -22,6 +22,18 @@
     </keybind>
   </keyboard>
 
+  <!--
+    ความเร็วเมาส์: ค่าเริ่มต้นของ libinput (0.0) ช้าเกินไปบนจอ 1920×1080 กับเมาส์ไร้สายที่ใช้ทดสอบ
+    (Pakon แจ้ง 2026-09-24) · ช่วง -1.0 ถึง 1.0 · adaptive = ขยับเร็วแล้วไปไกลขึ้น
+    ภายหลังควรย้ายไปให้ผู้ใช้ปรับเองในหน้าตั้งค่า (ต้องมีการ์ดออกแบบ)
+  -->
+  <libinput>
+    <device category="non-touch">
+      <pointerSpeed>0.6</pointerSpeed>
+      <accelProfile>adaptive</accelProfile>
+    </device>
+  </libinput>
+
   <mouse>
     <!-- คลิกที่หน้าต่าง = เลือกหน้าต่างนั้น · ไม่มีเมนูคลิกขวาบนพื้นหลัง -->
     <context name="Client">
