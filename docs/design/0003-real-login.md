@@ -29,7 +29,7 @@
 
 ## 4. ความสัมพันธ์กับชิ้นส่วนอื่น
 
-- **พึ่ง:** greetd + cage บน Pi (ต้องยืนยันจากผล `check-old-system.sh`) · PySide6 ที่ผู้ใช้ `_greetd` ใช้ได้ (glibc ≥ 2.39 ถ้าใช้ pip)
+- **พึ่ง:** greetd + cage (ลงด้วย apt จาก `install-greeter.sh` บน OS ที่ลงใหม่) · PySide6 ที่ผู้ใช้ `_greetd` ใช้ได้ (glibc ≥ 2.39 ถ้าใช้ pip)
 - **มีคนพึ่ง:** การ์ด 0001 นัดหมาย (เตือนหลังเข้าใช้ · Logout = ไม่เตือน) · ระบบใบหน้า (เฟส 2) จะมาต่อเป็นขั้นก่อนรหัสผ่าน · การสมัครบัญชีจริง (การ์ดแยก)
 - **ชั้น:** หน้าจอ (greeter) + ตัวต่อ greetd ใน Python · รันเป็นผู้ใช้ `_greetd` ใน cage ก่อนมีใครเข้าเครื่อง
 
@@ -48,11 +48,12 @@
 
 `aipc.login.greetd` (Python ล้วน ทดสอบได้ด้วย socket ปลอม):
 
-- `Greetd(sock_path)` · `create_session(user)` → `AuthPrompt(kind, text)` | `Success` | `Failure(text)`
+- `Greetd(sock)` / `Greetd.connect()` (อ่าน `$GREETD_SOCK`) · `create_session(user)` → `Reply(kind="prompt"|"success"|"error")`
 - `answer(response)` → เหมือนกัน (PAM อาจถามหลายรอบ เช่น รหัสหมดอายุ)
 - `start(cmd, env)` · `cancel()`
 - ข้อความ: ความยาว u32 (native endian) + JSON ตามโปรโตคอล greetd IPC
-- `LoginController` ใน backend: ถ้ามี `$GREETD_SOCK` → ใช้ greetd จริง · ไม่มี → พฤติกรรมเดิม (dev/ปฏิเสธ)
+- `login(g, user, password, cmd)` → `LoginResult(ok, message, notes)`
+- `LoginController(greeter_session=[...])` ใน backend = โหมด greeter (`aipc.ui --greeter "เซสชัน"`) · ไม่มี → พฤติกรรมเดิม (dev/ปฏิเสธ)
 
 ## 7. กรณีที่ต้องคิดไว้ก่อน
 
@@ -81,4 +82,5 @@ greeter ทำงานเฉพาะก่อนเข้าเครื่อ
 - เข้าด้วยใบหน้า (ยังไม่มีระบบใบหน้า — เฟส 2)
 - สมัครบัญชีจริงจากหน้า Login (ต้องใช้สิทธิ์ root สร้างบัญชี → การ์ดแยก)
 - สลับผู้ใช้ / ล็อกหน้าจอ
-- เอาระบบเก่า "ai computer" ออกทั้งหมด (/opt/ai-pc ฯลฯ) — ทำหลังหน้า Login ใหม่ผ่านบน Pi แล้ว เพื่อให้ย้อนกลับได้เสมอ
+- ไล่ลบระบบเก่าทีละไฟล์ — ผู้ใช้สั่ง "เอาของเดิมออกให้หมด" จึงลง OS ใหม่แทน ([runbook](../runbooks/pi4-fresh-install.md))
+- ตัวแปรสภาพแวดล้อมของเซสชัน (เช่น `XDG_SESSION_TYPE`): **ยังไม่รู้** ว่า labwc ของ Pi ต้องการอะไรเพิ่มเมื่อเริ่มจาก greetd แทน lightdm → ดูผลบน Pi
