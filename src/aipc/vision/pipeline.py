@@ -52,7 +52,8 @@ class FrameResult:
     def advice(self) -> str:
         if self.quality is not None and not self.quality.ok:
             return self.quality.advice
-        return ADVICE.get(self.reason, "")
+        # เหตุผลของ quality gate อาจมาโดยไม่มีผล quality แนบ (เช่น no_face) → หาจากทั้งสองตาราง
+        return quality.ADVICE.get(self.reason) or ADVICE.get(self.reason, "")
 
 
 @dataclass
