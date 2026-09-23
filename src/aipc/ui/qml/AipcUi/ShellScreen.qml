@@ -27,17 +27,7 @@ Rectangle {
                     FilesPage { anchors.fill: parent; anchors.margins: 24; anchors.leftMargin: 32; anchors.rightMargin: 32 }
                 }
                 Item {
-                    PlannedPage {
-                        anchors.fill: parent; anchors.margins: 24; anchors.leftMargin: 32; anchors.rightMargin: 32
-                        title: "Skill"
-                        subtitle: "AI เลือก Skill เองจากรายการที่เปิดไว้ และใช้ได้แค่สิทธิ์ที่คุณอนุญาต"
-                        phase: "Skill แบบไม่มีโค้ดอยู่ในเฟส 5 (BRIEF 5.8, ADR-011)"
-                        plans: [
-                            "แสดง Skill ที่ติดตั้ง พร้อมสิทธิ์ที่แต่ละตัวขอ และสวิตช์เปิด/ปิด",
-                            "ให้ AI แนะนำ Skill ใหม่ แต่ติดตั้งได้หลังผ่านหน้าตรวจและคุณอนุมัติเท่านั้น",
-                            "สร้าง ทดลอง และส่งออก Skill เป็นแพ็กเกจที่ลงลายเซ็น"
-                        ]
-                    }
+                    SkillsPage { anchors.fill: parent; anchors.margins: 24; anchors.leftMargin: 32; anchors.rightMargin: 32 }
                 }
                 Item {
                     PlannedPage {

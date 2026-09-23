@@ -1,7 +1,8 @@
 // หน้าผู้ช่วย AI (BRIEF 5.4) · ช่องพิมพ์ทำงานจริงตามข้อ 7:
 //   Enter = ส่ง · Shift+Enter = ขึ้นบรรทัดใหม่ · ไม่ส่งขณะ IME กำลังประกอบคำ
-// ยังไม่มีโมเดลในเครื่อง (llama-server, เฟส 1) ข้อความที่ส่งจึงได้คำตอบเป็น "ประกาศจากระบบ"
-// ที่บอกเหตุผล ไม่ใช่คำตอบปลอมของ AI · ข้อความยังไม่ถูกบันทึกที่ไหน
+// ข้อความทุกอันผ่านตัวเลือกสกิล (skills.handle ใน Python) แล้วได้ "การ์ดคำตอบ" กลับมา
+// สกิลที่โค้ดทำงานหลัก (สั่งงานเครื่อง, ถามเครื่อง) ใช้ได้จริงแล้ว · ที่ต้องใช้โมเดลบอกว่ายังขาดอะไร
+// ยังไม่มีโมเดลในเครื่อง ข้อความคุยทั่วไปจึงได้ประกาศจากระบบ ไม่ใช่คำตอบปลอมของ AI · ยังไม่บันทึกประวัติ
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -10,15 +11,29 @@ RowLayout {
     id: root
     spacing: 0
 
-    ListModel { id: messages }
+    // รายการข้อความเป็น JS array ธรรมดา: { user: true, text } หรือ { user: false, card }
+    property var items: []
+    property var answered: ({})   // token ของการ์ดที่ตอบ "ใช่/ไม่ใช่" ไปแล้ว
 
+    function push(item) {
+        items = items.concat([item])
+    }
+    function showCard(card) {
+        push({ user: false, card: card })
+        if (card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
+    }
     function send() {
         const text = input.text.trim()
         if (text === "") return
-        messages.append({ fromUser: true, body: text })
-        messages.append({ fromUser: false, body: "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง (llama-server อยู่ในเฟส 1) · ข้อความนี้ไม่ได้ถูกส่งไปที่ไหน" })
+        push({ user: true, text: text })
         input.text = ""
-        list.positionViewAtEnd()
+        showCard(skills.handle(text))
+    }
+    function answer(token, yes) {
+        const a = Object.assign({}, answered)
+        a[token] = true
+        answered = a
+        showCard(skills.confirm(token, yes))
     }
 
     // ---------- รายการบทสนทนา ----------
@@ -35,7 +50,7 @@ RowLayout {
             RowLayout {
                 Layout.fillWidth: true
                 AppText { text: "บทสนทนา"; size: Theme.px(18); strong: true; Layout.fillWidth: true }
-                AppButton { text: "แชทใหม่"; kind: "outline"; iconPath: Icons.plus; onClicked: messages.clear() }
+                AppButton { text: "แชทใหม่"; kind: "outline"; iconPath: Icons.plus; onClicked: { root.items = []; root.answered = ({}) } }
             }
             AppText {
                 Layout.fillWidth: true
@@ -63,7 +78,7 @@ RowLayout {
                 Layout.leftMargin: 24
                 Layout.rightMargin: 24
                 spacing: 12
-                AppText { text: messages.count > 0 ? "แชทใหม่" : "ผู้ช่วย AI"; size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
+                AppText { text: root.items.length > 0 ? "แชทใหม่" : "ผู้ช่วย AI"; size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
                 Chip { text: "ยังไม่ได้เชื่อมต่อโมเดล"; iconPath: Icons.cpu; kind: "neutral" }
             }
             Rectangle { Layout.fillWidth: true; height: 1; color: Theme.line }
@@ -71,13 +86,14 @@ RowLayout {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                clip: true   // ตัดส่วนที่เลื่อนพ้นกรอบ รวมไอคอนแบบ Shape ที่ ListView ตัดเองไม่หมด
 
                 NotReady {
-                    visible: messages.count === 0
+                    visible: root.items.length === 0
                     anchors.centerIn: parent
-                    width: 520
-                    title: "แชทกับโมเดลในเครื่องยังไม่พร้อม"
-                    detail: "ช่องพิมพ์ด้านล่างใช้งานได้แล้ว (Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่) แต่ยังไม่มีโมเดลตอบ · โมเดลภาษาไทยจะเลือกจากผลวัดบน Pi 5 (ADR-007)"
+                    width: 560
+                    title: "ยังไม่มีโมเดลภาษา แต่สกิลที่โค้ดทำงานหลักใช้ได้แล้ว"
+                    detail: "ลองพิมพ์: “เปิดยูทูบ” · “ปรับเสียงสี่สิบ” · “เปิดหน้าตั้งค่า” · “ทำไมเครื่องช้า” — การคุยทั่วไป แปล และจดนัด รอโมเดลในเครื่อง (ADR-007)"
                 }
 
                 ListView {
@@ -87,28 +103,39 @@ RowLayout {
                     anchors.margins: 24
                     spacing: 16
                     clip: true
-                    model: messages
+                    model: root.items
+                    // ความสูงของการ์ดรู้หลังวาดเสร็จ จึงเลื่อนลงล่างสุดทุกครั้งที่เนื้อหายาวขึ้น
+                    onContentHeightChanged: positionViewAtEnd()
                     delegate: Item {
-                        required property bool fromUser
-                        required property string body
+                        id: row
+                        required property var modelData
                         width: ListView.view.width
-                        height: bubble.height
+                        height: modelData.user ? bubble.height : card.height
+
                         Rectangle {
                             id: bubble
-                            anchors.right: parent.fromUser ? parent.right : undefined
+                            visible: row.modelData.user
+                            anchors.right: parent.right
                             width: Math.min(bodyText.implicitWidth + 32, parent.width * 0.75)
                             height: bodyText.implicitHeight + 24
                             radius: Theme.radiusCard
-                            color: parent.fromUser ? Theme.accentSoft : Theme.surface2
-                            border.width: parent.fromUser ? 0 : 1
-                            border.color: Theme.lineStrong
+                            color: Theme.accentSoft
                             AppText {
                                 id: bodyText
                                 x: 16; y: 12
                                 width: parent.width - 32
-                                text: parent.parent.body
-                                color: parent.parent.fromUser ? Theme.bubbleInk : Theme.inkMuted
+                                text: row.modelData.text || ""
+                                color: Theme.bubbleInk
                             }
+                        }
+                        SkillCard {
+                            id: card
+                            visible: !row.modelData.user
+                            width: Math.min(640, parent.width)
+                            height: visible ? implicitHeight : 0
+                            info: row.modelData.card || ({})
+                            answered: !!root.answered[(row.modelData.card || {}).confirmToken]
+                            onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
                         }
                     }
                 }

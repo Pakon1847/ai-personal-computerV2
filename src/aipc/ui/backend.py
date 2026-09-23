@@ -263,3 +263,141 @@ class SignupController(QObject):
     @Slot(result=str)
     def newRecoveryCode(self) -> str:  # noqa: N802
         return validation.new_recovery_code()
+
+
+class SkillsController(QObject):
+    """ต่อสกิลเข้ากับหน้าแชท · handle(ข้อความ) คืน "การ์ดคำตอบ" ที่ QML วาดได้ทันที.
+
+    การ์ดมีรูปเดียวกันทุกชนิด: badge (ใช้สกิลอะไร เพราะอะไร ใครทำงาน), title, chips, lines
+    และ confirmToken เมื่อต้องถามก่อนทำ · Plan ที่รอยืนยันเก็บไว้ที่ Python ไม่ส่งไปให้ QML
+    หน้าจอส่งกลับมาได้แค่ token จึงแก้คำสั่งระหว่างทางไม่ได้
+    """
+
+    # สิ่งที่ระบบมีตอนนี้ (llm stt vlm camera ยังไม่มี) · เพิ่มเมื่อต่อ backend จริงแล้วเท่านั้น
+    AVAILABLE: frozenset[str] = frozenset()
+    WORKER_LABEL = {"code": "โค้ด", "llm": "LLM", "code+llm": "LLM + โค้ด",
+                    "stt+llm": "เสียง → LLM", "camera+vlm": "กล้อง → โมเดลดูภาพ"}  # fmt: skip
+    NEED_LABEL = {
+        "llm": "โมเดลภาษาในเครื่อง (ยังไม่ได้เลือก — รอผลวัดบน Pi 5, ADR-007)",
+        "stt": "ระบบถอดเสียงภาษาไทย (ADR-005)",
+        "vlm": "โมเดลดูภาพ (ROADMAP 0.11)",
+        "camera": "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)",
+    }
+    LEVEL = {"ok": "ok", "warn": "warn", "danger": "danger", "neutral": "neutral"}
+
+    def __init__(self, executor=None, root: Path = Path("/")):
+        super().__init__()
+        from aipc.skills import actions, manifest
+
+        self._skills = manifest.load_builtin()
+        self._exec = executor or actions.Executor()
+        self._root = root
+        self._pending: dict[str, object] = {}
+        self._counter = 0
+
+    def _badge(self, skill, reason: str) -> dict:
+        return {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}
+
+    @Property("QVariantList", constant=True)
+    def skills(self) -> list:
+        out = []
+        for s in self._skills:
+            missing = [n for n in s.needs if n not in self.AVAILABLE]
+            out.append({
+                "id": s.id, "name": s.name, "description": s.description,
+                "worker": self.WORKER_LABEL[s.worker], "permissions": s.permission_labels(),
+                "ready": not missing, "missing": [self.NEED_LABEL[n] for n in missing],
+            })  # fmt: skip
+        return out
+
+    @Property(bool, constant=True)
+    def simulated(self) -> bool:
+        return self._exec.dry_run
+
+    def _run_plan(self, plan) -> dict:
+        out = self._exec.execute(plan)
+        if out.simulated:
+            title = plan.summary + " (จำลอง)"
+        else:
+            title = plan.summary if out.ok else out.message
+        return {
+            "title": title,
+            "chips": [{"text": "จำลอง" if out.simulated else ("ทำแล้ว" if out.ok else "ไม่สำเร็จ"),
+                       "kind": "warn" if out.simulated else ("ok" if out.ok else "danger")}],
+            "lines": [out.message] if out.simulated else [],
+            "page": out.page,
+        }  # fmt: skip
+
+    @Slot(str, result="QVariantMap")
+    def handle(self, text: str) -> dict:
+        from aipc.skills import machine, router
+
+        r = router.route(text, self._skills, set(self.AVAILABLE))
+        card = {
+            "kind": r.kind,
+            "badge": {},
+            "title": "",
+            "chips": [],
+            "lines": [],
+            "confirmToken": "",
+            "page": "",
+        }
+
+        if r.kind == "command":
+            card["badge"] = self._badge(r.skill, r.reason)
+            risk = {"low": "ความเสี่ยงต่ำ", "medium": "ความเสี่ยงกลาง", "high": "ความเสี่ยงสูง"}[
+                r.command.plan.spec.risk
+            ]
+            if r.command.needs_confirmation:
+                self._counter += 1
+                token = f"c{self._counter}"
+                self._pending[token] = r.command.plan
+                card.update(
+                    title=f"หมายถึง “{r.command.plan.summary}” ใช่ไหม",
+                    lines=[f"ได้ยินว่า “{r.command.heard}” · ชื่อไม่ตรงเป๊ะ จึงถามก่อน"],
+                    chips=[{"text": risk, "kind": "neutral"}],
+                    confirmToken=token,
+                )
+            else:
+                card.update(self._run_plan(r.command.plan))
+                card["chips"].append({"text": risk, "kind": "neutral"})
+        elif r.kind == "skill" and r.skill.id == "machine-status":
+            card["badge"] = self._badge(r.skill, r.reason)
+            d = machine.ask(self._root)
+            card["title"] = d.headline
+            card["chips"] = [{"text": f.text, "kind": self.LEVEL[f.level]} for f in d.findings]
+            card["lines"] = [f"ลองทำ: {a}" for a in d.advice]
+            if d.unknown:
+                card["lines"].append("อ่านไม่ได้ (จึงไม่สรุป): " + ", ".join(d.unknown))
+            card["page"] = ""
+        elif r.kind in ("needs", "skill"):
+            card["badge"] = self._badge(r.skill, r.reason)
+            card["kind"] = "needs"
+            card["title"] = f"สกิล “{r.skill.name}” ยังใช้ไม่ได้"
+            card["lines"] = ["ต้องมีก่อน: " + self.NEED_LABEL[n] for n in (r.missing or r.skill.needs)]
+        else:
+            card["title"] = "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง"
+            card["lines"] = [
+                "ข้อความนี้ไม่ได้ถูกส่งไปที่ไหน · ลองสั่งงานเครื่อง เช่น “เปิดยูทูบ” หรือถาม “ทำไมเครื่องช้า”"
+            ]
+        return card
+
+    @Slot(str, bool, result="QVariantMap")
+    def confirm(self, token: str, yes: bool) -> dict:
+        plan = self._pending.pop(token, None)
+        card = {
+            "kind": "command",
+            "badge": {},
+            "title": "",
+            "chips": [],
+            "lines": [],
+            "confirmToken": "",
+            "page": "",
+        }
+        if plan is None:
+            card["title"] = "คำสั่งนี้หมดอายุแล้ว"
+        elif not yes:
+            card["title"] = "ยกเลิกแล้ว ไม่ได้ทำอะไร"
+        else:
+            card.update(self._run_plan(plan))
+        return card

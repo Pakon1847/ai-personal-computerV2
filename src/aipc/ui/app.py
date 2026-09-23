@@ -16,6 +16,7 @@ from aipc.ui.backend import (
     FilesBrowser,
     LoginController,
     SignupController,
+    SkillsController,
     SystemStatus,
     UiSettings,
 )
@@ -74,6 +75,7 @@ def build(opts: Options, argv: list[str] | None = None):
         "login": LoginController(opts.dev, opts.demo_scan),
         "signup": SignupController(),
         "filesBrowser": FilesBrowser(),
+        "skills": SkillsController(),
     }
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():

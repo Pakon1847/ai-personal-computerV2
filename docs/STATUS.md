@@ -44,6 +44,10 @@
 | 0.7 เครื่องมือ spike LLM `aipc.spikes.llm` (pp/tg tok/s, prefill 200 token, RAM สูงสุด, soak 10 นาที) | 3 | 58 เทสต์ผ่านบนวินโดวส์ 2026-09-23 (`tests/test_spike_llm.py`) · **ยังไม่ได้วัดจริง** · ชื่อฟิลด์ JSON ของ llama-bench ยังไม่ได้เทียบกับของจริง · ขั้นตอน: [runbooks/pi-phase0.md](runbooks/pi-phase0.md) |
 | 0.6 spike PostgreSQL peer auth + FORCE RLS (`spikes/pg-rls/`) | 2 | สคริปต์ + SQL, ตรวจ syntax แล้ว (`bash -n`) · **ยังไม่เคยรันจริงที่ไหนเลย** — รันบน Pi 4 ตาม runbook ข้อ 5.1 · เกณฑ์ตัดสินอยู่ใน [ADR-004](adr/0004-db-permissions.md) |
 | หน้าจอ QML (`aipc.ui`): Login 5 สถานะ, สมัครบัญชี 5 ขั้น, Shell 6 หน้า, ธีมสว่าง/มืด | 3 (หน้าตา) · 2 (การทำงาน) | 80 เทสต์ผ่าน (ข้าม 3 ที่ต้องรันบน Linux) บนวินโดวส์ 2026-09-23 รวมเทสต์โหลดทุกหน้าจอแบบ offscreen ไม่มี warning และเทสต์ Enter/Shift+Enter · **ยังไม่เคยรันบน Pi** · สิ่งที่ยังไม่มี backend จริงดูตาราง "อะไรจริง อะไรยังไม่มี" ใน [ARCHITECTURE](ARCHITECTURE.md) |
+| Skill: รูปแบบไฟล์ + ตัวตรวจ + ตัวคัดสกิล (`aipc.skills`) · ไฟล์สกิลทั้ง 6 | 3 | 118 เทสต์ผ่านบนวินโดวส์ 2026-09-23 (`tests/test_skills.py`, `tests/test_ui_skills.py`) · ตัวคัดสกิลยังใช้คำสำคัญอย่างเดียว (ยังไม่มี LLM เลือก) |
+| สกิล 4 สั่งงานเครื่อง | 3 | ตัวแปลคำสั่งไทย + ตัวเลขไทย + allow-list ผ่านเทสต์ · **บนวินโดวส์เป็นแบบจำลอง ยังไม่เคยรัน xdg-open/gtk-launch/wpctl จริงบน Pi** · ชื่อไฟล์ .desktop ของแอปยังไม่ได้ตรวจกับ image จริง |
+| สกิล 5 ถามเครื่องว่าเป็นอะไร | 3 | อธิบายจากค่าจริงของ `aipc.doctor` + MemAvailable · ยังไม่มี LLM เรียบเรียงคำ · **ยังไม่เคยรันบน Pi** |
+| สกิล 1, 2, 3, 6 | 1 | ไฟล์สกิลพร้อม · รอ LLM / STT / โมเดลดูภาพ / ADR-015 · ข้อกำหนดใน [SKILLS.md](SKILLS.md) |
 | ADR-014 ไลเซนส์ | ตัดสินแล้ว | [adr/0014-licensing.md](adr/0014-licensing.md) |
 | ข้อต้องมีทุกข้อใน BRIEF หัวข้อ 5 | 1 | [BRIEF.md](BRIEF.md) (spec เท่านั้น ยังไม่มีโค้ด) |
 

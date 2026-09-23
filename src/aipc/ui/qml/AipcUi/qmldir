@@ -27,3 +27,5 @@ HealthPage 1.0 HealthPage.qml
 SettingsPage 1.0 SettingsPage.qml
 PlannedPage 1.0 PlannedPage.qml
 ShellScreen 1.0 ShellScreen.qml
+SkillCard 1.0 SkillCard.qml
+SkillsPage 1.0 SkillsPage.qml
