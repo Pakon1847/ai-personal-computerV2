@@ -34,7 +34,13 @@ def main(argv: list[str] | None = None) -> int:
     if a.screenshot and "QT_QPA_PLATFORM" not in os.environ:
         os.environ["QT_QPA_PLATFORM"] = "offscreen"  # ถ่ายภาพได้โดยไม่เปิดหน้าต่างจริง
     opts = uiapp.Options(
-        a.screen, a.page, a.theme, a.dev, a.demo_scan, a.signup_step, a.software or bool(a.screenshot)
+        screen=a.screen,
+        page=a.page,
+        theme=a.theme,
+        dev=a.dev,
+        demo_scan=a.demo_scan,
+        signup_step=a.signup_step,
+        software=a.software or bool(a.screenshot),
     )
     app, engine, warnings = uiapp.build(opts, sys.argv[:1])
     if not engine.rootObjects():
