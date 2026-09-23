@@ -63,6 +63,16 @@ def make_pairs(ids: dict[str, list[int]], max_genuine: int, max_impostor: int, s
     return genuine, impostor
 
 
+def pick_face(faces, shape, mode: str):
+    """เลือกหน้าที่จะใช้ · largest = หน้าใหญ่สุด (แบบใช้งานจริง: คนที่ใกล้กล้องที่สุด)
+    centre = ใกล้กลางภาพที่สุด (ใช้กับ LFW: ภาพมีหลายคนได้ แต่คนที่ติดป้ายชื่ออยู่กลางภาพเสมอ)
+    """
+    if mode == "largest":
+        return faces[0]
+    h, w = shape[:2]
+    return min(faces, key=lambda f: (f[0] + f[2] / 2 - w / 2) ** 2 + (f[1] + f[3] / 2 - h / 2) ** 2)
+
+
 def parse_lfw_pairs(text: str) -> list[tuple[str, str, bool, int]]:
     """pairs.txt ของ LFW → [(ภาพ a, ภาพ b, คนเดียวกันไหม, fold)].
 
@@ -108,7 +118,7 @@ def run_pairs(a, cfg, det, emb) -> dict:
             if not faces:
                 cache[rel] = None
                 continue
-            f = quality.Face.from_yunet(faces[0])
+            f = quality.Face.from_yunet(pick_face(faces, img.shape, a.pick))
             cache[rel] = matching.l2_normalize(emb.embed(align.crop(img, f.landmarks)))
 
     def score(pa, pb):
@@ -132,6 +142,7 @@ def run_pairs(a, cfg, det, emb) -> dict:
     plot(c, a.out / "det.png", "DET  " + title, det=True)
     return {
         "protocol": "LFW pairs.txt · 10-fold · threshold จาก 9 fold ที่เหลือ",
+        "face_pick": a.pick,
         "pairs": {"genuine": int(same.sum()), "impostor": int((~same).sum()), "folds": 10},
         "images": len(cache), "no_face_images": sum(v is None for v in cache.values()),
         "accuracy_mean": round(mean, 5), "accuracy_std": round(std, 5),
@@ -213,6 +224,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--max-impostor", type=int, default=100000)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--limit-people", type=int, default=0, help="ใช้แค่ N คนแรก (ทดลองเร็ว ๆ)")
+    ap.add_argument("--pick", choices=("largest", "centre"), default="largest",
+                    help="เลือกหน้าไหนเมื่อภาพมีหลายหน้า (LFW ใช้ centre)")  # fmt: skip
     ap.add_argument("--pairs", type=Path, help="pairs.txt ของ LFW → ใช้วิธีมาตรฐาน 6,000 คู่ 10 fold")
     a = ap.parse_args(argv)
     # คอนโซลวินโดวส์ภาษาไทยใช้ cp874 ที่ไม่มีบางตัวอักษร (เช่น ·) → พิมพ์เป็น UTF-8 แทนการล่มตอนท้าย
@@ -250,7 +263,7 @@ def main(argv: list[str] | None = None) -> int:
             if not faces:
                 no_face += 1
                 continue
-            f = quality.Face.from_yunet(faces[0])
+            f = quality.Face.from_yunet(pick_face(faces, img.shape, a.pick))
             gate_pass += quality.check(img, f, cfg).ok
             v = matching.l2_normalize(emb.embed(align.crop(img, f.landmarks)))
             per_image_ms.append((time.perf_counter() - t0) * 1000)

@@ -60,5 +60,13 @@ class PairsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluate.parse_lfw_pairs(chr(10).join(["1 1", "A 1 2", "B 1 3 C 2"]))
 
+    def test_pick_face(self):
+        big_corner = [0, 0, 120, 120]
+        small_centre = [100, 100, 50, 50]
+        faces = [big_corner, small_centre]  # YuNet เรียงหน้าใหญ่สุดก่อนแล้ว
+        self.assertEqual(evaluate.pick_face(faces, (250, 250, 3), "largest"), big_corner)
+        self.assertEqual(evaluate.pick_face(faces, (250, 250, 3), "centre"), small_centre)
+
+
 if __name__ == "__main__":
     unittest.main()
