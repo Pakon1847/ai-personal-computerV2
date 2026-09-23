@@ -33,3 +33,5 @@ docs/benchmarks/**/*.wav
 !src/aipc/vision/models/4_0_0_80x80_MiniFASNetV1SE.onnx
 # ภาพหน้าจอ UI เป็นหลักฐานการ์ด 0002 (ไม่มีใบหน้า)
 !docs/benchmarks/2026-09-24-card0002/*.png
+# กราฟผลประเมินใบหน้า (ไม่มีภาพคน)
+!docs/benchmarks/2026-09-24-face-lfw/*.png

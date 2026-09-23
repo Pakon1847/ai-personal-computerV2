@@ -22,3 +22,5 @@
 - การ์ด 0002 สร้างเสร็จ: ตัวอักษร 200% ไม่ทับไม่ตัด (Login เลื่อนได้, สุขภาพเครื่องการ์ดสูงตามข้อความ) · เทสต์ไฟกล้อง/ไมค์ทุกหน้า + การ์ดนัดถัดไป · RAM บน Pi 4 +2.0% ([ผล](docs/benchmarks/2026-09-24-card0002/README.md))
 - เซสชัน V2: ปุ่ม ~ สลับไทย/อังกฤษ (กฎ xkb ของเรา + เทสต์คอมไพล์ผังแป้นจริง) · เมาส์เร็วขึ้น (pointerSpeed 0.6)
 - Pi 4: ปิด autologin ที่ tty1 · ปิด Raspberry Pi Connect + linger (ตามที่ Pakon อนุมัติ)
+- ระบบใบหน้า ([การ์ด 0005](docs/design/0005-face.md)): `aipc.vision` — quality gate (ขนาด/ความคม/แสง/มุม + คำแนะนำไทย), align 5 จุด, PAD MiniFASNet (แปลงเองจากต้นฉบับ, ผ่าน OpenCV), SFace, เฉลี่ยหลายเฟรม, 1:N threshold + margin, ลงทะเบียน 3 ท่า, log ไม่มีภาพ · `python -m aipc.vision.models fetch|check` · `python -m aipc.vision.evaluate` (FAR/FRR/EER/ROC/DET) · LFW EER 0.36% ([ผล](docs/benchmarks/2026-09-24-face-lfw/README.md))
+- ไม่ทำจากข้อกำหนดที่ส่งมา (เหตุผลในการ์ด 0005): InsightFace (ไลเซนส์/หนัก), FastAPI (พอร์ต/RAM), Fernet (กุญแจข้างข้อมูล), อัปเดตแม่แบบอัตโนมัติ (ขัด BRIEF 5.1 ข้อ 6)

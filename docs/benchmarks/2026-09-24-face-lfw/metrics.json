@@ -1,0 +1,37 @@
+{
+  "dataset": "LFW ทั้งชุด (คู่สุ่ม ไม่ใช่ 6000 คู่มาตรฐาน)",
+  "date": "2026-09-24T03:46:43+07:00",
+  "commit": "4a8cac4",
+  "machine": "win32 · Python 3.13.14 · OpenCV 5.0.0",
+  "models_sha256": {
+    "face_detection_yunet_2023mar.onnx": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+    "face_recognition_sface_2021dec.onnx": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79"
+  },
+  "people": 5749,
+  "images": 13233,
+  "images_used": 13233,
+  "failure_to_acquire": 0.0,
+  "quality_gate_pass_rate": 0.0104,
+  "pairs": {
+    "genuine": 20000,
+    "impostor": 100000,
+    "seed": 0
+  },
+  "eer": 0.00355,
+  "eer_threshold": 0.3274,
+  "at_far_0.1%": {
+    "threshold": 0.3651,
+    "far": 0.001,
+    "frr": 0.00405
+  },
+  "at_config_threshold": {
+    "threshold": 0.363,
+    "far": 0.00106,
+    "frr": 0.00405
+  },
+  "per_image_ms": {
+    "median": 8.5,
+    "p95": 10.8
+  },
+  "note": "เวลาต่อภาพ = ตรวจหน้า + align + embedding บนเครื่องที่รัน · ไม่ใช่ตัวเลขของ Pi 5 เว้นแต่ machine ระบุว่ารันบน Pi 5"
+}
