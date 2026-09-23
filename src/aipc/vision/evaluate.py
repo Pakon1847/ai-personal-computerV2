@@ -99,6 +99,7 @@ def plot(c: metrics.Curve, path: Path, title: str, det: bool) -> None:
     def px(far, y):
         lx = np.log10(np.clip(far, 10**xlo, 1.0))
         fy = (np.log10(np.clip(y, 10**ylo, 1.0)) - ylo) / -ylo if det else (y - ylo) / (1 - ylo)
+        fy = min(1.0, max(0.0, fy))  # จุดที่ต่ำกว่าช่วงแกน (FAR เล็กกว่าที่วัดได้) วาดที่ขอบ ไม่หลุดกรอบ
         return int(m + (lx - xlo) / -xlo * (w - 2 * m)), int(h - m - fy * (h - 2 * m))
 
     for e in range(int(xlo), 1):
