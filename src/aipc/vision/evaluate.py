@@ -235,16 +235,18 @@ def main(argv: list[str] | None = None) -> int:
 
     import cv2
 
+    # อ่าน commit ตอนเริ่ม · ถ้าอ่านหลังเขียนผลลงโฟลเดอร์ใน repo จะกลายเป็น -dirty เพราะผลของตัวเอง
+    commit = git_commit()
     cfg = config.load(a.config)
     if a.pairs:
         det, emb = models.Detector(cfg.min_detect_score), models.Embedder()
-        res = {"dataset": a.name or a.folder.name, "commit": git_commit(),
+        res = {"dataset": a.name or a.folder.name, "commit": commit,
                "date": datetime.now().astimezone().isoformat(timespec="seconds"),
                "machine": machine_text(cv2),
                "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE)},
                **run_pairs(a, cfg, det, emb)}  # fmt: skip
         text = json.dumps(res, ensure_ascii=False, indent=2)
-        (a.out / "metrics.json").write_text(text, encoding="utf-8")
+        (a.out / "metrics.json").write_text(text + "\n", encoding="utf-8", newline="\n")
         print(text)
         return 0
     people = list_people(a.folder)
@@ -296,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
     result = {
         "dataset": a.name or a.folder.name,
         "date": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "commit": git_commit(),
+        "commit": commit,
         "machine": machine_text(cv2),
         "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE)},
         "people": len(ids), "images": total, "images_used": len(files),
@@ -313,7 +315,7 @@ def main(argv: list[str] | None = None) -> int:
                 "เว้นแต่ machine ระบุว่ารันบน Pi 5",
     }  # fmt: skip
     text = json.dumps(result, ensure_ascii=False, indent=2)
-    (a.out / "metrics.json").write_text(text, encoding="utf-8")
+    (a.out / "metrics.json").write_text(text + "\n", encoding="utf-8", newline="\n")
     title = f"{a.plot_title}  EER={eer_rate * 100:.2f}%  ({len(genuine)} gen / {len(impostor)} imp)"
     plot(c, a.out / "roc.png", "ROC  " + title, det=False)
     plot(c, a.out / "det.png", "DET  " + title, det=True)
