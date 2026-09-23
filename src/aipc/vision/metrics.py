@@ -73,3 +73,31 @@ def rates_at(genuine, impostor, threshold: float) -> tuple[float, float]:
     far = np.count_nonzero(i >= threshold) / len(i)
     frr = np.count_nonzero(g < threshold) / len(g)
     return float(far), float(frr)
+
+
+def best_threshold(scores, same) -> float:
+    """threshold ที่ถูกมากที่สุด (ตอบ "คนเดียวกัน" เมื่อคะแนน ≥ t) · ลองทุกจุดกึ่งกลางระหว่างคะแนน."""
+    s = np.asarray(scores, dtype=np.float64)
+    y = np.asarray(same, dtype=bool)
+    u = np.unique(s)
+    cands = np.concatenate([[u[0] - 1e-6], (u[:-1] + u[1:]) / 2, [u[-1] + 1e-6]])
+    acc = [np.mean((s >= t) == y) for t in cands]
+    return float(cands[int(np.argmax(acc))])
+
+
+def kfold_accuracy(scores, same, folds) -> tuple[float, float, list[float]]:
+    """ความแม่นยำแบบ k-fold ตามวิธีของ LFW: หา threshold จากชุดอื่น แล้ววัดกับชุดที่เว้นไว้.
+
+    คืน (ค่าเฉลี่ย, ส่วนเบี่ยงเบนมาตรฐาน, threshold ของแต่ละ fold)
+    ไม่เลือก threshold จากข้อมูลที่ใช้วัด (ถ้าเลือกจากชุดเดียวกัน ตัวเลขจะดีเกินจริง)
+    """
+    s = np.asarray(scores, dtype=np.float64)
+    y = np.asarray(same, dtype=bool)
+    f = np.asarray(folds)
+    accs, ths = [], []
+    for k in np.unique(f):
+        test = f == k
+        t = best_threshold(s[~test], y[~test])
+        ths.append(t)
+        accs.append(float(np.mean((s[test] >= t) == y[test])))
+    return float(np.mean(accs)), float(np.std(accs)), ths

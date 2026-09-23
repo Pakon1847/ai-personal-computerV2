@@ -63,6 +63,87 @@ def make_pairs(ids: dict[str, list[int]], max_genuine: int, max_impostor: int, s
     return genuine, impostor
 
 
+def parse_lfw_pairs(text: str) -> list[tuple[str, str, bool, int]]:
+    """pairs.txt ของ LFW → [(ภาพ a, ภาพ b, คนเดียวกันไหม, fold)].
+
+    บรรทัดแรก "10 300" = 10 fold × (คนเดียวกัน 300 คู่ ตามด้วยคนละคน 300 คู่)
+    คนเดียวกัน: ชื่อ i j · คนละคน: ชื่อ1 i ชื่อ2 j · ภาพ = ชื่อ/ชื่อ_0001.jpg
+    """
+    lines = [ln.split() for ln in text.strip().splitlines()]
+    n_folds, per = (int(x) for x in lines[0])
+    body = lines[1:]
+    if len(body) != n_folds * per * 2:
+        raise ValueError(f"pairs.txt ควรมี {n_folds * per * 2} คู่ แต่มี {len(body)}")
+
+    def img(name, i):
+        return f"{name}/{name}_{int(i):04d}.jpg"
+
+    out = []
+    for k, f in enumerate(body):
+        fold = k // (per * 2)
+        if len(f) == 3:
+            out.append((img(f[0], f[1]), img(f[0], f[2]), True, fold))
+        elif len(f) == 4:
+            out.append((img(f[0], f[1]), img(f[2], f[3]), False, fold))
+        else:
+            raise ValueError(f"pairs.txt บรรทัด {k + 2} ต้องมี 3 หรือ 4 ช่อง: {' '.join(f)}")
+    return out
+
+
+def run_pairs(a, cfg, det, emb) -> dict:
+    """วิธีมาตรฐานของ LFW: 6,000 คู่ 10 fold · หา threshold จาก 9 fold วัดกับ fold ที่เหลือ.
+
+    ภาพที่หาหน้าไม่เจอ → คู่นั้นได้คะแนน −1 (นับเป็นตอบผิดถ้าเป็นคนเดียวกัน · ไม่ตัดทิ้งให้ตัวเลขสวย)
+    """
+    import cv2
+
+    pairs = parse_lfw_pairs(a.pairs.read_text(encoding="utf-8"))
+    cache: dict[str, np.ndarray | None] = {}
+    for pa, pb, _, _ in pairs:
+        for rel in (pa, pb):
+            if rel in cache:
+                continue
+            img = cv2.imread(str(a.folder / rel))
+            faces = det.detect(img) if img is not None else []
+            if not faces:
+                cache[rel] = None
+                continue
+            f = quality.Face.from_yunet(faces[0])
+            cache[rel] = matching.l2_normalize(emb.embed(align.crop(img, f.landmarks)))
+
+    def score(pa, pb):
+        va, vb = cache[pa], cache[pb]
+        return float(va @ vb) if va is not None and vb is not None else -1.0
+
+    scores = np.array([score(pa, pb) for pa, pb, _, _ in pairs])
+    same = np.array([p[2] for p in pairs])
+    folds = np.array([p[3] for p in pairs])
+    mean, std, ths = metrics.kfold_accuracy(scores, same, folds)
+    c = metrics.curve(scores[same], scores[~same])
+    eer_rate, eer_t = metrics.eer(c)
+    a.out.mkdir(parents=True, exist_ok=True)
+    with gzip.open(a.out / "scores.csv.gz", "wt", newline="", encoding="utf-8") as fh:
+        wr = csv.writer(fh)
+        wr.writerow(["fold", "label", "score", "a", "b"])
+        for (pa, pb, sm, fd), sc in zip(pairs, scores, strict=True):
+            wr.writerow([fd, "genuine" if sm else "impostor", f"{sc:.6f}", pa, pb])
+    title = f"{a.plot_title}  acc={mean * 100:.2f}%  EER={eer_rate * 100:.2f}%"
+    plot(c, a.out / "roc.png", "ROC  " + title, det=False)
+    plot(c, a.out / "det.png", "DET  " + title, det=True)
+    return {
+        "protocol": "LFW pairs.txt · 10-fold · threshold จาก 9 fold ที่เหลือ",
+        "pairs": {"genuine": int(same.sum()), "impostor": int((~same).sum()), "folds": 10},
+        "images": len(cache), "no_face_images": sum(v is None for v in cache.values()),
+        "accuracy_mean": round(mean, 5), "accuracy_std": round(std, 5),
+        "fold_thresholds": [round(t, 4) for t in ths],
+        "eer": round(eer_rate, 5), "eer_threshold": round(eer_t, 4),
+    }
+
+
+def machine_text(cv2) -> str:
+    return f"{sys.platform} · Python {sys.version.split()[0]} · OpenCV {cv2.__version__}"
+
+
 def git_commit() -> str:
     try:
         # --dirty = โค้ดที่รันมีส่วนที่ยังไม่ commit → ตัวเลขนี้ทำซ้ำจาก commit นั้นตรง ๆ ไม่ได้
@@ -132,6 +213,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--max-impostor", type=int, default=100000)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--limit-people", type=int, default=0, help="ใช้แค่ N คนแรก (ทดลองเร็ว ๆ)")
+    ap.add_argument("--pairs", type=Path, help="pairs.txt ของ LFW → ใช้วิธีมาตรฐาน 6,000 คู่ 10 fold")
     a = ap.parse_args(argv)
     # คอนโซลวินโดวส์ภาษาไทยใช้ cp874 ที่ไม่มีบางตัวอักษร (เช่น ·) → พิมพ์เป็น UTF-8 แทนการล่มตอนท้าย
     for stream in (sys.stdout, sys.stderr):
@@ -141,6 +223,17 @@ def main(argv: list[str] | None = None) -> int:
     import cv2
 
     cfg = config.load(a.config)
+    if a.pairs:
+        det, emb = models.Detector(cfg.min_detect_score), models.Embedder()
+        res = {"dataset": a.name or a.folder.name, "commit": git_commit(),
+               "date": datetime.now().astimezone().isoformat(timespec="seconds"),
+               "machine": machine_text(cv2),
+               "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE)},
+               **run_pairs(a, cfg, det, emb)}  # fmt: skip
+        text = json.dumps(res, ensure_ascii=False, indent=2)
+        (a.out / "metrics.json").write_text(text, encoding="utf-8")
+        print(text)
+        return 0
     people = list_people(a.folder)
     if a.limit_people:
         people = dict(list(people.items())[: a.limit_people])
@@ -191,7 +284,7 @@ def main(argv: list[str] | None = None) -> int:
         "dataset": a.name or a.folder.name,
         "date": datetime.now().astimezone().isoformat(timespec="seconds"),
         "commit": git_commit(),
-        "machine": f"{sys.platform} · Python {sys.version.split()[0]} · OpenCV {cv2.__version__}",
+        "machine": machine_text(cv2),
         "models_sha256": {m.name: m.sha256 for m in (models.YUNET, models.SFACE)},
         "people": len(ids), "images": total, "images_used": len(files),
         "failure_to_acquire": round(no_face / total, 4) if total else None,

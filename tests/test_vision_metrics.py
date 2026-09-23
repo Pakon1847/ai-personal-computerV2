@@ -58,5 +58,28 @@ class MetricsTest(unittest.TestCase):
             metrics.curve([], [0.1])
 
 
+    def test_best_threshold_separates_perfectly(self):
+        t = metrics.best_threshold([0.1, 0.2, 0.8, 0.9], [False, False, True, True])
+        self.assertTrue(0.2 < t < 0.8)
+
+    def test_kfold_uses_other_folds_for_threshold(self):
+        # fold 0 ข้อมูลสลับกัน ถ้าเลือก threshold จาก fold ตัวเองจะได้ 100% ปลอม ๆ · ต้องได้ 0%
+        scores = [0.9, 0.8, 0.1, 0.2] + [0.1, 0.2, 0.9, 0.8]
+        same = [True, True, False, False] + [True, True, False, False]
+        folds = [1, 1, 1, 1] + [0, 0, 0, 0]
+        mean, std, ths = metrics.kfold_accuracy(scores, same, folds)
+        self.assertEqual(len(ths), 2)
+        # fold 0 วัดด้วย threshold จาก fold 1 (ข้อมูลปกติ) → กลับด้านหมด ถูก 0%
+        # fold 1 วัดด้วย threshold จาก fold 0 (กลับด้าน) → ดีสุดคือตอบ "คนเดียวกัน" ทุกคู่ ถูก 50%
+        self.assertAlmostEqual(mean, 0.25)
+
+    def test_kfold_perfect(self):
+        rng = np.random.default_rng(0)
+        same = np.tile([True, False], 50)
+        scores = np.where(same, rng.uniform(0.6, 1, 100), rng.uniform(0, 0.4, 100))
+        mean, std, _ = metrics.kfold_accuracy(scores, same, np.repeat(np.arange(10), 10))
+        self.assertEqual((mean, std), (1.0, 0.0))
+
+
 if __name__ == "__main__":
     unittest.main()

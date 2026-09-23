@@ -45,6 +45,20 @@ class PairsTest(unittest.TestCase):
         self.assertEqual(list(people), ["x"])
         self.assertEqual([p.name for p in people["x"]], ["1.jpg"])
 
+    def test_parse_lfw_pairs(self):
+        rows = ["2 1", "A 1 2", "B 1 C 2", "D 3 4", "E 1 F 1"]
+        pairs = evaluate.parse_lfw_pairs(chr(10).join(r.replace(" ", chr(9)) for r in rows))
+        self.assertEqual(pairs[0], ("A/A_0001.jpg", "A/A_0002.jpg", True, 0))
+        self.assertEqual(pairs[1], ("B/B_0001.jpg", "C/C_0002.jpg", False, 0))
+        self.assertEqual([p[3] for p in pairs], [0, 0, 1, 1])
+
+    def test_parse_lfw_pairs_wrong_count(self):
+        with self.assertRaises(ValueError):
+            evaluate.parse_lfw_pairs(chr(10).join(["2 1", "A 1 2"]))
+
+    def test_parse_lfw_pairs_bad_line(self):
+        with self.assertRaises(ValueError):
+            evaluate.parse_lfw_pairs(chr(10).join(["1 1", "A 1 2", "B 1 3 C 2"]))
 
 if __name__ == "__main__":
     unittest.main()
