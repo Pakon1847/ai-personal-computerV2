@@ -19,3 +19,6 @@
 - เซสชัน V2 ([การ์ด 0004](docs/design/0004-v2-session.md)): หลัง login เข้าหน้าจอ V2 เต็มจอ ไม่มีเดสก์ท็อป Pi · `aipc.ui --session` · "ออก" จบเซสชันจริง · ล่มแล้วเปิดใหม่ (3 ครั้ง/นาทีแล้วกลับหน้า Login) · labwc ค่าตั้งของเรา (Alt+Tab เท่านั้น, แป้น us/th) · `install-greeter.sh --session v2` · ติดตั้งและทดสอบบน Pi 4 แล้ว
 - แก้: ไฟล์สกิล builtin/*.json ไม่ถูกติดตั้งเมื่อไม่ใช่ `pip install -e` (เทสต์ package-data ใหม่)
 - แก้: `aipc.doctor --audit` ไม่เห็น Raspberry Pi Connect ที่ Imager เปิดเป็นบริการรายผู้ใช้
+- การ์ด 0002 สร้างเสร็จ: ตัวอักษร 200% ไม่ทับไม่ตัด (Login เลื่อนได้, สุขภาพเครื่องการ์ดสูงตามข้อความ) · เทสต์ไฟกล้อง/ไมค์ทุกหน้า + การ์ดนัดถัดไป · RAM บน Pi 4 +2.0% ([ผล](docs/benchmarks/2026-09-24-card0002/README.md))
+- เซสชัน V2: ปุ่ม ~ สลับไทย/อังกฤษ (กฎ xkb ของเรา + เทสต์คอมไพล์ผังแป้นจริง) · เมาส์เร็วขึ้น (pointerSpeed 0.6)
+- Pi 4: ปิด autologin ที่ tty1 · ปิด Raspberry Pi Connect + linger (ตามที่ Pakon อนุมัติ)
