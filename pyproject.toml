@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aipc"
+version = "0.0.1"
+description = "AI Personal Computer on Raspberry Pi 5 - senior project"
+requires-python = ">=3.11"
+# ตั้งใจให้ส่วนเครื่องมือวัดใช้แค่ standard library ของ Python
+# จะได้รันบน Pi ที่เพิ่งลง OS ได้ทันทีโดยไม่ต้องติดตั้งอะไรเพิ่ม
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
