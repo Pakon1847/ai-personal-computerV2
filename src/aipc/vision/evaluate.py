@@ -8,14 +8,16 @@
 
 ผลลัพธ์ (ไม่มีภาพ ไม่มี embedding · มีแค่ชื่อไฟล์และคะแนน):
 - metrics.json  ตัวเลขทั้งหมด + commit + sha256 โมเดล + จำนวนคู่ + เวลาต่อภาพ
-- scores.csv    ค่าดิบทุกคู่ (label, score, ภาพ a, ภาพ b) → คำนวณซ้ำได้
-- roc.png       กราฟ ROC แกน FAR แบบ log
+- scores.csv.gz ค่าดิบทุกคู่ (label, score, ภาพ a, ภาพ b) → คำนวณซ้ำได้
+- roc.png       ROC: TAR เทียบ FAR (log) · แกน TAR ซูมตามข้อมูล
+- det.png       DET: FRR เทียบ FAR (log ทั้งสองแกน) · กราฟมาตรฐานของงาน biometrics อ่านง่ายกว่า ROC
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import json
 import statistics
 import subprocess
@@ -72,34 +74,49 @@ def git_commit() -> str:
         return "?"
 
 
-def roc_png(c: metrics.Curve, eer_rate: float, path: Path, title: str) -> None:
-    """วาด ROC ด้วย OpenCV (ไม่เพิ่ม matplotlib) · แกน x = FAR แบบ log 1e-4 … 1 · แกน y = TAR."""
+def plot(c: metrics.Curve, path: Path, title: str, det: bool) -> None:
+    """วาดกราฟด้วย OpenCV (ไม่เพิ่ม matplotlib) · แกน x = FAR แบบ log.
+
+    det=False → ROC: แกน y = TAR เชิงเส้น ซูมตั้งแต่ค่าต่ำสุดของข้อมูล (ไม่งั้นเส้นชิดขอบบนอ่านไม่ออก)
+    det=True  → DET: แกน y = FRR แบบ log
+    OpenCV วาดได้แต่ตัวอักษร ASCII → ชื่อกราฟต้องเป็นภาษาอังกฤษ
+    """
     import cv2
 
-    w, h, m = 900, 640, 80
-    font, ink = cv2.FONT_HERSHEY_SIMPLEX, (0, 0, 0)
+    w, h, m = 900, 640, 90
+    font, ink, grid = cv2.FONT_HERSHEY_SIMPLEX, (0, 0, 0), (220, 220, 220)
     img = np.full((h, w, 3), 255, np.uint8)
-    lo, hi = -4.0, 0.0
+    n_imp = 1.0 / max(1e-12, np.min(c.far[c.far > 0])) if np.any(c.far > 0) else 1e4
+    xlo = float(np.floor(np.log10(1.0 / n_imp)))  # FAR ที่เล็กที่สุดที่วัดได้ = 1/จำนวนคู่ impostor
+    if det:
+        frr_pos = c.frr[c.frr > 0]
+        ylo = float(np.floor(np.log10(frr_pos.min()))) if len(frr_pos) else -4.0
+        ys = [10.0**e for e in range(int(ylo), 1)]
+    else:
+        ylo = float(np.floor(c.tar[c.far >= 10**xlo].min() * 100) / 100)
+        ys = list(np.linspace(ylo, 1.0, 6))
 
-    def xy(far, tar):
-        lf = np.log10(np.clip(far, 10**lo, 1.0))
-        return int(m + (lf - lo) / (hi - lo) * (w - 2 * m)), int(h - m - tar * (h - 2 * m))
+    def px(far, y):
+        lx = np.log10(np.clip(far, 10**xlo, 1.0))
+        fy = (np.log10(np.clip(y, 10**ylo, 1.0)) - ylo) / -ylo if det else (y - ylo) / (1 - ylo)
+        return int(m + (lx - xlo) / -xlo * (w - 2 * m)), int(h - m - fy * (h - 2 * m))
 
-    grid = (220, 220, 220)
-    for e in range(int(lo), int(hi) + 1):
-        x, _ = xy(10.0**e, 0)
+    for e in range(int(xlo), 1):
+        x, _ = px(10.0**e, ys[-1])
         cv2.line(img, (x, m), (x, h - m), grid, 1)
         cv2.putText(img, f"1e{e}", (x - 18, h - m + 25), font, 0.5, ink, 1)
-    for k in range(11):
-        _, y = xy(1, k / 10)
+    for v in ys:
+        _, y = px(1.0, v)
         cv2.line(img, (m, y), (w - m, y), grid, 1)
-        cv2.putText(img, f"{k / 10:.1f}", (m - 40, y + 5), font, 0.5, ink, 1)
-    pts = np.array([xy(f, t) for f, t in zip(c.far, c.tar, strict=True)], np.int32)
+        label = f"1e{int(round(np.log10(v)))}" if det else f"{v:.2f}"
+        cv2.putText(img, label, (m - 60, y + 5), font, 0.5, ink, 1)
+    ycol = c.frr if det else c.tar
+    pts = np.array([px(f, v) for f, v in zip(c.far, ycol, strict=True)], np.int32)
     cv2.polylines(img, [pts], False, (180, 60, 40), 2, cv2.LINE_AA)
     cv2.rectangle(img, (m, m), (w - m, h - m), ink, 1)
-    cv2.putText(img, "FAR (log)", (w // 2 - 40, h - 25), font, 0.6, ink, 1)
-    cv2.putText(img, "TAR", (15, h // 2), font, 0.6, ink, 1)
-    cv2.putText(img, f"{title}  EER={eer_rate * 100:.2f}%", (m, 50), font, 0.7, ink, 2)
+    cv2.putText(img, "FAR (log)", (w // 2 - 40, h - 30), font, 0.6, ink, 1)
+    cv2.putText(img, "FRR (log)" if det else "TAR", (10, m - 15), font, 0.6, ink, 1)
+    cv2.putText(img, title, (m, 45), font, 0.7, ink, 2)
     cv2.imwrite(str(path), img)
 
 
@@ -108,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("folder", type=Path)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--name", default="", help="ชื่อชุดข้อมูลในรายงาน เช่น LFW")
+    ap.add_argument("--plot-title", default="face matching", help="ชื่อบนกราฟ (ASCII เท่านั้น)")
     ap.add_argument("--config", type=Path, help="ไฟล์ค่าตั้งใบหน้า (threshold ที่จะรายงาน FAR/FRR)")
     ap.add_argument("--max-genuine", type=int, default=20000)
     ap.add_argument("--max-impostor", type=int, default=100000)
@@ -162,7 +180,7 @@ def main(argv: list[str] | None = None) -> int:
     far_cfg, frr_cfg = metrics.rates_at(g_scores, i_scores, cfg.match_threshold)
 
     a.out.mkdir(parents=True, exist_ok=True)
-    with (a.out / "scores.csv").open("w", newline="", encoding="utf-8") as fh:
+    with gzip.open(a.out / "scores.csv.gz", "wt", newline="", encoding="utf-8") as fh:
         wr = csv.writer(fh)
         wr.writerow(["label", "score", "a", "b"])
         for lab, pairs, sc in (("genuine", genuine, g_scores), ("impostor", impostor, i_scores)):
@@ -189,7 +207,9 @@ def main(argv: list[str] | None = None) -> int:
     }  # fmt: skip
     text = json.dumps(result, ensure_ascii=False, indent=2)
     (a.out / "metrics.json").write_text(text, encoding="utf-8")
-    roc_png(c, eer_rate, a.out / "roc.png", result["dataset"])
+    title = f"{a.plot_title}  EER={eer_rate * 100:.2f}%  ({len(genuine)} gen / {len(impostor)} imp)"
+    plot(c, a.out / "roc.png", "ROC  " + title, det=False)
+    plot(c, a.out / "det.png", "DET  " + title, det=True)
     print(text)
     return 0
 
