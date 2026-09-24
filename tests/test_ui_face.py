@@ -179,6 +179,16 @@ class FaceControllerTest(unittest.TestCase):
         self.assertEqual(f.state, "none")
         self.assertFalse(self.fs.path.exists())
 
+    def test_memory_returned_after_every_job(self):
+        # วัดบน Pi 4: ไม่คืน = RSS ค้าง ~90 MB หลังใช้กล้อง (การ์ด 0006) → ต้องเรียกทุกครั้งที่งานจบ
+        from unittest import mock
+
+        with mock.patch("aipc.ui.face.release_memory") as release:
+            face = self.make(Scanner(enroll_result=None))
+            face.startEnroll(True)
+            settle(face)
+        release.assert_called_once()
+
     def test_inactive_in_greeter(self):
         f = FaceController(active=False)
         self.assertEqual(f.state, "unavailable")

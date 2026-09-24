@@ -11,7 +11,10 @@
 
 from __future__ import annotations
 
+import ctypes
+import gc
 import getpass
+import sys
 import threading
 import time
 from datetime import datetime
@@ -19,6 +22,22 @@ from datetime import datetime
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
 POSES = ("front", "left", "right")
+
+
+def release_memory() -> None:
+    """คืนหน่วยความจำที่ปล่อยแล้วให้ระบบ (Linux).
+
+    วัดจริงบน Pi 4 (การ์ด 0006): โหลดโมเดลในเธรดแยกแล้วปล่อย โมเดลถูกลบจริง แต่ RSS ไม่ลด
+    เพราะ glibc เก็บหน่วยความจำที่คืนแล้วไว้ใน pool ของเธรดนั้น · malloc_trim(0) สั่งให้คืนระบบ
+    (ผลทดลอง: 139 → 96 MB และนิ่งทุกรอบ) · เครื่องอื่นที่ไม่ใช่ glibc = ไม่ทำอะไร
+    """
+    gc.collect()
+    if not sys.platform.startswith("linux"):
+        return
+    try:
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except (OSError, AttributeError):  # libc อื่น (เช่น musl) ไม่มีฟังก์ชันนี้
+        pass
 
 
 class FaceController(QObject):
@@ -175,6 +194,7 @@ class FaceController(QObject):
             if cap is not None:
                 cap.release()
             del scanner  # ปล่อยโมเดล
+            release_memory()  # แล้วคืนหน่วยความจำให้ระบบจริง (H4)
         self._done.emit(ok, msg)
 
     def _frames(self, cap, seconds: float):
