@@ -240,6 +240,17 @@ class FaceControllerTest(unittest.TestCase):
         settle(f)
         self.assertEqual(images() - before, set())
 
+    def test_pose_reach_matches_pose_directions(self):
+        from aipc.ui.face import pose_reach
+
+        # ทิศเดียวกับ pipeline.pose_of: yaw > 0 = หันซ้าย · pitch > 0 = ก้ม · 8° = เต็ม
+        self.assertEqual(pose_reach("left", 8, 0), 1.0)
+        self.assertEqual(pose_reach("left", -8, 0), 0.0)
+        self.assertAlmostEqual(pose_reach("down", 0, 4), 0.5)
+        self.assertEqual(pose_reach("up", 0, -20), 1.0)
+        self.assertEqual(pose_reach("front", 3, -2), 1.0)
+        self.assertEqual(pose_reach("front", 16, 0), 0.0)
+
     def test_mirror_box_and_next_pose(self):
         from aipc.ui import face as face_mod
 

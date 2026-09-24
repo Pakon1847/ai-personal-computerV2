@@ -59,18 +59,26 @@ Card {
                 + "เก็บแค่ตัวเลข 128 ค่า ไม่เก็บภาพ · รหัสผ่านยังเป็นกุญแจเสมอ"
         }
 
-        // ---------- ระหว่างลงทะเบียน: ภาพสด (กระจก) + วงรีนำทาง + กรอบหน้า + ลูกศรท่าถัดไป ----------
+        // ---------- ระหว่างลงทะเบียน: ภาพสด (กระจก) · นอกวงรีมืดลง · ลูกศรอยู่นอกวงรี ไม่บังหน้า ----------
         Rectangle {
             id: preview
             objectName: "facePreview"
             visible: root.enrolling
             Layout.fillWidth: true
-            Layout.maximumWidth: 480
+            Layout.maximumWidth: 640
             Layout.preferredHeight: width * 9 / 16
             Layout.alignment: Qt.AlignHCenter
             radius: Theme.radiusCard
             color: Theme.camera
             clip: true
+
+            // วงรีคำนวณจากภาพที่วาดจริง (ภาพอาจไม่เต็มกรอบถ้ากล้องไม่ใช่ 16:9)
+            readonly property real cx: width / 2
+            readonly property real cy: height / 2
+            readonly property real rx: live.paintedHeight * 0.28
+            readonly property real ry: live.paintedHeight * 0.36
+            readonly property bool seen: face.faceBox.length === 4
+            readonly property string pose: face.currentPose
 
             Image {
                 id: live
@@ -87,58 +95,88 @@ Card {
                 text: "กำลังเปิดกล้อง…"
                 color: Theme.cameraText
             }
-            // วงรีให้เอาหน้าใส่ · เป็นเส้นประกอบเท่านั้น ไม่ได้ใช้ตัดสิน
+            // ม่านมืดนอกวงรี + เส้นวงรี · สีเขียว = ระบบเห็นหน้าแล้ว (ไม่มีกรอบทับหน้า)
             Shape {
                 anchors.fill: parent
-                opacity: 0.85
                 layer.enabled: true  // วาดลง texture ก่อน ไม่หลุดกรอบเมื่อวาดด้วย CPU (เหมือน Icon)
                 ShapePath {
-                    strokeWidth: 3
-                    strokeColor: face.faceBox.length === 4 ? Theme.scanLine : Theme.lineStrong
+                    fillRule: ShapePath.OddEvenFill  // สี่เหลี่ยมลบวงรี = ทึบเฉพาะนอกวงรี
+                    fillColor: "#8C000000"
+                    strokeColor: "transparent"
+                    PathRectangle { x: 0; y: 0; width: preview.width; height: preview.height }
+                    PathAngleArc {
+                        moveToStart: true
+                        centerX: preview.cx; centerY: preview.cy
+                        radiusX: preview.rx; radiusY: preview.ry
+                        startAngle: 0; sweepAngle: 360
+                    }
+                }
+                ShapePath {
+                    strokeWidth: 4
+                    strokeColor: preview.seen ? Theme.scanFound : "#E6FFFFFF"
                     fillColor: "transparent"
                     PathAngleArc {
-                        centerX: preview.width / 2
-                        centerY: preview.height / 2
-                        radiusX: live.paintedHeight * 0.3
-                        radiusY: live.paintedHeight * 0.4
-                        startAngle: 0
-                        sweepAngle: 360
+                        centerX: preview.cx; centerY: preview.cy
+                        radiusX: preview.rx; radiusY: preview.ry
+                        startAngle: 0; sweepAngle: 360
                     }
                 }
             }
-            // กรอบหน้าที่ระบบเห็น (สัดส่วน 0–1 ของภาพที่วาดจริง)
-            Rectangle {
-                readonly property real ox: (live.width - live.paintedWidth) / 2
-                readonly property real oy: (live.height - live.paintedHeight) / 2
-                visible: face.faceBox.length === 4
-                x: ox + (face.faceBox[0] || 0) * live.paintedWidth
-                y: oy + (face.faceBox[1] || 0) * live.paintedHeight
-                width: (face.faceBox[2] || 0) * live.paintedWidth
-                height: (face.faceBox[3] || 0) * live.paintedHeight
-                color: "transparent"
-                border.width: 2
-                border.color: Theme.scanFound
-                radius: 8
-            }
-            // ลูกศรท่าถัดไป (ท่าตรง = ไม่มีลูกศร)
-            Rectangle {
-                visible: face.currentPose !== "" && face.currentPose !== "front"
-                width: 56; height: 56; radius: 28
-                color: Theme.accent
-                opacity: 0.9
-                anchors.verticalCenter: face.currentPose === "up" || face.currentPose === "down" ? undefined : parent.verticalCenter
-                anchors.horizontalCenter: face.currentPose === "up" || face.currentPose === "down" ? parent.horizontalCenter : undefined
-                anchors.left: face.currentPose === "left" ? parent.left : undefined
-                anchors.right: face.currentPose === "right" ? parent.right : undefined
-                anchors.top: face.currentPose === "up" ? parent.top : undefined
-                anchors.bottom: face.currentPose === "down" ? parent.bottom : undefined
-                anchors.margins: 12
-                Icon {
-                    anchors.centerIn: parent
-                    path: Icons.back
-                    color: Theme.textOnAccent
-                    rotation: root.poseArrow[face.currentPose] || 0
+            // ลูกศรท่าถัดไป: อยู่ในส่วนมืดนอกวงรีเสมอ · กะพริบเบา ๆ ให้สังเกตง่าย
+            Icon {
+                id: cue
+                objectName: "facePoseCue"
+                visible: preview.pose !== "" && preview.pose !== "front"
+                width: 48; height: 48
+                path: Icons.back
+                color: "#FFFFFF"
+                rotation: root.poseArrow[preview.pose] || 0
+                readonly property real gap: 18
+                x: preview.pose === "left" ? preview.cx - preview.rx - gap - width
+                 : preview.pose === "right" ? preview.cx + preview.rx + gap
+                 : preview.cx - width / 2
+                y: preview.pose === "up" ? Math.max(4, preview.cy - preview.ry - gap - height)
+                 : preview.pose === "down" ? Math.min(preview.height - height - 4, preview.cy + preview.ry + gap)
+                 : preview.cy - height / 2
+                SequentialAnimation on opacity {
+                    running: cue.visible
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 1; to: 0.5; duration: 700 }
+                    NumberAnimation { from: 0.5; to: 1; duration: 700 }
                 }
+            }
+            // ขั้นตอน "ท่า n/5" มุมซ้ายบน (อยู่ในส่วนมืด)
+            Rectangle {
+                anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10
+                radius: height / 2
+                color: "#99000000"
+                width: step.implicitWidth + 20; height: step.implicitHeight + 8
+                AppText {
+                    id: step
+                    anchors.centerIn: parent
+                    color: "#FFFFFF"
+                    size: Theme.fontSmall
+                    text: "ท่า " + (root.poseOrder.indexOf(preview.pose) + 1) + "/5 · " + (root.poseNames[preview.pose] || "")
+                }
+            }
+        }
+
+        // แถบบอกว่าหัน/ก้มถึงหรือยัง (เต็ม = นับท่านี้ได้แล้ว) · ช่วยท่าก้มที่ผู้ใช้ไม่รู้ต้องก้มแค่ไหน
+        Rectangle {
+            objectName: "faceReach"
+            visible: root.enrolling && face.currentPose !== "front"
+            Layout.fillWidth: true
+            Layout.maximumWidth: 640
+            Layout.alignment: Qt.AlignHCenter
+            implicitHeight: 8
+            radius: 4
+            color: Theme.surface2
+            Rectangle {
+                width: parent.width * face.reach
+                height: parent.height
+                radius: 4
+                color: face.reach >= 1 ? Theme.ok : Theme.accent
+                Behavior on width { NumberAnimation { duration: 120 } }
             }
         }
 
@@ -150,6 +188,7 @@ Card {
             AppText {
                 objectName: "faceAdvice"
                 Layout.fillWidth: true
+                horizontalAlignment: root.enrolling ? Text.AlignHCenter : Text.AlignLeft
                 text: face.advice
                 size: Theme.fontHeading
                 strong: true
@@ -157,7 +196,7 @@ Card {
             }
             Flow {
                 objectName: "facePoses"
-                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
                 spacing: 8
                 visible: root.enrolling
                 Repeater {
@@ -165,12 +204,16 @@ Card {
                     Chip {
                         required property string modelData
                         readonly property int got: face.poses[modelData] || 0
-                        text: root.poseNames[modelData] + (got >= 2 ? " ✓" : " " + got + "/2")
-                        kind: got >= 2 ? "ok" : "neutral"
+                        text: root.poseNames[modelData] + (got >= 2 ? " ✓" : "")
+                        // เสร็จ = เขียว · ท่าที่กำลังทำ = คราม · ที่เหลือ = เทา
+                        kind: got >= 2 ? "ok" : modelData === face.currentPose ? "accent" : "neutral"
                     }
                 }
             }
-            AppButton { text: "ยกเลิก"; kind: "secondary"; onClicked: face.cancel() }
+            AppButton {
+                text: "ยกเลิก"; kind: "secondary"; onClicked: face.cancel()
+                Layout.alignment: root.enrolling ? Qt.AlignHCenter : Qt.AlignLeft
+            }
         }
 
         // ---------- ปุ่ม ----------

@@ -56,6 +56,7 @@ for theme in ("light", "dark"):
         }
         face._busy, face._preview_on, face._preview_img = True, True, img
         face._preview_serial, face._face_box, face._poses = 1, frac, counts
+        face._reach = 0.6
         face._advice = face_mod.POSE_PROMPT[pose]
         face.changed.emit()
         face.previewChanged.emit()

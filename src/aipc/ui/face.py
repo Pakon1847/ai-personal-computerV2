@@ -58,6 +58,19 @@ def make_preview(frame, box):
     return img.copy(), frac
 
 
+def pose_reach(pose: str, yaw: float, pitch: float) -> float:
+    """หันไปทางท่าเป้าหมายได้แค่ไหน 0–1 (1 = ถึงเกณฑ์นับท่าแล้ว) · ใช้วาดแถบบนจอเท่านั้น ไม่ได้ใช้ตัดสิน.
+
+    ทิศเดียวกับ pipeline.pose_of: yaw > 0 = ผู้ใช้หันซ้าย · pitch > 0 = ก้ม
+    """
+    from aipc.vision.pipeline import POSE_SPLIT_DEG as split
+
+    along = {"left": yaw, "right": -yaw, "up": -pitch, "down": pitch}
+    if pose == "front":  # อยู่ในกรอบ ±split = เต็ม · หันเกินออกไปเท่าไร แถบลดลงเท่านั้น
+        return max(0.0, min(1.0, 2 - max(abs(yaw), abs(pitch)) / split))
+    return max(0.0, min(1.0, along.get(pose, 0.0) / split))
+
+
 def next_pose(counts: dict) -> str:
     """ท่าถัดไปที่ยังไม่ครบ ตามลำดับที่บอกผู้ใช้ · ครบหมด = "" ."""
     return next((p for p in POSES if counts.get(p, 0) < PER_POSE), "")
@@ -85,7 +98,7 @@ class FaceController(QObject):
     # ส่งจากเธรดงาน → เธรดหลัก (ห้ามแตะสถานะที่ QML อ่านจากเธรดงานตรง ๆ)
     _progress = Signal(str, "QVariantMap")
     _done = Signal(bool, str)
-    _preview = Signal(list)
+    _preview = Signal(list, float)
     previewChanged = Signal()  # แยกจาก changed: เปลี่ยนทุกเฟรม ไม่ต้องให้ทุกอย่างบนหน้าคำนวณใหม่
 
     def __init__(self, active: bool = True, fs=None, open_camera=None, build_scanner=None,
@@ -109,6 +122,7 @@ class FaceController(QObject):
         self._preview_img: QImage | None = None
         self._preview_serial = 0
         self._face_box: list = []
+        self._reach = 0.0
         self._frames_seen = 0
         self._thread: threading.Thread | None = None
         self._enroll_seconds, self._scan_seconds = enroll_seconds, scan_seconds
@@ -182,6 +196,11 @@ class FaceController(QObject):
     @Property(list, notify=previewChanged)
     def faceBox(self) -> list:  # noqa: N802
         return self._face_box
+
+    @Property(float, notify=previewChanged)
+    def reach(self) -> float:
+        """ความคืบหน้าไปยังท่าปัจจุบัน 0–1 (ให้ผู้ใช้รู้ว่าต้องหัน/ก้มอีกแค่ไหน)."""
+        return self._reach
 
     def preview_image(self) -> QImage | None:
         """ภาพล่าสุด (เรียกจาก ImageProvider) · ไม่มี = None."""
@@ -299,9 +318,12 @@ class FaceController(QObject):
         frame = self._last_frame
         if self._preview_on and frame is not None:
             img, frac = make_preview(frame, getattr(r, "box", None))
+            q = getattr(r, "quality", None)
+            target = next_pose(counts)
+            reach = pose_reach(target, q.yaw, q.pitch) if q is not None and frac else 0.0
             with self._lock:
                 self._preview_img = img
-            self._preview.emit(frac)
+            self._preview.emit(frac, reach)
 
     def _enroll_job(self, scanner, cap, given: str):
         from aipc.vision import pipeline, store
@@ -342,17 +364,17 @@ class FaceController(QObject):
         self._advice, self._poses = advice, counts
         self.changed.emit()
 
-    def _on_preview(self, frac: list) -> None:
+    def _on_preview(self, frac: list, reach: float) -> None:
         if not self._busy:  # ภาพที่มาถึงหลังงานจบแล้ว ไม่ต้องแสดง
             return
         self._preview_serial += 1
-        self._face_box = frac
+        self._face_box, self._reach = frac, reach
         self.previewChanged.emit()
 
     def _clear_preview(self) -> None:
         with self._lock:
             self._preview_img = None
-        self._preview_serial, self._face_box, self._preview_on = 0, [], False
+        self._preview_serial, self._face_box, self._preview_on, self._reach = 0, [], False, 0.0
         self.previewChanged.emit()
 
     def _on_done(self, ok: bool, message: str) -> None:
