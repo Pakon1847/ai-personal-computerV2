@@ -83,5 +83,20 @@ class LoadTest(unittest.TestCase):
         self.assertIsNotNone(cv2)
 
 
+@unittest.skipIf(models is None, "ไม่มี OpenCV")
+class RescaleTest(unittest.TestCase):
+    def test_coordinates_scaled_back_score_kept(self):
+        row = np.array([10, 20, 30, 40, *range(10), 0.9], dtype=np.float32)
+        (out,) = models.rescale([row], 0.5)
+        self.assertEqual(out[:4].tolist(), [20, 40, 60, 80])
+        self.assertEqual(out[4:14].tolist(), [v * 2 for v in range(10)])
+        self.assertAlmostEqual(float(out[14]), 0.9, places=6)
+
+    def test_large_frame_is_downscaled_for_detection(self):
+        d = models.Detector(max_side=640)
+        self.assertEqual(d.detect(np.full((720, 1280, 3), 128, np.uint8)), [])
+        self.assertEqual(d._size, (640, 360), "หาหน้าบนภาพที่ย่อแล้ว")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -110,21 +110,41 @@ def fetch(m: ModelFile = SFACE) -> Path:
 class Detector:
     """YuNet: คืนแถว [x, y, w, h, 5×(x, y), score] ต่อหน้า เรียงจากหน้าใหญ่สุด."""
 
-    def __init__(self, min_score: float = 0.8):
+    def __init__(self, min_score: float = 0.8, max_side: int = 640):
         import cv2
 
+        self._cv2 = cv2
         self._net = cv2.FaceDetectorYN.create(str(locate(YUNET)), "", (320, 320), min_score)
         self._size = (320, 320)
+        # ภาพใหญ่ (เช่นกล้อง 1280×720) ย่อก่อนหาหน้า แล้วแปลงพิกัดกลับ · YuNet ช้าขึ้นตามจำนวนพิกเซล
+        # ส่วน align/embedding ยังใช้ภาพเต็ม → หน้าคมเท่าเดิม (เจอบน Pi 4: 640×480 หน้าเล็กเกิน 112 px)
+        self.max_side = max_side
 
     def detect(self, frame: np.ndarray) -> list[np.ndarray]:
         h, w = frame.shape[:2]
-        if (w, h) != self._size:
-            self._net.setInputSize((w, h))
-            self._size = (w, h)
-        _, faces = self._net.detect(frame)
+        scale = min(1.0, self.max_side / max(h, w))
+        small = frame
+        if scale < 1.0:
+            small = self._cv2.resize(frame, (round(w * scale), round(h * scale)),
+                                     interpolation=self._cv2.INTER_AREA)  # fmt: skip
+        sh, sw = small.shape[:2]
+        if (sw, sh) != self._size:
+            self._net.setInputSize((sw, sh))
+            self._size = (sw, sh)
+        _, faces = self._net.detect(small)
         if faces is None:
             return []
-        return sorted(faces, key=lambda f: f[2] * f[3], reverse=True)
+        return sorted(rescale(faces, scale), key=lambda f: f[2] * f[3], reverse=True)
+
+
+def rescale(rows, scale: float) -> list[np.ndarray]:
+    """แปลงพิกัดจากภาพที่ย่อ (scale) กลับเป็นพิกัดภาพเต็ม · คอลัมน์ 0–13 คือพิกัด · 14 คือคะแนน (ไม่แปลง)."""
+    out = []
+    for r in rows:
+        r = np.array(r, dtype=np.float32)
+        r[:14] /= scale
+        out.append(r)
+    return out
 
 
 class Embedder:

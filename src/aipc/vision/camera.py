@@ -31,6 +31,9 @@ CONSENT_TEXT = """\
 พิมพ์ ยินยอม เพื่อยืนยัน: """
 
 
+CAPTURE_SIZE = (1280, 720)
+
+
 def log_path() -> Path:
     base = os.environ.get("XDG_STATE_HOME") or Path.home() / ".local" / "state"
     return Path(base) / "aipc" / "face-scans.log"
@@ -63,6 +66,11 @@ def open_camera(index: int | None = None):
     cap = cv2.VideoCapture(index, api)
     if not cap.isOpened():
         raise RuntimeError(f"เปิดกล้อง {index} ไม่ได้")
+    # ขอ 1280×720 แบบ MJPG (กล้อง USB ส่วนใหญ่ส่งได้เร็วกว่า YUYV มาก) · กล้องไม่รองรับ = ได้ค่าที่กล้องเลือกเอง
+    # ที่ 640×480 หน้าคนนั่งระยะปกติเล็กกว่า 112 px (วัดจริงบน Pi 4: 111 px) → ต้องนั่งใกล้เกินไป
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_SIZE[0])
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_SIZE[1])
     return cap
 
 
