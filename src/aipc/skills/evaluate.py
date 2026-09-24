@@ -25,6 +25,7 @@ from aipc.skills import actions, command, machine
 
 DATA_DIR = Path(__file__).resolve().parents[3] / "tests" / "data"
 COMMANDS_FILE = DATA_DIR / "command_sentences.json"
+HELDOUT_FILE = DATA_DIR / "command_sentences_heldout.json"  # เขียนก่อนแก้ตัวแปลหลัง baseline
 MACHINE_FILE = DATA_DIR / "machine_states.json"
 
 
@@ -250,7 +251,7 @@ def report_markdown(cmd: dict, mac: dict) -> str:
         "",
         "| ตัวชี้วัด | ผล | เกณฑ์ | ตัดสิน |",
         "|---|---|---|---|",
-        f"| ตีความถูก (19 คำสั่ง × 5 วิธีพูด) | {s['commands_correct']}/{s['commands_total']} "
+        f"| ตีความถูก (19 คำสั่ง) | {s['commands_correct']}/{s['commands_total']} "
         f"= {s['commands_correct_rate']:.1%} (ในนี้ถามก่อน {s['commands_correct_asked']}) | ≥ 95% "
         f"| {ok(s['pass']['commands_correct'])} |",
         f"| ทำสิ่งที่ไม่ได้ตั้งใจโดยไม่ถาม | {s['unintended']}/{s['unintended_denominator']} "
@@ -297,9 +298,10 @@ def report_markdown(cmd: dict, mac: dict) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--commands", type=Path, default=COMMANDS_FILE, help="ชุดประโยคสกิล 4")
     ap.add_argument("--save", type=Path, help="โฟลเดอร์เก็บผล · ห้ามมีอยู่แล้ว (ไม่เขียนทับ)")
     args = ap.parse_args(argv)
-    cmd, mac = score_commands(load(COMMANDS_FILE)), score_machine(load(MACHINE_FILE))
+    cmd, mac = score_commands(load(args.commands)), score_machine(load(MACHINE_FILE))
     md = report_markdown(cmd, mac)
     sys.stdout.write(md)
     if args.save:

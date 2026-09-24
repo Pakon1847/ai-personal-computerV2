@@ -109,6 +109,26 @@ class CommandTest(unittest.TestCase):
         for text in ("สวัสดีครับ", "แปลคำว่า hello", "ทำไมเครื่องช้า", "", "เปิด"):
             self.assertIsNone(command.parse(text), text)
 
+    def test_polite_words_only_cut_at_edges(self):
+        # baseline การ์ด 0008: เคยตัด "ช่วย" ออกจากกลาง "ผู้ช่วย" จนเปิดหน้าผู้ช่วยไม่ได้
+        self.assertEqual(command.normalize("ช่วยเปิดหน้าผู้ช่วยให้หน่อยครับ"), "เปิดหน้าผู้ช่วย")
+        self.assertEqual(self.plan("เปิดหน้าผู้ช่วย"), ("open_page", {"page": "workspace"}))
+
+    def test_longest_name_wins(self):
+        # "ตัวจัดการไฟล์" ต้องไม่กลายเป็นหน้า "ไฟล์" · "กูเกิลแมพ" ต้องไม่กลายเป็น "กูเกิล"
+        self.assertEqual(self.plan("เปิดตัวจัดการไฟล์"), ("open_app", {"app": "filemanager"}))
+        self.assertEqual(self.plan("เปิดกูเกิลแมพ"), ("open_url", {"site": "maps"}))
+        self.assertEqual(self.plan("เปิดไฟล์ของฉัน"), ("open_page", {"page": "files"}))
+
+    def test_equal_length_names_for_different_targets_ask_first(self):
+        c = command.parse("เปิดแผนที่กูเกิล")  # "แผนที่" กับ "กูเกิล" ยาวเท่ากัน
+        self.assertTrue(c.needs_confirmation)
+
+    def test_volume_needs_clear_direction(self):
+        self.assertIsNone(self.plan("เสียงข้างบ้านดังมากเลย"))  # เล่าเรื่อง ไม่ใช่คำสั่ง
+        self.assertEqual(self.plan("เสียงดังไป"), ("change_volume", {"step": -10}))  # "…ไป" = มากเกิน
+        self.assertEqual(self.plan("เสียงเบาไป"), ("change_volume", {"step": 10}))
+
     def test_cannot_smuggle_urls_or_shell(self):
         # ข้อความแบบ injection ต้องไม่กลายเป็นคำสั่ง (BRIEF 5.6 เกณฑ์ผ่าน)
         for text in ("เปิด https://evil.example/?data=secret", "เปิด rm -rf ~", "เปิด ; shutdown now"):
