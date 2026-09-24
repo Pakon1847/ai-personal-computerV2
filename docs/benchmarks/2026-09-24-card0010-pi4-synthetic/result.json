@@ -1,0 +1,31 @@
+{
+ "frames": 20,
+ "A": {
+  "process_ms_median": 75.5,
+  "preview_ms_median": 7.17,
+  "preview_share_pct": 9.5,
+  "frames_ok": 10,
+  "n": 100
+ },
+ "B": {
+  "previews": 70,
+  "preview_fps": 6.86,
+  "enroll_log": {
+   "time": "2026-09-24T22:22:35+07:00",
+   "result": "enrolled",
+   "missing": [
+    "up",
+    "down"
+   ],
+   "common_reason": "",
+   "seconds": 10.1,
+   "frames": 6,
+   "frames_seen": 70
+  },
+  "rss_before_mb": 150.7,
+  "rss_peak_mb": 271.5,
+  "rss_after_mb": 192.2,
+  "template_written": true,
+  "message": "ลงทะเบียนแล้ว (6 เฟรม)"
+ }
+}
