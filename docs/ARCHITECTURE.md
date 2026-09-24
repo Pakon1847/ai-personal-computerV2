@@ -39,7 +39,7 @@
 
 ไฟล์สกิลเป็นข้อมูล ผ่านตัวตรวจ `manifest.validate` ก่อนใช้เสมอ · Action และสิทธิ์ที่ขอได้ถูกกำหนดในโค้ดของระบบเท่านั้น
 
-## ใบหน้า (`aipc.vision` · การ์ด 0005 · ยังไม่ต่อหน้าจอ)
+## ใบหน้า (`aipc.vision` · การ์ด 0005 · ต่อหน้าตั้งค่าแล้วในการ์ด 0006 · ยังไม่ใช้ที่หน้า Login)
 
 ```text
 กล้อง ─► models.Detector (YuNet) ─► quality.check ─► models.Liveness (MiniFASNet ×2) ─► align.crop 112×112
@@ -51,6 +51,18 @@ pipeline.ScanLog: ~/.local/state/aipc/face-scans.log (ไม่มีภาพ �
 
 โมเดลโหลดผ่าน OpenCV อย่างเดียว ตรวจ sha256 ทุกครั้ง (`models/NOTICE.md`) · SFace ดาวน์โหลดด้วย `python -m aipc.vision.models fetch`
 เครื่องมือ: `aipc.vision.camera` (ทดลองกับกล้อง) · `aipc.vision.evaluate` (FAR/FRR/EER/ROC/DET) · `aipc.vision.bench` (เวลา/RAM)
+
+**ในหน้าจอ (การ์ด 0006):** `ui/face.py` `FaceController` ห่อ pipeline ให้ QML (`FacePanel.qml` ในหน้าตั้งค่า)
+
+```text
+FacePanel (QML) ── startEnroll(ยินยอม) / tryScan / cancel / deleteTemplate ──► FaceController (เธรดหลัก)
+                                                                                 │ เปิดเธรดงาน
+   ◄── state · advice · posesDone · busy (ข้อความเท่านั้น ไม่มีภาพ/embedding) ── เธรดงาน: กล้อง + FaceScanner
+                                                                                 │ เสร็จ/ยกเลิก/กล้องหลุด
+                                                                                 └ ปิดกล้อง ปล่อยโมเดล · บันทึกเฉพาะเมื่อสำเร็จ
+```
+
+ผลจากเธรดงานส่งกลับเธรดหลักผ่าน signal เท่านั้น · หน้า Login (`--greeter`) สร้าง `FaceController(active=False)` จึงไม่แตะกล้อง
 
 ## หน้าจอ (`aipc.ui`)
 
@@ -66,7 +78,8 @@ qml/AipcUi/Main.qml  ── AppState.screen ──►  LoginScreen      backend.
                                             ShellScreen        ├ system      นาฬิกา สถานะเครื่อง → aipc.doctor, aipc.bench.machine
                                               ├ StatusBar      ├ login       สถานะสแกนหน้า, signIn
                                               ├ Sidebar        ├ signup      กฎตรวจฟอร์ม → aipc.accounts.validation
-                                              └ 6 หน้า          └ filesBrowser ไฟล์ใน home → files.py (ห้ามออกนอก home)
+                                              └ 6 หน้า          ├ filesBrowser ไฟล์ใน home → files.py (ห้ามออกนอก home)
+                                                                 └ face        ใบหน้าของฉัน → face.py → aipc.vision (การ์ด 0006)
 ```
 
 **หลักการแบ่งงาน:** QML วาดอย่างเดียว · การตัดสินใจ ตัวเลข และการตรวจข้อมูลอยู่ใน Python ซึ่งมีเทสต์
@@ -87,7 +100,8 @@ qml/AipcUi/Main.qml  ── AppState.screen ──►  LoginScreen      backend.
 | สั่งงานเครื่อง | บน Linux รัน `xdg-open` / `gtk-launch` / `wpctl` จริง (แบบ list ไม่ผ่าน shell) · **บนวินโดวส์เป็นแบบจำลอง และการ์ดเขียนว่า "จำลอง"** |
 | เข้าสู่ระบบ | โหมด greeter (`--greeter`): ส่งให้ greetd/PAM ตรวจจริง · หน้าต่างพัฒนา: ปฏิเสธเสมอนอกโหมดพัฒนา |
 | หลังเข้าระบบ | โหมดเซสชัน (`--session`): เริ่มที่ Shell, "ออก" จบเซสชันจริง, ไม่มีโหมดพัฒนา |
-| สแกนหน้า, ลงทะเบียนใบหน้า | แกนมีแล้วใน `aipc.vision` (ใช้จาก terminal ได้) · **หน้าจอยังไม่ได้ต่อ** · วงกล้องยังบอก "ยังไม่พร้อม" · ดูหน้าตาได้ด้วย `--demo-scan` |
+| ใบหน้าในหน้าตั้งค่า | ลงทะเบียน 3 ท่า / ทดลองสแกน 1:1 / ลบ ทำงานจริงกับกล้อง (การ์ด 0006) · ขอความยินยอมทุกครั้ง · **ไม่แสดงภาพสดบนจอ** · แถบบนขึ้น "กล้องกำลังใช้" |
+| สแกนหน้าที่หน้า Login | **ยังไม่ได้ต่อ** (greeter อ่านแม่แบบใน home ของผู้ใช้ไม่ได้ ต้องมี visiond) · วงกล้องบอก "ยังไม่พร้อม" · ดูหน้าตาได้ด้วย `--demo-scan` |
 | หน้า Skill | รายการจากไฟล์สกิลจริง พร้อมบอกว่าตัวไหนใช้ได้ ตัวไหนยังขาดอะไร · **นำเข้า/ให้ AI ช่วยสร้าง ยังไม่มี** |
 | ปิดบัง/ล็อก, ความเป็นส่วนตัว, เสียง | **ไม่มี** · หน้าจอบอกว่ายังไม่พร้อมและอยู่เฟสไหน |
 
