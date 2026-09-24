@@ -134,6 +134,13 @@ class CameraFlowTest(unittest.TestCase):
         self.assertEqual(len(lines), 2)
         self.assertIn('"subject": "P01"', lines[0])
 
+    def test_self_scan_uses_who_as_template_name(self):
+        self.fs.save(self.vec, 6, "t", store.Consent("t"))
+        sc = FakeScanner(scan_result=pipeline.ScanResult("P00", "matched", 0.9, -1, 5, 5, {}, 1.0))
+        with mock.patch.object(camera, "log_path", return_value=self.dir / "s.log"):
+            camera.cmd_scan(FakeCap(10), sc, self.fs, 1, 5, out=self.out.append, subject="P00")
+        self.assertEqual(list(sc.templates), ["P00"])
+
 
 if __name__ == "__main__":
     unittest.main()

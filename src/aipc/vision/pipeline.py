@@ -70,7 +70,13 @@ class ScanResult:
 
     @property
     def advice(self) -> str:
-        return "" if self.account else (ADVICE.get(self.reason) or self.last_advice)
+        if self.account:
+            return ""
+        general = ADVICE.get(self.reason, "")
+        # "ภาพไม่พอ" อย่างเดียวผู้ใช้ทำอะไรต่อไม่ได้ → ต่อท้ายเหตุผลของ quality gate เฟรมล่าสุด
+        if self.reason == "not_enough_frames" and self.last_advice:
+            return f"{general} · {self.last_advice}"
+        return general or self.last_advice
 
 
 class FaceScanner:

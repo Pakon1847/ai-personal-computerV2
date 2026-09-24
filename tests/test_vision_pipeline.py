@@ -94,6 +94,7 @@ class PipelineTest(Base):
         res = s.scan([self.frame] * 6, self.templates)
         self.assertEqual((res.reason, res.frames_used), ("not_enough_frames", 2))
         self.assertIn("ยังได้ภาพที่ชัดไม่พอ", res.advice)
+        self.assertIn("ขยับเข้ามาใกล้อีกนิด", res.advice, "ต้องบอกเหตุผลที่ทำตามได้ด้วย")
         self.assertEqual(res.last_advice, "ขยับเข้ามาใกล้อีกนิด")
 
     def test_second_big_face_is_refused(self):

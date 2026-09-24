@@ -142,7 +142,8 @@ def cmd_scan(cap, scanner, fs: store.FaceStore, times: int, seconds: float, out=
         if stored is None:
             out(fs.problem or "ยังไม่ได้ลงทะเบียนใบหน้า · ใช้คำสั่ง enroll ก่อน")
             return 1
-        templates = {getpass.getuser(): stored.vector}
+        # --who ในโหมดเทียบตัวเอง = ชื่อของแม่แบบด้วย → ป้ายใน log ตรงกัน (report นับถูกคน/ผิดคนได้)
+        templates = {subject or getpass.getuser(): stored.vector}
     if not templates:
         out("ไม่มีแม่แบบให้เทียบ")
         return 1
