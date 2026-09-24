@@ -1,0 +1,15 @@
+{
+  "collected_at": "2026-09-24T05:13:12+00:00",
+  "hostname": "ai-pc",
+  "board_model": "Raspberry Pi 4 Model B Rev 1.4",
+  "board_class": "pi4",
+  "ram_total_mb": 3795,
+  "os": "Debian GNU/Linux 13 (trixie)",
+  "kernel": "6.18.50+rpt-rpi-v8",
+  "python": "3.13.5",
+  "cpu_temp_c": 48.199,
+  "throttled": 0,
+  "throttled_problems": [],
+  "git_commit": "e56a4ea23e5e751d68cb990facc14529dde776b9",
+  "git_dirty": true
+}

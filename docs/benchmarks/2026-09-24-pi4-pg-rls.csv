@@ -1,0 +1,16 @@
+id,ผู้ทดสอบ,สิ่งที่ลอง,ที่คาดไว้,ผลจริง,ตัดสิน
+1,A,"A เขียนแชทของตัวเอง","1","1",ผ่าน
+2,A,"A นับแถวของตัวเอง","1","1",ผ่าน
+3,B,"B อ่านตาราง (ต้องไม่เห็นแถวของ A)","0","0",ผ่าน
+4,B,"B เขียนแถวโดยอ้างว่าเป็นของ A","ถูกปฏิเสธ","ERROR:  new row violates row-level security policy for table 'chats' \ ERROR_EXIT",ผ่าน
+5,B,"B แก้แถวของ A","0","0",ผ่าน
+6,B,"B ลบแถวของ A","0","0",ผ่าน
+7,A,"A ตรวจว่าแถวของตัวเองยังอยู่ครบ","secret-a","secret-a",ผ่าน
+8,B,"B ปิด RLS ของตาราง","ถูกปฏิเสธ","ERROR:  must be owner of table chats \ ERROR_EXIT",ผ่าน
+9,B,"B สลับตัวเป็น A ด้วย SET ROLE","ถูกปฏิเสธ","ERROR:  permission denied to set role 'aipc_spike_a' \ ERROR_EXIT",ผ่าน
+10,B,"B ต่อ DB โดยอ้างชื่อ A (peer auth)","ถูกปฏิเสธ","psql: error: connection to server on socket '/var/run/postgresql/.s.PGSQL.5432' failed: FATAL:  Peer authentication failed for user 'aipc_spike_a'",ผ่าน
+11,owner,"เจ้าของตาราง (FORCE RLS ต้องบังคับด้วย)","0","0",ผ่าน
+12,B,"B อ่านผ่าน view แบบ security_invoker","0","0",ผ่าน
+13,B,"B อ่านผ่าน view แบบธรรมดา (ไม่มี security_invoker)","บันทึกผล","0",สังเกต
+14,B,"B ยิง query ค้างนาน (statement_timeout 2 วิ)","ถูกปฏิเสธ","ERROR:  canceling statement due to statement timeout \ ERROR_EXIT",ผ่าน
+15,root,"superuser postgres อ่านตาราง","เห็นได้ — root/superuser อยู่นอกขอบเขต (THREAT_MODEL)","1",สังเกต
