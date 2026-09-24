@@ -98,13 +98,20 @@ class HardwareTest(unittest.TestCase):
 
 # โหนดวิดีโอของ Pi 4 ที่ไม่ได้ต่อกล้อง (คัดจาก /sys/class/video4linux บนเครื่องจริง 2026-09-24)
 PI4_SOC_NODES = {
-    "video10": "bcm2835-codec-decode", "video11": "bcm2835-codec-encode",
-    "video12": "bcm2835-codec-isp", "video13": "bcm2835-isp-output0",
-    "video14": "bcm2835-isp-capture0", "video15": "bcm2835-isp-capture1",
-    "video16": "bcm2835-isp-stats2", "video18": "bcm2835-codec-image_fx",
-    "video19": "rpi-hevc-dec", "video20": "bcm2835-isp-output0",
-    "video21": "bcm2835-isp-capture0", "video22": "bcm2835-isp-capture1",
-    "video23": "bcm2835-isp-stats2", "video31": "bcm2835-codec-encode_image",
+    "video10": "bcm2835-codec-decode",
+    "video11": "bcm2835-codec-encode",
+    "video12": "bcm2835-codec-isp",
+    "video13": "bcm2835-isp-output0",
+    "video14": "bcm2835-isp-capture0",
+    "video15": "bcm2835-isp-capture1",
+    "video16": "bcm2835-isp-stats2",
+    "video18": "bcm2835-codec-image_fx",
+    "video19": "rpi-hevc-dec",
+    "video20": "bcm2835-isp-output0",
+    "video21": "bcm2835-isp-capture0",
+    "video22": "bcm2835-isp-capture1",
+    "video23": "bcm2835-isp-stats2",
+    "video31": "bcm2835-codec-encode_image",
 }
 
 

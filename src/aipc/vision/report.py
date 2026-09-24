@@ -65,7 +65,8 @@ def verdicts(s: dict) -> dict:
         "frr": s["frr"] is not None and s["frr"] <= cr["frr_max"],
         "wrong_person": s["wrong_person"] == cr["wrong_person"],
         "bpcer": s["bpcer"] is not None and s["bpcer"] <= cr["bpcer_max"],
-        "time": t["median"] is not None and t["median"] <= cr["time_median_ms_max"]
+        "time": t["median"] is not None
+        and t["median"] <= cr["time_median_ms_max"]
         and t["p95"] <= cr["time_p95_ms_max"],
     }
 

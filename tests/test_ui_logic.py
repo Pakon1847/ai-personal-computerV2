@@ -20,8 +20,15 @@ class ThaiDateTest(unittest.TestCase):
 
     def test_greeting_boundaries(self):
         cases = {
-            4: "ค่ำ", 5: "เช้า", 11: "เช้า", 12: "บ่าย", 16: "บ่าย",
-            17: "เย็น", 19: "เย็น", 20: "ค่ำ", 23: "ค่ำ",
+            4: "ค่ำ",
+            5: "เช้า",
+            11: "เช้า",
+            12: "บ่าย",
+            16: "บ่าย",
+            17: "เย็น",
+            19: "เย็น",
+            20: "ค่ำ",
+            23: "ค่ำ",
         }
         for hour, part in cases.items():
             got = thaidate.greeting(datetime(2026, 9, 23, hour, 0))

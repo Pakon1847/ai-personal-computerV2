@@ -266,9 +266,7 @@ def check_camera(root: Path) -> Check:
         return Check("camera", "กล้อง", PASS, f"เจอกล้อง: {', '.join(cameras[:4])}")
     if unnamed:
         # อ่านชื่อไม่ได้ = ไม่รู้ว่าเป็นกล้องหรือของชิป · ไม่เดาว่าเป็นกล้อง (H5)
-        return Check(
-            "camera", "กล้อง", UNKNOWN, f"เจอ {', '.join(unnamed[:4])} แต่อ่านชื่ออุปกรณ์ไม่ได้"
-        )
+        return Check("camera", "กล้อง", UNKNOWN, f"เจอ {', '.join(unnamed[:4])} แต่อ่านชื่ออุปกรณ์ไม่ได้")
     return Check(
         "camera",
         "กล้อง",

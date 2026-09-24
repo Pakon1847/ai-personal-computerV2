@@ -38,7 +38,8 @@
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,ui,vision]"
+.\.venv\Scripts\python.exe -m aipc.vision.models fetch     # SFace 37 MB (ตรวจ sha256) · ไม่มี = เทสต์ข้อนั้นถูกข้าม
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 ```
 

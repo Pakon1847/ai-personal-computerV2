@@ -26,6 +26,7 @@ def tearDownModule():
     else:
         os.environ["XDG_DATA_HOME"] = _OLD_DATA_HOME
 
+
 try:
     from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer
 

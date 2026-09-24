@@ -144,10 +144,13 @@ def run_pairs(a, cfg, det, emb) -> dict:
         "protocol": "LFW pairs.txt · 10-fold · threshold จาก 9 fold ที่เหลือ",
         "face_pick": a.pick,
         "pairs": {"genuine": int(same.sum()), "impostor": int((~same).sum()), "folds": 10},
-        "images": len(cache), "no_face_images": sum(v is None for v in cache.values()),
-        "accuracy_mean": round(mean, 5), "accuracy_std": round(std, 5),
+        "images": len(cache),
+        "no_face_images": sum(v is None for v in cache.values()),
+        "accuracy_mean": round(mean, 5),
+        "accuracy_std": round(std, 5),
         "fold_thresholds": [round(t, 4) for t in ths],
-        "eer": round(eer_rate, 5), "eer_threshold": round(eer_t, 4),
+        "eer": round(eer_rate, 5),
+        "eer_threshold": round(eer_t, 4),
     }
 
 

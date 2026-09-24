@@ -57,7 +57,6 @@ class MetricsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             metrics.curve([], [0.1])
 
-
     def test_best_threshold_separates_perfectly(self):
         t = metrics.best_threshold([0.1, 0.2, 0.8, 0.9], [False, False, True, True])
         self.assertTrue(0.2 < t < 0.8)

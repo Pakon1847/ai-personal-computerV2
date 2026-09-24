@@ -45,7 +45,8 @@ ldd --version | head -1
 ```bash
 git clone ~/aipc.bundle ~/aipc
 cd ~/aipc
-python3 -m venv .venv && ./.venv/bin/pip install -e ".[ui]"
+python3 -m venv .venv && ./.venv/bin/pip install -e ".[ui,vision]"
+./.venv/bin/python -m aipc.vision.models fetch          # โมเดลใบหน้า SFace (การ์ด 0005)
 ./.venv/bin/python -m unittest discover -s tests -t .      # ต้องผ่าน
 ./.venv/bin/python -m aipc.ui --dev --fullscreen            # ลองดูหน้าจอ · ออกด้วย Ctrl+Alt+Q
 ```
