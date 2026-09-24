@@ -98,7 +98,8 @@ class FaceControllerTest(unittest.TestCase):
 
         return FaceController(fs=self.fs, open_camera=open_camera, build_scanner=lambda: scanner,
                               enroll_seconds=5, scan_seconds=5,
-                              enroll_log=self.fs.path.parent / "enroll.log")  # fmt: skip
+                              enroll_log=self.fs.path.parent / "enroll.log",
+                              scan_log=self.fs.path.parent / "scans.log")  # fmt: skip
 
     def test_starts_as_none(self):
         self.assertEqual(self.make(Scanner()).state, "none")

@@ -90,7 +90,7 @@ class FaceController(QObject):
 
     def __init__(self, active: bool = True, fs=None, open_camera=None, build_scanner=None,
                  enroll_seconds: float = 40.0, scan_seconds: float = 5.0,
-                 enroll_log=None):  # fmt: skip
+                 enroll_log=None, scan_log=None):  # fmt: skip
         super().__init__()
         self._active = active
         self._state = "unavailable"
@@ -119,6 +119,7 @@ class FaceController(QObject):
         self._open_camera = open_camera
         self._build_scanner = build_scanner
         self._enroll_log_path = enroll_log
+        self._scan_log_path = scan_log
         if active:
             self._setup()
         self.refresh()
@@ -132,6 +133,7 @@ class FaceController(QObject):
             return
         self._fs = self._fs or store.FaceStore()
         self._enroll_log_path = self._enroll_log_path or camera.enroll_log_path()
+        self._scan_log_path = self._scan_log_path or camera.log_path()
         self._open_camera = self._open_camera or camera.open_camera
         if self._build_scanner is None:
             self._build_scanner = lambda: camera.build_scanner(config.load(None))
@@ -321,7 +323,7 @@ class FaceController(QObject):
         return True, f"ลงทะเบียนแล้ว ({res.frames} เฟรม)"
 
     def _scan_job(self, scanner, cap, stored):
-        from aipc.vision import camera, pipeline
+        from aipc.vision import pipeline
 
         who = getpass.getuser()
         res = scanner.scan(self._frames(cap, self._scan_seconds), {who: stored.vector},
@@ -330,7 +332,7 @@ class FaceController(QObject):
             return False, "ยกเลิกแล้ว"
         if self._camera_lost:
             return False, "กล้องหลุด · ลองใหม่เมื่อต่อกล้องแล้ว"
-        pipeline.ScanLog(camera.log_path()).write(res)
+        pipeline.ScanLog(self._scan_log_path).write(res)
         if res.account:
             return True, f"รู้จัก · คะแนน {res.score:.2f} · {res.total_ms / 1000:.1f} วิ"
         return False, f"ไม่ผ่าน: {res.advice}"
