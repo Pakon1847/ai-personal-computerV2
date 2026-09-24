@@ -1,0 +1,6 @@
+{"time": "2026-09-24T22:40:36+07:00", "result": "enrolled", "missing": ["down"], "common_reason": "", "seconds": 40.1, "frames": 6, "frames_seen": 296}
+{"time": "2026-09-24T22:41:34+07:00", "result": "enrolled", "missing": [], "common_reason": "", "seconds": 26.4, "frames": 6, "frames_seen": 170}
+{"time": "2026-09-24T22:49:44+07:00", "result": "enrolled", "missing": ["up", "down"], "common_reason": "", "seconds": 40.1, "frames": 6, "frames_seen": 202}
+{"time": "2026-09-24T22:50:29+07:00", "result": "enrolled", "missing": ["up", "down"], "common_reason": "", "seconds": 40.0, "frames": 6, "frames_seen": 203}
+{"time": "2026-09-24T22:51:15+07:00", "result": "enrolled", "missing": ["down"], "common_reason": "", "seconds": 40.1, "frames": 6, "frames_seen": 202}
+{"time": "2026-09-24T22:51:38+07:00", "result": "enrolled", "missing": [], "common_reason": "", "seconds": 18.1, "frames": 6, "frames_seen": 110}
