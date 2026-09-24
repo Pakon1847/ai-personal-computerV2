@@ -6,6 +6,7 @@ warning ของ QML มักแปลว่ามีอะไรบนจอ�
 """
 
 import os
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -141,6 +142,7 @@ class ShellCardTest(unittest.TestCase):
             win.close()
             uiapp.shutdown(engine)
             QCoreApplication.processEvents()
+            shutil.rmtree(tmp, ignore_errors=True)  # ไม่ทิ้งโฟลเดอร์ชั่วคราวไว้ใน /tmp ของ Pi
 
         self.addCleanup(close)
         return engine, win, warnings
