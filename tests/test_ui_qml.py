@@ -157,6 +157,21 @@ class ShellCardTest(unittest.TestCase):
                     self.assertTrue(found[0].property("text"), name)
                 self.assertEqual(warnings, [])
 
+    def test_face_panel_and_camera_in_use(self):
+        engine, win, warnings = self.open_shell("settings")
+        face = engine.rootContext().contextProperty("face")
+        self.assertEqual(len(find_all(win, "facePanel")), 1)
+        self.assertEqual(find_all(win, "faceStatus")[0].property("text"), "ยังไม่ได้ลงทะเบียน")
+        cam = find_all(win, "cameraIndicator")[0]
+        self.assertNotEqual(cam.property("text"), "กล้องกำลังใช้")
+        face._busy = True  # จำลองว่ากำลังใช้กล้อง (ไม่เปิดกล้องจริงในเทสต์)
+        face.changed.emit()
+        settle(50)
+        self.assertEqual(cam.property("text"), "กล้องกำลังใช้", "H3: ต้องเห็นว่ากล้องกำลังใช้")
+        face._busy = False
+        face.changed.emit()
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")

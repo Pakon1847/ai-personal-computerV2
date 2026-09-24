@@ -82,6 +82,13 @@ class PipelineTest(Base):
             self.assertIn(step, res.timings_ms)
         self.assertGreaterEqual(res.total_ms, 0)
 
+    def test_scan_reports_progress(self):
+        seen = []
+        self.scanner([[row()]]).scan(
+            [self.frame] * 8, self.templates, progress=lambda r, c: seen.append(c["good"])
+        )
+        self.assertEqual(seen, [1, 2, 3, 4, 5])
+
     def test_spoof_rejects_immediately(self):
         s = self.scanner([[row()]], live=[0.99, 0.2, 0.99])
         res = s.scan([self.frame] * 8, self.templates)
@@ -132,6 +139,15 @@ class EnrollTest(Base):
         self.assertIsInstance(t, pipeline.Template)
         self.assertEqual(t.frames, 6)
         self.assertGreater(matching.cosine(t.vector, self.alice), 0.95)
+
+    def test_enroll_reports_progress_every_frame(self):
+        seen = []
+        order = ("front", "left", "right") * 2
+        rows = [[row(**self.POSES[p])] for p in order]
+        self.scanner(rows).enroll([self.frame] * 10, progress=lambda r, c: seen.append(dict(c)))
+        self.assertEqual(len(seen), 6)
+        self.assertEqual(seen[0], {"front": 1, "left": 0, "right": 0})
+        self.assertEqual(seen[-1], {"front": 2, "left": 2, "right": 2})
 
     def test_missing_pose_is_rejected_with_advice(self):
         rows = [[row(**self.POSES[p])] for p in ("front", "left", "front", "left")]

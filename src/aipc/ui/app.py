@@ -21,6 +21,7 @@ from aipc.ui.backend import (
     SystemStatus,
     UiSettings,
 )
+from aipc.ui.face import FaceController
 
 HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
@@ -88,6 +89,8 @@ def build(opts: Options, argv: list[str] | None = None):
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(run_timer=not opts.greeter_session),
         "session": SessionController(opts.session and not opts.greeter_session),
+        # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
+        "face": FaceController(active=not opts.greeter_session),
     }
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():

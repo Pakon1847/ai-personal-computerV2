@@ -1,5 +1,5 @@
 // หน้าตั้งค่า · ธีมและขนาดตัวอักษรทำงานจริงและบันทึกลง ~/.config/aipc/ui.json
-// การตรวจเจ้าของยังไม่มีระบบรองรับ จึงแสดงเป็น "ยังไม่พร้อม"
+// ใบหน้าของฉัน (การ์ด 0006) ลงทะเบียน/ทดลอง/ลบได้จริง · การตรวจเจ้าของ (ปิดบัง/ล็อก) ยังไม่พร้อม
 import QtQuick
 import QtQuick.Layouts
 
@@ -51,6 +51,8 @@ ColumnLayout {
             }
         }
     }
+
+    FacePanel { Layout.fillWidth: true }
 
     NotReady {
         Layout.fillWidth: true

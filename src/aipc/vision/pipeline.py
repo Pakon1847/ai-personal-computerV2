@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import os
 import time
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -121,8 +121,16 @@ class FaceScanner:
         return FrameResult(True, "", q, live, emb, t)
 
     # ---------- สแกน 1:N ----------
-    def scan(self, frames: Iterable[np.ndarray], templates: dict[str, np.ndarray]) -> ScanResult:
-        """อ่านเฟรมไปเรื่อย ๆ จนได้เฟรมดีครบ max_frames หรือเฟรมหมด."""
+    def scan(
+        self,
+        frames: Iterable[np.ndarray],
+        templates: dict[str, np.ndarray],
+        progress: Callable[[FrameResult, dict], None] | None = None,
+    ) -> ScanResult:
+        """อ่านเฟรมไปเรื่อย ๆ จนได้เฟรมดีครบ max_frames หรือเฟรมหมด.
+
+        progress(ผลเฟรม, {"good": จำนวนเฟรมที่ผ่าน}) ถูกเรียกทุกเฟรม · ให้หน้าจอแสดงคำแนะนำสด
+        """
         t0 = self._clock()
         good: list[FrameResult] = []
         seen, sums, advice = 0, {}, ""
@@ -135,10 +143,12 @@ class FaceScanner:
                 return self._done(ScanResult(None, "spoof", frames_seen=seen, timings_ms=sums), t0)
             if r.ok:
                 good.append(r)
-                if len(good) >= self.cfg.max_frames:
-                    break
             else:
                 advice = r.advice
+            if progress:
+                progress(r, {"good": len(good)})
+            if len(good) >= self.cfg.max_frames:
+                break
         best = matching.select_best(good, lambda r: r.quality.score, self.cfg.min_frames,
                                     self.cfg.max_frames)  # fmt: skip
         if not best:
@@ -157,8 +167,15 @@ class FaceScanner:
         return res
 
     # ---------- ลงทะเบียน ----------
-    def enroll(self, frames: Iterable[np.ndarray], per_pose: int = 2) -> Template | Rejected:
+    def enroll(
+        self,
+        frames: Iterable[np.ndarray],
+        per_pose: int = 2,
+        progress: Callable[[FrameResult, dict], None] | None = None,
+    ) -> Template | Rejected:
         """ต้องได้เฟรมดีท่าละ per_pose เฟรม ครบทั้งหน้าตรง/ซ้าย/ขวา · PAD ไม่ผ่าน = ยกเลิกทันที.
+
+        progress(ผลเฟรม, {"front": n, "left": n, "right": n}) ถูกเรียกทุกเฟรม (หน้าจอบอกว่าท่าไหนได้แล้ว)
 
         ผู้เรียก (หน้าจอลงทะเบียน) ต้องยืนยันตัวตนแล้วเท่านั้น (BRIEF 5.1 ข้อ 6) — ฟังก์ชันนี้ไม่ตรวจสิทธิ์
         """
@@ -168,12 +185,14 @@ class FaceScanner:
             r = self.process(frame)
             if r.reason == "spoof":
                 return Rejected(("spoof",), ADVICE["spoof"])
-            if not r.ok:
+            if r.ok:
+                yaw = r.quality.yaw
+                pose = "front" if abs(yaw) <= POSE_SPLIT_DEG else ("right" if yaw > 0 else "left")
+                bins[pose].append(r)
+            else:
                 reasons.append(r.reason)
-                continue
-            yaw = r.quality.yaw
-            pose = "front" if abs(yaw) <= POSE_SPLIT_DEG else ("right" if yaw > 0 else "left")
-            bins[pose].append(r)
+            if progress:
+                progress(r, {p: len(v) for p, v in bins.items()})
             if all(len(v) >= per_pose for v in bins.values()):
                 break
         missing = [p for p, v in bins.items() if len(v) < per_pose]

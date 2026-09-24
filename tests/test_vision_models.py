@@ -29,6 +29,16 @@ class ModelFileTest(unittest.TestCase):
                 with self.assertRaisesRegex(models.ModelError, "sha256"):
                     models.locate(fake)
 
+    def test_shared_model_dir_is_used_when_user_has_none(self):
+        with tempfile.TemporaryDirectory() as user, tempfile.TemporaryDirectory() as shared:
+            fake = models.ModelFile(
+                "x.onnx", models.sha256(Path(__file__)), url="https://x.invalid"
+            )
+            (Path(shared) / "x.onnx").write_bytes(Path(__file__).read_bytes())
+            with mock.patch.dict(os.environ, {"AIPC_MODEL_DIR": user}):
+                with mock.patch.object(models, "shared_dir", return_value=Path(shared)):
+                    self.assertEqual(models.locate(fake), Path(shared) / "x.onnx")
+
     def test_missing_download_says_how_to_fetch(self):
         with tempfile.TemporaryDirectory() as d, mock.patch.dict(os.environ, {"AIPC_MODEL_DIR": d}):
             with self.assertRaisesRegex(models.ModelError, "fetch"):

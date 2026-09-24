@@ -72,6 +72,12 @@ def download_dir() -> Path:
     return Path(base) / "aipc" / "models"
 
 
+def shared_dir() -> Path:
+    """ที่เก็บโมเดลกลางของแอปที่ติดตั้ง (เช่น /opt/aipc-v2/models ข้าง .venv) · ผู้ใช้ทุกคนอ่านได้
+    ไม่ต้องดาวน์โหลด 37 MB แยกทุกบัญชี · install-greeter.sh ดาวน์โหลดไว้ให้ (ตรวจ sha256)."""
+    return Path(sys.prefix).parent / "models"
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -82,7 +88,11 @@ def sha256(path: Path) -> str:
 
 def locate(m: ModelFile) -> Path:
     """หาไฟล์แล้วตรวจ sha256 · ไม่ผ่าน = ModelError."""
-    path = (download_dir() if m.url else HERE) / m.name
+    if m.url:
+        candidates = [download_dir() / m.name, shared_dir() / m.name]
+        path = next((p for p in candidates if p.exists()), candidates[0])
+    else:
+        path = HERE / m.name
     if not path.exists():
         hint = " · ดาวน์โหลดด้วย python -m aipc.vision.models fetch" if m.url else ""
         raise ModelError(f"ไม่มีไฟล์โมเดล {path}{hint}")

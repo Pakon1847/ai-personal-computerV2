@@ -28,8 +28,10 @@ Item {
         }
         Chip {
             objectName: "cameraIndicator"
-            text: system.cameraPresent ? "กล้องพร้อม · ไม่ได้ใช้" : "ไม่พบกล้อง"
-            iconPath: system.cameraPresent ? Icons.camera : Icons.cameraOff
+            // H3: กำลังใช้กล้อง (ลงทะเบียน/ทดลองใบหน้า) ต้องเห็นชัดทุกหน้า
+            text: face.busy ? "กล้องกำลังใช้" : system.cameraPresent ? "กล้องพร้อม · ไม่ได้ใช้" : "ไม่พบกล้อง"
+            kind: face.busy ? "warn" : "neutral"
+            iconPath: system.cameraPresent || face.busy ? Icons.camera : Icons.cameraOff
         }
         Chip { objectName: "micIndicator"; text: "ไมค์ปิด"; iconPath: Icons.mic }
         Chip { text: "โมเดล: ยังไม่เชื่อมต่อ"; iconPath: Icons.cpu; kind: "warn"; compact: bar.tight }
