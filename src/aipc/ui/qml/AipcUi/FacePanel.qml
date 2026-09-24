@@ -1,9 +1,11 @@
-// "ใบหน้าของฉัน" ในหน้าตั้งค่า (การ์ด 0006) · ลงทะเบียน · ทดลองสแกน · ลบ
+// "ใบหน้าของฉัน" ในหน้าตั้งค่า (การ์ด 0006, 0010) · ลงทะเบียน · ทดลองสแกน · ลบ
 // ทุกการตัดสินอยู่ใน Python (face = FaceController) · หน้านี้แสดงสถานะและส่งคำสั่งเท่านั้น (H7)
-// ไม่มีภาพจากกล้องบนจอ (การ์ด 0006 ข้อ 3) · ขอความยินยอมก่อนเปิดกล้องทุกครั้งที่ลงทะเบียน
+// ภาพสดเฉพาะตอนลงทะเบียน (การ์ด 0010) · ภาพมาจาก Python ทาง image://face · ไม่มีการบันทึกภาพ
+// ขอความยินยอมก่อนเปิดกล้องทุกครั้งที่ลงทะเบียน
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import QtQuick.Shapes
 
 Card {
     id: root
@@ -11,7 +13,11 @@ Card {
     radius: Theme.radiusCard
     implicitHeight: col.implicitHeight + 40
 
-    readonly property var poseNames: ({ front: "หน้าตรง", left: "หันซ้าย", right: "หันขวา" })
+    readonly property var poseNames: ({ front: "ตรง", left: "ซ้าย", right: "ขวา", up: "เงย", down: "ก้ม" })
+    readonly property var poseOrder: ["front", "left", "right", "up", "down"]
+    // ลูกศรบอกทิศบนภาพกระจก: หันซ้ายของผู้ใช้ = ซ้ายของจอ
+    readonly property var poseArrow: ({ front: 0, left: 0, right: 180, up: 90, down: -90 })
+    readonly property bool enrolling: face.busy && face.currentPose !== ""
     readonly property string statusText: ({
         none: "ยังไม่ได้ลงทะเบียน",
         enrolled: "ลงทะเบียนแล้ว · " + face.enrolledAt.slice(0, 16).replace("T", " ") + " · ความยินยอม " + face.consentVersion,
@@ -53,6 +59,89 @@ Card {
                 + "เก็บแค่ตัวเลข 128 ค่า ไม่เก็บภาพ · รหัสผ่านยังเป็นกุญแจเสมอ"
         }
 
+        // ---------- ระหว่างลงทะเบียน: ภาพสด (กระจก) + วงรีนำทาง + กรอบหน้า + ลูกศรท่าถัดไป ----------
+        Rectangle {
+            id: preview
+            objectName: "facePreview"
+            visible: root.enrolling
+            Layout.fillWidth: true
+            Layout.maximumWidth: 480
+            Layout.preferredHeight: width * 9 / 16
+            Layout.alignment: Qt.AlignHCenter
+            radius: Theme.radiusCard
+            color: Theme.camera
+            clip: true
+
+            Image {
+                id: live
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+                cache: false
+                asynchronous: false
+                // เลข serial เปลี่ยน = ขอภาพใหม่ · 0 = ยังไม่มีภาพ (ไม่ขอเลย)
+                source: face.previewSerial > 0 ? "image://face/" + face.previewSerial : ""
+            }
+            AppText {
+                anchors.centerIn: parent
+                visible: face.previewSerial === 0
+                text: "กำลังเปิดกล้อง…"
+                color: Theme.cameraText
+            }
+            // วงรีให้เอาหน้าใส่ · เป็นเส้นประกอบเท่านั้น ไม่ได้ใช้ตัดสิน
+            Shape {
+                anchors.fill: parent
+                opacity: 0.85
+                layer.enabled: true  // วาดลง texture ก่อน ไม่หลุดกรอบเมื่อวาดด้วย CPU (เหมือน Icon)
+                ShapePath {
+                    strokeWidth: 3
+                    strokeColor: face.faceBox.length === 4 ? Theme.scanLine : Theme.lineStrong
+                    fillColor: "transparent"
+                    PathAngleArc {
+                        centerX: preview.width / 2
+                        centerY: preview.height / 2
+                        radiusX: live.paintedHeight * 0.3
+                        radiusY: live.paintedHeight * 0.4
+                        startAngle: 0
+                        sweepAngle: 360
+                    }
+                }
+            }
+            // กรอบหน้าที่ระบบเห็น (สัดส่วน 0–1 ของภาพที่วาดจริง)
+            Rectangle {
+                readonly property real ox: (live.width - live.paintedWidth) / 2
+                readonly property real oy: (live.height - live.paintedHeight) / 2
+                visible: face.faceBox.length === 4
+                x: ox + (face.faceBox[0] || 0) * live.paintedWidth
+                y: oy + (face.faceBox[1] || 0) * live.paintedHeight
+                width: (face.faceBox[2] || 0) * live.paintedWidth
+                height: (face.faceBox[3] || 0) * live.paintedHeight
+                color: "transparent"
+                border.width: 2
+                border.color: Theme.scanFound
+                radius: 8
+            }
+            // ลูกศรท่าถัดไป (ท่าตรง = ไม่มีลูกศร)
+            Rectangle {
+                visible: face.currentPose !== "" && face.currentPose !== "front"
+                width: 56; height: 56; radius: 28
+                color: Theme.accent
+                opacity: 0.9
+                anchors.verticalCenter: face.currentPose === "up" || face.currentPose === "down" ? undefined : parent.verticalCenter
+                anchors.horizontalCenter: face.currentPose === "up" || face.currentPose === "down" ? parent.horizontalCenter : undefined
+                anchors.left: face.currentPose === "left" ? parent.left : undefined
+                anchors.right: face.currentPose === "right" ? parent.right : undefined
+                anchors.top: face.currentPose === "up" ? parent.top : undefined
+                anchors.bottom: face.currentPose === "down" ? parent.bottom : undefined
+                anchors.margins: 12
+                Icon {
+                    anchors.centerIn: parent
+                    path: Icons.back
+                    color: Theme.textOnAccent
+                    rotation: root.poseArrow[face.currentPose] || 0
+                }
+            }
+        }
+
         // ---------- ระหว่างทำงาน: คำแนะนำสด + ท่าที่ได้แล้ว ----------
         ColumnLayout {
             visible: face.busy
@@ -67,11 +156,12 @@ Card {
                 color: Theme.accentInk
             }
             Flow {
+                objectName: "facePoses"
                 Layout.fillWidth: true
                 spacing: 8
-                visible: Object.keys(face.poses).length === 3
+                visible: root.enrolling
                 Repeater {
-                    model: ["front", "left", "right"]
+                    model: root.poseOrder
                     Chip {
                         required property string modelData
                         readonly property int got: face.poses[modelData] || 0

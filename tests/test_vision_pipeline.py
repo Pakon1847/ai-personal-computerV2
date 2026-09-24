@@ -133,8 +133,9 @@ class EnrollTest(Base):
     # nose_down: หน้าตรง 0.57 · 0.47 ≈ เงย 13° · 0.67 ≈ ก้ม 13° (estimate_pose)
     POSES = {
         "front": {},
-        "left": {"yaw_shift": -0.3},
-        "right": {"yaw_shift": 0.3},
+        # ผู้ใช้หันซ้ายของตัวเอง = จมูกไปทางขวาของภาพ (yaw_shift บวก)
+        "left": {"yaw_shift": 0.3},
+        "right": {"yaw_shift": -0.3},
         "up": {"nose_down": 0.47},
         "down": {"nose_down": 0.67},
     }

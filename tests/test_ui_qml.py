@@ -172,6 +172,38 @@ class ShellCardTest(unittest.TestCase):
         face.changed.emit()
         self.assertEqual(warnings, [])
 
+    def test_enroll_preview_every_pose_without_warnings(self):
+        from PySide6.QtGui import QImage
+
+        engine, win, warnings = self.open_shell("settings")
+        face = engine.rootContext().contextProperty("face")
+        preview = find_all(win, "facePreview")[0]
+        self.assertFalse(preview.property("visible"), "ไม่ลงทะเบียน = ไม่มีภาพสด")
+        img = QImage(480, 270, QImage.Format.Format_RGB888)
+        img.fill(0x404040)
+        # จำลองสถานะระหว่างลงทะเบียน (ไม่เปิดกล้องจริงในเทสต์)
+        face._busy, face._preview_on, face._preview_img = True, True, img
+        face._preview_serial, face._face_box = 1, [0.35, 0.2, 0.3, 0.55]
+        counts = {"front": 0, "left": 0, "right": 0, "up": 0, "down": 0}
+        for pose in ("front", "left", "right", "up", "down", None):
+            face._poses = dict(counts)
+            face.changed.emit()
+            face.previewChanged.emit()
+            settle(30)
+            self.assertTrue(preview.property("visible") or pose is None, pose)
+            if pose:
+                self.assertEqual(face.currentPose, pose)
+                counts[pose] = 2
+        self.assertTrue(
+            find_all(win, "facePoses")[0].property("visible") is False
+        )  # ครบ = ไม่ใช่ท่าไหนแล้ว
+        face._busy = False
+        face._clear_preview()
+        face.changed.emit()
+        settle(30)
+        self.assertFalse(preview.property("visible"))
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")

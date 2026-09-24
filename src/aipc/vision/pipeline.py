@@ -50,13 +50,15 @@ POSE_SPLIT_DEG = 8.0  # มุม ≤ 8° = หน้าตรง · เกิ�
 def pose_of(q: quality.Quality) -> str | None:
     """แบ่งท่าจากมุมที่ประมาณได้ · หันและก้มเงยพร้อมกัน = ท่ากำกวม ไม่นับ (None).
 
-    yaw > 0 = ขวา (ตามภาพจากกล้อง ไม่กลับด้าน) · pitch > 0 = จมูกต่ำลง = ก้ม · pitch < 0 = เงย
+    ซ้าย/ขวา ตามมุมมองของ **ผู้ใช้** (ตรงกับคำสั่ง "หันซ้าย" บนจอ): กล้องหันหน้าเข้าหาผู้ใช้
+    ผู้ใช้หันไปทางซ้ายของตัวเอง → จมูกเลื่อนไปทางขวาของภาพ → yaw > 0 = "left"
+    pitch > 0 = จมูกต่ำลง = ก้ม · pitch < 0 = เงย
     """
     turned, tilted = abs(q.yaw) > POSE_SPLIT_DEG, abs(q.pitch) > POSE_SPLIT_DEG
     if turned and tilted:
         return None
     if turned:
-        return "right" if q.yaw > 0 else "left"
+        return "left" if q.yaw > 0 else "right"
     if tilted:
         return "down" if q.pitch > 0 else "up"
     return "front"
