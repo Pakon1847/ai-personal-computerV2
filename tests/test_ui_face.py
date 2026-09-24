@@ -85,13 +85,20 @@ class FaceControllerTest(unittest.TestCase):
         self.cap = Cap()
         self.opened = 0
 
+    def enroll_log(self):
+        import json
+
+        text = (self.fs.path.parent / "enroll.log").read_text(encoding="utf-8")
+        return [json.loads(x) for x in text.splitlines()]
+
     def make(self, scanner, cap=None):
         def open_camera():
             self.opened += 1
             return cap or self.cap
 
         return FaceController(fs=self.fs, open_camera=open_camera, build_scanner=lambda: scanner,
-                              enroll_seconds=5, scan_seconds=5)  # fmt: skip
+                              enroll_seconds=5, scan_seconds=5,
+                              enroll_log=self.fs.path.parent / "enroll.log")  # fmt: skip
 
     def test_starts_as_none(self):
         self.assertEqual(self.make(Scanner()).state, "none")
@@ -122,6 +129,7 @@ class FaceControllerTest(unittest.TestCase):
         settle(f)
         self.assertIn("หันขวาเล็กน้อย", f.message)
         self.assertEqual(f.state, "none")
+        self.assertEqual(self.enroll_log()[-1]["result"], "rejected")  # log ทุกครั้ง แม้ไม่สำเร็จ
 
     def test_cancel_saves_nothing(self):
         f = self.make(Scanner(pipeline.Template(self.vec, 6, "t"), slow=0.05), Cap(n=1000))
@@ -131,6 +139,7 @@ class FaceControllerTest(unittest.TestCase):
         settle(f)
         self.assertIn("ยกเลิก", f.message)
         self.assertFalse(self.fs.path.exists())
+        self.assertEqual(self.enroll_log()[-1]["result"], "cancelled")
 
     def test_camera_unplugged_saves_nothing(self):
         f = self.make(Scanner(pipeline.Template(self.vec, 6, "t")), Cap(fail_after=3))

@@ -1,7 +1,8 @@
 """ทดลองระบบใบหน้ากับกล้องจริงจาก terminal (การ์ด 0005) · ยังไม่ต่อหน้าจอ QML.
 
     python -m aipc.vision.camera check            เปิดกล้อง ดูว่าเห็นหน้าไหม และคำแนะนำของ quality gate
-    python -m aipc.vision.camera enroll           ลงทะเบียนหน้าตัวเอง (ถามความยินยอมก่อน)
+    python -m aipc.vision.camera enroll           ลงทะเบียนหน้าตัวเอง 5 ท่า (ถามความยินยอมก่อน)
+    python -m aipc.vision.camera compare          เทียบแม่แบบ 3 ท่า กับ 5 ท่า (การ์ด 0010 · ไม่บันทึกแม่แบบ)
     python -m aipc.vision.camera scan [--times N] สแกนเทียบแม่แบบของตัวเอง · จับเวลาจริงตั้งแต่เปิดกล้อง
     python -m aipc.vision.camera delete           ลบแม่แบบใบหน้า (PDPA)
 
@@ -34,9 +35,17 @@ CONSENT_TEXT = """\
 CAPTURE_SIZE = (1280, 720)
 
 
-def log_path() -> Path:
+ENROLL_SECONDS = 40.0  # 5 ท่า (การ์ด 0010) · เดิม 3 ท่า 20 วิ
+ENROLL_HINT = "มองตรง แล้วค่อย ๆ หันซ้าย หันขวา เงยหน้า และก้มหน้า เล็กน้อยทีละท่า"
+
+
+def log_path(name: str = "face-scans.log") -> Path:
     base = os.environ.get("XDG_STATE_HOME") or Path.home() / ".local" / "state"
-    return Path(base) / "aipc" / "face-scans.log"
+    return Path(base) / "aipc" / name
+
+
+def enroll_log_path() -> Path:
+    return log_path("face-enroll.log")
 
 
 def find_camera(root: Path) -> int | None:
@@ -111,13 +120,72 @@ def cmd_enroll(cap, scanner, fs: store.FaceStore, seconds: float, ask=input, out
         out("ไม่ได้ยินยอม · ไม่ได้เก็บอะไร")
         return 1
     given = datetime.now().astimezone().isoformat(timespec="seconds")
-    out("มองกล้องตรง ๆ แล้วค่อย ๆ หันซ้ายเล็กน้อย และขวาเล็กน้อย")
+    out(ENROLL_HINT)
+    t0 = time.monotonic()
     res = scanner.enroll(frames(cap, seconds))
+    pipeline.EnrollLog(enroll_log_path()).write(res, time.monotonic() - t0)
     if isinstance(res, pipeline.Rejected):
         out(f"ลงทะเบียนไม่สำเร็จ: {res.advice}")
         return 1
     fs.save(res.vector, res.frames, res.created, store.Consent(given))
     out(f"ลงทะเบียนแล้ว ({res.frames} เฟรม) · ลบได้ด้วยคำสั่ง delete")
+    return 0
+
+
+COMPARE_SETS = {"3": ("front", "left", "right"), "5": ("front", "left", "right", "up", "down")}
+
+
+def cmd_compare(cap, scanner, cfg, times: int, seconds: float, ask=input, out=print) -> int:
+    """การ์ด 0010 ข้อ 8: ลงทะเบียน 5 ท่าครั้งเดียว → แม่แบบ 3 ท่า และ 5 ท่า ในหน่วยความจำ →
+    สแกน `times` ครั้ง ให้คะแนนการสแกนครั้งเดียวกันกับทั้งสองแม่แบบ · log เฉพาะคะแนน ไม่บันทึกแม่แบบ
+    """
+    import json
+
+    from aipc.vision import matching
+
+    if ask(CONSENT_TEXT).strip() != "ยินยอม":
+        out("ไม่ได้ยินยอม · ไม่ได้เก็บอะไร")
+        return 1
+    out(ENROLL_HINT)
+    res = scanner.enroll(frames(cap, ENROLL_SECONDS))
+    if isinstance(res, pipeline.Rejected) or any(p not in res.by_pose for p in COMPARE_SETS["5"]):
+        out("ต้องได้ครบ 5 ท่าจึงจะเทียบได้ · ลองใหม่")
+        return 1
+    tpl = {k: matching.average([e for p in poses for e in res.by_pose[p]])
+           for k, poses in COMPARE_SETS.items()}  # fmt: skip
+    rows = []
+    for i in range(times):
+        r = scanner.scan(frames(cap, seconds), {"me": tpl["3"]})
+        if r.probe is None:
+            out(f"[{i + 1}/{times}] สแกนไม่ได้: {r.advice}")
+            rows.append({"i": i + 1, "s3": None, "s5": None, "reason": r.reason})
+            continue
+        s = {k: round(matching.cosine(r.probe, v), 4) for k, v in tpl.items()}
+        rows.append({"i": i + 1, "s3": s["3"], "s5": s["5"], "reason": r.reason})
+        out(f"[{i + 1}/{times}] 3 ท่า {s['3']:.3f} · 5 ท่า {s['5']:.3f}")
+    done = [x for x in rows if x["s3"] is not None]
+    summary = {}
+    for k in COMPARE_SETS:
+        scores = [x[f"s{k}"] for x in done]
+        summary[k] = {
+            "matched": sum(v >= cfg.match_threshold for v in scores),
+            "mean": round(sum(scores) / len(scores), 4) if scores else None,
+        }
+    use5 = bool(done) and (summary["5"]["matched"] >= summary["3"]["matched"]
+                           and summary["5"]["mean"] >= summary["3"]["mean"])  # fmt: skip
+    entry = {
+        "time": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "scans": rows,
+        "summary": summary,
+        "threshold": cfg.match_threshold,
+        "five_not_worse": use5,
+    }
+    path = log_path("face-compare.log")
+    pipeline._append_line(path, json.loads(json.dumps(entry)))
+    for k in COMPARE_SETS:
+        out(f"{k} ท่า: รู้จัก {summary[k]['matched']}/{len(done)} · คะแนนเฉลี่ย {summary[k]['mean']}")
+    out("ผล: 5 ท่า ไม่แย่กว่า 3 ท่า" if use5 else "ผล: 5 ท่า แย่กว่า 3 ท่า → แม่แบบใช้ 3 ท่าต่อ")
+    out(f"log: {path}")
     return 0
 
 
@@ -162,7 +230,7 @@ def cmd_scan(cap, scanner, fs: store.FaceStore, times: int, seconds: float, out=
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m aipc.vision.camera")
-    ap.add_argument("action", choices=("check", "enroll", "scan", "delete"))
+    ap.add_argument("action", choices=("check", "enroll", "scan", "delete", "compare"))
     ap.add_argument("--camera", type=int, help="เลขกล้อง (ไม่ใส่ = หาเอง)")
     ap.add_argument("--seconds", type=float, default=5.0, help="เวลาสูงสุดต่อครั้ง")
     ap.add_argument("--times", type=int, default=10, help="จำนวนครั้งที่สแกน")
@@ -194,7 +262,9 @@ def main(argv: list[str] | None = None) -> int:
         if a.action == "check":
             return cmd_check(cap, scanner, a.seconds)
         if a.action == "enroll":
-            return cmd_enroll(cap, scanner, fs, max(a.seconds, 15.0))
+            return cmd_enroll(cap, scanner, fs, max(a.seconds, ENROLL_SECONDS))
+        if a.action == "compare":
+            return cmd_compare(cap, scanner, cfg, a.times, a.seconds)
         templates = load_templates(a.against) if a.against and not a.id else None
         return cmd_scan(cap, scanner, fs, a.times, a.seconds, templates=templates, subject=a.who)
     finally:

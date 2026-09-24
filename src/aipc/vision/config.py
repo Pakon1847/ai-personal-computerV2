@@ -29,6 +29,9 @@ class FaceConfig:
     # --- จับคู่ ---
     match_threshold: float = 0.363  # cosine · ค่าเริ่มต้นของ OpenCV SFace (BRIEF: ใช้เป็นจุดเริ่มเท่านั้น)
     match_margin: float = 0.05  # ต้องห่างจากคนอันดับสองอย่างน้อยเท่านี้ ไม่งั้น "ไม่แน่ใจ"
+    # --- ลงทะเบียน (การ์ด 0010) ---
+    # ผู้ใช้ทำครบ 5 ท่าเสมอ แต่แม่แบบใช้เฉพาะท่านี้ · เพิ่มเงย/ก้มได้หลังผลเทียบ 3 vs 5 ท่าเท่านั้น
+    template_poses: tuple = ("front", "left", "right")
 
     def validate(self) -> FaceConfig:
         checks = [
@@ -40,6 +43,11 @@ class FaceConfig:
             (1 <= self.min_frames <= self.max_frames, "ต้อง 1 ≤ min_frames ≤ max_frames"),
             (-1 <= self.match_threshold <= 1, "match_threshold ต้องอยู่ใน -1–1"),
             (0 <= self.match_margin <= 2, "match_margin ต้องอยู่ใน 0–2"),
+            (
+                "front" in self.template_poses
+                and set(self.template_poses) <= {"front", "left", "right", "up", "down"},
+                "template_poses ต้องมี front และใช้ได้แค่ front/left/right/up/down",
+            ),
         ]
         bad = [msg for ok, msg in checks if not ok]
         if bad:
@@ -60,7 +68,8 @@ def load(path: Path | None) -> FaceConfig:
     unknown = sorted(set(data) - set(known))
     if unknown:
         raise ValueError(f"ไม่รู้จักค่าตั้ง: {', '.join(unknown)}")
-    cast = {k: (int(v) if known[k] == "int" else float(v)) for k, v in data.items()}
+    casts = {"int": int, "float": float, "tuple": lambda v: tuple(str(x) for x in v)}
+    cast = {k: casts[known[k]](v) for k, v in data.items()}
     return replace(cfg, **cast).validate()
 
 

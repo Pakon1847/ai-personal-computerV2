@@ -130,7 +130,14 @@ class PipelineTest(Base):
 
 @unittest.skipIf(np is None, "ไม่มี numpy")
 class EnrollTest(Base):
-    POSES = {"front": {}, "left": {"yaw_shift": -0.3}, "right": {"yaw_shift": 0.3}}
+    # nose_down: หน้าตรง 0.57 · 0.47 ≈ เงย 13° · 0.67 ≈ ก้ม 13° (estimate_pose)
+    POSES = {
+        "front": {},
+        "left": {"yaw_shift": -0.3},
+        "right": {"yaw_shift": 0.3},
+        "up": {"nose_down": 0.47},
+        "down": {"nose_down": 0.67},
+    }
 
     def test_enroll_needs_front_left_right(self):
         order = ("front", "left", "right") * 2
@@ -142,12 +149,51 @@ class EnrollTest(Base):
 
     def test_enroll_reports_progress_every_frame(self):
         seen = []
-        order = ("front", "left", "right") * 2
+        order = ("front", "left", "right", "up", "down") * 2
         rows = [[row(**self.POSES[p])] for p in order]
-        self.scanner(rows).enroll([self.frame] * 10, progress=lambda r, c: seen.append(dict(c)))
-        self.assertEqual(len(seen), 6)
-        self.assertEqual(seen[0], {"front": 1, "left": 0, "right": 0})
-        self.assertEqual(seen[-1], {"front": 2, "left": 2, "right": 2})
+        self.scanner(rows).enroll([self.frame] * 20, progress=lambda r, c: seen.append(dict(c)))
+        self.assertEqual(len(seen), 10)  # ครบ 5 ท่า ท่าละ 2 แล้วหยุดอ่านเฟรม
+        self.assertEqual(seen[0], {"front": 1, "left": 0, "right": 0, "up": 0, "down": 0})
+        self.assertEqual(seen[-1], {p: 2 for p in self.POSES})
+
+    def test_pose_of_splits_five_poses_and_refuses_diagonal(self):
+        from aipc.vision import quality
+
+        def pose(**kw):
+            return pipeline.pose_of(quality.check(self.frame, face(**kw), self.cfg))
+
+        def face(**kw):
+            return quality.Face.from_yunet(row(**kw))
+
+        for name, kw in self.POSES.items():
+            self.assertEqual(pose(**kw), name, name)
+        self.assertIsNone(pose(yaw_shift=0.3, nose_down=0.67))  # หันและก้มพร้อมกัน = ไม่นับ
+
+    def test_template_uses_only_template_poses(self):
+        # เงย/ก้ม ได้ embedding ของอีกคน → ถ้าหลุดเข้าแม่แบบ คะแนนกับ alice จะตก
+        order = ("front", "left", "right", "up", "down") * 2
+        rows = [[row(**self.POSES[p])] for p in order]
+        embs = [self.bob if p in ("up", "down") else self.near(self.alice, i)
+                for i, p in enumerate(order)]  # fmt: skip
+        t = self.scanner(rows, embs=embs).enroll([self.frame] * 20)
+        self.assertEqual(t.frames, 6)
+        self.assertGreater(matching.cosine(t.vector, self.alice), 0.95)
+        self.assertEqual(set(t.by_pose), set(self.POSES))  # เก็บครบในหน่วยความจำไว้เทียบ 3 vs 5 ท่า
+
+    def test_optional_pose_missing_still_enrolls_and_says_which(self):
+        rows = [[row(**self.POSES[p])] for p in ("front", "left", "right", "up") * 2]
+        t = self.scanner(rows).enroll([self.frame] * 8)
+        self.assertIsInstance(t, pipeline.Template)
+        self.assertEqual(t.missing, ("down",))
+
+    def test_template_poses_can_include_up_down(self):
+        from dataclasses import replace
+
+        self.cfg = replace(self.cfg, template_poses=("front", "left", "right", "up", "down"))
+        rows = [[row(**self.POSES[p])] for p in ("front", "left", "right", "up") * 2]
+        r = self.scanner(rows).enroll([self.frame] * 8)
+        self.assertIsInstance(r, pipeline.Rejected)
+        self.assertEqual(r.reasons, ("down",))
 
     def test_missing_pose_is_rejected_with_advice(self):
         rows = [[row(**self.POSES[p])] for p in ("front", "left", "front", "left")]
@@ -161,6 +207,7 @@ class EnrollTest(Base):
         r = self.scanner([blurry_small]).enroll([self.frame] * 5)
         self.assertIsInstance(r, pipeline.Rejected)
         self.assertIn("ขยับเข้ามาใกล้อีกนิด", r.advice)
+        self.assertEqual(r.common, "too_small")  # log บอกได้ว่าติดเพราะอะไร (ปัญหาที่เจอในการ์ด 0006)
 
     def test_spoof_during_enroll_cancels(self):
         r = self.scanner([[row()]], live=[0.99, 0.1]).enroll([self.frame] * 6)
@@ -183,6 +230,21 @@ class ScanLogTest(unittest.TestCase):
             self.assertEqual(set(entry), set(pipeline.ScanLog.FIELDS))
         self.assertEqual((lines[0]["result"], lines[0]["score"]), ("matched", 0.7123))
         self.assertEqual((lines[1]["result"], lines[1]["account"]), ("rejected", None))
+
+    def test_enroll_log_has_reason_and_no_embedding(self):
+        t = pipeline.Template(np.ones(128), 6, "now", missing=("down",), by_pose={"front": [1]})
+        rej = pipeline.Rejected(("left",), "ต้องการภาพเพิ่ม", "too_dark")
+        with tempfile.TemporaryDirectory() as d:
+            log = pipeline.EnrollLog(Path(d) / "enroll.log")
+            log.write(t, 5.8)
+            log.write(rej, 40.0)
+            log.write(None, 3.0, "camera_lost")
+            lines = [json.loads(x) for x in log.path.read_text(encoding="utf-8").splitlines()]
+        for entry in lines:
+            self.assertEqual(set(entry), set(pipeline.EnrollLog.FIELDS))
+        self.assertEqual((lines[0]["result"], lines[0]["missing"]), ("enrolled", ["down"]))
+        self.assertEqual((lines[1]["result"], lines[1]["common_reason"]), ("rejected", "too_dark"))
+        self.assertEqual(lines[2]["result"], "camera_lost")
 
 
 if __name__ == "__main__":

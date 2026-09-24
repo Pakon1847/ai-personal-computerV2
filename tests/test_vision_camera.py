@@ -1,5 +1,6 @@
 """ขั้นตอนของเครื่องมือกล้อง (การ์ด 0005) ด้วยกล้องปลอมและ scanner ปลอม · ไม่เปิดกล้องจริง."""
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -51,6 +52,11 @@ class CameraFlowTest(unittest.TestCase):
         self.fs = store.FaceStore(self.dir / "face.json", model_sha256="m")
         self.vec = matching.l2_normalize(np.random.default_rng(0).normal(size=128))
         self.out = []
+        # ห้ามเขียน log ลง home จริงของคนที่รันเทสต์ · เทสต์ที่ต้องอ่าน log จะ patch ทับเอง
+        for name in ("log_path", "enroll_log_path"):
+            patcher = mock.patch.object(camera, name, return_value=self.dir / f"{name}.log")
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def test_frames_stop_when_camera_fails(self):
         self.assertEqual(sum(1 for _ in camera.frames(FakeCap(3), seconds=60)), 3)
@@ -93,6 +99,50 @@ class CameraFlowTest(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertEqual(len((self.dir / "scans.log").read_text(encoding="utf-8").splitlines()), 3)
         self.assertIn("รู้จัก: me", self.out[0])
+
+    def test_enroll_writes_enroll_log(self):
+        sc = FakeScanner(pipeline.Rejected(("left",), "ต้องการภาพเพิ่ม", "too_dark"))
+        with mock.patch.object(camera, "enroll_log_path", return_value=self.dir / "enroll.log"):
+            camera.cmd_enroll(
+                FakeCap(10), sc, self.fs, 5, ask=lambda _: "ยินยอม", out=self.out.append
+            )
+        entry = json.loads((self.dir / "enroll.log").read_text(encoding="utf-8"))
+        self.assertEqual((entry["result"], entry["common_reason"]), ("rejected", "too_dark"))
+
+    def compare(self, s5_offset, times=4):
+        """แม่แบบ 3 ท่าได้ alice · ท่าเงย/ก้มเป็นเวกเตอร์ที่ห่างออกไปตาม s5_offset."""
+        rng = np.random.default_rng(1)
+        alice = self.vec
+        other = matching.l2_normalize(rng.normal(size=128))
+        up = matching.l2_normalize(alice + s5_offset * other)
+        by_pose = {"front": [alice], "left": [alice], "right": [alice], "up": [up], "down": [up]}
+        sc = FakeScanner(pipeline.Template(alice, 6, "t", by_pose=by_pose),
+                         pipeline.ScanResult("me", "matched", 0.9, probe=alice))  # fmt: skip
+        with mock.patch.object(camera, "log_path", return_value=self.dir / "compare.log"):
+            rc = camera.cmd_compare(FakeCap(1000), sc, camera.config.FaceConfig(), times, 5,
+                                    ask=lambda _: "ยินยอม", out=self.out.append)  # fmt: skip
+        entry = json.loads((self.dir / "compare.log").read_text(encoding="utf-8"))
+        return rc, entry
+
+    def test_compare_scores_same_scan_against_both_templates(self):
+        rc, entry = self.compare(s5_offset=2.0)
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(entry["scans"]), 4)
+        self.assertGreater(entry["summary"]["3"]["mean"], entry["summary"]["5"]["mean"])
+        self.assertFalse(entry["five_not_worse"])  # 5 ท่าแย่กว่า → ใช้ 3 ท่าต่อ
+        self.assertNotIn("probe", json.dumps(entry))  # log ไม่มีเวกเตอร์หน้า
+
+    def test_compare_saves_no_template(self):
+        self.compare(s5_offset=0.0)
+        self.assertFalse(self.fs.path.exists())
+
+    def test_compare_needs_all_five_poses(self):
+        by_pose = {"front": [self.vec], "left": [self.vec], "right": [self.vec]}
+        sc = FakeScanner(pipeline.Template(self.vec, 6, "t", by_pose=by_pose))
+        rc = camera.cmd_compare(FakeCap(10), sc, camera.config.FaceConfig(), 3, 5,
+                                ask=lambda _: "ยินยอม", out=self.out.append)  # fmt: skip
+        self.assertEqual(rc, 1)
+        self.assertIn("5 ท่า", self.out[-1])
 
     def test_check_summarises_advice(self):
         rc = camera.cmd_check(FakeCap(4), FakeScanner(), 60, out=self.out.append)

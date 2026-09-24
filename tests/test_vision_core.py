@@ -70,6 +70,16 @@ class ConfigTest(unittest.TestCase):
     def test_missing_file_is_default(self):
         self.assertEqual(config.load(Path("/nonexistent/face.json")), config.FaceConfig())
 
+    def test_template_poses_from_file_and_must_keep_front(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "face.json"
+            p.write_text(json.dumps({"template_poses": ["front", "left", "right", "up"]}), "utf-8")
+            self.assertEqual(config.load(p).template_poses, ("front", "left", "right", "up"))
+            for bad in (["left", "right"], ["front", "sideways"]):
+                p.write_text(json.dumps({"template_poses": bad}), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    config.load(p)
+
 
 @unittest.skipIf(np is None, "ไม่มี numpy")
 class QualityGateTest(unittest.TestCase):

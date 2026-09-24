@@ -48,7 +48,8 @@ class FaceController(QObject):
     _done = Signal(bool, str)
 
     def __init__(self, active: bool = True, fs=None, open_camera=None, build_scanner=None,
-                 enroll_seconds: float = 20.0, scan_seconds: float = 5.0):  # fmt: skip
+                 enroll_seconds: float = 40.0, scan_seconds: float = 5.0,
+                 enroll_log=None):  # fmt: skip
         super().__init__()
         self._active = active
         self._state = "unavailable"
@@ -68,6 +69,7 @@ class FaceController(QObject):
         self._fs = fs
         self._open_camera = open_camera
         self._build_scanner = build_scanner
+        self._enroll_log_path = enroll_log
         if active:
             self._setup()
         self.refresh()
@@ -80,6 +82,7 @@ class FaceController(QObject):
             self._problem = f"ยังใช้ไม่ได้ในเครื่องนี้ (ไม่มีโมดูลใบหน้า: {e.name})"
             return
         self._fs = self._fs or store.FaceStore()
+        self._enroll_log_path = self._enroll_log_path or camera.enroll_log_path()
         self._open_camera = self._open_camera or camera.open_camera
         if self._build_scanner is None:
             self._build_scanner = lambda: camera.build_scanner(config.load(None))
@@ -206,16 +209,25 @@ class FaceController(QObject):
                 return
             yield frame
 
+    def _enroll_log(self):
+        from aipc.vision import pipeline
+
+        return pipeline.EnrollLog(self._enroll_log_path)
+
     def _report(self, r, counts) -> None:
         self._progress.emit(r.advice or "ดีมาก · ค้างไว้อย่างนี้", dict(counts))
 
     def _enroll_job(self, scanner, cap, given: str):
         from aipc.vision import pipeline, store
 
+        t0 = time.monotonic()
         res = scanner.enroll(self._frames(cap, self._enroll_seconds), progress=self._report)
-        if self._stop.is_set():
+        cut = "cancelled" if self._stop.is_set() else "camera_lost" if self._camera_lost else ""
+        # log ทุกครั้ง รวมที่ไม่สำเร็จ พร้อมเหตุผล (การ์ด 0010 ข้อ 5) · ไม่มีภาพ ไม่มี embedding
+        self._enroll_log().write(None if cut else res, time.monotonic() - t0, cut)
+        if cut == "cancelled":
             return False, "ยกเลิกแล้ว · ไม่ได้บันทึกอะไร"
-        if self._camera_lost:
+        if cut == "camera_lost":
             return False, "กล้องหลุด · ไม่ได้บันทึกอะไร"
         if isinstance(res, pipeline.Rejected):
             return False, f"ลงทะเบียนไม่สำเร็จ: {res.advice}"
