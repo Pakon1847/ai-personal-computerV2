@@ -25,6 +25,7 @@
 ```
 
 ติดตั้ง/ย้อนกลับ: `scripts/pi/install-greeter.sh [--apply] [--session v2] | --rollback` · ทางเข้าสำรอง: SSH, tty2
+อัปเดตแอปอย่างเดียว (ไม่แตะ greetd/บริการ): `scripts/pi/update-app.sh [--apply] | --rollback` · ติดตั้งลง venv เดิมด้วย `--no-deps`
 
 ## Skill (`aipc.skills`)
 
@@ -47,12 +48,15 @@
 pipeline.FaceScanner: process (ต่อเฟรม, จับเวลาทุกขั้น) · scan (1:N) · enroll (ตรง/ซ้าย/ขวา)
 store.FaceStore: แม่แบบ 128 ค่า + ความยินยอม + sha256 โมเดล · ~/.local/share/aipc/face-template.json (0600)
 pipeline.ScanLog: ~/.local/state/aipc/face-scans.log (ไม่มีภาพ ไม่มี embedding)
+pipeline.EnrollLog: ~/.local/state/aipc/face-enroll.log (ผล ท่าที่ขาด เหตุผลที่พบบ่อย เวลา · การ์ด 0010)
 ```
 
 โมเดลโหลดผ่าน OpenCV อย่างเดียว ตรวจ sha256 ทุกครั้ง (`models/NOTICE.md`) · SFace ดาวน์โหลดด้วย `python -m aipc.vision.models fetch`
 เครื่องมือ: `aipc.vision.camera` (ทดลองกับกล้อง) · `aipc.vision.evaluate` (FAR/FRR/EER/ROC/DET) · `aipc.vision.bench` (เวลา/RAM)
 
-**ในหน้าจอ (การ์ด 0006):** `ui/face.py` `FaceController` ห่อ pipeline ให้ QML (`FacePanel.qml` ในหน้าตั้งค่า)
+**ในหน้าจอ (การ์ด 0006, 0010):** `ui/face.py` `FaceController` ห่อ pipeline ให้ QML (`FacePanel.qml` ในหน้าตั้งค่า) ·
+ลงทะเบียน 5 ท่า (ตรง ซ้าย ขวา เงย ก้ม) แต่แม่แบบใช้เฉพาะ `template_poses` (ค่าเริ่มต้น ตรง/ซ้าย/ขวา) ·
+ภาพสดขณะลงทะเบียนผ่าน `image://face/<เลขภาพ>` (`FacePreviewProvider`) · ภาพล่าสุด 1 ภาพในหน่วยความจำ ล้างเมื่อจบ
 
 ```text
 FacePanel (QML) ── startEnroll(ยินยอม) / tryScan / cancel / deleteTemplate ──► FaceController (เธรดหลัก)
@@ -100,7 +104,7 @@ qml/AipcUi/Main.qml  ── AppState.screen ──►  LoginScreen      backend.
 | สั่งงานเครื่อง | บน Linux รัน `xdg-open` / `gtk-launch` / `wpctl` จริง (แบบ list ไม่ผ่าน shell) · **บนวินโดวส์เป็นแบบจำลอง และการ์ดเขียนว่า "จำลอง"** |
 | เข้าสู่ระบบ | โหมด greeter (`--greeter`): ส่งให้ greetd/PAM ตรวจจริง · หน้าต่างพัฒนา: ปฏิเสธเสมอนอกโหมดพัฒนา |
 | หลังเข้าระบบ | โหมดเซสชัน (`--session`): เริ่มที่ Shell, "ออก" จบเซสชันจริง, ไม่มีโหมดพัฒนา |
-| ใบหน้าในหน้าตั้งค่า | ลงทะเบียน 3 ท่า / ทดลองสแกน 1:1 / ลบ ทำงานจริงกับกล้อง (การ์ด 0006) · ขอความยินยอมทุกครั้ง · **ไม่แสดงภาพสดบนจอ** · แถบบนขึ้น "กล้องกำลังใช้" |
+| ใบหน้าในหน้าตั้งค่า | ลงทะเบียน 5 ท่าพร้อมภาพสดแบบกระจก / ทดลองสแกน 1:1 (ไม่มีภาพ) / ลบ (การ์ด 0006, 0010) · ขอความยินยอมทุกครั้ง · แถบบนขึ้น "กล้องกำลังใช้" · **หน้าจอบน Pi ยังเป็นรุ่นการ์ด 0006 จนกว่าจะรัน `update-app.sh`** |
 | สแกนหน้าที่หน้า Login | **ยังไม่ได้ต่อ** (greeter อ่านแม่แบบใน home ของผู้ใช้ไม่ได้ ต้องมี visiond) · วงกล้องบอก "ยังไม่พร้อม" · ดูหน้าตาได้ด้วย `--demo-scan` |
 | หน้า Skill | รายการจากไฟล์สกิลจริง พร้อมบอกว่าตัวไหนใช้ได้ ตัวไหนยังขาดอะไร · **นำเข้า/ให้ AI ช่วยสร้าง ยังไม่มี** |
 | ปิดบัง/ล็อก, ความเป็นส่วนตัว, เสียง | **ไม่มี** · หน้าจอบอกว่ายังไม่พร้อมและอยู่เฟสไหน |

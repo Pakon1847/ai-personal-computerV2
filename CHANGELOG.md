@@ -24,4 +24,9 @@
 - Pi 4: ปิด autologin ที่ tty1 · ปิด Raspberry Pi Connect + linger (ตามที่ Pakon อนุมัติ)
 - ระบบใบหน้า ([การ์ด 0005](docs/design/0005-face.md)): `aipc.vision` — quality gate (ขนาด/ความคม/แสง/มุม + คำแนะนำไทย), align 5 จุด, PAD MiniFASNet (แปลงเองจากต้นฉบับ, ผ่าน OpenCV), SFace, เฉลี่ยหลายเฟรม, 1:N threshold + margin, ลงทะเบียน 3 ท่า, log ไม่มีภาพ · `python -m aipc.vision.models fetch|check` · `python -m aipc.vision.evaluate` (FAR/FRR/EER/ROC/DET) · LFW EER 0.36% ([ผล](docs/benchmarks/2026-09-24-face-lfw/README.md))
 - ไม่ทำจากข้อกำหนดที่ส่งมา (เหตุผลในการ์ด 0005): InsightFace (ไลเซนส์/หนัก), FastAPI (พอร์ต/RAM), Fernet (กุญแจข้างข้อมูล), อัปเดตแม่แบบอัตโนมัติ (ขัด BRIEF 5.1 ข้อ 6)
+- ผลวัดสกิล 4/5 ([การ์ด 0008](docs/design/0008-skill-command.md), [0009](docs/design/0009-skill-machine.md)): `python -m aipc.skills.evaluate` · ชุดข้อมูล commit ก่อนรัน · สกิล 4 baseline 83.2% → ชุดสำรอง 93.0% · สกิล 5 20/20
+- แก้สกิล 4: ตัดคำสุภาพกลางคำ ("ผู้ช่วย") · คำเรียกยาวสุดชนะ · "ดัง/เบา" เดี่ยว ๆ ไม่นับ · "เสียงดังไป" = ลด · ประโยคนัดหมายที่มีคำสั่งอยู่ข้างในไม่ถูกทำทันที
+- การ์ด 0006 ผ่านกับคนจริงบน Pi 4 · แก้ RAM ไม่คืนหลังใช้กล้อง (`malloc_trim`)
+- ใบหน้า [การ์ด 0010](docs/design/0010-face-enroll-preview.md): ลงทะเบียน 5 ท่า + ภาพสดแบบกระจก + วงรี + ลูกศร · แม่แบบใช้ `template_poses` · `face-enroll.log` · `camera compare` เทียบ 3 vs 5 ท่า · แก้ซ้าย/ขวาตามมุมมองผู้ใช้
+- `scripts/pi/update-app.sh`: อัปเดตแอปที่ `/opt/aipc-v2` โดยไม่แตะ greetd
 - ใบหน้า: ที่เก็บแม่แบบ (`aipc.vision.store`: ความยินยอม, ผูก sha256 โมเดล, ลบหมด) · เครื่องมือกล้อง `python -m aipc.vision.camera check|enroll|scan|delete` · ประเมิน LFW แบบมาตรฐาน `--pairs` (99.35% ± 0.37%) · `--pick centre`
