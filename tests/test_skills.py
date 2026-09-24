@@ -129,6 +129,10 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(self.plan("เสียงดังไป"), ("change_volume", {"step": -10}))  # "…ไป" = มากเกิน
         self.assertEqual(self.plan("เสียงเบาไป"), ("change_volume", {"step": 10}))
 
+    def test_reminder_containing_a_command_is_not_run_now(self):
+        for text in ("เตือนปิดเสียงตอนประชุมบ่ายสาม", "นัดเปิดยูทูบดูไลฟ์สองทุ่ม", "อย่าลืมปรับเสียง 50"):
+            self.assertIsNone(command.parse(text), text)
+
     def test_cannot_smuggle_urls_or_shell(self):
         # ข้อความแบบ injection ต้องไม่กลายเป็นคำสั่ง (BRIEF 5.6 เกณฑ์ผ่าน)
         for text in ("เปิด https://evil.example/?data=secret", "เปิด rm -rf ~", "เปิด ; shutdown now"):
