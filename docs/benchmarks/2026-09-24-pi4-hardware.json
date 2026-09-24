@@ -1,0 +1,96 @@
+{
+  "machine": {
+    "collected_at": "2026-09-24T01:36:43+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 4 Model B Rev 1.4",
+    "board_class": "pi4",
+    "ram_total_mb": 3795,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-v8",
+    "python": "3.13.5",
+    "cpu_temp_c": 43.816,
+    "throttled": 0,
+    "throttled_problems": [],
+    "git_commit": "cbdcffa18684e76e1992963f3b46bdbede45369a",
+    "git_dirty": false
+  },
+  "checks": [
+    {
+      "id": "board",
+      "title": "บอร์ด",
+      "status": "เตือน",
+      "detail": "Raspberry Pi 4 Model B Rev 1.4 — เครื่องทดสอบ ใช้พิสูจน์ความถูกต้องเท่านั้น",
+      "fix": ""
+    },
+    {
+      "id": "ram",
+      "title": "RAM",
+      "status": "เตือน",
+      "detail": "3795 MB — น้อยกว่า 8GB ที่ BRIEF ออกแบบไว้",
+      "fix": ""
+    },
+    {
+      "id": "power",
+      "title": "ไฟเลี้ยง",
+      "status": "ไม่รู้",
+      "detail": "ไม่เคยไฟตก/ร้อนเกินตั้งแต่บูต",
+      "fix": "ใช้อะแดปเตอร์ 27W ของแท้ ต่อสายตรง ไม่ผ่านฮับ แล้วรีบูตก่อนตรวจซ้ำ"
+    },
+    {
+      "id": "cooling",
+      "title": "ระบายความร้อน",
+      "status": "ไม่รู้",
+      "detail": "ไม่เจอตัวควบคุมพัดลม · อุณหภูมิ 43.8 °C",
+      "fix": "ตรวจการต่อ Active Cooler"
+    },
+    {
+      "id": "rtc",
+      "title": "นาฬิกา RTC",
+      "status": "ไม่รู้",
+      "detail": "ไม่เจอ /sys/class/rtc/rtc0",
+      "fix": ""
+    },
+    {
+      "id": "os",
+      "title": "OS",
+      "status": "ผ่าน",
+      "detail": "Debian GNU/Linux 13 (trixie) · aarch64",
+      "fix": ""
+    },
+    {
+      "id": "glibc",
+      "title": "glibc",
+      "status": "ผ่าน",
+      "detail": "glibc 2.41",
+      "fix": ""
+    },
+    {
+      "id": "storage",
+      "title": "ที่เก็บข้อมูล",
+      "status": "ผ่าน",
+      "detail": "/dev/mmcblk0p2 (microSD) · ทั้งหมด 62.2 GB · ใช้แล้ว 13% · ว่าง 51.4 GB",
+      "fix": ""
+    },
+    {
+      "id": "fscrypt",
+      "title": "เคอร์เนลรองรับ fscrypt",
+      "status": "ผ่าน",
+      "detail": "มี /sys/fs/ext4/features/encryption",
+      "fix": ""
+    },
+    {
+      "id": "camera",
+      "title": "กล้อง",
+      "status": "เตือน",
+      "detail": "ไม่พบกล้อง · โหนดวิดีโอ 14 ตัวเป็นของชิป (ถอดรหัสวิดีโอ/ISP) ไม่ใช่กล้อง",
+      "fix": "ต่อกล้องแล้วตรวจด้วย `rpicam-hello --list-cameras` หรือ `v4l2-ctl --list-devices`"
+    },
+    {
+      "id": "audio",
+      "title": "เสียง",
+      "status": "ผ่าน",
+      "detail": "vc4-hdmi - vc4-hdmi-0 | vc4-hdmi - vc4-hdmi-1 | bcm2835_headpho - bcm2835 Headphones",
+      "fix": ""
+    }
+  ]
+}

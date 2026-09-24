@@ -1,0 +1,50 @@
+{
+  "name": "2026-09-24-pi4-ui-start-shell",
+  "command": [
+    "./.venv/bin/python",
+    "-m",
+    "aipc.ui",
+    "--session",
+    "--software",
+    "--screenshot",
+    "/tmp/ui-start.png"
+  ],
+  "meta": {
+    "screen": "shell",
+    "mode": "session-offscreen-software",
+    "note": "includes-600ms-screenshot-delay"
+  },
+  "files_sha256": {},
+  "machine": {
+    "collected_at": "2026-09-24T01:37:52+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 4 Model B Rev 1.4",
+    "board_class": "pi4",
+    "ram_total_mb": 3795,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-v8",
+    "python": "3.13.5",
+    "cpu_temp_c": 46.251,
+    "throttled": 0,
+    "throttled_problems": [],
+    "git_commit": "cbdcffa18684e76e1992963f3b46bdbede45369a",
+    "git_dirty": false
+  },
+  "throttled_before": 0,
+  "summary_seconds": {
+    "n": 10,
+    "median": 1.8611670925001818,
+    "p95": 1.961198749999312,
+    "minimum": 1.8322317180027312,
+    "maximum": 1.961198749999312
+  },
+  "summary_metrics": {},
+  "verdict": {
+    "evidence_level4": false,
+    "throttled_runs": [],
+    "throttle_unknown": false,
+    "warnings": [
+      "วัดบน Raspberry Pi 4 Model B Rev 1.4 ไม่ใช่ Pi 5 — ใช้เป็นหลักฐานระดับ 4 ไม่ได้ และตัวเลขความเร็ว/RAM ห้ามเข้าบทที่ 4"
+    ]
+  }
+}

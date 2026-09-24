@@ -1,0 +1,75 @@
+{
+  "machine": {
+    "collected_at": "2026-09-24T01:36:43+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 4 Model B Rev 1.4",
+    "board_class": "pi4",
+    "ram_total_mb": 3795,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-v8",
+    "python": "3.13.5",
+    "cpu_temp_c": 44.79,
+    "throttled": 0,
+    "throttled_problems": [],
+    "git_commit": "cbdcffa18684e76e1992963f3b46bdbede45369a",
+    "git_dirty": true
+  },
+  "checks": [
+    {
+      "id": "sudo",
+      "title": "sudo แบบไม่ใส่รหัส",
+      "status": "ไม่รู้",
+      "detail": "อ่านไม่ได้: sudoers, 010_at-export, 010_dpkg-threads, 010_global-tty, 010_proxy, README",
+      "fix": "รันด้วย sudo"
+    },
+    {
+      "id": "groups",
+      "title": "ผู้ใช้ในกลุ่มสิทธิ์สูง",
+      "status": "เตือน",
+      "detail": "sudo: pakon1847 · adm: pakon1847 · video: pakon1847",
+      "fix": "ก่อน OOBE เป็นเรื่องปกติ (บัญชีที่ใช้ติดตั้ง) · หลัง OOBE บัญชีผู้ใช้ทั่วไปต้องไม่อยู่ในกลุ่มเหล่านี้"
+    },
+    {
+      "id": "remote",
+      "title": "บริการเข้าถึงระยะไกล",
+      "status": "เตือน",
+      "detail": "ssh.service (enabled)",
+      "fix": "ปิดถ้าไม่ใช้ (BRIEF 5.2 ข้อ 2) — ระวัง: ถ้าใช้ SSH เข้าเครื่องอยู่ ปิดแล้วจะเข้าไม่ได้"
+    },
+    {
+      "id": "ports",
+      "title": "พอร์ตที่เปิดรับจากนอกเครื่อง",
+      "status": "เตือน",
+      "detail": "22/tcp6, 22/tcp, 111/tcp, 111/tcp6",
+      "fix": "ทุกพอร์ตต้องอธิบายได้ว่าเป็นของบริการไหน (BRIEF หัวข้อ 7 ข้อ 3–4)"
+    },
+    {
+      "id": "camnode",
+      "title": "สิทธิ์โหนดกล้อง",
+      "status": "ไม่รู้",
+      "detail": "14 โหนด · สิทธิ์ปกติไม่เปิดให้ทุกคน แต่ยังไม่ได้ตรวจ ACL",
+      "fix": "BRIEF 5.2 ข้อ 2: udev rule ตัด uaccess เฉพาะโหนดกล้อง ให้กล้องเป็นของ visiond · ตรวจ ACL ด้วย `getfacl /dev/videoN` ด้วย เพราะ uaccess ให้สิทธิ์ผ่าน ACL ซึ่งเครื่องมือนี้ยังไม่ได้อ่าน"
+    },
+    {
+      "id": "homes",
+      "title": "สิทธิ์ home",
+      "status": "ผ่าน",
+      "detail": "1 โฟลเดอร์ เป็น 0700 ทั้งหมด",
+      "fix": ""
+    },
+    {
+      "id": "logout",
+      "title": "Logout ปิดโปรเซสของผู้ใช้",
+      "status": "เตือน",
+      "detail": "KillUserProcesses=no (ค่าเริ่มต้น)",
+      "fix": "BRIEF 5.2 ข้อ 6: KillUserProcesses=yes และไม่เปิด linger — ทำตอนเฟส 1 พร้อมเทสต์"
+    },
+    {
+      "id": "swap",
+      "title": "swap",
+      "status": "ผ่าน",
+      "detail": "zram เท่านั้น (1 อุปกรณ์)",
+      "fix": ""
+    }
+  ]
+}
