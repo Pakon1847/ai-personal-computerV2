@@ -17,7 +17,7 @@ except ImportError:  # pragma: no cover
 CFG = config.FaceConfig() if np is not None else None
 
 
-def frontal(cx=320.0, cy=240.0, eye=60.0, yaw_shift=0.0, nose_down=0.45):
+def frontal(cx=320.0, cy=240.0, eye=60.0, yaw_shift=0.0, nose_down=0.57):
     """5 จุดของหน้าตรงขนาดตาห่าง `eye` px · yaw_shift = จมูกเลื่อนไปข้าง (เท่าของครึ่งระยะตา)."""
     ey, my = cy - 0.4 * eye, cy + 0.6 * eye
     nose = (cx + yaw_shift * eye / 2, ey + nose_down * (my - ey))

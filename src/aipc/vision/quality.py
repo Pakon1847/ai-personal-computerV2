@@ -28,6 +28,12 @@ ADVICE = {
 }
 ORDER = list(ADVICE)
 
+# ตำแหน่งจมูกตอนหน้าตรง (สัดส่วนจากเส้นตาถึงเส้นปาก) · ค่ากลางจาก LFW 2,000 ภาพ = 0.568
+# (5 จุดของ YuNet · 2026-09-24) · ตรงกับกล้องจริงบน Pi 4 คนนั่งหน้าตรง = 0.58
+NEUTRAL_NOSE = 0.57
+# วัดความคมบนภาพหน้าที่ย่อเป็นขนาดนี้เสมอ → ค่าไม่ขึ้นกับความละเอียดกล้องหรือระยะนั่ง
+SHARP_SIZE = 112
+
 
 @dataclass(frozen=True)
 class Face:
@@ -73,7 +79,8 @@ def estimate_pose(landmarks) -> tuple[float, float]:
 
     yaw: หน้าตรง จมูกอยู่กึ่งกลางระหว่างตา · หันไป จมูกเลื่อนไปทางที่หัน
          ใช้ระยะเลื่อนเทียบระยะห่างตา แล้วแปลงเป็นมุมด้วย asin (จมูกยื่นจากหน้า ~0.5 เท่าของระยะตา)
-    pitch: หน้าตรง จมูกอยู่ราว 45% ของทางจากเส้นตาลงไปเส้นปาก · เงย = จมูกขึ้น ก้ม = จมูกลง
+    pitch: หน้าตรง จมูกอยู่ราว 57% ของทางจากเส้นตาลงไปเส้นปาก · เงย = จมูกขึ้น ก้ม = จมูกลง
+           (NEUTRAL_NOSE ปรับจากข้อมูลจริง · เดิมเดา 45% ทำให้หน้าตรงถูกนับว่าก้ม 17°)
     """
     (rex, rey), (lex, ley), (nx, ny), (rmx, rmy), (lmx, lmy) = landmarks
     eye_mid_x, eye_mid_y = (rex + lex) / 2, (rey + ley) / 2
@@ -83,7 +90,7 @@ def estimate_pose(landmarks) -> tuple[float, float]:
         return 90.0, 90.0  # จุดซ้อนกัน/กลับหัว = วัดไม่ได้ ถือว่าหันมาก
     yaw = math.degrees(math.asin(max(-1.0, min(1.0, (nx - eye_mid_x) / (0.5 * eye_dist)))))
     ratio = (ny - eye_mid_y) / (mouth_mid_y - eye_mid_y)
-    pitch = math.degrees(math.asin(max(-1.0, min(1.0, (ratio - 0.45) / 0.45))))
+    pitch = math.degrees(math.asin(max(-1.0, min(1.0, (ratio - NEUTRAL_NOSE) / 0.45))))
     return yaw, pitch
 
 
@@ -104,6 +111,15 @@ def sharpness(gray: np.ndarray) -> float:
     c = gray[1:-1, 1:-1]
     lap = gray[:-2, 1:-1] + gray[2:, 1:-1] + gray[1:-1, :-2] + gray[1:-1, 2:] - 4 * c
     return float(lap.var())
+
+
+def _resize(gray: np.ndarray, size: int) -> np.ndarray:
+    """ย่อ/ขยายเป็น size×size แบบเฉลี่ยพื้นที่ (OpenCV) · หน้าขนาดต่างกันจึงเทียบความคมกันได้."""
+    import cv2
+
+    if gray.shape[0] < 2 or gray.shape[1] < 2:
+        return gray
+    return cv2.resize(gray, (size, size), interpolation=cv2.INTER_AREA)
 
 
 def check(frame: np.ndarray, face: Face | None, cfg: FaceConfig) -> Quality:
@@ -134,7 +150,7 @@ def check(frame: np.ndarray, face: Face | None, cfg: FaceConfig) -> Quality:
     if abs(yaw) > cfg.max_yaw_deg or abs(pitch) > cfg.max_pitch_deg:
         reasons.append("turned")
 
-    sharp = sharpness(crop)
+    sharp = sharpness(_resize(crop, SHARP_SIZE))
     if sharp < cfg.min_sharpness:
         reasons.append("blurry")
 
