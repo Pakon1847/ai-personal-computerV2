@@ -279,12 +279,12 @@ class EnrollLog:
     ไม่มีภาพ ไม่มี embedding · มีแค่ผล ท่าที่ขาด เหตุผลที่พบบ่อย และเวลา (การ์ด 0010 ข้อ 5)
     """
 
-    FIELDS = ("time", "result", "missing", "common_reason", "seconds", "frames")
+    FIELDS = ("time", "result", "missing", "common_reason", "seconds", "frames", "frames_seen")
 
     def __init__(self, path: Path):
         self.path = path
 
-    def write(self, res, seconds: float, result: str = "") -> dict:
+    def write(self, res, seconds: float, result: str = "", frames_seen: int = 0) -> dict:
         """res = Template | Rejected | None · result ว่าง = ตัดสินจาก res (ส่งเองได้ เช่น "cancelled")."""
         ok = isinstance(res, Template)
         if res is None:
@@ -298,6 +298,8 @@ class EnrollLog:
             "common_reason": res.common if isinstance(res, Rejected) else "",
             "seconds": round(seconds, 1),
             "frames": res.frames if ok else 0,
+            # เฟรมจากกล้องที่วิเคราะห์ (= จำนวนภาพสดที่แสดง) · ÷ seconds = อัตราภาพ (เกณฑ์ ≥ 5/วิ)
+            "frames_seen": frames_seen,
         }
         _append_line(self.path, entry)
         return entry

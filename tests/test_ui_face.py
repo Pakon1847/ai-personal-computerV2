@@ -10,7 +10,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 try:
     import numpy as np
-    from PySide6.QtCore import QCoreApplication
+    from PySide6.QtCore import QCoreApplication, QSize
     from PySide6.QtGui import QGuiApplication
 
     from aipc.ui.face import FaceController
@@ -29,7 +29,7 @@ class Cap:
             return False, None
         if self.reads > self.n:
             return False, None
-        return True, np.zeros((4, 4, 3), np.uint8)
+        return True, getattr(self, "frame", np.zeros((4, 4, 3), np.uint8))
 
     def release(self):
         self.released = True
@@ -197,6 +197,57 @@ class FaceControllerTest(unittest.TestCase):
             face.startEnroll(True)
             settle(face)
         release.assert_called_once()
+
+    def test_preview_only_while_enrolling_then_cleared(self):
+        cap = Cap(n=1000)
+        cap.frame = np.full((72, 128, 3), 200, np.uint8)
+        f = self.make(Scanner(pipeline.Template(self.vec, 6, "t"), slow=0.05), cap)
+        seen = []
+        f.previewChanged.connect(lambda: seen.append((f.previewSerial, f.preview_image())))
+        f.startEnroll(True)
+        time.sleep(0.3)
+        f.cancel()
+        settle(f)
+        shown = [(n, img) for n, img in seen if n > 0]
+        self.assertTrue(shown, "ระหว่างลงทะเบียนต้องมีภาพสด")
+        self.assertEqual(shown[-1][1].width(), 480)  # ย่อแล้ว
+        self.assertEqual((f.previewSerial, f.preview_image(), f.faceBox), (0, None, []))
+        provided = f.image_provider().requestImage("0", QSize(), QSize())
+        self.assertEqual(provided.width(), 1)  # หลังจบ ได้ภาพว่าง ไม่ใช่ภาพเก่า
+
+    def test_scan_has_no_preview(self):
+        self.fs.save(self.vec, 6, "t", store.Consent("t"))
+        f = self.make(Scanner(scan_result=pipeline.ScanResult("me", "matched", 0.9)))
+        f.tryScan()
+        settle(f)
+        self.assertEqual(f.previewSerial, 0)
+
+    def test_preview_never_written_to_disk(self):
+        import tempfile as tf
+
+        places = [Path(tf.gettempdir()), self.fs.path.parent]
+
+        def images():
+            exts = {".png", ".jpg", ".jpeg", ".bmp", ".ppm"}
+            return {p for d in places for p in d.rglob("*") if p.suffix.lower() in exts}
+
+        before = images()
+        f = self.make(Scanner(pipeline.Template(self.vec, 6, "t"), slow=0.02), Cap(n=1000))
+        f.startEnroll(True)
+        time.sleep(0.2)
+        f.cancel()
+        settle(f)
+        self.assertEqual(images() - before, set())
+
+    def test_mirror_box_and_next_pose(self):
+        from aipc.ui import face as face_mod
+
+        img, frac = face_mod.make_preview(np.zeros((720, 1280, 3), np.uint8), (100, 72, 256, 288))
+        self.assertEqual((img.width(), img.height()), (480, 270))
+        # กล่องชิดซ้ายในภาพกล้อง → ชิดขวาในภาพกระจก
+        self.assertAlmostEqual(frac[0], (1280 - 100 - 256) / 1280)
+        self.assertEqual(face_mod.next_pose({"front": 2, "left": 1}), "left")
+        self.assertEqual(face_mod.next_pose({p: 2 for p in face_mod.POSES}), "")
 
     def test_inactive_in_greeter(self):
         f = FaceController(active=False)

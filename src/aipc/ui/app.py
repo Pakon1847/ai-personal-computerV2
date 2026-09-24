@@ -95,6 +95,9 @@ def build(opts: Options, argv: list[str] | None = None):
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():
         ctx.setContextProperty(name, obj)
+    # ภาพสดขณะลงทะเบียนใบหน้า (การ์ด 0010) · QML ใช้ image://face/<เลขภาพ>
+    engine._face_provider = engine._backends["face"].image_provider()
+    engine.addImageProvider("face", engine._face_provider)
     screen = "shell" if opts.session else opts.screen
     ctx.setContextProperty("startScreen", screen if screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
