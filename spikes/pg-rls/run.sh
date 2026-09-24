@@ -22,7 +22,7 @@ plan() {
 --apply จะทำตามลำดับ:
   1. ตรวจว่ามี psql และ pg_hba.conf มีบรรทัด 'local ... peer' (อ่านอย่างเดียว ไม่แก้)
   2. sudo useradd --system --no-create-home --shell /usr/sbin/nologin ${USERS[*]}
-  3. sudo -u postgres psql -f $HERE/setup.sql   (สร้าง role 3 ตัว + ฐานข้อมูล aipc_spike)
+  3. sudo -u postgres psql -f - < $HERE/setup.sql   (สร้าง role 3 ตัว + ฐานข้อมูล aipc_spike)
   4. รัน 15 กรณีทดสอบ ในฐานะผู้ใช้ A, B และ postgres
   5. เขียนผลลง docs/benchmarks/<วันที่>-<เครื่อง>-pg-rls.{csv,md}
 
@@ -31,7 +31,8 @@ EOF
 }
 
 cleanup() {
-  (cd /tmp && sudo -u postgres psql -X -q -f "$HERE/cleanup.sql")
+  # ส่ง SQL ทาง stdin: ผู้ใช้ postgres อ่านไฟล์ใน home ของเรา (0700) ไม่ได้ ซึ่งถูกต้องแล้ว
+  (cd /tmp && sudo -u postgres psql -X -q -v ON_ERROR_STOP=1 -f - < "$HERE/cleanup.sql")
   for u in "${USERS[@]}"; do
     if id "$u" >/dev/null 2>&1; then sudo userdel "$u"; fi
   done
@@ -92,7 +93,7 @@ apply() {
   for u in "${USERS[@]}"; do
     id "$u" >/dev/null 2>&1 || sudo useradd --system --no-create-home --shell /usr/sbin/nologin "$u"
   done
-  (cd /tmp && sudo -u postgres psql -X -q -f "$HERE/setup.sql")
+  (cd /tmp && sudo -u postgres psql -X -q -v ON_ERROR_STOP=1 -f - < "$HERE/setup.sql")
 
   local A=aipc_spike_a B=aipc_spike_b
   echo "=== กรณีทดสอบ ==="
