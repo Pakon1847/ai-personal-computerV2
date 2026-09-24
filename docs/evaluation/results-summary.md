@@ -25,7 +25,9 @@
 | เวลาต่อภาพ (ตรวจ+align+embedding) | median 8.3 ms | เครื่องพัฒนา | face-lfw |
 | SFace int8 แทน fp32 | embedding 184.3 vs 57.5 ms (**ช้ากว่า 3.2×**) · LFW 99.17% vs 99.35% · RAM 145 vs 217 MB → ใช้ fp32 | (Pi 4) | [face-sface-int8](../benchmarks/2026-09-24-face-sface-int8/README.md) |
 
-**ยังไม่มี:** เวลาทั้งกระบวนการกับกล้องจริง (เกณฑ์ BRIEF median ≤ 1.5 วิ) · FRR/จับผิดคน/BPCER/APCER กับคนจริง → [แผนทดสอบ](face-protocol.md)
+| **สแกนกับคนจริงครั้งแรก** (1 คน 10 ครั้ง · เบื้องต้น) | ขณะนั่งอยู่ **8/8 ถูกคน** · คะแนน 0.885–0.937 · **เวลาจริง 0.75–1.03 วิ** (median 0.75) | (Pi 4) กล้อง USB 1280×720 | [face-live-pi4](../benchmarks/2026-09-24-face-live-pi4/README.md) |
+
+**ยังไม่มี:** ผลตามแผน (≥ 5 คน × ≥ 50 ครั้ง บน Pi 5) · FRR/จับผิดคน/BPCER/APCER · สภาพแสงต่าง ๆ → [แผนทดสอบ](face-protocol.md)
 
 ## 3. หน้าจอ
 
