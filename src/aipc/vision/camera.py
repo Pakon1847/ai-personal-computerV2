@@ -1,5 +1,6 @@
 """ทดลองระบบใบหน้ากับกล้องจริงจาก terminal (การ์ด 0005) · ยังไม่ต่อหน้าจอ QML.
 
+    python -m aipc.vision.camera test [--snap F]  ทดสอบกล้องอย่างเดียว ไม่ต้องมีโมเดล (การ์ด 0011)
     python -m aipc.vision.camera check            เปิดกล้อง ดูว่าเห็นหน้าไหม และคำแนะนำของ quality gate
     python -m aipc.vision.camera enroll           ลงทะเบียนหน้าตัวเอง 5 ท่า (ถามความยินยอมก่อน)
     python -m aipc.vision.camera compare          เทียบแม่แบบ 3 ท่า กับ 5 ท่า (การ์ด 0010 · ไม่บันทึกแม่แบบ)
@@ -8,6 +9,7 @@
 
 ใช้กับบัญชีของตัวเองเท่านั้น (แม่แบบอยู่ใน home ของผู้ที่รัน) · ต้องยืนยันตัวตนแล้ว = login เข้าเครื่องแล้ว
 ไม่บันทึกภาพ · log ผลการสแกนที่ ~/.local/state/aipc/face-scans.log (ไม่มีภาพ ไม่มี embedding)
+(ยกเว้น test --snap ที่สั่งบันทึกภาพ 1 ใบเอง)
 """
 
 from __future__ import annotations
@@ -91,6 +93,54 @@ def frames(cap, seconds: float, clock=time.monotonic) -> Iterator:
         if not ok:
             return
         yield frame
+
+
+WARMUP_SECONDS = 1.0  # ช่วงกล้องปรับแสงอัตโนมัติ · ไม่นับในผลวัด
+DARK, BRIGHT = 50, 205  # ความสว่างเฉลี่ย 0–255 ที่ถือว่ามืด/สว่างเกิน
+
+
+def _fourcc(cap) -> str:
+    """รูปแบบภาพที่กล้องส่งจริง เช่น MJPG · อ่านไม่ได้ = "?"."""
+    import cv2
+
+    code = int(cap.get(cv2.CAP_PROP_FOURCC)) if hasattr(cap, "get") else 0
+    text = "".join(chr((code >> 8 * i) & 0xFF) for i in range(4))
+    return text if text.isprintable() and text.strip() else "?"
+
+
+def cmd_test(cap, seconds: float, snap: Path | None = None, out=print, clock=time.monotonic) -> int:
+    """ทดสอบกล้องอย่างเดียว (การ์ด 0011) · รายงานค่าที่กล้องให้จริง · ไม่เขียนดิสก์ถ้าไม่สั่ง --snap."""
+    import cv2
+
+    skipped = sum(1 for _ in frames(cap, WARMUP_SECONDS, clock))
+    n, last, start = 0, None, clock()
+    for frame in frames(cap, seconds, clock):
+        n, last = n + 1, frame
+    elapsed = clock() - start
+    if last is None:
+        out(
+            f"กล้องเปิดได้แต่ไม่ได้ภาพเลย (อุ่นเครื่องได้ {skipped} เฟรม) · "
+            "ลองถอดเสียบใหม่ หรือปิดโปรแกรมอื่นที่ใช้กล้องอยู่"
+        )
+        return 1
+    h, w = last.shape[:2]
+    brightness = float(last.mean())
+    out(f"ภาพ {w}×{h} · {_fourcc(cap)} · ทิ้ง {skipped} เฟรมแรก (ปรับแสง)")
+    out(f"อ่าน {n} เฟรมใน {elapsed:.1f} วิ = {n / elapsed if elapsed > 0 else 0:.1f} ภาพ/วิ")
+    note = (
+        " · มืดไป เปิดไฟหรือหันกล้องออกจากหน้าต่าง"
+        if brightness < DARK
+        else (" · สว่างเกิน" if brightness > BRIGHT else "")
+    )
+    out(f"ความสว่างเฉลี่ย {brightness:.0f}/255{note}")
+    if snap is not None:
+        try:
+            if not cv2.imwrite(str(snap), last):
+                raise OSError("OpenCV เขียนไฟล์ไม่ได้ (นามสกุลต้องเป็น .jpg/.png)")
+            out(f"บันทึกภาพ 1 ใบที่ {snap} · ลบเองเมื่อไม่ใช้แล้ว")
+        except OSError as e:
+            out(f"บันทึกภาพไม่ได้: {e}")
+    return 0
 
 
 def build_scanner(cfg: config.FaceConfig) -> pipeline.FaceScanner:
@@ -230,11 +280,12 @@ def cmd_scan(cap, scanner, fs: store.FaceStore, times: int, seconds: float, out=
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m aipc.vision.camera")
-    ap.add_argument("action", choices=("check", "enroll", "scan", "delete", "compare"))
+    ap.add_argument("action", choices=("test", "check", "enroll", "scan", "delete", "compare"))
     ap.add_argument("--camera", type=int, help="เลขกล้อง (ไม่ใส่ = หาเอง)")
-    ap.add_argument("--seconds", type=float, default=5.0, help="เวลาสูงสุดต่อครั้ง")
+    ap.add_argument("--seconds", type=float, help="เวลาสูงสุดต่อครั้ง (test 3 วิ · อื่น ๆ 5 วิ)")
     ap.add_argument("--times", type=int, default=10, help="จำนวนครั้งที่สแกน")
     ap.add_argument("--config", type=Path)
+    ap.add_argument("--snap", type=Path, help="test: บันทึกภาพสุดท้าย 1 ใบ (ไม่ใส่ = ไม่เขียนดิสก์)")
     # สำหรับแผนทดสอบกับคนจริง (docs/evaluation/face-protocol.md) · ไม่ใช้ในการใช้งานปกติ
     ap.add_argument("--id", help="enroll: เก็บแม่แบบเป็น <รหัส>.json ในโฟลเดอร์ --against (เช่น P01)")
     ap.add_argument("--against", type=Path, help="โฟลเดอร์แม่แบบของผู้เข้าร่วมทดสอบ (1:N)")
@@ -251,6 +302,17 @@ def main(argv: list[str] | None = None) -> int:
     if a.action == "delete":
         print("ลบแม่แบบใบหน้าแล้ว" if fs.delete() else "ไม่มีแม่แบบใบหน้าให้ลบ")
         return 0
+    if a.action == "test":
+        try:
+            cap = open_camera(a.camera)
+        except RuntimeError as e:
+            print(f"ใช้กล้องไม่ได้: {e}")
+            return 1
+        try:
+            return cmd_test(cap, a.seconds or 3.0, a.snap)
+        finally:
+            cap.release()
+    a.seconds = a.seconds or 5.0
     cfg = config.load(a.config)
     try:
         scanner = build_scanner(cfg)

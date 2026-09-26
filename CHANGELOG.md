@@ -30,3 +30,4 @@
 - ใบหน้า [การ์ด 0010](docs/design/0010-face-enroll-preview.md): ลงทะเบียน 5 ท่า + ภาพสดแบบกระจก + วงรี + ลูกศร · แม่แบบใช้ `template_poses` · `face-enroll.log` · `camera compare` เทียบ 3 vs 5 ท่า · แก้ซ้าย/ขวาตามมุมมองผู้ใช้
 - `scripts/pi/update-app.sh`: อัปเดตแอปที่ `/opt/aipc-v2` โดยไม่แตะ greetd
 - ใบหน้า: ที่เก็บแม่แบบ (`aipc.vision.store`: ความยินยอม, ผูก sha256 โมเดล, ลบหมด) · เครื่องมือกล้อง `python -m aipc.vision.camera check|enroll|scan|delete` · ประเมิน LFW แบบมาตรฐาน `--pairs` (99.35% ± 0.37%) · `--pick centre`
+- เครื่องมือกล้อง [การ์ด 0011](docs/design/0011-camera-test.md): `python -m aipc.vision.camera test [--snap F]` ทดสอบกล้องโดยไม่ต้องมีโมเดล (ขนาดภาพ/FOURCC/ภาพต่อวิ/ความสว่าง หลังทิ้งช่วงปรับแสง) · Pi 5 + เว็บแคม Realtek: 1280×720 MJPG 30.1 ภาพ/วิ · `doctor` ไม่แนะนำ `rpicam-hello` กับกล้อง USB แล้ว · ยืนยันโหนด `pispbe` บน Pi 5

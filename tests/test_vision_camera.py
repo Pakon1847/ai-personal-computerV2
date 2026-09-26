@@ -1,5 +1,7 @@
 """ขั้นตอนของเครื่องมือกล้อง (การ์ด 0005) ด้วยกล้องปลอมและ scanner ปลอม · ไม่เปิดกล้องจริง."""
 
+import contextlib
+import io
 import json
 import tempfile
 import unittest
@@ -190,6 +192,92 @@ class CameraFlowTest(unittest.TestCase):
         with mock.patch.object(camera, "log_path", return_value=self.dir / "s.log"):
             camera.cmd_scan(FakeCap(10), sc, self.fs, 1, 5, out=self.out.append, subject="P00")
         self.assertEqual(list(sc.templates), ["P00"])
+
+
+class TickClock:
+    """นาฬิกาปลอม: เดินทีละ step ทุกครั้งที่ถูกอ่าน · ใช้คุมจำนวนเฟรมในช่วงอุ่นเครื่อง/วัด."""
+
+    def __init__(self, step):
+        self.t, self.step = 0.0, step
+
+    def __call__(self):
+        self.t += self.step
+        return self.t
+
+
+class LitCap(FakeCap):
+    """กล้องปลอมที่ให้ภาพความสว่างคงที่ขนาด 640×480."""
+
+    def __init__(self, n, level):
+        super().__init__(n)
+        self.level = level
+
+    def read(self):
+        ok, _ = super().read()
+        return (ok, np.full((480, 640, 3), self.level, np.uint8) if ok else None)
+
+    def release(self):
+        self.released = True
+
+
+@unittest.skipIf(np is None, "ไม่มี numpy")
+class CameraTestCommandTest(unittest.TestCase):
+    """การ์ด 0011: camera test ไม่ต้องมีโมเดล · ไม่เขียนดิสก์ถ้าไม่สั่ง --snap."""
+
+    def setUp(self):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        self.dir = Path(d.name)
+        self.out = []
+
+    def run_test(self, cap, snap=None):
+        return camera.cmd_test(cap, 1.0, snap, out=self.out.append, clock=TickClock(0.1))
+
+    def test_reports_size_fps_and_skips_warmup(self):
+        self.assertEqual(self.run_test(LitCap(100, 128)), 0)
+        text = "\n".join(self.out)
+        self.assertIn("640×480", text)
+        self.assertRegex(text, r"ทิ้ง \d+ เฟรมแรก")
+        self.assertRegex(text, r"อ่าน \d+ เฟรม")
+        self.assertIn("128/255", text)
+        self.assertNotIn("มืด", text)
+        self.assertEqual(list(self.dir.iterdir()), [], "ไม่มี --snap = ไม่เขียนดิสก์")
+
+    def test_warns_when_dark_or_bright(self):
+        self.run_test(LitCap(100, 20))
+        self.assertIn("มืดไป", self.out[-1])
+        self.out.clear()
+        self.run_test(LitCap(100, 240))
+        self.assertIn("สว่างเกิน", self.out[-1])
+
+    def test_no_frames_fails(self):
+        self.assertEqual(self.run_test(LitCap(0, 128)), 1)
+        self.assertIn("ไม่ได้ภาพ", self.out[0])
+
+    def test_frames_only_in_warmup_fails(self):
+        self.assertEqual(self.run_test(LitCap(3, 128)), 1, "ได้แค่ช่วงอุ่นเครื่อง = ยังไม่ผ่าน")
+
+    def test_snap_writes_one_image(self):
+        snap = self.dir / "snap.jpg"
+        self.assertEqual(self.run_test(LitCap(100, 128), snap), 0)
+        self.assertEqual(list(self.dir.iterdir()), [snap])
+        self.assertGreater(snap.stat().st_size, 0)
+
+    def test_snap_failure_still_reports(self):
+        rc = self.run_test(LitCap(100, 128), self.dir / "no-such-dir" / "snap.jpg")
+        self.assertEqual(rc, 0, "ผลวัดยังใช้ได้แม้บันทึกภาพไม่ได้")
+        self.assertIn("บันทึกภาพไม่ได้", self.out[-1])
+        self.assertTrue(any("ภาพ/วิ" in line for line in self.out))
+
+    def test_main_test_does_not_load_models(self):
+        cap = LitCap(0, 0)
+        with mock.patch.object(camera, "open_camera", return_value=cap), \
+             mock.patch.object(camera, "build_scanner") as build, \
+             contextlib.redirect_stdout(io.StringIO()):  # fmt: skip
+            rc = camera.main(["test", "--seconds", "0.01"])
+        build.assert_not_called()
+        self.assertEqual(rc, 1)
+        self.assertTrue(cap.released, "จบแล้วต้องปิดกล้อง")
 
 
 if __name__ == "__main__":

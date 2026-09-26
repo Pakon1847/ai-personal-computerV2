@@ -243,7 +243,7 @@ SOC_VIDEO_NODES = (
     "bcm2835-codec",  # Pi 4: ตัวถอด/เข้ารหัสวิดีโอ (ยืนยันแล้วบน Pi 4)
     "bcm2835-isp",  # Pi 4: ISP (ยืนยันแล้วบน Pi 4)
     "rpi-hevc-dec",  # Pi 4/5: ตัวถอด HEVC (ยืนยันแล้วบน Pi 4)
-    "pispbe",  # Pi 5: ISP back end (จากเอกสาร ยังไม่ได้ยืนยันกับ Pi 5 ของเรา)
+    "pispbe",  # Pi 5: ISP back end (ยืนยันแล้วบน Pi 5 2026-09-26: pispbe-input/-output0/-config ...)
 )
 
 
@@ -272,7 +272,8 @@ def check_camera(root: Path) -> Check:
         "กล้อง",
         WARN,
         f"ไม่พบกล้อง · โหนดวิดีโอ {len(videos)} ตัวเป็นของชิป (ถอดรหัสวิดีโอ/ISP) ไม่ใช่กล้อง",
-        "ต่อกล้องแล้วตรวจด้วย `rpicam-hello --list-cameras` หรือ `v4l2-ctl --list-devices`",
+        "ต่อกล้องแล้วตรวจด้วย `python -m aipc.vision.camera test` หรือ `v4l2-ctl --list-devices` · "
+        "`rpicam-hello` เห็นเฉพาะกล้อง CSI (กล้อง USB จะขึ้นว่า No cameras available ทั้งที่ใช้ได้)",
     )
 
 
