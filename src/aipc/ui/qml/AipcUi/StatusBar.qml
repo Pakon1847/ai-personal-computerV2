@@ -35,9 +35,7 @@ Item {
         }
         Chip { objectName: "micIndicator"; text: "ไมค์ปิด"; iconPath: Icons.mic }
         Chip { text: "โมเดล: ยังไม่เชื่อมต่อ"; iconPath: Icons.cpu; kind: "warn"; compact: bar.tight }
-        Chip { text: "งาน: ไม่มี"; iconPath: Icons.activity; compact: bar.tight; Accessible.name: "งานเบื้องหลัง: ไม่มี" }
         Chip { text: system.storageText; iconPath: Icons.hdd; compact: bar.tight }
         Chip { text: system.tempText; iconPath: Icons.thermo; compact: bar.tight; Accessible.name: "อุณหภูมิ " + system.tempText }
-        Chip { text: "สำรอง: ยังไม่ตั้ง"; iconPath: Icons.archive; compact: bar.tight; Accessible.name: "สำรองข้อมูล: ยังไม่ตั้งค่า" }
     }
 }

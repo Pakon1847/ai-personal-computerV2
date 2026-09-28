@@ -10,8 +10,6 @@ ColumnLayout {
     PageHeader {
         title: "Skill"
         subtitle: "AI เลือกสกิลเองจากรายการนี้ · สกิลเป็นข้อมูล ไม่ใช่โปรแกรม · ใช้ได้แค่สิทธิ์ที่แสดงไว้"
-        AppButton { text: "นำเข้าจากไฟล์"; kind: "secondary"; enabled: false; ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม (ADR-011)" }
-        AppButton { text: "ให้ AI ช่วยสร้าง"; iconPath: Icons.plus; enabled: false; ToolTip.visible: hovered; ToolTip.text: "ต้องมีโมเดลภาษาก่อน" }
     }
 
     GridLayout {

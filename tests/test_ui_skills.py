@@ -64,8 +64,8 @@ class SkillsControllerTest(unittest.TestCase):
         ready = {s["id"]: s["ready"] for s in self.s.skills}
         self.assertTrue(ready["system-command"])
         self.assertTrue(ready["machine-status"])
-        self.assertFalse(ready["translate"])
-        self.assertFalse(ready["what-is-this"])
+        self.assertFalse(ready["translate"])  # รอแชท LLM (การ์ด 0013)
+        self.assertNotIn("what-is-this", ready)  # ตัดออกในขอบเขตรอบ 3
 
 
 @unittest.skipIf(SkillsController is None, "ไม่มี PySide6")

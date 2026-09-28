@@ -17,8 +17,6 @@ ColumnLayout {
         spacing: 8
         AppButton { text: "ขึ้นไป"; kind: "secondary"; iconPath: Icons.back; enabled: filesBrowser.canGoUp; onClicked: filesBrowser.up() }
         AppText { text: filesBrowser.location; strong: true; oneLine: true; Layout.fillWidth: true; elide: Text.ElideMiddle }
-        AppButton { text: "เพิ่มไฟล์"; iconPath: Icons.plus; enabled: false
-                    ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม" }
     }
 
     AppText { visible: filesBrowser.error !== ""; text: filesBrowser.error; color: Theme.danger; Layout.fillWidth: true }

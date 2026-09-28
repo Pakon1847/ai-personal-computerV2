@@ -80,7 +80,7 @@ Item {
             AppText { text: "ประวัติบทสนทนา"; strong: true }
             AppText {
                 Layout.fillWidth: true
-                text: "ยังไม่มีบทสนทนาที่บันทึกไว้ · การบันทึกประวัติมาพร้อมฐานข้อมูลในเฟส 1 (ADR-004)"
+                text: "ยังไม่มีบทสนทนาที่บันทึกไว้"
                 size: Theme.fontSmall; color: Theme.inkMuted
             }
         }
@@ -333,11 +333,6 @@ Item {
             anchors.leftMargin: 12
             anchors.rightMargin: 8
             spacing: 6
-            AppButton {
-                kind: "ghost"; iconPath: Icons.clip; enabled: false
-                Accessible.name: "แนบไฟล์"
-                ToolTip.visible: hovered; ToolTip.text: "แนบไฟล์: ยังไม่พร้อม"
-            }
             ScrollView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -362,11 +357,6 @@ Item {
                         }
                     }
                 }
-            }
-            AppButton {
-                kind: "ghost"; iconPath: Icons.mic; enabled: false
-                Accessible.name: "พูดกับ AI"
-                ToolTip.visible: hovered; ToolTip.text: "พูดด้วยเสียง: ยังไม่พร้อม (เฟส 3)"
             }
             AppButton { text: "ส่ง"; iconPath: Icons.send; enabled: input.text.trim() !== ""; onClicked: root.send() }
         }

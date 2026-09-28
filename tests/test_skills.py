@@ -25,14 +25,8 @@ class ManifestTest(unittest.TestCase):
         skills = manifest.load_builtin()
         self.assertEqual(
             sorted(s.id for s in skills),
-            [
-                "machine-status",
-                "reminder",
-                "system-command",
-                "translate",
-                "voice-note",
-                "what-is-this",
-            ],
+            # สกิล 2 (voice-note) และ 6 (what-is-this) ตัดออกในขอบเขตรอบ 3 (2026-09-28)
+            ["machine-status", "reminder", "system-command", "translate"],
         )
 
     def test_rejects_unknown_action_and_permission(self):
@@ -165,6 +159,14 @@ class ExecutorTest(unittest.TestCase):
         out = ex.execute(command.parse("เปิดหน้าตั้งค่า").plan)
         self.assertEqual((out.page, calls), ("settings", []))
 
+    def test_privacy_page_opens_settings(self):
+        # หน้าความเป็นส่วนตัวตัดออก (รอบ 3) · คำสั่งยังเข้าใจเหมือนเดิม แต่หน้าจอพาไปหน้าตั้งค่า
+        cmd = command.parse("เปิดหน้าความเป็นส่วนตัว")
+        self.assertEqual(cmd.plan.params, {"page": "privacy"})
+        out = actions.Executor(dry_run=False).execute(cmd.plan)
+        self.assertEqual(out.page, "settings")
+        self.assertIn("ตั้งค่า", out.message)
+
     def test_missing_app_is_reported(self):
         ex = actions.Executor(runner=lambda a: 1, dry_run=False)
         out = ex.execute(command.parse("เปิดเทอร์มินัล").plan)
@@ -259,8 +261,9 @@ class RouterTest(unittest.TestCase):
 
     def test_other_skills(self):
         self.assertEqual(router.route("เตือนส่งงานพรุ่งนี้", self.skills, set()).skill.id, "reminder")
-        self.assertEqual(router.route("นี่คืออะไร", self.skills, set()).skill.id, "what-is-this")
-        self.assertEqual(router.route("จดโน้ตประชุม", self.skills, set()).skill.id, "voice-note")
+        # สกิล 2 และ 6 ตัดออกแล้ว → ไม่มีสกิลรับ ไปแชท
+        self.assertEqual(router.route("นี่คืออะไร", self.skills, set()).kind, "chat")
+        self.assertEqual(router.route("จดโน้ตประชุม", self.skills, set()).kind, "chat")
 
     def test_general_chat(self):
         self.assertEqual(router.route("เล่าเรื่องตลกให้ฟังหน่อย", self.skills, set()).kind, "chat")

@@ -26,19 +26,10 @@ Rectangle {
         NavItem { text: "ผู้ช่วย AI"; shortText: "ผู้ช่วย"; iconPath: Icons.chat; pageName: "workspace" }
         NavItem { text: "ไฟล์ของฉัน"; shortText: "ไฟล์"; iconPath: Icons.folder; pageName: "files" }
         NavItem { text: "Skill"; iconPath: Icons.sparkle; pageName: "skills" }
-        NavItem { text: "ความเป็นส่วนตัว"; shortText: "ส่วนตัว"; iconPath: Icons.shield; pageName: "privacy" }
         NavItem { text: "สุขภาพเครื่อง"; shortText: "เครื่อง"; iconPath: Icons.activity; pageName: "health" }
         NavItem { text: "ตั้งค่า"; iconPath: Icons.sliders; pageName: "settings" }
         Item { Layout.fillHeight: true }
 
-        AppButton {
-            Layout.alignment: Qt.AlignHCenter
-            kind: "ghost"; iconPath: Icons.eyeOff
-            enabled: false
-            Accessible.name: "ปิดบังหน้าจอ"
-            ToolTip.visible: hovered
-            ToolTip.text: "ปิดบังหน้าจอ · ยังไม่พร้อม: ใช้ ext-session-lock (เฟส 2)"
-        }
         AppButton {
             objectName: "logoutButton"
             Layout.alignment: Qt.AlignHCenter

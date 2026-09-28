@@ -62,10 +62,13 @@ PAGES = {
     "workspace": "ผู้ช่วย AI",
     "files": "ไฟล์ของฉัน",
     "skills": "Skill",
-    "privacy": "ความเป็นส่วนตัว",
+    "privacy": "ตั้งค่า (ส่วนความเป็นส่วนตัว)",
     "health": "สุขภาพเครื่อง",
     "settings": "ตั้งค่า",
 }
+# หน้าความเป็นส่วนตัวตัดออกในขอบเขตรอบ 3 · ที่ลบข้อมูลใบหน้าอยู่ในหน้าตั้งค่า
+# ผู้ใช้ยังพูดว่า "เปิดหน้าความเป็นส่วนตัว" ได้ แต่หน้าจอพาไปหน้าตั้งค่า
+PAGE_SCREEN = {"privacy": "settings"}
 
 SINK = "@DEFAULT_AUDIO_SINK@"  # ลำโพงหลักของ PipeWire (ระบบเสียงของ Raspberry Pi OS)
 
@@ -150,7 +153,8 @@ class Executor:
         if plan.action not in ACTIONS:  # ป้องกันซ้ำอีกชั้น แม้ Plan จะมาจากตัวแปลคำสั่งของเราเอง
             return Outcome(False, f"ไม่อนุญาต: {plan.action}")
         if plan.action == "open_page":
-            return Outcome(True, f"เปิดหน้า{PAGES[plan.params['page']]}", page=plan.params["page"])
+            key = plan.params["page"]
+            return Outcome(True, f"เปิดหน้า{PAGES[key]}", page=PAGE_SCREEN.get(key, key))
         args = command_for(plan)
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)

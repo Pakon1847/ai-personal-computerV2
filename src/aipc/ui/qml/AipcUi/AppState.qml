@@ -5,7 +5,7 @@ import QtQuick
 
 QtObject {
     property string screen: "login"      // login | signup | shell
-    property string page: "workspace"    // หน้าย่อยใน shell: workspace | files | skills | privacy | health | settings
+    property string page: "workspace"    // หน้าย่อยใน shell: workspace | files | skills | health | settings ("privacy" = settings)
     property bool devMode: false         // โหมดพัฒนา: เดินหน้าจอได้ครบโดยยังไม่มี backend จริง (มีแถบเตือนเสมอ)
 
     function go(name) { screen = name }
