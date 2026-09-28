@@ -175,7 +175,35 @@ git add docs/benchmarks && git commit -m "bench(pi5): llm <label> soak 10 นา
 
 เครื่องมือหยุดพร้อมบอกว่าไม่เจอฟิลด์ของ llama-bench → ส่งข้อความนั้นมา ผมจะแก้ตัวแปลง
 
-**ความเร็วอย่างเดียวยังตัดสิน ADR-007 ไม่ได้** · ชุดคำถามไทย 30 ข้อกับตัวรันเพื่อให้คะแนน ผมจะเขียนและ commit แยก (ต้อง commit ก่อนวัดตาม H9)
+**ความเร็วอย่างเดียวยังตัดสิน ADR-007 ไม่ได้** · ต่อด้วยขั้น 7.1
+
+## 7.1 วัดคุณภาพภาษาไทย (ADR-007 เกณฑ์ข้อ 1)
+
+ชุดคำถาม 30 ข้อ `tests/data/llm_thai_questions.json` commit ไว้ก่อนวัดแล้ว (2026-09-28) · รันทีละโมเดล:
+
+```bash
+cd ~/aipc
+S=~/llama.cpp/build/bin/llama-server
+$S -m models/typhoon2.5-qwen3-4b-q4_k_m.gguf --host 127.0.0.1 --port 8080 -c 4096 -t 4 --no-webui &
+sleep 60   # รอโหลดโมเดลจาก microSD
+./.venv/bin/python -m aipc.spikes.llm_quality ask --label typhoon25-4b-q4km \
+    --out docs/benchmarks/$(date +%F)-llm-thai/typhoon25-4b-q4km.json
+kill %1
+# ทำซ้ำกับ Qwen3-4B-Instruct-2507-Q4_K_M.gguf (label qwen3-4b-2507-q4km)
+# และ gemma-4-E2B-it-Q4_K_M.gguf (label gemma4-e2b-q4km)
+git add docs/benchmarks && git commit -m "bench(pi5): คำตอบ LLM 3 ตัวสำหรับให้คะแนน"
+```
+
+สร้างแบบให้คะแนนที่ไม่มีชื่อโมเดล แล้วส่งกลับมาวินโดวส์:
+
+```bash
+D=docs/benchmarks/$(date +%F)-llm-thai
+./.venv/bin/python -m aipc.spikes.llm_quality sheet $D/*.json --out $D/rating
+```
+
+- ให้คน 2 คน (Pakon + อีก 1 คน) เปิด `rating/rate-me.csv` คนละสำเนา (`rater1.csv`, `rater2.csv`) แล้วใส่คะแนน 1–5
+  ในคอลัมน์ score ตามเกณฑ์ใน `rubric` ของไฟล์คำถาม · **ห้ามเปิด `key.json` ก่อนให้คะแนนเสร็จ**
+- รวมคะแนน: `python -m aipc.spikes.llm_quality score --key $D/rating/key.json $D/rating/rater1.csv $D/rating/rater2.csv`
 
 ## 8. ส่งผลกลับ
 
