@@ -44,15 +44,16 @@ class SignupControllerTest(unittest.TestCase):
             return {"ok": True, "message": "สร้างแล้ว", "recovery_code": "AAAA-BBBB"}
 
         s, results = self.make(real=True, runner=runner)
-        self.assertTrue(s.create("น้ำฝน ", "namfon", "correct-horse-9", " pakon", "admin-pw"))
+        self.assertTrue(s.create("น้ำฝน ", "namfon", "correct-horse-9"))
         self.assertTrue(s.busy, "ระหว่างรอ หน้าจอต้องรู้ว่ากำลังทำ (ปุ่มปิด)")
-        self.assertFalse(s.create("x", "y", "z", "a", "b"), "ห้ามส่งซ้ำระหว่างรอ")
+        self.assertFalse(s.create("x", "y", "z"), "ห้ามส่งซ้ำระหว่างรอ")
         gate.set()
         wait_for(results)
         self.assertFalse(s.busy)
         self.assertEqual(results[0]["recovery_code"], "AAAA-BBBB")
         self.assertEqual(seen[0]["op"], "create")
-        self.assertEqual((seen[0]["display_name"], seen[0]["admin"]), ("น้ำฝน", "pakon"))
+        self.assertEqual(seen[0]["display_name"], "น้ำฝน")
+        self.assertEqual(set(seen[0]), {"op", "display_name", "username", "password"})
 
     def test_dev_mode_is_clearly_simulated(self):
         s, results = self.make(dev=True)
@@ -63,7 +64,7 @@ class SignupControllerTest(unittest.TestCase):
 
     def test_plain_window_refuses(self):
         s, results = self.make()
-        s.create("น้ำฝน", "namfon", "correct-horse-9", "pakon", "pw")
+        s.create("น้ำฝน", "namfon", "correct-horse-9")
         self.assertFalse(results[0]["ok"])
 
     def test_missing_helper_is_reported_not_crashed(self):

@@ -365,7 +365,7 @@ class SignupController(QObject):
     real = หน้า Login จริง (greeter) → ส่งคำขอให้ตัวช่วย root ผ่าน sudo
     dev  = หน้าต่างพัฒนา → ผลเป็นแบบจำลองที่เขียนว่า "จำลอง" ชัดเจน (H5)
     นอกจากสองแบบนี้ = บอกว่าสมัครได้เฉพาะหน้า Login จริง
-    งานเรียกตัวช่วยทำในเธรดแยก (PAM หน่วงราว 2 วิเมื่อรหัสผิด) แล้วส่งผลกลับด้วย signal
+    งานเรียกตัวช่วยทำในเธรดแยก (useradd + scrypt ใช้เวลาราววินาที) แล้วส่งผลกลับด้วย signal
     """
 
     changed = Signal()
@@ -410,11 +410,10 @@ class SignupController(QObject):
         self.changed.emit()
         self.finished.emit(result)
 
-    @Slot(str, str, str, str, str, result=bool)
-    def create(self, display: str, username: str, password: str, admin: str, admin_pw: str) -> bool:
+    @Slot(str, str, str, result=bool)
+    def create(self, display: str, username: str, password: str) -> bool:
         return self._submit({"op": "create", "display_name": display.strip(), "username": username,
-                             "password": password, "admin": admin.strip(),
-                             "admin_password": admin_pw})  # fmt: skip
+                             "password": password})  # fmt: skip
 
     @Slot(str, str, str, result=bool)
     def recover(self, username: str, code: str, new_password: str) -> bool:

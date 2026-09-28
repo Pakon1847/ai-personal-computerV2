@@ -224,7 +224,7 @@ Rectangle {
             size: Theme.fontSmall; color: Theme.inkFaint
             Layout.fillWidth: true
         }
-        // สมัครจริงผ่านตัวช่วย root โดยผู้ดูแลยืนยัน (การ์ด 0012)
+        // สมัครจริงผ่านตัวช่วย root · สมัครเสรี ไม่ต้องมีผู้ดูแลอนุมัติ (การ์ด 0012)
         AppButton { text: "สมัครบัญชี"; kind: "secondary"; iconPath: Icons.userPlus
                     onClicked: AppState.go("signup") }
         AppButton { text: "ภาษา: ไทย"; kind: "secondary"; iconPath: Icons.globe; enabled: false }

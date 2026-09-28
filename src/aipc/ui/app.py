@@ -109,7 +109,7 @@ def build(opts: Options, argv: list[str] | None = None):
     screen = "shell" if opts.session else opts.screen
     ctx.setContextProperty("startScreen", screen if screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
-    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 3)))
+    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 2)))
     dev = (opts.dev or opts.demo_scan is not None) and not real
     ctx.setContextProperty("devMode", dev)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)

@@ -41,7 +41,7 @@ CASES = [
     {"screen": "login", "demo_scan": "found"},
     {"screen": "login", "demo_scan": "unknown"},
     {"screen": "login", "demo_scan": "manual", "theme": "dark"},
-    *({"screen": "signup", "signup_step": n, "dev": True} for n in range(4)),
+    *({"screen": "signup", "signup_step": n, "dev": True} for n in range(3)),
     {"screen": "recover", "dev": True},
     {"screen": "recover", "greeter_session": ["labwc"]},
     {"screen": "signup", "signup_step": 1, "theme": "dark"},

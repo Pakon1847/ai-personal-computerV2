@@ -3,8 +3,10 @@
 หน้า Login (ผู้ใช้ `_greetd`) เรียกได้ทางเดียว: `sudo -n /usr/local/sbin/aipc-accounts` ไม่มีอาร์กิวเมนต์
 คำขอส่งเป็น JSON ทาง stdin (รหัสผ่านจึงไม่อยู่ใน argv ที่ใครก็เห็นได้จาก ps) · ตอบเป็น JSON ทาง stdout
 
+สมัครเสรี: ใครอยู่ที่หน้า Login ก็สร้างบัญชีได้ ไม่ต้องมีผู้ดูแลอนุมัติ (Pakon 2026-09-29 · การ์ด 0012 ข้อ 11)
+บัญชีใหม่ไม่อยู่กลุ่ม sudo · ไม่มีขีดจำกัดจำนวนบัญชี
+
 หลัก H7: หน้าจอไม่ตัดสินอะไร ตัวช่วยนี้ตรวจซ้ำเองทุกข้อ
-- รหัสผ่านผู้ดูแล → PAM ของ OS ตรวจ (โค้ดเราไม่อ่าน /etc/shadow) · ผู้ดูแลต้องอยู่กลุ่ม sudo
 - ชื่อ/รหัส/ชื่อที่แสดง → กฎชุดเดียวกับหน้าจอ (aipc.accounts.validation)
 - รหัสกู้คืน → เทียบ hash · ผิดหลายครั้งต้องรอ
 
@@ -26,16 +28,13 @@ from pathlib import Path
 
 from aipc.accounts import validation
 
-SERVICE = "aipc-accounts"  # ไฟล์ /etc/pam.d/aipc-accounts
 CALLER = "_greetd"  # ผู้ใช้ของหน้า Login · คนอื่นเรียกไม่ได้ แม้ผ่าน sudo
-ADMIN_GROUP = "sudo"
 GROUPS = ("video", "render", "audio")  # จอ กล้อง เสียง · ใส่เฉพาะกลุ่มที่เครื่องมีจริง
 STATE = Path("/var/lib/aipc")
 REQUEST_MAX = 4096
 FAIL_FREE = 5  # ผิดได้เท่านี้ก่อนต้องรอ
 WAIT_BASE_S, WAIT_MAX_S = 60, 3600
 SCRYPT = {"n": 2**14, "r": 8, "p": 1}  # ใช้หน่วยความจำราว 16 MB · 0.1–0.5 วิบน Pi (ค่าประมาณ)
-ADMIN_FAIL = "ผู้ดูแลยืนยันไม่ผ่าน"
 RECOVER_FAIL = "ชื่อผู้ใช้หรือรหัสกู้คืนไม่ถูกต้อง"  # ไม่บอกว่ามีบัญชีนี้หรือไม่
 
 
@@ -66,21 +65,6 @@ class System:
             return True
         except KeyError:
             return False
-
-    def in_group(self, user: str, group: str) -> bool:
-        import grp
-        import pwd
-
-        try:
-            g = grp.getgrnam(group)
-            return user in g.gr_mem or pwd.getpwnam(user).pw_gid == g.gr_gid
-        except KeyError:
-            return False
-
-    def authenticate(self, user: str, password: str) -> bool:
-        from aipc.accounts import pam
-
-        return pam.authenticate(SERVICE, user, password)
 
     def run(self, argv: list[str], stdin: str | None = None) -> int:
         r = subprocess.run(argv, input=stdin.encode() if stdin is not None else None,
@@ -173,20 +157,15 @@ def _strings(request: dict, *keys: str) -> list[str] | None:
 
 
 def create(request: dict, system: System) -> dict:
-    vals = _strings(request, "username", "display_name", "password", "admin", "admin_password")
+    vals = _strings(request, "username", "display_name", "password")
     if vals is None:
         return _fail("คำขอไม่ครบ")
-    user, display, password, admin, admin_pw = vals
+    user, display, password = vals
     display = display.strip()
     for check in (validation.check_username(user), validation.check_display_name(display),
                   validation.check_password(password, password)):  # fmt: skip
         if not check.ok:
             return _fail(check.message)
-    # ตรวจรหัสก่อนเสมอ แม้ผู้ยืนยันไม่ได้อยู่กลุ่ม sudo · ข้อความเดียวกันทุกกรณี (ไม่บอกว่าผิดตรงไหน)
-    admin_ok = bool(admin) and system.authenticate(admin, admin_pw)
-    if not (admin_ok and system.in_group(admin, ADMIN_GROUP)):
-        system.log(f"ปฏิเสธการสมัคร {user}: ผู้ดูแลยืนยันไม่ผ่าน ({admin or '-'})")
-        return _fail(ADMIN_FAIL)
     if system.user_home(user) is not None:
         return _fail("ชื่อผู้ใช้นี้มีคนใช้แล้ว")
 
@@ -208,7 +187,7 @@ def create(request: dict, system: System) -> dict:
         system.chmod(home, 0o700)  # ผู้ใช้อื่นเปิดโฟลเดอร์นี้ไม่ได้ (ข้ออ้างที่ 2 ของเล่ม)
     code = _new_recovery(system, user)
     marker.unlink(missing_ok=True)
-    system.log(f"สร้างบัญชี {user} อนุมัติโดย {admin}")
+    system.log(f"สร้างบัญชี {user} (สมัครเองที่หน้า Login)")
     return {"ok": True, "message": f"สร้างบัญชี {user} แล้ว", "recovery_code": code}
 
 

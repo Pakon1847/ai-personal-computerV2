@@ -4,11 +4,11 @@
 #
 #   ./scripts/pi/install-accounts.sh                  ดูว่าจะทำอะไร (ไม่เปลี่ยนอะไรเลย)
 #   sudo ./scripts/pi/install-accounts.sh --apply     ทำจริง
-#   sudo ./scripts/pi/install-accounts.sh --rollback  ลบตัวช่วย กฎ sudo และไฟล์ PAM · คืน autologin ถ้าเคยปิด
+#   sudo ./scripts/pi/install-accounts.sh --rollback  ลบตัวช่วยและกฎ sudo · คืน autologin ถ้าเคยปิด
 #
 # ทำอะไร:
 #   1. /usr/local/sbin/aipc-accounts (root 0755) = เรียก python -I -m aipc.accounts.helper จาก /opt/aipc-v2
-#   2. /etc/pam.d/aipc-accounts = ตรวจรหัสผ่านผู้ดูแลด้วย pam_unix (ชุดเดียวกับ login ปกติ)
+#   2. ลบ /etc/pam.d/aipc-accounts ของรุ่นก่อน (เคยใช้ตรวจรหัสผู้ดูแล · ตอนนี้สมัครเสรี ไม่ต้องใช้แล้ว)
 #   3. /etc/sudoers.d/aipc-accounts = ผู้ใช้ _greetd เรียกตัวช่วยได้คำสั่งเดียว ห้ามใส่อาร์กิวเมนต์
 #      **ตรวจด้วย visudo -c ก่อนติดตั้งเสมอ** (ไฟล์ sudoers ผิด = sudo ใช้ไม่ได้ทั้งเครื่อง)
 #   4. /var/lib/aipc (root 0700) = ที่เก็บ hash รหัสกู้คืน และงานสมัครค้าง
@@ -29,7 +29,7 @@ esac
 
 DEST=/opt/aipc-v2
 WRAPPER=/usr/local/sbin/aipc-accounts
-PAMFILE=/etc/pam.d/aipc-accounts
+PAMFILE=/etc/pam.d/aipc-accounts  # รุ่นก่อน 2026-09-29 เท่านั้น · ลบทิ้ง
 SUDOERS=/etc/sudoers.d/aipc-accounts
 STATE=/var/lib/aipc
 AUTOLOGIN=/etc/systemd/system/getty@tty1.service.d/autologin.conf
@@ -46,9 +46,6 @@ WRAPPER_TEXT='#!/bin/sh
 # ตัวช่วยสร้างบัญชี/กู้คืน (การ์ด 0012) · เรียกได้จากหน้า Login ผ่าน sudo เท่านั้น · คำขอเป็น JSON ทาง stdin
 # -I = ไม่อ่าน PYTHONPATH และ site ของผู้ใช้ → โหลดโค้ดจาก /opt/aipc-v2 ที่ root เป็นเจ้าของเท่านั้น
 exec /opt/aipc-v2/.venv/bin/python -I -m aipc.accounts.helper'
-PAM_TEXT='# ตรวจรหัสผ่านผู้ดูแลตอนอนุมัติบัญชีใหม่ (aipc การ์ด 0012)
-auth    required pam_unix.so
-account required pam_unix.so'
 SUDOERS_TEXT='# หน้า Login ของ aipc (ผู้ใช้ _greetd) เรียกตัวช่วยสร้างบัญชีได้คำสั่งเดียว ห้ามใส่อาร์กิวเมนต์ (การ์ด 0012)
 _greetd ALL=(root) NOPASSWD: /usr/local/sbin/aipc-accounts ""'
 
@@ -83,8 +80,12 @@ install_text() {  # install_text <ไฟล์ปลายทาง> <โหม�
 
 say ""; say "1) ตัวช่วย $WRAPPER"
 install_text "$WRAPPER" 0755 "$WRAPPER_TEXT"
-say ""; say "2) PAM $PAMFILE"
-install_text "$PAMFILE" 0644 "$PAM_TEXT"
+say ""; say "2) ไฟล์ PAM ของรุ่นก่อน"
+if [ -f "$PAMFILE" ]; then
+  if [ "$MODE" = "apply" ]; then rm -f "$PAMFILE" && say "+ ลบ $PAMFILE"; else say "[จะลบ] $PAMFILE"; fi
+else
+  say "   ไม่มี · ไม่ต้องทำอะไร"
+fi
 
 say ""; say "3) กฎ sudo $SUDOERS (ตรวจด้วย visudo ก่อน)"
 if [ "$MODE" = "apply" ]; then

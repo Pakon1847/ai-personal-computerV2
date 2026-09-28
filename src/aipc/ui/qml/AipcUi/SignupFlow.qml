@@ -1,5 +1,6 @@
 // สมัครบัญชีจากหน้า Login (การ์ด 0012 · BRIEF 5.1 ข้อ 3–4)
-// ลำดับ: บัญชี+รหัสผ่าน → ผู้ดูแลอนุมัติ (สร้างบัญชีจริงตรงนี้) → รหัสกู้คืน (แสดงครั้งเดียว) → พร้อมใช้
+// ลำดับ: บัญชี+รหัสผ่าน (กด "สร้างบัญชี" = สร้างจริง) → รหัสกู้คืน (แสดงครั้งเดียว) → พร้อมใช้
+// สมัครเสรี ไม่ต้องมีผู้ดูแลอนุมัติ (Pakon 2026-09-29)
 // หน้าจอตรวจฟอร์มเพื่อบอกผู้ใช้เร็ว ๆ เท่านั้น · ตัวช่วย root ตรวจซ้ำทุกข้อก่อนสร้าง (H7)
 // ลงทะเบียนใบหน้าอยู่ในหน้าตั้งค่าหลังเข้าครั้งแรก (BRIEF 5.1 ข้อ 6: ต้องยืนยันตัวตนก่อน)
 import QtQuick
@@ -10,7 +11,7 @@ import AipcUi
 Rectangle {
     id: root
     color: Theme.bg
-    property int page: 0                 // 0 บัญชี 1 อนุมัติ 2 รหัสกู้คืน 3 เสร็จ
+    property int page: 0                 // 0 บัญชี 1 รหัสกู้คืน 2 เสร็จ
     property string recoveryCode: ""
     property bool simulated: false       // หน้าต่างพัฒนา: ผลจำลอง ต้องเขียนว่า "จำลอง" (H5)
     property string loginError: ""
@@ -23,20 +24,19 @@ Rectangle {
 
     Component.onCompleted: {
         page = startSignupStep
-        if (page >= 2) { recoveryCode = "จำลอง-XXXX-XXXX"; simulated = true }  // ถ่ายภาพ/ทดสอบหน้าจอ
+        if (page >= 1) { recoveryCode = "จำลอง-XXXX-XXXX"; simulated = true }  // ถ่ายภาพ/ทดสอบหน้าจอ
     }
 
     Connections {
         target: signup
         function onFinished(r) {
-            adminPw.text = ""  // ไม่ถือรหัสผู้ดูแลค้างไว้
             if (r.ok) {
                 root.recoveryCode = r.recovery_code
                 root.simulated = r.simulated === true
-                approveMsg.text = ""
-                root.page = 2
+                createMsg.text = ""
+                root.page = 1
             } else {
-                approveMsg.text = r.message
+                createMsg.text = r.message
             }
         }
     }
@@ -53,7 +53,7 @@ Rectangle {
             Layout.fillWidth: true
             BrandMark { title: "สมัครบัญชี" }
             Item { Layout.fillWidth: true }
-            AppButton { text: "ยกเลิก กลับหน้า Login"; kind: "ghost"; visible: root.page < 2; enabled: !signup.busy
+            AppButton { text: "ยกเลิก กลับหน้า Login"; kind: "ghost"; visible: root.page < 1; enabled: !signup.busy
                         onClicked: AppState.go("login") }
         }
 
@@ -125,11 +125,23 @@ Rectangle {
                             }
                         }
                         Item { Layout.fillHeight: true }
+                        AppText {
+                            id: createMsg
+                            objectName: "createMsg"
+                            visible: text !== ""
+                            color: Theme.danger
+                            Layout.fillWidth: true
+                        }
+                        AppText { visible: signup.busy; text: "กำลังสร้างบัญชี…"; color: Theme.inkMuted }
                         RowLayout {
                             Layout.alignment: Qt.AlignRight
                             spacing: 12
-                            AppButton { text: "ย้อนกลับ"; kind: "secondary"; onClicked: AppState.go("login") }
-                            AppButton { text: "ถัดไป"; enabled: root.accountValid; onClicked: root.page = 1 }
+                            AppButton { text: "ย้อนกลับ"; kind: "secondary"; enabled: !signup.busy; onClicked: AppState.go("login") }
+                            AppButton {
+                                text: "สร้างบัญชี"
+                                enabled: root.accountValid && !signup.busy
+                                onClicked: signup.create(nameField.text, userField.text, pw1.text)
+                            }
                         }
                     }
                 }
@@ -153,46 +165,7 @@ Rectangle {
                 }
             }
 
-            // ---------- 2. ผู้ดูแลอนุมัติ (สร้างบัญชีจริงตรงนี้) ----------
-            Card {
-                highlight: true
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 32
-                    spacing: 14
-                    AppText { text: "ผู้ดูแลต้องอนุมัติบัญชีใหม่"; size: Theme.fontTitle; strong: true }
-                    AppText { text: "ให้ผู้ดูแลเครื่องพิมพ์ชื่อผู้ใช้และรหัสผ่านของตัวเองที่นี่ เพื่อสร้างบัญชีของ “" + nameField.text + "”"
-                              color: Theme.inkMuted; Layout.fillWidth: true }
-                    GridLayout {
-                        Layout.fillWidth: true
-                        columns: 2
-                        columnSpacing: 16
-                        AppField { id: adminUser; objectName: "adminUser"; Layout.fillWidth: true; label: "ชื่อผู้ใช้ของผู้ดูแล"; mono: true }
-                        AppField { id: adminPw; objectName: "adminPw"; Layout.fillWidth: true; label: "รหัสผ่านของผู้ดูแล"; password: true; emphasis: true }
-                    }
-                    AppText {
-                        id: approveMsg
-                        objectName: "approveMsg"
-                        visible: text !== ""
-                        color: Theme.danger
-                        Layout.fillWidth: true
-                    }
-                    AppText { visible: signup.busy; text: "กำลังตรวจรหัสผู้ดูแลและสร้างบัญชี…"; color: Theme.inkMuted }
-                    Item { Layout.fillHeight: true }
-                    RowLayout {
-                        Layout.alignment: Qt.AlignRight
-                        spacing: 12
-                        AppButton { text: "ย้อนกลับ"; kind: "secondary"; enabled: !signup.busy; onClicked: root.page = 0 }
-                        AppButton {
-                            text: "อนุมัติและสร้างบัญชี"
-                            enabled: !signup.busy && adminUser.text.trim() !== "" && adminPw.text !== ""
-                            onClicked: signup.create(nameField.text, userField.text, pw1.text, adminUser.text, adminPw.text)
-                        }
-                    }
-                }
-            }
-
-            // ---------- 3. รหัสกู้คืน (แสดงครั้งเดียว) ----------
+            // ---------- 2. รหัสกู้คืน (แสดงครั้งเดียว) ----------
             Card {
                 ColumnLayout {
                     anchors.fill: parent
@@ -248,12 +221,12 @@ Rectangle {
                         spacing: 12
                         Item { Layout.fillWidth: true }
                         AppCheck { id: wroteDown; text: "ฉันจดไว้แล้ว" }
-                        AppButton { text: "ถัดไป"; enabled: wroteDown.checked; onClicked: { root.recoveryCode = ""; root.page = 3 } }
+                        AppButton { text: "ถัดไป"; enabled: wroteDown.checked; onClicked: { root.recoveryCode = ""; root.page = 2 } }
                     }
                 }
             }
 
-            // ---------- 4. พร้อมใช้ ----------
+            // ---------- 3. พร้อมใช้ ----------
             Card {
                 ColumnLayout {
                     anchors.centerIn: parent

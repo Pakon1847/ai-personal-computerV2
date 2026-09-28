@@ -1,4 +1,4 @@
-"""ตัวช่วยสร้างบัญชี/กู้คืน (การ์ด 0012 ข้อ 8) · ระบบปลอม: ไม่มี PAM, useradd หรือ root จริง."""
+"""ตัวช่วยสร้างบัญชี/กู้คืน (การ์ด 0012 ข้อ 8) · ระบบปลอม: ไม่มี useradd หรือ root จริง."""
 
 import json
 import os
@@ -10,7 +10,6 @@ from pathlib import Path
 from aipc.accounts import helper, validation
 
 PW = "correct-horse-9"
-ADMIN_PW = "admin-secret-77"
 CANARY = "CANARY-4bd1"  # ต้องไม่หลุดไปอยู่ใน argv หรือ log
 
 
@@ -18,9 +17,8 @@ class FakeSystem(helper.System):
     def __init__(self, tmp: Path):
         self.state = tmp / "state"
         self.homes = {"pakon": tmp / "home" / "pakon"}
-        self.admins = {"pakon"}
-        self.passwords = {"pakon": ADMIN_PW}
-        self.groups = {"video", "audio"}  # ไม่มี render → ต้องไม่ใส่
+        self.passwords = {}
+        self.groups = {"video", "audio", "sudo"}  # ไม่มี render → ต้องไม่ใส่
         self.calls, self.stdins, self.logs = [], [], []
         self.fail = set()  # คำสั่งที่จะล้ม เช่น {"chpasswd"}
         self.who = "_greetd"
@@ -35,12 +33,6 @@ class FakeSystem(helper.System):
 
     def group_exists(self, group):
         return group in self.groups
-
-    def in_group(self, user, group):
-        return group == "sudo" and user in self.admins
-
-    def authenticate(self, user, password):
-        return self.passwords.get(user) == password
 
     def run(self, argv, stdin=None):
         self.calls.append(argv)
@@ -71,8 +63,7 @@ def req(**kw):
 
 
 def create_req(**over):
-    base = {"op": "create", "username": "namfon", "display_name": "น้ำฝน", "password": PW,
-            "admin": "pakon", "admin_password": ADMIN_PW}  # fmt: skip
+    base = {"op": "create", "username": "namfon", "display_name": "น้ำฝน", "password": PW}
     base.update(over)
     return req(**base)
 
@@ -87,7 +78,7 @@ class HelperTest(unittest.TestCase):
         return [c for c in self.sys.calls if c[0] == "useradd"]
 
     # ---------- สมัคร ----------
-    def test_create_with_admin_approval(self):
+    def test_create_without_admin(self):  # สมัครเสรี (Pakon 2026-09-29)
         r = helper.handle(create_req(), self.sys)
         self.assertTrue(r["ok"], r)
         self.assertEqual(self.sys.passwords["namfon"], PW)
@@ -99,19 +90,19 @@ class HelperTest(unittest.TestCase):
         self.assertEqual(len(validation.normalize_recovery_code(code)), 24)
         self.assertFalse((self.sys.state / "pending" / "namfon").exists())
 
-    def test_wrong_admin_password_never_runs_useradd(self):
-        for over in ({"admin_password": "wrong"}, {"admin": ""}, {"admin": "somchai"}):
-            with self.subTest(**over):
-                r = helper.handle(create_req(**over), self.sys)
-                self.assertFalse(r["ok"])
-                self.assertEqual(r["message"], helper.ADMIN_FAIL)  # ข้อความเดียวกันทุกกรณี
-        self.assertEqual(self.useradd_calls(), [])
+    def test_new_account_never_gets_admin_rights(self):
+        # เครื่องมีกลุ่ม sudo แต่บัญชีที่สมัครเองต้องไม่ได้ · ใส่ groups ในคำขอมาก็ไม่มีผล
+        helper.handle(create_req(groups="sudo"), self.sys)
+        add = self.useradd_calls()[0]
+        self.assertEqual(add[add.index("--groups") + 1], "video,audio")
+        self.assertTrue(all("sudo" not in arg for arg in add))
 
-    def test_non_admin_with_right_password_is_refused(self):
-        self.sys.passwords["somchai"] = "somchai-pass-1"
-        r = helper.handle(create_req(admin="somchai", admin_password="somchai-pass-1"), self.sys)
-        self.assertEqual(r["message"], helper.ADMIN_FAIL)
-        self.assertEqual(self.useradd_calls(), [])
+    def test_taken_username_is_refused(self):
+        self.assertTrue(helper.handle(create_req(), self.sys)["ok"])
+        r = helper.handle(create_req(password="another-pass-42"), self.sys)
+        self.assertFalse(r["ok"])
+        self.assertEqual(self.sys.passwords["namfon"], PW, "ห้ามเปลี่ยนรหัสของบัญชีที่มีอยู่แล้ว")
+        self.assertEqual(len(self.useradd_calls()), 1)
 
     def test_rules_are_checked_again_by_the_helper(self):
         bad = [{"username": "root\n"}, {"username": "pakon"}, {"username": "Namfon"},
@@ -156,7 +147,6 @@ class HelperTest(unittest.TestCase):
         helper.handle(create_req(password=CANARY + "-password"), self.sys)
         self.assertTrue(all(CANARY not in " ".join(c) for c in self.sys.calls))
         self.assertTrue(all(CANARY not in line for line in self.sys.logs))
-        self.assertTrue(all(ADMIN_PW not in line for line in self.sys.logs))
 
     # ---------- กู้คืน ----------
     def recover(self, code, pw="new-password-99"):
@@ -192,14 +182,6 @@ class HelperTest(unittest.TestCase):
         path = self.sys.state / "recovery" / "namfon.json"
         self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
         self.assertNotIn("recovery_code", path.read_text())
-
-
-class PamTest(unittest.TestCase):
-    @unittest.skipUnless(sys.platform.startswith("linux"), "PAM มีบน Linux เท่านั้น")
-    def test_unknown_user_is_refused_without_crashing(self):
-        from aipc.accounts import pam
-
-        self.assertFalse(pam.authenticate("login", "aipc-no-such-user-xyz", "whatever"))
 
 
 if __name__ == "__main__":

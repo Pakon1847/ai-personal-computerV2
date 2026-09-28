@@ -31,7 +31,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--theme", choices=("light", "dark"))
     p.add_argument("--dev", action="store_true")
     p.add_argument("--demo-scan", choices=("found", "scanning", "unknown", "manual"))
-    p.add_argument("--signup-step", type=int, default=0, help="0–5 เปิดหน้าสมัครที่ขั้นนี้")
+    p.add_argument("--signup-step", type=int, default=0, help="0–2 เปิดหน้าสมัครที่ขั้นนี้")
     p.add_argument("--screenshot", type=Path)
     p.add_argument("--software", action="store_true")
     p.add_argument("--fullscreen", action="store_true")
