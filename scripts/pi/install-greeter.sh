@@ -43,8 +43,9 @@ if [ "$MODE" = "rollback" ]; then
   need_root
   systemctl disable greetd || true
   systemctl enable lightdm
-  LAST="$(ls -1t "$CONF".before-aipc-* 2>/dev/null | head -1 || true)"
-  if [ -n "$LAST" ]; then cp -a "$LAST" "$CONF"; say "+ คืน $CONF จาก $LAST"; fi
+  # ไฟล์สำรองที่ **เก่าที่สุด** = config ของ OS ก่อนติดตั้งครั้งแรก (ทุก --apply สร้างสำรองใหม่ · ตรวจ 2026-09-28)
+  FIRST="$(ls -1tr "$CONF".before-aipc-* 2>/dev/null | head -1 || true)"
+  if [ -n "$FIRST" ]; then cp -a "$FIRST" "$CONF"; say "+ คืน $CONF จาก $FIRST"; fi
   say "เสร็จ · รีบูตแล้วจะกลับมาเป็นหน้า login ของ Raspberry Pi OS · $DEST ยังอยู่ (ลบเองได้)"
   exit 0
 fi
@@ -141,7 +142,10 @@ printf '%s\n' "$NEW" | sed 's/^/   /'
 # ---------- ยืนยันทางเข้าสำรองก่อนเปลี่ยนหน้า login ----------
 if [ "$MODE" = "apply" ]; then
   getent passwd _greetd >/dev/null || { say "หยุด: ไม่มีผู้ใช้ _greetd (แพ็กเกจ greetd ควรสร้างให้)"; exit 1; }
-  [ -f "$CONF" ] && cp -a "$CONF" "$CONF.before-aipc-$STAMP" && say "+ สำรอง $CONF.before-aipc-$STAMP"
+  if [ -f "$CONF" ]; then  # สำรองไม่สำเร็จ = หยุด ห้ามเขียนทับโดยไม่มีสำรอง (เดิม cp ล้มแล้วเขียนทับต่อ)
+    cp -a "$CONF" "$CONF.before-aipc-$STAMP" || { say "หยุด: สำรอง $CONF ไม่ได้"; exit 1; }
+    say "+ สำรอง $CONF.before-aipc-$STAMP"
+  fi
   mkdir -p "$(dirname "$CONF")"
   printf '%s\n' "$NEW" > "$CONF"
   say "+ เขียน $CONF"
