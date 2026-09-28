@@ -41,31 +41,35 @@ class SignupControllerTest(unittest.TestCase):
         def runner(request):
             seen.append(request)
             gate.wait(2)
-            return {"ok": True, "message": "สร้างแล้ว", "recovery_code": "AAAA-BBBB"}
+            return {"ok": True, "message": "สร้างแล้ว"}
 
         s, results = self.make(real=True, runner=runner)
-        self.assertTrue(s.create("น้ำฝน ", "namfon", "correct-horse-9"))
+        self.assertTrue(s.create("น้ำฝน ", "namfon", "correct-horse-9", "482917"))
         self.assertTrue(s.busy, "ระหว่างรอ หน้าจอต้องรู้ว่ากำลังทำ (ปุ่มปิด)")
-        self.assertFalse(s.create("x", "y", "z"), "ห้ามส่งซ้ำระหว่างรอ")
+        self.assertFalse(s.create("x", "y", "z", "1"), "ห้ามส่งซ้ำระหว่างรอ")
         gate.set()
         wait_for(results)
         self.assertFalse(s.busy)
-        self.assertEqual(results[0]["recovery_code"], "AAAA-BBBB")
+        self.assertTrue(results[0]["ok"])
         self.assertEqual(seen[0]["op"], "create")
         self.assertEqual(seen[0]["display_name"], "น้ำฝน")
-        self.assertEqual(set(seen[0]), {"op", "display_name", "username", "password"})
+        self.assertEqual(set(seen[0]), {"op", "display_name", "username", "password", "pin"})
 
     def test_dev_mode_is_clearly_simulated(self):
         s, results = self.make(dev=True)
-        s.recover("namfon", "XXXX", "correct-horse-9")
+        s.recover("namfon", "482917", "correct-horse-9")
         self.assertTrue(results[0]["simulated"])
         self.assertIn("จำลอง", results[0]["message"])
-        self.assertIn("จำลอง", results[0]["recovery_code"])
 
     def test_plain_window_refuses(self):
         s, results = self.make()
-        s.create("น้ำฝน", "namfon", "correct-horse-9")
+        s.create("น้ำฝน", "namfon", "correct-horse-9", "482917")
         self.assertFalse(results[0]["ok"])
+
+    def test_pin_check_for_the_form(self):
+        s, _ = self.make()
+        self.assertTrue(s.checkPin("482917", "482917")["ok"])
+        self.assertFalse(s.checkPin("123456", "123456")["ok"])
 
     def test_missing_helper_is_reported_not_crashed(self):
         # เครื่องที่ยังไม่ได้ติดตั้งตัวช่วย: sudo หาไม่เจอหรือตอบไม่ใช่ JSON → บอกเหตุผล ไม่พัง

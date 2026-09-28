@@ -388,11 +388,8 @@ class SignupController(QObject):
             return False
         if not self._real:
             if self._dev:
-                code = "จำลอง-" + validation.new_recovery_code(groups=2)
                 msg = "จำลอง (โหมดพัฒนา) · ไม่ได้สร้างหรือเปลี่ยนบัญชีจริง"
-                self.finished.emit(
-                    {"ok": True, "simulated": True, "message": msg, "recovery_code": code}
-                )
+                self.finished.emit({"ok": True, "simulated": True, "message": msg})
             else:
                 self.finished.emit(
                     {"ok": False, "message": "สมัครและกู้คืนได้เฉพาะหน้า Login จริงของเครื่อง"}
@@ -410,15 +407,20 @@ class SignupController(QObject):
         self.changed.emit()
         self.finished.emit(result)
 
-    @Slot(str, str, str, result=bool)
-    def create(self, display: str, username: str, password: str) -> bool:
+    @Slot(str, str, str, str, result=bool)
+    def create(self, display: str, username: str, password: str, pin: str) -> bool:
         return self._submit({"op": "create", "display_name": display.strip(), "username": username,
-                             "password": password})  # fmt: skip
+                             "password": password, "pin": pin})  # fmt: skip
 
     @Slot(str, str, str, result=bool)
-    def recover(self, username: str, code: str, new_password: str) -> bool:
-        return self._submit({"op": "recover", "username": username.strip(), "recovery_code": code,
+    def recover(self, username: str, pin: str, new_password: str) -> bool:
+        return self._submit({"op": "recover", "username": username.strip(), "pin": pin,
                              "new_password": new_password})  # fmt: skip
+
+    @Slot(str, str, result="QVariantMap")
+    def checkPin(self, pin: str, confirm: str) -> dict:  # noqa: N802
+        r = validation.check_pin(pin, confirm)
+        return {"ok": r.ok, "message": r.message}
 
     @Slot(str, result="QVariantMap")
     def checkDisplayName(self, name: str) -> dict:  # noqa: N802

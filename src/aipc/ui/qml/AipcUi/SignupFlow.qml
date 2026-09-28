@@ -1,5 +1,6 @@
 // สมัครบัญชีจากหน้า Login (การ์ด 0012 · BRIEF 5.1 ข้อ 3–4)
-// ลำดับ: บัญชี+รหัสผ่าน (กด "สร้างบัญชี" = สร้างจริง) → รหัสกู้คืน (แสดงครั้งเดียว) → พร้อมใช้
+// ลำดับ: บัญชี+รหัสผ่าน → ตั้ง PIN กู้คืน (กด "สร้างบัญชี" = สร้างจริง) → พร้อมใช้
+// PIN แทนรหัสกู้คืนสุ่ม 24 ตัว (Pakon 2026-09-29: จำง่ายกว่า · การ์ด 0012 หัวข้อ 11)
 // สมัครเสรี ไม่ต้องมีผู้ดูแลอนุมัติ (Pakon 2026-09-29)
 // หน้าจอตรวจฟอร์มเพื่อบอกผู้ใช้เร็ว ๆ เท่านั้น · ตัวช่วย root ตรวจซ้ำทุกข้อก่อนสร้าง (H7)
 // ลงทะเบียนใบหน้าอยู่ในหน้าตั้งค่าหลังเข้าครั้งแรก (BRIEF 5.1 ข้อ 6: ต้องยืนยันตัวตนก่อน)
@@ -11,8 +12,7 @@ import AipcUi
 Rectangle {
     id: root
     color: Theme.bg
-    property int page: 0                 // 0 บัญชี 1 รหัสกู้คืน 2 เสร็จ
-    property string recoveryCode: ""
+    property int page: 0                 // 0 บัญชี 1 PIN กู้คืน 2 เสร็จ
     property bool simulated: false       // หน้าต่างพัฒนา: ผลจำลอง ต้องเขียนว่า "จำลอง" (H5)
     property string loginError: ""
 
@@ -21,20 +21,22 @@ Rectangle {
     readonly property var pwCheck: signup.checkPassword(pw1.text, pw2.text)
     readonly property int strength: signup.strength(pw1.text)
     readonly property bool accountValid: nameCheck.ok && userCheck.ok && pwCheck.ok
+    readonly property var pinCheck: signup.checkPin(pin1.text, pin2.text)
 
     Component.onCompleted: {
         page = startSignupStep
-        if (page >= 1) { recoveryCode = "จำลอง-XXXX-XXXX"; simulated = true }  // ถ่ายภาพ/ทดสอบหน้าจอ
+        if (page >= 2) simulated = true  // ถ่ายภาพ/ทดสอบหน้าจอ
     }
 
     Connections {
         target: signup
         function onFinished(r) {
             if (r.ok) {
-                root.recoveryCode = r.recovery_code
+                pin1.text = ""  // ไม่ถือ PIN ค้างไว้หลังสร้างบัญชีแล้ว
+                pin2.text = ""
                 root.simulated = r.simulated === true
                 createMsg.text = ""
-                root.page = 1
+                root.page = 2
             } else {
                 createMsg.text = r.message
             }
@@ -53,7 +55,7 @@ Rectangle {
             Layout.fillWidth: true
             BrandMark { title: "สมัครบัญชี" }
             Item { Layout.fillWidth: true }
-            AppButton { text: "ยกเลิก กลับหน้า Login"; kind: "ghost"; visible: root.page < 1; enabled: !signup.busy
+            AppButton { text: "ยกเลิก กลับหน้า Login"; kind: "ghost"; visible: root.page < 2; enabled: !signup.busy
                         onClicked: AppState.go("login") }
         }
 
@@ -125,23 +127,11 @@ Rectangle {
                             }
                         }
                         Item { Layout.fillHeight: true }
-                        AppText {
-                            id: createMsg
-                            objectName: "createMsg"
-                            visible: text !== ""
-                            color: Theme.danger
-                            Layout.fillWidth: true
-                        }
-                        AppText { visible: signup.busy; text: "กำลังสร้างบัญชี…"; color: Theme.inkMuted }
                         RowLayout {
                             Layout.alignment: Qt.AlignRight
                             spacing: 12
-                            AppButton { text: "ย้อนกลับ"; kind: "secondary"; enabled: !signup.busy; onClicked: AppState.go("login") }
-                            AppButton {
-                                text: "สร้างบัญชี"
-                                enabled: root.accountValid && !signup.busy
-                                onClicked: signup.create(nameField.text, userField.text, pw1.text)
-                            }
+                            AppButton { text: "ย้อนกลับ"; kind: "secondary"; onClicked: AppState.go("login") }
+                            AppButton { text: "ถัดไป"; enabled: root.accountValid; onClicked: root.page = 1 }
                         }
                     }
                 }
@@ -159,69 +149,87 @@ Rectangle {
                         AppText { Layout.fillWidth: true; color: Theme.bubbleInk
                                   text: "ทุกบัญชีเป็นบัญชีของเครื่องจริง ไฟล์ แชท และนัดหมายของคุณอยู่ในโฟลเดอร์ที่ผู้ใช้คนอื่นเปิดไม่ได้" }
                         AppText { Layout.fillWidth: true; color: Theme.bubbleInk
-                                  text: "ลืมรหัสผ่านได้ ใช้รหัสกู้คืนที่ได้ในขั้นถัดไปตั้งรหัสใหม่ · ลงทะเบียนใบหน้าได้ในหน้าตั้งค่าหลังเข้าใช้" }
+                                  text: "ลืมรหัสผ่านได้ ใช้ PIN ที่ตั้งในขั้นถัดไปตั้งรหัสใหม่ · ลงทะเบียนใบหน้าได้ในหน้าตั้งค่าหลังเข้าใช้" }
                         Item { Layout.fillHeight: true }
                     }
                 }
             }
 
-            // ---------- 2. รหัสกู้คืน (แสดงครั้งเดียว) ----------
+            // ---------- 2. ตั้ง PIN กู้คืน (กด "สร้างบัญชี" = สร้างจริงตรงนี้) ----------
             Card {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 32
-                    spacing: 18
+                    spacing: 16
                     RowLayout {
                         spacing: 12
                         Rectangle {
                             width: 44; height: 44; radius: Theme.radiusCard; color: Theme.accentSoft
                             Icon { anchors.centerIn: parent; path: Icons.key; color: Theme.accentInk; width: 22; height: 22 }
                         }
-                        AppText { text: "จดรหัสกู้คืนไว้ในที่ปลอดภัย"; size: Theme.fontTitle; strong: true }
+                        AppText { text: "ตั้ง PIN สำหรับกู้คืนรหัสผ่าน"; size: Theme.fontTitle; strong: true }
                     }
-                    Rectangle {
+                    AppText { Layout.fillWidth: true; color: Theme.inkMuted
+                              text: "ถ้าลืมรหัสผ่าน ใช้ PIN นี้ที่หน้า Login (“ลืมรหัสผ่าน?”) เพื่อตั้งรหัสใหม่ · ตัวเลข 6–12 หลัก" }
+                    GridLayout {
                         Layout.fillWidth: true
-                        implicitHeight: 88
-                        radius: Theme.radiusCard
-                        color: Theme.surface2
-                        border.width: 1
-                        border.color: Theme.lineStrong
-                        Text {
-                            objectName: "recoveryCode"
-                            anchors.centerIn: parent
-                            text: root.recoveryCode
-                            font.family: Theme.mono
-                            font.pixelSize: Theme.px(28)
-                            font.letterSpacing: 2
-                            color: Theme.ink
-                            Accessible.name: "รหัสกู้คืน"
+                        columns: 2
+                        columnSpacing: 16
+                        AppField {
+                            id: pin1
+                            objectName: "pin1"
+                            Layout.fillWidth: true
+                            label: "PIN"; password: true; mono: true; emphasis: true
+                            field.inputMethodHints: Qt.ImhDigitsOnly
+                            field.maximumLength: 12
+                        }
+                        AppField {
+                            id: pin2
+                            objectName: "pin2"
+                            Layout.fillWidth: true
+                            label: "ยืนยัน PIN"; password: true; mono: true
+                            field.inputMethodHints: Qt.ImhDigitsOnly
+                            field.maximumLength: 12
+                            hint: pin1.text === "" ? "" : root.pinCheck.message
+                            hintKind: pin1.text === "" ? "normal" : root.pinCheck.ok ? "ok" : "error"
                         }
                     }
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: warnText.implicitHeight + 28
                         radius: Theme.radiusCard
-                        color: Theme.dangerSoft
+                        color: Theme.warnSoft
                         RowLayout {
                             anchors.fill: parent
                             anchors.margins: 14
                             spacing: 12
-                            Icon { path: Icons.alert; color: Theme.dangerInk; Layout.alignment: Qt.AlignTop }
+                            Icon { path: Icons.alert; color: Theme.warnInk; Layout.alignment: Qt.AlignTop }
                             AppText {
                                 id: warnText
                                 Layout.fillWidth: true
-                                color: Theme.dangerInk
-                                text: "แสดงครั้งเดียว · ถ้าลืมรหัสผ่าน ใช้รหัสนี้ที่หน้า Login (“ลืมรหัสผ่าน?”) เพื่อตั้งรหัสใหม่ · ใช้แล้วจะได้รหัสกู้คืนชุดใหม่"
+                                color: Theme.warnInk
+                                text: "ใครรู้ PIN นี้ ตั้งรหัสผ่านใหม่ให้บัญชีของคุณได้ · อย่าใช้วันเกิด เบอร์โทร หรือ PIN เดียวกับบัตร ATM · ใส่ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ"
                             }
                         }
                     }
+                    AppText {
+                        id: createMsg
+                        objectName: "createMsg"
+                        visible: text !== ""
+                        color: Theme.danger
+                        Layout.fillWidth: true
+                    }
+                    AppText { visible: signup.busy; text: "กำลังสร้างบัญชี…"; color: Theme.inkMuted }
                     Item { Layout.fillHeight: true }
                     RowLayout {
-                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignRight
                         spacing: 12
-                        Item { Layout.fillWidth: true }
-                        AppCheck { id: wroteDown; text: "ฉันจดไว้แล้ว" }
-                        AppButton { text: "ถัดไป"; enabled: wroteDown.checked; onClicked: { root.recoveryCode = ""; root.page = 2 } }
+                        AppButton { text: "ย้อนกลับ"; kind: "secondary"; enabled: !signup.busy; onClicked: root.page = 0 }
+                        AppButton {
+                            text: "สร้างบัญชี"
+                            enabled: root.accountValid && root.pinCheck.ok && !signup.busy
+                            onClicked: signup.create(nameField.text, userField.text, pw1.text, pin1.text)
+                        }
                     }
                 }
             }

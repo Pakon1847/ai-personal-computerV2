@@ -1,4 +1,3 @@
-import re
 import unittest
 
 from aipc.accounts import validation as v
@@ -48,17 +47,26 @@ class PasswordTest(unittest.TestCase):
         self.assertTrue(v.check_password("longenough1", "longenough1").ok)
 
 
-class RecoveryCodeTest(unittest.TestCase):
-    def test_format(self):
-        code = v.new_recovery_code()
-        self.assertRegex(code, r"^([0-9A-Z]{4}-){5}[0-9A-Z]{4}$")
+class PinTest(unittest.TestCase):
+    def test_good_pins(self):
+        for pin in ("482917", "๔๘๒๙๑๗", "4829 17", "730519204816"):
+            self.assertTrue(v.check_pin(pin, pin).ok, pin)
 
-    def test_no_confusable_letters(self):
-        code = v.new_recovery_code()
-        self.assertIsNone(re.search(r"[ILOU]", code))
+    def test_length_and_digits_only(self):
+        for pin in ("", "48291", "4829173051924", "48291a", "４８２９１７", "48-291"):
+            self.assertFalse(v.check_pin(pin, pin).ok, pin)
 
-    def test_codes_differ(self):
-        self.assertEqual(len({v.new_recovery_code() for _ in range(50)}), 50)
+    def test_easy_pins_rejected(self):
+        for pin in ("000000", "111111", "123456", "654321", "890123", "121212", "123123",
+                    "12341234", "112233", "147258"):  # fmt: skip
+            self.assertFalse(v.check_pin(pin, pin).ok, pin)
+
+    def test_confirm_must_match(self):
+        self.assertFalse(v.check_pin("482917", "482918").ok)
+        self.assertTrue(v.check_pin("482917", "๔๘๒๙๑๗").ok)  # เลขไทย = เลขอารบิก
+
+    def test_normalize(self):
+        self.assertEqual(v.normalize_pin(" ๔๘๒ ๙๑๗ "), "482917")
 
 
 if __name__ == "__main__":

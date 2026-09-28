@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import re
-import secrets
 from dataclasses import dataclass
 
 # ชื่อผู้ใช้กลายเป็นชื่อ Linux user (BRIEF หัวข้อ 4: 1 บัญชี = 1 Linux user)
@@ -117,23 +116,39 @@ def check_display_name(name: str) -> Result:
     return Result(True, "ใช้ได้")
 
 
-# ตัวอักษรของรหัสกู้คืน: Crockford base32 ตัด I L O U ออก
-# เพราะคนจดด้วยมือแล้วสับสนกับ 1 0 V ได้ง่าย
-RECOVERY_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+# PIN กู้คืนรหัสผ่าน (Pakon 2026-09-29: ตั้งเองจำง่ายกว่ารหัสสุ่ม 24 ตัว · การ์ด 0012 หัวข้อ 11)
+# PIN เดาง่ายกว่ารหัสสุ่มมาก สิ่งที่กันการเดาจริงคือการหน่วงเมื่อผิดหลายครั้งในตัวช่วย root
+# กฎนี้แค่ตัด PIN ที่คนเดาเป็นอันดับแรก ๆ ออก · วันเกิดตรวจไม่ได้ จึงเตือนที่หน้าจอแทน
+MIN_PIN, MAX_PIN = 6, 12
+THAI_DIGITS = str.maketrans("๐๑๒๓๔๕๖๗๘๙", "0123456789")
+COMMON_PINS = {"112233", "001122", "147258", "258369", "159357", "159753", "741852", "963852",
+               "789456", "142536", "102030", "010203"}  # fmt: skip
 
 
-def new_recovery_code(groups: int = 6, size: int = 4) -> str:
-    """รหัสกู้คืนแบบสุ่ม เช่น 7K2Q-9XMA-4TPE-8WRD-3HJN-6CFB.
-
-    ใช้ `secrets` ไม่ใช่ `random` เพราะ random เดาได้ถ้ารู้ค่าเริ่มต้น
-    ส่วน secrets ใช้ตัวสุ่มของระบบปฏิบัติการที่ออกแบบมาสำหรับความลับ
-    6 กลุ่ม × 4 ตัว × 5 บิต = 120 บิต — เดาสุ่มไม่ได้ในทางปฏิบัติ
-    """
-    chars = [secrets.choice(RECOVERY_ALPHABET) for _ in range(groups * size)]
-    return "-".join("".join(chars[i : i + size]) for i in range(0, len(chars), size))
+def normalize_pin(pin: str) -> str:
+    """ไม่สนช่องว่าง · เลขไทย ๐–๙ = 0–9 (แป้นไทยพิมพ์เลขไทยได้)."""
+    return re.sub(r"\s", "", pin).translate(THAI_DIGITS)
 
 
-def normalize_recovery_code(code: str) -> str:
-    """รหัสที่คนพิมพ์เองจากกระดาษ: ไม่สนตัวเล็ก/ใหญ่ ขีด และช่องว่าง · I L → 1 · O → 0 (Crockford)."""
-    s = re.sub(r"[\s-]", "", code).upper()
-    return s.translate(str.maketrans({"I": "1", "L": "1", "O": "0"}))
+def _easy_pin(pin: str) -> bool:
+    if pin in COMMON_PINS:
+        return True
+    steps = {(int(b) - int(a)) % 10 for a, b in zip(pin, pin[1:], strict=False)}
+    if steps in ({0}, {1}, {9}):  # 000000 · 123456 · 987654 (รวมแบบวน เช่น 890123)
+        return True
+    # ซ้ำเป็นชุด: 121212 · 123123 · 12341234
+    n = len(pin)
+    return any(n % k == 0 and pin == pin[:k] * (n // k) for k in range(1, n // 2 + 1))
+
+
+def check_pin(pin: str, confirm: str) -> Result:
+    pin, confirm = normalize_pin(pin), normalize_pin(confirm)
+    if not pin.isascii() or not pin.isdigit():
+        return Result(False, "ใช้ตัวเลขเท่านั้น")
+    if not MIN_PIN <= len(pin) <= MAX_PIN:
+        return Result(False, f"ใช้ตัวเลข {MIN_PIN}–{MAX_PIN} หลัก")
+    if _easy_pin(pin):
+        return Result(False, "เดาง่ายเกินไป (เลขซ้ำ เลขเรียง หรือวนซ้ำ)")
+    if pin != confirm:
+        return Result(False, "PIN สองช่องไม่ตรงกัน")
+    return Result(True, "ตรงกัน")

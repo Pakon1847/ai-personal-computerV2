@@ -11,7 +11,7 @@
 #   2. ลบ /etc/pam.d/aipc-accounts ของรุ่นก่อน (เคยใช้ตรวจรหัสผู้ดูแล · ตอนนี้สมัครเสรี ไม่ต้องใช้แล้ว)
 #   3. /etc/sudoers.d/aipc-accounts = ผู้ใช้ _greetd เรียกตัวช่วยได้คำสั่งเดียว ห้ามใส่อาร์กิวเมนต์
 #      **ตรวจด้วย visudo -c ก่อนติดตั้งเสมอ** (ไฟล์ sudoers ผิด = sudo ใช้ไม่ได้ทั้งเครื่อง)
-#   4. /var/lib/aipc (root 0700) = ที่เก็บ hash รหัสกู้คืน และงานสมัครค้าง
+#   4. /var/lib/aipc (root 0700) = ที่เก็บ hash ของ PIN กู้คืน และงานสมัครค้าง
 #   5. ปิด autologin ที่ tty1 (ย้ายไฟล์ไปเก็บ ไม่ลบ) · ไม่งั้นกด Ctrl+Alt+F1 = ได้ shell โดยไม่ใส่รหัส
 #   6. /etc/systemd/logind.conf.d/aipc.conf: KillUserProcesses=yes = ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้
 #      (BRIEF หัวข้อ 4 นิยาม Logout · AI ของคนก่อนไม่ค้าง) · มีผลหลังรีบูต · ไม่ restart logind (เซสชันที่เปิดอยู่จะหลุด)
@@ -57,7 +57,7 @@ if [ "$MODE" = "rollback" ]; then
     mkdir -p "$(dirname "$AUTOLOGIN")"
     mv "$PARKED" "$AUTOLOGIN" && systemctl daemon-reload && say "+ คืน autologin ที่ tty1"
   fi
-  say "เสร็จ · $STATE ยังอยู่ (มี hash รหัสกู้คืน · ลบเองได้ถ้าไม่ใช้แล้ว) · บัญชีที่สร้างไปแล้วยังอยู่"
+  say "เสร็จ · $STATE ยังอยู่ (มี hash ของ PIN กู้คืน · ลบเองได้ถ้าไม่ใช้แล้ว) · บัญชีที่สร้างไปแล้วยังอยู่"
   exit 0
 fi
 

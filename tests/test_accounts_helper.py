@@ -7,9 +7,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aipc.accounts import helper, validation
+from aipc.accounts import helper
 
 PW = "correct-horse-9"
+PIN = "482917"
 CANARY = "CANARY-4bd1"  # ต้องไม่หลุดไปอยู่ใน argv หรือ log
 
 
@@ -63,7 +64,8 @@ def req(**kw):
 
 
 def create_req(**over):
-    base = {"op": "create", "username": "namfon", "display_name": "น้ำฝน", "password": PW}
+    base = {"op": "create", "username": "namfon", "display_name": "น้ำฝน", "password": PW,
+            "pin": PIN}  # fmt: skip
     base.update(over)
     return req(**base)
 
@@ -86,8 +88,8 @@ class HelperTest(unittest.TestCase):
         add = self.useradd_calls()[0]
         self.assertIn("video,audio", add)  # เฉพาะกลุ่มที่เครื่องมี
         self.assertIn("น้ำฝน", add)
-        code = r["recovery_code"]
-        self.assertEqual(len(validation.normalize_recovery_code(code)), 24)
+        self.assertNotIn("recovery_code", r)  # PIN ตั้งเอง ไม่มีรหัสให้จด
+        self.assertTrue((self.sys.state / "recovery" / "namfon.json").exists())
         self.assertFalse((self.sys.state / "pending" / "namfon").exists())
 
     def test_new_account_never_gets_admin_rights(self):
@@ -107,7 +109,8 @@ class HelperTest(unittest.TestCase):
     def test_rules_are_checked_again_by_the_helper(self):
         bad = [{"username": "root\n"}, {"username": "pakon"}, {"username": "Namfon"},
                {"password": "short"}, {"display_name": "a:b"}, {"display_name": ""},
-               {"password": "line\nbreak-long-enough"}]  # fmt: skip
+               {"password": "line\nbreak-long-enough"}, {"pin": "123456"}, {"pin": "12345"},
+               {"pin": "12ab56"}, {"pin": ""}]  # fmt: skip
         for over in bad:
             with self.subTest(**over):
                 self.assertFalse(helper.handle(create_req(**over), self.sys)["ok"])
@@ -144,37 +147,54 @@ class HelperTest(unittest.TestCase):
         self.assertIn(["userdel", "-r", "namfon"], self.sys.calls)
 
     def test_passwords_and_codes_never_in_argv_or_log(self):
-        helper.handle(create_req(password=CANARY + "-password"), self.sys)
-        self.assertTrue(all(CANARY not in " ".join(c) for c in self.sys.calls))
-        self.assertTrue(all(CANARY not in line for line in self.sys.logs))
+        helper.handle(create_req(password=CANARY + "-password", pin="730519"), self.sys)
+        for secret in (CANARY, "730519"):
+            self.assertTrue(all(secret not in " ".join(c) for c in self.sys.calls))
+            self.assertTrue(all(secret not in line for line in self.sys.logs))
+        stored = (self.sys.state / "recovery" / "namfon.json").read_text()
+        self.assertNotIn("730519", stored, "เก็บแค่ hash ของ PIN")
 
     # ---------- กู้คืน ----------
-    def recover(self, code, pw="new-password-99"):
-        return helper.handle(req(op="recover", username="namfon", recovery_code=code,
+    def recover(self, pin, pw="new-password-99"):
+        return helper.handle(req(op="recover", username="namfon", pin=pin,
                                  new_password=pw), self.sys)  # fmt: skip
 
-    def test_recover_sets_new_password_and_rotates_code(self):
-        code = helper.handle(create_req(), self.sys)["recovery_code"]
-        r = self.recover(code.lower().replace("-", " "))  # พิมพ์ตัวเล็ก เว้นวรรค ก็ได้
+    def test_recover_sets_new_password_and_keeps_pin(self):
+        helper.handle(create_req(), self.sys)
+        r = self.recover("๔๘๒ ๙๑๗")  # เลขไทยและช่องว่างก็ได้
         self.assertTrue(r["ok"], r)
         self.assertEqual(self.sys.passwords["namfon"], "new-password-99")
-        self.assertNotEqual(r["recovery_code"], code)
-        self.assertFalse(self.recover(code)["ok"], "รหัสเก่าต้องใช้ไม่ได้ทันที")
-        self.assertTrue(self.recover(r["recovery_code"])["ok"])
+        self.assertNotIn("recovery_code", r)
+        self.assertTrue(self.recover(PIN, pw="third-password-3")["ok"], "PIN เดิมใช้ต่อได้")
+        self.assertEqual(self.sys.passwords["namfon"], "third-password-3")
 
-    def test_wrong_codes_make_you_wait(self):
-        code = helper.handle(create_req(), self.sys)["recovery_code"]
+    def test_wrong_pins_make_you_wait(self):
+        helper.handle(create_req(), self.sys)
         for _ in range(helper.FAIL_FREE):
-            self.assertEqual(self.recover("0000-0000-0000-0000-0000-0000")["message"],
-                             helper.RECOVER_FAIL)  # fmt: skip
-        r = self.recover(code)
+            self.assertEqual(self.recover("000001")["message"], helper.RECOVER_FAIL)
+        r = self.recover(PIN)
         self.assertFalse(r["ok"])
-        self.assertIn("นาที", r["message"])  # แม้รหัสถูกก็ต้องรอ
+        self.assertIn("นาที", r["message"])  # แม้ PIN ถูกก็ต้องรอ
         self.sys.clock += helper.WAIT_BASE_S + 1
-        self.assertTrue(self.recover(code)["ok"])
+        self.assertTrue(self.recover(PIN)["ok"])
 
-    def test_unknown_user_or_no_code_gives_the_same_message(self):
-        self.assertEqual(self.recover("ABCD")["message"], helper.RECOVER_FAIL)
+    def test_waits_grow_and_reset_after_success(self):
+        helper.handle(create_req(), self.sys)
+        path = self.sys.state / "recovery" / "namfon.json"
+        waits = []
+        for _ in range(helper.FAIL_FREE + 3):
+            self.recover("000001")
+            rec = json.loads(path.read_text())
+            waits.append(rec["wait_until"] - self.sys.clock)
+            self.sys.clock = max(self.sys.clock, rec["wait_until"]) + 1
+        free = helper.FAIL_FREE - 1  # ผิดครั้งที่ 5 เริ่มรอ
+        self.assertTrue(all(w <= 0 for w in waits[:free]))
+        self.assertEqual(waits[free:], [helper.WAIT_BASE_S * 2**i for i in range(4)])  # 1 2 4 8 นาที
+        self.assertTrue(self.recover(PIN)["ok"])
+        self.assertEqual(json.loads(path.read_text())["failed"], 0)
+
+    def test_unknown_user_or_no_pin_gives_the_same_message(self):
+        self.assertEqual(self.recover("482917")["message"], helper.RECOVER_FAIL)
 
     @unittest.skipIf(sys.platform == "win32", "สิทธิ์ไฟล์ 0600 ตรวจได้บน Linux")
     def test_recovery_file_is_private(self):

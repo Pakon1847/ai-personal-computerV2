@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Rectangle {
     id: root
     property int step: 1
-    readonly property var labels: ["บัญชีและรหัสผ่าน", "รหัสกู้คืน", "พร้อมใช้"]
+    readonly property var labels: ["บัญชีและรหัสผ่าน", "PIN กู้คืน", "พร้อมใช้"]
     implicitHeight: 52
     radius: Theme.radiusCard
     color: Theme.surface

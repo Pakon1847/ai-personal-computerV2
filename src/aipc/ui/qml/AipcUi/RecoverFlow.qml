@@ -1,5 +1,5 @@
-// ลืมรหัสผ่าน: ใช้รหัสกู้คืนตั้งรหัสผ่านใหม่ที่หน้า Login (การ์ด 0012)
-// ตัวช่วย root เทียบ hash ของรหัสกู้คืน · ผิดหลายครั้งต้องรอ · ใช้แล้วออกรหัสใหม่ให้ (อันเก่าใช้ไม่ได้ทันที)
+// ลืมรหัสผ่าน: ใช้ PIN ที่ตั้งตอนสมัครตั้งรหัสผ่านใหม่ที่หน้า Login (การ์ด 0012 หัวข้อ 11)
+// ตัวช่วย root เทียบ hash ของ PIN · ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ · สำเร็จแล้ว PIN เดิมใช้ต่อได้
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -8,17 +8,17 @@ import AipcUi
 Rectangle {
     id: root
     color: Theme.bg
-    property string newCode: ""
+    property bool done: false
     property bool simulated: false
     readonly property var pwCheck: signup.checkPassword(pw1.text, pw2.text)
-    readonly property bool formValid: userField.text.trim() !== "" && codeField.text.trim() !== "" && pwCheck.ok
+    readonly property bool formValid: userField.text.trim() !== "" && pinField.text.trim() !== "" && pwCheck.ok
 
     Connections {
         target: signup
         function onFinished(r) {
-            codeField.text = ""
+            pinField.text = ""
             if (r.ok) {
-                root.newCode = r.recovery_code
+                root.done = true
                 root.simulated = r.simulated === true
                 msg.text = ""
             } else {
@@ -45,13 +45,13 @@ Rectangle {
         Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            visible: root.newCode === ""
+            visible: !root.done
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 32
                 spacing: 14
-                AppText { text: "ตั้งรหัสผ่านใหม่ด้วยรหัสกู้คืน"; size: Theme.fontTitle; strong: true }
-                AppText { text: "รหัสกู้คืนคือรหัส 24 ตัวที่ได้ตอนสมัคร · พิมพ์ตัวเล็กหรือใหญ่ มีขีดหรือไม่มีก็ได้"
+                AppText { text: "ตั้งรหัสผ่านใหม่ด้วย PIN"; size: Theme.fontTitle; strong: true }
+                AppText { text: "PIN คือตัวเลข 6–12 หลักที่ตั้งไว้ตอนสมัคร · ใส่ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ"
                           color: Theme.inkMuted; Layout.fillWidth: true }
                 GridLayout {
                     Layout.fillWidth: true
@@ -59,8 +59,8 @@ Rectangle {
                     columnSpacing: 16
                     rowSpacing: 12
                     AppField { id: userField; objectName: "recoverUser"; Layout.fillWidth: true; label: "ชื่อผู้ใช้"; mono: true }
-                    AppField { id: codeField; objectName: "recoverCode"; Layout.fillWidth: true; label: "รหัสกู้คืน"; mono: true
-                               placeholder: "XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" }
+                    AppField { id: pinField; objectName: "recoverPin"; Layout.fillWidth: true; label: "PIN"; mono: true; password: true
+                               field.inputMethodHints: Qt.ImhDigitsOnly; field.maximumLength: 12 }
                     AppField { id: pw1; Layout.fillWidth: true; label: "รหัสผ่านใหม่"; password: true; emphasis: true }
                     AppField {
                         id: pw2
@@ -71,13 +71,13 @@ Rectangle {
                     }
                 }
                 AppText { id: msg; objectName: "recoverMsg"; visible: text !== ""; color: Theme.danger; Layout.fillWidth: true }
-                AppText { visible: signup.busy; text: "กำลังตรวจรหัสกู้คืน…"; color: Theme.inkMuted }
+                AppText { visible: signup.busy; text: "กำลังตรวจ PIN…"; color: Theme.inkMuted }
                 Item { Layout.fillHeight: true }
                 AppButton {
                     Layout.alignment: Qt.AlignRight
                     text: "ตั้งรหัสผ่านใหม่"
                     enabled: root.formValid && !signup.busy
-                    onClicked: signup.recover(userField.text, codeField.text, pw1.text)
+                    onClicked: signup.recover(userField.text, pinField.text, pw1.text)
                 }
             }
         }
@@ -85,38 +85,15 @@ Rectangle {
         Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            visible: root.newCode !== ""
+            visible: root.done
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 32
                 spacing: 18
                 AppText { text: root.simulated ? "ตั้งรหัสผ่านใหม่แล้ว (จำลอง)" : "ตั้งรหัสผ่านใหม่แล้ว"; size: Theme.fontTitle; strong: true }
-                AppText { text: "รหัสกู้คืนเดิมใช้ไม่ได้แล้ว · จดรหัสกู้คืนชุดใหม่นี้ไว้ แสดงครั้งเดียว"; Layout.fillWidth: true }
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 88
-                    radius: Theme.radiusCard
-                    color: Theme.surface2
-                    border.width: 1
-                    border.color: Theme.lineStrong
-                    Text {
-                        anchors.centerIn: parent
-                        text: root.newCode
-                        font.family: Theme.mono
-                        font.pixelSize: Theme.px(28)
-                        font.letterSpacing: 2
-                        color: Theme.ink
-                        Accessible.name: "รหัสกู้คืนใหม่"
-                    }
-                }
+                AppText { text: "เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย · PIN เดิมยังใช้กู้คืนครั้งต่อไปได้"; Layout.fillWidth: true }
                 Item { Layout.fillHeight: true }
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 12
-                    Item { Layout.fillWidth: true }
-                    AppCheck { id: wroteDown; text: "ฉันจดไว้แล้ว" }
-                    AppButton { text: "ไปหน้า Login"; enabled: wroteDown.checked; onClicked: AppState.go("login") }
-                }
+                AppButton { Layout.alignment: Qt.AlignRight; text: "ไปหน้า Login"; onClicked: AppState.go("login") }
             }
         }
     }

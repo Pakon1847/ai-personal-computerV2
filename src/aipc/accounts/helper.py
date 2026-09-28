@@ -8,7 +8,7 @@
 
 หลัก H7: หน้าจอไม่ตัดสินอะไร ตัวช่วยนี้ตรวจซ้ำเองทุกข้อ
 - ชื่อ/รหัส/ชื่อที่แสดง → กฎชุดเดียวกับหน้าจอ (aipc.accounts.validation)
-- รหัสกู้คืน → เทียบ hash · ผิดหลายครั้งต้องรอ
+- PIN กู้คืน → เทียบ hash · ผิดหลายครั้งต้องรอ (สิ่งนี้คือตัวกันการเดา PIN จริง)
 
 หลัก H1: สร้างบัญชีแบบ "ครบหรือไม่มีเลย" — จดงานค้างก่อน useradd แล้วลบเมื่อสำเร็จ
 ไฟดับกลางคัน → เรียกครั้งถัดไปลบบัญชีครึ่ง ๆ ทิ้งก่อนทำงานใหม่ (ไม่มีบัญชีที่ไม่มีรหัสผ่านค้าง)
@@ -35,7 +35,7 @@ REQUEST_MAX = 4096
 FAIL_FREE = 5  # ผิดได้เท่านี้ก่อนต้องรอ
 WAIT_BASE_S, WAIT_MAX_S = 60, 3600
 SCRYPT = {"n": 2**14, "r": 8, "p": 1}  # ใช้หน่วยความจำราว 16 MB · 0.1–0.5 วิบน Pi (ค่าประมาณ)
-RECOVER_FAIL = "ชื่อผู้ใช้หรือรหัสกู้คืนไม่ถูกต้อง"  # ไม่บอกว่ามีบัญชีนี้หรือไม่
+RECOVER_FAIL = "ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง"  # ไม่บอกว่ามีบัญชีนี้หรือไม่
 
 
 class System:
@@ -116,18 +116,16 @@ def _recovery_file(system: System, user: str) -> Path:
     return system.state / "recovery" / f"{user}.json"
 
 
-def _hash(code: str, salt: bytes) -> str:
-    norm = validation.normalize_recovery_code(code).encode()
+def _hash(pin: str, salt: bytes) -> str:
+    norm = validation.normalize_pin(pin).encode()
     return hashlib.scrypt(norm, salt=salt, maxmem=64 * 1024 * 1024, **SCRYPT).hex()
 
 
-def _new_recovery(system: System, user: str) -> str:
-    code = validation.new_recovery_code()
+def _set_pin(system: System, user: str, pin: str) -> None:
     salt = os.urandom(16)
     _write_private(_recovery_file(system, user),
-                   {"salt": salt.hex(), "hash": _hash(code, salt), "scrypt": SCRYPT,
+                   {"kind": "pin", "salt": salt.hex(), "hash": _hash(pin, salt), "scrypt": SCRYPT,
                     "issued": int(system.now()), "failed": 0, "wait_until": 0})  # fmt: skip
-    return code
 
 
 def _cleanup_pending(system: System) -> None:
@@ -157,13 +155,14 @@ def _strings(request: dict, *keys: str) -> list[str] | None:
 
 
 def create(request: dict, system: System) -> dict:
-    vals = _strings(request, "username", "display_name", "password")
+    vals = _strings(request, "username", "display_name", "password", "pin")
     if vals is None:
         return _fail("คำขอไม่ครบ")
-    user, display, password = vals
+    user, display, password, pin = vals
     display = display.strip()
     for check in (validation.check_username(user), validation.check_display_name(display),
-                  validation.check_password(password, password)):  # fmt: skip
+                  validation.check_password(password, password),
+                  validation.check_pin(pin, pin)):  # fmt: skip
         if not check.ok:
             return _fail(check.message)
     if system.user_home(user) is not None:
@@ -185,29 +184,29 @@ def create(request: dict, system: System) -> dict:
     home = system.user_home(user)
     if home is not None:
         system.chmod(home, 0o700)  # ผู้ใช้อื่นเปิดโฟลเดอร์นี้ไม่ได้ (ข้ออ้างที่ 2 ของเล่ม)
-    code = _new_recovery(system, user)
+    _set_pin(system, user, pin)
     marker.unlink(missing_ok=True)
     system.log(f"สร้างบัญชี {user} (สมัครเองที่หน้า Login)")
-    return {"ok": True, "message": f"สร้างบัญชี {user} แล้ว", "recovery_code": code}
+    return {"ok": True, "message": f"สร้างบัญชี {user} แล้ว"}
 
 
 def recover(request: dict, system: System) -> dict:
-    vals = _strings(request, "username", "recovery_code", "new_password")
+    vals = _strings(request, "username", "pin", "new_password")
     if vals is None:
         return _fail("คำขอไม่ครบ")
-    user, code, password = vals
+    user, pin, password = vals
     if not validation.check_username(user).ok:
         return _fail(RECOVER_FAIL)
     path = _recovery_file(system, user)
     try:
         rec = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return _fail(RECOVER_FAIL)  # ไม่มีรหัสกู้คืน (เช่น บัญชีแรกที่มาจากตอนลง OS) = ข้อความเดียวกัน
+        return _fail(RECOVER_FAIL)  # ไม่มี PIN (เช่น บัญชีแรกที่มาจากตอนลง OS) = ข้อความเดียวกัน
     now = system.now()
     if rec.get("wait_until", 0) > now:
         minutes = int((rec["wait_until"] - now) // 60) + 1
         return _fail(f"ลองผิดหลายครั้ง · ลองใหม่ได้ในอีก {minutes} นาที")
-    if not hmac.compare_digest(_hash(code, bytes.fromhex(rec["salt"])), rec["hash"]):
+    if not hmac.compare_digest(_hash(pin, bytes.fromhex(rec["salt"])), rec["hash"]):
         rec["failed"] = rec.get("failed", 0) + 1
         extra = rec["failed"] - FAIL_FREE
         if extra >= 0:
@@ -217,12 +216,13 @@ def recover(request: dict, system: System) -> dict:
         return _fail(RECOVER_FAIL)
     check = validation.check_password(password, password)
     if not check.ok:
-        return _fail(check.message)  # รหัสกู้คืนยังใช้ได้ ลองตั้งรหัสใหม่อีกครั้งได้
+        return _fail(check.message)  # PIN ถูก ลองตั้งรหัสใหม่อีกครั้งได้
     if system.run(["chpasswd"], stdin=f"{user}:{password}\n") != 0:
-        return _fail("ตั้งรหัสผ่านใหม่ไม่สำเร็จ · รหัสกู้คืนเดิมยังใช้ได้")
-    new_code = _new_recovery(system, user)  # ใช้แล้วหมดอายุทันที
-    system.log(f"กู้คืน {user} สำเร็จ · ออกรหัสกู้คืนใหม่แล้ว")
-    return {"ok": True, "message": "ตั้งรหัสผ่านใหม่แล้ว", "recovery_code": new_code}
+        return _fail("ตั้งรหัสผ่านใหม่ไม่สำเร็จ · ลองใหม่ได้")
+    rec["failed"], rec["wait_until"] = 0, 0  # PIN เดิมใช้ต่อได้ (ผู้ใช้จำเอง ไม่ต้องจดชุดใหม่)
+    _write_private(path, rec)
+    system.log(f"กู้คืน {user} สำเร็จ")
+    return {"ok": True, "message": "ตั้งรหัสผ่านใหม่แล้ว"}
 
 
 def handle(raw: bytes, system: System) -> dict:

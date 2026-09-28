@@ -33,7 +33,7 @@
 ```text
 หน้า Login (_greetd) ── sudo -n /usr/local/sbin/aipc-accounts (ไม่มีอาร์กิวเมนต์ · JSON ทาง stdin)
                            └ aipc.accounts.helper (root): ตรวจกฎซ้ำ → useradd/chpasswd (สมัครเสรี · ไม่ใส่กลุ่ม sudo)
-                              → home 0700 → รหัสกู้คืน (hash scrypt ใน /var/lib/aipc/recovery, root 0600)
+                              → home 0700 → PIN กู้คืน (hash scrypt ใน /var/lib/aipc/recovery, root 0600)
 ```
 
 ติดตั้ง: `scripts/pi/install-accounts.sh [--apply] | --rollback` (ตัวช่วย + PAM + sudoers ผ่าน visudo + ปิด autologin tty1)
