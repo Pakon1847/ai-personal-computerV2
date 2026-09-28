@@ -120,7 +120,8 @@ else
   say "[จะทำ] git archive HEAD | tar -x -C $DEST"
 fi
 do_ python3 -m venv "$DEST/.venv"
-do_ "$DEST/.venv/bin/pip" install --no-cache-dir "$DEST[ui,vision]"
+# -c constraints.txt = ใช้ไลบรารีรุ่นเดียวกับที่วัดผลไว้ (ไม่ใช่รุ่นล่าสุด ณ วันติดตั้ง)
+do_ "$DEST/.venv/bin/pip" install --no-cache-dir -c "$DEST/constraints.txt" "$DEST[ui,vision]"
 # โมเดลใบหน้า SFace (37 MB · การ์ด 0006) เก็บกลางที่ $DEST/models ให้ทุกบัญชีใช้ร่วม · ตรวจ sha256 ก่อนใช้
 do_ env AIPC_MODEL_DIR="$DEST/models" "$DEST/.venv/bin/python" -m aipc.vision.models fetch
 do_ chown -R root:root "$DEST"

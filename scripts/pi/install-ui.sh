@@ -61,7 +61,7 @@ fi
 if [ ! -x "$PY" ]; then
   run python3 -m venv "$REPO/.venv"
 fi
-run "$PY" -m pip install -e "$REPO[ui]"
+run "$PY" -m pip install -c "$REPO/constraints.txt" -e "$REPO[ui]"
 
 say ""
 say "ไฟล์เปิดเอง: $AUTOSTART"
