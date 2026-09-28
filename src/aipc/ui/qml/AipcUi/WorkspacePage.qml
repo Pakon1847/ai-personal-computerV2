@@ -10,6 +10,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 Item {
+    objectName: "workspace"
     id: root
     clip: true   // ตัดส่วนที่เลื่อนพ้นกรอบ รวมไอคอนแบบ Shape ที่ ListView ตัดเองไม่หมด
 
@@ -328,7 +329,7 @@ Item {
 
             Rectangle {
                 id: bubble
-                visible: row.modelData.user
+                visible: !!row.modelData.user  // ข้อความ AI ไม่มีช่อง user → undefined (พบ 2026-09-28)
                 anchors.right: parent.right
                 width: Math.min(bodyText.implicitWidth + 32, parent.width * 0.75)
                 height: bodyText.implicitHeight + 20

@@ -211,6 +211,21 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(preview.property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_ai_answers_draw_without_warnings(self):
+        """การ์ด 0013: ข้อความ AI (กำลังตอบ / จบ / หยุด) วาดได้โดยไม่มี warning
+        · พบ 2026-09-28: ข้อความ AI ไม่มีช่อง user ทำให้ binding ได้ undefined."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        page.setProperty("items", [
+            {"user": True, "text": "ถาม"},
+            {"ai": True, "text": "ตอบจบแล้ว", "note": "", "done": True, "skill": ""},
+            {"ai": True, "text": "ครึ่ง", "note": "หยุดแล้ว", "done": True, "skill": "แปลไทย ↔ อังกฤษ"},
+            {"ai": True, "text": "", "note": "", "done": False, "skill": ""},
+        ])  # fmt: skip
+        settle(100)
+        self.assertEqual(find_all(win, "chatList")[0].property("count"), 4)
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")
