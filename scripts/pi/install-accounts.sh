@@ -13,6 +13,8 @@
 #      **ตรวจด้วย visudo -c ก่อนติดตั้งเสมอ** (ไฟล์ sudoers ผิด = sudo ใช้ไม่ได้ทั้งเครื่อง)
 #   4. /var/lib/aipc (root 0700) = ที่เก็บ hash รหัสกู้คืน และงานสมัครค้าง
 #   5. ปิด autologin ที่ tty1 (ย้ายไฟล์ไปเก็บ ไม่ลบ) · ไม่งั้นกด Ctrl+Alt+F1 = ได้ shell โดยไม่ใส่รหัส
+#   6. /etc/systemd/logind.conf.d/aipc.conf: KillUserProcesses=yes = ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้
+#      (BRIEF หัวข้อ 4 นิยาม Logout · AI ของคนก่อนไม่ค้าง) · มีผลหลังรีบูต · ไม่ restart logind (เซสชันที่เปิดอยู่จะหลุด)
 # ไม่แตะ: greetd config, PAM ชุด login ของ OS, ไฟล์บูต, พาร์ทิชัน · ไม่รีบูต
 # ทางเข้าสำรอง: SSH และ tty2 (Ctrl+Alt+F2) ใช้ได้ตามเดิม
 set -euo pipefail
@@ -32,6 +34,10 @@ SUDOERS=/etc/sudoers.d/aipc-accounts
 STATE=/var/lib/aipc
 AUTOLOGIN=/etc/systemd/system/getty@tty1.service.d/autologin.conf
 PARKED=/var/lib/aipc/autologin.conf.parked
+LOGIND=/etc/systemd/logind.conf.d/aipc.conf
+LOGIND_TEXT='# ออกจากระบบ = ปิดทุกโปรเซสของผู้ใช้ (BRIEF หัวข้อ 4 นิยาม Logout · aipc)
+[Login]
+KillUserProcesses=yes'
 
 say() { printf '%s\n' "$*"; }
 need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย sudo" >&2; exit 1; }; }
@@ -49,7 +55,7 @@ _greetd ALL=(root) NOPASSWD: /usr/local/sbin/aipc-accounts ""'
 if [ "$MODE" = "rollback" ]; then
   need_root
   rm -f "$SUDOERS" && say "+ ลบ $SUDOERS"
-  rm -f "$WRAPPER" "$PAMFILE" && say "+ ลบ $WRAPPER และ $PAMFILE"
+  rm -f "$WRAPPER" "$PAMFILE" "$LOGIND" && say "+ ลบ $WRAPPER, $PAMFILE และ $LOGIND (มีผลหลังรีบูต)"
   if [ -f "$PARKED" ]; then
     mkdir -p "$(dirname "$AUTOLOGIN")"
     mv "$PARKED" "$AUTOLOGIN" && systemctl daemon-reload && say "+ คืน autologin ที่ tty1"
@@ -67,6 +73,7 @@ getent passwd _greetd >/dev/null || { say "หยุด: ไม่มีผู�
 
 install_text() {  # install_text <ไฟล์ปลายทาง> <โหมด> <เนื้อหา>
   if [ "$MODE" != "apply" ]; then say "[จะเขียน] $1 ($2)"; printf '%s\n' "$3" | sed 's/^/   /'; return; fi
+  install -d -m 0755 "$(dirname "$1")"
   local tmp; tmp="$(mktemp)"
   printf '%s\n' "$3" > "$tmp"
   install -o root -g root -m "$2" "$tmp" "$1"
@@ -113,9 +120,12 @@ else
   say "   ไม่มี autologin ที่ tty1 · ไม่ต้องทำอะไร"
 fi
 
+say ""; say "6) ออกจากระบบ = ปิดทุกโปรเซส"
+install_text "$LOGIND" 0644 "$LOGIND_TEXT"
+
 say ""
 if [ "$MODE" = "apply" ]; then
-  say "เสร็จ · ตรวจ: sudo -l -U _greetd ต้องเห็นแค่ $WRAPPER"
+  say "เสร็จ · ตรวจ: sudo -l -U _greetd ต้องเห็นแค่ $WRAPPER · KillUserProcesses มีผลหลังรีบูต"
 else
   say "ยังไม่ได้เปลี่ยนอะไร · ถ้าข้างบนถูกต้อง: sudo ./scripts/pi/install-accounts.sh --apply"
 fi

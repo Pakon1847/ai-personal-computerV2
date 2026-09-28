@@ -9,8 +9,8 @@
 #   1. คัด llama-server ที่ build บนเครื่องนี้ (ไฟล์โปรแกรม + .so) ไป /opt/aipc-llm (root · อ่านได้ทุกคน)
 #   2. คัดไฟล์โมเดลไป /opt/aipc-models (root 0644) · แสดง sha256 ให้จดลงผลวัด
 #   3. /etc/aipc/llm.conf (MODEL THREADS CTX) · /etc/systemd/user/aipc-llm.service
-#   4. /etc/systemd/logind.conf.d/aipc.conf: KillUserProcesses=yes = ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้ (มีผลหลังรีบูต)
-# ไม่แตะ: greetd, PAM, ไฟล์บูต, พาร์ทิชัน · ไม่รีบูต · ไม่ restart logind (กันเซสชันที่เปิดอยู่หลุด)
+#   (KillUserProcesses=yes อยู่ใน install-accounts.sh · เป็นเรื่องแยกบัญชี ไม่ได้ผูกกับ AI)
+# ไม่แตะ: greetd, PAM, logind, ไฟล์บูต, พาร์ทิชัน · ไม่รีบูต
 # เปลี่ยนโมเดล = รันใหม่ด้วย --model อื่น แล้วออกจากระบบ-เข้าใหม่
 set -euo pipefail
 
@@ -33,15 +33,14 @@ OPT=/opt/aipc-llm
 MODELS=/opt/aipc-models
 CONF=/etc/aipc/llm.conf
 UNIT=/etc/systemd/user/aipc-llm.service
-LOGIND=/etc/systemd/logind.conf.d/aipc.conf
 say() { printf '%s\n' "$*"; }
 need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย sudo" >&2; exit 1; }; }
 
 if [ "$MODE" = "rollback" ]; then
   need_root
-  rm -f "$UNIT" "$CONF" "$LOGIND"
+  rm -f "$UNIT" "$CONF"
   rm -rf "$OPT"
-  say "เสร็จ · ถอด llama-server, ค่าตั้ง, user service และ KillUserProcesses แล้ว · โมเดลใน $MODELS ยังอยู่"
+  say "เสร็จ · ถอด llama-server, ค่าตั้ง และ user service แล้ว · โมเดลใน $MODELS ยังอยู่ (ลบเองได้)"
   exit 0
 fi
 
@@ -77,18 +76,13 @@ CONF_TEXT="# ค่าตั้ง AI ในเครื่อง (การ์�
 MODEL=$MODELS/$NAME
 THREADS=$THREADS
 CTX=4096"
-LOGIND_TEXT="# ออกจากระบบ = ปิดทุกโปรเซสของผู้ใช้ (BRIEF หัวข้อ 4 นิยาม Logout · การ์ด 0013)
-[Login]
-KillUserProcesses=yes"
 if [ "$MODE" = "apply" ]; then
-  install -d -m 0755 "$(dirname "$CONF")" "$(dirname "$UNIT")" "$(dirname "$LOGIND")"
+  install -d -m 0755 "$(dirname "$CONF")" "$(dirname "$UNIT")"
   printf '%s\n' "$CONF_TEXT" > "$CONF" && chmod 0644 "$CONF" && say "+ เขียน $CONF"
   install -o root -g root -m 0644 "$SRC/scripts/pi/session/aipc-llm.service" "$UNIT" && say "+ เขียน $UNIT"
-  printf '%s\n' "$LOGIND_TEXT" > "$LOGIND" && chmod 0644 "$LOGIND" && say "+ เขียน $LOGIND (มีผลหลังรีบูต)"
 else
   printf '%s\n' "$CONF_TEXT" | sed 's/^/   /'
   say "[จะคัด] $SRC/scripts/pi/session/aipc-llm.service → $UNIT"
-  say "[จะเขียน] $LOGIND"; printf '%s\n' "$LOGIND_TEXT" | sed 's/^/   /'
 fi
 
 say ""

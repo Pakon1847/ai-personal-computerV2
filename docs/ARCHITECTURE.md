@@ -48,7 +48,7 @@ aipc-session ── systemctl --user start aipc-llm ── llama-server -m /opt/
 ```
 
 ติดตั้ง: `scripts/pi/install-llm.sh --model <ไฟล์.gguf> [--apply] | --rollback` · service: `Restart=on-failure`, `MemoryMax=4G` ·
-`KillUserProcesses=yes` (ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้)
+`KillUserProcesses=yes` อยู่ใน `install-accounts.sh` (ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้)
 
 ## Skill (`aipc.skills`)
 
