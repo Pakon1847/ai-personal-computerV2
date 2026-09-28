@@ -400,10 +400,15 @@ class SkillsController(QObject):
         broken = self._store.broken
         self._missed = [] if broken else reminders.missed_since_last_session(self._store, now)
         self._clock_back = reminders.clock_went_back(self._store, now)
+        self._save_failed = False
         if self._missed:
             for r in self._missed:
                 r.fired = True  # รายงานครั้งเดียวว่าพลาด ไม่เตือนซ้ำเมื่อถึงรอบตรวจ
-            self._store.save(now)
+            try:
+                self._store.save(now)
+            except (OSError, reminders.Unreadable):
+                # พบ 2026-09-28: บันทึกล้มตรงนี้เคยทำให้หน้าจอเปิดไม่ขึ้น → ล่มซ้ำจนเซสชันจบ
+                self._save_failed = True
         self._timer = QTimer(self, interval=self.TICK_MS, timeout=self.tick)
         if run_timer:  # หน้า greeter (ยังไม่มีใครเข้าเครื่อง) ไม่มีนัดของใครให้เตือน และไม่เขียนไฟล์
             self._timer.start()
@@ -444,10 +449,12 @@ class SkillsController(QObject):
     def missed(self) -> list:
         return [self._reminder_dict(r) for r in self._missed]
 
-    @Property(str, constant=True)
+    @Property(str, notify=remindersChanged)
     def reminderWarning(self) -> str:  # noqa: N802
         if self._store.broken:
             return "อ่านไฟล์นัดหมายไม่ได้ (ไฟล์และสำเนาเสียทั้งคู่) · ยังไม่ได้เขียนทับ รอคุณตัดสิน"
+        if self._save_failed:
+            return "บันทึกนัดหมายไม่สำเร็จ (พื้นที่อาจเต็ม) · ยังเตือนในรอบนี้ แต่ปิดเครื่องแล้วอาจแจ้งซ้ำว่าพลาด"
         if self._clock_back:
             return "นาฬิกาเครื่องอาจไม่ถูก (เวลาถอยหลังจากที่เคยเห็น) · การเตือนอาจคลาดเคลื่อน"
         if self._store.recovered_from_backup:
@@ -463,7 +470,9 @@ class SkillsController(QObject):
         t = reminders.tick(self._store, self._now())
         for r in t.due:
             self.reminderDue.emit(self._reminder_dict(r))
-        if t.due:
+        if t.save_failed:
+            self._save_failed = True
+        if t.due or t.save_failed:
             self.remindersChanged.emit()
 
     def _reminder_card(self, route, text: str) -> dict:

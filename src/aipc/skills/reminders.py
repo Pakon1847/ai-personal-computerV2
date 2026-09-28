@@ -37,6 +37,17 @@ def aware(dt: datetime) -> datetime:
     return dt if dt.tzinfo else dt.astimezone()
 
 
+def _fsync_dir(folder: Path) -> None:
+    """ให้การเปลี่ยนชื่อไฟล์ลงดิสก์จริง (ไฟดับหลัง rename แล้วไฟล์ใหม่ไม่หาย) · วินโดวส์ไม่มี ข้ามได้."""
+    if os.name != "posix":
+        return
+    fd = os.open(folder, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 @dataclass
 class Reminder:
     what: str
@@ -78,6 +89,7 @@ class ReminderStore:
         self.bak = self.path.with_name(self.path.name + ".bak")
         self.recovered_from_backup = False
         self._broken = False
+        self._main_ok = False  # ไฟล์หลักอ่านได้ไหม · ไม่ได้ = ห้ามคัดไฟล์หลักทับ .bak ที่ดี
         self.last_seen: datetime | None = None
         self.items: list[Reminder] = []
         self._load()
@@ -93,6 +105,7 @@ class ReminderStore:
             return
         try:
             self.items, self.last_seen = self._read(self.path)
+            self._main_ok = True
             return
         except (OSError, ValueError, KeyError, TypeError):
             pass
@@ -118,27 +131,39 @@ class ReminderStore:
             "reminders": [r.to_json() for r in self.items],
         }
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        if self.path.exists():
-            shutil.copy2(self.path, self.bak)  # เก็บรุ่นก่อนไว้ กันไฟล์เสียจากสาเหตุอื่น
+        # เก็บรุ่นก่อนไว้ กันไฟล์เสียจากสาเหตุอื่น · ไฟล์หลักที่อ่านไม่ได้ห้ามคัดทับ .bak ที่ดี
+        # (พบ 2026-09-28: กู้จาก .bak แล้วบันทึกครั้งถัดไปล้ม = เสียทั้งคู่)
+        if self.path.exists() and self._main_ok:
+            shutil.copy2(self.path, self.bak)
         tmp = self.path.with_name(self.path.name + ".tmp")
         with tmp.open("w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=1)
             f.flush()
             os.fsync(f.fileno())
         os.replace(tmp, self.path)
+        self._main_ok = True
+        _fsync_dir(self.path.parent)
 
     def add(self, r: Reminder, now: datetime | None = None) -> Reminder:
         self.items.append(r)
-        self.save(now)
+        try:
+            self.save(now)
+        except Exception:
+            self.items.remove(r)  # บันทึกไม่สำเร็จ = ไม่มีนัดนี้ (เดิมยังเตือนทั้งที่หน้าจอบอกว่าไม่สำเร็จ)
+            raise
         return r
 
     def delete(self, rid: str, now: datetime | None = None) -> bool:
-        before = len(self.items)
+        before = list(self.items)
         self.items = [r for r in self.items if r.id != rid]
-        if len(self.items) != before:
+        if len(self.items) == len(before):
+            return False
+        try:
             self.save(now)
-            return True
-        return False
+        except Exception:
+            self.items = before  # ลบไม่สำเร็จ = นัดยังอยู่ ตรงกับไฟล์
+            raise
+        return True
 
     def upcoming(self, now: datetime) -> list[Reminder]:
         now = aware(now)
@@ -150,6 +175,7 @@ class ReminderStore:
 class Tick:
     due: list[Reminder]
     clock_went_back: bool
+    save_failed: bool = False  # เตือนแล้ว แต่บันทึกไม่ได้ → เข้าใช้ครั้งหน้าจะรายงานว่า "พลาดไป"
 
 
 def clock_went_back(store: ReminderStore, now: datetime) -> bool:
@@ -164,9 +190,15 @@ def tick(store: ReminderStore, now: datetime) -> Tick:
     for r in due:
         r.fired = True
     stale = store.last_seen is None or now - store.last_seen >= SEEN_EVERY
+    failed = False
     if due or (stale and not back):
-        store.save(now)
-    return Tick(due, back)
+        # บันทึกไม่ได้ (ดิสก์เต็ม, การ์ดอ่านอย่างเดียว) ต้องไม่ทำให้การเตือนหาย (พบ 2026-09-28)
+        # ในเซสชันนี้ไม่เตือนซ้ำ (fired อยู่ในหน่วยความจำ) · บนดิสก์ยังไม่ fired → ครั้งหน้ารายงานว่าพลาด
+        try:
+            store.save(now)
+        except (OSError, Unreadable):
+            failed = True
+    return Tick(due, back, failed)
 
 
 def missed_since_last_session(store: ReminderStore, now: datetime) -> list[Reminder]:

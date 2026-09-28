@@ -3,10 +3,12 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
+from unittest import mock
 
 from aipc.skills import reminders as rm
 
 NOW = datetime(2026, 9, 23, 10, 0).astimezone()
+DISK_FULL = OSError(28, "No space left on device")
 
 
 class StoreTest(unittest.TestCase):
@@ -57,6 +59,30 @@ class StoreTest(unittest.TestCase):
         self.assertTrue(s.delete(r.id, NOW))
         self.assertEqual(rm.ReminderStore(self.path).items, [])
 
+    def test_failed_add_is_not_kept(self):
+        """พบ 2026-09-28: บันทึกไม่สำเร็จ (ดิสก์เต็ม) แต่นัดยังอยู่ในหน่วยความจำ → หน้าจอบอกว่าไม่สำเร็จ แต่ยังเตือน."""
+        s = rm.ReminderStore(self.path)
+        with mock.patch.object(s, "save", side_effect=DISK_FULL):
+            with self.assertRaises(OSError):
+                s.add(rm.Reminder("ไม่ควรค้าง", NOW + timedelta(hours=1)), NOW)
+        self.assertEqual(s.items, [])
+
+    def test_recovery_keeps_the_good_backup(self):
+        """พบ 2026-09-28: หลังกู้จาก .bak การบันทึกครั้งถัดไปคัดไฟล์หลักที่เสียทับ .bak ที่ดี
+        ถ้าการเขียนครั้งนั้นล้มด้วย = เสียทั้งคู่ ข้อมูลหายหมด."""
+        s = rm.ReminderStore(self.path)
+        s.add(rm.Reminder("หนึ่ง", NOW + timedelta(hours=1)), NOW)
+        s.add(rm.Reminder("สอง", NOW + timedelta(hours=2)), NOW)  # .bak = รุ่นที่มี "หนึ่ง"
+        self.path.write_text("{เสีย", encoding="utf-8")
+        again = rm.ReminderStore(self.path)
+        self.assertTrue(again.recovered_from_backup)
+        with mock.patch.object(rm.os, "replace", side_effect=DISK_FULL):
+            with self.assertRaises(OSError):
+                again.add(rm.Reminder("สาม", NOW + timedelta(hours=3)), NOW)
+        after = rm.ReminderStore(self.path)
+        self.assertFalse(after.broken, ".bak ที่ดีต้องยังอยู่")
+        self.assertEqual([r.what for r in after.items], ["หนึ่ง"])
+
 
 class SchedulerTest(unittest.TestCase):
     def setUp(self):
@@ -103,6 +129,21 @@ class SchedulerTest(unittest.TestCase):
         self.s.add(rm.Reminder("กินยา", NOW + timedelta(minutes=1)), NOW)
         rm.tick(self.s, NOW + timedelta(minutes=1))
         self.assertTrue(rm.ReminderStore(self.s.path).items[0].fired)
+
+    def test_save_failure_does_not_lose_the_alert(self):
+        """พบ 2026-09-28: ทำเครื่องหมายว่าเตือนแล้วก่อนบันทึก · บันทึกล้ม = ไม่มีการเตือนเลย
+        ต้องเตือนตอนนี้ และเมื่อบันทึกไม่ได้ ครั้งหน้าที่เข้าใช้ต้องรายงานว่า "พลาดไป" (ไม่หายเงียบ)."""
+        self.s.add(rm.Reminder("กินยา", NOW + timedelta(minutes=1)), NOW)
+        due_at = NOW + timedelta(minutes=1)
+        with mock.patch.object(self.s, "save", side_effect=DISK_FULL):
+            t = rm.tick(self.s, due_at)
+        self.assertEqual([r.what for r in t.due], ["กินยา"])
+        self.assertTrue(t.save_failed)
+        again = rm.tick(self.s, due_at + timedelta(seconds=30))
+        self.assertEqual(again.due, [], "ไม่เตือนซ้ำในเซสชันเดียวกัน")
+        on_disk = rm.ReminderStore(self.s.path)
+        missed = rm.missed_since_last_session(on_disk, due_at + timedelta(hours=1))
+        self.assertEqual([r.what for r in missed], ["กินยา"])
 
     def test_upcoming_sorted(self):
         self.s.add(rm.Reminder("สอง", NOW + timedelta(hours=2)), NOW)
