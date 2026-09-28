@@ -47,6 +47,10 @@ UNSUPPORTED = {
 }
 
 NUM = r"(\d{1,2}|สิบเอ็ด|สิบสอง|สิบ|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า)"
+# ระยะเวลาสัมพัทธ์: "อีก 30 นาที" "อีกสองชั่วโมงครึ่ง" "อีก 1 ชั่วโมง 30 นาที" "อีก 3 วัน"
+# เคยรับแค่ "อีก N หน่วย" ส่วน "ครึ่ง" และ "M นาที" ที่ตามมาไปปนในชื่อนัด (พบ 2026-09-28)
+RELATIVE = (r"อีก\s*(ครึ่ง|" + NUM + r")\s*(ชั่วโมง|ชม\.?|นาที|วัน)(\s*ครึ่ง)?"
+            r"(?:\s*(?:กับ|และ)?\s*" + NUM + r"\s*นาที)?")  # fmt: skip
 TRIGGERS = ("ช่วยเตือน", "ตั้งเตือน", "เตือนให้", "เตือนฉัน", "เตือน", "อย่าลืม", "นัดหมาย", "ปลุก")
 POLITE = ("ด้วยนะ", "ด้วย", "หน่อย", "ครับ", "ค่ะ", "คะ", "นะ", "จ้า")
 
@@ -86,10 +90,13 @@ def _time(t: _Text, notes: list[str]) -> tuple[time | None, bool]:
             return None
         return time(h, 30 if halfmark and m == 0 else m)
 
-    m = t.take(r"(\d{1,2})\s*[:.]\s*(\d{2})\s*(น\.)?")
+    # ตัวเลขที่ตามด้วยหน่วยเงิน/ขนาดไม่ใช่เวลา: "1.50 บาท" เคยกลายเป็น 01:50 (พบ 2026-09-28)
+    m = t.take(r"(\d{1,2})\s*[:.]\s*(\d{2})(?!\d)(?!\s*(?:บาท|฿|%|เปอร์เซ็นต์|กิโล|กก|ลิตร|เมตร|ซม|มม))"
+               r"\s*(น\.)?")  # fmt: skip
     if m:
         return mk(int(m[1]), int(m[2])), True
     if t.take(r"เที่ยงคืน"):
+        notes.append("“เที่ยงคืน” ใช้เวลา 00:00 น. ตอนเริ่มวันที่แสดง")
         return time(0, 0), True
     m = t.take(r"เที่ยง(วัน)?" + half)
     if m:
@@ -129,13 +136,24 @@ def _time(t: _Text, notes: list[str]) -> tuple[time | None, bool]:
     return None, False
 
 
+def _next_year(d: date) -> date | None:
+    """วันเดียวกันของปีหน้า · None = ปีหน้าไม่มีวันนี้ (29 ก.พ.)."""
+    try:
+        return d.replace(year=d.year + 1)
+    except ValueError:
+        return None
+
+
 def _date(t: _Text, now: datetime, notes: list[str]) -> tuple[date | None, str, bool]:
     """คืน (วันที่, ปัญหา, มาจากชื่อวันในสัปดาห์ไหม) · ปัญหา ≠ "" แปลว่าวันที่ที่ระบุใช้ไม่ได้."""
     today = now.date()
     if t.take(r"วันนี้|คืนนี้"):
         return today, "", False
     if t.take(r"พรุ่งนี้"):
-        return today + timedelta(days=1), "", False
+        d = today + timedelta(days=1)
+        if now.hour < 4:  # ยังไม่นอนแต่เลยเที่ยงคืนแล้ว — คนมักหมายถึง "วันนี้" ตามปฏิทิน · บอกให้ชัด
+            notes.append(f"ตอนนี้เลยเที่ยงคืนแล้ว “พรุ่งนี้” จึงเป็นวันที่ {d.day}/{d.month}")
+        return d, "", False
     if t.take(r"มะรืน(นี้)?"):
         return today + timedelta(days=2), "", False
     m = t.take(
@@ -153,21 +171,29 @@ def _date(t: _Text, now: datetime, notes: list[str]) -> tuple[date | None, str, 
         except ValueError:
             return None, f"ไม่มีวันที่ {day} {m[3]}", False
         if d < today and not m[4]:
-            d = d.replace(year=year + 1)
+            d = _next_year(d)
+            if d is None:  # 29 ก.พ. ที่ปีถัดไปไม่มี · เคยโยน ValueError ถึงหน้าจอ (พบ 2026-09-28)
+                return None, f"ปีหน้าไม่มีวันที่ {day} {m[3]} ระบุปีให้ชัด", False
             notes.append("วันที่นี้ผ่านไปแล้วปีนี้ จึงใช้ปีหน้า")
         return d, "", False
     m = t.take(r"(\d{1,2})\s*/\s*(\d{1,2})(?:\s*/\s*(\d{2,4}))?")
     if m:
         day, month = int(m[1]), int(m[2])
-        year = int(m[3]) if m[3] else today.year
-        year = year + 2000 if year < 100 else year
-        year = year - 543 if year > 2400 else year
+        if m[3] and len(m[3]) == 2:
+            # ปีย่อ 2 หลักของคนไทยคือ พ.ศ. (69 = 2569) · เคยตีเป็น ค.ศ. 2069 (พบ 2026-09-28)
+            year = 2500 + int(m[3]) - 543
+            notes.append(f"ปี {m[3]} ตีความเป็น พ.ศ. 25{m[3]}")
+        else:
+            year = int(m[3]) if m[3] else today.year
+            year = year - 543 if year > 2400 else year
         try:
             d = date(year, month, day)
         except ValueError:
             return None, f"ไม่มีวันที่ {m[0].strip()}", False
         if d < today and not m[3]:
-            d = d.replace(year=year + 1)
+            d = _next_year(d)
+            if d is None:
+                return None, f"ปีหน้าไม่มีวันที่ {m[0].strip()} ระบุปีให้ชัด", False
             notes.append("วันที่นี้ผ่านไปแล้วปีนี้ จึงใช้ปีหน้า")
         return d, "", False
     m = t.take(r"วันที่\s*(\d{1,2})")
@@ -207,7 +233,7 @@ def parse(text: str, now: datetime) -> WhenResult:
 
     t = _Text(text)
     # ระยะเวลาสัมพัทธ์ "อีก N ..." ตรวจก่อน เพราะกำหนดทั้งวันและเวลาในตัว
-    m = t.take(r"อีก\s*(ครึ่ง|" + NUM + r")\s*(ชั่วโมง|ชม\.?|นาที|วัน)")
+    m = t.take(RELATIVE)
     at: datetime | None = None
     from_weekday = False
     if m:
@@ -216,7 +242,13 @@ def parse(text: str, now: datetime) -> WhenResult:
         if unit == "วัน":
             d, tm = now.date() + timedelta(days=int(amount)), None
         else:
-            minutes = amount * (60 if unit.startswith("ช") else 1)
+            if unit.startswith("ช"):
+                extra = 30 if m[4] else 0  # "…ชั่วโมงครึ่ง"
+                if m[5]:  # "…ชั่วโมง M นาที"
+                    extra += _n(m[5]) or 0
+                minutes = amount * 60 + extra
+            else:
+                minutes = amount + (0.5 if m[4] else 0)
             at = (now + timedelta(minutes=minutes)).replace(second=0, microsecond=0)
     if at is None:
         tm, explicit = _time(t, notes)
@@ -244,6 +276,27 @@ def parse(text: str, now: datetime) -> WhenResult:
             else:
                 return WhenResult(None, _what(t.s), confident=False, problem="วันเวลาที่ระบุผ่านไปแล้ว")
     return WhenResult(at, _what(t.s), notes)
+
+
+# ใช้แค่ดูว่ามีคำบอกวันไหม ไม่ได้คำนวณวันจริง · ไกลในอดีตจะได้ไม่มีอะไร "ผ่านไปแล้ว"
+_REFERENCE = datetime(2000, 1, 3)
+
+
+def mentions_time(text: str, *, part_of_day: bool = True) -> bool:
+    """ประโยคนี้มีคำบอกวันหรือเวลาไหม (ไม่สนว่าถูกต้องหรือผ่านไปแล้ว).
+
+    ใช้แยก "ทำตอนนี้" กับ "ให้ทำทีหลัง" · พบ 2026-09-28: "อีก 10 นาทีเตือนให้ลดเสียง" เคยลดเสียงทันที
+    part_of_day=False = ไม่นับ "เช้า/บ่าย/เย็น" ลอย ๆ (เช่น "น้ำเย็น" ไม่ใช่เวลา) ใช้ตอนตัดสินว่าเป็นนัดหมายไหม
+    """
+    t = _Text(text)
+    if t.take(RELATIVE):
+        return True
+    notes: list[str] = []
+    tm, explicit = _time(t, notes)
+    if explicit or (tm is not None and part_of_day):
+        return True
+    d, problem, _ = _date(t, _REFERENCE, notes)
+    return d is not None or bool(problem)
 
 
 def _what(rest: str) -> str:

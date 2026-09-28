@@ -90,5 +90,52 @@ class EdgeTest(unittest.TestCase):
             self.assertFalse(r.at is not None and r.confident, text)
 
 
+class FoundOn20260928Test(unittest.TestCase):
+    """บั๊กที่ตรวจเจอ 2026-09-28 (วินโดวส์) · ทุกข้อเคย "มั่นใจแต่ผิด" หรือทำโปรแกรมพัง."""
+
+    def test_two_digit_year_is_buddhist_era(self):
+        # เคยได้ปี 2069 · คนไทยเขียนปีย่อเป็น พ.ศ. (69 = 2569 = ค.ศ. 2026)
+        r = when.parse("นัดหมอ 25/12/69 บ่ายสาม", NOW)
+        self.assertEqual(r.at, datetime(2026, 12, 25, 15, 0))
+        self.assertTrue(any("พ.ศ." in n for n in r.assumptions), "ต้องบอกว่าตีความปีเอง")
+
+    def test_hours_and_minutes_together(self):
+        # เคยบวกแค่ 1 ชั่วโมง แล้วเอา "30 นาที" ไปปนในชื่อนัด
+        r = when.parse("อีก 1 ชั่วโมง 30 นาที เตือนกินยา", NOW)
+        self.assertEqual(r.at, datetime(2026, 9, 23, 11, 30))
+        self.assertEqual(r.what, "กินยา")
+
+    def test_hours_and_a_half(self):
+        r = when.parse("อีกสองชั่วโมงครึ่งเตือนปิดเตา", NOW)
+        self.assertEqual(r.at, datetime(2026, 9, 23, 12, 30))
+        self.assertEqual(r.what, "ปิดเตา")
+
+    def test_leap_day_after_it_passed_does_not_crash(self):
+        # เคยโยน ValueError ออกไปถึงหน้าจอ (ปีถัดไปไม่มีวันที่ 29 ก.พ.)
+        after_leap_day = datetime(2028, 3, 1, 10, 0)
+        for text in ("เตือนจ่ายค่าเช่า 29 ก.พ.", "29/2 จ่ายค่าเช่า"):
+            with self.subTest(text=text):
+                r = when.parse(text, after_leap_day)
+                self.assertFalse(r.confident)
+                self.assertTrue(r.problem)
+
+    def test_money_is_not_a_time(self):
+        # "1.50 บาท" เคยกลายเป็นเวลา 01:50
+        r = when.parse("พรุ่งนี้โอนค่าน้ำ 1.50 บาท", NOW)
+        self.assertEqual(r.at, datetime(2026, 9, 24, 9, 0))
+        self.assertIn("1.50 บาท", r.what)
+
+    def test_midnight_is_announced(self):
+        r = when.parse("พรุ่งนี้เที่ยงคืนส่งงาน", NOW)
+        self.assertEqual(r.at, datetime(2026, 9, 24, 0, 0))
+        self.assertTrue(any("เที่ยงคืน" in n for n in r.assumptions), "ต้องบอกว่าเที่ยงคืนคือตอนไหน")
+
+    def test_tomorrow_said_after_midnight_is_announced(self):
+        just_after_midnight = datetime(2026, 9, 24, 0, 30)
+        r = when.parse("พรุ่งนี้ 9 โมงประชุม", just_after_midnight)
+        self.assertEqual(r.at, datetime(2026, 9, 25, 9, 0))
+        self.assertTrue(any("เที่ยงคืน" in n for n in r.assumptions), "ต้องบอกว่า “พรุ่งนี้” คือวันไหน")
+
+
 if __name__ == "__main__":
     unittest.main()

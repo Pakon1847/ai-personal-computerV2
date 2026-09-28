@@ -18,6 +18,7 @@ import difflib
 import re
 from dataclasses import dataclass
 
+from aipc.skills import when
 from aipc.skills.actions import APPS, PAGES, SITES, Plan
 from aipc.skills.thainum import find_number
 
@@ -49,9 +50,15 @@ PAGE_ALIASES = {
     "workspace": ("ผู้ช่วย", "แชท", "หน้าหลัก"),
 }
 
-# ประโยคที่ขึ้นต้นแบบนี้คือ "ให้ทำทีหลัง" ไม่ใช่คำสั่งตอนนี้ → ส่งต่อให้สกิลนัดหมาย/โน้ต
+# ประโยคที่มีคำเหล่านี้คือ "ให้ทำทีหลัง" ไม่ใช่คำสั่งตอนนี้ → ส่งต่อให้สกิลนัดหมาย/โน้ต
 # (ชุดสำรองการ์ด 0008: "เตือนปิดเสียงตอนประชุมบ่ายสาม" เคยปิดเสียงทันที)
+# ตรวจทั้งประโยค ไม่ใช่แค่คำขึ้นต้น: "อีก 10 นาทีเตือนให้ลดเสียง" เคยลดเสียงทันที (พบ 2026-09-28)
 LATER_WORDS = ("เตือน", "นัด", "จด", "บันทึก", "อย่าลืม")
+# ปฏิเสธ: "อย่าปิดเสียงนะ" เคยปิดเสียง (พบ 2026-09-28) · ไม่ใช้ "ไม่" เดี่ยว ๆ ("ไม่ได้ยิน เพิ่มเสียงหน่อย" เป็นคำสั่ง)
+NEGATIONS = ("อย่า", "ไม่ต้อง", "ห้าม")
+# มีคำว่า "เสียง" แต่ไม่ใช่เสียงลำโพง · ตัวเลขที่ตามด้วยหน่วยเวลาไม่ใช่ระดับเสียง ("อัดเสียง 10 นาที" เคยได้ 10%)
+NOT_VOLUME = ("อัดเสียง", "ข้อความเสียง", "ไฟล์เสียง", "ส่งเสียง")
+DURATION = re.compile(r"นาที|ชั่วโมง|ชม\.|วินาที")
 
 SURE = 1.0
 FUZZY_CUTOFF = 0.72  # ต่ำกว่านี้ถือว่าไม่ใช่คำสั่ง · สูงกว่านี้แต่ไม่ตรงเป๊ะ = ถามก่อน
@@ -117,6 +124,8 @@ def _match(targets: list[str], groups: list[tuple[str, dict]]) -> tuple[str, str
 
 
 def _volume(t: str, heard: str) -> Command | None:
+    if any(w in t for w in NOT_VOLUME) or DURATION.search(t):
+        return None
     # ต้องตรวจ "เปิดเสียง" ก่อน เพราะคำว่า "เปิดเสียง" มี "ปิดเสียง" ซ้อนอยู่ข้างใน (เ-ปิดเสียง)
     if "เปิดเสียง" in t or "unmute" in t:
         if find_number(t) is None:
@@ -143,8 +152,8 @@ def parse(text: str) -> Command | None:
     """แปลงประโยคเป็นคำสั่ง · None = ไม่ใช่คำสั่งเครื่อง (ส่งต่อให้สกิลอื่น)."""
     heard = text.strip()
     t = normalize(text)
-    if not t or t.startswith(LATER_WORDS):
-        return None
+    if not t or any(w in t for w in LATER_WORDS + NEGATIONS) or when.mentions_time(heard):
+        return None  # ให้ทำทีหลัง / สั่งไม่ให้ทำ → ไม่ใช่คำสั่งตอนนี้ (ส่งต่อให้สกิลนัดหมายหรือแชท)
 
     vol = _volume(t, heard)
     if vol:
