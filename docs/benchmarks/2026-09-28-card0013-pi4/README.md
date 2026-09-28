@@ -16,3 +16,18 @@
 
 **ยังไม่ได้ทดสอบ:** user service `aipc-llm` ผ่าน systemd (ต้องติดตั้งด้วย `install-llm.sh`) · หน้าจอจริง ·
 `kill -9` ระหว่างตอบ (T7) · ผู้ใช้อื่นลองต่อ socket (T12) · โมเดลผู้สมัครบน Pi 5
+
+## ติดตั้งเป็น user service (รุ่น `636a2afa`)
+
+`update-app.sh --apply` (ลองเปิดหน้า Login + หน้าจอเซสชันผ่าน · ลบรุ่นเก่า a0e6544e เหลือ 2 รุ่น) →
+`install-llm.sh --apply --model <โมเดลทดสอบ>` (llama-server → `/opt/aipc-llm` · โมเดล → `/opt/aipc-models` sha256 ตรง ·
+`/etc/aipc/llm.conf` · `/etc/systemd/user/aipc-llm.service` · `KillUserProcesses=yes` มีผลหลังรีบูต)
+
+| สิ่งที่ตรวจ | ผล |
+|---|---|
+| `systemctl --user start aipc-llm` | active · `/health` ready ผ่าน socket |
+| **T7: `kill -9` llama-server** | systemd เปิดใหม่เอง (NRestarts 1) · **กลับมา ready ใน 6 วิ** (เกณฑ์ ≤ 60 วิ) — (Pi 4, โมเดล 0.5B) |
+| MemoryMax | 4294967296 (4 GB) มีผลกับ service |
+| stop | inactive |
+
+**ยังไม่ได้:** เริ่มจาก `aipc-session` ตอน login จริง · ออกจากระบบแล้ว service หยุด (ต้องรีบูตให้ KillUserProcesses มีผลก่อน) · T12 ด้วยผู้ใช้คนที่สอง
