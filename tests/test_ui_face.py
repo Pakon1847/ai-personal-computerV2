@@ -5,6 +5,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
@@ -123,6 +124,32 @@ class FaceControllerTest(unittest.TestCase):
         self.assertTrue(self.fs.load().consent.given_at)
         self.assertTrue(self.cap.released, "ต้องปิดกล้องเมื่อเสร็จ")
         self.assertFalse(f.busy)
+
+    def test_save_failure_is_logged_as_failure(self):
+        """พบ 2026-09-28: log เขียน "enrolled" ก่อนบันทึกแม่แบบ · บันทึกล้ม (ดิสก์เต็ม) = log บอกสำเร็จ
+        แต่ไม่มีแม่แบบ → ตัวเลข "ลงทะเบียนสำเร็จ" ของการ์ด 0010 นับเกินจริง."""
+        f = self.make(Scanner(pipeline.Template(self.vec, 6, "2026-09-24T12:00:00+07:00")))
+        with mock.patch.object(self.fs, "save", side_effect=OSError(28, "No space left on device")):
+            f.startEnroll(True)
+            settle(f)
+        self.assertEqual(f.state, "none")
+        self.assertIn("ไม่สำเร็จ", f.message)
+        self.assertEqual(self.enroll_log()[-1]["result"], "save_failed")
+
+    def test_unreadable_template_does_not_crash_the_screen(self):
+        with mock.patch.object(self.fs, "load", side_effect=RuntimeError("ไฟล์แปลก")):
+            f = self.make(Scanner())
+        self.assertEqual(f.state, "broken")
+        self.assertTrue(f.problem)
+
+    def test_shutdown_stops_a_running_job(self):
+        """ปิดแอประหว่างลงทะเบียน: ต้องหยุดกล้องและรอเธรดจบก่อนปิด ไม่ปล่อยเธรดค้างตอนโปรแกรมจบ."""
+        f = self.make(Scanner(pipeline.Template(self.vec, 6, "t"), slow=0.05))
+        f.startEnroll(True)
+        f.shutdown(timeout=3)
+        self.assertFalse(f._thread.is_alive())
+        self.assertTrue(self.cap.released)
+        self.assertFalse(self.fs.path.exists(), "หยุดกลางคัน = ไม่บันทึก")
 
     def test_rejected_enroll_tells_why_saves_nothing(self):
         f = self.make(Scanner(pipeline.Rejected(("right",), "ต้องการภาพเพิ่ม: หันขวาเล็กน้อย")))

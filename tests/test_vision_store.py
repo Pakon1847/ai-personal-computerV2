@@ -56,6 +56,25 @@ class FaceStoreTest(unittest.TestCase):
         self.path.write_text("{เสีย", encoding="utf-8")
         self.assertEqual(self.s.load().frames, 6)
 
+    def test_wrong_shape_json_is_treated_as_corrupt(self):
+        """พบ 2026-09-28: JSON ที่อ่านได้แต่ผิดรูป (null, [], ตัวเลขอนันต์) ทำให้ load() โยน error
+        ออกไปถึงหน้าจอ → หน้าจอเปิดไม่ขึ้นทุกครั้งที่ login จนกว่าจะลบไฟล์เอง."""
+        self.s.save(self.vec, 6, NOW, self.consent)
+        data = json.loads(self.path.read_text(encoding="utf-8"))
+        data["frames"] = float("inf")
+        for text in ("null", "[]", '"x"', json.dumps(data)):
+            with self.subTest(text=text[:20]):
+                self.path.write_text(text, encoding="utf-8")
+                self.path.with_name(self.path.name + ".bak").unlink(missing_ok=True)
+                self.assertIsNone(self.s.load())
+                self.assertTrue(self.s.problem)
+
+    def test_wrong_shape_main_file_uses_backup(self):
+        self.s.save(self.vec, 6, NOW, self.consent)
+        self.s.save(self.vec, 7, NOW, self.consent)
+        self.path.write_text("[]", encoding="utf-8")
+        self.assertEqual(self.s.load().frames, 6)
+
     def test_both_corrupt_reports_problem(self):
         self.path.write_text("x", encoding="utf-8")
         self.assertIsNone(self.s.load())

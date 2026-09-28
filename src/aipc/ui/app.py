@@ -119,6 +119,9 @@ def shutdown(engine) -> None:
     import shiboken6
 
     backends = getattr(engine, "_backends", {})
+    face = backends.get("face")
+    if face is not None:  # หยุดงานกล้องและรอเธรดจบก่อนรื้อหน้าจอ (พบ 2026-09-28)
+        face.shutdown()
     if shiboken6.isValid(engine):
         shiboken6.delete(engine)
     backends.clear()

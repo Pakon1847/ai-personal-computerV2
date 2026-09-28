@@ -4,6 +4,9 @@ import QtQuick.Layouts
 
 Rectangle {
     color: Theme.bg
+    // ออกจาก Shell (เช่นกด "ออก" ในหน้าต่างพัฒนา) = หยุดงานกล้องที่ค้างอยู่ ไม่ให้กล้องเปิดต่อหลังหน้าจอหายไป
+    // (การ์ด 0006 ข้อ 6 · พบ 2026-09-28 ว่าไม่มีใครสั่งหยุด)
+    Component.onDestruction: if (typeof face !== "undefined" && face) face.cancel()
 
     RowLayout {
         anchors.fill: parent

@@ -95,6 +95,8 @@ class FaceStore:
     # ---------- อ่าน ----------
     def _read(self, p: Path) -> Stored:
         d = json.loads(p.read_text(encoding="utf-8"))
+        if not isinstance(d, dict):  # "null" "[]" ก็เป็น JSON ที่อ่านได้ (พบ 2026-09-28)
+            raise ValueError("รูปแบบไฟล์ผิด")
         if d.get("version") != VERSION:
             raise ValueError("รุ่นไฟล์ไม่รู้จัก")
         vec = np.frombuffer(base64.b64decode(d["vector_f32_b64"]), dtype="<f4").astype(np.float32)
@@ -115,7 +117,8 @@ class FaceStore:
             try:
                 stored = self._read(p)
                 break
-            except (OSError, ValueError, KeyError, TypeError):
+            # OverflowError: "frames": Infinity · ทุกแบบถือเป็นไฟล์เสีย ไม่โยนออกไปถึงหน้าจอ
+            except (OSError, ValueError, KeyError, TypeError, OverflowError):
                 continue
         if stored is None:
             self.problem = "ไฟล์แม่แบบใบหน้าเสีย · ลงทะเบียนใหม่ได้ (ใช้รหัสผ่านเข้าเครื่องได้ตามปกติ)"

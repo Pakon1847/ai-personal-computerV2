@@ -221,7 +221,12 @@ class FaceController(QObject):
         if not self._active:
             self._state = "unavailable"
         else:
-            stored = self._fs.load()
+            try:
+                stored = self._fs.load()
+            except Exception as e:  # noqa: BLE001 — หน้าจอต้องเปิดได้เสมอ แม้ไฟล์แม่แบบแปลกแค่ไหน (พบ 2026-09-28)
+                self._state, self._problem = "broken", f"อ่านแม่แบบใบหน้าไม่ได้ ({e}) · ลงทะเบียนใหม่ได้"
+                self.changed.emit()
+                return
             if stored is not None:
                 self._state = "enrolled"
                 self._enrolled_at = stored.created
@@ -331,17 +336,30 @@ class FaceController(QObject):
         t0 = time.monotonic()
         res = scanner.enroll(self._frames(cap, self._enroll_seconds), progress=self._report)
         cut = "cancelled" if self._stop.is_set() else "camera_lost" if self._camera_lost else ""
+
         # log ทุกครั้ง รวมที่ไม่สำเร็จ พร้อมเหตุผล (การ์ด 0010 ข้อ 5) · ไม่มีภาพ ไม่มี embedding
-        self._enroll_log().write(
-            None if cut else res, time.monotonic() - t0, cut, self._frames_seen
-        )
+        # เขียนหลังรู้ผลจริงเท่านั้น: เดิมเขียน "enrolled" ก่อนบันทึกแม่แบบ (พบ 2026-09-28)
+        def log(result, how=""):
+            try:
+                self._enroll_log().write(result, time.monotonic() - t0, how, self._frames_seen)
+            except OSError:
+                pass  # log เขียนไม่ได้ต้องไม่ทำให้การลงทะเบียนที่สำเร็จแล้วเสีย
+
         if cut == "cancelled":
+            log(None, cut)
             return False, "ยกเลิกแล้ว · ไม่ได้บันทึกอะไร"
         if cut == "camera_lost":
+            log(None, cut)
             return False, "กล้องหลุด · ไม่ได้บันทึกอะไร"
         if isinstance(res, pipeline.Rejected):
+            log(res)
             return False, f"ลงทะเบียนไม่สำเร็จ: {res.advice}"
-        self._fs.save(res.vector, res.frames, res.created, store.Consent(given))
+        try:
+            self._fs.save(res.vector, res.frames, res.created, store.Consent(given))
+        except OSError as e:
+            log(res, "save_failed")
+            return False, f"ลงทะเบียนไม่สำเร็จ: บันทึกแม่แบบไม่ได้ ({e.strerror or e})"
+        log(res)
         return True, f"ลงทะเบียนแล้ว ({res.frames} เฟรม)"
 
     def _scan_job(self, scanner, cap, stored):
@@ -395,6 +413,14 @@ class FaceController(QObject):
         """สำหรับเทสต์: รอเธรดงานจบ (ผลยังต้องให้ event loop ส่งกลับเธรดหลัก)."""
         if self._thread is not None:
             self._thread.join(timeout)
+
+    def shutdown(self, timeout: float = 3.0) -> None:
+        """ตอนปิดแอป: สั่งหยุดงานกล้องแล้วรอเธรดจบ (ปิดกล้องใน finally ของเธรดเอง).
+
+        เดิมไม่มีใครสั่งหยุด เธรด daemon จึงอาจยังอยู่ใน OpenCV ตอนโปรแกรมจบ (พบ 2026-09-28)
+        """
+        self._stop.set()
+        self.wait(timeout)
 
 
 class FacePreviewProvider(QQuickImageProvider):
