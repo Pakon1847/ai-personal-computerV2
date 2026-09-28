@@ -38,3 +38,20 @@
 ป้ายโมเดล "พร้อม · ในเครื่อง" · คำแรกขึ้นใน 3.6 วิ · จบใน 7.1 วิ · บันทึกประวัติ 1 บทสนทนา ·
 **พบ QML warning** เมื่อมีข้อความ AI บนจอ (`visible` ได้ undefined) → แก้แล้ว + เทสต์ `test_ai_answers_draw_without_warnings` ·
 คุณภาพภาษาไทยของโมเดล 0.5B แย่ (คาดไว้ · ไม่ใช่ผู้สมัคร) · หลังทดสอบปิด llama-server ชั่วคราวและ tunnel แล้ว
+
+## ถอดโมเดลทดสอบ + รีบูต + ออกจากระบบแล้วโปรเซสหาย (รุ่น `5b6fc516` · 2026-09-28 23:47)
+
+Pakon สั่ง "ถอดออก" และอนุญาตรีบูต · `update-app.sh --apply` (ผ่าน · ลบรุ่นเก่า fa1e7f6f) → `install-llm.sh --rollback` →
+ลบโมเดลทดสอบ 0.5B จาก `/opt/aipc-models` และ `~/aipc/models` → `install-accounts.sh --apply` (เขียน
+`/etc/systemd/logind.conf.d/aipc.conf` · ตอนนี้ `KillUserProcesses` อยู่ในสคริปต์นี้ ถอด AI แล้วไม่หาย) → รีบูต
+
+| สิ่งที่ตรวจ | ผล |
+|---|---|
+| หลังถอด | ไม่มี `aipc-llm.service`, `/etc/aipc/llm.conf`, `/opt/aipc-llm` · ไม่มี llama-server ทำงาน |
+| รีบูต | SSH กลับมาใน ~20 วิ · `greetd` active · หน้า Login (`cage` + `aipc.ui --greeter`) ของ `_greetd` ทำงาน · `/opt/aipc-v2` → `/opt/aipc-releases/5b6fc516` · ไม่มี unit ล้มเหลว |
+| logind | `KillUserProcesses=yes` มีผล (busctl ได้ `true`) |
+| ออกจากระบบ = ปิดทุกโปรเซส | เปิด `nohup sleep 4242 & disown` ใน SSH แล้วออก → เข้า SSH ใหม่ ไม่เหลือโปรเซสนั้น **ผ่าน (Pi 4)** |
+
+error ใน journal ตอนบูตเป็นของ OS (alsa-restore rule, blkmapd, bluetoothd, wpa_supplicant) ไม่เกี่ยวกับ aipc
+
+**ยังไม่ได้:** ออกจากเซสชัน V2 ที่หน้าจอจริงแล้วดูว่า llama-server หายด้วย (ต้องติดตั้งโมเดลก่อน → ทำบน Pi 5) · T12 ด้วยผู้ใช้คนที่สอง
