@@ -28,7 +28,8 @@ ApplicationWindow {
 
     // ทางออกของหน้าต่างพัฒนา · หน้าต่างเต็มจอที่ออกไม่ได้ = ขังผู้ใช้ไว้ในเครื่อง
     // ในเซสชันจริง (การ์ด 0004) ปิดไว้: หน้าจอนี้คือทั้งเซสชัน ปิดแล้วเหลือจอว่าง · ทางออกคือปุ่ม "ออก"
-    readonly property bool quitKeyEnabled: !session.active
+    // หน้า Login จริง (greeter) ก็ปิดไว้: ใครอยู่หน้าเครื่องก็กดปิดหน้า Login ได้ (พบ 2026-09-28)
+    readonly property bool quitKeyEnabled: !session.active && !login.greeterMode
     Shortcut {
         enabled: win.quitKeyEnabled
         sequence: "Ctrl+Alt+Q"

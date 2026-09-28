@@ -22,6 +22,12 @@ class UsernameTest(unittest.TestCase):
         self.assertFalse(v.check_username("root").ok)
         self.assertFalse(v.check_username("postgres").ok)
 
+    def test_trailing_newline_rejected(self):
+        """พบ 2026-09-28: re.match + $ ยอมให้มีขึ้นบรรทัดท้าย → "root\\n" หลุดทั้งกฎและรายชื่อสงวน
+        ชื่อนี้จะถูกส่งให้ useradd ตอนสร้างบัญชีจริง (การ์ด 0012) จึงต้องตรวจทั้งสตริง."""
+        for name in ("root\n", "namfon\n", "pakon2\r\n"):
+            self.assertFalse(v.check_username(name).ok, repr(name))
+
 
 class PasswordTest(unittest.TestCase):
     def test_short_passwords_score_low(self):

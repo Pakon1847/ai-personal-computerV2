@@ -73,6 +73,9 @@ class QmlLoadTest(unittest.TestCase):
                         ctx = engine.rootContext()
                         self.assertFalse(ctx.contextProperty("devMode"), "greeter ต้องไม่มีโหมดพัฒนา")
                         self.assertEqual(ctx.contextProperty("login").scanState, "unavailable")
+                        # พบ 2026-09-28: Ctrl+Alt+Q ปิดหน้า Login จริงได้ → ใครอยู่หน้าเครื่องก็ปิดได้
+                        win = engine.rootObjects()[0]
+                        self.assertFalse(win.property("quitKeyEnabled"), "หน้า Login จริงห้ามปิดได้")
                     if case.get("session"):
                         ctx = engine.rootContext()
                         self.assertFalse(ctx.contextProperty("devMode"), "เซสชันจริงต้องไม่มีโหมดพัฒนา")

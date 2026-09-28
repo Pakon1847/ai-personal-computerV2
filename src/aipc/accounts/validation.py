@@ -62,7 +62,8 @@ def check_username(name: str) -> Result:
         return Result(False, "ใส่ชื่อผู้ใช้")
     if name != name.lower():
         return Result(False, "ใช้ตัวพิมพ์เล็กเท่านั้น")
-    if not USERNAME_RE.match(name):
+    # fullmatch ไม่ใช่ match: "$" ของ match ยอมให้มี "\n" ท้ายสตริง → "root\n" เคยผ่าน (พบ 2026-09-28)
+    if not USERNAME_RE.fullmatch(name):
         return Result(False, "ขึ้นต้นด้วย a–z แล้วตามด้วย a–z 0–9 หรือ - รวม 3–32 ตัว")
     if name in RESERVED:
         return Result(False, "ชื่อนี้ระบบใช้อยู่แล้ว")
