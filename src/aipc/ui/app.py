@@ -13,6 +13,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
 from aipc.ui.backend import (
+    ChatController,
     FilesBrowser,
     LoginController,
     SessionController,
@@ -76,6 +77,8 @@ def build(opts: Options, argv: list[str] | None = None):
     # เก็บ backend ไว้บน engine ด้วย ไม่งั้น Python จะเก็บกวาดทิ้งขณะหน้าจอยังใช้อยู่
     # เซสชันจริงกับ greeter: ไม่มีโหมดพัฒนา/สาธิต · เซสชันจริงเริ่มที่ Shell เสมอ (login ผ่าน greetd แล้ว)
     real = bool(opts.greeter_session) or opts.session
+    # หน้า Login ไม่มีเจ้าของเซสชัน → ไม่คุยกับ AI (การ์ด 0013) · เซสชัน/หน้าต่างพัฒนาใช้ llama-server ของผู้ใช้
+    chat = ChatController(active=not opts.greeter_session)
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
@@ -88,11 +91,15 @@ def build(opts: Options, argv: list[str] | None = None):
         # สมัคร/กู้คืนจริงเฉพาะหน้า Login จริง · หน้าต่างพัฒนาเป็นแบบจำลองที่บอกว่า "จำลอง" (การ์ด 0012)
         "signup": SignupController(real=bool(opts.greeter_session), dev=opts.dev and not real),
         "filesBrowser": FilesBrowser(),
-        "skills": SkillsController(run_timer=not opts.greeter_session),
+        "skills": SkillsController(
+            run_timer=not opts.greeter_session, llm_ready=lambda: chat.ready
+        ),
+        "chat": chat,
         "session": SessionController(opts.session and not opts.greeter_session),
         # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
         "face": FaceController(active=not opts.greeter_session),
     }
+    chat.statusChanged.connect(engine._backends["skills"].skillsChanged)  # สกิลแปลพร้อมเมื่อ AI พร้อม
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():
         ctx.setContextProperty(name, obj)
@@ -123,6 +130,9 @@ def shutdown(engine) -> None:
     face = backends.get("face")
     if face is not None:  # หยุดงานกล้องและรอเธรดจบก่อนรื้อหน้าจอ (พบ 2026-09-28)
         face.shutdown()
+    chat = backends.get("chat")
+    if chat is not None:  # หยุดคำตอบที่ค้างและตัวจับเวลาตรวจสถานะ AI
+        chat.shutdown()
     if shiboken6.isValid(engine):
         shiboken6.delete(engine)
     backends.clear()

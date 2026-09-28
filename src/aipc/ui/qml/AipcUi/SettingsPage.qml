@@ -54,5 +54,30 @@ ColumnLayout {
 
     FacePanel { Layout.fillWidth: true }
 
+    // ประวัติแชทอยู่ใน home ของคุณเท่านั้น · ลบทั้งหมดได้ทันที (การ์ด 0013 ข้อ 4)
+    Card {
+        Layout.fillWidth: true
+        implicitHeight: chatRow.implicitHeight + 40
+        RowLayout {
+            id: chatRow
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 16
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                AppText { text: "ประวัติแชท"; strong: true }
+                AppText { id: chatDeleted; Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                          text: "เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · " + chat.history.length + " บทสนทนา" }
+            }
+            AppButton {
+                objectName: "deleteChats"
+                text: "ลบประวัติแชททั้งหมด"; kind: "secondary"; iconPath: Icons.trash
+                enabled: chat.history.length > 0 && !chat.busy
+                onClicked: chatDeleted.text = "ลบแล้ว " + chat.deleteAll() + " บทสนทนา"
+            }
+        }
+    }
+
     Item { Layout.fillHeight: true }
 }

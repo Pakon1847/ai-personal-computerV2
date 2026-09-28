@@ -1,0 +1,17 @@
+# AI ในเครื่องของผู้ใช้แต่ละคน (การ์ด 0013) · ติดตั้งที่ /etc/systemd/user/ โดย install-llm.sh
+# เริ่มจาก aipc-session ตอน login · หยุดเมื่อผู้ใช้ออกจากระบบ (user manager ปิด)
+[Unit]
+Description=aipc: llama-server ของผู้ใช้ (Unix socket ใน XDG_RUNTIME_DIR)
+ConditionPathExists=/etc/aipc/llm.conf
+
+[Service]
+ExecStart=/opt/aipc-v2/scripts/pi/session/aipc-llm-start
+# พัง = เปิดใหม่เอง (T7) · หน้าจอบอก "AI กำลังเริ่มใหม่" ระหว่างนั้น
+Restart=on-failure
+RestartSec=3
+# กัน LLM ดึง RAM จนหน้าจอและระบบค้าง · ให้ความสำคัญ CPU ต่ำกว่าหน้าจอเล็กน้อย
+MemoryMax=4G
+Nice=5
+
+[Install]
+WantedBy=default.target

@@ -34,7 +34,9 @@ Item {
             iconPath: system.cameraPresent || face.busy ? Icons.camera : Icons.cameraOff
         }
         Chip { objectName: "micIndicator"; text: "ไมค์ปิด"; iconPath: Icons.mic }
-        Chip { text: "โมเดล: ยังไม่เชื่อมต่อ"; iconPath: Icons.cpu; kind: "warn"; compact: bar.tight }
+        // สถานะจริงจาก /health ของ llama-server (การ์ด 0013 · H5)
+        Chip { objectName: "modelIndicator"; text: chat.statusText; iconPath: Icons.cpu; compact: bar.tight
+               kind: chat.ready ? "ok" : chat.status === "loading" ? "accent" : "warn" }
         Chip { text: system.storageText; iconPath: Icons.hdd; compact: bar.tight }
         Chip { text: system.tempText; iconPath: Icons.thermo; compact: bar.tight; Accessible.name: "อุณหภูมิ " + system.tempText }
     }

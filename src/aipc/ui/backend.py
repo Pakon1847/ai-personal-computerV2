@@ -469,9 +469,13 @@ class SkillsController(QObject):
     reminderDue = Signal("QVariantMap")  # noqa: N815
     remindersChanged = Signal()  # noqa: N815
 
+    skillsChanged = Signal()  # noqa: N815
+
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
-                 run_timer: bool = True):  # fmt: skip
+                 run_timer: bool = True, llm_ready=None):  # fmt: skip
         super().__init__()
+        # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
+        self._llm_ready = llm_ready or (lambda: False)
         from aipc.skills import actions, manifest, reminders
 
         self._skills = manifest.load_builtin()
@@ -501,11 +505,14 @@ class SkillsController(QObject):
     def _badge(self, skill, reason: str) -> dict:
         return {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}
 
-    @Property("QVariantList", constant=True)
+    def available(self) -> set[str]:
+        return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() else set())
+
+    @Property("QVariantList", notify=skillsChanged)
     def skills(self) -> list:
         out = []
         for s in self._skills:
-            missing = [n for n in s.needs if n not in self.AVAILABLE]
+            missing = [n for n in s.needs if n not in self.available()]
             out.append({
                 "id": s.id, "name": s.name, "description": s.description,
                 "worker": self.WORKER_LABEL[s.worker], "permissions": s.permission_labels(),
@@ -609,7 +616,7 @@ class SkillsController(QObject):
     def handle(self, text: str) -> dict:
         from aipc.skills import machine, router
 
-        r = router.route(text, self._skills, set(self.AVAILABLE))
+        r = router.route(text, self._skills, self.available())
         card = {
             "kind": r.kind,
             "badge": {},
@@ -649,11 +656,18 @@ class SkillsController(QObject):
             if d.unknown:
                 card["lines"].append("อ่านไม่ได้ (จึงไม่สรุป): " + ", ".join(d.unknown))
             card["page"] = ""
+        elif r.kind == "skill" and r.skill.worker == "llm":
+            # สกิลที่ LLM ทำ (สกิล 1 แปล): ให้หน้าจอถาม LLM ด้วย prompt ของสกิล (การ์ด 0013)
+            card.update(
+                kind="chat", llm=True, badge=self._badge(r.skill, r.reason), prompt=r.skill.prompt
+            )
         elif r.kind in ("needs", "skill"):
             card["badge"] = self._badge(r.skill, r.reason)
             card["kind"] = "needs"
             card["title"] = f"สกิล “{r.skill.name}” ยังใช้ไม่ได้"
             card["lines"] = ["ต้องมีก่อน: " + self.NEED_LABEL[n] for n in (r.missing or r.skill.needs)]
+        elif self._llm_ready():
+            card.update(kind="chat", llm=True, prompt="")  # คุยทั่วไป → LLM ในเครื่อง (การ์ด 0013)
         else:
             card["title"] = "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง"
             card["lines"] = [
@@ -693,3 +707,191 @@ class SkillsController(QObject):
         else:
             card.update(self._run_plan(plan))
         return card
+
+
+class ChatController(QObject):
+    """แชทกับ LLM ในเครื่อง (การ์ด 0013) · ถาม llama-server ของผู้ใช้ในเธรดแยก แล้วส่ง token กลับทีละคำ.
+
+    active=False (หน้า Login) = ไม่ติดต่อ AI เลย · สถานะมาจากการถาม /health จริงทุก 5 วิ (H5)
+    คำตอบของ LLM เป็นข้อความเท่านั้น สั่ง Action ไม่ได้ (H8)
+    """
+
+    SYSTEM = "คุณคือผู้ช่วย AI ภาษาไทยที่ทำงานในเครื่องของผู้ใช้ ตอบเป็นภาษาไทย กระชับ ถูกต้อง ถ้าไม่รู้ให้บอกว่าไม่รู้"
+    STATUS_TEXT = {"ready": "โมเดล: พร้อม · ในเครื่อง", "loading": "โมเดล: กำลังโหลด…",
+                   "down": "โมเดล: ไม่พร้อม", "off": "โมเดล: ไม่ใช้ในหน้านี้"}  # fmt: skip
+    NOTE = {"stopped": "หยุดแล้ว", "crashed": "ตอบไม่จบ: AI หยุดทำงาน · ระบบกำลังเปิด AI ใหม่เอง"}
+
+    changed = Signal()
+    streamChanged = Signal()  # noqa: N815
+    statusChanged = Signal()  # noqa: N815
+    finished = Signal(str, str)  # ข้อความ, หมายเหตุ ("" = จบปกติ)
+    _token = Signal(str)
+    _done = Signal(object)
+    _health = Signal(str)
+
+    def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000):
+        super().__init__()
+        from aipc.chat import client
+        from aipc.chat import store as chat_store
+
+        self._active = active
+        self._target = target or client.Target.from_env()
+        self._store = store or chat_store.ChatStore()
+        self._conv = chat_store.new_conversation()
+        self._temporary = False
+        self._status = "down" if active else "off"
+        self._busy, self._stream_text, self._stream = False, "", None
+        self._trimmed, self._save_error = False, ""
+        self._token.connect(self._on_token)
+        self._done.connect(self._on_done)
+        self._health.connect(self._on_health)
+        self._timer = QTimer(self, interval=poll_ms, timeout=self.refresh)
+        if active:
+            self._timer.start()
+            self.refresh()
+
+    # ---------- สถานะที่ QML อ่าน ----------
+    @Property(str, notify=statusChanged)
+    def status(self) -> str:
+        return self._status
+
+    @Property(str, notify=statusChanged)
+    def statusText(self) -> str:  # noqa: N802
+        return self.STATUS_TEXT[self._status]
+
+    @Property(bool, notify=statusChanged)
+    def ready(self) -> bool:
+        return self._status == "ready"
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    @Property(str, notify=streamChanged)
+    def streamText(self) -> str:  # noqa: N802
+        return self._stream_text
+
+    @Property(bool, notify=changed)
+    def temporary(self) -> bool:
+        return self._temporary
+
+    @Property(str, notify=changed)
+    def notice(self) -> str:
+        parts = []
+        if self._temporary:
+            parts.append("แชทชั่วคราว: ไม่บันทึกประวัติ")
+        if self._trimmed:
+            parts.append("บทสนทนายาวแล้ว AI เห็นเฉพาะข้อความล่าสุด")
+        if self._save_error:
+            parts.append(self._save_error)
+        return " · ".join(parts)
+
+    @Property("QVariantList", notify=changed)
+    def history(self) -> list:
+        try:
+            return self._store.list()
+        except OSError:
+            return []
+
+    # ---------- สถานะ AI ----------
+    @Slot()
+    def refresh(self) -> None:
+        if not self._active or self._busy:
+            return
+        import threading
+
+        from aipc.chat import client
+
+        target = self._target
+        threading.Thread(
+            target=lambda: self._health.emit(client.health(target)), daemon=True
+        ).start()
+
+    def _on_health(self, status: str) -> None:
+        if status != self._status:
+            self._status = status
+            self.statusChanged.emit()
+
+    # ---------- คำสั่งจาก QML ----------
+    @Slot(str, str, result=bool)
+    def send(self, text: str, prompt: str = "") -> bool:
+        if self._busy or not text.strip() or self._status != "ready":
+            return False
+        import threading
+
+        from aipc.chat import client
+
+        self._conv["messages"].append({"role": "user", "content": text})
+        if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
+            messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
+        else:
+            messages, trimmed = client.fit_context(self.SYSTEM, self._conv["messages"])
+        self._trimmed = trimmed and not prompt
+        self._busy, self._stream_text = True, ""
+        stream = self._stream = client.Stream(self._target, messages)
+        self.changed.emit()
+        self.streamChanged.emit()
+        threading.Thread(
+            target=lambda: self._done.emit(stream.run(self._token.emit)), daemon=True
+        ).start()
+        return True
+
+    @Slot()
+    def stop(self) -> None:
+        if self._stream is not None:
+            self._stream.abort()
+
+    def _on_token(self, token: str) -> None:
+        self._stream_text += token
+        self.streamChanged.emit()
+
+    def _on_done(self, reply) -> None:
+        self._busy, self._stream = False, None
+        note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
+        if reply.text:
+            self._conv["messages"].append({"role": "assistant", "content": reply.text})
+        if not self._temporary:
+            try:
+                self._store.save(self._conv)
+                self._save_error = ""
+            except OSError as e:  # บันทึกไม่ได้ = บอก ไม่หายเงียบ (H2)
+                self._save_error = f"บันทึกประวัติไม่สำเร็จ ({e.strerror or e})"
+        self._stream_text = ""
+        self.changed.emit()
+        self.streamChanged.emit()
+        self.finished.emit(reply.text, note)
+        if reply.reason == "crashed":
+            self._on_health("down")
+        self.refresh()
+
+    @Slot(bool)
+    def newChat(self, temporary: bool) -> None:  # noqa: N802
+        from aipc.chat import store as chat_store
+
+        self.stop()
+        self._conv, self._temporary, self._trimmed = chat_store.new_conversation(), temporary, False
+        self.changed.emit()
+
+    @Slot(str, result="QVariantList")
+    def openChat(self, cid: str) -> list:  # noqa: N802
+        conv = self._store.load(cid)
+        if conv is None or self._busy:
+            return []
+        self._conv, self._temporary, self._trimmed = conv, False, False
+        self.changed.emit()
+        return conv["messages"]
+
+    @Slot(str)
+    def deleteChat(self, cid: str) -> None:  # noqa: N802
+        self._store.delete(cid)
+        self.changed.emit()
+
+    @Slot(result=int)
+    def deleteAll(self) -> int:  # noqa: N802
+        n = self._store.delete_all()
+        self.newChat(False)
+        return n
+
+    def shutdown(self) -> None:
+        self._timer.stop()
+        self.stop()

@@ -1,0 +1,15 @@
+#!/bin/sh
+# เริ่ม llama-server ของผู้ใช้คนนี้ (การ์ด 0013) · systemd user service aipc-llm.service เรียกไฟล์นี้
+# ค่าตั้งมาจาก /etc/aipc/llm.conf (ผู้ดูแลแก้): MODEL= THREADS= CTX=
+# คุยผ่าน Unix socket ใน $XDG_RUNTIME_DIR/aipc (0700 ของผู้ใช้คนนี้) · ไม่เปิดพอร์ตเครือข่าย (ADR-008)
+# --no-webui --no-slots = ปิดหน้าเว็บในตัวและหน้าดูสถานะ slot (ไม่ให้เห็นบทสนทนาผ่าน API)
+set -eu
+. /etc/aipc/llm.conf
+: "${MODEL:?ไม่มี MODEL ใน /etc/aipc/llm.conf}"
+DIR="${XDG_RUNTIME_DIR:?ไม่มี XDG_RUNTIME_DIR}/aipc"
+mkdir -p "$DIR"
+chmod 0700 "$DIR"
+rm -f "$DIR/llm.sock"   # socket ค้างจากรอบที่แล้ว (ล่ม) ทำให้เริ่มใหม่ไม่ได้
+export LD_LIBRARY_PATH=/opt/aipc-llm/lib
+exec /opt/aipc-llm/bin/llama-server -m "$MODEL" --host "$DIR/llm.sock" \
+  -c "${CTX:-4096}" -t "${THREADS:-4}" --no-webui --no-slots

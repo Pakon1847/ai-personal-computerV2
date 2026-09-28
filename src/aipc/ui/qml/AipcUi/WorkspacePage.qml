@@ -3,7 +3,8 @@
 // ยังไม่มีข้อความ = หน้าแรก: คำทัก + ช่องพิมพ์กลางจอ + ปุ่มลัดสกิลที่ใช้ได้จริง + นัดถัดไป + สถานะเครื่อง
 // มีข้อความแล้ว = แชท: คอลัมน์กลางกว้างไม่เกิน 760 px ช่องพิมพ์ย้ายลงล่าง (ช่องเดียวกัน ไม่ใช่สองช่อง)
 // ข้อความทุกอันผ่านตัวเลือกสกิล (skills.handle ใน Python) แล้วได้ "การ์ดคำตอบ" กลับมา
-// ยังไม่มีโมเดลในเครื่อง ข้อความคุยทั่วไปจึงได้ประกาศจากระบบ ไม่ใช่คำตอบปลอมของ AI · ยังไม่บันทึกประวัติ
+// ข้อความที่ไม่ตรงสกิลใด (และสกิลแปล) ส่งให้ LLM ในเครื่อง (chat · การ์ด 0013) คำตอบขึ้นทีละคำ หยุดได้ด้วยปุ่ม/Esc
+// AI ไม่พร้อม = ประกาศจากระบบตามจริง ไม่ใช่คำตอบปลอม · ประวัติบันทึกใน home (ยกเว้นแชทชั่วคราว)
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -12,7 +13,7 @@ Item {
     id: root
     clip: true   // ตัดส่วนที่เลื่อนพ้นกรอบ รวมไอคอนแบบ Shape ที่ ListView ตัดเองไม่หมด
 
-    // รายการข้อความเป็น JS array ธรรมดา: { user: true, text } หรือ { user: false, card }
+    // รายการข้อความเป็น JS array ธรรมดา: { user: true, text } · { user: false, card } · { ai: true, text, note, done }
     property var items: []
     property var answered: ({})   // token ของการ์ดที่ตอบ "ใช่/ไม่ใช่" ไปแล้ว
     readonly property bool home: items.length === 0
@@ -34,10 +35,32 @@ Item {
     }
     function send() {
         const text = input.text.trim()
-        if (text === "") return
+        if (text === "" || chat.busy) return
         push({ user: true, text: text })
         input.text = ""
-        showCard(skills.handle(text))
+        const card = skills.handle(text)
+        if (card.llm && chat.send(text, card.prompt || "")) {
+            push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
+        } else if (card.llm) {
+            card.title = "ยังตอบไม่ได้: " + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
+            showCard(card)
+        } else {
+            showCard(card)
+        }
+    }
+    function loadChat(messages) {
+        items = messages.map(m => m.role === "user" ? { user: true, text: m.content }
+                                                    : { ai: true, text: m.content, note: "", done: true })
+        answered = ({})
+    }
+    Connections {
+        target: chat
+        function onFinished(text, note) {
+            const i = root.items.slice()
+            if (i.length === 0 || !i[i.length - 1].ai) return
+            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true })
+            root.items = i
+        }
     }
     function sendText(text) {
         input.text = text
@@ -65,7 +88,12 @@ Item {
         AppButton {
             visible: !root.home
             text: "แชทใหม่"; kind: "secondary"; iconPath: Icons.plus
-            onClicked: { root.items = []; root.answered = ({}) }
+            onClicked: { chat.newChat(false); root.items = []; root.answered = ({}) }
+        }
+        AppButton {
+            text: chat.temporary ? "แชทชั่วคราว ✓" : "แชทชั่วคราว"; kind: "secondary"
+            ToolTip.visible: hovered; ToolTip.text: "ไม่บันทึกประวัติของบทสนทนานี้"
+            onClicked: { chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
         }
     }
     Popup {
@@ -80,8 +108,19 @@ Item {
             AppText { text: "ประวัติบทสนทนา"; strong: true }
             AppText {
                 Layout.fillWidth: true
+                visible: chat.history.length === 0
                 text: "ยังไม่มีบทสนทนาที่บันทึกไว้"
                 size: Theme.fontSmall; color: Theme.inkMuted
+            }
+            Repeater {
+                model: chat.history.slice(0, 12)
+                AppButton {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    kind: "ghost"
+                    text: modelData.title || "(ไม่มีชื่อ)"
+                    onClicked: { root.loadChat(chat.openChat(modelData.id)); historyPopup.close() }
+                }
             }
         }
     }
@@ -285,7 +324,7 @@ Item {
             id: row
             required property var modelData
             width: ListView.view.width
-            height: modelData.user ? bubble.height : card.height
+            height: modelData.user ? bubble.height : modelData.ai ? aiBox.height : card.height
 
             Rectangle {
                 id: bubble
@@ -303,9 +342,40 @@ Item {
                     color: Theme.bubbleInk
                 }
             }
+            Rectangle {
+                id: aiBox
+                visible: !!row.modelData.ai
+                width: parent.width
+                height: visible ? aiCol.implicitHeight + 24 : 0
+                radius: Theme.radiusLarge
+                color: Theme.surface
+                border.width: 1
+                border.color: Theme.line
+                ColumnLayout {
+                    id: aiCol
+                    x: 16; y: 12
+                    width: parent.width - 32
+                    spacing: 6
+                    AppText {
+                        text: "AI ในเครื่อง" + (row.modelData.skill ? " · " + row.modelData.skill : "")
+                        size: Theme.fontCaption; color: Theme.inkMuted
+                    }
+                    AppText {
+                        objectName: "aiText"
+                        Layout.fillWidth: true
+                        text: row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : "กำลังอ่านข้อความ…")
+                    }
+                    AppText {
+                        visible: !!row.modelData.note
+                        Layout.fillWidth: true
+                        text: row.modelData.note || ""
+                        size: Theme.fontSmall; color: Theme.warnInk
+                    }
+                }
+            }
             SkillCard {
                 id: card
-                visible: !row.modelData.user
+                visible: !row.modelData.user && !row.modelData.ai
                 width: parent.width
                 height: visible ? implicitHeight : 0
                 info: row.modelData.card || ({})
@@ -354,11 +424,19 @@ Item {
                         if (enter && !(event.modifiers & Qt.ShiftModifier) && !input.inputMethodComposing) {
                             event.accepted = true
                             root.send()
+                        } else if (event.key === Qt.Key_Escape && chat.busy) {
+                            event.accepted = true
+                            chat.stop()   // BRIEF 5.4 ข้อ 7: หยุดการตอบด้วย Esc
                         }
                     }
                 }
             }
-            AppButton { text: "ส่ง"; iconPath: Icons.send; enabled: input.text.trim() !== ""; onClicked: root.send() }
+            AppButton {
+                objectName: "sendButton"
+                text: chat.busy ? "หยุด" : "ส่ง"; iconPath: chat.busy ? Icons.stop : Icons.send
+                enabled: chat.busy || input.text.trim() !== ""
+                onClicked: chat.busy ? chat.stop() : root.send()
+            }
         }
     }
     AppText {
@@ -367,7 +445,9 @@ Item {
         anchors.top: composer.bottom
         anchors.topMargin: 6
         anchors.horizontalCenter: parent.horizontalCenter
-        text: "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
-        size: Theme.fontCaption; color: Theme.inkFaint; oneLine: true
+        objectName: "chatHint"
+        text: chat.notice !== "" ? chat.notice
+              : chat.busy ? "Esc หรือปุ่มหยุด = หยุดตอบ" : "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
+        size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true
     }
 }

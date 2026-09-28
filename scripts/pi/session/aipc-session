@@ -16,4 +16,10 @@ export XDG_SESSION_DESKTOP=aipc
 # ผังแป้นเพิ่มของเรา (ปุ่ม ~ สลับไทย/อังกฤษ) · libxkbcommon ค้นที่นี่ก่อนที่ของระบบ
 export XKB_CONFIG_EXTRA_PATH="$HERE/xkb"
 
+# AI ในเครื่อง (การ์ด 0013): llama-server เป็น user service ของผู้ใช้คนนี้ · ไม่รอให้โหลดเสร็จ (หน้าจอขึ้นก่อน)
+# ไม่มีไฟล์ตั้งค่า/โมเดล = ไม่เริ่ม หน้าจอบอก "โมเดล: ไม่พร้อม" เอง · ออกจากระบบแล้ว service หยุดพร้อม user manager
+if [ -f /etc/aipc/llm.conf ]; then
+  systemctl --user --no-block start aipc-llm.service 2>/dev/null || true
+fi
+
 exec labwc -C "$HERE/labwc" -S "$HERE/aipc-shell-loop"
