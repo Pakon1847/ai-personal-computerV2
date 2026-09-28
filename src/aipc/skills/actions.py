@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -92,12 +93,35 @@ class Outcome:
 
 Runner = Callable[[list[str]], int]
 
+# โปรแกรมที่เปิดแอปอื่น · แอปที่เปิดขึ้นมาทำงานต่อหลังคำสั่งจบ จึงห้ามรอ output ของมัน
+LAUNCHERS = ("xdg-open", "gtk-launch")
+LAUNCH_SETTLE_S = 1.5  # รอดูแค่ว่าตัวเปิดล้มทันทีไหม (เช่น ไม่พบแอป) · ยังทำงานอยู่ = กำลังเปิดแอป
+
 
 def run_process(args: list[str]) -> int:
+    """รันคำสั่งแบบ list (ไม่ผ่าน shell) · คืนรหัสจบ · 127 = รันไม่ได้หรือหมดเวลา."""
+    quiet = dict.fromkeys(("stdin", "stdout", "stderr"), subprocess.DEVNULL)
     try:
-        return subprocess.run(args, check=False, capture_output=True, timeout=10).returncode
+        if args and args[0] in LAUNCHERS:
+            return _launch(args, quiet)
+        return subprocess.run(args, check=False, timeout=10, **quiet).returncode
     except (OSError, subprocess.TimeoutExpired):
         return 127
+
+
+def _launch(args: list[str], quiet: dict) -> int:
+    """เปิดแอปโดยไม่ผูก output และแยกกลุ่มโปรเซส.
+
+    เดิมใช้ capture_output: แอปที่ถูกเปิดถือ pipe ไว้ → รอจนหมดเวลา 10 วิ (หน้าจอค้าง)
+    แล้วรายงานว่าล้มเหลวทั้งที่แอปเปิดแล้ว (พบ 2026-09-28)
+    """
+    p = subprocess.Popen(args, start_new_session=True, **quiet)
+    try:
+        return p.wait(timeout=LAUNCH_SETTLE_S)
+    except subprocess.TimeoutExpired:
+        # ยังทำงานอยู่ = กำลังเปิดแอป (xdg-open บางแบบรันแอปค้างไว้เอง) · เก็บโปรเซสเมื่อจบ ไม่ให้เป็น zombie
+        threading.Thread(target=p.wait, daemon=True).start()
+        return 0
 
 
 def command_for(plan: Plan) -> list[str] | None:

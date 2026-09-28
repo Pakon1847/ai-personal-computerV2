@@ -1,5 +1,8 @@
 import copy
+import sys
+import time
 import unittest
+from unittest import mock
 
 from aipc.doctor import hardware as hw
 from aipc.skills import actions, command, machine, manifest, router, thainum
@@ -171,6 +174,33 @@ class ExecutorTest(unittest.TestCase):
     def test_unknown_action_refused(self):
         out = actions.Executor(dry_run=False).execute(actions.Plan("format_disk"))
         self.assertFalse(out.ok)
+
+
+class LauncherTest(unittest.TestCase):
+    """พบ 2026-09-28: รอ output ของแอปที่เปิด (capture_output) → แอปถือ pipe ค้าง หน้าจอค้าง 10 วิ
+    แล้วบอกว่า "ทำไม่สำเร็จ" ทั้งที่แอปเปิดแล้ว · ตัวเปิดแอปต้องไม่รอแอป."""
+
+    # "ตัวเปิด" ที่ปล่อยแอปลูกให้ทำงานต่อ 6 วิแล้วจบเอง (เหมือน gtk-launch)
+    APP = (
+        "import subprocess, sys; "
+        "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(6)']); print('ok')"
+    )
+
+    def test_launcher_does_not_wait_for_the_app(self):
+        with mock.patch.object(actions, "LAUNCHERS", (sys.executable,)):
+            t0 = time.monotonic()
+            code = actions.run_process([sys.executable, "-c", self.APP])
+            elapsed = time.monotonic() - t0
+        self.assertEqual(code, 0)
+        self.assertLess(elapsed, 4, "ต้องไม่รอจนแอปปิด")
+
+    def test_launcher_that_fails_at_once_is_reported(self):
+        with mock.patch.object(actions, "LAUNCHERS", (sys.executable,)):
+            code = actions.run_process([sys.executable, "-c", "raise SystemExit(3)"])
+        self.assertNotEqual(code, 0)
+
+    def test_missing_program(self):
+        self.assertEqual(actions.run_process(["aipc-no-such-program-xyz"]), 127)
 
 
 def checks(**status):
