@@ -25,7 +25,30 @@
 ```
 
 ติดตั้ง/ย้อนกลับ: `scripts/pi/install-greeter.sh [--apply] [--session v2] | --rollback` · ทางเข้าสำรอง: SSH, tty2
-อัปเดตแอปอย่างเดียว (ไม่แตะ greetd/บริการ): `scripts/pi/update-app.sh [--apply] | --rollback` · ติดตั้งลง venv เดิมด้วย `--no-deps`
+อัปเดตแอป (ADR-009): `scripts/pi/update-app.sh [--apply] | --rollback` · `/opt/aipc-v2` เป็น symlink → `/opt/aipc-releases/<commit>`
+(แต่ละรุ่นมี venv ของตัวเอง) · ลองเปิดหน้า Login ด้วย `_greetd` ก่อนสลับ · rollback = สลับ symlink
+
+## สมัครบัญชีและลืมรหัสผ่าน (การ์ด 0012)
+
+```text
+หน้า Login (_greetd) ── sudo -n /usr/local/sbin/aipc-accounts (ไม่มีอาร์กิวเมนต์ · JSON ทาง stdin)
+                           └ aipc.accounts.helper (root): PAM ตรวจรหัสผู้ดูแล + กลุ่ม sudo → useradd/chpasswd
+                              → home 0700 → รหัสกู้คืน (hash scrypt ใน /var/lib/aipc/recovery, root 0600)
+```
+
+ติดตั้ง: `scripts/pi/install-accounts.sh [--apply] | --rollback` (ตัวช่วย + PAM + sudoers ผ่าน visudo + ปิด autologin tty1)
+
+## AI ในเครื่อง (การ์ด 0013)
+
+```text
+aipc-session ── systemctl --user start aipc-llm ── llama-server -m /opt/aipc-models/<โมเดล>
+                                                     --host $XDG_RUNTIME_DIR/aipc/llm.sock (0700 ของผู้ใช้)
+หน้าจอ: ข้อความ → ตัวคัดสกิล → ไม่ตรงสกิล/สกิลแปล → ChatController (เธรดแยก) → aipc.chat.client (SSE ทีละ token)
+ประวัติ: ~/.local/share/aipc/chats/<id>.json (atomic) · แชทชั่วคราวไม่เขียนดิสก์
+```
+
+ติดตั้ง: `scripts/pi/install-llm.sh --model <ไฟล์.gguf> [--apply] | --rollback` · service: `Restart=on-failure`, `MemoryMax=4G` ·
+`KillUserProcesses=yes` (ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้)
 
 ## Skill (`aipc.skills`)
 
@@ -98,8 +121,8 @@ qml/AipcUi/Main.qml  ── AppState.screen ──►  LoginScreen      backend.
 | ธีมสว่าง/มืด, ขนาดตัวอักษร 100–200% | ทำงานจริง บันทึกที่ `~/.config/aipc/ui.json` |
 | แถบสถานะ, หน้าสุขภาพเครื่อง | ค่าจริงจาก `aipc.doctor` ทุก 10 วิ |
 | หน้าไฟล์ของฉัน | รายการไฟล์จริงใน home แบบอ่านอย่างเดียว |
-| ฟอร์มสมัคร | ตรวจข้อมูลจริง, รหัสกู้คืนสุ่มจริง (`secrets`) — **แต่ไม่ได้สร้างบัญชีหรือบันทึกอะไร** |
-| ช่องพิมพ์แชท | Enter/Shift+Enter/IME ทำงานจริง · ทุกข้อความผ่านตัวคัดสกิล — สั่งงานเครื่อง ถามเครื่อง และจดนัดใช้ได้จริง · **คุยทั่วไป/แปล ไม่มีโมเดลตอบ** |
+| ฟอร์มสมัคร / ลืมรหัสผ่าน | หน้า Login จริง: สร้างบัญชีจริงผ่านตัวช่วย root เมื่อผู้ดูแลยืนยัน · กู้คืนด้วยรหัสกู้คืน (การ์ด 0012) · หน้าต่างพัฒนา: แบบจำลองที่เขียนว่า "จำลอง" |
+| ช่องพิมพ์แชท | Enter/Shift+Enter/IME/Esc ทำงานจริง · ทุกข้อความผ่านตัวคัดสกิลก่อน · ที่เหลือและสกิลแปลส่งให้ llama-server ของผู้ใช้ (การ์ด 0013) · AI ไม่พร้อม = บอกตามจริง · ป้ายโมเดลจาก `/health` |
 | นัดหมาย | แปลงวันเวลาด้วยโค้ด ยืนยันก่อนบันทึก เก็บที่ `~/.local/share/aipc/reminders.json` (atomic + .bak) · เตือนเด้งบนจอทุกรอบ 30 วิ · แจ้งนัดที่พลาดตอนเข้าใช้ · **ยังไม่มีหน้ารายการ/ลบนัด ไม่มีเสียงเตือน ไม่มีนัดซ้ำ** · ที่เก็บจริงรอ ADR-004 |
 | สั่งงานเครื่อง | บน Linux รัน `xdg-open` / `gtk-launch` / `wpctl` จริง (แบบ list ไม่ผ่าน shell) · **บนวินโดวส์เป็นแบบจำลอง และการ์ดเขียนว่า "จำลอง"** |
 | เข้าสู่ระบบ | โหมด greeter (`--greeter`): ส่งให้ greetd/PAM ตรวจจริง · หน้าต่างพัฒนา: ปฏิเสธเสมอนอกโหมดพัฒนา |

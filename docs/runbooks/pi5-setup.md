@@ -215,7 +215,20 @@ git bundle create ~/results-pi5.bundle --all
 เอา `~/results-pi5.bundle` และ `~/pi5-freeze.txt` กลับมาวินโดวส์ พร้อมข้อความจากขั้น 0, 3 (autologin) และ 4 (`camera test`) แล้วบอกผม
 ผมจะดึงผลเข้า repo (`git pull <path>\results-pi5.bundle master`) อัปเดต STATUS แล้วบอกว่าข้อไหนขึ้นระดับ 4
 
-## ที่ยังไม่ทำใน runbook นี้
+## 9. ติดตั้งหน้า Login + สมัคร + AI (หลังขั้น 1–8)
 
-- เปลี่ยนหน้า Login ของ Pi 5 เป็นของ V2 (`install-greeter.sh`) — รอแก้บั๊ก Ctrl+Alt+Q, ขั้นปิด autologin และสคริปต์อัปเดตก่อน
-- ชุดคำถามไทยสำหรับให้คะแนน LLM — ผมเขียนแยก
+ลำดับเดียวกับที่ทดสอบผ่านบน Pi 4 แล้ว 2026-09-28 ([ผล](../benchmarks/2026-09-28-card0012-pi4/README.md),
+[ผล AI](../benchmarks/2026-09-28-card0013-pi4/README.md)) · ทุกสคริปต์รันแบบไม่ใส่ `--apply` ก่อนเพื่อดูว่าจะทำอะไร ·
+ตรวจทางเข้าสำรอง (Ctrl+Alt+F2 และ SSH) ก่อนขั้นแรก
+
+```bash
+cd ~/aipc
+sudo ./scripts/pi/install-greeter.sh --apply --session v2   # หน้า Login ของ V2 (ถาม YES)
+sudo ./scripts/pi/update-app.sh --apply                     # ย้ายเข้าโครงสร้างโฟลเดอร์ต่อรุ่น
+sudo ./scripts/pi/install-accounts.sh --apply               # สมัคร/กู้คืน + ปิด autologin tty1
+sudo -l -U _greetd                                          # ต้องเห็นคำสั่งเดียว
+sudo ./scripts/pi/install-llm.sh --apply --model models/<โมเดลที่ชนะตาม ADR-007>.gguf --threads <3|4>
+sudo reboot                                                 # ให้ KillUserProcesses มีผล
+```
+
+หลังรีบูต: สมัครบัญชีทดสอบที่หน้า Login → เข้าใช้ → ป้าย "โมเดล" ต้องเป็นสีเขียว → ถามอะไรก็ได้ → กดหยุด/Esc ได้
