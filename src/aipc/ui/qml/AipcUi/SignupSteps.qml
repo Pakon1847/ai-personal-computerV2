@@ -1,11 +1,11 @@
-// แถบขั้นตอนสมัครบัญชี 5 ขั้น · step = ขั้นปัจจุบัน (1–5)
+// แถบขั้นตอนสมัครบัญชี 4 ขั้น (การ์ด 0012) · step = ขั้นปัจจุบัน (1–4)
 import QtQuick
 import QtQuick.Layouts
 
 Rectangle {
     id: root
     property int step: 1
-    readonly property var labels: ["บัญชีและรหัสผ่าน", "รหัสกู้คืน", "ผู้ดูแลอนุมัติ", "ลงทะเบียนใบหน้า", "พร้อมใช้"]
+    readonly property var labels: ["บัญชีและรหัสผ่าน", "ผู้ดูแลอนุมัติ", "รหัสกู้คืน", "พร้อมใช้"]
     implicitHeight: 52
     radius: Theme.radiusCard
     color: Theme.surface

@@ -45,11 +45,13 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             sourceComponent: AppState.screen === "signup" ? signupPage
+                           : AppState.screen === "recover" ? recoverPage
                            : AppState.screen === "shell" ? shellPage : loginPage
         }
     }
 
     Component { id: loginPage; LoginScreen {} }
     Component { id: signupPage; SignupFlow {} }
+    Component { id: recoverPage; RecoverFlow {} }
     Component { id: shellPage; ShellScreen {} }
 }

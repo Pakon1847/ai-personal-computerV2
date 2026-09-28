@@ -88,12 +88,33 @@ def password_strength(password: str) -> int:
 STRENGTH_LABELS = ["สั้นเกินไป", "อ่อน", "พอใช้", "ดี", "ดีมาก"]
 
 
+CONTROL = re.compile(r"[\x00-\x1f\x7f]")
+
+
 def check_password(password: str, confirm: str) -> Result:
     if len(password) < MIN_PASSWORD:
         return Result(False, f"อย่างน้อย {MIN_PASSWORD} ตัวอักษร")
+    # ตัวควบคุม/ขึ้นบรรทัดทำให้รูปแบบ "ชื่อ:รหัส" ของ chpasswd เสีย (การ์ด 0012 ข้อ 6)
+    if CONTROL.search(password):
+        return Result(False, "มีตัวอักษรพิเศษที่ใช้ไม่ได้ (เช่น ขึ้นบรรทัดใหม่)")
     if password != confirm:
         return Result(False, "รหัสผ่านสองช่องไม่ตรงกัน")
     return Result(True, "ตรงกัน")
+
+
+MAX_DISPLAY_NAME = 64
+
+
+def check_display_name(name: str) -> Result:
+    """ชื่อที่แสดงลงไปอยู่ในช่อง comment ของ /etc/passwd · ":" "," และตัวควบคุมทำให้ไฟล์นั้นเสีย."""
+    name = name.strip()
+    if not name:
+        return Result(False, "ใส่ชื่อที่แสดง")
+    if len(name) > MAX_DISPLAY_NAME:
+        return Result(False, f"ยาวได้ไม่เกิน {MAX_DISPLAY_NAME} ตัวอักษร")
+    if CONTROL.search(name) or any(c in name for c in ":,"):
+        return Result(False, "ห้ามมีเครื่องหมาย : , หรือขึ้นบรรทัดใหม่")
+    return Result(True, "ใช้ได้")
 
 
 # ตัวอักษรของรหัสกู้คืน: Crockford base32 ตัด I L O U ออก
@@ -110,3 +131,9 @@ def new_recovery_code(groups: int = 6, size: int = 4) -> str:
     """
     chars = [secrets.choice(RECOVERY_ALPHABET) for _ in range(groups * size)]
     return "-".join("".join(chars[i : i + size]) for i in range(0, len(chars), size))
+
+
+def normalize_recovery_code(code: str) -> str:
+    """รหัสที่คนพิมพ์เองจากกระดาษ: ไม่สนตัวเล็ก/ใหญ่ ขีด และช่องว่าง · I L → 1 · O → 0 (Crockford)."""
+    s = re.sub(r"[\s-]", "", code).upper()
+    return s.translate(str.maketrans({"I": "1", "L": "1", "O": "0"}))

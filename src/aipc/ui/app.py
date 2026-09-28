@@ -26,7 +26,7 @@ from aipc.ui.face import FaceController
 HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
 FONT_DIR = HERE / "fonts"
-SCREENS = ("login", "signup", "shell")
+SCREENS = ("login", "signup", "recover", "shell")
 PAGES = ("workspace", "files", "skills", "health", "settings")
 
 
@@ -85,7 +85,8 @@ def build(opts: Options, argv: list[str] | None = None):
             None if real else opts.demo_scan,
             greeter_session=opts.greeter_session,
         ),
-        "signup": SignupController(),
+        # สมัคร/กู้คืนจริงเฉพาะหน้า Login จริง · หน้าต่างพัฒนาเป็นแบบจำลองที่บอกว่า "จำลอง" (การ์ด 0012)
+        "signup": SignupController(real=bool(opts.greeter_session), dev=opts.dev and not real),
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(run_timer=not opts.greeter_session),
         "session": SessionController(opts.session and not opts.greeter_session),
@@ -101,7 +102,7 @@ def build(opts: Options, argv: list[str] | None = None):
     screen = "shell" if opts.session else opts.screen
     ctx.setContextProperty("startScreen", screen if screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
-    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 5)))
+    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 3)))
     dev = (opts.dev or opts.demo_scan is not None) and not real
     ctx.setContextProperty("devMode", dev)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)

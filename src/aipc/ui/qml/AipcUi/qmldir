@@ -16,6 +16,7 @@ LoginScreen 1.0 LoginScreen.qml
 FaceRing 1.0 FaceRing.qml
 SignupSteps 1.0 SignupSteps.qml
 SignupFlow 1.0 SignupFlow.qml
+RecoverFlow 1.0 RecoverFlow.qml
 AppCheck 1.0 AppCheck.qml
 StatusBar 1.0 StatusBar.qml
 NavItem 1.0 NavItem.qml

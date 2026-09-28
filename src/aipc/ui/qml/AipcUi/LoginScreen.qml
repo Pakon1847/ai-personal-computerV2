@@ -24,7 +24,7 @@ Rectangle {
     }
 
     readonly property var status: ({
-        unavailable: { text: system.cameraPresent ? "ระบบจดจำใบหน้ายังไม่พร้อม · ใช้รหัสผ่านได้เลย"
+        unavailable: { text: system.cameraPresent ? "รุ่นนี้เข้าสู่ระบบด้วยรหัสผ่าน"
                                                   : "ไม่พบกล้อง · ใช้รหัสผ่านได้เลย", kind: "neutral" },
         scanning: { text: "กำลังสแกนใบหน้า… มองมาที่กล้อง", kind: "accent" },
         found: { text: "จำหน้าได้", kind: "ok" },
@@ -203,8 +203,8 @@ Rectangle {
 
         AppButton {
             Layout.alignment: Qt.AlignHCenter
-            text: "ลืมรหัสผ่าน? ใช้รหัสกู้คืน"; kind: "ghost"; enabled: false
-            ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม (เฟส 1)"
+            text: "ลืมรหัสผ่าน? ใช้รหัสกู้คืน"; kind: "ghost"
+            onClicked: AppState.go("recover")   // การ์ด 0012
         }
     }
     }
@@ -220,14 +220,13 @@ Rectangle {
         anchors.rightMargin: 32
         spacing: 8
         AppText {
-            text: "ใบหน้าช่วยหาบัญชี ส่วนรหัสผ่านคือกุญแจเปิดข้อมูลของคุณ"
+            text: "เข้าสู่ระบบด้วยรหัสผ่าน · ข้อมูลของแต่ละคนแยกกันด้วยบัญชีของเครื่อง"
             size: Theme.fontSmall; color: Theme.inkFaint
             Layout.fillWidth: true
         }
-        // สมัครจากหน้า login จริงยังสร้างบัญชีจริงไม่ได้ (ต้องใช้สิทธิ์ root · การ์ดแยก) จึงไม่ให้กรอกแล้วหายเงียบ
-        AppButton { text: "สมัครบัญชี"; kind: "secondary"; iconPath: Icons.userPlus; enabled: !login.greeterMode
-                    onClicked: AppState.go("signup")
-                    ToolTip.visible: hovered && !enabled; ToolTip.text: "ยังไม่พร้อม: สร้างบัญชีจริงจากหน้านี้ยังไม่ได้" }
+        // สมัครจริงผ่านตัวช่วย root โดยผู้ดูแลยืนยัน (การ์ด 0012)
+        AppButton { text: "สมัครบัญชี"; kind: "secondary"; iconPath: Icons.userPlus
+                    onClicked: AppState.go("signup") }
         AppButton { text: "ภาษา: ไทย"; kind: "secondary"; iconPath: Icons.globe; enabled: false }
         AppButton { text: "ปิดเครื่อง"; kind: "secondary"; iconPath: Icons.power; enabled: false
                     ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม (เฟส 1)" }

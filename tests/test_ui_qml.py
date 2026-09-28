@@ -41,8 +41,10 @@ CASES = [
     {"screen": "login", "demo_scan": "found"},
     {"screen": "login", "demo_scan": "unknown"},
     {"screen": "login", "demo_scan": "manual", "theme": "dark"},
-    *({"screen": "signup", "signup_step": n, "dev": True} for n in range(6)),
-    {"screen": "signup", "signup_step": 3, "theme": "dark"},
+    *({"screen": "signup", "signup_step": n, "dev": True} for n in range(4)),
+    {"screen": "recover", "dev": True},
+    {"screen": "recover", "greeter_session": ["labwc"]},
+    {"screen": "signup", "signup_step": 1, "theme": "dark"},
     *(({"screen": "shell", "page": p} for p in uiapp.PAGES) if uiapp else ()),
     {"screen": "shell", "page": "workspace", "theme": "dark"},
     # หน้า login จริงผ่าน greetd (การ์ด 0003) · ใส่ dev/demo มาด้วยเพื่อตรวจว่าถูกปิดทิ้ง

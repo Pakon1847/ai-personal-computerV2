@@ -334,8 +334,97 @@ def _run_quiet(args: list[str]) -> int:
         return 127
 
 
+HELPER = "/usr/local/sbin/aipc-accounts"  # ตัวช่วย root ของการ์ด 0012 (ติดตั้งโดย install-greeter.sh)
+
+
+def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
+    """เรียกตัวช่วยผ่าน sudo (-n = ห้ามถามรหัส ถ้ากฎ sudo ไม่ตรงให้ล้มทันที ไม่ค้าง).
+
+    คำขอส่งทาง stdin เป็น JSON · ตัวช่วยตรวจทุกอย่างซ้ำเอง (H7) หน้าจอแค่ส่งและแสดงผล
+    """
+    import json
+    import subprocess
+
+    try:
+        r = subprocess.run(["sudo", "-n", HELPER], input=json.dumps(request).encode(),
+                           capture_output=True, timeout=timeout, check=False)  # fmt: skip
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "message": "ตัวจัดการบัญชีไม่ตอบ · ลองอีกครั้ง"}
+    except OSError as e:
+        return {"ok": False, "message": f"เรียกตัวจัดการบัญชีไม่ได้ ({e.strerror or e})"}
+    try:
+        out = json.loads(r.stdout.decode("utf-8").strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        return {"ok": False, "message": "ตัวจัดการบัญชียังไม่ได้ติดตั้งในเครื่องนี้ (install-greeter.sh)"}
+    return out if isinstance(out, dict) and "ok" in out else {"ok": False, "message": "ตอบผิดรูปแบบ"}
+
+
 class SignupController(QObject):
-    """กฎตรวจฟอร์มสมัคร · เรียกกฎชุดเดียวกับที่ตัวสร้างบัญชีจริงจะใช้ (aipc.accounts.validation)."""
+    """ฟอร์มสมัครและลืมรหัสผ่าน (การ์ด 0012) · กฎตรวจชุดเดียวกับตัวช่วยสร้างบัญชีจริง.
+
+    real = หน้า Login จริง (greeter) → ส่งคำขอให้ตัวช่วย root ผ่าน sudo
+    dev  = หน้าต่างพัฒนา → ผลเป็นแบบจำลองที่เขียนว่า "จำลอง" ชัดเจน (H5)
+    นอกจากสองแบบนี้ = บอกว่าสมัครได้เฉพาะหน้า Login จริง
+    งานเรียกตัวช่วยทำในเธรดแยก (PAM หน่วงราว 2 วิเมื่อรหัสผิด) แล้วส่งผลกลับด้วย signal
+    """
+
+    changed = Signal()
+    finished = Signal("QVariantMap")
+    _result = Signal("QVariantMap")
+
+    def __init__(self, real: bool = False, dev: bool = False, runner=None):
+        super().__init__()
+        self._real, self._dev = real, dev
+        self._run = runner or run_accounts_helper
+        self._busy = False
+        self._result.connect(self._on_result)
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    def _submit(self, request: dict) -> bool:
+        if self._busy:
+            return False
+        if not self._real:
+            if self._dev:
+                code = "จำลอง-" + validation.new_recovery_code(groups=2)
+                msg = "จำลอง (โหมดพัฒนา) · ไม่ได้สร้างหรือเปลี่ยนบัญชีจริง"
+                self.finished.emit(
+                    {"ok": True, "simulated": True, "message": msg, "recovery_code": code}
+                )
+            else:
+                self.finished.emit(
+                    {"ok": False, "message": "สมัครและกู้คืนได้เฉพาะหน้า Login จริงของเครื่อง"}
+                )
+            return True
+        import threading
+
+        self._busy = True
+        self.changed.emit()
+        threading.Thread(target=lambda: self._result.emit(self._run(request)), daemon=True).start()
+        return True
+
+    def _on_result(self, result: dict) -> None:
+        self._busy = False
+        self.changed.emit()
+        self.finished.emit(result)
+
+    @Slot(str, str, str, str, str, result=bool)
+    def create(self, display: str, username: str, password: str, admin: str, admin_pw: str) -> bool:
+        return self._submit({"op": "create", "display_name": display.strip(), "username": username,
+                             "password": password, "admin": admin.strip(),
+                             "admin_password": admin_pw})  # fmt: skip
+
+    @Slot(str, str, str, result=bool)
+    def recover(self, username: str, code: str, new_password: str) -> bool:
+        return self._submit({"op": "recover", "username": username.strip(), "recovery_code": code,
+                             "new_password": new_password})  # fmt: skip
+
+    @Slot(str, result="QVariantMap")
+    def checkDisplayName(self, name: str) -> dict:  # noqa: N802
+        r = validation.check_display_name(name)
+        return {"ok": r.ok, "message": r.message}
 
     @Slot(str, result="QVariantMap")
     def checkUsername(self, name: str) -> dict:  # noqa: N802
@@ -354,10 +443,6 @@ class SignupController(QObject):
     @Slot(int, result=str)
     def strengthLabel(self, score: int) -> str:  # noqa: N802
         return validation.STRENGTH_LABELS[max(0, min(score, 4))]
-
-    @Slot(result=str)
-    def newRecoveryCode(self) -> str:  # noqa: N802
-        return validation.new_recovery_code()
 
 
 class SkillsController(QObject):
