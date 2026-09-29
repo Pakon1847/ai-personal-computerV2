@@ -34,7 +34,7 @@ import re
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
-from aipc.skills.actions import APPS, PAGES, SITES, Plan
+from aipc.skills.actions import PAGES, SITES, Plan, app_table
 
 LIST_KEYS = ("keywords", "examples", "needs", "permissions", "actions")
 SECTION_STEPS = "ขั้นตอน"
@@ -80,12 +80,16 @@ def _site(target: str) -> tuple[Step | None, str]:
 
 
 def _app(name: str) -> tuple[Step | None, str]:
-    k = _lookup(name, APPS, lambda v: v[0])
+    apps = app_table()  # ตารางคงที่ + แอปที่ติดตั้งจริงในเครื่องนี้ (ไฟล์ .desktop)
+    k = _lookup(name, apps, lambda v: v[0])
     if k is None:
-        k = next((a for a, v in APPS.items() if name.strip().lower() == v[1].lower()), None)
+        want = name.strip().lower().removesuffix(".desktop")
+        k = next(
+            (a for a, v in apps.items() if want == v[1].lower().removesuffix(".desktop")), None
+        )
     if k is None:
-        return None, f"ไม่รู้จักแอป “{name}” · แอปที่รู้จัก: " + ", ".join(v[0] for v in APPS.values())
-    summary = f"เปิด{APPS[k][0]}"
+        return None, f"ไม่รู้จักแอป “{name}” · แอปที่รู้จัก: " + ", ".join(v[0] for v in apps.values())
+    summary = f"เปิด{apps[k][0]}"
     return Step("action", summary, Plan("open_app", {"app": k}, summary)), ""
 
 

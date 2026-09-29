@@ -58,6 +58,20 @@ APPS = {
     "filemanager": ("ตัวจัดการไฟล์", "pcmanfm.desktop"),
 }
 
+# แอปที่หาเจอจากไฟล์ .desktop ในเครื่อง (apps.py · งานข้อ ⑥) ใช้ id "desk:<ไฟล์>"
+# แอปในตารางบนชนะถ้าเป็นไฟล์เดียวกัน
+
+
+def app_table() -> dict[str, tuple[str, str]]:
+    """id → (ชื่อที่แสดง, ไฟล์ .desktop) · ตารางคงที่ข้างบน + แอปที่ติดตั้งจริง (อ่านใหม่เมื่อโฟลเดอร์เปลี่ยน)."""
+    from aipc.skills import apps
+
+    static = {v[1] for v in APPS.values()}
+    found = {f"desk:{a.desktop}": (a.name, a.desktop) for a in apps.REGISTRY.apps().values()
+             if a.desktop not in static}  # fmt: skip
+    return {**found, **APPS}
+
+
 # หน้าในระบบของเรา (ไม่รันโปรแกรมใด แค่บอกหน้าจอให้เปลี่ยนหน้า)
 PAGES = {
     "workspace": "ผู้ช่วย AI",
@@ -134,7 +148,7 @@ def command_for(plan: Plan) -> list[str] | None:
     if plan.action == "open_url":
         return ["xdg-open", p["url"] if "url" in p else SITES[p["site"]][1]]
     if plan.action == "open_app":
-        return ["gtk-launch", APPS[p["app"]][1]]
+        return ["gtk-launch", app_table()[p["app"]][1]]  # KeyError = แอปถูกถอนไปแล้ว
     if plan.action == "set_volume":
         return ["wpctl", "set-volume", SINK, f"{int(p['percent'])}%"]
     if plan.action == "change_volume":
@@ -156,7 +170,10 @@ class Executor:
         if plan.action == "open_page":
             key = plan.params["page"]
             return Outcome(True, f"เปิดหน้า{PAGES[key]}", page=PAGE_SCREEN.get(key, key))
-        args = command_for(plan)
+        try:
+            args = command_for(plan)
+        except KeyError:
+            return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)
         code = self._run(args)

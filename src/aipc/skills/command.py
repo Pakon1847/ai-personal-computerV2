@@ -19,7 +19,7 @@ import re
 from dataclasses import dataclass
 
 from aipc.skills import when
-from aipc.skills.actions import APPS, PAGES, SITES, Plan
+from aipc.skills.actions import PAGES, SITES, Plan, app_table
 from aipc.skills.thainum import find_number
 
 # คำสุภาพ ตัดเฉพาะหัว/ท้ายประโยค (ตัดซ้ำจนไม่เหลือ เช่น "หน่อย" + "ครับ")
@@ -148,6 +148,12 @@ def _volume(t: str, heard: str) -> Command | None:
     return None
 
 
+def _discovered_aliases() -> dict[str, tuple[str, ...]]:
+    from aipc.skills import apps
+
+    return {f"desk:{a.desktop}": a.aliases for a in apps.REGISTRY.apps().values()}
+
+
 def parse(text: str) -> Command | None:
     """แปลงประโยคเป็นคำสั่ง · None = ไม่ใช่คำสั่งเครื่อง (ส่งต่อให้สกิลอื่น)."""
     heard = text.strip()
@@ -168,8 +174,12 @@ def parse(text: str) -> Command | None:
         return None
 
     # ลองทั้งแบบมีคำนำ ("หน้าหลัก") และแบบตัดคำนำแล้ว ("ตั้งค่า")
+    # แอปที่ติดตั้งจริง (ไฟล์ .desktop) เป็นกลุ่มสุดท้าย · คำเรียกไทยของตารางคงที่มาก่อนเสมอ
+    table = app_table()
+    found = {k: a for k, a in _discovered_aliases().items() if k in table}
     hit = _match(
-        [raw, target], [("page", PAGE_ALIASES), ("site", SITE_ALIASES), ("app", APP_ALIASES)]
+        [raw, target],
+        [("page", PAGE_ALIASES), ("site", SITE_ALIASES), ("app", {**found, **APP_ALIASES})],
     )
     if not hit:
         return None
@@ -179,5 +189,5 @@ def parse(text: str) -> Command | None:
     elif group == "site":
         plan = Plan("open_url", {"site": key}, f"เปิด {SITES[key][0]}")
     else:
-        plan = Plan("open_app", {"app": key}, f"เปิด{APPS[key][0]}")
+        plan = Plan("open_app", {"app": key}, f"เปิด{table[key][0]}")
     return Command(plan, conf, heard)
