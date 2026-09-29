@@ -697,6 +697,21 @@ class SkillsController(QObject):
     def _card(self, r, text: str) -> dict:
         from aipc.skills import machine
 
+        if r.kind == "skill" and r.tied:  # คะแนนเท่ากัน = ถาม ไม่เดา
+            import dataclasses
+
+            names = [s.name for s in self._skills if s.id in r.tied]
+            self._counter += 1
+            token = f"t{self._counter}"
+            self._pending[token] = ("tie", dataclasses.replace(r, tied=[]), text)
+            others = " · ".join(n for n in names if n != r.skill.name)
+            return {"kind": "skill", "badge": self._badge(r.skill, r.reason),
+                    "title": f"หมายถึงสกิล “{r.skill.name}” ใช่ไหม",
+                    "chips": [{"text": n, "kind": "neutral"} for n in names],
+                    "lines": [f"ข้อความนี้ตรงกับหลายสกิลเท่า ๆ กัน (มี {others} ด้วย) · ถ้าไม่ใช่ กด “ไม่ใช่” "
+                              "แล้วพิมพ์ให้ชัดขึ้น"],
+                    "confirmToken": token, "page": ""}  # fmt: skip
+
         card = {
             "kind": r.kind,
             "badge": {},
@@ -773,6 +788,12 @@ class SkillsController(QObject):
             card["title"] = "คำสั่งนี้หมดอายุแล้ว"
         elif not yes:
             card["title"] = "ยกเลิกแล้ว ไม่ได้ทำอะไร"
+        elif isinstance(plan, tuple) and plan[0] == "tie":
+            _, route, text = plan
+            card = self._card(route, text)
+            if card.get("llm"):
+                card["llmText"] = text  # หน้าจอส่งข้อความเดิมให้ AI พร้อม prompt ของสกิลที่ผู้ใช้ยืนยัน
+            return card
         elif isinstance(plan, tuple) and plan[0] == "steps":
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))

@@ -41,6 +41,7 @@ class Route:
     command: command.Command | None = None
     missing: list[str] = field(default_factory=list)
     candidates: list[str] = field(default_factory=list)
+    tied: list[str] = field(default_factory=list)  # สกิลที่คะแนนเท่ากับตัวที่ชนะ (≥ 2 ตัว = ต้องถามผู้ใช้)
 
 
 def has_keyword(text: str, keyword: str) -> bool:
@@ -100,8 +101,11 @@ def route(text: str, manifests: list[Manifest], available: set[str]) -> Route:
         return Route("chat")
 
     best = ranked[0][1]
+    # คะแนนเท่ากัน: เดิมตัวที่โหลดก่อนชนะเงียบ ๆ · ตอนนี้บอกหน้าจอให้ถามผู้ใช้ (ข้อเสนอ 2026-09-29 งานข้อ ④)
+    tied = [m.id for s, m in ranked if s == ranked[0][0]]
     hits = [k for k in best.keywords if has_keyword(text, k)]
     reason = "เพราะมีคำว่า " + ", ".join(f"“{k}”" for k in hits[:2])
     missing = [n for n in best.needs if n not in available]
     kind = "needs" if missing else "skill"
-    return Route(kind, best, reason, missing=missing, candidates=[m.id for _, m in ranked])
+    return Route(kind, best, reason, missing=missing, candidates=[m.id for _, m in ranked],
+                 tied=tied if len(tied) > 1 else [])  # fmt: skip

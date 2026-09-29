@@ -272,5 +272,39 @@ class AiPicksSkillTest(unittest.TestCase):
         self.assertEqual(self.calls, [], "AI เลือกสกิลแล้วต้องไม่มีอะไรรันเอง")
 
 
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class TieTest(unittest.TestCase):
+    """คะแนนเท่ากัน: เดิมตัวที่โหลดก่อนชนะเงียบ ๆ · ตอนนี้ถามผู้ใช้ (งานข้อ ④)."""
+
+    def setUp(self):
+        from aipc.skills import manifest
+
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        d = Path(tmp.name)
+        text = SAY_AI_SKILL.replace("keywords: จดไอเดีย", "keywords: จดไอเดีย, ค้าง")
+        (d / "idea.md").write_text(text, encoding="utf-8")
+        self.s = SkillsController(
+            reminders_path=d / "r.json", run_timer=False, llm_ready=lambda: True
+        )
+        self.s._skills = [*self.s._skills, *manifest.load_dir(d)]
+
+    def test_tie_asks_then_runs_the_confirmed_skill(self):
+        from aipc.skills import router
+
+        r = router.route("งานค้างเยอะ", self.s._skills, {"llm"})
+        self.assertEqual(sorted(r.tied), ["idea-note", "machine-status"])
+        card = self.s.handle("งานค้างเยอะ")
+        self.assertTrue(card["confirmToken"])
+        self.assertIn("ใช่ไหม", card["title"])
+        self.assertEqual(len(card["chips"]), 2)
+        self.assertEqual(
+            self.s.confirm(card["confirmToken"], False)["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร"
+        )
+        card = self.s.handle("งานค้างเยอะ")
+        done = self.s.confirm(card["confirmToken"], True)
+        self.assertNotIn("ใช่ไหม", done["title"], "ยืนยันแล้ว = ทำเลย ไม่ถามซ้ำ")
+
+
 if __name__ == "__main__":
     unittest.main()
