@@ -1,0 +1,732 @@
+{
+ "label": "typhoon25-4b-q4km",
+ "date": "2026-09-29",
+ "sampling": {
+  "temperature": 0.6,
+  "top_p": 0.95,
+  "max_tokens": 512
+ },
+ "questions_file": "llm_thai_questions.json",
+ "answers": [
+  {
+   "id": "q01",
+   "answer": "ท้องฟ้าเป็นสีฟ้าเพราะแสงแดดผ่านอากาศมา เรากลับมองเห็นสีฟ้าของอากาศเลยค่ะ 😊",
+   "seconds": 12.86,
+   "usage": {
+    "completion_tokens": 37,
+    "prompt_tokens": 96,
+    "total_tokens": 133,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 96,
+    "prompt_ms": 4652.855,
+    "prompt_per_token_ms": 48.46723958333333,
+    "prompt_per_second": 20.632493383094896,
+    "predicted_n": 37,
+    "predicted_ms": 8189.805,
+    "predicted_per_token_ms": 227.49458333333334,
+    "predicted_per_second": 4.395709055343809
+   }
+  },
+  {
+   "id": "q02",
+   "answer": "ประเทศไทยมี 76 จังหวัด  \nจังหวัดที่ใหญ่ที่สุดคือ จังหวัดเชียงใหม่",
+   "seconds": 9.94,
+   "usage": {
+    "completion_tokens": 36,
+    "prompt_tokens": 98,
+    "total_tokens": 134,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 1859.445,
+    "prompt_per_token_ms": 54.68955882352941,
+    "prompt_per_second": 18.28502590826833,
+    "predicted_n": 36,
+    "predicted_ms": 8067.368,
+    "predicted_per_token_ms": 230.4962285714286,
+    "predicted_per_second": 4.338465779669404
+   }
+  },
+  {
+   "id": "q03",
+   "answer": "สงกรานต์คือเทศกาลปีใหม่ของไทย ตรงกับวันที่ 13 เมษายนทุกปี",
+   "seconds": 8.69,
+   "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 92,
+    "total_tokens": 124,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 28,
+    "prompt_ms": 1507.366,
+    "prompt_per_token_ms": 53.8345,
+    "prompt_per_second": 18.575448829282337,
+    "predicted_n": 32,
+    "predicted_ms": 7169.969,
+    "predicted_per_token_ms": 231.28932258064518,
+    "predicted_per_second": 4.323589125699149
+   }
+  },
+  {
+   "id": "q04",
+   "answer": "RAM และพื้นที่เก็บข้อมูล (Storage) ในคอมพิวเตอร์ต่างกันดังนี้:\n\n- **RAM (Random Access Memory)**  \nใช้เก็บข้อมูลชั่วคราวขณะทำงาน เช่น เวลาเปิดโปรแกรมหรือหน้าเว็บ  \nเร็วมากแต่หายไปเมื่อเครื่องปิด  \nสามารถเข้าถึงข้อมูลได้ทุกตำแหน่งในเวลาเดียวกัน (Random Access)\n\n- **พื้นที่เก็บข้อมูล (Storage)** เช่น HDD, SSD  \nเก็บข้อมูลไว้ถาวร เช่น ไฟล์เอกสาร รูปภาพ เสียง เวลาเปิดเครื่องหรือปิดเครื่องก็ยังมีอยู่  \nช้ากว่า RAM มากแต่ยังคงข้อมูลไว้ตลอดเวลา\n\nสรุป: RAM เร็วแต่ชั่วคราว ส่วน Storage เก็บไว้ถาวรแต่ช้ากว่า",
+   "seconds": 58.54,
+   "usage": {
+    "completion_tokens": 240,
+    "prompt_tokens": 98,
+    "total_tokens": 338,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 1954.97,
+    "prompt_per_token_ms": 57.499117647058824,
+    "prompt_per_second": 17.391571226156923,
+    "predicted_n": 240,
+    "predicted_ms": 56576.765,
+    "predicted_per_token_ms": 236.7228661087866,
+    "predicted_per_second": 4.224348988493775
+   }
+  },
+  {
+   "id": "q05",
+   "answer": "หากเป็นหวัดควรดูแลตัวเองดังนี้:  \n- นอนพักผ่อนให้เพียงพอ  \n- ดื่มน้ำให้เพียงพอเพื่อช่วยให้ร่างกายฟื้นตัวเร็วขึ้น  \n- ล้างมือบ่อยๆ และหลีกเลี่ยงการสัมผัสผู้อื่นเพื่อลดการแพร่เชื้อ  \n- กินอาหารที่มีประโยชน์ เช่น ผัก ผลไม้ และโปรตีนสูง  \n\nควรไปพบแพทย์เมื่อ:  \n- ไข้สูงเกิน 38.5°C และไม่ลดลงหลังจากพักผ่อนและดื่มน้ำแล้ว  \n- มีอาการหายใจลำบากหรือหอบเหนื่อยอย่างรุนแรง  \n- ปวดศีรษะหนัก หรือมีอาการปวดท้องรุนแรง  \n- อาการแย่ลงหรือไม่ดีขึ้นหลังจาก 7–10 วัน",
+   "seconds": 62.49,
+   "usage": {
+    "completion_tokens": 256,
+    "prompt_tokens": 96,
+    "total_tokens": 352,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 32,
+    "prompt_ms": 1710.174,
+    "prompt_per_token_ms": 53.4429375,
+    "prompt_per_second": 18.711546310492384,
+    "predicted_n": 256,
+    "predicted_ms": 60759.108,
+    "predicted_per_token_ms": 238.2710117647059,
+    "predicted_per_second": 4.1969016398331584
+   }
+  },
+  {
+   "id": "q06",
+   "answer": "เรียน อาจารย์ที่เคารพครับ/ค่ะ\n\nขออนุญาตแจ้งล่วงหน้าว่าต้องขอเลื่อนนัดพบจากวันพฤหัสบดีเป็นวันศุกร์ เนื่องจากมีการสอบที่ต้องเข้าร่วมอีกครั้งครับ/ค่ะ\n\nขอขอบพระคุณครับ/ค่ะ",
+   "seconds": 26.2,
+   "usage": {
+    "completion_tokens": 100,
+    "prompt_tokens": 119,
+    "total_tokens": 219,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 55,
+    "prompt_ms": 3097.737,
+    "prompt_per_token_ms": 56.32249090909091,
+    "prompt_per_second": 17.75489655835857,
+    "predicted_n": 100,
+    "predicted_ms": 23080.021,
+    "predicted_per_token_ms": 233.13152525252525,
+    "predicted_per_second": 4.289424173400882
+   }
+  },
+  {
+   "id": "q07",
+   "answer": "ขออนุญาตลาป่วยไป 1 วัน เพื่อรับการรักษาตัวตามแพทย์สั่งครับ",
+   "seconds": 9.82,
+   "usage": {
+    "completion_tokens": 34,
+    "prompt_tokens": 104,
+    "total_tokens": 138,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 40,
+    "prompt_ms": 2209.264,
+    "prompt_per_token_ms": 55.2316,
+    "prompt_per_second": 18.105577242013627,
+    "predicted_n": 34,
+    "predicted_ms": 7598.595,
+    "predicted_per_token_ms": 230.26045454545456,
+    "predicted_per_second": 4.342908129726614
+   }
+  },
+  {
+   "id": "q08",
+   "answer": "1. น้ำตาลชมพู – เน้นความอบอุ่น สดใส เหมาะกับบรรยากาศเชียงใหม่ที่เต็มไปด้วยธรรมชาติและเรื่องราวอันน่ารัก  \n2. สะพานเก่า – เปรียบเสมือนการเดินข้ามความวุ่นวายมาสู่จุดหมายสงบ ช่วยให้ลูกค้ารู้สึกผ่อนคลาย  \n3. กาแฟขุนเขา – สื่อถึงความบริสุทธิ์และแรงบันดาลใจจากธรรมชาติของเชียงใหม่  \n4. ริมแม่น้ำ – เน้นบรรยากาศใกล้ธรรมชาติ เหมาะกับร้านกาแฟริมฝั่งแม่น้ำใส่ใจรายละเอียด  \n5. เด็กนักเรียน – สื่อถึงความสดใส ใส่ใจเด็กและครอบครัว สะท้อนชีวิตประจำวันในเมืองเชียงใหม่",
+   "seconds": 60.22,
+   "usage": {
+    "completion_tokens": 244,
+    "prompt_tokens": 108,
+    "total_tokens": 352,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 44,
+    "prompt_ms": 2411.081,
+    "prompt_per_token_ms": 54.797295454545456,
+    "prompt_per_second": 18.24907582947234,
+    "predicted_n": 244,
+    "predicted_ms": 57793.054,
+    "predicted_per_token_ms": 237.83149794238682,
+    "predicted_per_second": 4.204657535488607
+   }
+  },
+  {
+   "id": "q09",
+   "answer": "ขอให้แม่แข็งแรง ร่าเริง และมีความสุขทุกวันนะคะ 🌸",
+   "seconds": 8.51,
+   "usage": {
+    "completion_tokens": 30,
+    "prompt_tokens": 96,
+    "total_tokens": 126,
+    "prompt_tokens_details": {
+     "cached_tokens": 66
+    }
+   },
+   "timings": {
+    "cache_n": 66,
+    "prompt_n": 30,
+    "prompt_ms": 1772.018,
+    "prompt_per_token_ms": 59.06726666666667,
+    "prompt_per_second": 16.92985059971174,
+    "predicted_n": 30,
+    "predicted_ms": 6703.899,
+    "predicted_per_token_ms": 231.16893103448277,
+    "predicted_per_second": 4.325840827852568
+   }
+  },
+  {
+   "id": "q10",
+   "answer": "แจ้งเตือน: พรุ่งนี้ยกเลิกเรียนคาบบ่ายครับ/ค่ะ  \nทุกคนต้องส่งงานทางอีเมลแทนตามปกติครับ/ค่ะ",
+   "seconds": 14.89,
+   "usage": {
+    "completion_tokens": 52,
+    "prompt_tokens": 114,
+    "total_tokens": 166,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 50,
+    "prompt_ms": 2866.863,
+    "prompt_per_token_ms": 57.33725999999999,
+    "prompt_per_second": 17.440665982294934,
+    "predicted_n": 52,
+    "predicted_ms": 12020.556,
+    "predicted_per_token_ms": 235.69717647058823,
+    "predicted_per_second": 4.242732199741843
+   }
+  },
+  {
+   "id": "q11",
+   "answer": "ระบบนี้ทำงานบน Raspberry Pi 5 โดยไม่ต้องใช้อินเทอร์เน็ต และแยกข้อมูลผู้ใช้แต่ละคนด้วยบัญชี Linux  \nการตัดสินใจทุกอย่างใช้โค้ดตัดสินแทน AI เพื่อความแม่นยำ และทุกการกระทำต้องได้รับการยืนยันจากการทดลองจริง",
+   "seconds": 31.69,
+   "usage": {
+    "completion_tokens": 98,
+    "prompt_tokens": 209,
+    "total_tokens": 307,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 145,
+    "prompt_ms": 8162.158,
+    "prompt_per_token_ms": 56.29074482758621,
+    "prompt_per_second": 17.76490972117913,
+    "predicted_n": 98,
+    "predicted_ms": 23516.62,
+    "predicted_per_token_ms": 242.43938144329897,
+    "predicted_per_second": 4.124742416214575
+   }
+  },
+  {
+   "id": "q12",
+   "answer": "ข้อดีของการทำงานที่บ้าน:  \n1. ประหยัดเวลาเดินทางและค่าใช้จ่ายในการเดินทาง  \n2. มีความยืดหยุ่นในการจัดสรรเวลาทำงานได้มากขึ้น  \n3. ลดความเครียดจากสภาพแวดล้อมการทำงานนอกบ้าน  \n\nข้อเสียของการทำงานที่บ้าน:  \n1. เสี่ยงต่อการขาดแรงจูงใจหรือความรู้สึกแยกตัวจากทีมงาน  \n2. เกิดปัญหาเรื่องสมาธิและประสิทธิภาพการทำงานลดลง  \n3. เสี่ยงต่อการละเลยสุขภาพและกิจวัตรประจำวัน",
+   "seconds": 41.34,
+   "usage": {
+    "completion_tokens": 173,
+    "prompt_tokens": 95,
+    "total_tokens": 268,
+    "prompt_tokens_details": {
+     "cached_tokens": 69
+    }
+   },
+   "timings": {
+    "cache_n": 69,
+    "prompt_n": 26,
+    "prompt_ms": 1560.159,
+    "prompt_per_token_ms": 60.00611538461539,
+    "prompt_per_second": 16.66496812183886,
+    "predicted_n": 173,
+    "predicted_ms": 39752.162,
+    "predicted_per_token_ms": 231.11722093023255,
+    "predicted_per_second": 4.326808690304694
+   }
+  },
+  {
+   "id": "q13",
+   "answer": "AI ที่ทำงานในเครื่อง (Edge AI) ประมวลผลข้อมูลที่เครื่องใช้เองโดยตรง ไม่ต้องส่งข้อมูลออกไปภายนอก จึงช่วยรักษาความเป็นส่วนตัวได้ดีกว่า AI บนคลาวด์ ที่ต้องส่งข้อมูลไปยังเซิร์ฟเวอร์ภายนอก",
+   "seconds": 24.91,
+   "usage": {
+    "completion_tokens": 97,
+    "prompt_tokens": 115,
+    "total_tokens": 212,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 51,
+    "prompt_ms": 2880.294,
+    "prompt_per_token_ms": 56.476352941176465,
+    "prompt_per_second": 17.70652579215872,
+    "predicted_n": 97,
+    "predicted_ms": 22008.116,
+    "predicted_per_token_ms": 229.25120833333335,
+    "predicted_per_second": 4.362027172157761
+   }
+  },
+  {
+   "id": "q14",
+   "answer": "Tomorrow I have a meeting at 2 PM. Can you remind me?",
+   "seconds": 5.92,
+   "usage": {
+    "completion_tokens": 16,
+    "prompt_tokens": 109,
+    "total_tokens": 125,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 45,
+    "prompt_ms": 2484.196,
+    "prompt_per_token_ms": 55.20435555555555,
+    "prompt_per_second": 18.114512703506488,
+    "predicted_n": 16,
+    "predicted_ms": 3420.377,
+    "predicted_per_token_ms": 228.02513333333334,
+    "predicted_per_second": 4.385481483473898
+   }
+  },
+  {
+   "id": "q15",
+   "answer": "ประชุมถูกเลื่อนไปถึงวันจันทร์หน้า เนื่องจากผู้จัดการป่วย",
+   "seconds": 8.29,
+   "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 89,
+    "total_tokens": 121,
+    "prompt_tokens_details": {
+     "cached_tokens": 68
+    }
+   },
+   "timings": {
+    "cache_n": 68,
+    "prompt_n": 21,
+    "prompt_ms": 1214.342,
+    "prompt_per_token_ms": 57.825809523809525,
+    "prompt_per_second": 17.293316050997163,
+    "predicted_n": 32,
+    "predicted_ms": 7067.982,
+    "predicted_per_token_ms": 227.99941935483872,
+    "predicted_per_second": 4.385976081999077
+   }
+  },
+  {
+   "id": "q16",
+   "answer": "Sorry for the delayed response, I've been very busy lately.",
+   "seconds": 5.15,
+   "usage": {
+    "completion_tokens": 14,
+    "prompt_tokens": 106,
+    "total_tokens": 120,
+    "prompt_tokens_details": {
+     "cached_tokens": 68
+    }
+   },
+   "timings": {
+    "cache_n": 68,
+    "prompt_n": 38,
+    "prompt_ms": 2198.642,
+    "prompt_per_token_ms": 57.858999999999995,
+    "prompt_per_second": 17.28339584161496,
+    "predicted_n": 14,
+    "predicted_ms": 2946.799,
+    "predicted_per_token_ms": 226.67684615384616,
+    "predicted_per_second": 4.41156658462284
+   }
+  },
+  {
+   "id": "q17",
+   "answer": "คำว่า \"เกรงใจ\" แปลเป็นภาษาอังกฤษว่า **\"feel shy\"** หรือ **\"be embarrassed\"** ได้บ้าง\n\nแต่การแปลตรงตัวยาก เพราะคำว่า \"เกรงใจ\" ในภาษาไทยมีความหมายลึกซึ้งกว่าแค่ความรู้สึกอายหรืออับอาย โดยมักสื่อถึงความรู้สึกหวาดกลัว หรือเกรงใจในเรื่องความผิดพลาด ความรับผิดชอบ หรือการกระทำที่อาจทำให้ผู้อื่นไม่พอใจ เช่น เกรงใจพูดผิด หรือเกรงใจทำร้ายใครสักคน\n\nดังนั้น การแปลตรงตัวเป็นคำเดียวในภาษาอังกฤษจึงไม่สามารถสื่อความหมายครบถ้วนได้เท่าที่ควร",
+   "seconds": 51.59,
+   "usage": {
+    "completion_tokens": 213,
+    "prompt_tokens": 98,
+    "total_tokens": 311,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 1959.473,
+    "prompt_per_token_ms": 57.63155882352941,
+    "prompt_per_second": 17.35160423236248,
+    "predicted_n": 213,
+    "predicted_ms": 49623.408,
+    "predicted_per_token_ms": 234.07267924528304,
+    "predicted_per_second": 4.272177356299269
+   }
+  },
+  {
+   "id": "q18",
+   "answer": "รวมราคาของทั้งหมด = 3 × 45 = 135 บาท  \nเงินทอน = 500 – 135 = 365 บาท  \n\nตอบ: ได้เงินทอน 365 บาท",
+   "seconds": 16.19,
+   "usage": {
+    "completion_tokens": 58,
+    "prompt_tokens": 120,
+    "total_tokens": 178,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 56,
+    "prompt_ms": 3012.26,
+    "prompt_per_token_ms": 53.79035714285715,
+    "prompt_per_second": 18.59069270248916,
+    "predicted_n": 58,
+    "predicted_ms": 13149.707,
+    "predicted_per_token_ms": 230.69661403508772,
+    "predicted_per_second": 4.3346973434465115
+   }
+  },
+  {
+   "id": "q19",
+   "answer": "ถ้าวันนี้เป็นวันจันทร์ อีก 10 วันจะเป็นวันศุกร์",
+   "seconds": 9.35,
+   "usage": {
+    "completion_tokens": 33,
+    "prompt_tokens": 98,
+    "total_tokens": 131,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 1956.788,
+    "prompt_per_token_ms": 57.55258823529412,
+    "prompt_per_second": 17.37541317710452,
+    "predicted_n": 33,
+    "predicted_ms": 7380.82,
+    "predicted_per_token_ms": 230.650625,
+    "predicted_per_second": 4.335561631363453
+   }
+  },
+  {
+   "id": "q20",
+   "answer": "เก็บได้เดือนละ 3,600 บาท  \nเก็บได้ 1 ปีละ 43,200 บาท",
+   "seconds": 10.67,
+   "usage": {
+    "completion_tokens": 34,
+    "prompt_tokens": 120,
+    "total_tokens": 154,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 56,
+    "prompt_ms": 3041.661,
+    "prompt_per_token_ms": 54.315375,
+    "prompt_per_second": 18.410993204042136,
+    "predicted_n": 34,
+    "predicted_ms": 7621.051,
+    "predicted_per_token_ms": 230.9409393939394,
+    "predicted_per_second": 4.330111424264186
+   }
+  },
+  {
+   "id": "q21",
+   "answer": "ต้องเร่งเรียนทันที แบ่งเนื้อหาออกเป็นส่วนย่อย จัดเวลาเรียนวันละ 3–4 ชั่วโมง พร้อมพักสายตาบ่อยๆ พักผ่อนให้เพียงพอ และฝึกทำข้อสอบจำลองเพื่อลดความตื่นตระหนก",
+   "seconds": 21.53,
+   "usage": {
+    "completion_tokens": 86,
+    "prompt_tokens": 97,
+    "total_tokens": 183,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 33,
+    "prompt_ms": 1845.692,
+    "prompt_per_token_ms": 55.93006060606061,
+    "prompt_per_second": 17.87947284812417,
+    "predicted_n": 86,
+    "predicted_ms": 19671.955,
+    "predicted_per_token_ms": 231.43476470588237,
+    "predicted_per_second": 4.320872023141574
+   }
+  },
+  {
+   "id": "q22",
+   "answer": "มีวิธีช่วยนอนไม่หลับโดยไม่ต้องใช้ยาได้หลายวิธี เช่น  \n- หลีกเลี่ยงเครื่องดื่มที่มีคาเฟอีน เช่น กาแฟ ชาดำ โคคาอีน ก่อนนอน  \n- หลีกเลี่ยงการดื่มน้ำเยอะมากก่อนนอน เพราะอาจต้องขึ้นเวียนหัว  \n- นอนให้เป็นปกติทุกวัน เช่น เริ่มนอนเวลาเดียวกันทุกวัน  \n- ฝึกการผ่อนคลาย เช่น หายใจลึกๆ นั่งสมาธิ หรือจินตนาการถึงสถานที่สงบ  \n- หลีกเลี่ยงโทรศัพท์หรือหน้าจอจิ๋วก่อนนอน เพราะแสงนั้นทำให้ร่างกายไม่หลับง่าย  \n- นอนในสภาพแวดล้อมที่เงียบ เงียบ นุ่มนวล เช่น เสื้อผ้าสบาย น้ำยาหอมเบาๆ",
+   "seconds": 63.69,
+   "usage": {
+    "completion_tokens": 263,
+    "prompt_tokens": 97,
+    "total_tokens": 360,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 33,
+    "prompt_ms": 1844.913,
+    "prompt_per_token_ms": 55.906454545454544,
+    "prompt_per_second": 17.887022314873384,
+    "predicted_n": 263,
+    "predicted_ms": 61828.071,
+    "predicted_per_token_ms": 235.98500381679392,
+    "predicted_per_second": 4.237557403335452
+   }
+  },
+  {
+   "id": "q23",
+   "answer": "เมนูแนะนำ: ก๋วยเตี๋ยวหมูแดงกับผักกาดขาว  \nรายการซื้อของ:  \n- ก๋วยเตี๋ยวหมูแดง (กระป๋อง 1 กระป๋อง)  \n- หมูสับ 100 กรัม  \n- ผักกาดขาว 1 หัว  \n- กระเทียม 2 กลีบ  \n- เกลือ น้ำตาล ซีอิ๊วดำดำ ตามชอบ  \n- น้ำมันพืช 1 ช้อนโต๊ะ  \n\nคำนวณค่าใช้จ่ายประมาณ 250 บาท (รวมวัตถุดิบและค่าครองชีพ)  \nเหลือเงินเก็บประมาณ 50 บาท",
+   "seconds": 45.23,
+   "usage": {
+    "completion_tokens": 183,
+    "prompt_tokens": 108,
+    "total_tokens": 291,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 44,
+    "prompt_ms": 2386.833,
+    "prompt_per_token_ms": 54.246204545454546,
+    "prompt_per_second": 18.434469441305698,
+    "predicted_n": 183,
+    "predicted_ms": 42813.8,
+    "predicted_per_token_ms": 235.24065934065936,
+    "predicted_per_second": 4.25096581008927
+   }
+  },
+  {
+   "id": "q24",
+   "answer": "ควรตรวจเรียงลำดับดังนี้:\n\n1. เริ่มจากสังเกตโปรแกรมที่เปิดอยู่เยอะเกินไปหรือไม่จำเป็น  \n2. ตรวจสอบหน่วยความจำ (RAM) ว่ามีความจุว่างเหลืออยู่หรือไม่  \n3. ลบไฟล์ชั่วคราวหรือโปรแกรมที่ไม่ใช้งานแล้ว  \n4. ตรวจสอบว่ามีไวรัสหรือมัลแวร์รบกวนหรือไม่  \n5. อัปเดตระบบปฏิบัติการและซอฟต์แวร์ทั้งหมดให้เป็นเวอร์ชันล่าสุด  \n6. ตรวจสอบฮาร์ดดิสก์ว่ามีความเสื่อมหรือไม่ (เช่น HDD เก่า)  \n7. ตรวจสอบการตั้งค่าพลังงาน เช่น การปิดเครื่องอัตโนมัติหรือการใช้พลังงานแบบประหยัดเกินไป  \n8. หากยังช้า อาจต้องพิจารณาเปลี่ยนฮาร์ดดิสก์เป็น SSD หรือเพิ่ม RAM",
+   "seconds": 70.2,
+   "usage": {
+    "completion_tokens": 289,
+    "prompt_tokens": 99,
+    "total_tokens": 388,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 35,
+    "prompt_ms": 2059.649,
+    "prompt_per_token_ms": 58.847114285714284,
+    "prompt_per_second": 16.99318670317127,
+    "predicted_n": 289,
+    "predicted_ms": 68120.652,
+    "predicted_per_token_ms": 236.53004166666668,
+    "predicted_per_second": 4.227792769804963
+   }
+  },
+  {
+   "id": "q25",
+   "answer": "ใช่",
+   "seconds": 2.75,
+   "usage": {
+    "completion_tokens": 3,
+    "prompt_tokens": 105,
+    "total_tokens": 108,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 41,
+    "prompt_ms": 2259.715,
+    "prompt_per_token_ms": 55.115,
+    "prompt_per_second": 18.143880976140796,
+    "predicted_n": 3,
+    "predicted_ms": 461.527,
+    "predicted_per_token_ms": 230.7635,
+    "predicted_per_second": 4.333440947116854
+   }
+  },
+  {
+   "id": "q26",
+   "answer": "1. มะม่วง  \n2. กล้วย  \n3. ลitchi  \n4. มะขาม  \n5. มะพร้าว",
+   "seconds": 10.74,
+   "usage": {
+    "completion_tokens": 37,
+    "prompt_tokens": 108,
+    "total_tokens": 145,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 44,
+    "prompt_ms": 2439.155,
+    "prompt_per_token_ms": 55.43534090909091,
+    "prompt_per_second": 18.039034009728777,
+    "predicted_n": 37,
+    "predicted_ms": 8292.773,
+    "predicted_per_token_ms": 230.35480555555554,
+    "predicted_per_second": 4.341129318263023
+   }
+  },
+  {
+   "id": "q27",
+   "answer": "ฝนตกหนักจนรถติดยาวไกล ต้องรออยู่ภายใต้ร่มคุ้มค่าเพียงเล็กน้อย",
+   "seconds": 9.63,
+   "usage": {
+    "completion_tokens": 34,
+    "prompt_tokens": 99,
+    "total_tokens": 133,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 35,
+    "prompt_ms": 2047.112,
+    "prompt_per_token_ms": 58.48891428571429,
+    "prompt_per_second": 17.09725701378332,
+    "predicted_n": 34,
+    "predicted_ms": 7571.008,
+    "predicted_per_token_ms": 229.42448484848484,
+    "predicted_per_second": 4.358732681302146
+   }
+  },
+  {
+   "id": "q28",
+   "answer": "ไม่รู้",
+   "seconds": 1.84,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 80,
+    "total_tokens": 85,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 16,
+    "prompt_ms": 888.406,
+    "prompt_per_token_ms": 55.525375,
+    "prompt_per_second": 18.00978381505753,
+    "predicted_n": 5,
+    "predicted_ms": 942.982,
+    "predicted_per_token_ms": 235.7455,
+    "predicted_per_second": 4.241862516993962
+   }
+  },
+  {
+   "id": "q29",
+   "answer": "ไม่รู้",
+   "seconds": 2.76,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 97,
+    "total_tokens": 102,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 33,
+    "prompt_ms": 1825.501,
+    "prompt_per_token_ms": 55.31821212121212,
+    "prompt_per_second": 18.07722920995387,
+    "predicted_n": 5,
+    "predicted_ms": 927.048,
+    "predicted_per_token_ms": 231.762,
+    "predicted_per_second": 4.314771187683917
+   }
+  },
+  {
+   "id": "q30",
+   "answer": "ไม่รู้",
+   "seconds": 2.37,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 89,
+    "total_tokens": 94,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 25,
+    "prompt_ms": 1440.914,
+    "prompt_per_token_ms": 57.63656,
+    "prompt_per_second": 17.350098617960544,
+    "predicted_n": 5,
+    "predicted_ms": 928.39,
+    "predicted_per_token_ms": 232.0975,
+    "predicted_per_second": 4.308534128975969
+   }
+  }
+ ]
+}
