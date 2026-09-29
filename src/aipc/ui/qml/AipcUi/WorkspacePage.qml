@@ -40,14 +40,14 @@ Item {
         push({ user: true, text: text })
         input.text = ""
         const card = skills.handle(text)
-        if (card.llm && chat.send(text, card.prompt || "")) {
-            push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
-        } else if (card.llm) {
+        const toAi = card.llm === true && chat.send(text, card.prompt || "")
+        if (card.llm && !toAi)
             card.title = "ยังตอบไม่ได้: " + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
+        // สกิลแบบขั้นตอนเห็นการ์ดขั้นตอนเสมอ แม้ขั้นสุดท้ายจะส่งต่อให้ AI
+        if (!toAi || card.kind === "steps")
             showCard(card)
-        } else {
-            showCard(card)
-        }
+        if (toAi)
+            push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
     }
     function loadChat(messages) {
         items = messages.map(m => m.role === "user" ? { user: true, text: m.content }
@@ -71,7 +71,11 @@ Item {
         const a = Object.assign({}, answered)
         a[token] = true
         answered = a
-        showCard(skills.confirm(token, yes))
+        const card = skills.confirm(token, yes)
+        showCard(card)
+        // สกิลแบบขั้นตอนที่จบด้วย "ถาม AI:" · ส่งข้อความเดิมของผู้ใช้ให้ AI พร้อมคำสั่งของขั้นนั้น
+        if (card.llm && card.llmText && chat.send(card.llmText, card.prompt || ""))
+            push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
     }
 
     // ---------- ปุ่มมุมขวาบน ----------

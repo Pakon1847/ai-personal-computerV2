@@ -465,6 +465,8 @@ class SkillsController(QObject):
         "camera": "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)",
     }
     LEVEL = {"ok": "ok", "warn": "warn", "danger": "danger", "neutral": "neutral"}
+    RISK_LABEL = {"low": "ความเสี่ยงต่ำ", "medium": "ความเสี่ยงกลาง", "high": "ความเสี่ยงสูง"}
+    RISK_ORDER = {"low": 0, "medium": 1, "high": 2}
     TICK_MS = 30_000  # การ์ด 0001 หัวข้อ 7: ตรวจนัดทุก 30 วินาที
 
     reminderDue = Signal("QVariantMap")  # noqa: N815
@@ -599,6 +601,54 @@ class SkillsController(QObject):
         card["confirmToken"] = token
         return card
 
+    # ---------- สกิลแบบขั้นตอน (.md · ข้อเสนอ 2026-09-29 หัวข้อ 10.1) ----------
+
+    def _steps_card(self, route, text: str) -> dict:
+        """แสดงทุกขั้นก่อนทำ · มีขั้นที่สั่งเครื่อง = ถามยืนยันครั้งเดียว (ความเสี่ยงของขั้นที่สูงสุด) แล้วทำตามลำดับ."""
+        skill = route.skill
+        prefix = {"llm": "ถาม AI: ", "say": "บอก: ", "action": ""}
+        lines = [f"{i}. {prefix[s.kind]}{s.text}" for i, s in enumerate(skill.steps, 1)]
+        card = {"kind": "steps", "badge": self._badge(skill, route.reason), "title": "",
+                "chips": [], "lines": lines, "confirmToken": "", "page": ""}  # fmt: skip
+        acting = [s.plan.spec.risk for s in skill.steps if s.plan is not None]
+        if not acting:  # บอกข้อความ / ถาม AI อย่างเดียว = ไม่แตะเครื่อง ทำได้เลย
+            return self._run_steps(skill, text, card)
+        self._counter += 1
+        token = f"s{self._counter}"
+        self._pending[token] = ("steps", skill, text)
+        risk = max(acting, key=self.RISK_ORDER.__getitem__)
+        card["title"] = f"จะทำ {len(skill.steps)} ขั้นนี้ ใช่ไหม"
+        card["chips"] = [{"text": self.RISK_LABEL[risk], "kind": "neutral"}]
+        card["confirmToken"] = token
+        return card
+
+    def _run_steps(self, skill, text: str, card: dict) -> dict:
+        """ทำทีละขั้นตามลำดับ · ขั้นไหนไม่สำเร็จ = หยุดตรงนั้นและบอกว่าเหลือกี่ขั้นที่ไม่ได้ทำ."""
+        lines, simulated, total = [], False, len(skill.steps)
+        for i, s in enumerate(skill.steps, 1):
+            if s.kind == "say":
+                lines.append(s.text)
+            elif s.kind == "llm":  # ขั้นสุดท้ายเสมอ (ตัวตรวจบังคับ) · หน้าจอส่งข้อความของผู้ใช้ให้ AI พร้อมคำสั่งนี้
+                card.update(llm=True, prompt=s.text, llmText=text)
+                lines.append(f"{i}. ส่งให้ AI ในเครื่องทำต่อ")
+            else:
+                out = self._exec.execute(s.plan)
+                simulated = simulated or out.simulated
+                if out.page:
+                    card["page"] = out.page
+                if not out.ok:
+                    lines.append(f"✗ {i}. {s.plan.summary} · {out.message}")
+                    if i < total:
+                        lines.append(f"ขั้นที่เหลือ {total - i} ขั้นไม่ได้ทำ")
+                    card.update(title=f"หยุดที่ขั้น {i}: {out.message}", lines=lines,
+                                chips=[{"text": "ไม่สำเร็จ", "kind": "danger"}])  # fmt: skip
+                    return card
+                lines.append(f"{'จำลอง' if out.simulated else '✓'} {i}. {s.plan.summary}")
+        chip = {"text": "จำลอง", "kind": "warn"} if simulated else {"text": "ทำแล้ว", "kind": "ok"}
+        title = f"ทำครบ {total} ขั้นแล้ว" + (" (จำลอง)" if simulated else "")
+        card.update(title=title, lines=lines, confirmToken="", chips=[chip])
+        return card
+
     def _run_plan(self, plan) -> dict:
         out = self._exec.execute(plan)
         if out.simulated:
@@ -630,9 +680,7 @@ class SkillsController(QObject):
 
         if r.kind == "command":
             card["badge"] = self._badge(r.skill, r.reason)
-            risk = {"low": "ความเสี่ยงต่ำ", "medium": "ความเสี่ยงกลาง", "high": "ความเสี่ยงสูง"}[
-                r.command.plan.spec.risk
-            ]
+            risk = self.RISK_LABEL[r.command.plan.spec.risk]
             if r.command.needs_confirmation:
                 self._counter += 1
                 token = f"c{self._counter}"
@@ -657,6 +705,8 @@ class SkillsController(QObject):
             if d.unknown:
                 card["lines"].append("อ่านไม่ได้ (จึงไม่สรุป): " + ", ".join(d.unknown))
             card["page"] = ""
+        elif r.kind == "skill" and r.skill.steps:
+            return self._steps_card(r, text)
         elif r.kind == "skill" and r.skill.worker == "llm":
             # สกิลที่ LLM ทำ (สกิล 1 แปล): ให้หน้าจอถาม LLM ด้วย prompt ของสกิล (การ์ด 0013)
             card.update(
@@ -694,6 +744,10 @@ class SkillsController(QObject):
             card["title"] = "คำสั่งนี้หมดอายุแล้ว"
         elif not yes:
             card["title"] = "ยกเลิกแล้ว ไม่ได้ทำอะไร"
+        elif isinstance(plan, tuple) and plan[0] == "steps":
+            _, skill, text = plan
+            card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
+            return self._run_steps(skill, text, card)
         elif isinstance(plan, reminders.Reminder):
             try:
                 self._store.add(plan, self._now())

@@ -161,6 +161,52 @@ class PasswordThaiHintTest(unittest.TestCase):
                 uiapp.shutdown(engine)
 
 
+STEP_MD = """---
+id: start-work
+name: เริ่มวันทำงาน
+description: เปิดอีเมลและปรับเสียง
+keywords: เริ่มวันทำงาน
+examples: เริ่มวันทำงาน | เริ่มงานเช้านี้ | เปิดของที่ใช้ทำงาน
+permissions: run_actions
+---
+## ขั้นตอน
+1. เปิดเว็บ gmail
+2. ปรับเสียง 30
+"""
+
+
+@unittest.skipIf(uiapp is None, "ไม่มี PySide6")
+class StepSkillCardTest(unittest.TestCase):
+    """สกิลแบบขั้นตอน (.md): การ์ดที่แสดงทุกขั้นพร้อมปุ่มยืนยัน วาดได้โดยไม่มี QML warning."""
+
+    def test_steps_card_draws_without_warnings(self):
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+
+        from aipc.skills import manifest
+
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            (d / "start-work.md").write_text(STEP_MD, encoding="utf-8")
+            opts = uiapp.Options(screen="shell", software=True, settings_path=d / "ui.json")
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            skills = engine.rootContext().contextProperty("skills")
+            skills._skills = [*skills._skills, *manifest.load_dir(d)]
+            win = engine.rootObjects()[0]
+            chat_input = win.findChild(QObject, "chatInput")
+            chat_list = win.findChild(QObject, "chatList")
+            chat_input.forceActiveFocus()
+            settle(100)
+            chat_input.setProperty("text", "เริ่มวันทำงาน")
+            QTest.keyClick(win, Qt.Key.Key_Return)
+            settle(200)
+            self.assertEqual(chat_list.property("count"), 2, "ข้อความผู้ใช้ + การ์ดขั้นตอน")
+            self.assertEqual(warnings, [])
+            win.close()
+            uiapp.shutdown(engine)
+
+
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")
 class ShellCardTest(unittest.TestCase):
     """เกณฑ์การ์ด 0002 ข้อ 8: ไฟกล้อง/ไมค์ทุกหน้า และการ์ดนัดถัดไปจาก upcoming จริง."""

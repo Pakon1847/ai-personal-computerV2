@@ -1,5 +1,8 @@
 """รูปแบบไฟล์สกิล และตัวตรวจว่าไฟล์ถูกต้องและไม่ขอเกินที่ระบบอนุญาต.
 
+ไฟล์สกิลเป็น .md (mdskill.py · ตั้งแต่ 2026-09-29) หรือ .json แบบเดิม · ทั้งสองแบบกลายเป็นข้อมูลรูปเดียวกัน
+แล้วผ่านตัวตรวจตัวเดียวกันนี้
+
 ตัวตรวจนี้ใช้กับทุกสกิล ทั้งที่มากับเครื่อง ที่ AI ช่วยสร้าง และที่นำเข้าจากเครื่องอื่น
 สกิลที่ไม่ผ่านตัวตรวจ ติดตั้งไม่ได้เลย (BRIEF 5.8 ข้อ 4: ผลตรวจอัตโนมัติ schema ขนาด รูปแบบต้องห้าม)
 """
@@ -45,6 +48,7 @@ class Manifest:
     keywords: tuple[str, ...] = ()
     prompt: str = ""
     author: str = "ระบบ"
+    steps: tuple = ()  # ขั้นตอนของสกิล .md (mdskill.Step) · โค้ดทำตามทีละข้อ
     extra: dict = field(default_factory=dict, compare=False)
 
     def permission_labels(self) -> list[str]:
@@ -131,8 +135,18 @@ def from_dict(data: dict) -> Manifest:
 
 def load(path: Path) -> Manifest:
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        if path.suffix == ".md":
+            from aipc.skills import mdskill
+
+            data, errors = mdskill.parse(text)
+            if errors:
+                raise InvalidSkill([f"{path.name}: {e}" for e in errors])
+        else:
+            data = json.loads(text)
     except (OSError, ValueError) as e:
+        if isinstance(e, InvalidSkill):
+            raise
         raise InvalidSkill([f"อ่านไฟล์ไม่ได้: {e}"]) from e
     return from_dict(data)
 
@@ -140,5 +154,16 @@ def load(path: Path) -> Manifest:
 BUILTIN_DIR = Path(__file__).parent / "builtin"
 
 
+def load_dir(folder: Path) -> list[Manifest]:
+    """สกิลทุกไฟล์ในโฟลเดอร์ (.md และ .json) · id ซ้ำ = ผิด (สองสกิลแย่งกันไม่ได้)."""
+    skills = [load(p) for p in sorted([*folder.glob("*.md"), *folder.glob("*.json")])]
+    seen: set[str] = set()
+    for s in skills:
+        if s.id in seen:
+            raise InvalidSkill([f"id ซ้ำ: {s.id}"])
+        seen.add(s.id)
+    return skills
+
+
 def load_builtin() -> list[Manifest]:
-    return [load(p) for p in sorted(BUILTIN_DIR.glob("*.json"))]
+    return load_dir(BUILTIN_DIR)
