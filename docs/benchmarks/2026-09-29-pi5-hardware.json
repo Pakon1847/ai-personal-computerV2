@@ -1,0 +1,96 @@
+{
+  "machine": {
+    "collected_at": "2026-09-29T10:05:48+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 5 Model B Rev 1.0",
+    "board_class": "pi5",
+    "ram_total_mb": 8062,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-2712",
+    "python": "3.13.5",
+    "cpu_temp_c": 56.2,
+    "throttled": 0,
+    "throttled_problems": [],
+    "git_commit": "5dafc1a1ec2935370a7248fd4f573901bc532c80",
+    "git_dirty": false
+  },
+  "checks": [
+    {
+      "id": "board",
+      "title": "บอร์ด",
+      "status": "ผ่าน",
+      "detail": "Raspberry Pi 5 Model B Rev 1.0 — เครื่องจริง",
+      "fix": ""
+    },
+    {
+      "id": "ram",
+      "title": "RAM",
+      "status": "ผ่าน",
+      "detail": "8062 MB",
+      "fix": ""
+    },
+    {
+      "id": "power",
+      "title": "ไฟเลี้ยง",
+      "status": "ผ่าน",
+      "detail": "บอร์ดรับรู้กระแสสูงสุด 5000 mA · ไม่เคยไฟตก/ร้อนเกินตั้งแต่บูต",
+      "fix": ""
+    },
+    {
+      "id": "cooling",
+      "title": "ระบายความร้อน",
+      "status": "ผ่าน",
+      "detail": "พัดลม 3393 rpm · อุณหภูมิ 56.2 °C",
+      "fix": ""
+    },
+    {
+      "id": "rtc",
+      "title": "นาฬิกา RTC",
+      "status": "เตือน",
+      "detail": "ไม่ได้ชาร์จแบต RTC (charging_voltage = 0)",
+      "fix": "BRIEF หัวข้อ 2 ให้เพิ่ม dtparam=rtc_bbat_vchg=3000000 ใน /boot/firmware/config.txt — เป็นไฟล์บูต ต้องสำรองไฟล์ก่อนแก้ และให้ Pakon ตัดสินใจเอง เครื่องมือนี้ไม่แก้ให้"
+    },
+    {
+      "id": "os",
+      "title": "OS",
+      "status": "ผ่าน",
+      "detail": "Debian GNU/Linux 13 (trixie) · aarch64",
+      "fix": ""
+    },
+    {
+      "id": "glibc",
+      "title": "glibc",
+      "status": "ผ่าน",
+      "detail": "glibc 2.41",
+      "fix": ""
+    },
+    {
+      "id": "storage",
+      "title": "ที่เก็บข้อมูล",
+      "status": "ผ่าน",
+      "detail": "/dev/mmcblk0p2 (microSD) · ทั้งหมด 60.9 GB · ใช้แล้ว 10% · ว่าง 52.2 GB",
+      "fix": ""
+    },
+    {
+      "id": "fscrypt",
+      "title": "เคอร์เนลรองรับ fscrypt",
+      "status": "ผ่าน",
+      "detail": "มี /sys/fs/ext4/features/encryption",
+      "fix": ""
+    },
+    {
+      "id": "camera",
+      "title": "กล้อง",
+      "status": "เตือน",
+      "detail": "ไม่พบกล้อง · โหนดวิดีโอ 17 ตัวเป็นของชิป (ถอดรหัสวิดีโอ/ISP) ไม่ใช่กล้อง",
+      "fix": "ต่อกล้องแล้วตรวจด้วย `python -m aipc.vision.camera test` หรือ `v4l2-ctl --list-devices` · `rpicam-hello` เห็นเฉพาะกล้อง CSI (กล้อง USB จะขึ้นว่า No cameras available ทั้งที่ใช้ได้)"
+    },
+    {
+      "id": "audio",
+      "title": "เสียง",
+      "status": "ผ่าน",
+      "detail": "vc4-hdmi - vc4-hdmi-0 | vc4-hdmi - vc4-hdmi-1",
+      "fix": ""
+    }
+  ]
+}
