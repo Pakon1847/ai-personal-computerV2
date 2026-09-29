@@ -250,7 +250,7 @@ def save(p: Proposal, out: Path) -> Path:
     name = p.skill_id or "failed-" + date.today().isoformat()
     md = out / f"{name}.md"
     if p.skill_md:
-        md.write_text(p.skill_md, encoding="utf-8")
+        md.write_text(p.skill_md, encoding="utf-8", newline="\n")
     fsutil.write_json(out / f"{name}.report.json", asdict(p), mode=0o644)
     return md
 
@@ -271,7 +271,7 @@ def install(
     dest.mkdir(parents=True, exist_ok=True)
     target = dest / f"{new.id}.md"
     tmp = target.with_suffix(".md.tmp")
-    tmp.write_text(md.read_text(encoding="utf-8"), encoding="utf-8")
+    tmp.write_text(md.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     os.replace(tmp, target)
     return new
 

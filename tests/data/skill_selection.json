@@ -1,0 +1,75 @@
+{
+  "about": "ชุดประโยควัดการเลือกสกิล (ADR-007 เกณฑ์ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) · เขียนและ commit ก่อนวัด (H9) · ผู้ช่วยเขียน 2026-09-29 · Pakon ตรวจทานได้ แต่ห้ามแก้หลังเริ่มวัดเพื่อให้ผ่าน · expect = id ของสกิลที่ควรถูกเลือก หรือ none (คุยกับ AI ตามปกติ) · kind: direct = มีคำสำคัญของสกิล · paraphrase = พูดอ้อม ไม่มีคำสำคัญ · general = คุยทั่วไป · trap = มีคำคล้ายสกิลแต่ความหมายอื่น",
+  "criteria": {
+    "correct_min": 0.8,
+    "false_call_max": 0.1,
+    "note": "correct = เลือกตรง expect ทุกประโยค · false_call = ประโยค expect none ที่ถูกเรียกสกิล ÷ จำนวนประโยค none"
+  },
+  "items": [
+    {"text": "สรุปข่าวนี้ให้หน่อย: ครม. อนุมัติงบซ่อมถนน 12 เส้นทางในภาคเหนือ เริ่มเดือนหน้า", "expect": "summarize-text", "kind": "direct"},
+    {"text": "ช่วยย่อความประกาศนี้ให้สั้นลง: ห้องสมุดปิดปรับปรุงสามสัปดาห์ ผู้ยืมหนังสือคืนที่ตู้หน้าอาคาร", "expect": "summarize-text", "kind": "direct"},
+    {"text": "ขอใจความสำคัญของอีเมลนี้: ทีมขอให้ส่งแบบฟอร์มลงทะเบียนและสำเนาบัตรภายในสัปดาห์นี้", "expect": "summarize-text", "kind": "direct"},
+    {"text": "สรุปเป็นข้อ ๆ ให้ที: บริษัทย้ายสำนักงาน ที่จอดรถลดลง พนักงานต้องลงชื่อเข้างานผ่านแอป", "expect": "summarize-text", "kind": "direct"},
+    {"text": "อ่านไม่ไหวแล้ว ยาวมาก เล่าสั้น ๆ ทีว่าข้อความนี้พูดเรื่องอะไร: ชุมชนจัดตลาดนัดทุกเสาร์ รายได้เข้ากองทุนโรงเรียน", "expect": "summarize-text", "kind": "paraphrase"},
+    {"text": "ช่วยเก็บประเด็นจากบทความนี้ให้หน่อย: การนอนน้อยทำให้ภูมิคุ้มกันต่ำและสมาธิสั้น", "expect": "summarize-text", "kind": "paraphrase"},
+    {"text": "ขอแบบกระชับที่สุดของเนื้อหานี้: ร้านค้าออนไลน์ต้องแจ้งราคารวมภาษีและค่าส่งก่อนลูกค้ากดสั่ง", "expect": "summarize-text", "kind": "paraphrase"},
+    {"text": "เนื้อหานี้ต้องการบอกอะไรเรา สั้น ๆ พอ: สภานักเรียนขอให้เพิ่มจุดกดน้ำดื่มในอาคารเรียน", "expect": "summarize-text", "kind": "paraphrase"},
+
+    {"text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้าให้หน่อย เป็นไข้ขอหยุดสองวัน", "expect": "letter-writer", "kind": "direct"},
+    {"text": "เขียนจดหมายขอบคุณอาจารย์ที่ช่วยแนะนำโครงงาน", "expect": "letter-writer", "kind": "direct"},
+    {"text": "ร่างจดหมายขอเลื่อนส่งรายงานวิชาฟิสิกส์ถึงอาจารย์ประจำวิชา", "expect": "letter-writer", "kind": "direct"},
+    {"text": "ช่วยเขียนอีเมลถึงฝ่ายบุคคลขอใบรับรองการทำงาน", "expect": "letter-writer", "kind": "direct"},
+    {"text": "อยากส่งข้อความสุภาพ ๆ ถึงเจ้าของหอว่าแอร์เสีย ช่วยเรียบเรียงให้ที", "expect": "letter-writer", "kind": "paraphrase"},
+    {"text": "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย", "expect": "letter-writer", "kind": "paraphrase"},
+    {"text": "ช่วยเรียบเรียงคำขอโทษลูกค้าที่ส่งของช้า ให้ดูเป็นมืออาชีพ", "expect": "letter-writer", "kind": "paraphrase"},
+    {"text": "อยากบอกหัวหน้าว่าขอทำงานที่บ้านวันศุกร์นี้ ช่วยเขียนข้อความส่งไปหน่อย", "expect": "letter-writer", "kind": "paraphrase"},
+
+    {"text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ขอบคุณที่มาร่วมงานวันนี้", "expect": "translate", "kind": "direct"},
+    {"text": "translate this to Thai: The meeting has been moved to next week", "expect": "translate", "kind": "direct"},
+    {"text": "คำว่า resilience ภาษาอังกฤษแปลว่าอะไร", "expect": "translate", "kind": "direct"},
+    {"text": "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate", "expect": "translate", "kind": "direct"},
+    {"text": "ประโยค I'm running late, start without me พูดเป็นไทยว่าไง", "expect": "translate", "kind": "paraphrase"},
+    {"text": "อยากบอกเพื่อนต่างชาติว่ายินดีต้อนรับสู่เชียงใหม่ ต้องพูดยังไง", "expect": "translate", "kind": "paraphrase"},
+    {"text": "ความหมายของ break a leg ในภาษาไทยคืออะไร", "expect": "translate", "kind": "paraphrase"},
+    {"text": "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ", "expect": "translate", "kind": "paraphrase"},
+
+    {"text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง", "expect": "reminder", "kind": "direct"},
+    {"text": "อย่าลืมโทรหาแม่สองทุ่ม", "expect": "reminder", "kind": "direct"},
+    {"text": "พรุ่งนี้เก้าโมงประชุมทีม", "expect": "reminder", "kind": "direct"},
+    {"text": "วันศุกร์หน้าบ่ายสามไปหาหมอฟัน", "expect": "reminder", "kind": "direct"},
+
+    {"text": "ทำไมเครื่องช้าจัง", "expect": "machine-status", "kind": "direct"},
+    {"text": "แรมเหลือเท่าไหร่", "expect": "machine-status", "kind": "direct"},
+    {"text": "เครื่องร้อนไปไหม", "expect": "machine-status", "kind": "direct"},
+    {"text": "พื้นที่เก็บข้อมูลเหลือเท่าไร", "expect": "machine-status", "kind": "direct"},
+    {"text": "คอมหน่วงมาก เปิดอะไรก็รอนาน เป็นอะไร", "expect": "machine-status", "kind": "paraphrase"},
+    {"text": "จอกระตุกตลอดเลย ตัวเครื่องมีปัญหาอะไรหรือเปล่า", "expect": "machine-status", "kind": "paraphrase"},
+    {"text": "ตอนนี้ระบบทำงานหนักแค่ไหน ปกติดีไหม", "expect": "machine-status", "kind": "paraphrase"},
+    {"text": "ลงไฟล์เพิ่มได้อีกไหม กลัวที่เต็ม", "expect": "machine-status", "kind": "paraphrase"},
+
+    {"text": "เปิดยูทูบ", "expect": "system-command", "kind": "direct"},
+    {"text": "ปรับเสียงสี่สิบ", "expect": "system-command", "kind": "direct"},
+    {"text": "เปิดหน้าตั้งค่า", "expect": "system-command", "kind": "direct"},
+    {"text": "ปิดเสียงหน่อย", "expect": "system-command", "kind": "direct"},
+
+    {"text": "เมืองหลวงของญี่ปุ่นคือที่ไหน", "expect": "none", "kind": "general"},
+    {"text": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย", "expect": "none", "kind": "general"},
+    {"text": "เล่ามุกตลกให้ฟังสักเรื่อง", "expect": "none", "kind": "general"},
+    {"text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า", "expect": "none", "kind": "general"},
+    {"text": "ต้มไข่ยางมะตูมต้องใช้เวลาเท่าไหร่", "expect": "none", "kind": "general"},
+    {"text": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้ห้าชื่อ", "expect": "none", "kind": "general"},
+    {"text": "ออกกำลังกายแบบไหนเหมาะกับคนทำงานนั่งโต๊ะ", "expect": "none", "kind": "general"},
+    {"text": "อธิบายเรื่องภาวะโลกร้อนแบบเข้าใจง่าย", "expect": "none", "kind": "general"},
+    {"text": "ปลูกกะเพราในกระถางต้องรดน้ำบ่อยแค่ไหน", "expect": "none", "kind": "general"},
+    {"text": "สวัสดี วันนี้เป็นยังไงบ้าง", "expect": "none", "kind": "general"},
+    {"text": "มีหนังสือพัฒนาตัวเองเล่มไหนน่าอ่านบ้าง", "expect": "none", "kind": "general"},
+    {"text": "ถ้าจะเริ่มเรียนเขียนโปรแกรมควรเริ่มจากภาษาอะไร", "expect": "none", "kind": "general"},
+
+    {"text": "สรุปแล้วโทรศัพท์รุ่นไหนคุ้มกว่ากันระหว่างสองรุ่นที่เพื่อนแนะนำ", "expect": "none", "kind": "trap"},
+    {"text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร", "expect": "none", "kind": "trap"},
+    {"text": "จดหมายรักที่ดังที่สุดในประวัติศาสตร์คือของใคร", "expect": "none", "kind": "trap"},
+    {"text": "ทำไมคนถึงชอบแปลชื่อหนังฝรั่งเป็นไทยแปลก ๆ", "expect": "none", "kind": "trap"},
+    {"text": "อาการนอนไม่พอทำให้สมองช้าลงจริงไหม", "expect": "none", "kind": "trap"},
+    {"text": "ห้องร้อนมาก มีวิธีคลายร้อนแบบไม่เปิดแอร์ไหม", "expect": "none", "kind": "trap"}
+  ]
+}

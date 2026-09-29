@@ -1,0 +1,434 @@
+{
+ "method": "rules only (router.route · skills builtin 6 ตัว · มี llm)",
+ "commit_before_dataset": "977086f",
+ "correct": 35,
+ "total": 58,
+ "false_calls": 7,
+ "none_total": 18,
+ "by_kind": {
+  "direct": [
+   22,
+   24
+  ],
+  "paraphrase": [
+   2,
+   16
+  ],
+  "general": [
+   11,
+   12
+  ],
+  "trap": [
+   0,
+   6
+  ]
+ },
+ "rows": [
+  {
+   "text": "สรุปข่าวนี้ให้หน่อย: ครม. อนุมัติงบซ่อมถนน 12 เส้นทางในภาคเหนือ เริ่มเดือนหน้า",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "ช่วยย่อความประกาศนี้ให้สั้นลง: ห้องสมุดปิดปรับปรุงสามสัปดาห์ ผู้ยืมหนังสือคืนที่ตู้หน้าอาคาร",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "ขอใจความสำคัญของอีเมลนี้: ทีมขอให้ส่งแบบฟอร์มลงทะเบียนและสำเนาบัตรภายในสัปดาห์นี้",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "got": "letter-writer",
+   "ok": false
+  },
+  {
+   "text": "สรุปเป็นข้อ ๆ ให้ที: บริษัทย้ายสำนักงาน ที่จอดรถลดลง พนักงานต้องลงชื่อเข้างานผ่านแอป",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "อ่านไม่ไหวแล้ว ยาวมาก เล่าสั้น ๆ ทีว่าข้อความนี้พูดเรื่องอะไร: ชุมชนจัดตลาดนัดทุกเสาร์ รายได้เข้ากองทุนโรงเรียน",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "ช่วยเก็บประเด็นจากบทความนี้ให้หน่อย: การนอนน้อยทำให้ภูมิคุ้มกันต่ำและสมาธิสั้น",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ขอแบบกระชับที่สุดของเนื้อหานี้: ร้านค้าออนไลน์ต้องแจ้งราคารวมภาษีและค่าส่งก่อนลูกค้ากดสั่ง",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "เนื้อหานี้ต้องการบอกอะไรเรา สั้น ๆ พอ: สภานักเรียนขอให้เพิ่มจุดกดน้ำดื่มในอาคารเรียน",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้าให้หน่อย เป็นไข้ขอหยุดสองวัน",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "เขียนจดหมายขอบคุณอาจารย์ที่ช่วยแนะนำโครงงาน",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "ร่างจดหมายขอเลื่อนส่งรายงานวิชาฟิสิกส์ถึงอาจารย์ประจำวิชา",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "ช่วยเขียนอีเมลถึงฝ่ายบุคคลขอใบรับรองการทำงาน",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "อยากส่งข้อความสุภาพ ๆ ถึงเจ้าของหอว่าแอร์เสีย ช่วยเรียบเรียงให้ที",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ช่วยเรียบเรียงคำขอโทษลูกค้าที่ส่งของช้า ให้ดูเป็นมืออาชีพ",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "got": "machine-status",
+   "ok": false
+  },
+  {
+   "text": "อยากบอกหัวหน้าว่าขอทำงานที่บ้านวันศุกร์นี้ ช่วยเขียนข้อความส่งไปหน่อย",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ขอบคุณที่มาร่วมงานวันนี้",
+   "expect": "translate",
+   "kind": "direct",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "translate this to Thai: The meeting has been moved to next week",
+   "expect": "translate",
+   "kind": "direct",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "คำว่า resilience ภาษาอังกฤษแปลว่าอะไร",
+   "expect": "translate",
+   "kind": "direct",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate",
+   "expect": "translate",
+   "kind": "direct",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "ประโยค I'm running late, start without me พูดเป็นไทยว่าไง",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "อยากบอกเพื่อนต่างชาติว่ายินดีต้อนรับสู่เชียงใหม่ ต้องพูดยังไง",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ความหมายของ break a leg ในภาษาไทยคืออะไร",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+   "expect": "reminder",
+   "kind": "direct",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "อย่าลืมโทรหาแม่สองทุ่ม",
+   "expect": "reminder",
+   "kind": "direct",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "พรุ่งนี้เก้าโมงประชุมทีม",
+   "expect": "reminder",
+   "kind": "direct",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "วันศุกร์หน้าบ่ายสามไปหาหมอฟัน",
+   "expect": "reminder",
+   "kind": "direct",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "ทำไมเครื่องช้าจัง",
+   "expect": "machine-status",
+   "kind": "direct",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "แรมเหลือเท่าไหร่",
+   "expect": "machine-status",
+   "kind": "direct",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "เครื่องร้อนไปไหม",
+   "expect": "machine-status",
+   "kind": "direct",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "พื้นที่เก็บข้อมูลเหลือเท่าไร",
+   "expect": "machine-status",
+   "kind": "direct",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "คอมหน่วงมาก เปิดอะไรก็รอนาน เป็นอะไร",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "จอกระตุกตลอดเลย ตัวเครื่องมีปัญหาอะไรหรือเปล่า",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "ตอนนี้ระบบทำงานหนักแค่ไหน ปกติดีไหม",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ลงไฟล์เพิ่มได้อีกไหม กลัวที่เต็ม",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "เปิดยูทูบ",
+   "expect": "system-command",
+   "kind": "direct",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "ปรับเสียงสี่สิบ",
+   "expect": "system-command",
+   "kind": "direct",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "เปิดหน้าตั้งค่า",
+   "expect": "system-command",
+   "kind": "direct",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "ปิดเสียงหน่อย",
+   "expect": "system-command",
+   "kind": "direct",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "เมืองหลวงของญี่ปุ่นคือที่ไหน",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "เล่ามุกตลกให้ฟังสักเรื่อง",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ต้มไข่ยางมะตูมต้องใช้เวลาเท่าไหร่",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้ห้าชื่อ",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ออกกำลังกายแบบไหนเหมาะกับคนทำงานนั่งโต๊ะ",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "อธิบายเรื่องภาวะโลกร้อนแบบเข้าใจง่าย",
+   "expect": "none",
+   "kind": "general",
+   "got": "machine-status",
+   "ok": false
+  },
+  {
+   "text": "ปลูกกะเพราในกระถางต้องรดน้ำบ่อยแค่ไหน",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "สวัสดี วันนี้เป็นยังไงบ้าง",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "มีหนังสือพัฒนาตัวเองเล่มไหนน่าอ่านบ้าง",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ถ้าจะเริ่มเรียนเขียนโปรแกรมควรเริ่มจากภาษาอะไร",
+   "expect": "none",
+   "kind": "general",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "สรุปแล้วโทรศัพท์รุ่นไหนคุ้มกว่ากันระหว่างสองรุ่นที่เพื่อนแนะนำ",
+   "expect": "none",
+   "kind": "trap",
+   "got": "summarize-text",
+   "ok": false
+  },
+  {
+   "text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร",
+   "expect": "none",
+   "kind": "trap",
+   "got": "machine-status",
+   "ok": false
+  },
+  {
+   "text": "จดหมายรักที่ดังที่สุดในประวัติศาสตร์คือของใคร",
+   "expect": "none",
+   "kind": "trap",
+   "got": "letter-writer",
+   "ok": false
+  },
+  {
+   "text": "ทำไมคนถึงชอบแปลชื่อหนังฝรั่งเป็นไทยแปลก ๆ",
+   "expect": "none",
+   "kind": "trap",
+   "got": "translate",
+   "ok": false
+  },
+  {
+   "text": "อาการนอนไม่พอทำให้สมองช้าลงจริงไหม",
+   "expect": "none",
+   "kind": "trap",
+   "got": "machine-status",
+   "ok": false
+  },
+  {
+   "text": "ห้องร้อนมาก มีวิธีคลายร้อนแบบไม่เปิดแอร์ไหม",
+   "expect": "none",
+   "kind": "trap",
+   "got": "machine-status",
+   "ok": false
+  }
+ ]
+}
