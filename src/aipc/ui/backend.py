@@ -690,8 +690,11 @@ class SkillsController(QObject):
 
     @Slot(str, result="QVariantMap")
     def handle(self, text: str) -> dict:
+        """AI ในเครื่องพร้อม = แบบผสม (router.route_ai_first) · ไม่พร้อม = กฎก่อน (router.route)."""
         from aipc.skills import router
 
+        if self._llm_ready():
+            return self._card(router.route_ai_first(text, self._skills), text)
         return self._card(router.route(text, self._skills, self.available()), text)
 
     def _card(self, r, text: str) -> dict:

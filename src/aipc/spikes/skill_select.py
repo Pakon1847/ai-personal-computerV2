@@ -26,7 +26,7 @@ import urllib.request
 from collections import OrderedDict
 from pathlib import Path
 
-from aipc.skills import catalog, command, manifest, router
+from aipc.skills import catalog, manifest, router
 
 REPO = Path(__file__).resolve().parents[3]
 DATASET = REPO / "tests" / "data" / "skill_selection.json"
@@ -73,8 +73,9 @@ def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300) -> d
 def by_rules(text: str, skills, avail: set[str], ai, mode: str) -> str:
     """สกิลที่กฎเลือก · "" = ให้ AI ตัดสิน (ตามแบบที่วัด)."""
     if mode == "ai-first" and ai is not None:
-        return "system-command" if command.parse(text) else ""
-    r = router.route(text, skills, avail)
+        r = router.route_ai_first(text, skills)  # ตัวเดียวกับ SkillsController.handle
+    else:
+        r = router.route(text, skills, avail)
     return r.skill.id if r.skill is not None else ""
 
 

@@ -78,12 +78,30 @@ def reminder_reason(text: str, m: Manifest) -> str:
     return ""
 
 
-def route(text: str, manifests: list[Manifest], available: set[str]) -> Route:
-    by_id = {m.id: m for m in manifests}
-
+def command_route(text: str, by_id: dict[str, Manifest]) -> Route | None:
+    """ข้อ 1: คำสั่งเครื่องที่ตัวแปลแบบกำหนดแน่นอนแปลได้ · None = ไม่ใช่คำสั่ง."""
     cmd = command.parse(text)
     if cmd and "system-command" in by_id:
         return Route("command", by_id["system-command"], f"ตรงกับคำสั่ง “{cmd.plan.summary}”", cmd)
+    return None
+
+
+def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
+    """แบบผสม (ผู้ใช้เลือก 2026-09-30) ใช้เมื่อ AI ในเครื่องพร้อม: คำสั่งเครื่อง (ข้อ 1) ทำเลย ·
+    ที่เหลือ = Route("chat") ให้ AI เลือกจากรายการสกิลเอง ไม่ผ่านกฎให้คะแนนคำสำคัญ
+    ผลวัด Pi 5 (docs/benchmarks/2026-09-29-skill-select-pi5 · Typhoon2.5 4B): แบบนี้ถูก 50/58
+    เรียกสกิลผิด 0/18 · กฎก่อนถูก 41/58 ผิด 7/18 (ประโยคหลอก 6 ข้อกฎตัดสินผิดหมดก่อนถึง AI)
+    spikes.skill_select --mode ai-first เรียกฟังก์ชันนี้ตัวเดียวกับแอป
+    """
+    return command_route(text, {m.id: m for m in manifests}) or Route("chat")
+
+
+def route(text: str, manifests: list[Manifest], available: set[str]) -> Route:
+    """กฎก่อน (ลำดับข้อ 1–4 ด้านบน) · แอปใช้ตอน AI ในเครื่องยังไม่พร้อม."""
+    by_id = {m.id: m for m in manifests}
+
+    if r := command_route(text, by_id):
+        return r
 
     reminder = by_id.get("reminder")
     if reminder and (why := reminder_reason(text, reminder)):

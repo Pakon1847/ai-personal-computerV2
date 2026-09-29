@@ -190,7 +190,7 @@ class StepSkillTest(unittest.TestCase):
 
     def test_shows_every_step_and_waits_for_yes(self):
         s = self.make()
-        card = s.handle("เริ่มวันทำงาน")
+        card = s.handleAs("start-work", "เริ่มวันทำงาน")
         self.assertEqual(card["kind"], "steps")
         self.assertEqual(card["title"], "จะทำ 3 ขั้นนี้ ใช่ไหม")
         self.assertEqual(card["lines"], ["1. เปิด Gmail", "2. ปรับเสียงเป็น 30%", "3. เปิดหน้าตั้งค่า"])
@@ -205,7 +205,7 @@ class StepSkillTest(unittest.TestCase):
 
     def test_stops_at_the_failing_step(self):
         s = self.make(codes=[0, 5])  # ขั้น 2 (ปรับเสียง) ล้ม
-        card = s.handle("เริ่มวันทำงาน")
+        card = s.handleAs("start-work", "เริ่มวันทำงาน")
         done = s.confirm(card["confirmToken"], True)
         self.assertTrue(done["title"].startswith("หยุดที่ขั้น 2"))
         self.assertIn("ขั้นที่เหลือ 1 ขั้นไม่ได้ทำ", done["lines"])
@@ -213,15 +213,14 @@ class StepSkillTest(unittest.TestCase):
 
     def test_no_means_nothing_runs(self):
         s = self.make()
-        card = s.handle("เริ่มวันทำงาน")
+        card = s.handleAs("start-work", "เริ่มวันทำงาน")
         self.assertEqual(s.confirm(card["confirmToken"], False)["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
         self.assertEqual(self.calls, [])
 
     def test_say_and_ask_ai_run_without_confirm(self):
         s = self.make()
-        # ประโยคที่บอกวัน/เวลา (เช่น "วันนี้" "9 โมง") ไปสกิลนัดหมายก่อนเสมอ (router ข้อ 2) และคำอย่าง "ค้าง"
-        # ชนกับสกิลถามเครื่อง (คะแนนเท่ากัน = ตัวที่โหลดก่อนชนะ · แก้ในงานข้อ ④) · จึงใช้ประโยคที่ไม่ชนสกิลอื่น
-        card = s.handle("จดไอเดีย ทำแอปสอนภาษา")
+        # AI พร้อม = แบบผสม: AI เลือกสกิล (handleAs) แล้วทำทางเดียวกับที่กฎเลือก
+        card = s.handleAs("idea-note", "จดไอเดีย ทำแอปสอนภาษา")
         self.assertEqual(card["confirmToken"], "", "ไม่มีขั้นที่แตะเครื่อง = ไม่ต้องถาม")
         self.assertIn("อย่าลืมดื่มน้ำ", card["lines"])
         self.assertTrue(card["llm"])
@@ -274,7 +273,8 @@ class AiPicksSkillTest(unittest.TestCase):
 
 @unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
 class TieTest(unittest.TestCase):
-    """คะแนนเท่ากัน: เดิมตัวที่โหลดก่อนชนะเงียบ ๆ · ตอนนี้ถามผู้ใช้ (งานข้อ ④)."""
+    """คะแนนเท่ากัน: เดิมตัวที่โหลดก่อนชนะเงียบ ๆ · ตอนนี้ถามผู้ใช้ (งานข้อ ④)
+    ใช้เฉพาะตอน AI ในเครื่องยังไม่พร้อม (กฎก่อน) · AI พร้อม = AI เลือกเอง ไม่ผ่านกฎให้คะแนน."""
 
     def setUp(self):
         from aipc.skills import manifest
@@ -282,17 +282,19 @@ class TieTest(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         d = Path(tmp.name)
+        # สกิลที่บอกข้อความอย่างเดียว = ไม่ต้องมี AI จึงชนกับสกิลถามเครื่องได้ตอนไม่มี AI
         text = SAY_AI_SKILL.replace("keywords: จดไอเดีย", "keywords: จดไอเดีย, ค้าง")
+        text = text.replace("2. ถาม AI: เรียบเรียงไอเดียนี้เป็นข้อ ๆ\n", "")
         (d / "idea.md").write_text(text, encoding="utf-8")
         self.s = SkillsController(
-            reminders_path=d / "r.json", run_timer=False, llm_ready=lambda: True
+            reminders_path=d / "r.json", run_timer=False, llm_ready=lambda: False
         )
         self.s._skills = [*self.s._skills, *manifest.load_dir(d)]
 
     def test_tie_asks_then_runs_the_confirmed_skill(self):
         from aipc.skills import router
 
-        r = router.route("งานค้างเยอะ", self.s._skills, {"llm"})
+        r = router.route("งานค้างเยอะ", self.s._skills, set())
         self.assertEqual(sorted(r.tied), ["idea-note", "machine-status"])
         card = self.s.handle("งานค้างเยอะ")
         self.assertTrue(card["confirmToken"])
@@ -304,6 +306,39 @@ class TieTest(unittest.TestCase):
         card = self.s.handle("งานค้างเยอะ")
         done = self.s.confirm(card["confirmToken"], True)
         self.assertNotIn("ใช่ไหม", done["title"], "ยืนยันแล้ว = ทำเลย ไม่ถามซ้ำ")
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class HybridRouteTest(unittest.TestCase):
+    """แบบผสม (ผู้ใช้เลือก 2026-09-30): AI พร้อม = คำสั่งเครื่องทำเลย ที่เหลือให้ AI เลือก ·
+    ไม่พร้อม = กฎก่อนแบบเดิม."""
+
+    def make(self, llm):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.calls = []
+        ex = actions.Executor(runner=lambda a: self.calls.append(a) or 0, dry_run=False)
+        return SkillsController(executor=ex, reminders_path=Path(tmp.name) / "r.json",
+                                run_timer=False, llm_ready=lambda: llm)  # fmt: skip
+
+    def test_commands_still_run_at_once_with_ai(self):
+        card = self.make(llm=True).handle("เปิดยูทูบ")
+        self.assertEqual(card["kind"], "command")
+        self.assertEqual(len(self.calls), 1, "คำสั่งเครื่องที่แปลได้แน่นอน ไม่ต้องรอ AI")
+
+    def test_keyword_traps_go_to_ai_not_to_a_skill(self):
+        # ประโยคหลอกในชุดวัด: กฎคำสำคัญเลือกสกิลถามเครื่อง (คำว่า "เครื่อง") · แบบผสมให้ AI ตัดสิน
+        text = "เครื่องบินลำแรกของโลกบินได้เมื่อไร"
+        card = self.make(llm=True).handle(text)
+        self.assertEqual(card["kind"], "chat")
+        self.assertTrue(card["llm"])
+        self.assertNotEqual(card.get("tools"), False, "ต้องส่งรายการสกิลให้ AI เลือก")
+        self.assertEqual(self.make(llm=False).handle(text)["kind"], "skill", "ไม่มี AI = กฎก่อน")
+
+    def test_skill_sentence_goes_to_ai_with_the_catalog(self):
+        card = self.make(llm=True).handle("เตือนส่งรายงานพรุ่งนี้บ่ายสอง")
+        self.assertEqual(card["kind"], "chat")
+        self.assertEqual(card["prompt"], "", "prompt ว่าง = ChatController ส่งรายการสกิลไปด้วย")
 
 
 if __name__ == "__main__":
