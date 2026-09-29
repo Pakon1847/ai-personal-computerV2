@@ -1,0 +1,8 @@
+label=typhoon25-4b-q4km model=typhoon2.5-qwen3-4b-q4_k_m.gguf ctx=4096 threads=4 llama_cpp=86ea01d template=scripts/pi/chat-templates/typhoon2.5-qwen3-4b-q4_k_m.jinja
+VmHWM:	 5642384 kB
+VmRSS:	 5633248 kB
+RssAnon:	 3199344 kB
+RssFile:	 2433904 kB
+               total        used        free      shared  buff/cache   available
+Mem:            8062        3636         701          34        3846        4426
+Swap:           2047           0        2047
