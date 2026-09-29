@@ -101,7 +101,7 @@ Rectangle {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: 6
-                                AppField { id: pw1; Layout.fillWidth: true; label: "รหัสผ่าน"; password: true; emphasis: true }
+                                AppField { id: pw1; objectName: "signupPw1"; Layout.fillWidth: true; label: "รหัสผ่าน"; password: true; emphasis: true }
                                 RowLayout {
                                     spacing: 8
                                     Repeater {

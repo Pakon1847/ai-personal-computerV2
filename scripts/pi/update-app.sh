@@ -106,6 +106,13 @@ chown -R root:root "$TMP"
 chmod -R go-w,a+rX "$TMP"
 
 # ---------- ลองเปิดก่อนสลับ ----------
+# ตัวเปิดหน้า Login (greetd เรียก aipc-greeter ของรุ่นที่ใช้อยู่) ต้องมี รันได้ และมีไฟล์ผังแป้นครบ · ไม่งั้นรีบูตแล้วหน้า Login หาย
+G="$TMP/scripts/pi/session"
+if ! { [ -x "$G/aipc-greeter" ] && sh -n "$G/aipc-greeter" && [ -f "$G/labwc/environment" ] \
+       && [ -f "$G/xkb/rules/evdev" ] && [ -f "$G/xkb/symbols/aipc" ]; }; then
+  say "หยุด: รุ่น $NEWID ไม่มีตัวเปิดหน้า Login (aipc-greeter + ผังแป้น) ที่ใช้ได้ · ไม่ได้สลับ (ยังใช้รุ่น $OLD)"
+  exit 1
+fi
 say "+ ลองเปิดหน้า Login ด้วยผู้ใช้ _greetd (ไม่มีจอ)"
 SHOT="$(mktemp -d)"
 chmod 0777 "$SHOT"
@@ -144,3 +151,8 @@ for d in "$RELEASES"/*/; do
 done
 
 say "เสร็จ · ใช้รุ่น $NEWID · ออกจากระบบแล้วเข้าใหม่เพื่อใช้รุ่นนี้ · ย้อนกลับ: sudo $SRC/scripts/pi/update-app.sh --rollback"
+say "   หน้า Login ที่เปิดค้างอยู่ยังเป็นรุ่นเดิม · เปิดใหม่: sudo systemctl restart greetd (เฉพาะตอนไม่มีใครใช้ที่จอ) หรือรีบูต"
+# เครื่องที่ติดตั้งก่อน 2026-09-29: greetd ยังเรียก cage ตรง ๆ = หน้า Login ไม่มีแป้นไทย
+if [ -f /etc/greetd/config.toml ] && ! grep -q aipc-greeter /etc/greetd/config.toml; then
+  say "   หมายเหตุ: หน้า Login ยังใช้คำสั่งแบบเก่า (พิมพ์ไทยไม่ได้) → sudo $SRC/scripts/pi/install-greeter.sh --config-only --apply"
+fi

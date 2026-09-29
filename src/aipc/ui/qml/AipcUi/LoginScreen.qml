@@ -180,6 +180,7 @@ Rectangle {
             AppField { id: userField; Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5)); placeholder: "ชื่อผู้ใช้"; mono: true }
             AppField {
                 id: pwField
+                objectName: "loginPw"
                 Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5))
                 placeholder: "รหัสผ่าน"; password: true; emphasis: true
                 field.onAccepted: root.submit(userField.text, text)
@@ -203,7 +204,7 @@ Rectangle {
 
         AppButton {
             Layout.alignment: Qt.AlignHCenter
-            text: "ลืมรหัสผ่าน? ใช้รหัสกู้คืน"; kind: "ghost"
+            text: "ลืมรหัสผ่าน? ใช้ PIN กู้คืน"; kind: "ghost"
             onClicked: AppState.go("recover")   // การ์ด 0012
         }
     }

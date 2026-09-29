@@ -13,7 +13,7 @@
 ## เปิดเครื่องถึงหน้าจอ V2 (การ์ด 0003, 0004 · ติดตั้งบน Pi 4 แล้ว)
 
 ```text
-เปิดเครื่อง → systemd → greetd ─► cage -s ─► aipc.ui --greeter <เซสชัน>     (ผู้ใช้ _greetd, /opt/aipc-v2)
+เปิดเครื่อง → systemd → greetd ─► aipc-greeter (ผังแป้นอังกฤษ/ไทย) ─► cage -s ─► aipc.ui --greeter <เซสชัน>     (ผู้ใช้ _greetd, /opt/aipc-v2)
                           │  socket $GREETD_SOCK  (aipc.login.greetd: create_session → answer → start)
                           │  PAM ของ OS ตรวจรหัสผ่าน · โค้ดเราไม่ตรวจเอง
                           ▼ ผ่าน

@@ -61,7 +61,7 @@ Rectangle {
                     AppField { id: userField; objectName: "recoverUser"; Layout.fillWidth: true; label: "ชื่อผู้ใช้"; mono: true }
                     AppField { id: pinField; objectName: "recoverPin"; Layout.fillWidth: true; label: "PIN"; mono: true; password: true
                                field.inputMethodHints: Qt.ImhDigitsOnly; field.maximumLength: 12 }
-                    AppField { id: pw1; Layout.fillWidth: true; label: "รหัสผ่านใหม่"; password: true; emphasis: true }
+                    AppField { id: pw1; objectName: "recoverPw1"; Layout.fillWidth: true; label: "รหัสผ่านใหม่"; password: true; emphasis: true }
                     AppField {
                         id: pw2
                         Layout.fillWidth: true

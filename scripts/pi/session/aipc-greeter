@@ -1,0 +1,14 @@
+#!/bin/sh
+# หน้า Login ของ V2 · greetd เรียกไฟล์นี้ (การ์ด 0003) → เปิด cage แล้วรันหน้าจอ V2 แบบ greeter
+#   aipc-greeter '<คำสั่งเซสชันหลังเข้าได้>'   (install-greeter.sh เขียนบรรทัดนี้ลง /etc/greetd/config.toml)
+#
+# ผังแป้นอังกฤษ + ไทย ชุดเดียวกับเซสชัน (ปุ่ม ~ หรือ Alt+Shift สลับ) · อ่านจาก labwc/environment ไฟล์เดียว ไม่เขียนค่าซ้ำ
+# พบ 2026-09-29: เดิม greetd เรียก cage ตรง ๆ ไม่มีผังแป้นไทย → ช่อง "ชื่อที่แสดง" ตอนสมัครพิมพ์ไทยไม่ได้
+# ไฟล์นี้อยู่ในโฟลเดอร์ของรุ่นแอป · update-app.sh ตรวจว่ามีและรันได้ก่อนสลับรุ่น (หน้า Login ต้องไม่หาย)
+HERE="$(dirname "$(readlink -f "$0")")"
+APP="$(dirname "$(dirname "$(dirname "$HERE")")")"
+for v in XKB_DEFAULT_MODEL XKB_DEFAULT_LAYOUT XKB_DEFAULT_OPTIONS; do
+  line="$(grep "^$v=" "$HERE/labwc/environment")" && export "$line"
+done
+export XKB_CONFIG_EXTRA_PATH="$HERE/xkb"
+exec cage -s -- "$APP/.venv/bin/python" -m aipc.ui --fullscreen --greeter "$1"

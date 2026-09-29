@@ -131,6 +131,37 @@ def find_all(root, name):
 
 
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")
+class PasswordThaiHintTest(unittest.TestCase):
+    """พบ 2026-09-29: หน้า Login เคยมีแต่แป้นอังกฤษ · เมื่อสลับไทยได้แล้ว ช่องรหัสผ่านต้องเตือนถ้ามีตัวอักษรไทย
+    (ช่องซ่อนตัวอักษร ผู้ใช้มองไม่เห็นเอง) · เตือนเท่านั้น ไม่ห้าม · เลขไทย ๐–๙ ไม่เตือน เพราะช่อง PIN รับได้"""
+
+    FIELDS = [({"screen": "login"}, "loginPw"),
+              ({"screen": "signup", "dev": True}, "signupPw1"),
+              ({"screen": "recover", "dev": True}, "recoverPw1")]  # fmt: skip
+
+    def test_thai_letters_in_password_show_a_hint(self):
+        for case, name in self.FIELDS:
+            with self.subTest(field=name), tempfile.TemporaryDirectory() as tmp:
+                opts = uiapp.Options(software=True, settings_path=Path(tmp) / "ui.json", **case)
+                app, engine, warnings = uiapp.build(opts)
+                settle()
+                win = engine.rootObjects()[0]
+                field = find_all(win, name)[0]
+                self.assertFalse(field.property("thaiInPassword"))
+                field.setProperty("text", "รหัสผ่านไทย12")
+                settle(50)
+                self.assertTrue(field.property("thaiInPassword"))
+                self.assertIn("กด ~", field.property("shownHint"))
+                self.assertEqual(field.property("shownKind"), "warn")
+                field.setProperty("text", "correct-horse-๙๘")  # เลขไทยอย่างเดียว = ไม่เตือน
+                settle(50)
+                self.assertFalse(field.property("thaiInPassword"))
+                self.assertEqual(warnings, [])
+                win.close()
+                uiapp.shutdown(engine)
+
+
+@unittest.skipIf(uiapp is None, "ไม่มี PySide6")
 class ShellCardTest(unittest.TestCase):
     """เกณฑ์การ์ด 0002 ข้อ 8: ไฟกล้อง/ไมค์ทุกหน้า และการ์ดนัดถัดไปจาก upcoming จริง."""
 

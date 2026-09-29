@@ -78,7 +78,7 @@ class System:
         return time.time()
 
     def log(self, text: str) -> None:
-        """บันทึกเหตุการณ์ลง journal ของระบบ · ห้ามมีรหัสผ่านหรือรหัสกู้คืน."""
+        """บันทึกเหตุการณ์ลง journal ของระบบ · ห้ามมีรหัสผ่านหรือ PIN."""
         try:
             import syslog
 

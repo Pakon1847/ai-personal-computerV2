@@ -1,4 +1,6 @@
-// ช่องกรอกพร้อมป้ายชื่อและข้อความช่วย · hintKind: normal | ok | error
+// ช่องกรอกพร้อมป้ายชื่อและข้อความช่วย · hintKind: normal | ok | warn | error
+// ช่องรหัสผ่านที่มีตัวอักษรไทย = อาจลืมสลับแป้น (ช่องนี้ซ่อนตัวอักษร จึงมองไม่เห็นเอง) → เตือนแทนข้อความช่วย ไม่ห้ามส่ง
+// ไม่นับเลขไทย ๐–๙ เพราะช่อง PIN รับได้ (พบ 2026-09-29: หน้า Login เคยมีแต่แป้นอังกฤษ ตอนนี้สลับไทยได้แล้ว)
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -14,6 +16,9 @@ ColumnLayout {
     property bool mono: false
     property bool emphasis: false
     property alias field: input
+    readonly property bool thaiInPassword: password && /[\u0E01-\u0E4F\u0E5A-\u0E7F]/.test(input.text)
+    readonly property string shownHint: thaiInPassword ? "มีตัวอักษรไทย · ถ้าไม่ได้ตั้งใจ กด ~ สลับเป็นอังกฤษ" : hint
+    readonly property string shownKind: thaiInPassword ? "warn" : hintKind
     spacing: 6
 
     AppText { text: root.label; strong: true; visible: root.label !== "" }
@@ -40,10 +45,11 @@ ColumnLayout {
     }
 
     AppText {
-        visible: root.hint !== ""
-        text: root.hint
+        visible: root.shownHint !== ""
+        text: root.shownHint
         size: Theme.fontCaption
-        color: root.hintKind === "ok" ? Theme.okInk : root.hintKind === "error" ? Theme.danger : Theme.inkMuted
+        color: root.shownKind === "ok" ? Theme.okInk : root.shownKind === "error" ? Theme.danger
+             : root.shownKind === "warn" ? Theme.warnInk : Theme.inkMuted
         Layout.fillWidth: true
     }
 }

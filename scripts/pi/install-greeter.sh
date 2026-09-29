@@ -6,20 +6,25 @@
 #   sudo ./scripts/pi/install-greeter.sh --rollback   กลับไปใช้หน้า login เดิมของ Raspberry Pi OS (lightdm)
 #   ตัวเลือก: --session "คำสั่ง"  เซสชันที่จะเริ่มหลังเข้าได้ (ค่าเริ่มต้น: อ่านจาก lightdm.conf = เดสก์ท็อป Pi)
 #             --session v2       หน้าจอ V2 เป็นทั้งเซสชัน ไม่มีเดสก์ท็อป Pi (การ์ด 0004)
+#             --config-only      เขียนเฉพาะ /etc/greetd/config.toml (เครื่องที่ติดตั้งแล้ว เช่น เปลี่ยนมาใช้ aipc-greeter)
+#                                ไม่ติดตั้งแพ็กเกจ ไม่คัดลอกแอป ไม่สลับ lightdm/greetd · ไม่บอก --session = ใช้เซสชันเดิมใน config
 #
 # ทำอะไร: ติดตั้ง greetd + cage (apt) · คัดลอกแอปไปที่ /opt/aipc-v2 ให้ผู้ใช้ _greetd อ่านได้
-#         · เขียน /etc/greetd/config.toml (สำรองของเดิมก่อน) · ปิด lightdm เปิด greetd · **ไม่รีบูตให้**
+#         · เขียน /etc/greetd/config.toml (สำรองของเดิมก่อน) ให้เรียก scripts/pi/session/aipc-greeter
+#           (cage + ผังแป้นอังกฤษ/ไทย ชุดเดียวกับเซสชัน) · ปิด lightdm เปิด greetd · **ไม่รีบูตให้**
 # ไม่แตะ: PAM (ใช้ชุด login ปกติของ OS), ไฟล์บูต, พาร์ทิชัน, /etc/fstab · ไม่ถอน lightdm (ย้อนกลับได้เสมอ)
 # ทางเข้าสำรอง: cage รันด้วย -s จึงกด Ctrl+Alt+F2 ไปหน้าจอตัวหนังสือได้ แล้วรัน --rollback
 set -euo pipefail
 
 MODE="dry-run"
 SESSION=""
+CONFIG_ONLY=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) MODE="apply" ;;
     --rollback) MODE="rollback" ;;
     --session) SESSION="${2:?--session ต้องตามด้วยคำสั่ง}"; shift ;;
+    --config-only) CONFIG_ONLY=1 ;;
     *) echo "ไม่รู้จัก: $1" >&2; exit 2 ;;
   esac
   shift
@@ -34,6 +39,8 @@ if [ "$SESSION" = "v2" ]; then
   SESSION="$DEST/scripts/pi/session/aipc-session"
   [ -x "$SRC/scripts/pi/session/aipc-session" ] || { echo "หยุด: ไม่มี scripts/pi/session/aipc-session ใน $SRC" >&2; exit 1; }
 fi
+GREETER="$DEST/scripts/pi/session/aipc-greeter"
+[ -x "$SRC/scripts/pi/session/aipc-greeter" ] || { echo "หยุด: ไม่มี scripts/pi/session/aipc-greeter ใน $SRC" >&2; exit 1; }
 
 say() { printf '%s\n' "$*"; }
 need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย sudo" >&2; exit 1; }; }
@@ -64,6 +71,15 @@ fi
 [ -d "$SRC/.git" ] || { say "หยุด: $SRC ไม่ใช่ git repo (ต้อง clone จาก aipc.bundle)"; exit 1; }
 if [ -n "$(git -C "$SRC" status --porcelain 2>/dev/null)" ]; then
   say "หยุด: $SRC มีไฟล์ที่แก้แต่ยังไม่ commit · ติดตั้งเฉพาะของที่ commit แล้วเท่านั้น"; exit 1
+fi
+
+# --config-only: ใช้เซสชันเดิมใน config (อาร์กิวเมนต์ในเครื่องหมาย ' ตัวสุดท้ายของบรรทัด command ทั้งแบบเก่าและแบบ aipc-greeter)
+if [ "$CONFIG_ONLY" = 1 ]; then
+  [ -x "$GREETER" ] || { say "หยุด: $GREETER ยังไม่มี · อัปเดตแอปก่อน (update-app.sh --apply)"; exit 1; }
+  if [ -z "$SESSION" ] && [ -f "$CONF" ]; then
+    SESSION="$(sed -n "s/^command = \".* '\([^']*\)'\"$/\1/p" "$CONF" | tail -1)"
+    [ -n "$SESSION" ] && say "ใช้เซสชันเดิมจาก $CONF"
+  fi
 fi
 
 # เซสชันหลังเข้าได้: ใช้ตัวเดียวกับที่ lightdm ใช้อยู่ ถ้าไม่ได้บอกมา
@@ -97,6 +113,7 @@ if [ "$MODE" = "apply" ]; then
   [ "$ANSWER" = "YES" ] || { say "ยกเลิก · ยังไม่ได้เปลี่ยนอะไร"; exit 1; }
 fi
 
+if [ "$CONFIG_ONLY" = 0 ]; then
 # ---------- 1. แพ็กเกจ ----------
 say ""; say "1) greetd + cage"
 MISSING=()
@@ -128,8 +145,11 @@ do_ env AIPC_MODEL_DIR="$DEST/models" "$DEST/.venv/bin/python" -m aipc.vision.mo
 do_ chown -R root:root "$DEST"
 do_ chmod -R go-w,a+rX "$DEST"
 
+fi  # CONFIG_ONLY = 0 (ขั้น 1–2)
+
 # ---------- 3. config ของ greetd ----------
-CMD="cage -s -- $DEST/.venv/bin/python -m aipc.ui --fullscreen --greeter '$SESSION'"
+# aipc-greeter = cage + ผังแป้นอังกฤษ/ไทย + หน้าจอ V2 แบบ greeter (อยู่ในโฟลเดอร์ของรุ่นแอป · เปลี่ยนตามรุ่นได้โดยไม่ต้องแก้ config)
+CMD="$GREETER '$SESSION'"
 NEW="[terminal]
 vt = 7
 
@@ -152,6 +172,15 @@ if [ "$MODE" = "apply" ]; then
 fi
 
 # ---------- 4. สลับตัวจัดการหน้า login ----------
+if [ "$CONFIG_ONLY" = 1 ]; then
+  say ""
+  if [ "$MODE" = "apply" ]; then
+    say "เสร็จ · หน้า Login ใหม่มีผลเมื่อเปิดใหม่: sudo systemctl restart greetd (เฉพาะตอนไม่มีใครใช้ที่จอ) หรือรีบูต"
+  else
+    say "ยังไม่ได้เปลี่ยนอะไร · ถ้าข้างบนถูกต้อง: sudo ./scripts/pi/install-greeter.sh --config-only --apply"
+  fi
+  exit 0
+fi
 say ""; say "4) ปิด lightdm เปิด greetd (มีผลหลังรีบูต)"
 if [ "$MODE" = "apply" ]; then
   systemctl disable lightdm || true
