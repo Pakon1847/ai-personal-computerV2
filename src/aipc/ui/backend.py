@@ -896,6 +896,15 @@ class ChatController(QObject):
         if self._stream is not None:
             self._stream.abort()
 
+    @Slot(str)
+    def copyText(self, text: str) -> None:  # noqa: N802
+        """คัดลอกคำตอบไปคลิปบอร์ด (เอาจดหมายที่ร่างไปใช้ต่อ) · อยู่ในเครื่อง ไม่ส่งไปไหน."""
+        from PySide6.QtGui import QGuiApplication
+
+        board = QGuiApplication.clipboard()
+        if board is not None:
+            board.setText(text)
+
     def _on_token(self, token: str) -> None:
         self._stream_text += token
         self.streamChanged.emit()

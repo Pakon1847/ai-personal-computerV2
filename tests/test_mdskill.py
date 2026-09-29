@@ -140,7 +140,8 @@ class LoadTest(unittest.TestCase):
 
     def test_builtins_are_md_and_keep_their_prompt(self):
         files = sorted(p.name for p in manifest.BUILTIN_DIR.iterdir() if p.is_file())
-        want = ["machine-status.md", "reminder.md", "system-command.md", "translate.md"]
+        want = ["letter-writer.md", "machine-status.md", "reminder.md", "summarize-text.md",
+                "system-command.md", "translate.md"]  # fmt: skip
         self.assertEqual(files, want)
         tr = next(s for s in manifest.load_builtin() if s.id == "translate")
         self.assertTrue(tr.prompt.startswith("แปลข้อความต่อไปนี้"))

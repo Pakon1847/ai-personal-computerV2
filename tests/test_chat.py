@@ -214,6 +214,12 @@ class ControllerTest(ServerCase):
         self.assertIn("ตอบไม่จบ", done[0][1])
         self.assertEqual(done[0][0], "สวัสดี")
 
+    def test_copy_answer_to_clipboard(self):
+        # ปุ่ม "คัดลอก" ใต้คำตอบ AI (ข้อเสนอ 2026-09-29 ข้อ ⑤) · เอาจดหมายที่ร่างไปใช้ต่อได้
+        c = ChatController(active=False)
+        c.copyText("เรียน อาจารย์ ...")
+        self.assertEqual(QGuiApplication.clipboard().text(), "เรียน อาจารย์ ...")
+
     def test_not_ready_refuses(self):
         c = ChatController(target=client.Target(), poll_ms=100000)
         self.addCleanup(c.shutdown)

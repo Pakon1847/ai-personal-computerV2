@@ -17,6 +17,7 @@ Item {
     // รายการข้อความเป็น JS array ธรรมดา: { user: true, text } · { user: false, card } · { ai: true, text, note, done }
     property var items: []
     property var answered: ({})   // token ของการ์ดที่ตอบ "ใช่/ไม่ใช่" ไปแล้ว
+    property int copiedRow: -1    // คำตอบ AI ที่เพิ่งกดคัดลอก (ปุ่มขึ้นว่า "คัดลอกแล้ว")
     readonly property bool home: items.length === 0
     readonly property int colWidth: Math.min(760, width - 48)
 
@@ -328,6 +329,7 @@ Item {
         delegate: Item {
             id: row
             required property var modelData
+            required property int index
             width: ListView.view.width
             height: modelData.user ? bubble.height : modelData.ai ? aiBox.height : card.height
 
@@ -375,6 +377,14 @@ Item {
                         Layout.fillWidth: true
                         text: row.modelData.note || ""
                         size: Theme.fontSmall; color: Theme.warnInk
+                    }
+                    // เอาคำตอบไปใช้ต่อ (เช่น จดหมายที่ร่าง) · คลิปบอร์ดอยู่ในเครื่อง ไม่ได้ส่งไปไหน
+                    AppButton {
+                        objectName: "copyAnswer"
+                        visible: !!row.modelData.done && (row.modelData.text || "") !== ""
+                        text: root.copiedRow === row.index ? "คัดลอกแล้ว" : "คัดลอก"
+                        kind: "ghost"
+                        onClicked: { chat.copyText(row.modelData.text); root.copiedRow = row.index }
                     }
                 }
             }

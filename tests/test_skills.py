@@ -26,7 +26,15 @@ class ManifestTest(unittest.TestCase):
         self.assertEqual(
             sorted(s.id for s in skills),
             # สกิล 2 (voice-note) และ 6 (what-is-this) ตัดออกในขอบเขตรอบ 3 (2026-09-28)
-            ["machine-status", "reminder", "system-command", "translate"],
+            # 2026-09-29: สรุปข้อความ + ร่างจดหมาย สร้างโดย Claude (forge.py) และผ่านการตรวจแล้ว
+            [
+                "letter-writer",
+                "machine-status",
+                "reminder",
+                "summarize-text",
+                "system-command",
+                "translate",
+            ],
         )
 
     def test_rejects_unknown_action_and_permission(self):
