@@ -123,6 +123,7 @@ class LocalRunnerTest(unittest.TestCase):
         self.assertEqual(sent[0]["response_format"]["type"], "json_schema", "บังคับรูป JSON")
         self.assertIn("## คำขอ", sent[0]["messages"][0]["content"], "แม่แบบคำขอเดียวกับ Claude")
         self.assertEqual(calls[0]["finish"], "stop")
+        self.assertIn("kid-words", calls[0]["text"], "เก็บคำตอบดิบไว้ตรวจ")
 
     def test_broken_answer_gets_a_second_try_with_the_errors(self):
         bad = json.dumps(

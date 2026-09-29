@@ -34,7 +34,8 @@ DATASET = REPO / "tests" / "data" / "skill_authoring.json"
 SELECTION = REPO / "tests" / "data" / "skill_selection.json"
 # ค่าเดียวกับตัววัดการเลือกสกิล · ไฟล์สกิล + ประโยคทดสอบ 12 ประโยค ≈ 1,500 token จึงเผื่อ 3,000
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "max_tokens": 3000}
-LOCAL_TIMEOUT = 1800  # 3,000 token ที่ ~4.6 token/วิ ≈ 11 นาที + อ่านคำขอ ~2 นาที
+LOCAL_TIMEOUT = 1800
+RAW_KEEP = 8000  # 3,000 token ที่ ~4.6 token/วิ ≈ 11 นาที + อ่านคำขอ ~2 นาที
 SCHEMA = {
     "type": "object",
     "properties": {
@@ -84,6 +85,7 @@ def local_runner(server: str, label: str, calls: list, opener=urllib.request.url
                 "seconds": round(time.monotonic() - t0, 2),
                 "finish": choice.get("finish_reason"),
                 "timings": data.get("timings", {}),
+                "text": text[:RAW_KEEP],  # คำตอบดิบ ไว้ดูว่าไม่ผ่านตัวตรวจเพราะอะไร
             }
         )
         wrapped = {
