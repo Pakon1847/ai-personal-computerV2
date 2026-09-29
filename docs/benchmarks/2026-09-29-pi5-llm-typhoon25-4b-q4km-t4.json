@@ -1,0 +1,97 @@
+{
+  "name": "2026-09-29-pi5-llm-typhoon25-4b-q4km-t4",
+  "command": [
+    "/home/aipc2030/llama.cpp/build/bin/llama-bench",
+    "-m",
+    "models/typhoon2.5-qwen3-4b-q4_k_m.gguf",
+    "-t",
+    "4",
+    "-p",
+    "200",
+    "-n",
+    "64",
+    "-r",
+    "1",
+    "-o",
+    "json"
+  ],
+  "meta": {
+    "threads": "4",
+    "prompt_tokens": "200",
+    "gen_tokens": "64",
+    "size_class": "3-4b",
+    "ttft_target_s": "10.0",
+    "llama_cpp": "86ea01d"
+  },
+  "files_sha256": {
+    "models/typhoon2.5-qwen3-4b-q4_k_m.gguf": "b365302922688f3a3c9ac8e3c00ab97a152cac0cdbf4eb5a734ecb483ae3e511"
+  },
+  "machine": {
+    "collected_at": "2026-09-29T11:25:41+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 5 Model B Rev 1.0",
+    "board_class": "pi5",
+    "ram_total_mb": 8062,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-2712",
+    "python": "3.13.5",
+    "cpu_temp_c": 51.25,
+    "throttled": 0,
+    "throttled_problems": [],
+    "git_commit": "86e7ab8b99456ee065f8a577c26bf97e4e1ffbd6",
+    "git_dirty": false
+  },
+  "throttled_before": 0,
+  "summary_seconds": {
+    "n": 5,
+    "median": 43.357122371000514,
+    "p95": 43.75470259700069,
+    "minimum": 41.82421265500034,
+    "maximum": 43.75470259700069
+  },
+  "summary_metrics": {
+    "peak_rss_mb": {
+      "n": 5,
+      "median": 4865.515625,
+      "p95": 4866.03125,
+      "minimum": 4865.5,
+      "maximum": 4866.03125
+    },
+    "pp_tok_s": {
+      "n": 5,
+      "median": 17.87465,
+      "p95": 18.107784,
+      "minimum": 17.791445,
+      "maximum": 18.107784
+    },
+    "prefill_s": {
+      "n": 5,
+      "median": 11.189030274718666,
+      "p95": 11.241357854856647,
+      "minimum": 11.044973807949113,
+      "maximum": 11.241357854856647
+    },
+    "tg_tok_s": {
+      "n": 5,
+      "median": 4.387481,
+      "p95": 4.402739,
+      "minimum": 4.319294,
+      "maximum": 4.402739
+    }
+  },
+  "verdict": {
+    "evidence_level4": false,
+    "throttled_runs": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "throttle_unknown": false,
+    "warnings": [
+      "ไฟตกหรือร้อนเกินระหว่างรอบ [0, 1, 2, 3, 4, 5] — ผลชุดนี้ใช้ไม่ได้ ต้องวัดใหม่"
+    ]
+  }
+}
