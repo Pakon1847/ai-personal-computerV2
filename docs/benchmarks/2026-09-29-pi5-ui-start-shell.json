@@ -1,0 +1,48 @@
+{
+  "name": "2026-09-29-pi5-ui-start-shell",
+  "command": [
+    "./.venv/bin/python",
+    "-m",
+    "aipc.ui",
+    "--session",
+    "--software",
+    "--screenshot",
+    "/tmp/ui-start.png"
+  ],
+  "meta": {
+    "screen": "shell",
+    "mode": "session-offscreen-software",
+    "note": "includes-600ms-screenshot-delay"
+  },
+  "files_sha256": {},
+  "machine": {
+    "collected_at": "2026-09-29T10:06:19+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 5 Model B Rev 1.0",
+    "board_class": "pi5",
+    "ram_total_mb": 8062,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-2712",
+    "python": "3.13.5",
+    "cpu_temp_c": 54.0,
+    "throttled": 0,
+    "throttled_problems": [],
+    "git_commit": "e7426ceb5ced6ad7fd305fe72118409d427f1b8c",
+    "git_dirty": false
+  },
+  "throttled_before": 0,
+  "summary_seconds": {
+    "n": 10,
+    "median": 1.1962950720001118,
+    "p95": 1.2213056810001035,
+    "minimum": 1.1867737640000087,
+    "maximum": 1.2213056810001035
+  },
+  "summary_metrics": {},
+  "verdict": {
+    "evidence_level4": true,
+    "throttled_runs": [],
+    "throttle_unknown": false,
+    "warnings": []
+  }
+}
