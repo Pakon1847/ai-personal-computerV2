@@ -1,0 +1,92 @@
+{
+  "name": "2026-09-29-pi5-llm-typhoon25-4b-q4km-t3-t3",
+  "command": [
+    "/home/aipc2030/llama.cpp/build/bin/llama-bench",
+    "-m",
+    "models/typhoon2.5-qwen3-4b-q4_k_m.gguf",
+    "-t",
+    "3",
+    "-p",
+    "200",
+    "-n",
+    "64",
+    "-r",
+    "1",
+    "-o",
+    "json"
+  ],
+  "meta": {
+    "threads": "3",
+    "prompt_tokens": "200",
+    "gen_tokens": "64",
+    "size_class": "3-4b",
+    "ttft_target_s": "10.0",
+    "llama_cpp": "86ea01d"
+  },
+  "files_sha256": {
+    "models/typhoon2.5-qwen3-4b-q4_k_m.gguf": "b365302922688f3a3c9ac8e3c00ab97a152cac0cdbf4eb5a734ecb483ae3e511"
+  },
+  "machine": {
+    "collected_at": "2026-09-29T11:30:02+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 5 Model B Rev 1.0",
+    "board_class": "pi5",
+    "ram_total_mb": 8062,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-2712",
+    "python": "3.13.5",
+    "cpu_temp_c": 73.25,
+    "throttled": 917504,
+    "throttled_problems": [
+      "เคยถูกจำกัดความถี่ตั้งแต่บูต",
+      "เคยถูกลดความเร็วตั้งแต่บูต",
+      "เคยถึงขีดอุณหภูมิแบบนุ่มตั้งแต่บูต"
+    ],
+    "git_commit": "f76322362eb40858e5f0e24e208d0d57552c7af4",
+    "git_dirty": false
+  },
+  "throttled_before": 917504,
+  "summary_seconds": {
+    "n": 5,
+    "median": 44.98678453999946,
+    "p95": 45.30750223399991,
+    "minimum": 44.05954843700056,
+    "maximum": 45.30750223399991
+  },
+  "summary_metrics": {
+    "peak_rss_mb": {
+      "n": 5,
+      "median": 4866.015625,
+      "p95": 4866.015625,
+      "minimum": 4866.015625,
+      "maximum": 4866.015625
+    },
+    "pp_tok_s": {
+      "n": 5,
+      "median": 16.260991,
+      "p95": 16.882965,
+      "minimum": 16.04254,
+      "maximum": 16.882965
+    },
+    "prefill_s": {
+      "n": 5,
+      "median": 12.299373389973587,
+      "p95": 12.466853752585315,
+      "minimum": 11.84626041693506,
+      "maximum": 12.466853752585315
+    },
+    "tg_tok_s": {
+      "n": 5,
+      "median": 4.632736,
+      "p95": 4.656576,
+      "minimum": 4.602098,
+      "maximum": 4.656576
+    }
+  },
+  "verdict": {
+    "evidence_level4": true,
+    "throttled_runs": [],
+    "throttle_unknown": false,
+    "warnings": []
+  }
+}
