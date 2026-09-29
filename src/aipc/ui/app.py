@@ -78,7 +78,13 @@ def build(opts: Options, argv: list[str] | None = None):
     # เซสชันจริงกับ greeter: ไม่มีโหมดพัฒนา/สาธิต · เซสชันจริงเริ่มที่ Shell เสมอ (login ผ่าน greetd แล้ว)
     real = bool(opts.greeter_session) or opts.session
     # หน้า Login ไม่มีเจ้าของเซสชัน → ไม่คุยกับ AI (การ์ด 0013) · เซสชัน/หน้าต่างพัฒนาใช้ llama-server ของผู้ใช้
-    chat = ChatController(active=not opts.greeter_session)
+    # AI เลือกสกิลได้ (อาจารย์ขอ · งานข้อ ④): รายการสกิลอ่านจาก SkillsController ตอนส่งทุกครั้ง
+    holder: dict = {}
+
+    def tools() -> list:
+        return holder["skills"].tool_catalog() if "skills" in holder else []
+
+    chat = ChatController(active=not opts.greeter_session, tools=tools)
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
@@ -100,6 +106,7 @@ def build(opts: Options, argv: list[str] | None = None):
         "face": FaceController(active=not opts.greeter_session),
     }
     chat.statusChanged.connect(engine._backends["skills"].skillsChanged)  # สกิลแปลพร้อมเมื่อ AI พร้อม
+    holder["skills"] = engine._backends["skills"]
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():
         ctx.setContextProperty(name, obj)

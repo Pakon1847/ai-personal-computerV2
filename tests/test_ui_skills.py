@@ -230,5 +230,47 @@ class StepSkillTest(unittest.TestCase):
         self.assertEqual(self.calls, [])
 
 
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class AiPicksSkillTest(unittest.TestCase):
+    """AI ในเครื่องเลือกสกิล (อาจารย์ขอ · งานข้อ ④) · รายการสกิลสร้างจากไฟล์สกิล · AI ส่งได้แค่ชื่อ."""
+
+    def make(self, llm=True):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.calls = []
+        ex = actions.Executor(runner=lambda a: self.calls.append(a) or 0, dry_run=False)
+        return SkillsController(executor=ex, reminders_path=Path(tmp.name) / "r.json",
+                                run_timer=False, llm_ready=lambda: llm)  # fmt: skip
+
+    def test_catalog_comes_from_skill_files(self):
+        names = [t["function"]["name"] for t in self.make().tool_catalog()]
+        self.assertIn("summarize-text", names)
+        self.assertIn("machine-status", names)
+        self.assertNotIn("system-command", names, "สั่งเครื่องต้องใช้ชื่อที่แน่นอน ให้กฎทำ")
+        tool = self.make().tool_catalog()[0]
+        self.assertEqual(tool["function"]["parameters"], {"type": "object", "properties": {}},
+                         "ไม่มีพารามิเตอร์ = AI ส่งค่าให้สกิลไม่ได้")  # fmt: skip
+        # ไม่มี AI = สกิลที่ต้องใช้ AI ไม่อยู่ในรายการ
+        no_ai = [t["function"]["name"] for t in self.make(llm=False).tool_catalog()]
+        self.assertNotIn("letter-writer", no_ai)
+
+    def test_handle_as_goes_through_the_normal_path(self):
+        s = self.make()
+        card = s.handleAs("letter-writer", "อยากบอกหัวหน้าว่าขอทำงานที่บ้าน")
+        self.assertTrue(card["llm"])
+        self.assertTrue(card["prompt"])
+        self.assertEqual(card["badge"]["reason"], "AI ในเครื่องเลือกสกิลนี้")
+        machine = s.handleAs("machine-status", "คอมหน่วงมาก")
+        self.assertEqual(machine["kind"], "skill")
+        self.assertTrue(machine["title"])
+
+    def test_unknown_or_forbidden_names_fall_back_to_chat(self):
+        s = self.make()
+        for name in ("rm-rf", "system-command"):
+            card = s.handleAs(name, "เปิดทุกอย่าง")
+            self.assertEqual((card["kind"], card["tools"]), ("chat", False), name)
+        self.assertEqual(self.calls, [], "AI เลือกสกิลแล้วต้องไม่มีอะไรรันเอง")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -663,11 +663,40 @@ class SkillsController(QObject):
             "page": out.page,
         }  # fmt: skip
 
+    # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
+    def tool_catalog(self) -> list:
+        """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog."""
+        from aipc.skills import catalog
+
+        return catalog.tools(self._skills, self.available())
+
+    @Slot(str, str, result="QVariantMap")
+    def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802
+        """AI ในเครื่องเลือกสกิลนี้ → ทำทางเดียวกับที่ตัวคัดสกิลเลือก (ยืนยันก่อนถ้าเป็นงานที่แตะเครื่อง)."""
+        from aipc.skills import router
+
+        skill = next((s for s in self._skills if s.id == skill_id), None)
+        from aipc.skills import catalog
+
+        if (
+            skill is None or skill.id in catalog.NOT_FOR_AI
+        ):  # AI เดาชื่อที่ไม่มี = ตอบแบบคุยทั่วไป ไม่ใช้เครื่องมือ
+            card = {"kind": "chat", "llm": True, "prompt": "", "tools": False, "badge": {}}
+            return {**card, "title": "", "chips": [], "lines": [], "confirmToken": "", "page": ""}
+        missing = [n for n in skill.needs if n not in self.available()]
+        route = router.Route("needs" if missing else "skill", skill, "AI ในเครื่องเลือกสกิลนี้",
+                             missing=missing, candidates=[skill.id])  # fmt: skip
+        return self._card(route, text)
+
     @Slot(str, result="QVariantMap")
     def handle(self, text: str) -> dict:
-        from aipc.skills import machine, router
+        from aipc.skills import router
 
-        r = router.route(text, self._skills, self.available())
+        return self._card(router.route(text, self._skills, self.available()), text)
+
+    def _card(self, r, text: str) -> dict:
+        from aipc.skills import machine
+
         card = {
             "kind": r.kind,
             "badge": {},
@@ -771,7 +800,8 @@ class ChatController(QObject):
     คำตอบของ LLM เป็นข้อความเท่านั้น สั่ง Action ไม่ได้ (H8)
     """
 
-    SYSTEM = "คุณคือผู้ช่วย AI ภาษาไทยที่ทำงานในเครื่องของผู้ใช้ ตอบเป็นภาษาไทย กระชับ ถูกต้อง ถ้าไม่รู้ให้บอกว่าไม่รู้"
+    from aipc.skills.catalog import SYSTEM, TOOLS_HINT  # ข้อความเดียวกับตัววัด spikes.skill_select
+
     STATUS_TEXT = {"ready": "โมเดล: พร้อม · ในเครื่อง", "loading": "โมเดล: กำลังโหลด…",
                    "down": "โมเดล: ไม่พร้อม", "off": "โมเดล: ไม่ใช้ในหน้านี้"}  # fmt: skip
     NOTE = {"stopped": "หยุดแล้ว", "crashed": "ตอบไม่จบ: AI หยุดทำงาน · ระบบกำลังเปิด AI ใหม่เอง"}
@@ -780,12 +810,17 @@ class ChatController(QObject):
     streamChanged = Signal()  # noqa: N815
     statusChanged = Signal()  # noqa: N815
     finished = Signal(str, str)  # ข้อความ, หมายเหตุ ("" = จบปกติ)
+    skillRequested = Signal(str, str)  # noqa: N815 · AI เลือกสกิล (id, ข้อความของผู้ใช้) · หน้าจอให้ SkillsController ทำต่อ
     _token = Signal(str)
     _done = Signal(object)
     _health = Signal(str)
 
-    def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000):
+    def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
+                 tools=None):  # fmt: skip
         super().__init__()
+        self._tools = tools or (
+            lambda: []
+        )  # สกิลที่ AI เลือกได้ ณ ตอนส่ง (SkillsController.tool_catalog)
         from aipc.chat import client
         from aipc.chat import store as chat_store
 
@@ -869,7 +904,8 @@ class ChatController(QObject):
 
     # ---------- คำสั่งจาก QML ----------
     @Slot(str, str, result=bool)
-    def send(self, text: str, prompt: str = "") -> bool:
+    @Slot(str, str, bool, result=bool)
+    def send(self, text: str, prompt: str = "", use_tools: bool = True) -> bool:
         if self._busy or not text.strip() or self._status != "ready":
             return False
         import threading
@@ -877,13 +913,16 @@ class ChatController(QObject):
         from aipc.chat import client
 
         self._conv["messages"].append({"role": "user", "content": text})
+        # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
+        tools = self._tools() if (use_tools and not prompt) else []
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
-            messages, trimmed = client.fit_context(self.SYSTEM, self._conv["messages"])
+            system = self.SYSTEM + (self.TOOLS_HINT if tools else "")
+            messages, trimmed = client.fit_context(system, self._conv["messages"])
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""
-        stream = self._stream = client.Stream(self._target, messages)
+        stream = self._stream = client.Stream(self._target, messages, tools=tools)
         self.changed.emit()
         self.streamChanged.emit()
         threading.Thread(
@@ -911,6 +950,15 @@ class ChatController(QObject):
 
     def _on_done(self, reply) -> None:
         self._busy, self._stream = False, None
+        if reply.tool_call and not reply.reason:
+            # AI เลือกสกิล: เอาข้อความของผู้ใช้ออกจากบทสนทนา (ทางของสกิลจะส่งข้อความนี้เองอีกครั้ง) · ไม่บันทึก
+            text = self._conv["messages"].pop()["content"]
+            self._stream_text = ""
+            self.changed.emit()
+            self.streamChanged.emit()
+            self.skillRequested.emit(reply.tool_call, text)
+            self.refresh()
+            return
         note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
         if reply.text:
             self._conv["messages"].append({"role": "assistant", "content": reply.text})

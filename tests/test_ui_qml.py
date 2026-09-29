@@ -208,6 +208,26 @@ class StepSkillCardTest(unittest.TestCase):
 
 
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")
+class AiPicksSkillQmlTest(unittest.TestCase):
+    """AI เลือกสกิล → หน้าแชทแสดงการ์ดของสกิลนั้นแทนคำตอบ · ไม่มี QML warning."""
+
+    def test_skill_requested_shows_the_skill_card(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            opts = uiapp.Options(screen="shell", software=True, settings_path=Path(tmp) / "ui.json")
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            win = engine.rootObjects()[0]
+            chat = engine.rootContext().contextProperty("chat")
+            chat_list = win.findChild(QObject, "chatList")
+            chat.skillRequested.emit("machine-status", "คอมหน่วงมาก")
+            settle(200)
+            self.assertEqual(chat_list.property("count"), 1, "การ์ดถามเครื่อง 1 ใบ")
+            self.assertEqual(warnings, [])
+            win.close()
+            uiapp.shutdown(engine)
+
+
+@unittest.skipIf(uiapp is None, "ไม่มี PySide6")
 class ShellCardTest(unittest.TestCase):
     """เกณฑ์การ์ด 0002 ข้อ 8: ไฟกล้อง/ไมค์ทุกหน้า และการ์ดนัดถัดไปจาก upcoming จริง."""
 

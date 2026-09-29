@@ -40,8 +40,11 @@ Item {
         if (text === "" || chat.busy) return
         push({ user: true, text: text })
         input.text = ""
-        const card = skills.handle(text)
-        const toAi = card.llm === true && chat.send(text, card.prompt || "")
+        dispatch(skills.handle(text), text)
+    }
+    // การ์ดจากสกิล → แสดง และ/หรือส่งให้ AI ในเครื่อง · ใช้ทั้งตอนผู้ใช้พิมพ์ และตอน AI เลือกสกิลให้ (skillRequested)
+    function dispatch(card, text) {
+        const toAi = card.llm === true && chat.send(text, card.prompt || "", card.tools !== false)
         if (card.llm && !toAi)
             card.title = "ยังตอบไม่ได้: " + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
         // สกิลแบบขั้นตอนเห็นการ์ดขั้นตอนเสมอ แม้ขั้นสุดท้ายจะส่งต่อให้ AI
@@ -57,6 +60,14 @@ Item {
     }
     Connections {
         target: chat
+        // AI ในเครื่องเลือกสกิล (อาจารย์ขอ · งานข้อ ④): เอาฟองคำตอบที่รออยู่ออก แล้วทำทางเดียวกับที่กฎเลือก
+        function onSkillRequested(skillId, text) {
+            const i = root.items.slice()
+            if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done)
+                i.pop()
+            root.items = i
+            root.dispatch(skills.handleAs(skillId, text), text)
+        }
         function onFinished(text, note) {
             const i = root.items.slice()
             if (i.length === 0 || !i[i.length - 1].ai) return

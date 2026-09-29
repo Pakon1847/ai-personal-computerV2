@@ -15,7 +15,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
 class FakeLlama(BaseHTTPRequestHandler):
-    mode = "ok"  # ok | slow | crash | loading
+    mode = "ok"  # ok | slow | crash | loading | tool (AI เลือกสกิล machine-status)
     seen: list = []
 
     def log_message(self, *a):
@@ -41,6 +41,19 @@ class FakeLlama(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
         self.end_headers()
+        if self.mode == "tool":  # รูปแบบ OpenAI ที่ llama-server ส่ง: ชื่อก่อน แล้วอาร์กิวเมนต์ทีละส่วน
+            call = {"index": 0, "id": "c1", "type": "function",
+                    "function": {"name": "machine-status", "arguments": ""}}  # fmt: skip
+            for delta in (
+                {"tool_calls": [call]},
+                {"tool_calls": [{"index": 0, "function": {"arguments": '{"x": "ลบไฟล์"}'}}]},
+            ):
+                chunk = {"choices": [{"delta": delta}]}
+                self.wfile.write(
+                    b"data: " + json.dumps(chunk, ensure_ascii=False).encode() + b"\n\n"
+                )
+            self.wfile.write(b"data: [DONE]\n\n")
+            return
         tokens = ["สวัส", "ดี", "ครับ"] if self.mode != "slow" else ["ช้า"] * 40
         for i, tok in enumerate(tokens):
             chunk = {"choices": [{"delta": {"content": tok}}]}
@@ -165,11 +178,12 @@ class ControllerTest(ServerCase):
     def setUpClass(cls):
         cls.app = QGuiApplication.instance() or QGuiApplication([])
 
-    def make(self, folder=None):
+    def make(self, folder=None, tools=None):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         folder = folder or Path(d.name) / "chats"
-        c = ChatController(target=self.target, store=store.ChatStore(folder), poll_ms=100000)
+        c = ChatController(target=self.target, store=store.ChatStore(folder), poll_ms=100000,
+                           tools=tools)  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
         done = []
@@ -219,6 +233,38 @@ class ControllerTest(ServerCase):
         c = ChatController(active=False)
         c.copyText("เรียน อาจารย์ ...")
         self.assertEqual(QGuiApplication.clipboard().text(), "เรียน อาจารย์ ...")
+
+    def test_ai_picks_a_skill(self):
+        # อาจารย์ขอ (งานข้อ ④): คุยทั่วไปส่งรายการสกิลไปด้วย · AI เลือกสกิล = ส่งสัญญาณให้หน้าจอ ไม่ใช่คำตอบ
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "machine-status",
+                    "description": "ถามเครื่อง",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+            }
+        ]
+        c, done, folder = self.make(tools=lambda: tools)
+        picked = []
+        c.skillRequested.connect(lambda sid, text: picked.append((sid, text)))
+        FakeLlama.mode = "tool"
+        self.assertTrue(c.send("คอมหน่วงมาก เป็นอะไร", ""))
+        pump(lambda: picked)
+        self.assertEqual(picked, [("machine-status", "คอมหน่วงมาก เป็นอะไร")])
+        body = FakeLlama.seen[-1]
+        self.assertEqual(body["tools"], tools)
+        self.assertEqual(body["tool_choice"], "auto")
+        self.assertIn("เครื่องมือ", body["messages"][0]["content"])
+        self.assertEqual(done, [], "ไม่ใช่คำตอบ · ไม่มีฟองคำตอบค้าง")
+        self.assertEqual(c._conv["messages"], [], "ข้อความของผู้ใช้ไปทางสกิล ไม่ค้างในบทสนทนา")
+        self.assertFalse(c.busy)
+        # สกิลที่ถูกเลือกแล้ว (มี prompt) ไม่ส่งเครื่องมือ = ไม่วนเลือกซ้ำ
+        FakeLlama.mode = "ok"
+        c.send("คอมหน่วงมาก เป็นอะไร", "อธิบายสถานะเครื่อง")
+        pump(lambda: done)
+        self.assertNotIn("tools", FakeLlama.seen[-1])
 
     def test_not_ready_refuses(self):
         c = ChatController(target=client.Target(), poll_ms=100000)

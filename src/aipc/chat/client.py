@@ -80,13 +80,16 @@ class Reply:
     reason: str = ""  # "" = จบปกติ · stopped · crashed · error
     detail: str = ""
     timings: dict = field(default_factory=dict)
+    tool_call: str = ""  # สกิลที่ AI เลือก (ชื่อเครื่องมือ) · "" = ตอบเอง · ไม่มีอาร์กิวเมนต์ใด ๆ จาก AI
 
 
 class Stream:
     """ถาม 1 ครั้ง · on_token ถูกเรียกทุก token (จากเธรดที่เรียก run) · abort() เรียกจากเธรดไหนก็ได้."""
 
-    def __init__(self, target: Target, messages: list[dict], timeout: float = 600):
+    def __init__(self, target: Target, messages: list[dict], timeout: float = 600,
+                 tools: list[dict] | None = None):  # fmt: skip
         self.target, self.messages, self.timeout = target, messages, timeout
+        self.tools = tools or []  # สกิลที่ AI เลือกได้ (tool calling ของ llama-server · --jinja)
         self._conn: http.client.HTTPConnection | None = None
         self._sock: socket.socket | None = (
             None  # http.client ทิ้ง conn.sock เมื่อคำตอบเป็น stream จึงเก็บไว้เอง
@@ -105,6 +108,9 @@ class Stream:
     def run(self, on_token) -> Reply:
         body = {"messages": self.messages, "stream": True, "cache_prompt": True,
                 "max_tokens": MAX_TOKENS, **SAMPLING}  # fmt: skip
+        if self.tools:
+            body["tools"] = self.tools
+            body["tool_choice"] = "auto"
         reply = Reply()
         try:
             self._conn = self.target.connect(self.timeout)
@@ -136,7 +142,12 @@ class Stream:
                 if chunk.get("timings"):
                     reply.timings = chunk["timings"]
                 for choice in chunk.get("choices", []):
-                    token = (choice.get("delta") or {}).get("content") or ""
+                    delta = choice.get("delta") or {}
+                    for call in delta.get("tool_calls") or []:
+                        name = (call.get("function") or {}).get("name")
+                        if name and not reply.tool_call:  # สนแค่ชื่อ · อาร์กิวเมนต์ของ AI ไม่ถูกใช้ (H8)
+                            reply.tool_call = name
+                    token = delta.get("content") or ""
                     if token:
                         reply.text += token
                         on_token(token)
