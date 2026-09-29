@@ -11,8 +11,9 @@
     python -m aipc.spikes.skill_author route --server http://127.0.0.1:8080 \
         --out <ไฟล์.json> <โฟลเดอร์ผู้เขียน>...
 
-AI ในเครื่องตอบแบบบังคับรูป JSON (response_format json_schema ของ llama-server) · แอปจริงก็จะใช้แบบนี้ ·
-Claude ไม่ต้องบังคับ (ตอบ JSON ได้เองจากคำสั่งในแม่แบบ)
+ค่าเริ่มต้น: AI ในเครื่องได้คำขอแบบเดียวกับ Claude (ขอ JSON ในแม่แบบ ไม่บังคับรูป) · `--grammar` = บังคับรูป JSON
+ด้วย response_format json_schema ของ llama-server · Pi 5 2026-09-30: บังคับรูปแล้วสร้างข้อความยาว
+ได้แค่ 1.5–1.9 token/วิ (ทดสอบสั้น 200 token ได้ 4.4 เท่ากับไม่บังคับ) จึงไม่ใช้เป็นค่าเริ่มต้น
 """
 
 from __future__ import annotations
@@ -34,8 +35,8 @@ DATASET = REPO / "tests" / "data" / "skill_authoring.json"
 SELECTION = REPO / "tests" / "data" / "skill_selection.json"
 # ค่าเดียวกับตัววัดการเลือกสกิล · ไฟล์สกิล + ประโยคทดสอบ 12 ประโยค ≈ 1,500 token จึงเผื่อ 3,000
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "max_tokens": 3000}
-LOCAL_TIMEOUT = 1800
-RAW_KEEP = 8000  # 3,000 token ที่ ~4.6 token/วิ ≈ 11 นาที + อ่านคำขอ ~2 นาที
+LOCAL_TIMEOUT = 1800  # 3,000 token ที่ ~4.6 token/วิ ≈ 11 นาที + อ่านคำขอ ~2 นาที
+RAW_KEEP = 8000
 SCHEMA = {
     "type": "object",
     "properties": {
@@ -48,7 +49,9 @@ SCHEMA = {
 }
 
 
-def local_runner(server: str, label: str, calls: list, opener=urllib.request.urlopen):
+def local_runner(
+    server: str, label: str, calls: list, opener=urllib.request.urlopen, grammar: bool = False
+):
     """forge.Runner ที่ถาม llama-server แทน `claude -p` · ห่อคำตอบให้หน้าตาเหมือน JSON ของ claude -p.
 
     calls: ต่อท้ายเวลา/ตัวเลขของ llama-server ทุกครั้งที่ถาม (ไว้รายงาน)
@@ -60,12 +63,13 @@ def local_runner(server: str, label: str, calls: list, opener=urllib.request.url
             "stream": False,
             "cache_prompt": True,
             "chat_template_kwargs": {"enable_thinking": False},
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {"name": "skill", "schema": SCHEMA},
-            },
             **SAMPLING,
         }
+        if grammar:
+            body["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {"name": "skill", "schema": SCHEMA},
+            }
         req = urllib.request.Request(
             server.rstrip("/") + "/v1/chat/completions",
             data=json.dumps(body).encode(),
@@ -322,6 +326,7 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("--label", required=True)
     a.add_argument("--server", default="", help="llama-server ของ AI ในเครื่อง · ว่าง = ใช้ --claude")
     a.add_argument("--claude", default="", help="คำสั่ง claude (Claude Code)")
+    a.add_argument("--grammar", action="store_true", help="บังคับรูป JSON (ช้ากว่าบน Pi 5)")
     a.add_argument("--model", default=None, help="โมเดลของ Claude · ว่าง = ค่าเริ่มต้นของบัญชี")
     a.add_argument("--out", type=Path, required=True)
     r = sub.add_parser("route", help="ตัดสินสกิลของผู้เขียนแต่ละตัวด้วยตัวเลือกสกิลของแอปจริง")
@@ -337,8 +342,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "author":
         if args.server:
             calls: list = []
-            run = local_runner(args.server, args.label, calls)
-            version = f"llama-server {args.server}"
+            run = local_runner(args.server, args.label, calls, grammar=args.grammar)
+            version = f"llama-server {args.server}" + (" · grammar" if args.grammar else "")
 
             def ask(request, skills):
                 return forge.forge(request, skills=skills, runner=run, claude_version=version)

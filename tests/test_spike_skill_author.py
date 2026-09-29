@@ -116,11 +116,11 @@ class LocalRunnerTest(unittest.TestCase):
         )
         opener, sent = fake_server([reply])
         calls = []
-        run = skill_author.local_runner("http://x", "fake", calls, opener=opener)
+        run = skill_author.local_runner("http://x", "fake", calls, opener=opener, grammar=True)
         p = forge.forge("อธิบายศัพท์ให้เด็ก", skills=manifest.load_builtin(), runner=run)
         self.assertEqual(p.skill_id, "kid-words")
         self.assertTrue(p.skill_md)
-        self.assertEqual(sent[0]["response_format"]["type"], "json_schema", "บังคับรูป JSON")
+        self.assertEqual(sent[0]["response_format"]["type"], "json_schema", "--grammar = บังคับรูป")
         self.assertIn("## คำขอ", sent[0]["messages"][0]["content"], "แม่แบบคำขอเดียวกับ Claude")
         self.assertEqual(calls[0]["finish"], "stop")
         self.assertIn("kid-words", calls[0]["text"], "เก็บคำตอบดิบไว้ตรวจ")
@@ -139,6 +139,7 @@ class LocalRunnerTest(unittest.TestCase):
         self.assertEqual(p.attempts, 2)
         self.assertTrue(p.skill_md)
         self.assertIn("รอบก่อนไม่ผ่านตัวตรวจ", sent[1]["messages"][0]["content"])
+        self.assertNotIn("response_format", sent[0], "ค่าเริ่มต้นไม่บังคับรูป (เหมือน Claude)")
 
 
 class RouteTest(unittest.TestCase):
