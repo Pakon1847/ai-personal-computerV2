@@ -27,3 +27,8 @@
 |---|---|---|---|---|
 | IBM Plex Sans Thai, IBM Plex Mono (ฟอนต์ใน `src/aipc/ui/fonts/`) | SIL Open Font License 1.1 | ได้ (ห้ามขายตัวฟอนต์แยก) | `src/aipc/ui/fonts/OFL.txt` ดาวน์โหลดจาก github.com/google/fonts | 2026-09-23 |
 | PySide6-Essentials 6.11.2 (Qt for Python) | LGPL-3.0 (หรือเชิงพาณิชย์) | ได้ ถ้าลิงก์แบบ dynamic และให้ผู้ใช้เปลี่ยนไลบรารีได้ — เราติดตั้งผ่าน pip จึงเข้าเงื่อนไข | ยังไม่ได้เปิดอ่านไฟล์ไลเซนส์ใน wheel ด้วยตัวเอง ต้องตรวจซ้ำ | 2026-09-23 |
+| Typhoon2.5-Qwen3-4B GGUF (`typhoon-ai/typhoon2.5-qwen3-4b-gguf` · ฐาน `scb10x/typhoon2.5-qwen3-4b`) | Apache-2.0 | ได้ | Hugging Face API (`cardData.license`) | 2026-09-29 |
+| Qwen3-4B-Instruct-2507 GGUF (`unsloth/Qwen3-4B-Instruct-2507-GGUF` · ฐาน `Qwen/Qwen3-4B-Instruct-2507`) | Apache-2.0 | ได้ | Hugging Face API | 2026-09-29 |
+| Gemma 4 E2B-it GGUF (`unsloth/gemma-4-E2B-it-GGUF` · ฐาน `google/gemma-4-E2B-it`) | Apache-2.0 | ได้ | Hugging Face API | 2026-09-29 |
+| Qwen3-0.6B GGUF (`Qwen/Qwen3-0.6B-GGUF` · ตัวช่วยร่างสำหรับทดลอง) | Apache-2.0 | ได้ | Hugging Face API | 2026-09-29 |
+| llama.cpp (`llama-server`, `llama-bench` · build บน Pi 5 · commit `86ea01d`) | MIT | ได้ | github.com/ggml-org/llama.cpp/LICENSE | 2026-09-29 |

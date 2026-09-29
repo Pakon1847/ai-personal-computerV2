@@ -131,12 +131,12 @@ build ไม่ผ่าน → ส่งข้อความ error 30 บร�
 cd ~/aipc && mkdir -p models
 fetch() {  # fetch <repo> <ไฟล์>
   curl -L --fail -C - -o "models/$2" "https://huggingface.co/$1/resolve/main/$2" || return 1
-  want=$(curl -s "https://huggingface.co/api/models/$1/tree/main" | python3 -c \
+  want=$(curl -sL "https://huggingface.co/api/models/$1/tree/main" | python3 -c \
     "import json,sys; print(next(f['lfs']['oid'] for f in json.load(sys.stdin) if f['path']=='$2'))")
   got=$(sha256sum "models/$2" | cut -d' ' -f1)
   if [ "$want" = "$got" ]; then echo "ตรง: $2 $got"; else echo "ไม่ตรง! $2 ต้องเป็น $want ได้ $got"; fi
 }
-fetch scb10x/typhoon2.5-qwen3-4b-gguf typhoon2.5-qwen3-4b-q4_k_m.gguf
+fetch typhoon-ai/typhoon2.5-qwen3-4b-gguf typhoon2.5-qwen3-4b-q4_k_m.gguf   # ย้ายจาก scb10x/ (พบ 2026-09-29)
 fetch unsloth/Qwen3-4B-Instruct-2507-GGUF Qwen3-4B-Instruct-2507-Q4_K_M.gguf
 fetch unsloth/gemma-4-E2B-it-GGUF gemma-4-E2B-it-Q4_K_M.gguf
 ```
