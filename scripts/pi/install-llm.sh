@@ -1,26 +1,28 @@
 #!/usr/bin/env bash
 # ติดตั้ง AI ในเครื่อง (การ์ด 0013): llama-server + ไฟล์โมเดล + user service ให้ทุกบัญชีใช้ร่วมกัน
 #
-#   ./scripts/pi/install-llm.sh --model <ไฟล์.gguf> [--threads 4] [--llama ~/llama.cpp]   ดูว่าจะทำอะไร
+#   ./scripts/pi/install-llm.sh --model <ไฟล์.gguf> [--threads 4] [--template <ไฟล์.jinja>] [--llama ~/llama.cpp]   ดูว่าจะทำอะไร
 #   sudo ./scripts/pi/install-llm.sh --apply --model <ไฟล์.gguf> [...]                      ทำจริง
 #   sudo ./scripts/pi/install-llm.sh --rollback                                                 ถอด (ไม่ลบโมเดล)
 #
 # ทำอะไร:
 #   1. คัด llama-server ที่ build บนเครื่องนี้ (ไฟล์โปรแกรม + .so) ไป /opt/aipc-llm (root · อ่านได้ทุกคน)
 #   2. คัดไฟล์โมเดลไป /opt/aipc-models (root 0644) · แสดง sha256 ให้จดลงผลวัด
-#   3. /etc/aipc/llm.conf (MODEL THREADS CTX) · /etc/systemd/user/aipc-llm.service
+#   3. /etc/aipc/llm.conf (MODEL THREADS CTX TEMPLATE) · /etc/systemd/user/aipc-llm.service
+#   template: ไม่บอก --template = ใช้ scripts/pi/chat-templates/<ชื่อโมเดล>.jinja ถ้ามี (ตัวใน GGUF บางตัวไม่มี tool calling)
 #   (KillUserProcesses=yes อยู่ใน install-accounts.sh · เป็นเรื่องแยกบัญชี ไม่ได้ผูกกับ AI)
 # ไม่แตะ: greetd, PAM, logind, ไฟล์บูต, พาร์ทิชัน · ไม่รีบูต
 # เปลี่ยนโมเดล = รันใหม่ด้วย --model อื่น แล้วออกจากระบบ-เข้าใหม่
 set -euo pipefail
 
-MODE="dry-run"; MODEL=""; THREADS=4; LLAMA="${SUDO_USER:+$(getent passwd "$SUDO_USER" | cut -d: -f6)}/llama.cpp"
+MODE="dry-run"; MODEL=""; THREADS=4; TEMPLATE=""; LLAMA="${SUDO_USER:+$(getent passwd "$SUDO_USER" | cut -d: -f6)}/llama.cpp"
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) MODE="apply" ;;
     --rollback) MODE="rollback" ;;
     --model) MODEL="${2:?}"; shift ;;
     --threads) THREADS="${2:?}"; shift ;;
+    --template) TEMPLATE="${2:?}"; shift ;;
     --llama) LLAMA="${2:?}"; shift ;;
     *) echo "ไม่รู้จัก: $1" >&2; exit 2 ;;
   esac
@@ -51,6 +53,9 @@ BIN="$LLAMA/build/bin"
 "$BIN/llama-server" --help 2>/dev/null | grep -q "\.sock" \
   || { say "หยุด: llama-server รุ่นนี้ไม่รองรับ Unix socket (ADR-008)" >&2; exit 1; }
 NAME="$(basename "$MODEL")"
+[ -n "$TEMPLATE" ] || { t="$SRC/scripts/pi/chat-templates/${NAME%.gguf}.jinja"; [ -f "$t" ] && TEMPLATE="$t"; }
+[ -z "$TEMPLATE" ] || [ -f "$TEMPLATE" ] || { say "หยุด: ไม่มีไฟล์ $TEMPLATE" >&2; exit 1; }
+TNAME="${NAME%.gguf}.jinja"
 say "llama.cpp: $(git -C "$LLAMA" rev-parse --short HEAD 2>/dev/null || echo ไม่รู้ commit) · โมเดล: $NAME · threads $THREADS"
 [ "$MODE" = "apply" ] || { say "== โหมดดูก่อน: ยังไม่เปลี่ยนอะไร =="; }
 [ "$MODE" = "apply" ] && need_root
@@ -70,12 +75,19 @@ say ""; say "2) โมเดล → $MODELS/$NAME"
 run install -d -o root -g root -m 0755 "$MODELS"
 run install -o root -g root -m 0644 "$MODEL" "$MODELS/$NAME"
 say "   sha256: $(sha256sum "$MODEL" | cut -d' ' -f1)"
+if [ -n "$TEMPLATE" ]; then
+  run install -o root -g root -m 0644 "$TEMPLATE" "$MODELS/$TNAME"
+  say "   chat template: $TEMPLATE · sha256 $(sha256sum "$TEMPLATE" | cut -d' ' -f1)"
+else
+  say "   chat template: ใช้ตัวที่ฝังใน GGUF · ตรวจหลังติดตั้ง: /props ต้องมี supports_tools true (ไม่งั้น AI เลือกสกิลไม่ได้)"
+fi
 
 say ""; say "3) $CONF และ $UNIT"
 CONF_TEXT="# ค่าตั้ง AI ในเครื่อง (การ์ด 0013) · แก้แล้วให้ผู้ใช้ออกจากระบบ-เข้าใหม่
 MODEL=$MODELS/$NAME
 THREADS=$THREADS
-CTX=4096"
+CTX=4096
+TEMPLATE=${TEMPLATE:+$MODELS/$TNAME}"
 if [ "$MODE" = "apply" ]; then
   install -d -m 0755 "$(dirname "$CONF")" "$(dirname "$UNIT")"
   printf '%s\n' "$CONF_TEXT" > "$CONF" && chmod 0644 "$CONF" && say "+ เขียน $CONF"
