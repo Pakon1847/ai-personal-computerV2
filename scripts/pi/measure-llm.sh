@@ -29,14 +29,14 @@ if has 1; then
 fi
 has 3 || has 4 || { echo "เสร็จ: $LABEL"; exit 0; }
 
-echo "== 2) เปิด llama-server ชั่วคราว (127.0.0.1:8080 · --jinja เป็นค่าเริ่มต้น = tool calling)"
+echo "== 2) เปิด llama-server ชั่วคราว (127.0.0.1:8080 · --jinja เป็นค่าเริ่มต้น = tool calling · -fa off เหมือนแอป)"
 if [ -f "$TPL" ]; then
   echo "   chat template: $TPL"
   "$B/llama-server" -m "models/$M" --chat-template-file "$TPL" --host 127.0.0.1 --port 8080 -c 4096 -t 4 \
-      --no-webui > "/tmp/llama-$LABEL.log" 2>&1 &
+      -fa off --no-webui > "/tmp/llama-$LABEL.log" 2>&1 &
 else
   echo "   chat template: ตัวที่ฝังใน GGUF"
-  "$B/llama-server" -m "models/$M" --host 127.0.0.1 --port 8080 -c 4096 -t 4 --no-webui \
+  "$B/llama-server" -m "models/$M" --host 127.0.0.1 --port 8080 -c 4096 -t 4 -fa off --no-webui \
       > "/tmp/llama-$LABEL.log" 2>&1 &
 fi
 PID=$!

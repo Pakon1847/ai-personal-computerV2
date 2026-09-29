@@ -43,8 +43,10 @@ class ChatTemplateFilesTest(unittest.TestCase):
     def test_scripts_pass_template_to_llama_server(self):
         start = (REPO / "scripts" / "pi" / "session" / "aipc-llm-start").read_text(encoding="utf-8")
         self.assertIn('--chat-template-file "$TEMPLATE"', start)
+        self.assertEqual(start.count('-fa "${FLASH_ATTN:-off}"'), 2, "flash attention ช้าบน Pi 5")
         measure = (REPO / "scripts" / "pi" / "measure-llm.sh").read_text(encoding="utf-8")
         self.assertIn('--chat-template-file "$TPL"', measure)
+        self.assertEqual(measure.count("-fa off --no-webui"), 2, "วัดด้วยค่าเดียวกับแอป")
         install = (REPO / "scripts" / "pi" / "install-llm.sh").read_text(encoding="utf-8")
         self.assertIn("chat-templates/${NAME%.gguf}.jinja", install)
 

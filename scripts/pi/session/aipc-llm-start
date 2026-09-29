@@ -3,6 +3,8 @@
 # ค่าตั้งมาจาก /etc/aipc/llm.conf (ผู้ดูแลแก้): MODEL= THREADS= CTX= TEMPLATE=
 # คุยผ่าน Unix socket ใน $XDG_RUNTIME_DIR/aipc (0700 ของผู้ใช้คนนี้) · ไม่เปิดพอร์ตเครือข่าย (ADR-008)
 # --no-webui --no-slots = ปิดหน้าเว็บในตัวและหน้าดูสถานะ slot (ไม่ให้เห็นบทสนทนาผ่าน API)
+# FLASH_ATTN = off เป็นค่าเริ่มต้น: Pi 5 (Typhoon 4B · 3 thread) คำขอยาว 2,048 token สร้างได้ 3.68 tok/s เมื่อปิด
+#   แต่เปิด (ค่า auto ของ llama-server) เหลือ 2.01 · คำขอว่างเท่ากัน (docs/benchmarks/2026-09-30-flash-attn-pi5)
 # TEMPLATE = chat template ต้นฉบับของโมเดล (scripts/pi/chat-templates) · ตัวที่ฝังใน GGUF บางตัวไม่มี tool calling
 set -eu
 . /etc/aipc/llm.conf
@@ -14,7 +16,7 @@ rm -f "$DIR/llm.sock"   # socket ค้างจากรอบที่แล�
 export LD_LIBRARY_PATH=/opt/aipc-llm/lib
 if [ -n "${TEMPLATE:-}" ]; then
   exec /opt/aipc-llm/bin/llama-server -m "$MODEL" --chat-template-file "$TEMPLATE" --host "$DIR/llm.sock" \
-    -c "${CTX:-4096}" -t "${THREADS:-4}" --no-webui --no-slots
+    -c "${CTX:-4096}" -t "${THREADS:-4}" -fa "${FLASH_ATTN:-off}" --no-webui --no-slots
 fi
 exec /opt/aipc-llm/bin/llama-server -m "$MODEL" --host "$DIR/llm.sock" \
-  -c "${CTX:-4096}" -t "${THREADS:-4}" --no-webui --no-slots
+  -c "${CTX:-4096}" -t "${THREADS:-4}" -fa "${FLASH_ATTN:-off}" --no-webui --no-slots
