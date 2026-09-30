@@ -53,4 +53,16 @@ def pick(user_skills: list[Manifest], text: str, k: int = TOP_K) -> list[Manifes
         return list(user_skills)
     if not text.strip():
         return []
-    return Index(user_skills).top(text, k)
+    return _index_for(user_skills).top(text, k)
+
+
+_cache: dict = {}
+
+
+def _index_for(skills: list[Manifest]) -> Index:
+    """ใช้ดัชนีเดิมจนกว่ารายการสกิลจะเปลี่ยน · Pi 5 สร้างใหม่ทุกข้อความ = ~20 ms ที่ 44 สกิล."""
+    key = tuple((s.id, s.version, s.description, s.examples, s.keywords) for s in skills)
+    if key not in _cache:
+        _cache.clear()
+        _cache[key] = Index(skills)
+    return _cache[key]
