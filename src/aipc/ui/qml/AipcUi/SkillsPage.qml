@@ -69,7 +69,7 @@ ColumnLayout {
                     Flow {
                         Layout.fillWidth: true
                         spacing: 6
-                        Chip { text: "Claude สร้าง · รุ่น " + uc.modelData.version; kind: "accent" }
+                        Chip { text: (uc.modelData.imported ? "นำเข้าจากไฟล์" : "Claude สร้าง") + " · รุ่น " + uc.modelData.version; kind: "accent" }
                         Chip { text: "ใช้แล้ว " + uc.modelData.uses + " ครั้ง" }
                         Chip { visible: uc.modelData.created !== ""; text: uc.modelData.created }
                     }
@@ -98,6 +98,10 @@ ColumnLayout {
                             text: visible ? "ย้อนไปรุ่น " + older[older.length - 1] : ""
                             kind: "secondary"
                             onClicked: page.message = skills.revertSkill(uc.modelData.id, older[older.length - 1])
+                        }
+                        AppButton {
+                            text: "ส่งออกเป็นไฟล์"; kind: "secondary"
+                            onClicked: page.message = skills.exportSkill(uc.modelData.id)
                         }
                         AppButton {
                             objectName: "deleteSkillButton"

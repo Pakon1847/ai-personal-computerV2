@@ -1175,10 +1175,58 @@ class SkillsController(QObject):
                 "id": m.id, "name": m.name, "description": m.description, "detail": detail,
                 "version": e["version"], "versions": self._user.versions(m.id),
                 "enabled": e["enabled"],
-                "uses": e["uses"], "request": e.get("request") or m.extra.get("request", ""),
+                "uses": e["uses"],
+                "imported": e.get("model") == self.IMPORT_TAG,
+                "request": e.get("request") or m.extra.get("request", ""),
                 "created": (e.get("created") or m.extra.get("created", ""))[:10],
             })  # fmt: skip
         return out
+
+    # ---------- แชร์สกิลเป็นไฟล์ (ฟีเจอร์ข้อ 9 · ADR-011 ข้อเสนอ) ----------
+    IMPORT_TAG = "นำเข้าจากไฟล์"
+
+    @Slot(str, result=str)
+    def exportSkill(self, skill_id: str) -> str:  # noqa: N802
+        """บันทึกสกิลเป็นไฟล์ .md ใน ~/สกิลที่ส่งออก (ไฟล์ของฉัน) ไว้คัดลอกลง USB/ให้บัญชีอื่น · คืนข้อความบอกผล."""
+        if not self._is_user(skill_id):
+            return "ส่งออกได้เฉพาะสกิลที่ Claude สร้างหรือที่นำเข้า"
+        md = self._user.current_md(skill_id)
+        dest = Path.home() / "สกิลที่ส่งออก" / f"{skill_id}.md"
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(md, encoding="utf-8", newline="\n")
+        except OSError as e:
+            return f"ส่งออกไม่ได้: {e.strerror or e}"
+        return f"บันทึกแล้วที่ ไฟล์ของฉัน / สกิลที่ส่งออก / {dest.name}"
+
+    @Slot(str, bool, result=str)
+    def importSkill(self, path: str, install: bool) -> str:  # noqa: N802
+        """ไฟล์สกิลจากภายนอก: ตรวจด้วยประตูเดียวกับสกิลอัตโนมัติ (0017) · install=False = ดูก่อน · คืนข้อความ."""
+        from aipc.skills import manifest, userskills
+
+        if self._user is None:
+            return "บัญชีนี้ติดตั้งสกิลเพิ่มไม่ได้"
+        try:
+            md = Path(path).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as e:
+            return f"อ่านไฟล์ไม่ได้: {e}"
+        m, errors = userskills.gate(md, self._skills)
+        if m is None:
+            return "ติดตั้งไม่ได้: " + "; ".join(errors[:2])
+        detail = " → ".join(s.text for s in m.steps) if m.steps else "งานภาษาโดย AI ในเครื่อง"
+        perms = ", ".join(m.permission_labels()) or "ไม่ขอสิทธิ์พิเศษ"
+        if not install:
+            return (
+                f"สกิล “{m.name}”: {detail} · สิทธิ์: {perms} · "
+                "ไฟล์มาจากภายนอก ตรวจแล้วผ่าน · กดอีกครั้งเพื่อติดตั้ง"
+            )
+        try:
+            self._user.install(md, self._skills, request=f"{self.IMPORT_TAG} {Path(path).name}",
+                               model=self.IMPORT_TAG)  # fmt: skip
+        except (manifest.InvalidSkill, OSError) as e:
+            return f"ติดตั้งไม่ได้: {e}"
+        self._reload()
+        return f"ติดตั้งสกิล “{m.name}” แล้ว · ดู/ปิด/ลบได้ที่หน้า Skill"
 
     @Slot(str, int, result=str)
     def revertSkill(self, skill_id: str, version: int) -> str:  # noqa: N802

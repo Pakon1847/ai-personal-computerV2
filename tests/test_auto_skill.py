@@ -281,6 +281,34 @@ class ControllerTest(unittest.TestCase):
         self.assertEqual(s.removeSkill("meeting-mode")["title"], "ลบสกิลนี้แล้ว")
         self.assertEqual(s.removeSkill("translate")["title"], "ลบไม่ได้: ไม่ใช่สกิลที่ Claude สร้าง")
 
+    def test_export_then_import_on_another_account(self):
+        # ฟีเจอร์ข้อ 9: ส่งออกเป็น .md → อีกบัญชีนำเข้า (ผ่านประตูเดียวกัน · ดูก่อนแล้วค่อยติดตั้ง)
+        import os
+        from unittest import mock
+
+        s, done = self.make(GOOD)
+        s.handleAs("create-skill", "เข้าโหมดประชุมให้หน่อย")
+        pump(lambda: done)
+        home = tempfile.TemporaryDirectory()
+        self.addCleanup(home.cleanup)
+        with mock.patch.object(Path, "home", return_value=Path(home.name)):
+            msg = s.exportSkill("meeting-mode")
+        self.assertIn("สกิลที่ส่งออก", msg)
+        exported = Path(home.name) / "สกิลที่ส่งออก" / "meeting-mode.md"
+        self.assertTrue(exported.is_file())
+
+        other, _ = self.make(GOOD)  # บัญชีอื่น (คลังว่าง)
+        preview = other.importSkill(str(exported), False)
+        self.assertIn("กดอีกครั้ง", preview)
+        self.assertEqual(other.userSkills, [], "ดูก่อน = ยังไม่ติดตั้ง")
+        self.assertIn("ติดตั้งสกิล", other.importSkill(str(exported), True))
+        self.assertTrue(other.userSkills[0]["imported"])
+        bad = Path(home.name) / "bad.md"
+        bad.write_text(BAD["items"][2]["skill_md"], encoding="utf-8")  # เปิดลิงก์เอง
+        self.assertIn("ติดตั้งไม่ได้", other.importSkill(str(bad), True))
+        self.assertEqual(len(other.userSkills), 1)
+        self.assertTrue(os.path.exists(exported))
+
     def test_no_claude_no_tool(self):
         s = SkillsController(run_timer=False, llm_ready=lambda: True)
         self.assertNotIn("create-skill", [t["function"]["name"] for t in s.tool_catalog()])

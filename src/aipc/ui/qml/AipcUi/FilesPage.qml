@@ -4,7 +4,9 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 ColumnLayout {
+    id: page
     spacing: 16
+    property string pendingSkill: ""   // ไฟล์สกิลที่ตรวจแล้ว รอกดยืนยันติดตั้ง
 
     PageHeader {
         title: "ไฟล์ของฉัน"
@@ -73,6 +75,20 @@ ColumnLayout {
                                 const err = chat.attachFile(filesBrowser.pathOf(row.modelData.name))
                                 if (err === "") AppState.page = "workspace"
                                 else fileError.text = err
+                            }
+                        }
+                        // ไฟล์สกิล .md จากภายนอก (ฟีเจอร์ข้อ 9): กดแรก = ตรวจและบอกว่าทำอะไร · กดอีกครั้ง = ติดตั้ง
+                        AppButton {
+                            objectName: "installSkillButton"
+                            visible: !row.modelData.is_dir && row.modelData.name.toLowerCase().endsWith(".md")
+                            text: page.pendingSkill === row.modelData.name ? "ยืนยันติดตั้ง" : "ติดตั้งเป็นสกิล"
+                            kind: page.pendingSkill === row.modelData.name ? "primary" : "secondary"
+                            onClicked: {
+                                const path = filesBrowser.pathOf(row.modelData.name)
+                                const install = page.pendingSkill === row.modelData.name
+                                const msg = skills.importSkill(path, install)
+                                page.pendingSkill = (!install && msg.indexOf("กดอีกครั้ง") >= 0) ? row.modelData.name : ""
+                                fileError.text = msg
                             }
                         }
                         Item { width: 4 }
