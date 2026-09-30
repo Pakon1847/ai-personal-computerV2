@@ -1,7 +1,7 @@
 // หน้า Login (BRIEF 5.1) แบบหน้าล็อก (การ์ด 0002) · เวลาใหญ่ → วงกล้อง → ชื่อ/รหัสผ่าน อยู่กลางจอ
 // state มาจาก login.scanState ใน Python:
-//   unavailable = ยังไม่มีระบบจดจำใบหน้า (ค่าจริงตอนนี้) → ใช้ชื่อผู้ใช้ + รหัสผ่าน
-//   scanning / found / unknown / manual = สถานะตามบอร์ดออกแบบ (ตอนนี้ดูได้ในโหมดสาธิตเท่านั้น)
+//   unavailable = ไม่มี visiond หรือยังไม่มีบัญชีเปิดเข้าด้วยใบหน้า → ใช้ชื่อผู้ใช้ + รหัสผ่าน
+//   scanning / found / unknown / manual = สแกนจริงผ่าน visiond (การ์ด 0015) · found = เข้าระบบเองไม่ต้องพิมพ์รหัส
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -18,13 +18,12 @@ Rectangle {
         error = login.signIn(user, pw)
         // รหัสผ่านไม่ค้างอยู่ในช่องหลังส่ง (การ์ด 0003 H3)
         pwField.text = ""
-        foundPw.text = ""
         // โหมด greeter: เข้าได้แล้ว Python ปิดหน้าต่างเอง แล้ว greetd เริ่มเซสชันของผู้ใช้
         if (error === "" && !login.greeterMode) AppState.open("workspace")
     }
 
     readonly property var status: ({
-        unavailable: { text: system.cameraPresent ? "รุ่นนี้เข้าสู่ระบบด้วยรหัสผ่าน"
+        unavailable: { text: system.cameraPresent ? "เข้าสู่ระบบด้วยรหัสผ่าน"
                                                   : "ไม่พบกล้อง · ใช้รหัสผ่านได้เลย", kind: "neutral" },
         scanning: { text: "กำลังสแกนใบหน้า… มองมาที่กล้อง", kind: "accent" },
         found: { text: "จำหน้าได้", kind: "ok" },
@@ -123,6 +122,16 @@ Rectangle {
             kind: root.status.kind
         }
 
+        // คำแนะนำสดจาก visiond ระหว่างสแกน หรือเหตุผลที่สแกนไม่ผ่าน
+        AppText {
+            objectName: "scanMessage"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 8
+            visible: login.scanMessage !== "" && root.scan !== "found"
+            text: login.scanMessage; color: Theme.inkMuted
+            horizontalAlignment: Text.AlignHCenter
+        }
+
         // กำลังสแกน
         AppButton {
             Layout.alignment: Qt.AlignHCenter
@@ -141,18 +150,14 @@ Rectangle {
             AppText { text: "สวัสดี " + login.foundName; size: Theme.px(22); strong: true; oneLine: true }
             AppButton { text: "ไม่ใช่ฉัน"; kind: "ghost"; onClicked: login.setScanState("manual") }
         }
-        RowLayout {
+        // เข้าด้วยใบหน้า (การ์ด 0015): ไม่มีช่องรหัสผ่าน · Python เข้าระบบเองใน 1.5 วิ ถ้าไม่กด "ไม่ใช่ฉัน"
+        AppText {
+            objectName: "faceSigningIn"
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 6
             visible: root.scan === "found"
-            spacing: 8
-            AppField {
-                id: foundPw
-                Layout.preferredWidth: 300
-                placeholder: "รหัสผ่าน"; password: true; emphasis: true
-                field.onAccepted: root.submit(login.foundName, text)
-            }
-            AppButton { text: "เข้าสู่ระบบ"; onClicked: root.submit(login.foundName, foundPw.text) }
+            text: login.demo ? "(สาธิต) จะเข้าสู่ระบบด้วยใบหน้า" : "กำลังเข้าสู่ระบบด้วยใบหน้า…"
+            color: Theme.inkMuted; oneLine: true
         }
 
         // ไม่รู้จักใบหน้า

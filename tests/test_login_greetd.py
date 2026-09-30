@@ -243,5 +243,100 @@ class GreeterModeTest(Base):
         self.assertNotEqual(LoginController(False).signIn("pakon", PW), "")
 
 
+class FaceLoginTest(Base):
+    """เข้าด้วยตั๋วใบหน้า (การ์ด 0015): ไม่ส่งรหัสผ่านเลย · PAM ถามรหัส = ไม่มีตั๋ว → ยกเลิก."""
+
+    def face(self, script):
+        fake = FakeGreetd(script)
+        return gd.face_login(gd.Greetd(fake.client), "namfon", ["labwc"]), fake
+
+    def test_ticket_means_straight_in_without_a_password(self):
+        r, fake = self.face([("create_session", OK), ("start_session", OK)])
+        self.assertTrue(r.ok)
+        self.assertEqual(fake.types(), ["create_session", "start_session"])
+        self.assertFalse(any("response" in g for g in fake.got), "ไม่มีการส่งรหัสผ่าน")
+
+    def test_password_prompt_means_no_ticket_and_is_cancelled(self):
+        r, fake = self.face([("create_session", SECRET), ("cancel_session", OK)])
+        self.assertFalse(r.ok)
+        self.assertEqual(r.message, gd.FACE_FAIL)
+        self.assertEqual(fake.types(), ["create_session", "cancel_session"])
+
+    def test_pam_error_is_cancelled(self):
+        r, fake = self.face([("create_session", AUTH_ERR), ("cancel_session", OK)])
+        self.assertFalse(r.ok)
+
+
+@unittest.skipIf(LoginController is None, "ไม่มี PySide6")
+class FaceScanTest(Base):
+    """หน้า Login + visiond ปลอม (การ์ด 0015): จำได้ = เข้าเอง · "ไม่ใช่ฉัน" = ไม่เข้า · ไม่มีตั๋ว = พิมพ์รหัส."""
+
+    def setUp(self):
+        import time
+
+        from PySide6.QtCore import QCoreApplication
+
+        self.app = QCoreApplication.instance() or QCoreApplication([])
+        self.time = time
+
+    def wait(self, cond, secs=3.0):
+        end = self.time.monotonic() + secs
+        while not cond() and self.time.monotonic() < end:
+            self.app.processEvents()
+            self.time.sleep(0.01)
+        return cond()
+
+    def make(self, face_result, script=()):
+        self.fake = FakeGreetd(list(script))
+        self.asked = []
+
+        def face(req, on_progress):
+            self.asked.append(req)
+            on_progress({"state": "scanning", "hint": "มองกล้องตรง ๆ"})
+            return face_result
+
+        c = LoginController(False, None, greeter_session=["labwc"],
+                            connect=lambda: gd.Greetd(self.fake.client), face=face)  # fmt: skip
+        c.AUTO_LOGIN_MS = 50
+        return c
+
+    def test_found_signs_in_without_a_password(self):
+        c = self.make({"ok": True, "state": "found", "user": "namfon"},
+                      [("create_session", OK), ("start_session", OK)])  # fmt: skip
+        self.assertEqual(c.scanState, "scanning")
+        self.assertTrue(self.wait(lambda: c.scanState == "found"))
+        self.assertEqual(self.asked[0]["op"], "identify")
+        self.assertTrue(self.wait(lambda: self.fake.types() == ["create_session", "start_session"]))
+        self.assertEqual(self.fake.got[0]["username"], "namfon")
+
+    def test_not_me_cancels_the_automatic_sign_in(self):
+        c = self.make({"ok": True, "state": "found", "user": "namfon"})
+        self.assertTrue(self.wait(lambda: c.scanState == "found"))
+        c.setScanState("manual")
+        self.time.sleep(0.15)
+        self.app.processEvents()
+        self.assertEqual(self.fake.types(), [], "กด ไม่ใช่ฉัน แล้วต้องไม่มีการเข้าระบบ")
+
+    def test_no_ticket_falls_back_to_typing(self):
+        c = self.make({"ok": True, "state": "found", "user": "namfon"},
+                      [("create_session", SECRET), ("cancel_session", OK)])  # fmt: skip
+        self.assertTrue(self.wait(lambda: c.scanState == "manual"))
+        self.assertEqual(c.scanMessage, gd.FACE_FAIL)
+
+    def test_unknown_locked_and_unavailable(self):
+        for res, want in (({"ok": False, "state": "unknown", "message": "ยังไม่แน่ใจ"}, "unknown"),
+                          ({"ok": False, "state": "locked", "message": "ใช้รหัสผ่าน"}, "manual"),
+                          ({"ok": False, "state": "no-templates"}, "unavailable"),
+                          ({"ok": False, "state": "unavailable"}, "unavailable")):  # fmt: skip
+            c = self.make(res)
+            self.assertTrue(self.wait(lambda c=c, want=want: c.scanState == want), res)
+
+    def test_without_visiond_stays_on_password(self):
+        c = LoginController(False, None, greeter_session=["labwc"], face=None)
+        self.assertEqual(c.scanState, "unavailable")
+        c.setScanState("scanning")
+        self.assertEqual(c.scanState, "unavailable")
+
+
 if __name__ == "__main__":
     unittest.main()

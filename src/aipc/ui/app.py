@@ -56,6 +56,13 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
+def _face_client():
+    """ตัวต่อ visiond ของหน้า Login (การ์ด 0015) · ไม่ได้ติดตั้ง = None (ใช้รหัสผ่านตามเดิม)."""
+    from aipc.vision import client
+
+    return client.request if client.available() else None
+
+
 def build(opts: Options, argv: list[str] | None = None):
     """สร้างแอปและ engine · คืน (app, engine, warnings) เพื่อให้เทสต์ตรวจ warning ของ QML ได้."""
     if sys.platform == "win32":
@@ -93,6 +100,8 @@ def build(opts: Options, argv: list[str] | None = None):
             opts.dev and not real,
             None if real else opts.demo_scan,
             greeter_session=opts.greeter_session,
+            # สแกนหน้าเข้าเครื่อง (การ์ด 0015) · เฉพาะหน้า Login จริงที่มี visiond
+            face=_face_client() if opts.greeter_session else None,
         ),
         # สมัคร/กู้คืนจริงเฉพาะหน้า Login จริง · หน้าต่างพัฒนาเป็นแบบจำลองที่บอกว่า "จำลอง" (การ์ด 0012)
         "signup": SignupController(real=bool(opts.greeter_session), dev=opts.dev and not real),

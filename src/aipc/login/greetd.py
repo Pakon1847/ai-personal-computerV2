@@ -148,3 +148,31 @@ def login(g: Greetd, username: str, password: str, cmd: list[str],
         g.cancel()
         return LoginResult(False, f"เริ่มเซสชันไม่ได้: {s.text}", notes)
     return LoginResult(True, "", notes)
+
+
+FACE_FAIL = "สแกนหน้าแล้วแต่เข้าไม่ได้ · ใช้รหัสผ่านได้เลย"
+
+
+def face_login(
+    g: Greetd, username: str, cmd: list[str], env: list[str] | None = None
+) -> LoginResult:
+    """เข้าระบบด้วยตั๋วใบหน้า (การ์ด 0015 หัวข้อ 12) · **ไม่ส่งรหัสผ่านเลย**.
+
+    PAM ของ greetd บรรทัดแรกคือ aipc-face-pass: มีตั๋ว = PAM สำเร็จทันที (ไม่ถาม) · ไม่มีตั๋ว = PAM ถามรหัสผ่าน
+    → ยกเลิก แล้วให้ผู้ใช้พิมพ์รหัสผ่านแทน (หน้าจอไม่ตอบคำถามรหัสผ่านแทนผู้ใช้)
+    """
+    if not username:
+        return LoginResult(False, FACE_FAIL)
+    notes: list[str] = []
+    r = g.create_session(username)
+    while r.kind == "prompt" and r.prompt_type in ("info", "error"):
+        notes.append(r.text)
+        r = g.answer(None)
+    if r.kind != "success":
+        g.cancel()
+        return LoginResult(False, FACE_FAIL, notes)
+    s = g.start(cmd, env)
+    if s.kind != "success":
+        g.cancel()
+        return LoginResult(False, f"เริ่มเซสชันไม่ได้: {s.text}", notes)
+    return LoginResult(True, "", notes)

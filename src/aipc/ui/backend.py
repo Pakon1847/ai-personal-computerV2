@@ -211,23 +211,39 @@ class FilesBrowser(QObject):
 class LoginController(QObject):
     """สถานะหน้า Login.
 
-    ระบบจดจำใบหน้า (visiond) กับตัวเชื่อม greetd/PAM ยังไม่มี (เฟส 1–2)
-    จึงไม่แกล้งทำเป็นสแกนหน้าได้: scanState = "unavailable" เว้นแต่สั่งโหมดสาธิต
-    โหมดสาธิต (--demo-scan) มีไว้ดูหน้าตาแต่ละสถานะตามบอร์ดออกแบบ และจะขึ้นแถบเตือนเสมอ
+    โหมด greeter + มี visiond (การ์ด 0015): เปิดหน้ามาก็สแกนเลย · จำได้ = ขึ้นชื่อ แล้วเข้าระบบเองใน 1.5 วิ
+    (กด "ไม่ใช่ฉัน" ยกเลิกได้) · เข้าด้วยตั๋วใบหน้าผ่าน greetd/PAM ไม่มีรหัสผ่าน · ไม่มี visiond = "unavailable"
+    ใช้รหัสผ่านตามเดิม · โหมดสาธิต (--demo-scan) ไว้ดูหน้าตาแต่ละสถานะ และขึ้นแถบเตือนเสมอ
     """
 
     changed = Signal()
+    _scanned = Signal(int, object)  # (รอบที่สแกน, ผลจาก visiond) · ส่งจากเธรดสแกนกลับเธรดหลัก
+    _progress = Signal(int, str)
     STATES = ("unavailable", "scanning", "found", "unknown", "manual")
+    AUTO_LOGIN_MS = 1500
 
     def __init__(self, dev_mode: bool, demo_scan: str | None = None,
-                 greeter_session: list[str] | None = None, connect=None):  # fmt: skip
+                 greeter_session: list[str] | None = None, connect=None, face=None):  # fmt: skip
         super().__init__()
         self._dev = dev_mode
         # โหมด greeter (การ์ด 0003): greetd รันหน้านี้ก่อนมีใครเข้าเครื่อง · PAM ของ OS ตรวจรหัสผ่าน
         self._session = greeter_session
         self._connect = connect
-        self._state = demo_scan if demo_scan in self.STATES else "unavailable"
         self._demo = demo_scan in self.STATES
+        # face(req, on_progress) → dict · ตัวจริง = aipc.vision.client.request (เฉพาะโหมด greeter)
+        self._face = face
+        self._round = 0
+        self._found_user = self._found_name = self._message = ""
+        self._scanned.connect(self._on_scanned)
+        self._progress.connect(self._on_progress)
+        self._timer = None
+        if self._demo:
+            self._state = demo_scan
+        elif self._session is not None and self._face is not None:
+            self._state = "scanning"
+            self._start_scan()
+        else:
+            self._state = "unavailable"
 
     @Property(str, notify=changed)
     def scanState(self) -> str:  # noqa: N802
@@ -243,13 +259,88 @@ class LoginController(QObject):
 
     @Property(str, notify=changed)
     def foundName(self) -> str:  # noqa: N802
-        return "Pakon" if self._demo else ""
+        return "Pakon" if self._demo else self._found_name
+
+    @Property(str, notify=changed)
+    def scanMessage(self) -> str:  # noqa: N802
+        """คำแนะนำสดระหว่างสแกน หรือเหตุผลที่สแกนไม่ผ่าน (จาก visiond)."""
+        return self._message
 
     @Slot(str)
     def setScanState(self, state: str) -> None:  # noqa: N802
-        if state in self.STATES:
-            self._state = state
+        if state not in self.STATES:
+            return
+        self._round += 1  # ผลของการสแกนรอบเก่าที่ตามมาทีหลัง = ทิ้ง
+        if self._timer is not None:
+            self._timer.stop()
+        self._state, self._message = state, ""
+        if state == "scanning" and not self._demo:
+            if self._face is None:
+                self._state = "unavailable"
+            else:
+                self._start_scan()
+        self.changed.emit()
+
+    # ---------- สแกนผ่าน visiond ----------
+    def _start_scan(self) -> None:
+        import threading
+
+        self._round += 1
+        n = self._round
+
+        def work():
+            res = self._face({"op": "identify", "timeout_s": 8},
+                             lambda m: self._progress.emit(n, str(m.get("hint", ""))))  # fmt: skip
+            self._scanned.emit(n, res)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _on_progress(self, n: int, hint: str) -> None:
+        if n == self._round and self._state == "scanning" and hint != self._message:
+            self._message = hint
             self.changed.emit()
+
+    def _on_scanned(self, n: int, res: dict) -> None:
+        if n != self._round or self._state != "scanning":
+            return
+        state = res.get("state")
+        self._message = str(res.get("message", ""))
+        if res.get("ok") and state == "found":
+            self._found_user = str(res.get("user", ""))
+            self._found_name = _display_name(self._found_user)
+            self._state = "found"
+            self._timer = QTimer(self)
+            self._timer.setSingleShot(True)
+            self._timer.timeout.connect(lambda: self._face_sign_in(n))
+            self._timer.start(self.AUTO_LOGIN_MS)
+        elif state in ("unavailable", "no-templates"):
+            self._state = "unavailable"
+        elif state == "locked":
+            self._state = "manual"
+        else:
+            self._state = "unknown"
+        self.changed.emit()
+
+    def _face_sign_in(self, n: int) -> None:
+        from PySide6.QtCore import QCoreApplication
+
+        from aipc.login import greetd
+
+        if n != self._round or self._state != "found":
+            return
+        try:
+            g = (self._connect or greetd.Greetd.connect)()
+            try:
+                r = greetd.face_login(g, self._found_user, self._session)
+            finally:
+                g.close()
+        except (OSError, greetd.ProtocolError):
+            r = greetd.LoginResult(False, greetd.FACE_FAIL)
+        if r.ok:
+            QTimer.singleShot(0, QCoreApplication.quit)
+            return
+        self._state, self._message = "manual", r.message
+        self.changed.emit()
 
     @Slot(str, str, result=str)
     def signIn(self, username: str, password: str) -> str:  # noqa: N802
@@ -284,6 +375,16 @@ class LoginController(QObject):
         # greetd จะเริ่มเซสชันของผู้ใช้หลัง greeter ปิดตัวเอง
         QTimer.singleShot(0, QCoreApplication.quit)
         return ""
+
+
+def _display_name(user: str) -> str:
+    """ชื่อที่แสดงจากช่อง comment ของบัญชี (ตั้งตอนสมัคร) · อ่านไม่ได้ = ชื่อผู้ใช้."""
+    try:
+        import pwd
+
+        return pwd.getpwnam(user).pw_gecos.split(",")[0] or user
+    except (ImportError, KeyError):
+        return user
 
 
 class SessionController(QObject):
