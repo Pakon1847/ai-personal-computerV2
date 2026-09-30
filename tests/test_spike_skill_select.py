@@ -44,6 +44,7 @@ class ChatTemplateFilesTest(unittest.TestCase):
         start = (REPO / "scripts" / "pi" / "session" / "aipc-llm-start").read_text(encoding="utf-8")
         self.assertIn('--chat-template-file "$TEMPLATE"', start)
         self.assertEqual(start.count('-fa "${FLASH_ATTN:-off}"'), 2, "flash attention ช้าบน Pi 5")
+        self.assertEqual(start.count('-cram "${CACHE_RAM:-512}"'), 2, "แคชเริ่มต้น 8 GB = OOM")
         measure = (REPO / "scripts" / "pi" / "measure-llm.sh").read_text(encoding="utf-8")
         self.assertIn('--chat-template-file "$TPL"', measure)
         self.assertEqual(measure.count("-fa off --no-webui"), 2, "วัดด้วยค่าเดียวกับแอป")
