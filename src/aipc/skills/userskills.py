@@ -148,7 +148,7 @@ class UserSkills:
         if m is None:
             raise manifest.InvalidSkill(errors)
         old = self.info(m.id) if replacing else {}
-        version = old.get("version", 0) + 1 if replacing else 1
+        version = max([0, *self.versions(m.id)]) + 1 if replacing else 1
         self._write(self.folder / ".versions" / m.id / f"{version}.md", skill_md)
         self._write(self.folder / f"{m.id}.md", skill_md)
         self._index[m.id] = {
@@ -194,6 +194,27 @@ class UserSkills:
     def wrong(self, skill_id: str) -> bool:
         """ผู้ใช้กด "ไม่ใช่แบบนี้" · คืน True ถ้าปิดสกิลแล้ว."""
         return self.record(skill_id, ok=False)
+
+    def versions(self, skill_id: str) -> list[int]:
+        d = self.folder / ".versions" / skill_id
+        return sorted(int(p.stem) for p in d.glob("*.md") if p.stem.isdigit()) if d.is_dir() else []
+
+    def revert(self, skill_id: str, version: int, existing: list[manifest.Manifest]) -> manifest.Manifest:
+        """กลับไปใช้รุ่นที่เก็บไว้ (หน้า Skill · การ์ด 0017 ชั้นที่ 3) · ผ่านประตูใหม่ก่อน (สกิลอื่นอาจเพิ่มมาหลังรุ่นนั้น)."""
+        src = self.folder / ".versions" / skill_id / f"{version}.md"
+        try:
+            md = src.read_text(encoding="utf-8")
+        except OSError as e:
+            raise manifest.InvalidSkill([f"ไม่มีรุ่น {version}"]) from e
+        m, errors = gate(md, existing, skill_id)
+        if m is None:
+            raise manifest.InvalidSkill(errors)
+        self._write(self.folder / f"{skill_id}.md", md)
+        e = self.info(skill_id)
+        e.update(version=version, enabled=True, strikes=0, updated=datetime.now().isoformat(timespec="seconds"))
+        self._index[skill_id] = e
+        self._save_index()
+        return m
 
     def current_md(self, skill_id: str) -> str:
         try:

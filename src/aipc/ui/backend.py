@@ -641,7 +641,7 @@ class SkillsController(QObject):
     WORKER_LABEL = {"code": "โค้ด", "llm": "LLM", "code+llm": "LLM + โค้ด",
                     "stt+llm": "เสียง → LLM", "camera+vlm": "กล้อง → โมเดลดูภาพ"}  # fmt: skip
     NEED_LABEL = {
-        "llm": "โมเดลภาษาในเครื่อง (ยังไม่ได้เลือก — รอผลวัดบน Pi 5, ADR-007)",
+        "llm": "โมเดลภาษาในเครื่องพร้อมตอบ (ตอนนี้กำลังเริ่มหรือยังไม่ได้ติดตั้ง)",
         "stt": "ระบบถอดเสียงภาษาไทย (ADR-005)",
         "vlm": "โมเดลดูภาพ (ROADMAP 0.11)",
         "camera": "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)",
@@ -953,6 +953,37 @@ class SkillsController(QObject):
         return self._plain("command", "ลบสกิลนี้แล้ว",
                            ["กลับไปเหมือนไม่เคยมีสกิลนี้ · สั่งใหม่เมื่อไหร่ก็สร้างใหม่ได้"],
                            [{"text": "ลบแล้ว", "kind": "ok"}])  # fmt: skip
+
+    @Property("QVariantList", notify=skillsChanged)
+    def userSkills(self) -> list:  # noqa: N802
+        """สกิลที่ Claude สร้างให้ผู้ใช้คนนี้ ทั้งที่เปิดและปิดอยู่ (หน้า Skill · จัดการ/ย้อนรุ่น/ลบ)."""
+        if self._user is None:
+            return []
+        out = []
+        for m in self._user.load_all():
+            e = self._user.info(m.id)
+            detail = [s.text for s in m.steps] if m.steps else [m.prompt.strip().splitlines()[0][:120]]
+            out.append({
+                "id": m.id, "name": m.name, "description": m.description, "detail": detail,
+                "version": e["version"], "versions": self._user.versions(m.id), "enabled": e["enabled"],
+                "uses": e["uses"], "request": e.get("request") or m.extra.get("request", ""),
+                "created": (e.get("created") or m.extra.get("created", ""))[:10],
+            })  # fmt: skip
+        return out
+
+    @Slot(str, int, result=str)
+    def revertSkill(self, skill_id: str, version: int) -> str:  # noqa: N802
+        """กลับไปใช้รุ่นเก่า · คืนข้อความบอกผล ("" = สำเร็จ)."""
+        from aipc.skills import manifest
+
+        if not self._is_user(skill_id):
+            return "ไม่ใช่สกิลที่ Claude สร้าง"
+        try:
+            self._user.revert(skill_id, version, self._skills)
+        except manifest.InvalidSkill as e:
+            return "ย้อนไม่ได้: " + "; ".join(e.errors[:2])
+        self._reload()
+        return ""
 
     @Slot(str, bool)
     def setSkillEnabled(self, skill_id: str, on: bool) -> None:  # noqa: N802

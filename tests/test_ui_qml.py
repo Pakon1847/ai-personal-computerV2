@@ -361,6 +361,35 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(banner[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_skills_page_manages_claude_made_skills(self):
+        """หน้า Skill (การ์ด 0017 ชั้นที่ 3): สกิลที่ Claude สร้างมีการ์ดของตัวเอง · ปิด/ย้อนรุ่น/ลบได้ไม่มี warning."""
+        from aipc.skills import manifest, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        self.assertTrue(find_items(win, "userSkillsEmpty")[0].property("visible"))
+        root = Path(__file__).resolve().parent.parent
+        md = (root / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(encoding="utf-8")
+        store = userskills.UserSkills(Path(os.environ["XDG_DATA_HOME"]) / "aipc" / "skills")
+        builtin = manifest.load_builtin()
+        m = store.install(md, builtin, request="เข้าโหมดประชุม")
+        store.install(md.replace("3. บอก:", "3. บอก: (รุ่น 2)"), [*builtin, m], request="x", replacing=m.id)
+        skills._user = store
+        skills._reload()
+        settle(100)
+        self.assertEqual(len(find_items(win, "userSkillCard")), 1)
+        entry = skills.userSkills[0]
+        self.assertEqual((entry["version"], entry["versions"], entry["enabled"]), (2, [1, 2], True))
+        self.assertEqual(skills.revertSkill(m.id, 1), "")
+        self.assertEqual(skills.userSkills[0]["version"], 1)
+        skills.setSkillEnabled(m.id, False)
+        self.assertFalse(skills.userSkills[0]["enabled"])
+        self.assertNotIn(m.id, [t["function"]["name"] for t in skills.tool_catalog()])
+        skills.removeSkill(m.id)
+        settle(50)
+        self.assertEqual(skills.userSkills, [])
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")
