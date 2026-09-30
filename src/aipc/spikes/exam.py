@@ -65,6 +65,7 @@ def ask_local(server: str, system: str, text: str, tools: list[dict], timeout: f
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": text}],
         "stream": True,
         "cache_prompt": True,
+        "chat_template_kwargs": {"enable_thinking": False},  # เท่ากับแอป · Qwen3 ไม่คิดยาวก่อนตอบ
         **SAMPLING,
     }
     if tools:
@@ -110,7 +111,11 @@ def run_item(it: dict, skills, system: str, tools: list[dict], local, cloud, ph:
     if r.skill is not None:  # คำสั่งเครื่องที่แปลได้แน่นอน
         row.update(route=r.skill.id, by="rule", text="", ttft=0.0, seconds=0.0)
     else:
-        res = local(system, it["q"], tools)
+        try:
+            res = local(system, it["q"], tools)
+        except (OSError, ValueError) as e:  # server ล้ม/ปฏิเสธ (เช่น template ไม่รับเครื่องมือ) = ผลของข้อนี้
+            res = {"text": f"[error] {e}"[:300], "tool": "", "ttft": None, "seconds": 0.0,
+                   "finish": "error"}  # fmt: skip
         row.update(
             by="local",
             text=res["text"],

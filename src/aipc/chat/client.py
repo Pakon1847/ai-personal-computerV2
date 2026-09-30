@@ -19,7 +19,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
-SAMPLING = {"temperature": 0.6, "top_p": 0.95}  # ค่าเดียวกับตอนวัดคุณภาพ (ADR-007)
+# temperature/top_p ค่าเดียวกับตอนวัดคุณภาพ (ADR-007) · enable_thinking False: Qwen3 แบบคิดได้ (เช่น 8B)
+# ไม่คิดยาวก่อนตอบ · โมเดลที่ไม่มีโหมดนี้ไม่สนค่านี้
+SAMPLING = {"temperature": 0.6, "top_p": 0.95, "chat_template_kwargs": {"enable_thinking": False}}
 MAX_TOKENS = 512
 
 
