@@ -203,6 +203,26 @@ class ControllerTest(ServerCase):
         self.assertEqual(len(c.history), 1)
         self.assertEqual(FakeLlama.seen[0]["messages"][0]["role"], "system")
 
+    def test_crash_after_ready_says_restarting_then_down_after_grace(self):
+        c, _, _ = self.make()
+        c._on_health("down")  # T7: kill -9 llama-server หลังพร้อมแล้ว
+        self.assertEqual((c.status, c.statusText), ("restarting", "AI กำลังเริ่มใหม่…"))
+        c._on_health("loading")  # systemd เปิดใหม่ กำลังโหลดโมเดล
+        self.assertEqual(c.status, "restarting")
+        c._on_health("ready")
+        self.assertTrue(c.ready)
+        c._on_health("down")
+        c._lost_at -= c.RESTART_GRACE_S  # เกินเวลาที่ควรกลับมาแล้ว → บอกตามจริง
+        c._on_health("down")
+        self.assertEqual(c.status, "down")
+
+    def test_first_load_is_not_called_restart(self):
+        c = ChatController(target=self.target, store=store.ChatStore(Path(tempfile.mkdtemp())),
+                           poll_ms=100000)  # fmt: skip
+        self.addCleanup(c.shutdown)
+        c._on_health("loading")
+        self.assertEqual(c.status, "loading")
+
     def test_temporary_chat_writes_nothing(self):
         c, done, folder = self.make()
         c.newChat(True)

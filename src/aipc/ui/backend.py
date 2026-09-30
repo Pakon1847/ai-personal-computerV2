@@ -1009,7 +1009,11 @@ class ChatController(QObject):
     from aipc.skills.catalog import SYSTEM, TOOLS_HINT  # ข้อความเดียวกับตัววัด spikes.skill_select
 
     STATUS_TEXT = {"ready": "โมเดล: พร้อม · ในเครื่อง", "loading": "โมเดล: กำลังโหลด…",
-                   "down": "โมเดล: ไม่พร้อม", "off": "โมเดล: ไม่ใช้ในหน้านี้"}  # fmt: skip
+                   "down": "โมเดล: ไม่พร้อม", "off": "โมเดล: ไม่ใช้ในหน้านี้",
+                   "restarting": "AI กำลังเริ่มใหม่…"}  # fmt: skip
+    # T7: AI ที่เคยพร้อมแล้วล่ม → systemd เปิดใหม่เอง (Pi 5: 13 วิ) · บอกว่ากำลังเริ่มใหม่ได้แค่ช่วงนี้
+    # เกินนี้ยังไม่กลับ = บอก "ไม่พร้อม" ตามจริง ไม่ให้ผู้ใช้รอข้อความที่ไม่มีวันจริง
+    RESTART_GRACE_S = 120
     NOTE = {"stopped": "หยุดแล้ว", "crashed": "ตอบไม่จบ: AI หยุดทำงาน · ระบบกำลังเปิด AI ใหม่เอง"}
 
     changed = Signal()
@@ -1039,6 +1043,7 @@ class ChatController(QObject):
         self._conv = chat_store.new_conversation()
         self._temporary = False
         self._status = "down" if active else "off"
+        self._lost_at = None  # เวลาที่ AI ซึ่งเคยพร้อมหยุดตอบ (None = ยังไม่เคยพร้อม หรือพร้อมอยู่)
         self._busy, self._stream_text, self._stream = False, "", None
         self._trimmed, self._save_error = False, ""
         self._token.connect(self._on_token)
@@ -1107,6 +1112,15 @@ class ChatController(QObject):
         ).start()
 
     def _on_health(self, status: str) -> None:
+        import time
+
+        if status == "ready":
+            self._lost_at = None
+        elif self._status == "ready" or self._lost_at is not None:
+            now = time.monotonic()
+            self._lost_at = self._lost_at if self._lost_at is not None else now
+            if now - self._lost_at < self.RESTART_GRACE_S:
+                status = "restarting"
         if status != self._status:
             if status == "ready":
                 self._warm_up()
