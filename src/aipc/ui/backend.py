@@ -218,7 +218,7 @@ class LoginController(QObject):
 
     changed = Signal()
     _scanned = Signal(int, object)  # (รอบที่สแกน, ผลจาก visiond) · ส่งจากเธรดสแกนกลับเธรดหลัก
-    _progress = Signal(int, str)
+    _progress = Signal(int, object)
     STATES = ("unavailable", "scanning", "found", "unknown", "manual")
     AUTO_LOGIN_MS = 1500
 
@@ -236,6 +236,10 @@ class LoginController(QObject):
         self._found_user = self._found_name = self._message = ""
         self._scanned.connect(self._on_scanned)
         self._progress.connect(self._on_progress)
+        from aipc.ui.enrollview import EnrollView
+
+        # ภาพสดในวงกล้องระหว่างสแกน (QML: loginScan · image://loginscan) · Pakon ขอ 2026-09-30
+        self.scan_view = EnrollView()
         self._timer = None
         if self._demo:
             self._state = demo_scan
@@ -288,6 +292,7 @@ class LoginController(QObject):
         if self._timer is not None:
             self._timer.stop()
         self._state, self._message = state, ""
+        self.scan_view.clear()
         if state == "scanning" and not self._demo:
             if self._face is None:
                 self._state = "unavailable"
@@ -304,19 +309,24 @@ class LoginController(QObject):
 
         def work():
             res = self._face({"op": "identify", "timeout_s": 8},
-                             lambda m: self._progress.emit(n, str(m.get("hint", ""))))  # fmt: skip
+                             lambda m: self._progress.emit(n, m))  # fmt: skip
             self._scanned.emit(n, res)
 
         threading.Thread(target=work, daemon=True).start()
 
-    def _on_progress(self, n: int, hint: str) -> None:
-        if n == self._round and self._state == "scanning" and hint != self._message:
+    def _on_progress(self, n: int, m: dict) -> None:
+        if n != self._round or self._state != "scanning":
+            return
+        self.scan_view.update(m)
+        hint = str(m.get("hint", ""))
+        if hint != self._message:
             self._message = hint
             self.changed.emit()
 
     def _on_scanned(self, n: int, res: dict) -> None:
         if n != self._round or self._state != "scanning":
             return
+        self.scan_view.clear()  # จบสแกน = ไม่เก็บภาพหน้าไว้
         state = res.get("state")
         self._message = str(res.get("message", ""))
         if res.get("ok") and state == "found":

@@ -334,6 +334,25 @@ class FaceScanTest(Base):
             c = self.make(res)
             self.assertTrue(self.wait(lambda c=c, want=want: c.scanState == want), res)
 
+    def test_live_preview_during_scan_is_cleared_after(self):
+        from tests.test_ui_enrollview import jpeg_b64
+
+        gate = threading.Event()
+        seen = []
+
+        def face(req, on_progress):
+            on_progress({"state": "scanning", "hint": "มองกล้อง", "jpeg": jpeg_b64(), "box": []})
+            gate.wait(3)
+            return {"ok": False, "state": "unknown"}
+
+        c = LoginController(False, None, greeter_session=["labwc"], face=face)
+        self.assertTrue(self.wait(lambda: c.scan_view.previewSerial == 1))
+        seen.append(c.scan_view.image() is not None)
+        gate.set()
+        self.assertTrue(self.wait(lambda: c.scanState == "unknown"))
+        self.assertEqual(seen, [True])
+        self.assertIsNone(c.scan_view.image(), "จบสแกน = ไม่มีภาพหน้าค้าง")
+
     def test_login_screen_rescans_when_shown_again(self):
         results = [{"ok": False, "state": "no-templates"},
                    {"ok": True, "state": "found", "user": "namfon"}]  # fmt: skip

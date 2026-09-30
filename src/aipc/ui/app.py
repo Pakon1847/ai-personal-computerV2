@@ -144,9 +144,11 @@ def build(opts: Options, argv: list[str] | None = None):
     # ภาพสดตอนลงทะเบียนผ่าน visiond (หน้าสมัคร / สวิตช์เข้าเครื่องด้วยใบหน้า · การ์ด 0015)
     from aipc.ui.enrollview import EnrollPreviewProvider
 
-    for name, owner in (("signupface", "signup"), ("loginface", "loginFace")):
-        view = engine._backends[owner].enroll_view
-        engine.rootContext().setContextProperty(owner + "Enroll", view)
+    views = (("signupface", "signupEnroll", engine._backends["signup"].enroll_view),
+             ("loginface", "loginFaceEnroll", engine._backends["loginFace"].enroll_view),
+             ("loginscan", "loginScan", engine._backends["login"].scan_view))  # fmt: skip
+    for name, prop, view in views:
+        engine.rootContext().setContextProperty(prop, view)
         provider = EnrollPreviewProvider(view)
         setattr(engine, f"_{name}_provider", provider)  # กัน Python เก็บกวาดทิ้ง
         engine.addImageProvider(name, provider)

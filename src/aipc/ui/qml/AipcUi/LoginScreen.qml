@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import QtQuick.Shapes
 import AipcUi
 
 Rectangle {
@@ -83,12 +84,33 @@ Rectangle {
             implicitWidth: Theme.fontScale > 1.5 ? 112 : Theme.fontScale > 1.2 ? 160 : 200
             implicitHeight: implicitWidth; radius: implicitWidth / 2
             color: Theme.camera
-            border.width: 4
-            border.color: root.scan === "found" ? Theme.scanFound
-                        : root.scan === "unknown" ? Theme.scanUnknown
-                        : root.scan === "scanning" ? Theme.scanLine : Theme.lineStrong
             Accessible.name: "สแกนใบหน้า"
             clip: true
+            readonly property bool live: root.scan === "scanning" && loginScan.previewSerial > 0
+
+            // ภาพสดแบบกระจกระหว่างสแกน (Pakon ขอ 2026-09-30) · มาจาก visiond ไม่บันทึก · จบสแกนแล้วล้างทิ้ง
+            Image {
+                objectName: "loginLive"
+                anchors.fill: parent
+                visible: cam.live
+                fillMode: Image.PreserveAspectCrop
+                cache: false
+                source: cam.live ? "image://loginscan/" + loginScan.previewSerial : ""
+            }
+            // มุมนอกวงกลมทาสีพื้นหลังทับ = ภาพเป็นวงกลม (ไม่พึ่ง shader · ใช้ได้ทั้ง GPU และวาดด้วย CPU)
+            Shape {
+                anchors.fill: parent
+                visible: cam.live
+                layer.enabled: true
+                ShapePath {
+                    fillRule: ShapePath.OddEvenFill
+                    fillColor: Theme.bg
+                    strokeColor: "transparent"
+                    PathRectangle { x: -1; y: -1; width: cam.width + 2; height: cam.height + 2 }
+                    PathAngleArc { moveToStart: true; centerX: cam.width / 2; centerY: cam.height / 2
+                                   radiusX: cam.width / 2; radiusY: cam.height / 2; startAngle: 0; sweepAngle: 360 }
+                }
+            }
 
             Icon {
                 anchors.centerIn: parent
@@ -114,6 +136,16 @@ Rectangle {
                     NumberAnimation { from: 50; to: 150; duration: 1400; easing.type: Easing.InOutSine }
                     NumberAnimation { from: 150; to: 50; duration: 1400; easing.type: Easing.InOutSine }
                 }
+            }
+            // เส้นขอบสีสถานะอยู่บนสุด (เขียว = จำได้ · ส้ม = ไม่รู้จัก · คราม = กำลังสแกน)
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: "transparent"
+                border.width: 4
+                border.color: root.scan === "found" ? Theme.scanFound
+                            : root.scan === "unknown" ? Theme.scanUnknown
+                            : root.scan === "scanning" ? Theme.scanLine : Theme.lineStrong
             }
         }
 

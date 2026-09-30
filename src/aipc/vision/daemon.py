@@ -62,24 +62,45 @@ def check_password_via_helper(user: str, password: str) -> bool:
         return False
 
 
+def _tap(frames, last: dict):
+    """จำเฟรมล่าสุดไว้ทำภาพย่อ (เฟรมเดียวกับที่วิเคราะห์ ไม่อ่านกล้องซ้ำ)."""
+    for f in frames:
+        last["frame"] = f
+        yield f
+
+
+def _with_preview(msg: dict, r, frame, preview) -> dict:
+    import base64
+
+    if preview is not None and frame is not None:
+        jpeg, box = preview(frame, getattr(r, "box", None))
+        msg["jpeg"], msg["box"] = base64.b64encode(jpeg).decode("ascii"), box
+    return msg
+
+
+def scan_status(r, counts: dict, frame, preview) -> dict:
+    """สถานะระหว่างสแกนที่หน้า Login: คำแนะนำ + ภาพย่อแบบกระจกให้คนหน้ากล้องเห็นตัวเอง (Pakon ขอ 2026-09-30).
+
+    ภาพไปที่หน้า Login เท่านั้น (ผู้ขอ identify ต้องเป็น _greetd) · ไม่เขียนดิสก์ ไม่ลง log
+    """
+    msg = {"state": "scanning", "hint": r.advice, "good": counts.get("good", 0), "box": []}
+    return _with_preview(msg, r, frame, preview)
+
+
 def enroll_status(r, counts: dict, frame, preview) -> dict:
     """สถานะระหว่างลงทะเบียน 1 เฟรม: คำแนะนำ ท่าที่ได้ ท่าถัดไป หันถึงแค่ไหน + ภาพย่อแบบกระจก (base64 JPEG).
 
     ภาพส่งเฉพาะผู้ที่ขอลงทะเบียน (หน้าสมัคร/เจ้าของบัญชีที่อยู่หน้ากล้อง) · ไม่เขียนดิสก์ ไม่ลง log
     """
-    import base64
-
     from aipc.vision import guide
 
     target = guide.next_pose(counts)
     msg = {"state": "enrolling", "hint": guide.advice(r, counts), "poses": dict(counts),
            "pose": target, "reach": 0.0, "box": []}  # fmt: skip
-    if preview is not None and frame is not None:
-        jpeg, box = preview(frame, getattr(r, "box", None))
-        msg["jpeg"], msg["box"] = base64.b64encode(jpeg).decode("ascii"), box
-        q = getattr(r, "quality", None)
-        if q is not None and box:
-            msg["reach"] = guide.pose_reach(target, q.yaw, q.pitch)
+    _with_preview(msg, r, frame, preview)
+    q = getattr(r, "quality", None)
+    if q is not None and msg["box"]:
+        msg["reach"] = guide.pose_reach(target, q.yaw, q.pitch)
     return msg
 
 
@@ -126,10 +147,14 @@ class Handler:
                 return {"ok": False, "state": "error", "message": "ใช้ได้ที่หน้า Login เท่านั้น"}
             secs = min(float(req.get("timeout_s", 8)), IDENTIFY_MAX_S)
 
-            def progress(r, counts):
-                send({"state": "scanning", "hint": r.advice, "good": counts.get("good", 0)})
+            last: dict = {}
 
-            return self._with_camera(lambda: vars(self.face.identify(self.frames(secs), progress)))
+            def progress(r, counts):
+                send(scan_status(r, counts, last.get("frame"), self.preview))
+
+            return self._with_camera(
+                lambda: vars(self.face.identify(_tap(self.frames(secs), last), progress))
+            )
         if not isinstance(user, str) or not self._may_manage(uid, user):
             return {"ok": False, "state": "error", "message": "ทำได้เฉพาะบัญชีของตัวเอง"}
         if op == "enabled":
@@ -147,18 +172,13 @@ class Handler:
             consent = req.get("consent_at") if isinstance(req.get("consent_at"), str) else ""
             last: dict = {}
 
-            def tap(frames):  # จำเฟรมล่าสุดไว้ทำภาพย่อ (เฟรมเดียวกับที่วิเคราะห์ ไม่อ่านกล้องซ้ำ)
-                for f in frames:
-                    last["frame"] = f
-                    yield f
-
             def progress(r, counts):
                 send(enroll_status(r, counts, last.get("frame"), self.preview))
 
             return self._with_camera(
                 lambda: vars(
                     self.face.enroll(
-                        user, password, tap(self.frames(ENROLL_SECONDS)), consent, progress
+                        user, password, _tap(self.frames(ENROLL_SECONDS), last), consent, progress
                     )
                 )
             )
