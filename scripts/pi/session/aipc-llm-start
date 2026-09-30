@@ -17,10 +17,16 @@ DIR="${XDG_RUNTIME_DIR:?ไม่มี XDG_RUNTIME_DIR}/aipc"
 mkdir -p "$DIR"
 chmod 0700 "$DIR"
 rm -f "$DIR/llm.sock"   # socket ค้างจากรอบที่แล้ว (ล่ม) ทำให้เริ่มใหม่ไม่ได้
+# แคช prompt ที่อุ่นแล้ว (system + รายการสกิล) เก็บเป็นไฟล์ใน home ของผู้ใช้ · login ครั้งหน้าโหลดคืน 7 ms แทนอ่านใหม่ ~53 วิ
+# --swa-full: Gemma ใช้ sliding window · แคชแบบย่อใช้ส่วนต้นซ้ำหลังโหลดคืนไม่ได้ (วัด Pi 5 2026-09-30 · RAM +55 MB)
+# ไฟล์ละ ~14 MB · system prompt มีวันที่ = ไฟล์ใหม่ทุกวัน → ลบไฟล์ที่เก่ากว่า 2 วัน
+SLOTS="${XDG_CACHE_HOME:-$HOME/.cache}/aipc/llm-slots"
+mkdir -p "$SLOTS" && chmod 0700 "$SLOTS"
+find "$SLOTS" -name 'warm-*.bin' -mtime +2 -delete 2>/dev/null || true
 export LD_LIBRARY_PATH=/opt/aipc-llm/lib
 if [ -n "${TEMPLATE:-}" ]; then
   exec /opt/aipc-llm/bin/llama-server -m "$MODEL" --chat-template-file "$TEMPLATE" --host "$DIR/llm.sock" \
-    -c "${CTX:-4096}" -np 1 -t "${THREADS:-4}" -fa "${FLASH_ATTN:-off}" -cram "${CACHE_RAM:-512}" --no-webui --no-slots
+    -c "${CTX:-4096}" -np 1 -t "${THREADS:-4}" -fa "${FLASH_ATTN:-off}" -cram "${CACHE_RAM:-512}" --no-webui --no-slots --swa-full --slot-save-path "$SLOTS"
 fi
 exec /opt/aipc-llm/bin/llama-server -m "$MODEL" --host "$DIR/llm.sock" \
-  -c "${CTX:-4096}" -np 1 -t "${THREADS:-4}" -fa "${FLASH_ATTN:-off}" -cram "${CACHE_RAM:-512}" --no-webui --no-slots
+  -c "${CTX:-4096}" -np 1 -t "${THREADS:-4}" -fa "${FLASH_ATTN:-off}" -cram "${CACHE_RAM:-512}" --no-webui --no-slots --swa-full --slot-save-path "$SLOTS"

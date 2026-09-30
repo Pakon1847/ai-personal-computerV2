@@ -77,6 +77,28 @@ def health(target: Target, timeout: float = 2.0) -> str:
     return "ready" if code == 200 else "loading" if code == 503 else "down"
 
 
+def _slot(target: Target, action: str, filename: str, timeout: float = 30) -> bool:
+    """บันทึก/โหลดแคชของ slot 0 เป็นไฟล์ (llama-server --slot-save-path) · ไม่รองรับ/ไม่มีไฟล์ = False."""
+    try:
+        conn = target.connect(timeout)
+        conn.request("POST", f"/slots/0?action={action}", body=json.dumps({"filename": filename}),
+                     headers={"Content-Type": "application/json"})  # fmt: skip
+        resp = conn.getresponse()
+        ok = resp.status == 200 and "error" not in json.loads(resp.read() or b"{}")
+        conn.close()
+        return ok
+    except (OSError, http.client.HTTPException, ValueError):
+        return False
+
+
+def warm_key(system: str, tools: list[dict]) -> str:
+    """ชื่อไฟล์แคช = hash ของ system prompt (มีชื่อโมเดลและวันที่) + รายการเครื่องมือ · เปลี่ยนอะไร = ไฟล์ใหม่."""
+    import hashlib
+
+    raw = system + "\n" + json.dumps(tools, ensure_ascii=False, sort_keys=True)
+    return "warm-" + hashlib.sha256(raw.encode()).hexdigest()[:20] + ".bin"
+
+
 def warm(target: Target, system: str, tools: list[dict], timeout: float = 300) -> dict:
     """อ่าน system prompt + รายการสกิลไว้ในแคชของ llama-server ล่วงหน้า (ตอบ 1 token แล้วทิ้ง).
 
@@ -93,6 +115,10 @@ def warm(target: Target, system: str, tools: list[dict], timeout: float = 300) -
     }
     if tools:
         body["tools"], body["tool_choice"] = tools, "auto"
+    # เก็บแคชลงดิสก์ (ข้อเสนอ 2026-10-01 · docs/benchmarks/2026-10-01-llm-speed-ideas-pi5): เคยอุ่นชุดนี้แล้ว = โหลดคืน 7 ms
+    # แทนอ่านใหม่ 52.8 วิ · ต้องเปิด AI ด้วย --swa-full --slot-save-path (aipc-llm-start) · ไม่รองรับ = อุ่นแบบเดิม
+    key = warm_key(system, tools)
+    restored = _slot(target, "restore", key)
     try:
         conn = target.connect(timeout)
         conn.request("POST", "/v1/chat/completions", body=json.dumps(body),
@@ -101,7 +127,11 @@ def warm(target: Target, system: str, tools: list[dict], timeout: float = 300) -
         conn.close()
     except (OSError, http.client.HTTPException, ValueError):
         return {}
-    return data.get("timings", {}) if isinstance(data, dict) else {}
+    if not isinstance(data, dict):
+        return {}
+    if not restored:  # บันทึกหลังอุ่นทันที: มีแค่ system prompt + รายการสกิล + "สวัสดี" ไม่มีข้อความของผู้ใช้
+        _slot(target, "save", key)
+    return {**data.get("timings", {}), "restored": restored}
 
 
 @dataclass

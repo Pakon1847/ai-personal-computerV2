@@ -26,7 +26,17 @@ class FakeLlama(BaseHTTPRequestHandler):
         self.send_response(503 if self.mode == "loading" else 200)
         self.end_headers()
 
+    slots: list = []  # (action, filename) ของ /slots/0?action=save|restore
+    slot_ok = False  # False = เหมือน llama-server ที่ไม่ได้เปิด --slot-save-path
+
     def do_POST(self):  # noqa: N802
+        if self.path.startswith("/slots"):
+            body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            FakeLlama.slots.append((self.path.split("action=")[-1], body["filename"]))
+            self.send_response(200 if self.slot_ok else 501)
+            self.end_headers()
+            self.wfile.write(json.dumps({} if self.slot_ok else {"error": {"code": 501}}).encode())
+            return
         try:
             self._answer()
         except OSError:  # ผู้ทดสอบตัดการเชื่อมต่อเอง (หยุด) · ไม่ต้องพิมพ์ error
@@ -38,6 +48,12 @@ class FakeLlama(BaseHTTPRequestHandler):
         if self.mode == "loading":
             self.send_response(503)
             self.end_headers()
+            return
+        if body.get("stream") is False:  # การอุ่นแคช (client.warm) ขอแบบไม่ stream
+            self.send_response(200)
+            self.end_headers()
+            reply = {"choices": [{"message": {"content": "ส"}}], "timings": {"prompt_n": 10}}
+            self.wfile.write(json.dumps(reply, ensure_ascii=False).encode())
             return
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
@@ -71,7 +87,7 @@ class FakeLlama(BaseHTTPRequestHandler):
 
 class ServerCase(unittest.TestCase):
     def setUp(self):
-        FakeLlama.mode, FakeLlama.seen = "ok", []
+        FakeLlama.mode, FakeLlama.seen, FakeLlama.slots, FakeLlama.slot_ok = "ok", [], [], False
         self.srv = ThreadingHTTPServer(("127.0.0.1", 0), FakeLlama)
         threading.Thread(target=self.srv.serve_forever, daemon=True).start()
         self.addCleanup(self.srv.server_close)
@@ -80,6 +96,17 @@ class ServerCase(unittest.TestCase):
 
 
 class ClientTest(ServerCase):
+    def test_warm_restores_saved_cache_else_warms_and_saves(self):
+        tools = [{"type": "function", "function": {"name": "x", "description": "d", "parameters": {}}}]
+        t = client.warm(self.target, "ระบบ", tools)  # ไม่มีไฟล์ (server ไม่รองรับ) → อุ่นเองแล้วลองบันทึก
+        self.assertFalse(t["restored"])
+        key = client.warm_key("ระบบ", tools)
+        self.assertEqual(FakeLlama.slots, [("restore", key), ("save", key)])
+        FakeLlama.slots, FakeLlama.slot_ok = [], True
+        self.assertTrue(client.warm(self.target, "ระบบ", tools)["restored"])
+        self.assertEqual(FakeLlama.slots, [("restore", key)])  # โหลดคืนได้ = ไม่บันทึกซ้ำ
+        self.assertNotEqual(client.warm_key("ระบบ วันใหม่", tools), key)  # prompt เปลี่ยน = ไฟล์ใหม่
+
     def ask(self):
         tokens = []
         s = client.Stream(self.target, [{"role": "user", "content": "สวัสดี"}])
