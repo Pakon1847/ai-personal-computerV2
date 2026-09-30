@@ -314,7 +314,8 @@ class ControllerTest(ServerCase):
             lambda: picked, timeout=20
         )  # ชุดเทสต์เต็มบนเครื่องที่ยุ่ง 5 วิเคยไม่พอ (พลาด 1 ใน ~8 รอบ 2026-10-01)
         self.assertEqual(picked, [("machine-status", "คอมหน่วงมาก เป็นอะไร")])
-        body = FakeLlama.seen[-1]
+        # คำขออุ่นแคช (เธรดแยก · stream False) อาจมาถึงหลังคำขอแชท → เลือกคำขอแชทตัวจริง ไม่ใช่ตัวสุดท้าย
+        body = [b for b in FakeLlama.seen if b.get("stream") is not False][-1]
         self.assertEqual(body["tools"], tools)
         self.assertEqual(body["tool_choice"], "auto")
         self.assertIn("เครื่องมือ", body["messages"][0]["content"])
