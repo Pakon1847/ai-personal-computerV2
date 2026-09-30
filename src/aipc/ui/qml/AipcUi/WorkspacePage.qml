@@ -42,6 +42,11 @@ Item {
         if (text === "" || chat.busy) return
         push({ user: true, text: text })
         input.text = ""
+        if (chat.attachedFile !== "") {  // ถามเกี่ยวกับไฟล์: ตรงไป AI ในเครื่อง ไม่ผ่านสกิล (ฟีเจอร์ข้อ 4)
+            if (chat.send(text, "", false))
+                push({ ai: true, text: "", note: "", done: false, skill: "ไฟล์ " + chat.attachedFile })
+            return
+        }
         if (feedbackFor) {
             const id = feedbackFor.id
             feedbackFor = null
@@ -62,7 +67,7 @@ Item {
             push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
     }
     function loadChat(messages) {
-        items = messages.map(m => m.role === "user" ? { user: true, text: m.content }
+        items = messages.map(m => m.role === "user" ? { user: true, text: m.shown || m.content }
                                                     : { ai: true, text: m.content, note: "", done: true })
         answered = ({})
     }
@@ -569,6 +574,31 @@ Item {
                 size: Theme.fontSmall; color: Theme.warnInk
             }
             AppButton { text: "ยกเลิก"; kind: "ghost"; onClicked: root.feedbackFor = null }
+        }
+    }
+    // แนบไฟล์อยู่ (ฟีเจอร์ข้อ 4): คำถามถัดไปตอบจากไฟล์นี้ · กด ✕ เลิกแนบ
+    Rectangle {
+        objectName: "fileBanner"
+        parent: composer.parent
+        visible: chat.attachedFile !== "" && !root.feedbackFor
+        x: composer.x
+        width: composer.width
+        y: composer.y - height - 8
+        height: fileRow.implicitHeight + 16
+        radius: Theme.radiusLarge
+        color: Theme.accentSoft
+        RowLayout {
+            id: fileRow
+            anchors.fill: parent
+            anchors.leftMargin: 14
+            anchors.rightMargin: 8
+            spacing: 8
+            AppText {
+                Layout.fillWidth: true
+                text: "ถามเกี่ยวกับไฟล์ “" + chat.attachedFile + "” · AI ในเครื่องอ่าน ไม่ส่งไฟล์ออกนอกเครื่อง"
+                size: Theme.fontSmall; color: Theme.accentInk
+            }
+            AppButton { text: "เลิกแนบ"; kind: "ghost"; onClicked: chat.detachFile() }
         }
     }
     AppText {

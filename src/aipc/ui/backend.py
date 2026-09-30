@@ -223,7 +223,12 @@ class FilesBrowser(QObject):
 
     def _load(self) -> None:
         try:
-            self._entries = [e.to_dict() for e in files.list_dir(self._root, self._rel)]
+            from aipc import files_qa
+
+            self._entries = [
+                {**e.to_dict(), "askable": not e.is_dir and files_qa.supported(e.name)}
+                for e in files.list_dir(self._root, self._rel)
+            ]
             self._error = ""
         except (OSError, files.OutsideHome) as e:
             self._entries, self._error = [], f"เปิดโฟลเดอร์นี้ไม่ได้: {e}"
@@ -257,6 +262,14 @@ class FilesBrowser(QObject):
     def open(self, name: str) -> None:
         self._rel = str(Path(self._rel) / name) if self._rel else name
         self._load()
+
+    @Slot(str, result=str)
+    def pathOf(self, name: str) -> str:  # noqa: N802
+        """path จริงของไฟล์ในโฟลเดอร์ที่เปิดอยู่ (ต้องอยู่ใน home · ไม่งั้น "")."""
+        try:
+            return str(files.inside(self._root, self._root / self._rel / name))
+        except (OSError, files.OutsideHome):
+            return ""
 
     @Slot()
     def up(self) -> None:
@@ -1302,6 +1315,7 @@ class ChatController(QObject):
         self._target = target or client.Target.from_env()
         self._store = store or chat_store.ChatStore()
         self._conv = chat_store.new_conversation()
+        self._file: tuple[str, str] | None = None  # (ชื่อไฟล์, ข้อความ) ที่แนบให้คำถามถัดไป (ฟีเจอร์ข้อ 4)
         self._temporary = False
         self._status = "down" if active else "off"
         self._lost_at = None  # เวลาที่ AI ซึ่งเคยพร้อมหยุดตอบ (None = ยังไม่เคยพร้อม หรือพร้อมอยู่)
@@ -1437,7 +1451,16 @@ class ChatController(QObject):
 
         from aipc.chat import client
 
-        self._conv["messages"].append({"role": "user", "content": text})
+        if self._file is not None and not prompt:
+            # ถามเกี่ยวกับไฟล์: ส่งส่วนของไฟล์ที่เกี่ยวข้อง + คำถาม · ไม่มีเครื่องมือ · ไม่ส่งต่อ Claude (_on_done)
+            from aipc import files_qa
+
+            content = files_qa.build_message(self._file[0], self._file[1], text)
+            self._conv["messages"].append({"role": "user", "content": content, "shown": text,
+                                           "file": self._file[0]})  # fmt: skip
+            use_tools = False
+        else:
+            self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
         tools = self._all_tools(text) if (use_tools and not prompt) else []
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
@@ -1476,7 +1499,13 @@ class ChatController(QObject):
         self._busy, self._stream = False, None
         from aipc.skills import catalog
 
-        if self._cloud is not None and not reply.reason and not getattr(reply, "cloud", False):
+        with_file = bool(self._conv["messages"] and self._conv["messages"][-1].get("file"))
+        if (
+            self._cloud is not None
+            and not with_file  # คำถามเกี่ยวกับไฟล์ = เนื้อหาไฟล์อยู่ในข้อความ ห้ามส่งออกนอกเครื่อง
+            and not reply.reason
+            and not getattr(reply, "cloud", False)
+        ):
             from aipc.cloud.ask import local_gave_up
 
             # AI ในเครื่องเลือกส่งต่อเอง หรือตอบว่าไม่รู้ = ถามพี่ใหญ่ (การ์ด 0016)
@@ -1536,6 +1565,29 @@ class ChatController(QObject):
             self._done.emit(reply)
 
         threading.Thread(target=work, daemon=True).start()
+
+    # ---------- ถามเกี่ยวกับไฟล์ของฉัน (ฟีเจอร์ข้อ 4) ----------
+    @Property(str, notify=changed)
+    def attachedFile(self) -> str:  # noqa: N802
+        return self._file[0] if self._file else ""
+
+    @Slot(str, result=str)
+    def attachFile(self, path: str) -> str:  # noqa: N802
+        """แนบไฟล์ให้คำถามถัดไป ๆ · คืนข้อความผิดพลาด ("" = สำเร็จ) · เนื้อหาไฟล์อยู่ในเครื่องเท่านั้น."""
+        from aipc import files_qa
+
+        try:
+            text = files_qa.extract(Path(path))
+        except files_qa.Unsupported as e:
+            return str(e)
+        self._file = (Path(path).name, text)
+        self.changed.emit()
+        return ""
+
+    @Slot()
+    def detachFile(self) -> None:  # noqa: N802
+        self._file = None
+        self.changed.emit()
 
     @Slot(str, result=bool)
     def askCloudFor(self, text: str) -> bool:  # noqa: N802

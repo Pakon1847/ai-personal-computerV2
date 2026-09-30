@@ -20,6 +20,7 @@ ColumnLayout {
     }
 
     AppText { visible: filesBrowser.error !== ""; text: filesBrowser.error; color: Theme.danger; Layout.fillWidth: true }
+    AppText { id: fileError; objectName: "fileError"; visible: text !== ""; color: Theme.danger; Layout.fillWidth: true }
 
     Card {
         Layout.fillWidth: true
@@ -54,8 +55,7 @@ ColumnLayout {
                     required property var modelData
                     width: ListView.view.width
                     height: Theme.touch + 4
-                    enabled: modelData.is_dir
-                    onClicked: filesBrowser.open(modelData.name)
+                    onClicked: if (modelData.is_dir) filesBrowser.open(modelData.name)
                     background: Rectangle { color: row.hovered ? Theme.surface2 : "transparent" }
                     contentItem: RowLayout {
                         spacing: 12
@@ -64,6 +64,18 @@ ColumnLayout {
                         AppText { text: row.modelData.name; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
                         AppText { text: row.modelData.modified_text; color: Theme.inkMuted; oneLine: true; Layout.preferredWidth: 180 }
                         AppText { text: row.modelData.size_text; color: Theme.inkMuted; oneLine: true; Layout.preferredWidth: 100 }
+                        // ถาม AI ในเครื่องเกี่ยวกับไฟล์นี้ (ฟีเจอร์ข้อ 4) · เนื้อหาไม่ออกนอกเครื่อง
+                        AppButton {
+                            objectName: "askFileButton"
+                            visible: row.modelData.askable === true
+                            text: "ถาม AI"; kind: "secondary"; iconPath: Icons.chat
+                            onClicked: {
+                                const err = chat.attachFile(filesBrowser.pathOf(row.modelData.name))
+                                if (err === "") AppState.page = "workspace"
+                                else fileError.text = err
+                            }
+                        }
+                        Item { width: 4 }
                     }
                 }
             }
