@@ -24,6 +24,21 @@ TIMEOUT_S = 120
 CONTEXT_TURNS = 4
 
 
+# AI ในเครื่องยอมแพ้ = ส่งต่อ Claude อัตโนมัติ (การ์ด 0016 · เพิ่ม 2026-09-30 บ่าย)
+# ชุดสอบจบ (Typhoon + ไฮบริด): ข้อมูลสด 12 ข้อ AI ในเครื่องเรียก ask-cloud เองแค่ 2 ข้อ ที่เหลือตอบ "ไม่รู้"
+# กฎนี้ไม่ดูว่าคำถามเรื่องอะไร ดูแค่ว่าคำตอบสั้นและบอกว่าไม่รู้/ไม่มีข้อมูล · ปฏิเสธเรื่องผิดกฎหมาย/อันตรายไม่นับ
+GAVE_UP_MAX_CHARS = 160
+GAVE_UP = ("ไม่รู้", "ไม่ทราบ", "ไม่มีข้อมูล", "ไม่สามารถให้ข้อมูล", "ไม่สามารถตอบ", "ไม่สามารถบอก", "ข้อมูลสด")
+NOT_GIVING_UP = ("ผิดกฎหมาย", "อันตราย")
+
+
+def local_gave_up(text: str) -> bool:
+    t = " ".join(text.split())
+    if not t or len(t) > GAVE_UP_MAX_CHARS or any(w in t for w in NOT_GIVING_UP):
+        return False
+    return any(w in t for w in GAVE_UP)
+
+
 @dataclass
 class CloudReply:
     ok: bool

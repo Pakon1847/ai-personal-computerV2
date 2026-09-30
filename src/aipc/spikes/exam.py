@@ -23,6 +23,7 @@ import urllib.request
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from aipc.cloud.ask import local_gave_up
 from aipc.skills import catalog, manifest, router
 
 REPO = Path(__file__).resolve().parents[3]
@@ -104,7 +105,8 @@ def ask_local(server: str, system: str, text: str, tools: list[dict], timeout: f
     return out
 
 
-def run_item(it: dict, skills, system: str, tools: list[dict], local, cloud, ph: dict) -> dict:
+def run_item(it: dict, skills, system: str, tools: list[dict], local, cloud, ph: dict,
+             fallback: bool = False) -> dict:  # fmt: skip
     """1 ข้อ · local(system, text, tools) → dict · cloud(text) → CloudReply หรือ None (ไม่มีไฮบริด)."""
     row = {"id": it["id"], "cat": it["cat"], "q": it["q"], "expect": it["expect"]}
     r = router.route_ai_first(it["q"], skills)
@@ -125,7 +127,10 @@ def run_item(it: dict, skills, system: str, tools: list[dict], local, cloud, ph:
             timings=res.get("timings", {}),
             route=res["tool"] or "chat",
         )
-        if res["tool"] == catalog.ASK_CLOUD and cloud is not None:
+        gave_up = fallback and not res["tool"] and local_gave_up(res["text"])
+        if cloud is not None and (res["tool"] == catalog.ASK_CLOUD or gave_up):
+            row["escalated_by"] = "fallback" if gave_up else "tool"
+            row["local_text"] = res["text"]
             c = cloud(it["q"])
             row.update(
                 by="cloud",
@@ -204,6 +209,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--cloud", action="store_true", help="ไฮบริด: เปิดเครื่องมือ ask-cloud + ถาม Claude จริง"
     )
+    ap.add_argument("--fallback", action="store_true",
+                    help="ไฮบริด: AI ในเครื่องตอบว่าไม่รู้ = ส่งต่อ Claude ด้วย (เหมือนแอป)")  # fmt: skip
     ap.add_argument("--only", default="", help="เฉพาะ id ที่ขึ้นต้นด้วย (เช่น B) · ว่าง = ทุกข้อ")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args(argv)
@@ -232,12 +239,13 @@ def main(argv: list[str] | None = None) -> int:
         "label": a.label,
         "model": a.model_name,
         "cloud": a.cloud,
+        "fallback": a.fallback,
         "date": now.isoformat(timespec="minutes"),
         "system_chars": len(system),
         "rows": rows,
     }
     for it in items:
-        row = run_item(it, skills, system, tools, local, cloud, ph)
+        row = run_item(it, skills, system, tools, local, cloud, ph, fallback=a.fallback)
         rows.append(row)
         print(
             f"{row['id']} {row['by']:5} {row['route']:15} {row['auto']:14} "

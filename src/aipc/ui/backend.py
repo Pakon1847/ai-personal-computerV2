@@ -1193,9 +1193,15 @@ class ChatController(QObject):
         self._busy, self._stream = False, None
         from aipc.skills import catalog
 
-        if reply.tool_call == catalog.ASK_CLOUD and not reply.reason and self._cloud is not None:
-            self._ask_cloud()
-            return
+        if self._cloud is not None and not reply.reason and not getattr(reply, "cloud", False):
+            from aipc.cloud.ask import local_gave_up
+
+            # AI ในเครื่องเลือกส่งต่อเอง หรือตอบว่าไม่รู้ = ถามพี่ใหญ่ (การ์ด 0016)
+            if reply.tool_call == catalog.ASK_CLOUD or (
+                not reply.tool_call and local_gave_up(reply.text)
+            ):
+                self._ask_cloud()
+                return
         if reply.tool_call and not reply.reason:
             # AI เลือกสกิล: เอาข้อความของผู้ใช้ออกจากบทสนทนา (ทางของสกิลจะส่งข้อความนี้เองอีกครั้ง) · ไม่บันทึก
             text = self._conv["messages"].pop()["content"]

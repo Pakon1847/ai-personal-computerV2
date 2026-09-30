@@ -96,6 +96,29 @@ class JudgeTest(unittest.TestCase):
         self.assertTrue(all(s["checks"].values()))
 
 
+class FallbackTest(unittest.TestCase):
+    """AI ในเครื่องตอบว่าไม่รู้ = ส่งต่อ Claude (การ์ด 0016 · เพิ่ม 2026-09-30 บ่าย)."""
+
+    def test_gave_up_detection(self):
+        for t in ("ไม่รู้", "ขออภัย ผมไม่มีข้อมูลสดเรื่องนี้", "ไม่ทราบครับ"):
+            self.assertTrue(ask.local_gave_up(t), t)
+        for t in ("", "น้ำเดือดที่ 100 องศา", "ไม่สามารถช่วยได้ เพราะผิดกฎหมาย",
+                  "ไม่รู้ " + "ยาว" * 100):  # fmt: skip
+            self.assertFalse(ask.local_gave_up(t), t)
+
+    def test_exam_escalates_only_with_fallback(self):
+        def cloud(q):
+            return ask.CloudReply(True, "1 ดอลลาร์ ≈ 36 บาท (อ้างอิง ธปท.)", seconds=10.0)
+
+        it = ITEMS["B04"]
+        plain = exam.run_item(it, SKILLS, "s", [], local_says("ไม่รู้"), cloud, PH)
+        self.assertEqual(plain["by"], "local")
+        fb = exam.run_item(it, SKILLS, "s", [], local_says("ไม่รู้"), cloud, PH, fallback=True)
+        self.assertEqual(
+            (fb["by"], fb["escalated_by"], fb["local_text"]), ("cloud", "fallback", "ไม่รู้")
+        )
+
+
 class CloudTest(unittest.TestCase):
     def test_only_websearch_and_question_with_short_context(self):
         seen = {}

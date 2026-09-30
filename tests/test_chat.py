@@ -55,7 +55,7 @@ class FakeLlama(BaseHTTPRequestHandler):
                 )
             self.wfile.write(b"data: [DONE]\n\n")
             return
-        tokens = ["สวัส", "ดี", "ครับ"] if self.mode != "slow" else ["ช้า"] * 40
+        tokens = {"slow": ["ช้า"] * 40, "dunno": ["ไม่", "รู้"]}.get(self.mode, ["สวัส", "ดี", "ครับ"])
         for i, tok in enumerate(tokens):
             chunk = {"choices": [{"delta": {"content": tok}}]}
             self.wfile.write(b"data: " + json.dumps(chunk, ensure_ascii=False).encode() + b"\n\n")
@@ -314,6 +314,29 @@ class ControllerTest(ServerCase):
         real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1][-1]
         self.assertEqual(real["tools"][0]["function"]["name"], catalog.ASK_CLOUD)
         self.assertIn("ask-cloud", real["messages"][0]["content"])
+
+    def test_local_dont_know_goes_to_claude(self):
+        from aipc.cloud.ask import CloudReply
+
+        FakeLlama.mode = "dunno"
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           cloud=lambda q, h: CloudReply(True, "ข่าวเด่นวันนี้ …"))  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        done = []
+        c.finished.connect(lambda text, note: done.append((text, note)))
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: done)
+        self.assertEqual(done[0], ("ข่าวเด่นวันนี้ …", c.CLOUD_NOTE))
+
+    def test_local_dont_know_stays_without_cloud(self):
+        FakeLlama.mode = "dunno"
+        c, done, _ = self.make()
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: done)
+        self.assertEqual(done[0][0], "ไม่รู้")
 
     def test_hybrid_offline_is_told(self):
         from aipc.cloud.ask import CloudReply
