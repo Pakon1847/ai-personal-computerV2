@@ -909,11 +909,16 @@ class SkillsController(QObject):
         }  # fmt: skip
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
-    def tool_catalog(self) -> list:
+    def tool_catalog(self, text: str = "") -> list:
         """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog."""
-        from aipc.skills import catalog
+        from aipc.skills import catalog, retrieval
 
-        return catalog.tools(self._skills, self.available(), forge=self.canForge)
+        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง (ส่วนต้นคงที่ แคชใช้ได้) · สกิลของผู้ใช้เกิน 5 ตัว = ส่งเฉพาะที่ใกล้ข้อความ
+        user = [s for s in self._skills if self._is_user(s.id)]
+        base = [s for s in self._skills if not self._is_user(s.id)]
+        return catalog.tools(
+            base + retrieval.pick(user, text), self.available(), forge=self.canForge
+        )
 
     # ---------- สกิลอัตโนมัติ (การ์ด 0017) ----------
     @Property(bool, constant=True)
@@ -1354,12 +1359,17 @@ class ChatController(QObject):
                                      model=self._model_name, forge=self._forge)  # fmt: skip
         return base + (self.TOOLS_HINT if tools else "")
 
-    def _all_tools(self) -> list:
-        """ask-cloud (ถ้ามี Claude) ไว้หน้าสุด + สกิล · ลำดับคงที่ แคชจึงใช้ได้."""
+    def _all_tools(self, text: str = "") -> list:
+        """ask-cloud (ถ้ามี Claude) ไว้หน้าสุด + สกิล · ลำดับคงที่ แคชจึงใช้ได้
+        · text = ข้อความที่ใช้เลือกสกิล (0018)."""
         from aipc.skills import catalog
 
         cloud = catalog.tools([], set(), cloud=True) if self._cloud is not None else []
-        return cloud + list(self._tools())
+        try:
+            skills = self._tools(text)
+        except TypeError:  # ตัวให้รายการแบบเก่าที่ไม่รับข้อความ
+            skills = self._tools()
+        return cloud + list(skills)
 
     def _warm_up(self) -> None:
         """AI เพิ่งพร้อม (login ใหม่ / AI เริ่มใหม่) → อ่านรายการสกิลไว้ในแคชทันที ข้อความแรกไม่ต้องรอ ~1 นาที.
@@ -1387,7 +1397,7 @@ class ChatController(QObject):
 
         self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
-        tools = self._all_tools() if (use_tools and not prompt) else []
+        tools = self._all_tools(text) if (use_tools and not prompt) else []
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:

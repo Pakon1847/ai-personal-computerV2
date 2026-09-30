@@ -1,6 +1,6 @@
 # การ์ดออกแบบ 0018: ส่งให้ AI เฉพาะสกิลของผู้ใช้ที่เกี่ยวข้อง (top-k)
 
-- **สถานะ:** ร่าง · รออนุมัติ (ผู้ช่วยเสนอ 2026-10-01 · ยังไม่ได้เขียนโค้ดในแอป มีแค่ตัวลอง `aipc.spikes.skill_retrieval`)
+- **สถานะ:** อนุมัติ (Pakon 2026-10-01 "ทุกฟีเจอร์ดี ทำได้เลย") · สร้างแล้ว (`aipc.skills.retrieval` · SkillsController.tool_catalog) · รอวัดตามข้อ 4
 - **ข้อกำหนดที่อ้าง:** การ์ด 0017 (สกิลอัตโนมัติทำให้จำนวนสกิลโตไม่จำกัด) · การ์ด 0013 (แชท · ctx 4,096)
 - **งานวิจัยที่ใช้อ้าง (ตรวจที่ arXiv แล้ว):** Gan & Sun, *RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via
   Retrieval-Augmented Generation*, 2025 (arXiv:2505.03275) · Moon et al., *Efficient and Scalable Estimation of Tool
