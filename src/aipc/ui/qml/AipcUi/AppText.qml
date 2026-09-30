@@ -17,4 +17,7 @@ Text {
     // ดีกว่าปล่อยให้ข้อความล้นออกนอกกล่อง · บน Pi ที่มี libthai จะตัดตามคำไทยได้ถูก
     wrapMode: oneLine ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
     verticalAlignment: Text.AlignVCenter
+    // ข้อความธรรมดาเสมอ: ค่าเริ่มต้นของ Text (AutoText) เดาเป็น HTML ได้ · ข้อความจาก AI / Claude / สกิลที่นำเข้า
+    // ต้องไม่ถูกตีความเป็นแท็ก (แท็กรูปจะทำให้ Qt ไปดึงรูปจากเว็บ = ข้อมูลรั่ว T6) · ไม่มีหน้าไหนตั้งใจใช้ rich text
+    textFormat: Text.PlainText
 }
