@@ -1,0 +1,191 @@
+{
+ "label": "typhoon25-4b-hybrid-fb",
+ "model": "Typhoon2.5-Qwen3-4B",
+ "cloud": true,
+ "fallback": true,
+ "date": "2026-09-30T15:17",
+ "system_chars": 1383,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "ท้องฟ้าเป็นสีฟ้าเพราะก๊าซในบรรยากาศดูดกลืนแสงสีแดงและสีส้มจากแสงอาทิตย์ แล้วสะท้อนแสงสีฟ้ากลับมาที่ตาเรา",
+   "ttft": 138.91,
+   "seconds": 156.14,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1789,
+    "prompt_ms": 138817.766,
+    "prompt_per_token_ms": 77.59517384013415,
+    "prompt_per_second": 12.887399441365451,
+    "predicted_n": 57,
+    "predicted_ms": 17220.296,
+    "predicted_per_token_ms": 307.50528571428566,
+    "predicted_per_second": 3.251976621075503
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "น้ำเดือดที่ระดับน้ำทะเลอุณหภูมิ 100 องศาเซลเซียส",
+   "ttft": 3.24,
+   "seconds": 13.0,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 35,
+    "prompt_ms": 3194.073,
+    "prompt_per_token_ms": 91.25922857142857,
+    "prompt_per_second": 10.957795892579789,
+    "predicted_n": 33,
+    "predicted_ms": 9759.53,
+    "predicted_per_token_ms": 304.9853125,
+    "predicted_per_second": 3.278846419858333
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมีทั้งหมด 76 จังหวัด",
+   "ttft": 1.4,
+   "seconds": 6.19,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 14,
+    "prompt_ms": 1331.613,
+    "prompt_per_token_ms": 95.11521428571429,
+    "prompt_per_second": 10.513565127405634,
+    "predicted_n": 17,
+    "predicted_ms": 4813.676,
+    "predicted_per_token_ms": 300.85475,
+    "predicted_per_second": 3.3238630934030455
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "หลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์คิดค้นโดยจอห์น แธนส์ (John Danforth) และจอห์น คิงส์ลีย์ (John Kingsley) ในช่วงปลายศตวรรษที่ 19 แต่ความเป็นจริงแล้วคือจอห์น แธนส์คือผู้คิดค้นหลอดไฟแบบแอลอีดี (Edison's electric lamp) ที่ใช้งานได้จริงและเปิดตัวในปี ค.ศ. 1879",
+   "ttft": 3.13,
+   "seconds": 48.34,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 34,
+    "prompt_ms": 3073.565,
+    "prompt_per_token_ms": 90.3989705882353,
+    "prompt_per_second": 11.062072869778254,
+    "predicted_n": 149,
+    "predicted_ms": 45194.338,
+    "predicted_per_token_ms": 305.36714864864865,
+    "predicted_per_second": 3.2747464958995525
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "น้ำมีสูตรเคมีคือ H₂O",
+   "ttft": 1.68,
+   "seconds": 6.24,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 17,
+    "prompt_ms": 1622.82,
+    "prompt_per_token_ms": 95.46,
+    "prompt_per_second": 10.47559187094071,
+    "predicted_n": 16,
+    "predicted_ms": 4556.134,
+    "predicted_per_token_ms": 303.7422666666667,
+    "predicted_per_second": 3.292264889487447
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดาวพฤหัสบดี",
+   "ttft": 2.75,
+   "seconds": 11.63,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 29,
+    "prompt_ms": 2697.226,
+    "prompt_per_token_ms": 93.00779310344828,
+    "prompt_per_second": 10.751787206559628,
+    "predicted_n": 30,
+    "predicted_ms": 8880.426,
+    "predicted_per_token_ms": 306.2215862068965,
+    "predicted_per_second": 3.2656091047884415
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 6,
+  "auto_ok": 5,
+  "to_check": 1,
+  "cloud": 0,
+  "ttft_median": 3.13,
+  "seconds_total": 241.5,
+  "by_cat": {
+   "A": {
+    "n": 6,
+    "ok": 5,
+    "check": 1,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}
