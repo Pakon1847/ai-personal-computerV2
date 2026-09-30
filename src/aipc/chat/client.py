@@ -21,6 +21,7 @@ from urllib.parse import urlparse
 
 # temperature/top_p ค่าเดียวกับตอนวัดคุณภาพ (ADR-007) · enable_thinking False: Qwen3 แบบคิดได้ (เช่น 8B)
 # ไม่คิดยาวก่อนตอบ · โมเดลที่ไม่มีโหมดนี้ไม่สนค่านี้
+# Gemma 4 E2B (โมเดลในแอปตั้งแต่ 2026-09-30) ขาดค่านี้ = คิดจนหมด max_tokens แล้ว content ว่าง (ลองบน Pi 5)
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "chat_template_kwargs": {"enable_thinking": False}}
 MAX_TOKENS = 512
 

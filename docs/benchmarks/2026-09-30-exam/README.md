@@ -38,3 +38,10 @@ Pi ร้อน 80–86°C ถูกลดความเร็วตลอด�
 - วัดผ่าน `claude` บน Windows (Pi ยังไม่ได้ติดตั้ง Claude Code)
 
 คะแนนจากคน: หน้าให้คะแนนแบบปิดชื่อระบบ (`rating_seed.py` · ระบบ ก–ง = typhoon, typhoon-hybrid, qwen3-4b, gemma)
+
+## ติดตั้งแล้ว (Pakon เลือก 2026-09-30 16:3x)
+
+- `install-llm.sh --apply --model gemma-4-E2B-it-Q4_K_M.gguf --threads 3` · sha256 `740185b2…34b8` · template ในไฟล์ GGUF (`supports_tools: true`)
+- `/etc/aipc/llm.conf` → Gemma · Typhoon ยังอยู่ใน `/opt/aipc-models` (ย้อนกลับ = รัน install-llm.sh ด้วยไฟล์ Typhoon)
+- รีสตาร์ต AI ของ pakon1 · พร้อมใน 44 วิ · RAM ที่ยังว่าง 6.0 GB · 6.5 tok/s
+- ต้องส่ง `enable_thinking: false` (แอปส่งอยู่แล้วทุกคำขอ) · ไม่ส่ง = คิดจนหมด token แล้วคำตอบว่าง
