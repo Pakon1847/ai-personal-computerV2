@@ -214,8 +214,11 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
     p = Proposal(False, request, claude_version=claude_version)
     fix: list[str] = []
     previous = ""
+    revise_id = ""
     if revise is not None:
         previous = revise[0]
+        old, _ = _validate(previous)
+        revise_id = old.id if old is not None else ""
         fix = [f"ผู้ใช้ใช้สกิลนี้แล้วบอกว่าไม่ถูก: “{' '.join(revise[1].split())[:300]}” · "
                "แก้ให้ตรงกับที่ผู้ใช้ต้องการ · ใช้ id เดิม"]  # fmt: skip
     ids = {s.id for s in skills}
@@ -235,6 +238,10 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
             continue
         previous = data["skill_md"]
         new, errors = _validate(previous)
+        if new is not None and revise_id and new.id != revise_id:
+            # รุ่นแก้ต้องเป็นสกิลเดิม: Claude ตั้ง id ใหม่เอง (พบบน Pi 5 · work-mode → open-terminal-help) → ใช้ id เดิม
+            previous = re.sub(r"(?m)^id:\s*\S+", f"id: {revise_id}", previous, count=1)
+            new, errors = _validate(previous)
         if new is not None and new.id in ids:
             new, errors = None, [f"id {new.id} ซ้ำกับสกิลที่มีอยู่"]
         if new is None:

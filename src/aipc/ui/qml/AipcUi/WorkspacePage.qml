@@ -42,7 +42,7 @@ Item {
         if (text === "" || chat.busy) return
         push({ user: true, text: text })
         input.text = ""
-        if (feedbackFor !== null) {
+        if (feedbackFor) {
             const id = feedbackFor.id
             feedbackFor = null
             showCard(skills.reviseSkill(id, text, ""))
@@ -461,7 +461,7 @@ Item {
                 TextArea {
                     id: input
                     objectName: "chatInput"
-                    placeholderText: root.feedbackFor !== null
+                    placeholderText: !!root.feedbackFor
                                      ? "บอกว่าสกิล “" + root.feedbackFor.name + "” ผิดตรงไหน เช่น ให้เปิด Gmail แทน · Esc = ยกเลิก"
                                      : "พิมพ์ข้อความถึงผู้ช่วย AI"
                     placeholderTextColor: Theme.inkFaint
@@ -478,7 +478,7 @@ Item {
                         if (enter && !(event.modifiers & Qt.ShiftModifier) && !input.inputMethodComposing) {
                             event.accepted = true
                             root.send()
-                        } else if (event.key === Qt.Key_Escape && root.feedbackFor !== null) {
+                        } else if (event.key === Qt.Key_Escape && !!root.feedbackFor) {
                             event.accepted = true
                             root.feedbackFor = null
                         } else if (event.key === Qt.Key_Escape && chat.busy) {
@@ -494,6 +494,34 @@ Item {
                 enabled: chat.busy || input.text.trim() !== ""
                 onClicked: chat.busy ? chat.stop() : root.send()
             }
+        }
+    }
+    // โหมดบอกว่าสกิลผิด (การ์ด 0017): เดิมบอกแค่ใน placeholder · ผู้ใช้บน Pi 5 พิมพ์คำสั่งปกติ ("เปิดเทอร์มินัล")
+    // แล้วถูกส่งไปเป็นคำติสกิล → แถบเห็นชัดเหนือช่องพิมพ์ + ปุ่มยกเลิก
+    Rectangle {
+        objectName: "feedbackBanner"
+        parent: composer.parent
+        visible: !!root.feedbackFor
+        x: composer.x
+        width: composer.width
+        y: composer.y - height - 8   // ไม่ใช้ anchors: composer ย้ายพ่อได้ (หน้าแรก/แชท)
+        height: fbRow.implicitHeight + 16
+        radius: Theme.radiusLarge
+        color: Theme.warnSoft
+        RowLayout {
+            id: fbRow
+            anchors.fill: parent
+            anchors.leftMargin: 14
+            anchors.rightMargin: 8
+            spacing: 8
+            AppText {
+                Layout.fillWidth: true
+                text: !!root.feedbackFor
+                      ? "ข้อความถัดไปจะส่งให้ Claude แก้สกิล “" + root.feedbackFor.name + "” · บอกว่าผิดตรงไหน"
+                      : ""
+                size: Theme.fontSmall; color: Theme.warnInk
+            }
+            AppButton { text: "ยกเลิก"; kind: "ghost"; onClicked: root.feedbackFor = null }
         }
     }
     AppText {

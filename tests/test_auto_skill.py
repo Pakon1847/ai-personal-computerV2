@@ -154,6 +154,20 @@ class ForgeReviseTest(unittest.TestCase):
         self.assertIn("เฉพาะเว็บในรายการ", prompts[1])  # เหตุที่ประตูไม่ยอมถูกส่งกลับให้ Claude แก้
 
 
+class ReviseKeepsIdTest(unittest.TestCase):
+    def test_new_id_from_claude_is_replaced_with_the_original(self):
+        # พบบน Pi 5: แก้ work-mode แล้ว Claude ตั้งชื่อใหม่ open-terminal-help → ประตูไม่ยอม "รุ่นแก้ต้องใช้ id เดิม"
+        renamed = GOOD.replace("id: meeting-mode", "id: open-terminal-help")
+
+        def runner(args, prompt, cwd, timeout):
+            return 0, json.dumps({"result": json.dumps({"skill_md": renamed}), "total_cost_usd": 0.01}), ""
+
+        builtin = manifest.load_builtin()
+        p = forge.forge("โหมดประชุม", skills=builtin, runner=runner, revise=(GOOD, "ผิด"),
+                        check=lambda md: userskills.gate(md, builtin, "meeting-mode")[1])  # fmt: skip
+        self.assertEqual((p.skill_id, p.errors), ("meeting-mode", []))
+
+
 def pump(until, timeout=5.0):
     end = time.monotonic() + timeout
     while not until() and time.monotonic() < end:

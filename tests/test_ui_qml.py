@@ -354,6 +354,11 @@ class ShellCardTest(unittest.TestCase):
         page.setProperty("feedbackFor", {"id": "work-mode", "name": "โหมดทำงาน"})
         settle(50)
         self.assertIn("โหมดทำงาน", find_all(win, "chatInput")[0].property("placeholderText"))
+        banner = find_items(win, "feedbackBanner") or find_all(win, "feedbackBanner")
+        self.assertTrue(banner and banner[0].property("visible"), "แถบบอกโหมดแก้สกิลต้องเห็นชัด")
+        page.setProperty("feedbackFor", None)
+        settle(30)
+        self.assertFalse(banner[0].property("visible"))
         self.assertEqual(warnings, [])
 
     def test_next_reminder_card_empty_then_real(self):
