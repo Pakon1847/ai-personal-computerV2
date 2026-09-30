@@ -1,0 +1,2141 @@
+{
+ "server": {
+  "supports_tools": true,
+  "template_chars": 2630,
+  "template_sha256": "64f85b198065d0fba2a81f37e10ed68161ce2c19a754c7100e67e0ca2ee9c326",
+  "model": "models/typhoon2.5-qwen3-4b-q4_k_m.gguf"
+ },
+ "machine_start": {
+  "board": "Raspberry Pi 5 Model B Rev 1.0",
+  "ram_mb": 8058,
+  "temp_c": 68.3,
+  "throttled": 917504,
+  "commit": "2c6b6905694adec1faaf2f7d3ce8cc9a42fb5213",
+  "dirty": false
+ },
+ "criteria": {
+  "valid_min": 0.9,
+  "structure_min": 0.9,
+  "should_hit_min": 0.8,
+  "should_not_false_max": 0.1,
+  "regression_lost_max": 2,
+  "note": "valid = ผ่านตัวตรวจ (mdskill + manifest + id ไม่ซ้ำ) ภายใน 2 รอบ ÷ 10 · structure = ชนิดถูก + ขั้นสั่งเครื่องตรง actions ÷ 10 · should_hit = ประโยค should ที่ตัวเลือกสกิลเลือกสกิลใหม่ ÷ ทั้งหมด (สกิลที่ไม่ผ่านตัวตรวจ = พลาดทุกประโยค) · should_not_false = ประโยค should_not ที่ถูกเลือกไปสกิลใหม่ ÷ ทั้งหมด · regression = ชุดเลือกสกิล 58 ข้อ (tests/data/skill_selection.json) เมื่อเพิ่มสกิลที่ผ่านตัวตรวจทั้งหมดของผู้เขียนนั้น เทียบกับไม่เพิ่ม ข้อที่เคยถูกแล้วผิด ≤ 2 · ผู้เขียนในเครื่อง 'แทน Claude ได้' เมื่อผ่านทุกข้อ · เวลาต่อสกิลรายงานแยก (ไม่ใช่เกณฑ์ผ่าน/ไม่ผ่าน)"
+ },
+ "authors": {
+  "claude": {
+   "author": {
+    "valid": 10,
+    "structure": 10,
+    "n": 10,
+    "seconds_median": 26.07,
+    "seconds_total": 277.4,
+    "cost_usd": 1.0608
+   },
+   "route": {
+    "should_hit": 25,
+    "should_total": 30,
+    "should_not_false": 1,
+    "should_not_total": 30,
+    "rows": [
+     {
+      "id": "s1",
+      "text": "เข้าโหมดดูวิดีโอหน่อย",
+      "want": "new",
+      "got": "video-mode",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s1",
+      "text": "จะดูคลิปแล้ว เตรียมเครื่องให้ที",
+      "want": "new",
+      "got": "video-mode",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s1",
+      "text": "ขอโหมดดูวิดีโอ",
+      "want": "new",
+      "got": "video-mode",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s1",
+      "text": "วิดีโอความละเอียดสูงกินเน็ตเยอะไหม",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s1",
+      "text": "ช่วยแนะนำช่องยูทูบสอนทำอาหารหน่อย",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s1",
+      "text": "ทำไมดูคลิปแล้วเครื่องร้อน",
+      "want": "not-new",
+      "got": "machine-status",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s2",
+      "text": "เข้าโหมดประชุม",
+      "want": "new",
+      "got": "meeting-mode",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s2",
+      "text": "กำลังจะเข้าประชุม เตรียมเครื่องให้หน่อย",
+      "want": "new",
+      "got": "meeting-mode",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s2",
+      "text": "ขอโหมดประชุมที",
+      "want": "new",
+      "got": "meeting-mode",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s2",
+      "text": "ประชุมออนไลน์ให้ดูเป็นมืออาชีพต้องทำยังไง",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s2",
+      "text": "ช่วยเขียนอีเมลเชิญประชุมทีมให้หน่อย",
+      "want": "not-new",
+      "got": "letter-writer",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s2",
+      "text": "สรุปประชุมนี้ให้หน่อย: ทีมตกลงเลื่อนเปิดตัวสินค้า",
+      "want": "not-new",
+      "got": "summarize-text",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s3",
+      "text": "ขอดูแผนที่หน่อย",
+      "want": "new",
+      "got": "system-command",
+      "ok": false,
+      "valid": true
+     },
+     {
+      "id": "s3",
+      "text": "จะไปเซ็นทรัล ขอดูทางหน่อย",
+      "want": "new",
+      "got": "map-open",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s3",
+      "text": "เปิดแผนที่ให้ที",
+      "want": "new",
+      "got": "system-command",
+      "ok": false,
+      "valid": true
+     },
+     {
+      "id": "s3",
+      "text": "ประเทศไทยมีกี่จังหวัด",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s3",
+      "text": "แผนที่โลกแบบไหนแม่นที่สุด",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s3",
+      "text": "ทำไมจีพีเอสในรถชอบหลงทาง",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s4",
+      "text": "จะทำการบ้านแล้ว เตรียมเครื่องให้หน่อย",
+      "want": "new",
+      "got": "homework-prep",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s4",
+      "text": "เข้าโหมดทำการบ้าน",
+      "want": "new",
+      "got": "homework-prep",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s4",
+      "text": "ขอเตรียมพร้อมทำการบ้าน",
+      "want": "new",
+      "got": "homework-prep",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s4",
+      "text": "การบ้านเยอะเกินไปมีผลเสียกับเด็กไหม",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s4",
+      "text": "ช่วยอธิบายการสังเคราะห์แสงแบบเข้าใจง่าย",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s4",
+      "text": "แปลคำว่า homework เป็นไทย",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s5",
+      "text": "จะจัดไฟล์ในเครื่อง เปิดของที่ต้องใช้ให้หน่อย",
+      "want": "new",
+      "got": "file-organizer",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s5",
+      "text": "เข้าโหมดจัดไฟล์",
+      "want": "new",
+      "got": "system-command",
+      "ok": false,
+      "valid": true
+     },
+     {
+      "id": "s5",
+      "text": "ขอจัดระเบียบไฟล์หน่อย เปิดให้ที",
+      "want": "new",
+      "got": "file-organizer",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s5",
+      "text": "ไฟล์ pdf กับ docx ต่างกันยังไง",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s5",
+      "text": "ทำไมพื้นที่เครื่องเต็มเร็ว",
+      "want": "not-new",
+      "got": "machine-status",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "s5",
+      "text": "ช่วยตั้งชื่อไฟล์รายงานให้เป็นระเบียบหน่อย",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l1",
+      "text": "อธิบายคำว่า curious ให้ลูกฟังหน่อย ลูกเรียน ป.3",
+      "want": "new",
+      "got": "none",
+      "ok": false,
+      "valid": true
+     },
+     {
+      "id": "l1",
+      "text": "คำว่า brave แปลว่าอะไร อธิบายแบบเด็ก ๆ พร้อมตัวอย่าง",
+      "want": "new",
+      "got": "kid-vocab",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l1",
+      "text": "สอนคำว่า enormous ให้เด็กประถมหน่อย",
+      "want": "new",
+      "got": "kid-vocab",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l1",
+      "text": "แปลประโยคนี้เป็นอังกฤษ: วันนี้ฝนตกหนัก",
+      "want": "not-new",
+      "got": "translate",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l1",
+      "text": "เด็กประถมควรนอนวันละกี่ชั่วโมง",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l1",
+      "text": "แนะนำหนังสือนิทานภาษาอังกฤษสำหรับเด็ก",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l2",
+      "text": "ช่วยตรวจคำผิดให้หน่อย: ฉันอยากไปเที่ยวทะเลกับครอบครัวในวันหยุดนักขัตฤกษ์ แต่ลืมจองโรงแรมม",
+      "want": "new",
+      "got": "none",
+      "ok": false,
+      "valid": true
+     },
+     {
+      "id": "l2",
+      "text": "ข้อความนี้สะกดถูกไหม: ผมจะไปสัมภาสน์งานพรุ่งนี้",
+      "want": "new",
+      "got": "thai-spell-check",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l2",
+      "text": "เช็กคำผิดในประโยคนี้ที: เขาเป็นคนมีเสน่ห์และอนุญาติให้ทุกคนเข้าร่วม",
+      "want": "new",
+      "got": "thai-spell-check",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l2",
+      "text": "คำว่า อนุญาต มาจากภาษาอะไร",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l2",
+      "text": "ภาษาไทยมีวรรณยุกต์กี่รูป",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l2",
+      "text": "ช่วยแต่งกลอนสั้น ๆ เรื่องทะเล",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l3",
+      "text": "ในตู้เย็นมีไข่ หมูสับ ผักกาด ทำอะไรกินได้บ้าง",
+      "want": "new",
+      "got": "fridge-menu",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l3",
+      "text": "มีแค่เต้าหู้ ไข่ แครอท คิดเมนูให้หน่อย",
+      "want": "new",
+      "got": "fridge-menu",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l3",
+      "text": "เหลือไก่กับมะเขือเทศ ทำเมนูอะไรดี",
+      "want": "new",
+      "got": "fridge-menu",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l3",
+      "text": "ตู้เย็นเสียงดังผิดปกติเป็นเพราะอะไร",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l3",
+      "text": "ไข่ไก่เก็บในตู้เย็นได้กี่วัน",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l3",
+      "text": "ร้านอาหารแถวนี้มีร้านไหนอร่อย",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l4",
+      "text": "ช่วยแต่งแคปชันขายเสื้อยืดมือสองให้หน่อย",
+      "want": "new",
+      "got": "sales-caption",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l4",
+      "text": "เขียนโพสต์ขายขนมเปี๊ยะทำเองให้น่าซื้อ",
+      "want": "new",
+      "got": "sales-caption",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l4",
+      "text": "คิดคำโฆษณาสั้น ๆ ขายกระเป๋าผ้าลงเฟซบุ๊กให้ที",
+      "want": "new",
+      "got": "sales-caption",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l4",
+      "text": "ขายของออนไลน์ต้องเสียภาษีไหม",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l4",
+      "text": "เฟซบุ๊กกับติ๊กต็อกอันไหนขายของดีกว่า",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l4",
+      "text": "ช่วยเขียนอีเมลตอบลูกค้าที่ถามเรื่องการคืนสินค้า",
+      "want": "not-new",
+      "got": "letter-writer",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l5",
+      "text": "ช่วยทำให้เป็นภาษาทางการหน่อย: พรุ่งนี้ผมไม่ว่างนะครับ ขอเลื่อนไปก่อน",
+      "want": "new",
+      "got": "formal-thai",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l5",
+      "text": "เปลี่ยนประโยคนี้เป็นภาษาทางการ: งานนี้เสร็จแล้วนะ เดี๋ยวส่งให้",
+      "want": "new",
+      "got": "formal-thai",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l5",
+      "text": "ปรับข้อความนี้ให้เป็นภาษาเขียนทางการ: ของที่สั่งมายังไม่ได้เลยอ่ะ",
+      "want": "new",
+      "got": "formal-thai",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l5",
+      "text": "ภาษาทางการกับภาษากึ่งทางการต่างกันยังไง",
+      "want": "not-new",
+      "got": "none",
+      "ok": true,
+      "valid": true
+     },
+     {
+      "id": "l5",
+      "text": "แปลเป็นภาษาอังกฤษแบบทางการ: ขอบคุณสำหรับความช่วยเหลือ",
+      "want": "not-new",
+      "got": "formal-thai",
+      "ok": false,
+      "valid": true
+     },
+     {
+      "id": "l5",
+      "text": "สรุปข้อความนี้ให้หน่อย: บริษัทประกาศวันหยุดพิเศษเพิ่มหนึ่งวัน",
+      "want": "not-new",
+      "got": "summarize-text",
+      "ok": true,
+      "valid": true
+     }
+    ]
+   },
+   "regression": {
+    "added": [
+     "video-mode",
+     "meeting-mode",
+     "map-open",
+     "homework-prep",
+     "file-organizer",
+     "kid-vocab",
+     "thai-spell-check",
+     "fridge-menu",
+     "sales-caption",
+     "formal-thai"
+    ],
+    "correct": 49,
+    "total": 58,
+    "false_calls": 0,
+    "none_total": 18,
+    "rows": [
+     {
+      "text": "สรุปข่าวนี้ให้หน่อย: ครม. อนุมัติงบซ่อมถนน 12 เส้นทางในภาคเหนือ เริ่มเดือนหน้า",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ช่วยย่อความประกาศนี้ให้สั้นลง: ห้องสมุดปิดปรับปรุงสามสัปดาห์ ผู้ยืมหนังสือคืนที่ตู้หน้าอาคาร",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ขอใจความสำคัญของอีเมลนี้: ทีมขอให้ส่งแบบฟอร์มลงทะเบียนและสำเนาบัตรภายในสัปดาห์นี้",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "สรุปเป็นข้อ ๆ ให้ที: บริษัทย้ายสำนักงาน ที่จอดรถลดลง พนักงานต้องลงชื่อเข้างานผ่านแอป",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "อ่านไม่ไหวแล้ว ยาวมาก เล่าสั้น ๆ ทีว่าข้อความนี้พูดเรื่องอะไร: ชุมชนจัดตลาดนัดทุกเสาร์ รายได้เข้ากองทุนโรงเรียน",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ช่วยเก็บประเด็นจากบทความนี้ให้หน่อย: การนอนน้อยทำให้ภูมิคุ้มกันต่ำและสมาธิสั้น",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ขอแบบกระชับที่สุดของเนื้อหานี้: ร้านค้าออนไลน์ต้องแจ้งราคารวมภาษีและค่าส่งก่อนลูกค้ากดสั่ง",
+      "expect": "summarize-text",
+      "got": "formal-thai",
+      "ok": false
+     },
+     {
+      "text": "เนื้อหานี้ต้องการบอกอะไรเรา สั้น ๆ พอ: สภานักเรียนขอให้เพิ่มจุดกดน้ำดื่มในอาคารเรียน",
+      "expect": "summarize-text",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้าให้หน่อย เป็นไข้ขอหยุดสองวัน",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "เขียนจดหมายขอบคุณอาจารย์ที่ช่วยแนะนำโครงงาน",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ร่างจดหมายขอเลื่อนส่งรายงานวิชาฟิสิกส์ถึงอาจารย์ประจำวิชา",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ช่วยเขียนอีเมลถึงฝ่ายบุคคลขอใบรับรองการทำงาน",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "อยากส่งข้อความสุภาพ ๆ ถึงเจ้าของหอว่าแอร์เสีย ช่วยเรียบเรียงให้ที",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย",
+      "expect": "letter-writer",
+      "got": "formal-thai",
+      "ok": false
+     },
+     {
+      "text": "ช่วยเรียบเรียงคำขอโทษลูกค้าที่ส่งของช้า ให้ดูเป็นมืออาชีพ",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "อยากบอกหัวหน้าว่าขอทำงานที่บ้านวันศุกร์นี้ ช่วยเขียนข้อความส่งไปหน่อย",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ขอบคุณที่มาร่วมงานวันนี้",
+      "expect": "translate",
+      "got": "translate",
+      "ok": true
+     },
+     {
+      "text": "translate this to Thai: The meeting has been moved to next week",
+      "expect": "translate",
+      "got": "translate",
+      "ok": true
+     },
+     {
+      "text": "คำว่า resilience ภาษาอังกฤษแปลว่าอะไร",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ประโยค I'm running late, start without me พูดเป็นไทยว่าไง",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "อยากบอกเพื่อนต่างชาติว่ายินดีต้อนรับสู่เชียงใหม่ ต้องพูดยังไง",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ความหมายของ break a leg ในภาษาไทยคืออะไร",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ",
+      "expect": "translate",
+      "got": "formal-thai",
+      "ok": false
+     },
+     {
+      "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "อย่าลืมโทรหาแม่สองทุ่ม",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "พรุ่งนี้เก้าโมงประชุมทีม",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "วันศุกร์หน้าบ่ายสามไปหาหมอฟัน",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "ทำไมเครื่องช้าจัง",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "แรมเหลือเท่าไหร่",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "เครื่องร้อนไปไหม",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "พื้นที่เก็บข้อมูลเหลือเท่าไร",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "คอมหน่วงมาก เปิดอะไรก็รอนาน เป็นอะไร",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "จอกระตุกตลอดเลย ตัวเครื่องมีปัญหาอะไรหรือเปล่า",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "ตอนนี้ระบบทำงานหนักแค่ไหน ปกติดีไหม",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "ลงไฟล์เพิ่มได้อีกไหม กลัวที่เต็ม",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "เปิดยูทูบ",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "ปรับเสียงสี่สิบ",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "เปิดหน้าตั้งค่า",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "ปิดเสียงหน่อย",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "เมืองหลวงของญี่ปุ่นคือที่ไหน",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "เล่ามุกตลกให้ฟังสักเรื่อง",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ต้มไข่ยางมะตูมต้องใช้เวลาเท่าไหร่",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้ห้าชื่อ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ออกกำลังกายแบบไหนเหมาะกับคนทำงานนั่งโต๊ะ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "อธิบายเรื่องภาวะโลกร้อนแบบเข้าใจง่าย",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ปลูกกะเพราในกระถางต้องรดน้ำบ่อยแค่ไหน",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "สวัสดี วันนี้เป็นยังไงบ้าง",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "มีหนังสือพัฒนาตัวเองเล่มไหนน่าอ่านบ้าง",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ถ้าจะเริ่มเรียนเขียนโปรแกรมควรเริ่มจากภาษาอะไร",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "สรุปแล้วโทรศัพท์รุ่นไหนคุ้มกว่ากันระหว่างสองรุ่นที่เพื่อนแนะนำ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "จดหมายรักที่ดังที่สุดในประวัติศาสตร์คือของใคร",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ทำไมคนถึงชอบแปลชื่อหนังฝรั่งเป็นไทยแปลก ๆ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "อาการนอนไม่พอทำให้สมองช้าลงจริงไหม",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ห้องร้อนมาก มีวิธีคลายร้อนแบบไม่เปิดแอร์ไหม",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     }
+    ]
+   },
+   "verdict": {
+    "checks": {
+     "valid": true,
+     "structure": true,
+     "should_hit": true,
+     "should_not_false": true,
+     "regression": false
+    },
+    "pass": false,
+    "regression_lost": [
+     "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย",
+     "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate",
+     "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ"
+    ]
+   }
+  },
+  "typhoon25-4b": {
+   "author": {
+    "valid": 0,
+    "structure": 0,
+    "n": 10,
+    "seconds_median": 810.77,
+    "seconds_total": 7988.5,
+    "cost_usd": 0.0
+   },
+   "route": {
+    "should_hit": 0,
+    "should_total": 30,
+    "should_not_false": 0,
+    "should_not_total": 30,
+    "rows": [
+     {
+      "id": "s1",
+      "text": "เข้าโหมดดูวิดีโอหน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s1",
+      "text": "จะดูคลิปแล้ว เตรียมเครื่องให้ที",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s1",
+      "text": "ขอโหมดดูวิดีโอ",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s1",
+      "text": "วิดีโอความละเอียดสูงกินเน็ตเยอะไหม",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s1",
+      "text": "ช่วยแนะนำช่องยูทูบสอนทำอาหารหน่อย",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s1",
+      "text": "ทำไมดูคลิปแล้วเครื่องร้อน",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s2",
+      "text": "เข้าโหมดประชุม",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s2",
+      "text": "กำลังจะเข้าประชุม เตรียมเครื่องให้หน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s2",
+      "text": "ขอโหมดประชุมที",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s2",
+      "text": "ประชุมออนไลน์ให้ดูเป็นมืออาชีพต้องทำยังไง",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s2",
+      "text": "ช่วยเขียนอีเมลเชิญประชุมทีมให้หน่อย",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s2",
+      "text": "สรุปประชุมนี้ให้หน่อย: ทีมตกลงเลื่อนเปิดตัวสินค้า",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s3",
+      "text": "ขอดูแผนที่หน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s3",
+      "text": "จะไปเซ็นทรัล ขอดูทางหน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s3",
+      "text": "เปิดแผนที่ให้ที",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s3",
+      "text": "ประเทศไทยมีกี่จังหวัด",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s3",
+      "text": "แผนที่โลกแบบไหนแม่นที่สุด",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s3",
+      "text": "ทำไมจีพีเอสในรถชอบหลงทาง",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s4",
+      "text": "จะทำการบ้านแล้ว เตรียมเครื่องให้หน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s4",
+      "text": "เข้าโหมดทำการบ้าน",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s4",
+      "text": "ขอเตรียมพร้อมทำการบ้าน",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s4",
+      "text": "การบ้านเยอะเกินไปมีผลเสียกับเด็กไหม",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s4",
+      "text": "ช่วยอธิบายการสังเคราะห์แสงแบบเข้าใจง่าย",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s4",
+      "text": "แปลคำว่า homework เป็นไทย",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s5",
+      "text": "จะจัดไฟล์ในเครื่อง เปิดของที่ต้องใช้ให้หน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s5",
+      "text": "เข้าโหมดจัดไฟล์",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s5",
+      "text": "ขอจัดระเบียบไฟล์หน่อย เปิดให้ที",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "s5",
+      "text": "ไฟล์ pdf กับ docx ต่างกันยังไง",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s5",
+      "text": "ทำไมพื้นที่เครื่องเต็มเร็ว",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "s5",
+      "text": "ช่วยตั้งชื่อไฟล์รายงานให้เป็นระเบียบหน่อย",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l1",
+      "text": "อธิบายคำว่า curious ให้ลูกฟังหน่อย ลูกเรียน ป.3",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l1",
+      "text": "คำว่า brave แปลว่าอะไร อธิบายแบบเด็ก ๆ พร้อมตัวอย่าง",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l1",
+      "text": "สอนคำว่า enormous ให้เด็กประถมหน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l1",
+      "text": "แปลประโยคนี้เป็นอังกฤษ: วันนี้ฝนตกหนัก",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l1",
+      "text": "เด็กประถมควรนอนวันละกี่ชั่วโมง",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l1",
+      "text": "แนะนำหนังสือนิทานภาษาอังกฤษสำหรับเด็ก",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l2",
+      "text": "ช่วยตรวจคำผิดให้หน่อย: ฉันอยากไปเที่ยวทะเลกับครอบครัวในวันหยุดนักขัตฤกษ์ แต่ลืมจองโรงแรมม",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l2",
+      "text": "ข้อความนี้สะกดถูกไหม: ผมจะไปสัมภาสน์งานพรุ่งนี้",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l2",
+      "text": "เช็กคำผิดในประโยคนี้ที: เขาเป็นคนมีเสน่ห์และอนุญาติให้ทุกคนเข้าร่วม",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l2",
+      "text": "คำว่า อนุญาต มาจากภาษาอะไร",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l2",
+      "text": "ภาษาไทยมีวรรณยุกต์กี่รูป",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l2",
+      "text": "ช่วยแต่งกลอนสั้น ๆ เรื่องทะเล",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l3",
+      "text": "ในตู้เย็นมีไข่ หมูสับ ผักกาด ทำอะไรกินได้บ้าง",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l3",
+      "text": "มีแค่เต้าหู้ ไข่ แครอท คิดเมนูให้หน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l3",
+      "text": "เหลือไก่กับมะเขือเทศ ทำเมนูอะไรดี",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l3",
+      "text": "ตู้เย็นเสียงดังผิดปกติเป็นเพราะอะไร",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l3",
+      "text": "ไข่ไก่เก็บในตู้เย็นได้กี่วัน",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l3",
+      "text": "ร้านอาหารแถวนี้มีร้านไหนอร่อย",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l4",
+      "text": "ช่วยแต่งแคปชันขายเสื้อยืดมือสองให้หน่อย",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l4",
+      "text": "เขียนโพสต์ขายขนมเปี๊ยะทำเองให้น่าซื้อ",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l4",
+      "text": "คิดคำโฆษณาสั้น ๆ ขายกระเป๋าผ้าลงเฟซบุ๊กให้ที",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l4",
+      "text": "ขายของออนไลน์ต้องเสียภาษีไหม",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l4",
+      "text": "เฟซบุ๊กกับติ๊กต็อกอันไหนขายของดีกว่า",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l4",
+      "text": "ช่วยเขียนอีเมลตอบลูกค้าที่ถามเรื่องการคืนสินค้า",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l5",
+      "text": "ช่วยทำให้เป็นภาษาทางการหน่อย: พรุ่งนี้ผมไม่ว่างนะครับ ขอเลื่อนไปก่อน",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l5",
+      "text": "เปลี่ยนประโยคนี้เป็นภาษาทางการ: งานนี้เสร็จแล้วนะ เดี๋ยวส่งให้",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l5",
+      "text": "ปรับข้อความนี้ให้เป็นภาษาเขียนทางการ: ของที่สั่งมายังไม่ได้เลยอ่ะ",
+      "want": "new",
+      "got": "",
+      "ok": false,
+      "valid": false
+     },
+     {
+      "id": "l5",
+      "text": "ภาษาทางการกับภาษากึ่งทางการต่างกันยังไง",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l5",
+      "text": "แปลเป็นภาษาอังกฤษแบบทางการ: ขอบคุณสำหรับความช่วยเหลือ",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     },
+     {
+      "id": "l5",
+      "text": "สรุปข้อความนี้ให้หน่อย: บริษัทประกาศวันหยุดพิเศษเพิ่มหนึ่งวัน",
+      "want": "not-new",
+      "got": "",
+      "ok": true,
+      "valid": false
+     }
+    ]
+   },
+   "regression": {
+    "added": [],
+    "correct": 50,
+    "total": 58,
+    "false_calls": 0,
+    "none_total": 18,
+    "rows": [
+     {
+      "text": "สรุปข่าวนี้ให้หน่อย: ครม. อนุมัติงบซ่อมถนน 12 เส้นทางในภาคเหนือ เริ่มเดือนหน้า",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ช่วยย่อความประกาศนี้ให้สั้นลง: ห้องสมุดปิดปรับปรุงสามสัปดาห์ ผู้ยืมหนังสือคืนที่ตู้หน้าอาคาร",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ขอใจความสำคัญของอีเมลนี้: ทีมขอให้ส่งแบบฟอร์มลงทะเบียนและสำเนาบัตรภายในสัปดาห์นี้",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "สรุปเป็นข้อ ๆ ให้ที: บริษัทย้ายสำนักงาน ที่จอดรถลดลง พนักงานต้องลงชื่อเข้างานผ่านแอป",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "อ่านไม่ไหวแล้ว ยาวมาก เล่าสั้น ๆ ทีว่าข้อความนี้พูดเรื่องอะไร: ชุมชนจัดตลาดนัดทุกเสาร์ รายได้เข้ากองทุนโรงเรียน",
+      "expect": "summarize-text",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยเก็บประเด็นจากบทความนี้ให้หน่อย: การนอนน้อยทำให้ภูมิคุ้มกันต่ำและสมาธิสั้น",
+      "expect": "summarize-text",
+      "got": "summarize-text",
+      "ok": true
+     },
+     {
+      "text": "ขอแบบกระชับที่สุดของเนื้อหานี้: ร้านค้าออนไลน์ต้องแจ้งราคารวมภาษีและค่าส่งก่อนลูกค้ากดสั่ง",
+      "expect": "summarize-text",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "เนื้อหานี้ต้องการบอกอะไรเรา สั้น ๆ พอ: สภานักเรียนขอให้เพิ่มจุดกดน้ำดื่มในอาคารเรียน",
+      "expect": "summarize-text",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้าให้หน่อย เป็นไข้ขอหยุดสองวัน",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "เขียนจดหมายขอบคุณอาจารย์ที่ช่วยแนะนำโครงงาน",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ร่างจดหมายขอเลื่อนส่งรายงานวิชาฟิสิกส์ถึงอาจารย์ประจำวิชา",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ช่วยเขียนอีเมลถึงฝ่ายบุคคลขอใบรับรองการทำงาน",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "อยากส่งข้อความสุภาพ ๆ ถึงเจ้าของหอว่าแอร์เสีย ช่วยเรียบเรียงให้ที",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "ช่วยเรียบเรียงคำขอโทษลูกค้าที่ส่งของช้า ให้ดูเป็นมืออาชีพ",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "อยากบอกหัวหน้าว่าขอทำงานที่บ้านวันศุกร์นี้ ช่วยเขียนข้อความส่งไปหน่อย",
+      "expect": "letter-writer",
+      "got": "letter-writer",
+      "ok": true
+     },
+     {
+      "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ขอบคุณที่มาร่วมงานวันนี้",
+      "expect": "translate",
+      "got": "translate",
+      "ok": true
+     },
+     {
+      "text": "translate this to Thai: The meeting has been moved to next week",
+      "expect": "translate",
+      "got": "translate",
+      "ok": true
+     },
+     {
+      "text": "คำว่า resilience ภาษาอังกฤษแปลว่าอะไร",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ประโยค I'm running late, start without me พูดเป็นไทยว่าไง",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "อยากบอกเพื่อนต่างชาติว่ายินดีต้อนรับสู่เชียงใหม่ ต้องพูดยังไง",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ความหมายของ break a leg ในภาษาไทยคืออะไร",
+      "expect": "translate",
+      "got": "none",
+      "ok": false
+     },
+     {
+      "text": "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ",
+      "expect": "translate",
+      "got": "translate",
+      "ok": true
+     },
+     {
+      "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "อย่าลืมโทรหาแม่สองทุ่ม",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "พรุ่งนี้เก้าโมงประชุมทีม",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "วันศุกร์หน้าบ่ายสามไปหาหมอฟัน",
+      "expect": "reminder",
+      "got": "reminder",
+      "ok": true
+     },
+     {
+      "text": "ทำไมเครื่องช้าจัง",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "แรมเหลือเท่าไหร่",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "เครื่องร้อนไปไหม",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "พื้นที่เก็บข้อมูลเหลือเท่าไร",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "คอมหน่วงมาก เปิดอะไรก็รอนาน เป็นอะไร",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "จอกระตุกตลอดเลย ตัวเครื่องมีปัญหาอะไรหรือเปล่า",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "ตอนนี้ระบบทำงานหนักแค่ไหน ปกติดีไหม",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "ลงไฟล์เพิ่มได้อีกไหม กลัวที่เต็ม",
+      "expect": "machine-status",
+      "got": "machine-status",
+      "ok": true
+     },
+     {
+      "text": "เปิดยูทูบ",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "ปรับเสียงสี่สิบ",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "เปิดหน้าตั้งค่า",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "ปิดเสียงหน่อย",
+      "expect": "system-command",
+      "got": "system-command",
+      "ok": true
+     },
+     {
+      "text": "เมืองหลวงของญี่ปุ่นคือที่ไหน",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "เล่ามุกตลกให้ฟังสักเรื่อง",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ต้มไข่ยางมะตูมต้องใช้เวลาเท่าไหร่",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้ห้าชื่อ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ออกกำลังกายแบบไหนเหมาะกับคนทำงานนั่งโต๊ะ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "อธิบายเรื่องภาวะโลกร้อนแบบเข้าใจง่าย",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ปลูกกะเพราในกระถางต้องรดน้ำบ่อยแค่ไหน",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "สวัสดี วันนี้เป็นยังไงบ้าง",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "มีหนังสือพัฒนาตัวเองเล่มไหนน่าอ่านบ้าง",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ถ้าจะเริ่มเรียนเขียนโปรแกรมควรเริ่มจากภาษาอะไร",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "สรุปแล้วโทรศัพท์รุ่นไหนคุ้มกว่ากันระหว่างสองรุ่นที่เพื่อนแนะนำ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "จดหมายรักที่ดังที่สุดในประวัติศาสตร์คือของใคร",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ทำไมคนถึงชอบแปลชื่อหนังฝรั่งเป็นไทยแปลก ๆ",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "อาการนอนไม่พอทำให้สมองช้าลงจริงไหม",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     },
+     {
+      "text": "ห้องร้อนมาก มีวิธีคลายร้อนแบบไม่เปิดแอร์ไหม",
+      "expect": "none",
+      "got": "none",
+      "ok": true
+     }
+    ]
+   },
+   "verdict": {
+    "checks": {
+     "valid": false,
+     "structure": false,
+     "should_hit": false,
+     "should_not_false": true,
+     "regression": true
+    },
+    "pass": false,
+    "regression_lost": [
+     "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate"
+    ]
+   }
+  }
+ },
+ "baseline": {
+  "added": [],
+  "correct": 51,
+  "total": 58,
+  "false_calls": 0,
+  "none_total": 18,
+  "rows": [
+   {
+    "text": "สรุปข่าวนี้ให้หน่อย: ครม. อนุมัติงบซ่อมถนน 12 เส้นทางในภาคเหนือ เริ่มเดือนหน้า",
+    "expect": "summarize-text",
+    "got": "summarize-text",
+    "ok": true
+   },
+   {
+    "text": "ช่วยย่อความประกาศนี้ให้สั้นลง: ห้องสมุดปิดปรับปรุงสามสัปดาห์ ผู้ยืมหนังสือคืนที่ตู้หน้าอาคาร",
+    "expect": "summarize-text",
+    "got": "summarize-text",
+    "ok": true
+   },
+   {
+    "text": "ขอใจความสำคัญของอีเมลนี้: ทีมขอให้ส่งแบบฟอร์มลงทะเบียนและสำเนาบัตรภายในสัปดาห์นี้",
+    "expect": "summarize-text",
+    "got": "summarize-text",
+    "ok": true
+   },
+   {
+    "text": "สรุปเป็นข้อ ๆ ให้ที: บริษัทย้ายสำนักงาน ที่จอดรถลดลง พนักงานต้องลงชื่อเข้างานผ่านแอป",
+    "expect": "summarize-text",
+    "got": "summarize-text",
+    "ok": true
+   },
+   {
+    "text": "อ่านไม่ไหวแล้ว ยาวมาก เล่าสั้น ๆ ทีว่าข้อความนี้พูดเรื่องอะไร: ชุมชนจัดตลาดนัดทุกเสาร์ รายได้เข้ากองทุนโรงเรียน",
+    "expect": "summarize-text",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "ช่วยเก็บประเด็นจากบทความนี้ให้หน่อย: การนอนน้อยทำให้ภูมิคุ้มกันต่ำและสมาธิสั้น",
+    "expect": "summarize-text",
+    "got": "summarize-text",
+    "ok": true
+   },
+   {
+    "text": "ขอแบบกระชับที่สุดของเนื้อหานี้: ร้านค้าออนไลน์ต้องแจ้งราคารวมภาษีและค่าส่งก่อนลูกค้ากดสั่ง",
+    "expect": "summarize-text",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "เนื้อหานี้ต้องการบอกอะไรเรา สั้น ๆ พอ: สภานักเรียนขอให้เพิ่มจุดกดน้ำดื่มในอาคารเรียน",
+    "expect": "summarize-text",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้าให้หน่อย เป็นไข้ขอหยุดสองวัน",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "เขียนจดหมายขอบคุณอาจารย์ที่ช่วยแนะนำโครงงาน",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "ร่างจดหมายขอเลื่อนส่งรายงานวิชาฟิสิกส์ถึงอาจารย์ประจำวิชา",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "ช่วยเขียนอีเมลถึงฝ่ายบุคคลขอใบรับรองการทำงาน",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "อยากส่งข้อความสุภาพ ๆ ถึงเจ้าของหอว่าแอร์เสีย ช่วยเรียบเรียงให้ที",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "ช่วยเรียบเรียงคำขอโทษลูกค้าที่ส่งของช้า ให้ดูเป็นมืออาชีพ",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "อยากบอกหัวหน้าว่าขอทำงานที่บ้านวันศุกร์นี้ ช่วยเขียนข้อความส่งไปหน่อย",
+    "expect": "letter-writer",
+    "got": "letter-writer",
+    "ok": true
+   },
+   {
+    "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ขอบคุณที่มาร่วมงานวันนี้",
+    "expect": "translate",
+    "got": "translate",
+    "ok": true
+   },
+   {
+    "text": "translate this to Thai: The meeting has been moved to next week",
+    "expect": "translate",
+    "got": "translate",
+    "ok": true
+   },
+   {
+    "text": "คำว่า resilience ภาษาอังกฤษแปลว่าอะไร",
+    "expect": "translate",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate",
+    "expect": "translate",
+    "got": "translate",
+    "ok": true
+   },
+   {
+    "text": "ประโยค I'm running late, start without me พูดเป็นไทยว่าไง",
+    "expect": "translate",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "อยากบอกเพื่อนต่างชาติว่ายินดีต้อนรับสู่เชียงใหม่ ต้องพูดยังไง",
+    "expect": "translate",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "ความหมายของ break a leg ในภาษาไทยคืออะไร",
+    "expect": "translate",
+    "got": "none",
+    "ok": false
+   },
+   {
+    "text": "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ",
+    "expect": "translate",
+    "got": "translate",
+    "ok": true
+   },
+   {
+    "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+    "expect": "reminder",
+    "got": "reminder",
+    "ok": true
+   },
+   {
+    "text": "อย่าลืมโทรหาแม่สองทุ่ม",
+    "expect": "reminder",
+    "got": "reminder",
+    "ok": true
+   },
+   {
+    "text": "พรุ่งนี้เก้าโมงประชุมทีม",
+    "expect": "reminder",
+    "got": "reminder",
+    "ok": true
+   },
+   {
+    "text": "วันศุกร์หน้าบ่ายสามไปหาหมอฟัน",
+    "expect": "reminder",
+    "got": "reminder",
+    "ok": true
+   },
+   {
+    "text": "ทำไมเครื่องช้าจัง",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "แรมเหลือเท่าไหร่",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "เครื่องร้อนไปไหม",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "พื้นที่เก็บข้อมูลเหลือเท่าไร",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "คอมหน่วงมาก เปิดอะไรก็รอนาน เป็นอะไร",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "จอกระตุกตลอดเลย ตัวเครื่องมีปัญหาอะไรหรือเปล่า",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "ตอนนี้ระบบทำงานหนักแค่ไหน ปกติดีไหม",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "ลงไฟล์เพิ่มได้อีกไหม กลัวที่เต็ม",
+    "expect": "machine-status",
+    "got": "machine-status",
+    "ok": true
+   },
+   {
+    "text": "เปิดยูทูบ",
+    "expect": "system-command",
+    "got": "system-command",
+    "ok": true
+   },
+   {
+    "text": "ปรับเสียงสี่สิบ",
+    "expect": "system-command",
+    "got": "system-command",
+    "ok": true
+   },
+   {
+    "text": "เปิดหน้าตั้งค่า",
+    "expect": "system-command",
+    "got": "system-command",
+    "ok": true
+   },
+   {
+    "text": "ปิดเสียงหน่อย",
+    "expect": "system-command",
+    "got": "system-command",
+    "ok": true
+   },
+   {
+    "text": "เมืองหลวงของญี่ปุ่นคือที่ไหน",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "เล่ามุกตลกให้ฟังสักเรื่อง",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ต้มไข่ยางมะตูมต้องใช้เวลาเท่าไหร่",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้ห้าชื่อ",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ออกกำลังกายแบบไหนเหมาะกับคนทำงานนั่งโต๊ะ",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "อธิบายเรื่องภาวะโลกร้อนแบบเข้าใจง่าย",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ปลูกกะเพราในกระถางต้องรดน้ำบ่อยแค่ไหน",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "สวัสดี วันนี้เป็นยังไงบ้าง",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "มีหนังสือพัฒนาตัวเองเล่มไหนน่าอ่านบ้าง",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ถ้าจะเริ่มเรียนเขียนโปรแกรมควรเริ่มจากภาษาอะไร",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "สรุปแล้วโทรศัพท์รุ่นไหนคุ้มกว่ากันระหว่างสองรุ่นที่เพื่อนแนะนำ",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "จดหมายรักที่ดังที่สุดในประวัติศาสตร์คือของใคร",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ทำไมคนถึงชอบแปลชื่อหนังฝรั่งเป็นไทยแปลก ๆ",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "อาการนอนไม่พอทำให้สมองช้าลงจริงไหม",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   },
+   {
+    "text": "ห้องร้อนมาก มีวิธีคลายร้อนแบบไม่เปิดแอร์ไหม",
+    "expect": "none",
+    "got": "none",
+    "ok": true
+   }
+  ]
+ },
+ "seconds": 2113.9,
+ "machine_end": {
+  "board": "Raspberry Pi 5 Model B Rev 1.0",
+  "ram_mb": 8058,
+  "temp_c": 82.6,
+  "throttled": 917512,
+  "commit": "2c6b6905694adec1faaf2f7d3ce8cc9a42fb5213",
+  "dirty": false
+ }
+}
