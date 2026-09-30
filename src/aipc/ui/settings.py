@@ -27,12 +27,13 @@ def default_path() -> Path:
 class UiPrefs:
     theme: str = "light"
     font_scale: float = 1.0
+    onboarded: bool = False  # เห็นหน้าแนะนำการใช้งานครั้งแรกแล้ว (ฟีเจอร์ข้อ 8)
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
         theme = self.theme if self.theme in THEMES else "light"
         scale = self.font_scale if self.font_scale in FONT_SCALES else 1.0
-        return UiPrefs(theme, scale)
+        return UiPrefs(theme, scale, self.onboarded is True)
 
 
 def load(path: Path | None = None) -> UiPrefs:
@@ -40,7 +41,9 @@ def load(path: Path | None = None) -> UiPrefs:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         return UiPrefs(
-            theme=str(data.get("theme", "light")), font_scale=float(data.get("font_scale", 1.0))
+            theme=str(data.get("theme", "light")),
+            font_scale=float(data.get("font_scale", 1.0)),
+            onboarded=data.get("onboarded") is True,
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()

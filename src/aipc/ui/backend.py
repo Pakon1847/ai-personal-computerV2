@@ -48,6 +48,18 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
+    @Property(bool, notify=changed)
+    def onboarded(self) -> bool:
+        return self._prefs.onboarded
+
+    @Slot()
+    def finishOnboarding(self) -> None:  # noqa: N802
+        """ปิดหน้าแนะนำการใช้งานครั้งแรก · จำไว้ในไฟล์ตั้งค่าของผู้ใช้ (ไม่ขึ้นอีก)."""
+        if not self._prefs.onboarded:
+            self._prefs.onboarded = True
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     @Slot(float)
     def setFontScale(self, scale: float) -> None:  # noqa: N802
         if scale in settings.FONT_SCALES and scale != self._prefs.font_scale:

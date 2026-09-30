@@ -229,6 +229,53 @@ Item {
             }
         }
 
+        // แนะนำการใช้งานครั้งแรก (ฟีเจอร์ข้อ 8) · กดตัวอย่าง = ส่งจริง · "เข้าใจแล้ว" = ไม่ขึ้นอีก (จำในไฟล์ตั้งค่า)
+        Card {
+            objectName: "onboarding"
+            visible: !uiSettings.onboarded
+            Layout.fillWidth: true
+            implicitHeight: visible ? obCol.implicitHeight + 32 : 0
+            ColumnLayout {
+                id: obCol
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 16
+                spacing: 10
+                AppText { text: "ยินดีต้อนรับ · ลองพิมพ์แบบนี้ได้เลย"; strong: true; Layout.fillWidth: true }
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 8
+                    Repeater {
+                        model: [
+                            "วันนี้ต้องทำอะไรบ้าง",
+                            "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+                            "ทำไมเครื่องช้า",
+                            "สรุปข้อความนี้ให้หน่อย: ",
+                        ].concat(skills.canForge ? ["เปิดโหมดทำงานให้หน่อย"] : [])
+                        AppButton {
+                            required property string modelData
+                            kind: "secondary"; iconPath: Icons.sparkle
+                            text: "“" + modelData.replace(/: $/, "") + "”"
+                            onClicked: modelData.endsWith(": ") ? (input.text = modelData, input.forceActiveFocus())
+                                                                : root.sendText(modelData)
+                        }
+                    }
+                }
+                AppText {
+                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                    text: "แชท นัด และไฟล์เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · คำสั่งเครื่องกับคำถามทั่วไป AI ในเครื่องทำเอง"
+                          + (skills.canForge ? " · ข้อมูลสด (อากาศ ข่าว) และงานใหม่ที่ยังไม่มีสกิล จะส่งเฉพาะประโยคนั้นให้ Claude" : "")
+                          + " · ตั้งเข้าเครื่องด้วยใบหน้าได้ที่หน้าตั้งค่า"
+                }
+                AppButton {
+                    objectName: "onboardingDone"
+                    text: "เข้าใจแล้ว"
+                    onClicked: uiSettings.finishOnboarding()
+                }
+            }
+        }
+
         // ที่ว่างให้ช่องพิมพ์วางทับ (ช่องพิมพ์ตัวจริงอยู่ข้างล่าง ตำแหน่งผูกกับ Item นี้)
         Item { id: composerSlot; Layout.fillWidth: true; Layout.preferredHeight: composer.height + hint.height + 6 }
 

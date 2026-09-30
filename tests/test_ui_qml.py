@@ -396,6 +396,20 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(skills.userSkills, [])
         self.assertEqual(warnings, [])
 
+    def test_onboarding_shows_once(self):
+        """ฟีเจอร์ข้อ 8: หน้าแนะนำขึ้นครั้งแรก · กด "เข้าใจแล้ว" = จำในไฟล์ตั้งค่า ไม่ขึ้นอีก."""
+        from aipc.ui import settings
+
+        engine, win, warnings = self.open_shell()
+        ui = engine.rootContext().contextProperty("uiSettings")
+        card = find_items(win, "onboarding")[0]
+        self.assertTrue(card.property("visible"))
+        ui.finishOnboarding()
+        settle(50)
+        self.assertFalse(card.property("visible"))
+        self.assertTrue(settings.load(ui._path).onboarded)
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")
