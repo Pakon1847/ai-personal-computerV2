@@ -80,5 +80,55 @@ ColumnLayout {
         }
     }
 
+    // Claude (ไฮบริด + สกิลอัตโนมัติ): ใช้ไปเท่าไรวันนี้ + เพดานต่อวัน · ครบแล้วไม่เรียก Claude จนวันใหม่
+    Card {
+        objectName: "cloudUsageCard"
+        Layout.fillWidth: true
+        implicitHeight: cloudCol.implicitHeight + 40
+        ColumnLayout {
+            id: cloudCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 16
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+                    AppText { text: "Claude (ถามข้อมูลสด · สร้างสกิล)"; strong: true }
+                    AppText {
+                        objectName: "cloudUsageText"
+                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        text: !cloudUsage.available
+                              ? "บัญชีนี้ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude Code · ใช้ได้แค่ AI ในเครื่อง"
+                              : "วันนี้ใช้ไป $" + cloudUsage.spentToday.toFixed(2) + " จากเพดาน $" + cloudUsage.limit.toFixed(2)
+                                + " · " + cloudUsage.callsToday + " ครั้ง · ราคาอ้างอิงที่ Claude รายงาน"
+                    }
+                }
+                Chip {
+                    visible: cloudUsage.available
+                    text: cloudUsage.spentToday >= cloudUsage.limit ? "ครบเพดานวันนี้" : "ใช้ได้"
+                    kind: cloudUsage.spentToday >= cloudUsage.limit ? "warn" : "ok"
+                    dot: true
+                }
+            }
+            RowLayout {
+                visible: cloudUsage.available
+                spacing: 8
+                AppText { text: "เพดานต่อวัน"; size: Theme.fontSmall; color: Theme.inkMuted }
+                Repeater {
+                    model: cloudUsage.limits
+                    AppButton {
+                        required property real modelData
+                        text: "$" + modelData.toFixed(2)
+                        kind: cloudUsage.limit === modelData ? "primary" : "secondary"
+                        onClicked: cloudUsage.setLimit(modelData)
+                    }
+                }
+            }
+        }
+    }
+
     Item { Layout.fillHeight: true }
 }

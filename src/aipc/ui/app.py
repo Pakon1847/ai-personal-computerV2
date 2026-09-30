@@ -14,6 +14,7 @@ from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
 from aipc.ui.backend import (
     ChatController,
+    CloudUsage,
     FilesBrowser,
     LoginController,
     SessionController,
@@ -57,8 +58,11 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
-def _cloud_client():
-    """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0."""
+def _cloud_client(budget=None):
+    """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0.
+
+    budget (aipc.cloud.budget.Budget): ครบเพดานต่อวัน = ไม่เรียก Claude บอกผู้ใช้ตรง ๆ
+    """
     import os
 
     from aipc.cloud import ask
@@ -66,10 +70,18 @@ def _cloud_client():
     if os.environ.get("AIPC_CLOUD", "1") == "0" or ask.find_claude() is None:
         return None
 
-    return lambda question, history: ask.ask(question, history)
+    def run(question, history):
+        if budget is not None and not budget.allow():
+            return ask.CloudReply(False, error=budget.blocked_message())
+        r = ask.ask(question, history)
+        if budget is not None:
+            budget.record(r.cost_usd, "ask")
+        return r
+
+    return run
 
 
-def _skill_forge():
+def _skill_forge(budget=None):
     """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้.
 
     ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0
@@ -84,8 +96,13 @@ def _skill_forge():
     from aipc.skills import forge
 
     def run(request, **kw):  # เธรดแยก · อ่านรุ่นของ claude ตอนใช้ (ไม่ให้เปิดแอปช้าลง)
+        if budget is not None and not budget.allow():
+            return forge.Proposal(False, request, errors=[budget.blocked_message()])
         version = forge.run_process([exe, "--version"], "", ".", 30)[1].strip()
-        return forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
+        p = forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
+        if budget is not None:
+            budget.record(p.cost_usd, "skill")
+        return p
 
     return run
 
@@ -149,14 +166,19 @@ def build(opts: Options, argv: list[str] | None = None):
         return holder["skills"].tool_catalog() if "skills" in holder else []
 
     in_session = not opts.greeter_session
-    skill_forge = _skill_forge() if in_session else None
+    budget = None
+    if in_session:
+        from aipc.cloud.budget import Budget
+
+        budget = Budget()  # เพดานค่าใช้จ่าย Claude ต่อวันของผู้ใช้คนนี้
+    skill_forge = _skill_forge(budget) if in_session else None
     user_skills = None
     if in_session:
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
     chat = ChatController(active=in_session, tools=tools,
-                          cloud=_cloud_client() if in_session else None,
+                          cloud=_cloud_client(budget) if in_session else None,
                           model_name=_local_model_name(),
                           forge=skill_forge is not None)  # fmt: skip
     engine._backends = {
@@ -182,6 +204,7 @@ def build(opts: Options, argv: list[str] | None = None):
             forge=skill_forge, user_skills=user_skills,
         ),
         "chat": chat,
+        "cloudUsage": CloudUsage(budget, available=chat._cloud is not None),
         "session": SessionController(opts.session and not opts.greeter_session),
         # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
         "face": FaceController(active=not opts.greeter_session),

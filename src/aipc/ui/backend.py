@@ -56,6 +56,48 @@ class UiSettings(QObject):
             self.changed.emit()
 
 
+class CloudUsage(QObject):
+    """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget · ไม่มี Claude = available False."""
+
+    changed = Signal()
+
+    def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000):
+        super().__init__()
+        self._b = budget
+        self._available = available and budget is not None
+        self._timer = QTimer(self, interval=poll_ms, timeout=self.changed.emit)  # อ่านซ้ำ: บันทึกจากเธรดอื่น
+        if self._available:
+            self._timer.start()
+
+    @Property(bool, notify=changed)
+    def available(self) -> bool:
+        return self._available
+
+    @Property(float, notify=changed)
+    def spentToday(self) -> float:  # noqa: N802
+        return self._b.spent() if self._b else 0.0
+
+    @Property(int, notify=changed)
+    def callsToday(self) -> int:  # noqa: N802
+        return self._b.calls() if self._b else 0
+
+    @Property(float, notify=changed)
+    def limit(self) -> float:
+        return self._b.limit if self._b else 0.0
+
+    @Property("QVariantList", constant=True)
+    def limits(self) -> list:
+        from aipc.cloud.budget import LIMITS
+
+        return list(LIMITS)
+
+    @Slot(float)
+    def setLimit(self, usd: float) -> None:  # noqa: N802
+        if self._b is not None:
+            self._b.set_limit(usd)
+            self.changed.emit()
+
+
 class SystemStatus(QObject):
     """ค่าจริงจากเครื่องสำหรับแถบสถานะและหน้าสุขภาพเครื่อง.
 
