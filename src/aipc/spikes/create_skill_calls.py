@@ -37,11 +37,14 @@ def evaluate(items: list[dict], ai, skills=None) -> dict:
     for it in items:
         r = router.route_ai_first(it["text"], skills)
         row = {**it}
-        if r.skill is not None:  # กฎ/คำสั่งตรงตัดสินก่อนถึง AI (แอปจริงก็เป็นแบบนี้)
+        if r.kind == "create":  # กฎตั้งโหมด/งานประจำ (router.define_intent) ตัดสินก่อนถึง AI
+            row.update(by="rule", got=catalog.CREATE_SKILL)
+        elif r.skill is not None:  # กฎ/คำสั่งตรงตัดสินก่อนถึง AI (แอปจริงก็เป็นแบบนี้)
             row.update(by="rule", got=r.skill.id)
         else:
             res = ai(it["text"])
-            row.update(by="ai", got=res["tool"] or "none", seconds=res["seconds"], timings=res["timings"])
+            row.update(by="ai", got=res["tool"] or "none", seconds=res["seconds"], timings=res["timings"],
+                       reply=res.get("text", "")[:300])  # fmt: skip
         row["called"] = row["got"] == catalog.CREATE_SKILL
         rows.append(row)
     create = [r for r in rows if r["expect"] == "create"]
@@ -61,12 +64,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--server", required=True)
     ap.add_argument("--model-name", default="gemma-4-E2B-it-Q4_K_M")
     ap.add_argument("--out", type=Path)
+    ap.add_argument("--dataset", type=Path, default=DATASET, help="ชุดพัฒนา: tests/data/create_skill_dev.json")
+    ap.add_argument("--show", action="store_true", help="พิมพ์คำตอบของ AI ข้อที่ไม่เรียกเครื่องมือ (ใช้กับชุดพัฒนา)")
     a = ap.parse_args(argv)
     info = skill_select.server_info(a.server)
     if not info["supports_tools"]:
         print("หยุด: chat template ไม่รับรายการเครื่องมือ", file=sys.stderr)
         return 2
-    data = json.loads(DATASET.read_text(encoding="utf-8"))
+    data = json.loads(a.dataset.read_text(encoding="utf-8"))
+    data.setdefault("criteria", json.loads(DATASET.read_text(encoding="utf-8"))["criteria"])
     system, tools = app_prompt_and_tools(a.model_name)
     skill_select.SYSTEM_PROMPT = system  # ask_ai ใช้ค่านี้
 
@@ -87,6 +93,8 @@ def main(argv: list[str] | None = None) -> int:
     for r in res["rows"]:
         mark = "✓" if r["called"] == (r["expect"] == "create") else "✗"
         print(f"  {mark} {r['id']} {r['by']:4} {r['got']:16} {r['text'][:50]}")
+        if a.show and r.get("reply"):
+            print("      AI: " + " ".join(r["reply"].split())[:160])
     if a.out:
         a.out.parent.mkdir(parents=True, exist_ok=True)
         out = {"label": a.label, "server": info, "summary": line, "system_chars": len(system),

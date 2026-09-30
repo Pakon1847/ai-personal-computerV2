@@ -68,6 +68,7 @@ def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300) -> d
     name = ((calls[0].get("function") or {}).get("name") or "") if calls else ""
     return {
         "tool": name,
+        "text": msg.get("content") or "",
         "seconds": round(time.monotonic() - t0, 2),
         "timings": data.get("timings", {}),
     }

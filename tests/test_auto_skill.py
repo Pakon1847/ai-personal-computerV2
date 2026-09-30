@@ -40,6 +40,30 @@ class GateTest(unittest.TestCase):
         self.assertEqual(userskills._pick("ทำให้เป็นทางการหน่อย", manifest.load_builtin()), "")
 
 
+class DefineIntentTest(unittest.TestCase):
+    """กฎตั้งโหมด/งานประจำ (router.define_intent) · ประโยคจากชุดพัฒนาเท่านั้น (ไม่ใช้ชุดประเมิน)."""
+
+    def test_mode_and_routine_go_to_create(self):
+        from aipc.skills import router
+
+        builtin = manifest.load_builtin()
+        for t in ("เปิดโหมดพักผ่อนหน่อย", "เริ่มโหมดทำการบ้าน", "ต่อไปถ้าบอกว่าเช็กเมล ให้เปิด Gmail กับ Google"):
+            self.assertEqual(router.route_ai_first(t, builtin).kind, "create", t)
+        for t in ("โหมดเครื่องบินในมือถือคืออะไร", "เปิดหน้าสกิล", "ปิดเสียงหน่อย", "สกิลในเครื่องนี้มีอะไรบ้าง"):
+            self.assertNotEqual(router.route_ai_first(t, builtin).kind, "create", t)
+
+    def test_existing_mode_skill_is_used_not_recreated(self):
+        from aipc.skills import router
+
+        store_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(store_dir.cleanup)
+        store = userskills.UserSkills(Path(store_dir.name))
+        builtin = manifest.load_builtin()
+        m = store.install(GOOD, builtin, request="โหมดประชุม")  # คำสำคัญมี "โหมดประชุม"
+        r = router.route_ai_first("เข้าโหมดประชุมให้หน่อย", [*builtin, m])
+        self.assertEqual((r.kind, r.skill.id), ("skill", "meeting-mode"))
+
+
 class StoreTest(unittest.TestCase):
     def setUp(self):
         d = tempfile.TemporaryDirectory()

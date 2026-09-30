@@ -1000,7 +1000,10 @@ class SkillsController(QObject):
         from aipc.skills import router
 
         if self._llm_ready():
-            return self._card(router.route_ai_first(text, self._skills), text)
+            r = router.route_ai_first(text, self._skills)
+            if r.kind == "create":  # ตั้งโหมด/งานประจำที่ยังไม่มีสกิล (การ์ด 0017)
+                return self._start_forge(text) if self.canForge else self._card(router.Route("chat"), text)
+            return self._card(r, text)
         return self._card(router.route(text, self._skills, self.available()), text)
 
     def _card(self, r, text: str) -> dict:

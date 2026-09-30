@@ -35,7 +35,7 @@ QUESTION_WORDS = ("ไหม", "มั้ย", "หรือเปล่า", "�
 
 @dataclass
 class Route:
-    kind: str  # command | skill | needs | chat
+    kind: str  # command | skill | needs | chat | create (ให้ Claude สร้างสกิล · การ์ด 0017)
     skill: Manifest | None = None
     reason: str = ""
     command: command.Command | None = None
@@ -93,7 +93,30 @@ def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
     เรียกสกิลผิด 0/18 · กฎก่อนถูก 41/58 ผิด 7/18 (ประโยคหลอก 6 ข้อกฎตัดสินผิดหมดก่อนถึง AI)
     spikes.skill_select --mode ai-first เรียกฟังก์ชันนี้ตัวเดียวกับแอป
     """
-    return command_route(text, {m.id: m for m in manifests}) or Route("chat")
+    by_id = {m.id: m for m in manifests}
+    if r := command_route(text, by_id):
+        return r
+    if define_intent(text):  # ตั้งโหมด/งานประจำ (การ์ด 0017): มีสกิลที่ตรงแล้ว = ใช้เลย · ยังไม่มี = ให้ Claude สร้าง
+        ranked = sorted(((score(text, m), m) for m in manifests if m.id != "system-command"),
+                        key=lambda x: x[0], reverse=True)  # fmt: skip
+        if ranked and ranked[0][0] > 0:
+            best = ranked[0][1]
+            hits = [k for k in best.keywords if has_keyword(text, k)]
+            return Route("skill", best, "เพราะมีคำว่า " + ", ".join(f"“{k}”" for k in hits[:2]))
+        return Route("create", reason="ขอโหมดหรืองานประจำที่เครื่องยังไม่มี")
+    return Route("chat")
+
+
+# ประโยคตั้งโหมด/งานประจำ = ให้ Claude สร้างสกิล โดยไม่ต้องรอ AI ในเครื่องตัดสิน (การ์ด 0017)
+# ชุดพัฒนา create_skill_dev.json: Gemma 4 E2B ตอบ "ไม่เข้าใจคำสั่งเปิดโหมดพักผ่อน" แทนการเรียก create-skill ·
+# กฎตัดสินแน่นอน เร็ว และอธิบายได้ · คำถาม ("โหมดเครื่องบินคืออะไร") ไม่ขึ้นต้นด้วยคำกริยา จึงไม่เข้าข่าย
+DEFINE_START = re.compile(r"^(ช่วย|ขอ)?(เปิด|เข้า|เริ่ม|ใช้)โหมด")
+DEFINE_ANY = ("ทุกครั้งที่", "ต่อไปถ้า", "ต่อไปเวลา", "จากนี้ถ้า", "จากนี้ไปถ้า", "จากนี้ไปทุกครั้ง")
+
+
+def define_intent(text: str) -> bool:
+    t = re.sub(r"\s+", "", text.strip().lower())
+    return bool(DEFINE_START.match(t)) or any(w in t for w in DEFINE_ANY)
 
 
 def route(text: str, manifests: list[Manifest], available: set[str]) -> Route:

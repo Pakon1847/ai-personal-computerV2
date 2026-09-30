@@ -1,0 +1,33 @@
+{
+  "about": "ชุดพัฒนา (dev) ของการ์ด 0017 · ใช้ปรับกฎ/คำอธิบาย create-skill ได้ · แยกจากชุดประเมิน tests/data/create_skill_calls.json (ห้ามใช้ชุดประเมินปรับ) · ผู้ช่วยเขียน 2026-09-30 หลังวัดชุดประเมินรอบ 1 · ประโยคไม่ซ้ำกับชุดประเมิน",
+  "items": [
+    {"id": "d01", "expect": "create", "style": "explicit", "text": "อยากได้สกิลเปิดข่าวตอนเช้า เปิด Google กับ Gmail"},
+    {"id": "d02", "expect": "create", "style": "explicit", "text": "สร้างสกิลโหมดพักผ่อน ปรับเสียงเป็น 30 แล้วเปิดยูทูบ"},
+    {"id": "d03", "expect": "create", "style": "explicit", "text": "ขอสกิลคิดแคปชันรูปท่องเที่ยวสั้น ๆ"},
+    {"id": "d04", "expect": "create", "style": "explicit", "text": "ทำสกิลช่วยเขียนคำอวยพรปีใหม่ให้ผู้ใหญ่ได้ไหม"},
+    {"id": "d05", "expect": "create", "style": "explicit", "text": "อยากได้คำสั่งประจำชื่อโหมดเรียน เปิดวิกิพีเดียกับปิดเสียง"},
+    {"id": "d06", "expect": "create", "style": "explicit", "text": "สร้างสกิลอธิบายเรื่องยากให้เด็ก ป.4 ฟัง"},
+    {"id": "d07", "expect": "create", "style": "implicit", "text": "เปิดโหมดพักผ่อนหน่อย"},
+    {"id": "d08", "expect": "create", "style": "implicit", "text": "เข้าโหมดเรียนออนไลน์ให้ที"},
+    {"id": "d09", "expect": "create", "style": "implicit", "text": "เริ่มโหมดทำการบ้าน"},
+    {"id": "d10", "expect": "create", "style": "implicit", "text": "ทุกครั้งที่พิมพ์ว่าเลิกงาน ให้ปิดเสียงแล้วเปิดยูทูบนะ"},
+    {"id": "d11", "expect": "create", "style": "implicit", "text": "ต่อไปถ้าบอกว่าเช็กเมล ให้เปิด Gmail กับ Google"},
+    {"id": "d12", "expect": "create", "style": "implicit", "text": "จากนี้ถ้าพิมพ์ว่าฟังเพลง ให้ปรับเสียง 60 แล้วเปิดยูทูบ"},
+    {"id": "d13", "expect": "create", "style": "implicit", "text": "อยากได้ตัวช่วยแต่งคำโฆษณาขายขนม ใช้ทุกวัน"},
+    {"id": "d14", "expect": "create", "style": "implicit", "text": "ช่วยทำตัวตรวจคำผิดภาษาไทยไว้ใช้ประจำ"},
+    {"id": "d15", "expect": "no", "style": "command", "text": "เปิดหน้าสกิล"},
+    {"id": "d16", "expect": "no", "style": "command", "text": "เปิดยูทูบ"},
+    {"id": "d17", "expect": "no", "style": "command", "text": "ปรับเสียงเป็น 40"},
+    {"id": "d18", "expect": "no", "style": "command", "text": "ปิดเสียงหน่อย"},
+    {"id": "d19", "expect": "no", "style": "knowledge", "text": "โหมดเครื่องบินในมือถือคืออะไร"},
+    {"id": "d20", "expect": "no", "style": "knowledge", "text": "สกิลที่ควรมีในการทำงานยุคนี้มีอะไรบ้าง"},
+    {"id": "d21", "expect": "no", "style": "knowledge", "text": "อธิบายการสังเคราะห์แสงสั้น ๆ"},
+    {"id": "d22", "expect": "no", "style": "chat", "text": "วันนี้ทำงานเสร็จแล้ว ดีใจจัง"},
+    {"id": "d23", "expect": "no", "style": "existing", "text": "แปลว่า good luck เป็นไทย"},
+    {"id": "d24", "expect": "no", "style": "existing", "text": "เตือนกินยาตอนสองทุ่ม"},
+    {"id": "d25", "expect": "no", "style": "existing", "text": "ร่างอีเมลขอบคุณลูกค้าให้หน่อย"},
+    {"id": "d26", "expect": "no", "style": "live", "text": "ผลบอลเมื่อคืนเป็นยังไง"},
+    {"id": "d27", "expect": "no", "style": "about", "text": "สกิลในเครื่องนี้มีอะไรบ้าง"},
+    {"id": "d28", "expect": "no", "style": "knowledge", "text": "ช่วยคิดชื่อเล่นให้แมวหน่อย"}
+  ]
+}
