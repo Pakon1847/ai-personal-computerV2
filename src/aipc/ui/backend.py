@@ -266,6 +266,20 @@ class LoginController(QObject):
         """คำแนะนำสดระหว่างสแกน หรือเหตุผลที่สแกนไม่ผ่าน (จาก visiond)."""
         return self._message
 
+    @Property(bool, constant=True)
+    def faceReady(self) -> bool:  # noqa: N802
+        """มี visiond ให้สแกน (หน้า Login จริง) · ใช้แสดงปุ่ม "สแกนหน้า"."""
+        return self._session is not None and self._face is not None
+
+    @Slot()
+    def wake(self) -> None:
+        """หน้า Login เปิดขึ้นมา (ครั้งแรก หรือกลับจากหน้าสมัคร) → สแกนใหม่ถ้ายังไม่ได้สแกนอยู่.
+
+        เดิมสแกนแค่ตอนเริ่มโปรแกรม: สมัคร + ลงทะเบียนหน้าแล้วกลับมา หน้า Login ไม่สแกนอีก (พบบน Pi 5 2026-09-30)
+        """
+        if self.faceReady and not self._demo and self._state in ("unavailable", "unknown"):
+            self.setScanState("scanning")
+
     @Slot(str)
     def setScanState(self, state: str) -> None:  # noqa: N802
         if state not in self.STATES:

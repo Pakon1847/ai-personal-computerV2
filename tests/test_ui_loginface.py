@@ -7,7 +7,7 @@ import unittest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 try:
-    from PySide6.QtCore import QCoreApplication
+    from PySide6.QtGui import QGuiApplication
 
     from aipc.ui.loginface import LoginFaceController
 except ImportError:  # pragma: no cover
@@ -37,7 +37,7 @@ class FakeVisiond:
 class LoginFaceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.app = QCoreApplication.instance() or QCoreApplication([])
+        cls.app = QGuiApplication.instance() or QGuiApplication([])
 
     def settle(self, c):
         end = time.monotonic() + 3

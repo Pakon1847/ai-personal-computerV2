@@ -1,6 +1,7 @@
 """ตัวต่อ greetd (การ์ด 0003 ข้อ 9) · ใช้ greetd ปลอมผ่าน socketpair ไม่ต้องมี greetd จริง."""
 
 import json
+import os
 import socket
 import struct
 import threading
@@ -274,9 +275,11 @@ class FaceScanTest(Base):
     def setUp(self):
         import time
 
-        from PySide6.QtCore import QCoreApplication
+        os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+        from PySide6.QtGui import QGuiApplication
 
-        self.app = QCoreApplication.instance() or QCoreApplication([])
+        # QGuiApplication (ไม่ใช่ QCoreApplication): เทสต์ QML ที่รันต่อจากนี้ต้องใช้แบบ GUI ไม่งั้น segfault
+        self.app = QGuiApplication.instance() or QGuiApplication([])
         self.time = time
 
     def wait(self, cond, secs=3.0):
@@ -330,6 +333,24 @@ class FaceScanTest(Base):
                           ({"ok": False, "state": "unavailable"}, "unavailable")):  # fmt: skip
             c = self.make(res)
             self.assertTrue(self.wait(lambda c=c, want=want: c.scanState == want), res)
+
+    def test_login_screen_rescans_when_shown_again(self):
+        results = [{"ok": False, "state": "no-templates"},
+                   {"ok": True, "state": "found", "user": "namfon"}]  # fmt: skip
+        calls = []
+
+        def face(req, on_progress):
+            calls.append(req)
+            return results[min(len(calls) - 1, 1)]
+
+        c = LoginController(False, None, greeter_session=["labwc"], face=face)
+        c.AUTO_LOGIN_MS = 60_000
+        self.assertTrue(self.wait(lambda: c.scanState == "unavailable"))
+        c.wake()  # กลับจากหน้าสมัครหลังลงทะเบียนใบหน้า
+        self.assertTrue(self.wait(lambda: c.scanState == "found"))
+        self.assertEqual(len(calls), 2)
+        c.wake()  # กำลังจะเข้าระบบอยู่แล้ว = ไม่สแกนซ้ำ
+        self.assertEqual(len(calls), 2)
 
     def test_without_visiond_stays_on_password(self):
         c = LoginController(False, None, greeter_session=["labwc"], face=None)

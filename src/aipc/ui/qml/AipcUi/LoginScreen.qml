@@ -11,6 +11,8 @@ Rectangle {
     id: root
     color: Theme.bg
     readonly property string scan: login.scanState
+    // เปิดหน้านี้ (ครั้งแรก / กลับจากหน้าสมัคร) = สแกนใหม่ · Loader สร้างหน้านี้ใหม่ทุกครั้ง
+    Component.onCompleted: login.wake()
     readonly property bool typing: scan === "manual" || scan === "unavailable"
     property string error: ""
 
@@ -193,9 +195,10 @@ Rectangle {
             AppButton { text: "เข้าสู่ระบบ"; onClicked: root.submit(userField.text, pwField.text) }
         }
         AppButton {
+            objectName: "scanAgain"
             Layout.alignment: Qt.AlignHCenter
-            visible: root.scan === "manual"
-            text: "สแกนหน้าแทน"; kind: "ghost"
+            visible: root.scan === "manual" || (root.scan === "unavailable" && login.faceReady)
+            text: "สแกนหน้าแทน"; kind: "ghost"; iconPath: Icons.camera
             onClicked: login.setScanState("scanning")
         }
 
