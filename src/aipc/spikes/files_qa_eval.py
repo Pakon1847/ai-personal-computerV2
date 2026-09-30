@@ -78,9 +78,8 @@ def main(argv: list[str] | None = None) -> int:
                     "chars_sent": len(content),
                 }
             )
-            print(
-                f"{'✓' if ok else '✗'} {doc['id']} {q['expect']:11} ttft {rows[-1]['ttft']} · {q['q'][:40]}"
-            )
+            mark = "✓" if ok else "✗"
+            print(f"{mark} {doc['id']} {q['expect']:11} ttft {rows[-1]['ttft']} · {q['q'][:40]}")
             print("     ", " ".join(r.text.split())[:150])
     by = {e: [r for r in rows if r["expect"] == e] for e in ("answer", "summary", "not_in_file")}
     ttfts = [r["ttft"] for r in rows if r["ttft"] is not None]
