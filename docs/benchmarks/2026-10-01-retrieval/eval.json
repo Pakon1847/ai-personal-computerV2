@@ -1,0 +1,1161 @@
+{
+ "summary": {
+  "pool": 44,
+  "sentences": 88,
+  "recall_at_5": [
+   88,
+   88
+  ],
+  "pick_ms_median": 10.25,
+  "pick_ms_max": 13.07,
+  "user_tool_chars_all": 18581,
+  "user_tool_chars_top5_median": 2094.5
+ },
+ "passed": true,
+ "rows": [
+  {
+   "id": "bedtime-story-grandchild",
+   "text": "ช่วยแต่งนิทานสั้น ๆ ให้น้องมีนฟังก่อนนอนหน่อย น้องชอบช้างมาก",
+   "top5": [
+    "bedtime-story-grandchild",
+    "youtube-bedtime",
+    "birthday-poem",
+    "gift-ideas",
+    "formal-report-language"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "bedtime-story-grandchild",
+   "text": "คืนนี้หลานชายชื่อต้นกล้าจะนอนแล้ว เล่านิทานเรื่องน้องแมวให้ฟังหน่อยได้ไหม",
+   "top5": [
+    "bedtime-story-grandchild",
+    "open-files-grandkids-photos",
+    "settings-louder-hearing",
+    "shop-name-ideas",
+    "fade-volume-sleep"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "birthday-poem",
+   "text": "เขียนกลอนอวยพรวันเกิดให้แม่หน่อย ชื่อแม่สมหญิง อยากได้แบบอบอุ่น ๆ",
+   "top5": [
+    "birthday-poem",
+    "gift-ideas",
+    "bedtime-story-grandchild",
+    "shop-name-ideas",
+    "essay-title-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "birthday-poem",
+   "text": "พรุ่งนี้วันเกิดเพื่อนสนิทชื่อปอ ช่วยแต่งกลอนสั้น ๆ ให้หน่อย",
+   "top5": [
+    "birthday-poem",
+    "bedtime-story-grandchild",
+    "gift-ideas",
+    "shop-name-ideas",
+    "youtube-luktung-prep"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "classroom-activity-ideas",
+   "text": "สอนวิชาภาษาไทยให้ ป.4 ห้องนี้มีนักเรียน 30 คน มีไอเดียกิจกรรมในห้องไหม",
+   "top5": [
+    "classroom-activity-ideas",
+    "proofread-thai-report",
+    "prepare-teaching",
+    "gift-ideas",
+    "math-step-by-step"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "classroom-activity-ideas",
+   "text": "อยากได้กิจกรรมสนุก ๆ สัก 5 อย่างสำหรับคาบวิทย์ นักเรียน 25 คน",
+   "top5": [
+    "classroom-activity-ideas",
+    "science-homework-research",
+    "presentation-outline",
+    "prepare-teaching",
+    "proofread-thai-report"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "customer-price-reply",
+   "text": "มีลูกค้าทักแชตมาถามราคากระเป๋าผ้า ตัวละ 350 ส่งฟรี ช่วยเขียนตอบให้หน่อย",
+   "top5": [
+    "customer-price-reply",
+    "customer-thank-you",
+    "facebook-promo-caption",
+    "formal-report-language",
+    "product-blurb"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "customer-price-reply",
+   "text": "ลูกค้าถามว่าเค้กชิ้นนี้เท่าไหร่ ช่วยร่างข้อความตอบแบบสุภาพ ๆ เป็นกันเองหน่อย ราคา 89 บาท",
+   "top5": [
+    "customer-price-reply",
+    "customer-thank-you",
+    "formal-report-language",
+    "month-end-system-check",
+    "explain-official-elder"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "customer-thank-you",
+   "text": "เพิ่งขายเสื้อยืดให้คุณนิดไป ช่วยเขียนข้อความขอบคุณหน่อย ขอแบบไม่ซ้ำเดิมนะ",
+   "top5": [
+    "customer-thank-you",
+    "youtube-luktung-prep",
+    "customer-price-reply",
+    "product-blurb",
+    "essay-title-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "customer-thank-you",
+   "text": "อยากส่งข้อความขอบคุณลูกค้าที่ซื้อกาแฟดริปไปเมื่อกี้ ลูกค้าชื่อพี่โอ๊ต",
+   "top5": [
+    "customer-thank-you",
+    "customer-price-reply",
+    "shop-name-ideas",
+    "essay-title-ideas",
+    "maps-delivery-market"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "english-grammar-check",
+   "text": "ช่วยเช็กไวยากรณ์ประโยคนี้หน่อย \"She don't like going to school yesterday\" แล้วอธิบายเป็นไทยด้วย",
+   "top5": [
+    "english-grammar-check",
+    "explain-official-elder",
+    "medicine-explain-elder",
+    "explain-like-kid",
+    "formal-report-language"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "english-grammar-check",
+   "text": "เขียนอังกฤษมาประโยคนึง ไม่แน่ใจว่าถูกไหม ช่วยตรวจแล้วบอกว่าผิดตรงไหนที",
+   "top5": [
+    "english-grammar-check",
+    "proofread-thai-report",
+    "formal-report-language",
+    "medicine-explain-elder",
+    "month-end-system-check"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "essay-title-ideas",
+   "text": "จะเขียนเรียงความเรื่องการรักษาสิ่งแวดล้อมในโรงเรียน ช่วยคิดชื่อหัวข้อให้หน่อย 6 แบบ",
+   "top5": [
+    "essay-title-ideas",
+    "presentation-outline",
+    "classroom-activity-ideas",
+    "online-class-start",
+    "shop-name-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "essay-title-ideas",
+   "text": "ติดเรื่องตั้งชื่อเรียงความเลย เนื้อหาเกี่ยวกับการออมเงินของวัยรุ่น มีชื่อเก๋ ๆ ให้เลือกไหม",
+   "top5": [
+    "essay-title-ideas",
+    "shop-name-ideas",
+    "quiz-multiple-choice",
+    "presentation-outline",
+    "formal-report-language"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "exam-study-plan",
+   "text": "อีก 10 วันสอบฟิสิกส์แล้ว ช่วยจัดตารางอ่านหนังสือให้หน่อย",
+   "top5": [
+    "exam-study-plan",
+    "explain-official-elder",
+    "prepare-teaching",
+    "medicine-explain-elder",
+    "meeting-notes-report"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "exam-study-plan",
+   "text": "เหลือเวลา 5 วันก่อนสอบเคมี วางแผนอ่านแต่ละวันให้ที ไม่รู้จะเริ่มยังไง",
+   "top5": [
+    "exam-study-plan",
+    "bedtime-story-grandchild",
+    "medicine-explain-elder",
+    "online-class-start",
+    "office-work-start"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "explain-like-kid",
+   "text": "คำว่า \"เงินเฟ้อ\" คืออะไร อธิบายให้เด็กประถมเข้าใจหน่อย มีตัวอย่างใกล้ตัวด้วย",
+   "top5": [
+    "explain-like-kid",
+    "explain-official-elder",
+    "medicine-explain-elder",
+    "youtube-kids-cartoon",
+    "proofread-thai-report"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "explain-like-kid",
+   "text": "ช่วยเล่าเรื่องสังเคราะห์แสงแบบที่เด็ก ๆ ฟังแล้วเข้าใจหน่อย",
+   "top5": [
+    "explain-like-kid",
+    "youtube-kids-cartoon",
+    "storage-check-files",
+    "essay-title-ideas",
+    "explain-official-elder"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "explain-official-elder",
+   "text": "แม่ได้ประกาศจากเทศบาลมาอ่านไม่รู้เรื่อง ช่วยอธิบายให้ง่าย ๆ สำหรับผู้สูงอายุหน่อย",
+   "top5": [
+    "explain-official-elder",
+    "explain-like-kid",
+    "medicine-explain-elder",
+    "presentation-outline",
+    "shop-job-announcement"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "explain-official-elder",
+   "text": "มีข่าวราชการเรื่องเบี้ยผู้สูงอายุ ภาษาอ่านยากมาก ช่วยเล่าให้คุณตาเข้าใจหน่อย",
+   "top5": [
+    "explain-official-elder",
+    "medicine-explain-elder",
+    "essay-title-ideas",
+    "explain-like-kid",
+    "presentation-outline"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "facebook-promo-caption",
+   "text": "ร้านจะลดราคาทุกอย่าง 20% สุดสัปดาห์นี้ ช่วยเขียนแคปชั่นลงเฟซบุ๊กให้หน่อย",
+   "top5": [
+    "facebook-promo-caption",
+    "product-blurb",
+    "customer-price-reply",
+    "prepare-teaching",
+    "customer-thank-you"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "facebook-promo-caption",
+   "text": "เขียนแคปชั่นสั้น ๆ โพสต์เพจร้านหน่อย โปรซื้อสองแถมหนึ่งถึงวันอาทิตย์",
+   "top5": [
+    "facebook-promo-caption",
+    "product-blurb",
+    "presentation-outline",
+    "birthday-poem",
+    "exam-study-plan"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "fade-volume-sleep",
+   "text": "จะนอนดูยูทูบแล้ว ค่อย ๆ ลดเสียงลงแล้วปิดให้เลยนะ",
+   "top5": [
+    "fade-volume-sleep",
+    "youtube-bedtime",
+    "open-files-grandkids-photos",
+    "mute-now",
+    "unmute-half-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "fade-volume-sleep",
+   "text": "ง่วงแล้ว ช่วยหรี่เสียงลงทีละนิดจนเงียบแล้วปิดเสียงไปเลย เดี๋ยวหลับคาคลิป",
+   "top5": [
+    "fade-volume-sleep",
+    "mute-now",
+    "unmute-half-volume",
+    "wikipedia-report-volume",
+    "youtube-bedtime"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "formal-report-language",
+   "text": "ช่วยเปลี่ยนข้อความนี้เป็นภาษาทางการหน่อย จะส่งหัวหน้า \"ยอดเดือนนี้ตกนิดหน่อยนะครับ เพราะลูกค้าหายไปหลายเจ้า\"",
+   "top5": [
+    "formal-report-language",
+    "customer-thank-you",
+    "explain-official-elder",
+    "customer-price-reply",
+    "open-settings-page"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "formal-report-language",
+   "text": "ขอปรับประโยคที่พิมพ์ไว้ให้เป็นภาษาราชการสำหรับเขียนรายงานเสนอผู้จัดการหน่อย",
+   "top5": [
+    "formal-report-language",
+    "explain-official-elder",
+    "meeting-notes-report",
+    "english-grammar-check",
+    "wikipedia-report-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "fridge-menu-ideas",
+   "text": "ในตู้เย็นมีไข่ หมูสับ กับผักกาด ทำอะไรกินดี ขอ 3 เมนูพร้อมวิธีทำคร่าว ๆ",
+   "top5": [
+    "fridge-menu-ideas",
+    "math-step-by-step",
+    "open-skill-page",
+    "open-settings-page",
+    "meeting-notes-report"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "fridge-menu-ideas",
+   "text": "เหลือแต่อกไก่กับมะเขือเทศในตู้เย็น คิดเมนูให้หน่อยสิ",
+   "top5": [
+    "fridge-menu-ideas",
+    "exam-study-plan",
+    "unmute-half-volume",
+    "shop-name-ideas",
+    "open-settings-page"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "gift-ideas",
+   "text": "จะซื้อของขวัญให้พ่อ งบประมาณ 500 บาท มีไอเดียไหม",
+   "top5": [
+    "gift-ideas",
+    "customer-thank-you",
+    "shop-job-announcement",
+    "facebook-promo-caption",
+    "quiz-multiple-choice"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "gift-ideas",
+   "text": "เพื่อนร่วมงานจะย้ายออฟฟิศ อยากได้ของขวัญไม่เกินพันนึง ช่วยคิดให้ 5 อย่างหน่อย",
+   "top5": [
+    "gift-ideas",
+    "office-work-start",
+    "birthday-poem",
+    "shop-name-ideas",
+    "presentation-outline"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "gmail-attach-files",
+   "text": "เปิดเมลกับโฟลเดอร์ไฟล์พร้อมกันให้หน่อย จะแนบงานส่งครู",
+   "top5": [
+    "gmail-attach-files",
+    "prepare-teaching",
+    "open-files-grandkids-photos",
+    "month-end-system-check",
+    "unmute-half-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "gmail-attach-files",
+   "text": "ต้องส่งการบ้านทางอีเมล ขอเปิด Gmail กับตัวจัดการไฟล์ไว้คู่กันเลย",
+   "top5": [
+    "gmail-attach-files",
+    "prepare-teaching",
+    "office-work-start",
+    "science-homework-research",
+    "maps-delivery-market"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "interview-prep",
+   "text": "พรุ่งนี้สัมภาษณ์ตำแหน่งบัญชี ช่วยซ้อมถามคำถามที่เจอบ่อย ๆ 5 ข้อ พร้อมบอกแนวตอบด้วย",
+   "top5": [
+    "interview-prep",
+    "proofread-thai-report",
+    "quiz-multiple-choice",
+    "shop-job-announcement",
+    "customer-price-reply"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "interview-prep",
+   "text": "จะไปสัมภาษณ์งานเป็นพนักงานขาย เตรียมตัวไม่ถูกเลย ช่วยติวหน่อย",
+   "top5": [
+    "interview-prep",
+    "shop-job-announcement",
+    "formal-report-language",
+    "prepare-teaching",
+    "youtube-luktung-prep"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "maps-delivery-market",
+   "text": "จะไปตลาดส่งของเดี๋ยวนี้ เปิดแผนที่ให้หน่อย",
+   "top5": [
+    "maps-delivery-market",
+    "mute-now",
+    "maps-drive-to-work",
+    "formal-report-language",
+    "gmail-attach-files"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "maps-delivery-market",
+   "text": "เตรียมออกไปตลาดส่งของแล้ว ขอแผนที่นำทางหน่อย",
+   "top5": [
+    "maps-delivery-market",
+    "maps-drive-to-work",
+    "youtube-luktung-prep",
+    "prepare-teaching",
+    "exam-study-plan"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "maps-drive-to-work",
+   "text": "กำลังขับรถไปทำงาน เปิดแผนที่แล้วเพิ่มเสียงให้ได้ยินนำทางชัด ๆ หน่อย",
+   "top5": [
+    "maps-drive-to-work",
+    "settings-louder-hearing",
+    "maps-delivery-market",
+    "wikipedia-report-volume",
+    "unmute-half-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "maps-drive-to-work",
+   "text": "เช้านี้ขับไปที่ทำงาน ขอเปิดแมพแล้วดันเสียงขึ้นด้วยนะ จะฟังเสียงนำทาง",
+   "top5": [
+    "maps-drive-to-work",
+    "wikipedia-report-volume",
+    "settings-louder-hearing",
+    "fade-volume-sleep",
+    "unmute-half-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "math-step-by-step",
+   "text": "สอนทำโจทย์นี้หน่อย 2x + 5 = 17 ทำทีละขั้นแล้วบอกวิธีคิดด้วย",
+   "top5": [
+    "math-step-by-step",
+    "fade-volume-sleep",
+    "medicine-explain-elder",
+    "exam-study-plan",
+    "science-homework-research"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "math-step-by-step",
+   "text": "โจทย์คณิตข้อนี้ไม่เข้าใจเลย ช่วยอธิบายทีละสเต็ปหน่อย: รถวิ่ง 60 กม./ชม. นาน 2 ชั่วโมงครึ่งไปได้กี่กิโล",
+   "top5": [
+    "math-step-by-step",
+    "explain-official-elder",
+    "explain-like-kid",
+    "medicine-explain-elder",
+    "science-homework-research"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "medicine-explain-elder",
+   "text": "ฉลากยาเขียนว่า พาราเซตามอล 500 มก. วันละ 3 ครั้งหลังอาหาร ช่วยอธิบายให้อ่านง่าย ๆ หน่อย",
+   "top5": [
+    "medicine-explain-elder",
+    "explain-official-elder",
+    "explain-like-kid",
+    "exam-study-plan",
+    "product-blurb"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "medicine-explain-elder",
+   "text": "ช่วยแปลฉลากยาของคุณยายให้เป็นประโยคสั้น ๆ อ่านสบาย ๆ หน่อย ว่ากินยังไงต้องระวังอะไร",
+   "top5": [
+    "medicine-explain-elder",
+    "explain-official-elder",
+    "explain-like-kid",
+    "formal-report-language",
+    "gift-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "meeting-notes-report",
+   "text": "มีโน้ตประชุมที่จดไว้มั่ว ๆ ช่วยจัดเป็นรายงานเรียบร้อย มีเรื่องที่คุย มติ และงานที่ต้องทำ",
+   "top5": [
+    "meeting-notes-report",
+    "mute-now",
+    "formal-report-language",
+    "proofread-thai-report",
+    "wikipedia-report-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "meeting-notes-report",
+   "text": "เพิ่งประชุมเสร็จ จดไว้คร่าว ๆ ขอให้จัดเป็นรายงานเป็นหัวข้อให้หน่อย",
+   "top5": [
+    "meeting-notes-report",
+    "formal-report-language",
+    "wikipedia-report-volume",
+    "mute-now",
+    "essay-title-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "month-end-system-check",
+   "text": "สิ้นเดือนแล้ว เปิดตัวจัดการไฟล์แล้วไปหน้าสุขภาพเครื่องต่อเลย จะเช็กระบบ",
+   "top5": [
+    "month-end-system-check",
+    "storage-check-files",
+    "gmail-attach-files",
+    "prepare-teaching",
+    "open-files-grandkids-photos"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "month-end-system-check",
+   "text": "ถึงเวลาตรวจเครื่องประจำเดือนแล้ว เปิดไฟล์ให้หน่อยแล้วตามด้วยหน้าสุขภาพเลยนะ",
+   "top5": [
+    "month-end-system-check",
+    "storage-check-files",
+    "open-files-grandkids-photos",
+    "settings-louder-hearing",
+    "mute-now"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "mute-now",
+   "text": "เสียงดังลั่นเลย! ปิดเสียงเดี๋ยวนี้ กำลังประชุมอยู่",
+   "top5": [
+    "mute-now",
+    "unmute-half-volume",
+    "fade-volume-sleep",
+    "settings-louder-hearing",
+    "meeting-notes-report"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "mute-now",
+   "text": "ตกใจหมด เสียงออกลำโพงดังมาก ปิดเสียงด่วนเลย",
+   "top5": [
+    "mute-now",
+    "unmute-half-volume",
+    "settings-louder-hearing",
+    "fade-volume-sleep",
+    "maps-drive-to-work"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "office-work-start",
+   "text": "ถึงออฟฟิศแล้ว เปิด Gmail กับ Google ให้หน่อย จะเริ่มงาน",
+   "top5": [
+    "office-work-start",
+    "online-class-start",
+    "gmail-attach-files",
+    "maps-drive-to-work",
+    "science-homework-research"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "office-work-start",
+   "text": "เริ่มงานที่ออฟฟิศวันนี้ เปิดเมลกับกูเกิลไว้คู่กันเลยนะ",
+   "top5": [
+    "office-work-start",
+    "gmail-attach-files",
+    "open-skill-page",
+    "online-class-start",
+    "formal-report-language"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "online-class-start",
+   "text": "จะเริ่มเรียนออนไลน์แล้ว เปิดเบราว์เซอร์ เปิดกูเกิล แล้วตั้งเสียงไว้ 40 ให้ด้วย",
+   "top5": [
+    "online-class-start",
+    "youtube-kids-cartoon",
+    "settings-louder-hearing",
+    "office-work-start",
+    "unmute-half-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "online-class-start",
+   "text": "ใกล้ได้เวลาเรียนออนไลน์แล้ว ช่วยเตรียมเครื่องให้หน่อย เปิดเบราว์เซอร์กับกูเกิล เสียงเอาสัก 40",
+   "top5": [
+    "online-class-start",
+    "prepare-teaching",
+    "unmute-half-volume",
+    "youtube-kids-cartoon",
+    "mute-now"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "open-files-grandkids-photos",
+   "text": "อยากดูรูปหลาน ๆ เปิดไฟล์ของฉันให้หน่อย แล้วลดเสียงลงนิดนึงด้วย",
+   "top5": [
+    "open-files-grandkids-photos",
+    "fade-volume-sleep",
+    "open-skill-page",
+    "unmute-half-volume",
+    "settings-louder-hearing"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "open-files-grandkids-photos",
+   "text": "คิดถึงหลานจัง ขอเปิดโฟลเดอร์รูปในเครื่องหน่อย เสียงก็ลดลงหน่อยนะ",
+   "top5": [
+    "open-files-grandkids-photos",
+    "unmute-half-volume",
+    "mute-now",
+    "youtube-luktung-prep",
+    "maps-delivery-market"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "open-settings-page",
+   "text": "หาเมนูตั้งค่าไม่เจอเลย เปิดหน้าตั้งค่าให้หน่อย",
+   "top5": [
+    "open-settings-page",
+    "settings-louder-hearing",
+    "formal-report-language",
+    "fridge-menu-ideas",
+    "open-skill-page"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "open-settings-page",
+   "text": "งงมาก ปุ่มตั้งค่าอยู่ไหน พาไปหน้าตั้งค่าของแอปหน่อย",
+   "top5": [
+    "open-settings-page",
+    "settings-louder-hearing",
+    "open-skill-page",
+    "shop-name-ideas",
+    "open-files-grandkids-photos"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "open-skill-page",
+   "text": "เปิดหน้าสกิลของฉันหน่อย อยากดูว่าสร้างอะไรไว้บ้างแล้ว",
+   "top5": [
+    "open-skill-page",
+    "open-files-grandkids-photos",
+    "open-settings-page",
+    "settings-louder-hearing",
+    "youtube-kids-cartoon"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "open-skill-page",
+   "text": "ขอดูรายการสกิลที่ทำไว้ทั้งหมดหน่อย พาไปหน้า Skill เลย",
+   "top5": [
+    "open-skill-page",
+    "open-settings-page",
+    "open-files-grandkids-photos",
+    "formal-report-language",
+    "storage-check-files"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "prepare-teaching",
+   "text": "จะเตรียมสื่อการสอนแล้ว เปิดเบราว์เซอร์ วิกิพีเดีย แล้วก็ตัวจัดการไฟล์ให้ทีเดียวเลย",
+   "top5": [
+    "prepare-teaching",
+    "wikipedia-report-volume",
+    "gmail-attach-files",
+    "science-homework-research",
+    "youtube-kids-cartoon"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "prepare-teaching",
+   "text": "ครูต้องเตรียมสอนพรุ่งนี้ ขอเปิดวิกิ กับโฟลเดอร์ไฟล์พร้อมกันหน่อย",
+   "top5": [
+    "prepare-teaching",
+    "gmail-attach-files",
+    "youtube-luktung-prep",
+    "wikipedia-report-volume",
+    "science-homework-research"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "presentation-outline",
+   "text": "ต้องพรีเซนต์เรื่องพลังงานแสงอาทิตย์ ช่วยเขียนหัวข้อสไลด์พร้อมหัวข้อย่อยให้หน่อย",
+   "top5": [
+    "presentation-outline",
+    "essay-title-ideas",
+    "meeting-notes-report",
+    "prepare-teaching",
+    "formal-report-language"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "presentation-outline",
+   "text": "ขอโครงสไลด์นำเสนอเรื่องการท่องเที่ยวเชิงอนุรักษ์ มีหัวข้อย่อยด้วยนะ",
+   "top5": [
+    "presentation-outline",
+    "essay-title-ideas",
+    "formal-report-language",
+    "meeting-notes-report",
+    "classroom-activity-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "product-blurb",
+   "text": "ช่วยแต่งคำโปรยขายสบู่สมุนไพรทำมือหน่อย จุดเด่นคือธรรมชาติ 100% กลิ่นหอมอ่อน ๆ",
+   "top5": [
+    "product-blurb",
+    "birthday-poem",
+    "customer-price-reply",
+    "shop-name-ideas",
+    "customer-thank-you"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "product-blurb",
+   "text": "จะลงขายหมวกปัก ช่วยคิดคำโปรยให้น่าสนใจหน่อย จุดเด่นคือใส่สบาย ระบายอากาศดี",
+   "top5": [
+    "product-blurb",
+    "essay-title-ideas",
+    "shop-name-ideas",
+    "explain-like-kid",
+    "explain-official-elder"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "proofread-thai-report",
+   "text": "ช่วยตรวจคำผิดรายงานนี้หน่อย เกลาภาษาให้ด้วย แล้วบอกด้วยว่าแก้ตรงไหนเพราะอะไร",
+   "top5": [
+    "proofread-thai-report",
+    "formal-report-language",
+    "settings-louder-hearing",
+    "english-grammar-check",
+    "wikipedia-report-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "proofread-thai-report",
+   "text": "นักเรียนส่งรายงานมา ขอเช็กคำผิดแล้วปรับสำนวนให้สละสลวย พร้อมอธิบายที่แก้ด้วย",
+   "top5": [
+    "proofread-thai-report",
+    "formal-report-language",
+    "explain-like-kid",
+    "english-grammar-check",
+    "wikipedia-report-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "quiz-multiple-choice",
+   "text": "ออกข้อสอบปรนัย 10 ข้อจากเนื้อหาที่วางนี้ให้หน่อย มีตัวเลือก ก-ง แล้วก็เฉลยด้วย",
+   "top5": [
+    "quiz-multiple-choice",
+    "essay-title-ideas",
+    "exam-study-plan",
+    "medicine-explain-elder",
+    "proofread-thai-report"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "quiz-multiple-choice",
+   "text": "ครูมีเนื้อหาบทนี้ อยากได้ข้อสอบแบบเลือกตอบสิบข้อ พร้อมเฉลยเลย",
+   "top5": [
+    "quiz-multiple-choice",
+    "essay-title-ideas",
+    "exam-study-plan",
+    "presentation-outline",
+    "gift-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "science-homework-research",
+   "text": "จะค้นข้อมูลทำการบ้านวิทย์ เปิดกูเกิลแล้วตามด้วยวิกิพีเดียให้หน่อย",
+   "top5": [
+    "science-homework-research",
+    "wikipedia-report-volume",
+    "prepare-teaching",
+    "open-skill-page",
+    "storage-check-files"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "science-homework-research",
+   "text": "การบ้านวิทยาศาสตร์วันนี้ต้องหาข้อมูลเยอะ เปิดกูเกิลกับวิกิให้ทีเดียวเลย",
+   "top5": [
+    "science-homework-research",
+    "wikipedia-report-volume",
+    "classroom-activity-ideas",
+    "prepare-teaching",
+    "storage-check-files"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "settings-louder-hearing",
+   "text": "หูไม่ค่อยได้ยิน เปิดหน้าตั้งค่าแล้วเพิ่มเสียงเป็น 20 ให้หน่อย",
+   "top5": [
+    "settings-louder-hearing",
+    "open-settings-page",
+    "maps-drive-to-work",
+    "wikipedia-report-volume",
+    "unmute-half-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "settings-louder-hearing",
+   "text": "ช่วยพาไปหน้าตั้งค่าแล้วดันเสียงขึ้นอีกหน่อย ตอนนี้ฟังไม่ค่อยชัด",
+   "top5": [
+    "settings-louder-hearing",
+    "open-settings-page",
+    "medicine-explain-elder",
+    "maps-drive-to-work",
+    "wikipedia-report-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "shop-job-announcement",
+   "text": "ร้านจะรับพนักงานขายหน้าร้าน เงินเดือน 12,000 ช่วยเขียนประกาศรับสมัครให้หน่อย",
+   "top5": [
+    "shop-job-announcement",
+    "interview-prep",
+    "month-end-system-check",
+    "facebook-promo-caption",
+    "shop-name-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "shop-job-announcement",
+   "text": "อยากติดประกาศหาคนมาช่วยงานร้านขายของชำ ตำแหน่งแคชเชียร์ เงินเดือน 11,000 ช่วยเรียบเรียงให้ที",
+   "top5": [
+    "shop-job-announcement",
+    "interview-prep",
+    "month-end-system-check",
+    "essay-title-ideas",
+    "shop-name-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "shop-name-ideas",
+   "text": "กำลังจะเปิดร้านขายขนมไทย ช่วยคิดชื่อร้านเก๋ ๆ สัก 10 ชื่อหน่อย",
+   "top5": [
+    "shop-name-ideas",
+    "essay-title-ideas",
+    "product-blurb",
+    "shop-job-announcement",
+    "birthday-poem"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "shop-name-ideas",
+   "text": "ตั้งชื่อร้านไม่ถูกเลย ร้านขายต้นไม้เล็ก ๆ มีไอเดียไหม",
+   "top5": [
+    "shop-name-ideas",
+    "essay-title-ideas",
+    "customer-thank-you",
+    "shop-job-announcement",
+    "gift-ideas"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "storage-check-files",
+   "text": "เครื่องเต็มหรือยังนะ เปิดหน้าสุขภาพเครื่องแล้วตามด้วยตัวจัดการไฟล์ให้หน่อย",
+   "top5": [
+    "storage-check-files",
+    "month-end-system-check",
+    "gmail-attach-files",
+    "prepare-teaching",
+    "mute-now"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "storage-check-files",
+   "text": "อยากเช็กว่าที่เก็บข้อมูลใกล้เต็มไหม ขอดูหน้าสุขภาพเครื่อง แล้วเปิดไฟล์ต่อเลย",
+   "top5": [
+    "storage-check-files",
+    "month-end-system-check",
+    "open-files-grandkids-photos",
+    "open-skill-page",
+    "science-homework-research"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "unmute-half-volume",
+   "text": "เปิดเสียงเครื่องให้หน่อย เอาประมาณครึ่งหนึ่งพอ",
+   "top5": [
+    "unmute-half-volume",
+    "mute-now",
+    "youtube-bedtime",
+    "youtube-kids-cartoon",
+    "fade-volume-sleep"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "unmute-half-volume",
+   "text": "เครื่องปิดเสียงอยู่ เปิดแล้วตั้งไว้ 50 เลยนะ",
+   "top5": [
+    "unmute-half-volume",
+    "mute-now",
+    "fade-volume-sleep",
+    "maps-drive-to-work",
+    "settings-louder-hearing"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "wikipedia-report-volume",
+   "text": "จะหาข้อมูลทำรายงาน เปิดวิกิพีเดียให้หน่อย แล้วเพิ่มเสียงขึ้นนิดหน่อยเผื่อฟังคลิป",
+   "top5": [
+    "wikipedia-report-volume",
+    "science-homework-research",
+    "settings-louder-hearing",
+    "maps-drive-to-work",
+    "prepare-teaching"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "wikipedia-report-volume",
+   "text": "ทำรายงานอยู่ ขอเปิดวิกิ แล้วดันเสียงขึ้นอีกหน่อยนะ จะฟังคลิปประกอบด้วย",
+   "top5": [
+    "wikipedia-report-volume",
+    "unmute-half-volume",
+    "settings-louder-hearing",
+    "youtube-bedtime",
+    "maps-drive-to-work"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "youtube-bedtime",
+   "text": "จะนอนดูคลิปสักพัก เปิดยูทูบแล้วตั้งเสียงครึ่งหนึ่งให้หน่อย",
+   "top5": [
+    "youtube-bedtime",
+    "unmute-half-volume",
+    "fade-volume-sleep",
+    "youtube-kids-cartoon",
+    "wikipedia-report-volume"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "youtube-bedtime",
+   "text": "ก่อนนอนอยากดูยูทูบเบา ๆ เปิดให้แล้วเสียงเอาที่ 50 พอ",
+   "top5": [
+    "youtube-bedtime",
+    "fade-volume-sleep",
+    "unmute-half-volume",
+    "bedtime-story-grandchild",
+    "open-files-grandkids-photos"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "youtube-kids-cartoon",
+   "text": "เด็ก ๆ เลิกเรียนแล้ว เปิดยูทูบให้ดูการ์ตูน แล้วเปิดเบราว์เซอร์ค้างไว้ด้วย",
+   "top5": [
+    "youtube-kids-cartoon",
+    "prepare-teaching",
+    "youtube-bedtime",
+    "online-class-start",
+    "fade-volume-sleep"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "youtube-kids-cartoon",
+   "text": "ลูกกลับจากโรงเรียนแล้ว อยากดูการ์ตูน เปิดยูทูบกับเบราว์เซอร์ไว้ให้หน่อย",
+   "top5": [
+    "youtube-kids-cartoon",
+    "fade-volume-sleep",
+    "youtube-bedtime",
+    "online-class-start",
+    "prepare-teaching"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "youtube-luktung-prep",
+   "text": "เตรียมของขายอยู่ เปิดยูทูบแล้วตั้งเสียง 70 จะเปิดเพลงลูกทุ่งฟัง",
+   "top5": [
+    "youtube-luktung-prep",
+    "fade-volume-sleep",
+    "unmute-half-volume",
+    "youtube-bedtime",
+    "mute-now"
+   ],
+   "hit": true,
+   "rank": 1
+  },
+  {
+   "id": "youtube-luktung-prep",
+   "text": "ขอยูทูบหน่อย เสียงเอาดังหน่อยที่ 70 เปิดลูกทุ่งคลอระหว่างจัดของขาย",
+   "top5": [
+    "youtube-luktung-prep",
+    "unmute-half-volume",
+    "fade-volume-sleep",
+    "youtube-bedtime",
+    "mute-now"
+   ],
+   "hit": true,
+   "rank": 1
+  }
+ ]
+}
