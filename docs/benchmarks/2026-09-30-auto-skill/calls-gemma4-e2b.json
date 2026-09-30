@@ -1,0 +1,802 @@
+{
+ "label": "gemma4-e2b",
+ "server": {
+  "supports_tools": true,
+  "template_chars": 18807,
+  "template_sha256": "74a88f94c57c14e22dcdbe08e94127f42b87c6f584cb73838e73e32126f3f6b3",
+  "model": "models/gemma-4-E2B-it-Q4_K_M.gguf"
+ },
+ "summary": "gemma4-e2b: ควรสร้าง เรียก 6/16 = 38% (เกณฑ์ ≥ 70%) · ไม่ควร เรียกผิด 0/22 = 0% (เกณฑ์ ≤ 10%) → ไม่ผ่าน",
+ "system_chars": 1518,
+ "date": "2026-09-30",
+ "create_hit": [
+  6,
+  16
+ ],
+ "no_false": [
+  0,
+  22
+ ],
+ "by_style": {
+  "explicit": [
+   6,
+   8
+  ],
+  "implicit": [
+   0,
+   8
+  ],
+  "knowledge": [
+   0,
+   7
+  ],
+  "chat": [
+   0,
+   3
+  ],
+  "live": [
+   0,
+   3
+  ],
+  "existing": [
+   0,
+   7
+  ],
+  "about": [
+   0,
+   2
+  ]
+ },
+ "rows": [
+  {
+   "id": "c01",
+   "expect": "create",
+   "style": "explicit",
+   "text": "อยากได้สกิลโหมดเช้า เปิด Gmail แล้วเปิด Google Maps ให้ทีเดียว",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 56.59,
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1197,
+    "prompt_ms": 55213.75,
+    "prompt_per_token_ms": 46.126775271512116,
+    "prompt_per_second": 21.67938240021734,
+    "predicted_n": 9,
+    "predicted_ms": 1300.202,
+    "predicted_per_token_ms": 162.52525,
+    "predicted_per_second": 6.152890089386111
+   },
+   "called": true
+  },
+  {
+   "id": "c02",
+   "expect": "create",
+   "style": "explicit",
+   "text": "ช่วยทำคำสั่งประจำไว้ให้หน่อย พิมพ์ว่าโหมดดูหนังแล้วให้เปิดยูทูบกับปรับเสียงเป็น 80",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "c03",
+   "expect": "create",
+   "style": "explicit",
+   "text": "สร้างสกิลแต่งกลอนอวยพรวันเกิดให้หน่อย จะได้ใช้บ่อย ๆ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.57,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1245.146,
+    "prompt_per_token_ms": 51.88108333333333,
+    "prompt_per_second": 19.27484809010349,
+    "predicted_n": 9,
+    "predicted_ms": 1294.717,
+    "predicted_per_token_ms": 161.839625,
+    "predicted_per_second": 6.178956482381864
+   },
+   "called": true
+  },
+  {
+   "id": "c04",
+   "expect": "create",
+   "style": "explicit",
+   "text": "อยากได้สกิลตั้งชื่อร้านค้าออนไลน์ ขอทีละ 5 ชื่อ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.4,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 20,
+    "prompt_ms": 1048.412,
+    "prompt_per_token_ms": 52.4206,
+    "prompt_per_second": 19.076469937391025,
+    "predicted_n": 9,
+    "predicted_ms": 1295.797,
+    "predicted_per_token_ms": 161.974625,
+    "predicted_per_second": 6.173806545315354
+   },
+   "called": true
+  },
+  {
+   "id": "c05",
+   "expect": "create",
+   "style": "explicit",
+   "text": "ทำสกิลอธิบายศัพท์คอมพิวเตอร์ให้ผู้สูงอายุเข้าใจได้ไหม",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.5,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 22,
+    "prompt_ms": 1171.265,
+    "prompt_per_token_ms": 53.239318181818184,
+    "prompt_per_second": 18.783110568487913,
+    "predicted_n": 9,
+    "predicted_ms": 1297.705,
+    "predicted_per_token_ms": 162.213125,
+    "predicted_per_second": 6.164729272061062
+   },
+   "called": true
+  },
+  {
+   "id": "c06",
+   "expect": "create",
+   "style": "explicit",
+   "text": "ขอสกิลช่วยคิดคำถามสัมภาษณ์งานจากตำแหน่งที่บอก",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.38,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 20,
+    "prompt_ms": 1032.319,
+    "prompt_per_token_ms": 51.61595,
+    "prompt_per_second": 19.373856337043105,
+    "predicted_n": 9,
+    "predicted_ms": 1295.823,
+    "predicted_per_token_ms": 161.977875,
+    "predicted_per_second": 6.173682671167281
+   },
+   "called": true
+  },
+  {
+   "id": "c07",
+   "expect": "create",
+   "style": "explicit",
+   "text": "อยากให้เครื่องมีคำสั่งเตรียมค้นรายงาน เปิดวิกิพีเดียกับ Google พร้อมกัน",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 7.32,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 25,
+    "prompt_ms": 1274.977,
+    "prompt_per_token_ms": 50.999080000000006,
+    "prompt_per_second": 19.608196853747163,
+    "predicted_n": 38,
+    "predicted_ms": 6005.352,
+    "predicted_per_token_ms": 162.30681081081082,
+    "predicted_per_second": 6.161170902221885
+   },
+   "called": true
+  },
+  {
+   "id": "c08",
+   "expect": "create",
+   "style": "explicit",
+   "text": "สร้างสกิลโหมดเงียบ ปิดเสียงเครื่องแล้วเปิดหน้าไฟล์ของฉัน",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "c09",
+   "expect": "create",
+   "style": "implicit",
+   "text": "เปิดโหมดทำงานให้หน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.83,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 11,
+    "prompt_ms": 667.633,
+    "prompt_per_token_ms": 60.693909090909095,
+    "prompt_per_second": 16.476117867151565,
+    "predicted_n": 14,
+    "predicted_ms": 2110.02,
+    "predicted_per_token_ms": 162.30923076923077,
+    "predicted_per_second": 6.1610790419048165
+   },
+   "called": false
+  },
+  {
+   "id": "c10",
+   "expect": "create",
+   "style": "implicit",
+   "text": "เข้าโหมดประชุมให้ที",
+   "by": "ai",
+   "got": "none",
+   "seconds": 5.26,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 11,
+    "prompt_ms": 670.338,
+    "prompt_per_token_ms": 60.939818181818175,
+    "prompt_per_second": 16.40963215571846,
+    "predicted_n": 29,
+    "predicted_ms": 4554.455,
+    "predicted_per_token_ms": 162.65910714285715,
+    "predicted_per_second": 6.14782668837435
+   },
+   "called": false
+  },
+  {
+   "id": "c11",
+   "expect": "create",
+   "style": "implicit",
+   "text": "จากนี้ไปทุกครั้งที่บอกว่าพักสายตา ให้ลดเสียงเหลือ 20 แล้วเปิดยูทูบ",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "c12",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ต่อไปถ้าพิมพ์ว่าเตรียมเดินทาง ให้เปิด Google Maps กับ Gmail เลยนะ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.58,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 19,
+    "prompt_ms": 1045.09,
+    "prompt_per_token_ms": 55.00473684210526,
+    "prompt_per_second": 18.180252418452,
+    "predicted_n": 47,
+    "predicted_ms": 7430.308,
+    "predicted_per_token_ms": 161.52843478260868,
+    "predicted_per_second": 6.1908604596202474
+   },
+   "called": false
+  },
+  {
+   "id": "c13",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ช่วยตรวจการบ้านภาษาอังกฤษของลูกทุกวัน บอกคำผิดแล้วอธิบายแบบเด็กเข้าใจ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.83,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1211.578,
+    "prompt_per_token_ms": 50.482416666666666,
+    "prompt_per_second": 19.808877348383678,
+    "predicted_n": 48,
+    "predicted_ms": 7584.029,
+    "predicted_per_token_ms": 161.36231914893617,
+    "predicted_per_second": 6.197233686738276
+   },
+   "called": false
+  },
+  {
+   "id": "c14",
+   "expect": "create",
+   "style": "implicit",
+   "text": "อยากได้ตัวช่วยเปลี่ยนสูตรอาหารให้เป็นรายการซื้อของ ใช้ทุกสัปดาห์",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.85,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1216.971,
+    "prompt_per_token_ms": 50.707125,
+    "prompt_per_second": 19.721094422134957,
+    "predicted_n": 48,
+    "predicted_ms": 7587.52,
+    "predicted_per_token_ms": 161.43659574468086,
+    "predicted_per_second": 6.194382354181602
+   },
+   "called": false
+  },
+  {
+   "id": "c15",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ขอตัวช่วยแปลงข้อความยาว ๆ ให้เป็นโพสต์ขายของสั้น ๆ ใช้ประจำ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.88,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1204.276,
+    "prompt_per_token_ms": 50.17816666666667,
+    "prompt_per_second": 19.928986378537807,
+    "predicted_n": 48,
+    "predicted_ms": 7630.752,
+    "predicted_per_token_ms": 162.3564255319149,
+    "predicted_per_second": 6.159288101618293
+   },
+   "called": false
+  },
+  {
+   "id": "c16",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ทำให้เครื่องมีโหมดอ่านหนังสือ ปิดเสียงแล้วเปิดวิกิพีเดีย",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "n01",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.39,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 717.799,
+    "prompt_per_token_ms": 55.21530769230769,
+    "prompt_per_second": 18.110919630704416,
+    "predicted_n": 48,
+    "predicted_ms": 7624.653,
+    "predicted_per_token_ms": 162.2266595744681,
+    "predicted_per_second": 6.164214948536018
+   },
+   "called": false
+  },
+  {
+   "id": "n02",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "AI กับ Machine Learning ต่างกันยังไง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.38,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 724.328,
+    "prompt_per_token_ms": 55.71753846153846,
+    "prompt_per_second": 17.947670116300902,
+    "predicted_n": 48,
+    "predicted_ms": 7618.202,
+    "predicted_per_token_ms": 162.08940425531915,
+    "predicted_per_second": 6.169434730137111
+   },
+   "called": false
+  },
+  {
+   "id": "n03",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "ช่วยอธิบายวงจรชีวิตของผีเสื้อ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.52,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 848.633,
+    "prompt_per_token_ms": 56.57553333333333,
+    "prompt_per_second": 17.67548516260857,
+    "predicted_n": 48,
+    "predicted_ms": 7631.599,
+    "predicted_per_token_ms": 162.37444680851064,
+    "predicted_per_second": 6.158604507390915
+   },
+   "called": false
+  },
+  {
+   "id": "n04",
+   "expect": "no",
+   "style": "chat",
+   "text": "สวัสดีครับ วันนี้เหนื่อยจัง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 4.36,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 755.674,
+    "prompt_per_token_ms": 58.12876923076923,
+    "prompt_per_second": 17.20318550062593,
+    "predicted_n": 23,
+    "predicted_ms": 3565.954,
+    "predicted_per_token_ms": 162.0888181818182,
+    "predicted_per_second": 6.169457037303341
+   },
+   "called": false
+  },
+  {
+   "id": "n05",
+   "expect": "no",
+   "style": "chat",
+   "text": "ขอบคุณมากนะ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.24,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 9,
+    "prompt_ms": 553.634,
+    "prompt_per_token_ms": 61.51488888888889,
+    "prompt_per_second": 16.25622703807931,
+    "predicted_n": 11,
+    "predicted_ms": 1620.541,
+    "predicted_per_token_ms": 162.0541,
+    "predicted_per_second": 6.170778770793211
+   },
+   "called": false
+  },
+  {
+   "id": "n06",
+   "expect": "no",
+   "style": "live",
+   "text": "วันนี้อากาศที่เชียงใหม่เป็นยังไง",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.12,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 14,
+    "prompt_ms": 781.47,
+    "prompt_per_token_ms": 55.81928571428572,
+    "prompt_per_second": 17.914955148630145,
+    "predicted_n": 9,
+    "predicted_ms": 1297.054,
+    "predicted_per_token_ms": 162.13175,
+    "predicted_per_second": 6.167823390545035
+   },
+   "called": false
+  },
+  {
+   "id": "n07",
+   "expect": "no",
+   "style": "live",
+   "text": "ราคาทองวันนี้เท่าไหร่",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.09,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 727.65,
+    "prompt_per_token_ms": 55.973076923076924,
+    "prompt_per_second": 17.865732151446437,
+    "predicted_n": 9,
+    "predicted_ms": 1315.345,
+    "predicted_per_token_ms": 164.418125,
+    "predicted_per_second": 6.082054518016186
+   },
+   "called": false
+  },
+  {
+   "id": "n08",
+   "expect": "no",
+   "style": "existing",
+   "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ฉันชอบกินข้าวเหนียวมะม่วง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 3.85,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1205.302,
+    "prompt_per_token_ms": 50.22091666666666,
+    "prompt_per_second": 19.912022049245753,
+    "predicted_n": 17,
+    "predicted_ms": 2587.715,
+    "predicted_per_token_ms": 161.7321875,
+    "predicted_per_second": 6.1830611176269406
+   },
+   "called": false
+  },
+  {
+   "id": "n09",
+   "expect": "no",
+   "style": "existing",
+   "text": "สรุปข้อความนี้ให้หน่อย: การนอนหลับที่เพียงพอช่วยให้ร่างกายฟื้นฟูและสมองจดจำได้ดีขึ้น ควรนอนวันละ 7-9 ชั่วโมง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 7.73,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 45,
+    "prompt_ms": 2185.208,
+    "prompt_per_token_ms": 48.56017777777778,
+    "prompt_per_second": 20.593005334046005,
+    "predicted_n": 35,
+    "predicted_ms": 5514.885,
+    "predicted_per_token_ms": 162.20250000000001,
+    "predicted_per_second": 6.165133089810576
+   },
+   "called": false
+  },
+  {
+   "id": "n10",
+   "expect": "no",
+   "style": "existing",
+   "text": "เขียนจดหมายลาป่วยถึงหัวหน้าให้หน่อย",
+   "by": "ai",
+   "got": "letter-writer",
+   "seconds": 4.28,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 16,
+    "prompt_ms": 835.604,
+    "prompt_per_token_ms": 52.22525,
+    "prompt_per_second": 19.147826003705102,
+    "predicted_n": 22,
+    "predicted_ms": 3395.928,
+    "predicted_per_token_ms": 161.71085714285715,
+    "predicted_per_second": 6.1838766899651585
+   },
+   "called": false
+  },
+  {
+   "id": "n11",
+   "expect": "no",
+   "style": "existing",
+   "text": "เตือนโทรหาแม่พรุ่งนี้หกโมงเย็น",
+   "by": "ai",
+   "got": "reminder",
+   "seconds": 5.01,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 17,
+    "prompt_ms": 887.254,
+    "prompt_per_token_ms": 52.19141176470588,
+    "prompt_per_second": 19.160240472288656,
+    "predicted_n": 26,
+    "predicted_ms": 4082.536,
+    "predicted_per_token_ms": 163.30144,
+    "predicted_per_second": 6.123644714951687
+   },
+   "called": false
+  },
+  {
+   "id": "n12",
+   "expect": "no",
+   "style": "existing",
+   "text": "ทำไมเครื่องช้าจัง",
+   "by": "ai",
+   "got": "machine-status",
+   "seconds": 1.96,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 644.095,
+    "prompt_per_token_ms": 53.67458333333334,
+    "prompt_per_second": 18.630792041546666,
+    "predicted_n": 9,
+    "predicted_ms": 1287.606,
+    "predicted_per_token_ms": 160.95075,
+    "predicted_per_second": 6.2130807094716864
+   },
+   "called": false
+  },
+  {
+   "id": "n13",
+   "expect": "no",
+   "style": "existing",
+   "text": "แรมเหลือเท่าไหร่",
+   "by": "ai",
+   "got": "machine-status",
+   "seconds": 1.93,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 10,
+    "prompt_ms": 607.334,
+    "prompt_per_token_ms": 60.733399999999996,
+    "prompt_per_second": 16.46540453852411,
+    "predicted_n": 9,
+    "predicted_ms": 1291.146,
+    "predicted_per_token_ms": 161.39325,
+    "predicted_per_second": 6.196045993249408
+   },
+   "called": false
+  },
+  {
+   "id": "n14",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "เขียนโค้ด Python หาค่าเฉลี่ยของลิสต์",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.61,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 18,
+    "prompt_ms": 957.968,
+    "prompt_per_token_ms": 53.22044444444444,
+    "prompt_per_second": 18.789771683396523,
+    "predicted_n": 48,
+    "predicted_ms": 7601.633,
+    "predicted_per_token_ms": 161.73687234042552,
+    "predicted_per_second": 6.182882020218551
+   },
+   "called": false
+  },
+  {
+   "id": "n15",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "1 ปีมีกี่วินาที",
+   "by": "ai",
+   "got": "none",
+   "seconds": 4.41,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 648.208,
+    "prompt_per_token_ms": 54.01733333333333,
+    "prompt_per_second": 18.5125762101054,
+    "predicted_n": 24,
+    "predicted_ms": 3702.428,
+    "predicted_per_token_ms": 160.9751304347826,
+    "predicted_per_second": 6.212139709401506
+   },
+   "called": false
+  },
+  {
+   "id": "n16",
+   "expect": "no",
+   "style": "chat",
+   "text": "เล่าเรื่องตลกให้ฟังหน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.37,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 719.52,
+    "prompt_per_token_ms": 55.347692307692306,
+    "prompt_per_second": 18.067600622637315,
+    "predicted_n": 48,
+    "predicted_ms": 7592.284,
+    "predicted_per_token_ms": 161.5379574468085,
+    "predicted_per_second": 6.190495508334514
+   },
+   "called": false
+  },
+  {
+   "id": "n17",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "แนะนำวิธีอ่านหนังสือสอบให้จำได้นาน",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.45,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 14,
+    "prompt_ms": 789.209,
+    "prompt_per_token_ms": 56.372071428571424,
+    "prompt_per_second": 17.73928072285035,
+    "predicted_n": 48,
+    "predicted_ms": 7631.203,
+    "predicted_per_token_ms": 162.36602127659575,
+    "predicted_per_second": 6.158924090998496
+   },
+   "called": false
+  },
+  {
+   "id": "n18",
+   "expect": "no",
+   "style": "about",
+   "text": "เครื่องนี้ทำอะไรได้บ้าง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.31,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 11,
+    "prompt_ms": 670.48,
+    "prompt_per_token_ms": 60.95272727272727,
+    "prompt_per_second": 16.406156783200096,
+    "predicted_n": 48,
+    "predicted_ms": 7609.096,
+    "predicted_per_token_ms": 161.89565957446808,
+    "predicted_per_second": 6.176817850635608
+   },
+   "called": false
+  },
+  {
+   "id": "n19",
+   "expect": "no",
+   "style": "about",
+   "text": "ข้อมูลของฉันถูกส่งออกไปข้างนอกไหม",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.54,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 849.7,
+    "prompt_per_token_ms": 56.64666666666667,
+    "prompt_per_second": 17.653289396257502,
+    "predicted_n": 48,
+    "predicted_ms": 7600.993,
+    "predicted_per_token_ms": 161.72325531914893,
+    "predicted_per_second": 6.18340261594768
+   },
+   "called": false
+  },
+  {
+   "id": "n20",
+   "expect": "no",
+   "style": "live",
+   "text": "ข่าวเด่นวันนี้มีอะไรบ้าง",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 1.99,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 644.951,
+    "prompt_per_token_ms": 53.745916666666666,
+    "prompt_per_second": 18.606064646771614,
+    "predicted_n": 9,
+    "predicted_ms": 1290.041,
+    "predicted_per_token_ms": 161.255125,
+    "predicted_per_second": 6.201353290321781
+   },
+   "called": false
+  },
+  {
+   "id": "n21",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "ช่วยคิดเมนูมื้อเย็นวันนี้ให้หน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.52,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 846.975,
+    "prompt_per_token_ms": 56.465,
+    "prompt_per_second": 17.710085893916585,
+    "predicted_n": 48,
+    "predicted_ms": 7636.613,
+    "predicted_per_token_ms": 162.48112765957447,
+    "predicted_per_second": 6.154560929040139
+   },
+   "called": false
+  },
+  {
+   "id": "n22",
+   "expect": "no",
+   "style": "existing",
+   "text": "แปลคำว่า resilience เป็นภาษาไทย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.62,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 644.429,
+    "prompt_per_token_ms": 53.702416666666664,
+    "prompt_per_second": 18.621135920326367,
+    "predicted_n": 13,
+    "predicted_ms": 1940.574,
+    "predicted_per_token_ms": 161.71450000000002,
+    "predicted_per_second": 6.183737389040561
+   },
+   "called": false
+  }
+ ]
+}
