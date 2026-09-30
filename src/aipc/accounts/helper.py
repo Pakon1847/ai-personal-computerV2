@@ -29,6 +29,8 @@ from pathlib import Path
 from aipc.accounts import validation
 
 CALLER = "_greetd"  # ผู้ใช้ของหน้า Login · คนอื่นเรียกไม่ได้ แม้ผ่าน sudo
+VISION = "_aipcvision"  # visiond (การ์ด 0015) · เรียกได้เฉพาะ check-password
+PAM_SERVICE = "aipc-accounts"  # /etc/pam.d/aipc-accounts (pam_unix · ติดตั้งโดย install-accounts.sh)
 GROUPS = ("video", "render", "audio")  # จอ กล้อง เสียง · ใส่เฉพาะกลุ่มที่เครื่องมีจริง
 STATE = Path("/var/lib/aipc")
 REQUEST_MAX = 4096
@@ -86,6 +88,12 @@ class System:
             syslog.syslog(syslog.LOG_AUTH | syslog.LOG_NOTICE, text)
         except ImportError:  # วินโดวส์ไม่มี syslog
             pass
+
+    def authenticate(self, user: str, password: str) -> bool:
+        """PAM ของ OS ตรวจรหัสผ่าน · โค้ดเราไม่อ่าน /etc/shadow เอง."""
+        from aipc.accounts import pam
+
+        return pam.authenticate(PAM_SERVICE, user, password)
 
     def lock(self):
         """ทำทีละคำขอ (สองคำขอพร้อมกันอาจสร้างชื่อเดียวกันสองครั้ง)."""
@@ -225,8 +233,39 @@ def recover(request: dict, system: System) -> dict:
     return {"ok": True, "message": "ตั้งรหัสผ่านใหม่แล้ว"}
 
 
+def _check_file(system: System, user: str) -> Path:
+    return system.state / "password-checks" / f"{user}.json"
+
+
+def check_password(request: dict, system: System) -> dict:
+    """visiond ถามก่อนเปิด/ปิดเข้าเครื่องด้วยใบหน้า (การ์ด 0015) · ผิดหลายครั้งต้องรอ (กันใช้เป็นที่เดารหัส)."""
+    vals = _strings(request, "username", "password")
+    if vals is None or not validation.check_username(vals[0]).ok:
+        return _fail("รหัสผ่านไม่ถูกต้อง")
+    user, password = vals
+    path = _check_file(system, user)
+    try:
+        rec = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        rec = {"failed": 0, "wait_until": 0}
+    now = system.now()
+    if rec.get("wait_until", 0) > now:
+        return _fail("ลองผิดหลายครั้ง · รอสักครู่แล้วลองใหม่")
+    if system.user_home(user) is None or not system.authenticate(user, password):
+        rec["failed"] = rec.get("failed", 0) + 1
+        extra = rec["failed"] - FAIL_FREE
+        if extra >= 0:
+            rec["wait_until"] = now + min(WAIT_BASE_S * 2**extra, WAIT_MAX_S)
+        _write_private(path, rec)
+        system.log(f"ตรวจรหัสผ่าน {user} (ใบหน้า) ไม่ผ่าน ครั้งที่ {rec['failed']}")
+        return _fail("รหัสผ่านไม่ถูกต้อง")
+    path.unlink(missing_ok=True)
+    return {"ok": True, "message": "รหัสผ่านถูกต้อง"}
+
+
 def handle(raw: bytes, system: System) -> dict:
-    if system.caller() != CALLER:
+    caller = system.caller()
+    if caller not in (CALLER, VISION):
         return _fail("เรียกได้จากหน้า Login เท่านั้น")
     if len(raw) > REQUEST_MAX:
         return _fail("คำขอใหญ่เกินไป")
@@ -236,7 +275,11 @@ def handle(raw: bytes, system: System) -> dict:
         return _fail("คำขออ่านไม่ได้")
     if not isinstance(request, dict):
         return _fail("คำขออ่านไม่ได้")
-    ops = {"create": create, "recover": recover}
+    ops = (
+        {"create": create, "recover": recover}
+        if caller == CALLER
+        else {"check-password": check_password}
+    )
     op = ops.get(request.get("op"))
     if op is None:
         return _fail("ไม่รู้จักคำขอนี้")

@@ -58,6 +58,9 @@ class FakeSystem(helper.System):
     def log(self, text):
         self.logs.append(text)
 
+    def authenticate(self, user, password):
+        return self.passwords.get(user) == password
+
 
 def req(**kw):
     return json.dumps(kw).encode()
@@ -202,6 +205,44 @@ class HelperTest(unittest.TestCase):
         path = self.sys.state / "recovery" / "namfon.json"
         self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
         self.assertNotIn("recovery_code", path.read_text())
+
+
+class CheckPasswordTest(unittest.TestCase):
+    """visiond ถามตัวช่วยก่อนเปิด/ปิดเข้าเครื่องด้วยใบหน้า (การ์ด 0015)."""
+
+    def setUp(self):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        self.sys = FakeSystem(Path(d.name))
+        helper.handle(create_req(), self.sys)
+        self.sys.who = "_aipcvision"
+
+    def check(self, password, user="namfon"):
+        return helper.handle(req(op="check-password", username=user, password=password), self.sys)
+
+    def test_right_and_wrong_password(self):
+        self.assertTrue(self.check(PW)["ok"])
+        self.assertFalse(self.check("nope")["ok"])
+        self.assertFalse(self.check(PW, user="ghost")["ok"])
+
+    def test_visiond_can_only_check_passwords(self):
+        self.assertFalse(helper.handle(create_req(username="evil"), self.sys)["ok"])
+        self.assertNotIn("evil", self.sys.homes)
+        self.sys.who = "_greetd"
+        self.assertFalse(self.check(PW)["ok"], "หน้า Login ใช้ check-password ไม่ได้")
+
+    def test_many_wrong_guesses_must_wait(self):
+        for _ in range(helper.FAIL_FREE):
+            self.assertFalse(self.check("nope")["ok"])
+        r = self.check(PW)
+        self.assertFalse(r["ok"])
+        self.assertIn("รอ", r["message"])
+        self.sys.clock += helper.WAIT_MAX_S + 1
+        self.assertTrue(self.check(PW)["ok"])
+
+    def test_password_is_never_logged(self):
+        self.check(CANARY)
+        self.assertFalse(any(CANARY in line for line in self.sys.logs))
 
 
 if __name__ == "__main__":
