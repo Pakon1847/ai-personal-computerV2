@@ -110,13 +110,18 @@ def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
 # ประโยคตั้งโหมด/งานประจำ = ให้ Claude สร้างสกิล โดยไม่ต้องรอ AI ในเครื่องตัดสิน (การ์ด 0017)
 # ชุดพัฒนา create_skill_dev.json: Gemma 4 E2B ตอบ "ไม่เข้าใจคำสั่งเปิดโหมดพักผ่อน" แทนการเรียก create-skill ·
 # กฎตัดสินแน่นอน เร็ว และอธิบายได้ · คำถาม ("โหมดเครื่องบินคืออะไร") ไม่ขึ้นต้นด้วยคำกริยา จึงไม่เข้าข่าย
-DEFINE_START = re.compile(r"^(ช่วย|ขอ)?(เปิด|เข้า|เริ่ม|ใช้)โหมด")
-DEFINE_ANY = ("ทุกครั้งที่", "ต่อไปถ้า", "ต่อไปเวลา", "จากนี้ถ้า", "จากนี้ไปถ้า", "จากนี้ไปทุกครั้ง")
+# รอบ 2 (ชุดอิสระชุดแรกกลายเป็นชุดพัฒนา): "อยากได้/ทำ/สร้างโหมด…" ไม่เข้ากฎ · "ทุกครั้งที่ล้างจานควรใช้…เท่าไหร่"
+# เป็นคำถาม ไม่ใช่งานประจำ → คำบอกงานประจำนับเฉพาะประโยคที่ไม่ใช่คำถาม
+DEFINE_START = re.compile(r"^(ช่วย|ขอ)?(ทำ|สร้าง|อยากได้|เพิ่ม|เปิด|เข้า|เริ่ม|ใช้)(ให้)?โหมด")
+DEFINE_ANY = ("ทุกครั้งที่", "ต่อไปถ้า", "ต่อไปเวลา", "จากนี้ถ้า", "จากนี้ไปถ้า", "จากนี้ไปทุกครั้ง",
+              "พอพูดว่า", "ถ้าพูดว่า", "ถ้าพิมพ์ว่า", "ถ้าบอกว่า", "เวลาพูดว่า", "เวลาพิมพ์ว่า")  # fmt: skip
 
 
 def define_intent(text: str) -> bool:
     t = re.sub(r"\s+", "", text.strip().lower())
-    return bool(DEFINE_START.match(t)) or any(w in t for w in DEFINE_ANY)
+    if DEFINE_START.match(t):
+        return True
+    return not is_question(t) and any(w in t for w in DEFINE_ANY)
 
 
 def route(text: str, manifests: list[Manifest], available: set[str]) -> Route:
