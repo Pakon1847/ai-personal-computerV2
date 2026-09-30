@@ -55,12 +55,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{'✓' if row['ok'] else '✗'} {it['id']} {row['by']:4} {row['got']:24} {it['text']}")
     hit = sum(r["ok"] for r in rows)
     by_ai = [r for r in rows if r["by"] == "ai"]
-    line = (f"สำนวนอื่น: เรียกสกิลที่ Claude สร้างถูก {hit}/{len(rows)} = {hit / len(rows):.0%} "
-            f"(เกณฑ์ ≥ {data['criteria']['hit_min']:.0%}) · กฎตัดสิน {len(rows) - len(by_ai)} · AI ตัดสิน {len(by_ai)} "
-            f"(ถูก {sum(r['ok'] for r in by_ai)}) · ขอสร้างซ้ำ {sum(r['got'] == catalog.CREATE_SKILL for r in rows)}")  # fmt: skip
+    line = (
+        f"สำนวนอื่น: เรียกสกิลที่ Claude สร้างถูก {hit}/{len(rows)} = {hit / len(rows):.0%} "
+        f"(เกณฑ์ ≥ {data['criteria']['hit_min']:.0%}) · กฎตัดสิน {len(rows) - len(by_ai)} · "
+        f"AI ตัดสิน {len(by_ai)} (ถูก {sum(r['ok'] for r in by_ai)}) · "
+        f"ขอสร้างซ้ำ {sum(r['got'] == catalog.CREATE_SKILL for r in rows)}"
+    )
     print(line)
     if a.out:
-        a.out.write_text(json.dumps({"summary": line, "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
+        a.out.write_text(
+            json.dumps({"summary": line, "rows": rows}, ensure_ascii=False, indent=1),
+            encoding="utf-8",
+        )
     return 0
 
 

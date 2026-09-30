@@ -57,7 +57,9 @@ def check_md(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
     return (None, errors) if errors else (m, [])
 
 
-def gate(skill_md: str, existing: list[manifest.Manifest], replacing: str = "") -> tuple[manifest.Manifest | None, list[str]]:
+def gate(
+    skill_md: str, existing: list[manifest.Manifest], replacing: str = ""
+) -> tuple[manifest.Manifest | None, list[str]]:
     """ชั้นที่ 1: ผ่านทุกข้อ = คืน Manifest · ไม่ผ่าน = (None, เหตุผล).
 
     replacing = id ของสกิลที่กำลังแก้ (รุ่นใหม่ใช้ id เดิมได้ และไม่นับว่าแย่งประโยคของตัวเอง)
@@ -73,9 +75,12 @@ def gate(skill_md: str, existing: list[manifest.Manifest], replacing: str = "") 
     if replacing and m.id != replacing:
         return None, [f"รุ่นแก้ต้องใช้ id เดิม ({replacing}) ไม่ใช่ {m.id}"]
     # ตัวอย่างของสกิลใหม่ต้องไม่ใช่งานของสกิลเดิม (ชุดสกิลเสีย b06 b15: เอาประโยคของสกิลแปล/สรุปมาเป็นตัวอย่าง
-    # ตัวคัดสกิลแบบกฎยังส่งประโยคพวกนั้นไปสกิลเดิม trial จึงไม่เห็นว่าแย่ง แต่ AI ในเครื่องเลือกจากคำอธิบาย+ตัวอย่าง อาจเลือกสกิลใหม่)
-    # ดูเฉพาะส่วนคำสั่ง (ก่อน ":" · หลังจากนั้นคือข้อความที่ผู้ใช้วางมา เช่น "ทำให้เป็นทางการ: ...มาช้า" ไม่ใช่งานเช็กเครื่องช้า) ·
-    # คำสั่งตรงของระบบ (เปิดแผนที่) ทำก่อนถึง AI เสมอ จึงไม่นับว่าแย่ง (สกิลดีของ Claude 3/10 เคยถูกปฏิเสธผิดด้วยสองเหตุนี้)
+    # ตัวคัดสกิลแบบกฎยังส่งประโยคพวกนั้นไปสกิลเดิม trial จึงไม่เห็นว่าแย่ง แต่ AI
+    # ในเครื่องเลือกจากคำอธิบาย+ตัวอย่าง อาจเลือกสกิลใหม่)
+    # ดูเฉพาะส่วนคำสั่ง (ก่อน ":" · หลังจากนั้นคือข้อความที่ผู้ใช้วางมา เช่น "ทำให้เป็นทางการ:
+    # ...มาช้า" ไม่ใช่งานเช็กเครื่องช้า) ·
+    # คำสั่งตรงของระบบ (เปิดแผนที่) ทำก่อนถึง AI เสมอ จึงไม่นับว่าแย่ง (สกิลดีของ Claude 3/10
+    # เคยถูกปฏิเสธผิดด้วยสองเหตุนี้)
     overlap = [(e, k) for e in m.examples if (k := _pick(e.split(":")[0].split("：")[0], others))]
     if overlap:
         return None, [f"ตัวอย่าง “{e}” เป็นงานของสกิลเดิม ({k})" for e, k in overlap]
@@ -116,7 +121,9 @@ class UserSkills:
         os.replace(tmp, path)
 
     def _save_index(self) -> None:
-        self._write(self.folder / "index.json", json.dumps(self._index, ensure_ascii=False, indent=1))
+        self._write(
+            self.folder / "index.json", json.dumps(self._index, ensure_ascii=False, indent=1)
+        )
 
     def info(self, skill_id: str) -> dict:
         e = self._index.get(skill_id) or {}
@@ -141,8 +148,16 @@ class UserSkills:
         return [{"id": m.id, "name": m.name, **self.info(m.id)} for m in self.load_all()]
 
     # ---------- เขียน ----------
-    def install(self, skill_md: str, existing: list[manifest.Manifest], *, request: str,
-                model: str = "", cost_usd: float = 0.0, replacing: str = "") -> manifest.Manifest:  # fmt: skip
+    def install(
+        self,
+        skill_md: str,
+        existing: list[manifest.Manifest],
+        *,
+        request: str,
+        model: str = "",
+        cost_usd: float = 0.0,
+        replacing: str = "",
+    ) -> manifest.Manifest:
         """ผ่านชั้นที่ 1 แล้วติดตั้ง (หรือแทนรุ่นเดิมเมื่อ replacing) · ไม่ผ่าน = InvalidSkill ไม่เขียนอะไร."""
         m, errors = gate(skill_md, existing, replacing)
         if m is None:
@@ -152,12 +167,16 @@ class UserSkills:
         self._write(self.folder / ".versions" / m.id / f"{version}.md", skill_md)
         self._write(self.folder / f"{m.id}.md", skill_md)
         self._index[m.id] = {
-            "version": version, "enabled": True, "uses": old.get("uses", 0),
+            "version": version,
+            "enabled": True,
+            "uses": old.get("uses", 0),
             "strikes": old.get("strikes", 0) if replacing else 0,
-            "request": request, "model": model, "cost_usd": round(cost_usd, 4),
+            "request": request,
+            "model": model,
+            "cost_usd": round(cost_usd, 4),
             "created": old.get("created") or datetime.now().isoformat(timespec="seconds"),
             "updated": datetime.now().isoformat(timespec="seconds"),
-        }  # fmt: skip
+        }
         self._save_index()
         return m
 
@@ -199,7 +218,9 @@ class UserSkills:
         d = self.folder / ".versions" / skill_id
         return sorted(int(p.stem) for p in d.glob("*.md") if p.stem.isdigit()) if d.is_dir() else []
 
-    def revert(self, skill_id: str, version: int, existing: list[manifest.Manifest]) -> manifest.Manifest:
+    def revert(
+        self, skill_id: str, version: int, existing: list[manifest.Manifest]
+    ) -> manifest.Manifest:
         """กลับไปใช้รุ่นที่เก็บไว้ (หน้า Skill · การ์ด 0017 ชั้นที่ 3) · ผ่านประตูใหม่ก่อน (สกิลอื่นอาจเพิ่มมาหลังรุ่นนั้น)."""
         src = self.folder / ".versions" / skill_id / f"{version}.md"
         try:
@@ -211,7 +232,12 @@ class UserSkills:
             raise manifest.InvalidSkill(errors)
         self._write(self.folder / f"{skill_id}.md", md)
         e = self.info(skill_id)
-        e.update(version=version, enabled=True, strikes=0, updated=datetime.now().isoformat(timespec="seconds"))
+        e.update(
+            version=version,
+            enabled=True,
+            strikes=0,
+            updated=datetime.now().isoformat(timespec="seconds"),
+        )
         self._index[skill_id] = e
         self._save_index()
         return m

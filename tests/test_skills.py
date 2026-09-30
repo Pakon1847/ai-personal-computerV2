@@ -196,11 +196,16 @@ class AppCommandTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             (Path(d) / "lxterminal.desktop").write_text("[Desktop Entry]\n", encoding="utf-8")
             which = {"gio": "/usr/bin/gio"}.get
-            with mock.patch("shutil.which", which), mock.patch.object(actions, "DESKTOP_DIRS", (d,)):
-                self.assertEqual(actions._app_command("lxterminal.desktop"),
-                                 ["gio", "launch", str(Path(d) / "lxterminal.desktop")])  # fmt: skip
+            with (
+                mock.patch("shutil.which", which),
+                mock.patch.object(actions, "DESKTOP_DIRS", (d,)),
+            ):
+                want = ["gio", "launch", str(Path(d) / "lxterminal.desktop")]
+                self.assertEqual(actions._app_command("lxterminal.desktop"), want)
             with mock.patch("shutil.which", lambda n: "/usr/bin/" + n):  # มี gtk-launch = ใช้ตามเดิม
-                self.assertEqual(actions._app_command("lxterminal.desktop"), ["gtk-launch", "lxterminal.desktop"])
+                self.assertEqual(
+                    actions._app_command("lxterminal.desktop"), ["gtk-launch", "lxterminal.desktop"]
+                )
         self.assertIn("gio", actions.LAUNCHERS)  # ไม่รอ output ของแอปที่เปิด
 
 

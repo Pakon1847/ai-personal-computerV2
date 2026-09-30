@@ -97,7 +97,9 @@ class ServerCase(unittest.TestCase):
 
 class ClientTest(ServerCase):
     def test_warm_restores_saved_cache_else_warms_and_saves(self):
-        tools = [{"type": "function", "function": {"name": "x", "description": "d", "parameters": {}}}]
+        tools = [
+            {"type": "function", "function": {"name": "x", "description": "d", "parameters": {}}}
+        ]
         t = client.warm(self.target, "ระบบ", tools)  # ไม่มีไฟล์ (server ไม่รองรับ) → อุ่นเองแล้วลองบันทึก
         self.assertFalse(t["restored"])
         key = client.warm_key("ระบบ", tools)
@@ -308,7 +310,9 @@ class ControllerTest(ServerCase):
         c.skillRequested.connect(lambda sid, text: picked.append((sid, text)))
         FakeLlama.mode = "tool"
         self.assertTrue(c.send("คอมหน่วงมาก เป็นอะไร", ""))
-        pump(lambda: picked, timeout=20)  # ชุดเทสต์เต็มบนเครื่องที่ยุ่ง 5 วิเคยไม่พอ (พลาด 1 ใน ~8 รอบ 2026-10-01)
+        pump(
+            lambda: picked, timeout=20
+        )  # ชุดเทสต์เต็มบนเครื่องที่ยุ่ง 5 วิเคยไม่พอ (พลาด 1 ใน ~8 รอบ 2026-10-01)
         self.assertEqual(picked, [("machine-status", "คอมหน่วงมาก เป็นอะไร")])
         body = FakeLlama.seen[-1]
         self.assertEqual(body["tools"], tools)

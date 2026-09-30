@@ -98,7 +98,9 @@ def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
         return r
     if m := repeat_of(text, manifests):  # ประโยคเดิมที่ใช้สร้าง/เป็นตัวอย่างของสกิล = ใช้สกิลนั้นเลย (การ์ด 0017)
         return Route("skill", m, "ประโยคเดียวกับตัวอย่างของสกิลนี้")
-    if define_intent(text):  # ตั้งโหมด/งานประจำ (การ์ด 0017): มีสกิลที่ตรงแล้ว = ใช้เลย · ยังไม่มี = ให้ Claude สร้าง
+    if define_intent(
+        text
+    ):  # ตั้งโหมด/งานประจำ (การ์ด 0017): มีสกิลที่ตรงแล้ว = ใช้เลย · ยังไม่มี = ให้ Claude สร้าง
         ranked = sorted(((score(text, m), m) for m in manifests if m.id != "system-command"),
                         key=lambda x: x[0], reverse=True)  # fmt: skip
         if ranked and ranked[0][0] > 0:

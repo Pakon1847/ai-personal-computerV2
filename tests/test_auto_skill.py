@@ -9,8 +9,12 @@ from pathlib import Path
 from aipc.skills import forge, manifest, userskills
 
 ROOT = Path(__file__).resolve().parent.parent
-GOOD = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(encoding="utf-8")  # meeting-mode
-GOOD_LLM = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md").read_text(encoding="utf-8")
+GOOD = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(
+    encoding="utf-8"
+)  # meeting-mode
+GOOD_LLM = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md").read_text(
+    encoding="utf-8"
+)
 BAD = json.loads((ROOT / "tests/data/bad_skills.json").read_text(encoding="utf-8"))
 
 try:
@@ -26,7 +30,11 @@ except ImportError:  # pragma: no cover
 class GateTest(unittest.TestCase):
     def test_every_bad_skill_is_rejected(self):
         builtin = manifest.load_builtin()
-        passed = [it["id"] for it in BAD["items"] if userskills.gate(it["skill_md"], builtin)[0] is not None]
+        passed = [
+            it["id"]
+            for it in BAD["items"]
+            if userskills.gate(it["skill_md"], builtin)[0] is not None
+        ]
         self.assertEqual(passed, [], "เกณฑ์การ์ด 0017 ข้อ 10.2: สกิลเสียต้องติดตั้งไม่ได้ทุกไฟล์")
 
     def test_good_skills_from_claude_pass(self):
@@ -61,7 +69,9 @@ class DefineIntentTest(unittest.TestCase):
         self.assertEqual(command.parse("ปิดเสียงหน่อย").plan.action, "mute")
         self.assertIsNone(command.parse("เปิดวิกิกับกูเกิลรอไว้เลย"))  # เดิม: เปิด Google อย่างเดียว
         self.assertIsNone(command.parse("เปิด Gmail และ Google"))
-        self.assertEqual(command.parse("เปิดกูเกิลแมพ").plan.params, {"site": "maps"})  # คำซ้อนไม่นับสองอย่าง
+        self.assertEqual(
+            command.parse("เปิดกูเกิลแมพ").plan.params, {"site": "maps"}
+        )  # คำซ้อนไม่นับสองอย่าง
 
     def test_same_sentence_as_request_uses_that_skill(self):
         from aipc.skills import router
@@ -143,11 +153,20 @@ class ForgeReviseTest(unittest.TestCase):
         def runner(args, prompt, cwd, timeout):
             prompts.append(prompt)
             md = replies[len(prompts) - 1]
-            return 0, json.dumps({"result": json.dumps({"skill_md": md}), "total_cost_usd": 0.01}), ""
+            return (
+                0,
+                json.dumps({"result": json.dumps({"skill_md": md}), "total_cost_usd": 0.01}),
+                "",
+            )
 
         builtin = manifest.load_builtin()
-        p = forge.forge("โหมดประชุม", skills=builtin, runner=runner, revise=(GOOD, "ให้เปิด Gmail ด้วย"),
-                        check=lambda md: userskills.gate(md, builtin)[1])  # fmt: skip
+        p = forge.forge(
+            "โหมดประชุม",
+            skills=builtin,
+            runner=runner,
+            revise=(GOOD, "ให้เปิด Gmail ด้วย"),
+            check=lambda md: userskills.gate(md, builtin)[1],
+        )
         self.assertEqual((p.skill_md != "", p.errors), (True, []))
         self.assertEqual(len(prompts), 2)
         self.assertIn("ให้เปิด Gmail ด้วย", prompts[0])
@@ -156,15 +175,25 @@ class ForgeReviseTest(unittest.TestCase):
 
 class ReviseKeepsIdTest(unittest.TestCase):
     def test_new_id_from_claude_is_replaced_with_the_original(self):
-        # พบบน Pi 5: แก้ work-mode แล้ว Claude ตั้งชื่อใหม่ open-terminal-help → ประตูไม่ยอม "รุ่นแก้ต้องใช้ id เดิม"
+        # พบบน Pi 5: แก้ work-mode แล้ว Claude ตั้งชื่อใหม่ open-terminal-help → ประตูไม่ยอม
+        # "รุ่นแก้ต้องใช้ id เดิม"
         renamed = GOOD.replace("id: meeting-mode", "id: open-terminal-help")
 
         def runner(args, prompt, cwd, timeout):
-            return 0, json.dumps({"result": json.dumps({"skill_md": renamed}), "total_cost_usd": 0.01}), ""
+            return (
+                0,
+                json.dumps({"result": json.dumps({"skill_md": renamed}), "total_cost_usd": 0.01}),
+                "",
+            )
 
         builtin = manifest.load_builtin()
-        p = forge.forge("โหมดประชุม", skills=builtin, runner=runner, revise=(GOOD, "ผิด"),
-                        check=lambda md: userskills.gate(md, builtin, "meeting-mode")[1])  # fmt: skip
+        p = forge.forge(
+            "โหมดประชุม",
+            skills=builtin,
+            runner=runner,
+            revise=(GOOD, "ผิด"),
+            check=lambda md: userskills.gate(md, builtin, "meeting-mode")[1],
+        )
         self.assertEqual((p.skill_id, p.errors), ("meeting-mode", []))
 
 
@@ -190,13 +219,25 @@ class ControllerTest(unittest.TestCase):
         def fake_forge(request, **kw):
             seen.append((request, kw))
             errors = kw["check"](reply_md)
-            return forge.Proposal(not errors, request, skill_md=reply_md if not errors else "",
-                                  errors=errors, model="fake", cost_usd=0.05)  # fmt: skip
+            return forge.Proposal(
+                not errors,
+                request,
+                skill_md=reply_md if not errors else "",
+                errors=errors,
+                model="fake",
+                cost_usd=0.05,
+            )
 
         ex = actions.Executor(runner=lambda a: self.calls.append(a) or 0, dry_run=False)
         store = userskills.UserSkills(Path(d.name) / "skills")
-        s = SkillsController(executor=ex, reminders_path=Path(d.name) / "r.json", run_timer=False,
-                             llm_ready=lambda: True, forge=fake_forge, user_skills=store)  # fmt: skip
+        s = SkillsController(
+            executor=ex,
+            reminders_path=Path(d.name) / "r.json",
+            run_timer=False,
+            llm_ready=lambda: True,
+            forge=fake_forge,
+            user_skills=store,
+        )
         done = []
         s.forgeDone.connect(lambda card, text: done.append((card, text)))
         return s, done

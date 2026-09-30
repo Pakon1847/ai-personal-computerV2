@@ -3,8 +3,10 @@
     python -m aipc.spikes.create_skill_calls --label gemma4-e2b --server http://127.0.0.1:18080 \
         --out docs/benchmarks/2026-09-30-auto-skill/calls-gemma4-e2b.json
 
-ทางเดียวกับแอป: router.route_ai_first ก่อน (คำสั่งตรง/กฎ) → ไม่ตรง = ถาม llama-server ด้วย system prompt และ
-รายการเครื่องมือชุดเดียวกับ ChatController (ask-cloud + create-skill + สกิลในตัว) · ชุด tests/data/create_skill_calls.json
+ทางเดียวกับแอป: router.route_ai_first ก่อน (คำสั่งตรง/กฎ) → ไม่ตรง = ถาม llama-server ด้วย
+system prompt และ
+รายการเครื่องมือชุดเดียวกับ ChatController (ask-cloud + create-skill + สกิลในตัว)
+· ชุด tests/data/create_skill_calls.json
 เขียนและ commit ก่อนวัด (H9) · ห้ามปรับ prompt ด้วยชุดนี้
 """
 
@@ -43,8 +45,13 @@ def evaluate(items: list[dict], ai, skills=None) -> dict:
             row.update(by="rule", got=r.skill.id)
         else:
             res = ai(it["text"])
-            row.update(by="ai", got=res["tool"] or "none", seconds=res["seconds"], timings=res["timings"],
-                       reply=res.get("text", "")[:300])  # fmt: skip
+            row.update(
+                by="ai",
+                got=res["tool"] or "none",
+                seconds=res["seconds"],
+                timings=res["timings"],
+                reply=res.get("text", "")[:300],
+            )
         row["called"] = row["got"] == catalog.CREATE_SKILL
         rows.append(row)
     create = [r for r in rows if r["expect"] == "create"]
@@ -52,10 +59,15 @@ def evaluate(items: list[dict], ai, skills=None) -> dict:
     return {
         "create_hit": [sum(r["called"] for r in create), len(create)],
         "no_false": [sum(r["called"] for r in no), len(no)],
-        "by_style": {s: [sum(r["called"] for r in rows if r["style"] == s),
-                         sum(1 for r in rows if r["style"] == s)] for s in dict.fromkeys(r["style"] for r in rows)},
+        "by_style": {
+            s: [
+                sum(r["called"] for r in rows if r["style"] == s),
+                sum(1 for r in rows if r["style"] == s),
+            ]
+            for s in dict.fromkeys(r["style"] for r in rows)
+        },
         "rows": rows,
-    }  # fmt: skip
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -64,8 +76,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--server", required=True)
     ap.add_argument("--model-name", default="gemma-4-E2B-it-Q4_K_M")
     ap.add_argument("--out", type=Path)
-    ap.add_argument("--dataset", type=Path, default=DATASET, help="ชุดพัฒนา: tests/data/create_skill_dev.json")
-    ap.add_argument("--show", action="store_true", help="พิมพ์คำตอบของ AI ข้อที่ไม่เรียกเครื่องมือ (ใช้กับชุดพัฒนา)")
+    ap.add_argument(
+        "--dataset", type=Path, default=DATASET, help="ชุดพัฒนา: tests/data/create_skill_dev.json"
+    )
+    ap.add_argument(
+        "--show", action="store_true", help="พิมพ์คำตอบของ AI ข้อที่ไม่เรียกเครื่องมือ (ใช้กับชุดพัฒนา)"
+    )
     a = ap.parse_args(argv)
     info = skill_select.server_info(a.server)
     if not info["supports_tools"]:
@@ -84,9 +100,12 @@ def main(argv: list[str] | None = None) -> int:
     hit, n_c = res["create_hit"]
     fal, n_n = res["no_false"]
     ok = hit / n_c >= c["create_hit_min"] and fal / n_n <= c["no_false_max"]
-    line = (f"{a.label}: ควรสร้าง เรียก {hit}/{n_c} = {hit / n_c:.0%} (เกณฑ์ ≥ {c['create_hit_min']:.0%}) · "
-            f"ไม่ควร เรียกผิด {fal}/{n_n} = {fal / n_n:.0%} (เกณฑ์ ≤ {c['no_false_max']:.0%}) → "
-            f"{'ผ่าน' if ok else 'ไม่ผ่าน'}")  # fmt: skip
+    line = (
+        f"{a.label}: ควรสร้าง เรียก {hit}/{n_c} = {hit / n_c:.0%} "
+        f"(เกณฑ์ ≥ {c['create_hit_min']:.0%}) · "
+        f"ไม่ควร เรียกผิด {fal}/{n_n} = {fal / n_n:.0%} (เกณฑ์ ≤ {c['no_false_max']:.0%}) → "
+        f"{'ผ่าน' if ok else 'ไม่ผ่าน'}"
+    )
     print(line)
     for s, (k, n) in res["by_style"].items():
         print(f"  {s}: เรียก create-skill {k}/{n}")
@@ -97,8 +116,14 @@ def main(argv: list[str] | None = None) -> int:
             print("      AI: " + " ".join(r["reply"].split())[:160])
     if a.out:
         a.out.parent.mkdir(parents=True, exist_ok=True)
-        out = {"label": a.label, "server": info, "summary": line, "system_chars": len(system),
-               "date": date.today().isoformat(), **res}  # fmt: skip
+        out = {
+            "label": a.label,
+            "server": info,
+            "summary": line,
+            "system_chars": len(system),
+            "date": date.today().isoformat(),
+            **res,
+        }
         a.out.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     return 0
 

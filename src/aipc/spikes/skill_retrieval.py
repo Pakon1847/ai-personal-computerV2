@@ -2,8 +2,10 @@
 
     python -m aipc.spikes.skill_retrieval
 
-อ้างอิง: RAG-MCP (arXiv:2505.03275) ค้นเครื่องมือก่อน · Tool2Vec (arXiv:2409.02141) แทนเครื่องมือด้วย "ตัวอย่างคำขอ"
-ตัวค้นแบบไม่ต้องมีโมเดล: TF-IDF ของ n-gram ตัวอักษร (ภาษาไทยไม่เว้นวรรค) · เทียบข้อความกับ ชื่อ + คำอธิบาย + ตัวอย่าง + คำสำคัญ
+อ้างอิง: RAG-MCP (arXiv:2505.03275) ค้นเครื่องมือก่อน
+· Tool2Vec (arXiv:2409.02141) แทนเครื่องมือด้วย "ตัวอย่างคำขอ"
+ตัวค้นแบบไม่ต้องมีโมเดล: TF-IDF ของ n-gram ตัวอักษร (ภาษาไทยไม่เว้นวรรค)
+· เทียบข้อความกับ ชื่อ + คำอธิบาย + ตัวอย่าง + คำสำคัญ
 คลังสกิล 21 ตัว = ในตัว 6 + ที่ Claude สร้างในปลายทางจริง 5 + ที่ Claude เขียนในชุดวัดผู้เขียนสกิล 10
 วัด: สกิลที่ถูกอยู่ใน k อันดับแรกไหม (Recall@k) · ประโยค = ชุดเลือกสกิล 58 ข้อ (ข้อที่คาดว่าเป็นสกิล) + ชุดสำนวนอื่น 15 ข้อ
 **เป็นการดูความเป็นไปได้ (feasibility) ไม่ใช่ผลประเมิน** · ชุดข้อมูลเหล่านี้เคยใช้กับงานอื่นแล้ว
@@ -44,7 +46,10 @@ class Index:
 
     def top(self, text: str, k: int) -> list[str]:
         q = self._vec(grams(text))
-        scores = [(sum(w * v.get(g, 0) for g, w in q.items()), s.id) for s, v in zip(self.skills, self.vecs, strict=True)]
+        scores = [
+            (sum(w * v.get(g, 0) for g, w in q.items()), s.id)
+            for s, v in zip(self.skills, self.vecs, strict=True)
+        ]
         return [i for _, i in sorted(scores, reverse=True)[:k]]
 
 
@@ -52,7 +57,9 @@ def pool() -> list[manifest.Manifest]:
     skills = manifest.load_builtin()
     with tempfile.TemporaryDirectory() as d:
         store = userskills.UserSkills(Path(d))
-        for r in json.loads((REPO / "docs/benchmarks/2026-09-30-auto-skill/e2e-r2.json").read_text(encoding="utf-8"))["rows"]:
+        for r in json.loads(
+            (REPO / "docs/benchmarks/2026-09-30-auto-skill/e2e-r2.json").read_text(encoding="utf-8")
+        )["rows"]:
             store.install(r["skill_md"], skills + store.load(), request=r["text"])
         extra = store.load()
     for p in sorted((REPO / "docs/benchmarks/2026-09-30-skill-author/claude").glob("*.md")):
@@ -65,8 +72,12 @@ def pool() -> list[manifest.Manifest]:
 def main() -> int:
     skills = pool()
     idx = Index([s for s in skills if s.id != "system-command"])
-    sel = json.loads((REPO / "tests/data/skill_selection.json").read_text(encoding="utf-8"))["items"]
-    para = json.loads((REPO / "tests/data/auto_skill_paraphrase.json").read_text(encoding="utf-8"))["items"]
+    sel = json.loads((REPO / "tests/data/skill_selection.json").read_text(encoding="utf-8"))[
+        "items"
+    ]
+    para = json.loads((REPO / "tests/data/auto_skill_paraphrase.json").read_text(encoding="utf-8"))[
+        "items"
+    ]
     cases = [(i["text"], i["expect"]) for i in sel if i["expect"] not in ("none", "system-command")]
     cases += [(i["text"], i["expect"]) for i in para]
     print(f"คลัง {len(idx.skills)} สกิล · ประโยค {len(cases)}")
@@ -84,7 +95,10 @@ def main() -> int:
     builtin = {s.id for s in manifest.load_builtin()}
     uidx = Index([s for s in skills if s.id not in builtin])
     ucases = [(t, e) for t, e in cases if e not in builtin]
-    print(f"แบบเสนอ: สกิลในตัว {len(builtin)} ตัวส่งเสมอ · ค้นในสกิลของผู้ใช้ {len(uidx.skills)} ตัว · ประโยค {len(ucases)}")
+    print(
+        f"แบบเสนอ: สกิลในตัว {len(builtin)} ตัวส่งเสมอ · "
+        f"ค้นในสกิลของผู้ใช้ {len(uidx.skills)} ตัว · ประโยค {len(ucases)}"
+    )
     for k in (1, 3, 5):
         hit = sum(e in uidx.top(t, k) for t, e in ucases)
         print(f"  Recall@{k} (สกิลของผู้ใช้): {hit}/{len(ucases)} = {hit / len(ucases):.0%}")

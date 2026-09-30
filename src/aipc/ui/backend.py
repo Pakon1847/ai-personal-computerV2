@@ -57,7 +57,8 @@ class UiSettings(QObject):
 
 
 class CloudUsage(QObject):
-    """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget · ไม่มี Claude = available False."""
+    """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget
+    · ไม่มี Claude = available False."""
 
     changed = Signal()
 
@@ -65,7 +66,9 @@ class CloudUsage(QObject):
         super().__init__()
         self._b = budget
         self._available = available and budget is not None
-        self._timer = QTimer(self, interval=poll_ms, timeout=self.changed.emit)  # อ่านซ้ำ: บันทึกจากเธรดอื่น
+        self._timer = QTimer(
+            self, interval=poll_ms, timeout=self.changed.emit
+        )  # อ่านซ้ำ: บันทึกจากเธรดอื่น
         if self._available:
             self._timer.start()
 
@@ -707,7 +710,8 @@ class SkillsController(QObject):
         self._llm_ready = llm_ready or (lambda: False)
         from aipc.skills import actions, manifest, reminders
 
-        # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal · None = ไม่มี Claude
+        # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal
+        # · None = ไม่มี Claude
         self._forge = forge
         self._forging = False
         self._user = user_skills
@@ -920,7 +924,8 @@ class SkillsController(QObject):
                      "Claude เห็นเฉพาะประโยคนี้ ไม่เห็นแชท นัด หรือไฟล์ของคุณ"]  # fmt: skip
 
     def _plain(self, kind: str, title: str, lines=(), chips=()) -> dict:
-        return {"kind": kind, "badge": {}, "title": title, "chips": list(chips), "lines": list(lines),
+        return {"kind": kind, "badge": {}, "title": title, "chips": list(chips),
+                "lines": list(lines),
                 "confirmToken": "", "page": ""}  # fmt: skip
 
     def _start_forge(self, text: str, revise_id: str = "", feedback: str = "") -> dict:
@@ -939,8 +944,11 @@ class SkillsController(QObject):
 
         def work():
             try:
-                p = self._forge(text, skills=others, revise=revise,
-                                check=lambda md: userskills.gate(md, others, revise_id)[1])  # fmt: skip
+
+                def check(md):
+                    return userskills.gate(md, others, revise_id)[1]
+
+                p = self._forge(text, skills=others, revise=revise, check=check)
             except Exception as e:  # noqa: BLE001 · ทุกความผิดพลาด = บอกผู้ใช้ ไม่ให้หน้าจอรอค้าง
                 p = e
             self._forged.emit((p, text, revise_id))
@@ -1004,10 +1012,13 @@ class SkillsController(QObject):
         out = []
         for m in self._user.load_all():
             e = self._user.info(m.id)
-            detail = [s.text for s in m.steps] if m.steps else [m.prompt.strip().splitlines()[0][:120]]
+            detail = (
+                [s.text for s in m.steps] if m.steps else [m.prompt.strip().splitlines()[0][:120]]
+            )
             out.append({
                 "id": m.id, "name": m.name, "description": m.description, "detail": detail,
-                "version": e["version"], "versions": self._user.versions(m.id), "enabled": e["enabled"],
+                "version": e["version"], "versions": self._user.versions(m.id),
+                "enabled": e["enabled"],
                 "uses": e["uses"], "request": e.get("request") or m.extra.get("request", ""),
                 "created": (e.get("created") or m.extra.get("created", ""))[:10],
             })  # fmt: skip
@@ -1049,9 +1060,7 @@ class SkillsController(QObject):
     @Slot(str, str, result="QVariantMap")
     def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802
         """AI ในเครื่องเลือกสกิลนี้ → ทำทางเดียวกับที่ตัวคัดสกิลเลือก (ยืนยันก่อนถ้าเป็นงานที่แตะเครื่อง)."""
-        from aipc.skills import router
-
-        from aipc.skills import catalog
+        from aipc.skills import catalog, router
 
         if skill_id == catalog.CREATE_SKILL:  # AI ในเครื่องขอให้ Claude สร้างสกิล (การ์ด 0017)
             return self._start_forge(text)
@@ -1075,7 +1084,11 @@ class SkillsController(QObject):
         if self._llm_ready():
             r = router.route_ai_first(text, self._skills)
             if r.kind == "create":  # ตั้งโหมด/งานประจำที่ยังไม่มีสกิล (การ์ด 0017)
-                return self._start_forge(text) if self.canForge else self._card(router.Route("chat"), text)
+                return (
+                    self._start_forge(text)
+                    if self.canForge
+                    else self._card(router.Route("chat"), text)
+                )
             return self._card(r, text)
         return self._card(router.route(text, self._skills, self.available()), text)
 
@@ -1326,7 +1339,8 @@ class ChatController(QObject):
             self._status = status
             self.statusChanged.emit()
             # หลังตั้งสถานะ: สกิลที่ต้องใช้ AI (สรุป แปล ...) นับว่ามีเมื่อ chat.ready · อุ่นก่อนตั้ง = รายการสกิลไม่ครบ
-            # ส่วนต้นไม่ตรงกับคำขอจริง แคชใช้ไม่ได้ (Pi 5 2026-09-30: อุ่น 603 token แต่ข้อความแรกยังอ่านใหม่ 916 token 45 วิ)
+            # ส่วนต้นไม่ตรงกับคำขอจริง แคชใช้ไม่ได้ (Pi 5 2026-09-30: อุ่น 603 token
+            # แต่ข้อความแรกยังอ่านใหม่ 916 token 45 วิ)
             if status == "ready":
                 self._warm_up()
 
@@ -1473,7 +1487,8 @@ class ChatController(QObject):
 
     @Slot(str, result=bool)
     def askCloudFor(self, text: str) -> bool:  # noqa: N802
-        """สร้างสกิลไม่สำเร็จ → ให้ Claude ตอบคำขอนี้แทน (การ์ด 0017 ข้อ 4.5) · ไม่มี Claude / กำลังตอบ = False."""
+        """สร้างสกิลไม่สำเร็จ → ให้ Claude ตอบคำขอนี้แทน (การ์ด 0017 ข้อ 4.5)
+        · ไม่มี Claude / กำลังตอบ = False."""
         if self._cloud is None or self._busy or not text.strip():
             return False
         self._conv["messages"].append({"role": "user", "content": text})

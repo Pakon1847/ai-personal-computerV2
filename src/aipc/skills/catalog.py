@@ -21,9 +21,14 @@ ASK_CLOUD_DESC = ("ถามผู้ช่วยบน cloud ที่ค้น
 # สกิลอัตโนมัติ (การ์ด 0017): ให้ Claude สร้างสกิลใหม่ แล้วติดตั้งและทำงานนั้นทันที
 # ข้อความนี้เขียนก่อนวัดด้วย tests/data/create_skill_calls.json (H9) · ห้ามปรับโดยดูผลของชุดนั้น
 CREATE_SKILL = "create-skill"
-CREATE_SKILL_DESC = ("สร้างสกิลใหม่ให้เครื่องนี้ (Claude เขียนให้แล้วติดตั้งเอง): ใช้เมื่อผู้ใช้อยากได้สกิล โหมด หรือคำสั่งประจำ "
-                     "สำหรับงานที่จะทำซ้ำ เช่น เปิดเว็บหรือแอปหลายอย่างรวดเดียว ปรับเสียง หรืองานเขียน/งานภาษาแบบเดิมทุกครั้ง "
-                     "และยังไม่มีเครื่องมือตัวอื่นทำได้ · ไม่ใช้กับคำถามความรู้ คุยเล่น ข้อมูลสด หรืองานที่มีเครื่องมืออยู่แล้ว")  # fmt: skip
+CREATE_SKILL_DESC = (
+    "สร้างสกิลใหม่ให้เครื่องนี้ (Claude เขียนให้แล้วติดตั้งเอง): "
+    "ใช้เมื่อผู้ใช้อยากได้สกิล โหมด หรือคำสั่งประจำ "
+    "สำหรับงานที่จะทำซ้ำ เช่น เปิดเว็บหรือแอปหลายอย่างรวดเดียว ปรับเสียง "
+    "หรืองานเขียน/งานภาษาแบบเดิมทุกครั้ง "
+    "และยังไม่มีเครื่องมือตัวอื่นทำได้ · ไม่ใช้กับคำถามความรู้ คุยเล่น ข้อมูลสด "
+    "หรืองานที่มีเครื่องมืออยู่แล้ว"
+)
 # ข้อเท็จจริงเกี่ยวกับตัวระบบ (กรรมการสอบถามได้ · ชุดสอบจบกลุ่ม H) · ต้องตรงกับของจริงเสมอ
 ABOUT = (
     "เกี่ยวกับระบบนี้: ทำงานบน Raspberry Pi 5 RAM 8 GB · "
@@ -77,11 +82,11 @@ def tools(skills: list[Manifest], available: set[str], cloud: bool = False,
     out = []
     empty = {"type": "object", "properties": {}}
     if cloud:  # ไว้หน้าสุด: รายการเครื่องมือคงที่ แคชของ llama-server จึงใช้ส่วนต้นซ้ำได้
-        out.append({"type": "function", "function": {"name": ASK_CLOUD, "description": ASK_CLOUD_DESC,
-                                                     "parameters": empty}})  # fmt: skip
+        fn = {"name": ASK_CLOUD, "description": ASK_CLOUD_DESC, "parameters": empty}
+        out.append({"type": "function", "function": fn})
     if forge:  # คงที่เหมือนกัน · ไว้ก่อนสกิล (สกิลของผู้ใช้เพิ่ม/ลดได้ ต่อท้าย)
-        out.append({"type": "function", "function": {"name": CREATE_SKILL, "description": CREATE_SKILL_DESC,
-                                                     "parameters": empty}})  # fmt: skip
+        fn = {"name": CREATE_SKILL, "description": CREATE_SKILL_DESC, "parameters": empty}
+        out.append({"type": "function", "function": fn})
     for s in skills:
         if s.id in NOT_FOR_AI or any(n not in available for n in s.needs):
             continue

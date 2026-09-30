@@ -166,7 +166,17 @@ def _volume(t: str, heard: str) -> Command | None:
     return None
 
 
-VOLUME_CUES = ("ปิดเสียง", "เปิดเสียง", "เพิ่มเสียง", "ลดเสียง", "เร่งเสียง", "เบาเสียง", "ปรับเสียง", "ดังขึ้น", "เบาลง")
+VOLUME_CUES = (
+    "ปิดเสียง",
+    "เปิดเสียง",
+    "เพิ่มเสียง",
+    "ลดเสียง",
+    "เร่งเสียง",
+    "เบาเสียง",
+    "ปรับเสียง",
+    "ดังขึ้น",
+    "เบาลง",
+)
 
 
 def _several_actions(t: str) -> bool:
@@ -190,7 +200,11 @@ def parse(text: str) -> Command | None:
     """แปลงประโยคเป็นคำสั่ง · None = ไม่ใช่คำสั่งเครื่อง (ส่งต่อให้สกิลอื่น)."""
     heard = text.strip()
     t = normalize(text)
-    if not t or any(w in t for w in LATER_WORDS + NEGATIONS + DEFINE_WORDS) or when.mentions_time(heard):
+    if (
+        not t
+        or any(w in t for w in LATER_WORDS + NEGATIONS + DEFINE_WORDS)
+        or when.mentions_time(heard)
+    ):
         return None  # ให้ทำทีหลัง / สั่งไม่ให้ทำ → ไม่ใช่คำสั่งตอนนี้ (ส่งต่อให้สกิลนัดหมายหรือแชท)
 
     if _several_actions(t):

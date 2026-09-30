@@ -69,7 +69,8 @@ def ask_claude(prompt: str, *, claude: str, model: str | None, runner: Runner) -
     """เรียก `claude -p` แบบข้อความล้วน จากโฟลเดอร์ว่าง · prompt ส่งทาง stdin (ไม่อยู่ใน argv)."""
     args = [claude, "-p", "--output-format", "json", "--tools", "", "--permission-prompts", "none",
             "--no-session-persistence", "--max-budget-usd", BUDGET_USD,
-            "--strict-mcp-config", "--disable-slash-commands"]  # fmt: skip  # ไม่โหลด MCP/สกิลของบัญชี (การ์ด 0016)
+            "--strict-mcp-config", "--disable-slash-commands"]  # fmt: skip
+    # --strict-mcp-config --disable-slash-commands: ไม่โหลด MCP/สกิลของบัญชี (การ์ด 0016)
     if model:
         args += ["--model", model]
     with tempfile.TemporaryDirectory(prefix="aipc-forge-") as cwd:
@@ -239,7 +240,8 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
         previous = data["skill_md"]
         new, errors = _validate(previous)
         if new is not None and revise_id and new.id != revise_id:
-            # รุ่นแก้ต้องเป็นสกิลเดิม: Claude ตั้ง id ใหม่เอง (พบบน Pi 5 · work-mode → open-terminal-help) → ใช้ id เดิม
+            # รุ่นแก้ต้องเป็นสกิลเดิม: Claude ตั้ง id ใหม่เอง (พบบน Pi 5
+            # · work-mode → open-terminal-help) → ใช้ id เดิม
             previous = re.sub(r"(?m)^id:\s*\S+", f"id: {revise_id}", previous, count=1)
             new, errors = _validate(previous)
         if new is not None and new.id in ids:
@@ -247,7 +249,9 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
         if new is None:
             fix = p.errors = errors
             continue
-        if check is not None and (errors := check(previous)):  # ประตูของผู้เรียก (สกิลอัตโนมัติ · การ์ด 0017)
+        if check is not None and (
+            errors := check(previous)
+        ):  # ประตูของผู้เรียก (สกิลอัตโนมัติ · การ์ด 0017)
             fix = p.errors = errors
             continue
         should = [s for s in data.get("should_trigger", []) if isinstance(s, str)]
@@ -259,12 +263,12 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
         p.trial = {**asdict(t), "should_trigger": should, "should_not_trigger": should_not}
         p.ok = t.ok
         # อัตโนมัติ: เรียกผิด/แย่งประโยค = ให้ Claude แก้อีกรอบ · "ควรเรียกแต่ไม่เรียก" ไม่แก้ (วัดด้วยตัวคัดแบบกฎ
-        # แต่ในแอป AI เลือกจากคำอธิบาย · สกิลดีของ Claude เช่น ตัวอย่าง "meeting mode" กฎจับไม่ได้ ไม่ใช่เรื่องความปลอดภัย)
+        # แต่ในแอป AI เลือกจากคำอธิบาย · สกิลดีของ Claude เช่น ตัวอย่าง "meeting mode" กฎจับไม่ได้
+        # ไม่ใช่เรื่องความปลอดภัย)
         if (t.not_trigger_fail or t.stolen) and check is not None and attempt < MAX_ATTEMPTS:
-            fix = p.errors = (
-                [f"ประโยคนี้ไม่ควรเรียกสกิลใหม่แต่เรียก: {x}" for x in t.not_trigger_fail]
-                + [f"แย่งประโยคของสกิลเดิม: {x} (เดิมคือ {k})" for x, k in t.stolen]
-            )
+            fix = p.errors = [f"ประโยคนี้ไม่ควรเรียกสกิลใหม่แต่เรียก: {x}" for x in t.not_trigger_fail] + [
+                f"แย่งประโยคของสกิลเดิม: {x} (เดิมคือ {k})" for x, k in t.stolen
+            ]
             continue
         return p
     return p

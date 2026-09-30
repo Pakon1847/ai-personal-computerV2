@@ -200,8 +200,10 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(
-            run_timer=not opts.greeter_session, llm_ready=lambda: chat.ready,
-            forge=skill_forge, user_skills=user_skills,
+            run_timer=not opts.greeter_session,
+            llm_ready=lambda: chat.ready,
+            forge=skill_forge,
+            user_skills=user_skills,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None),

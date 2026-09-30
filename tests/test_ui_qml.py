@@ -335,7 +335,8 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(warnings, [])
 
     def test_claude_made_skill_cards_draw_with_undo_and_wrong_buttons(self):
-        """การ์ด 0017: กำลังสร้าง / สร้างไม่สำเร็จ / สกิลที่ Claude สร้าง (มีปุ่ม) วาดได้ · ปุ่ม "ไม่ใช่แบบนี้" เปลี่ยนช่องพิมพ์."""
+        """การ์ด 0017: กำลังสร้าง / สร้างไม่สำเร็จ / สกิลที่ Claude สร้าง (มีปุ่ม) วาดได้
+        · ปุ่ม "ไม่ใช่แบบนี้" เปลี่ยนช่องพิมพ์."""
         _, win, warnings = self.open_shell()
         page = find_all(win, "workspace")[0]
         base = {"chips": [], "lines": ["x"], "confirmToken": "", "page": ""}
@@ -344,9 +345,10 @@ class ShellCardTest(unittest.TestCase):
             {"user": False, "card": {**base, "kind": "steps", "title": "ทำครบ 2 ขั้นแล้ว",
                                      "badge": {"name": "โหมดทำงาน", "reason": "r", "worker": "โค้ด",
                                                "forgedId": "work-mode", "forgedVersion": 1}}},
-            {"user": False, "card": {**base, "kind": "forging", "badge": {}, "title": "กำลังให้ Claude สร้างสกิล…"}},
-            {"user": False, "card": {**base, "kind": "forge-failed", "badge": {}, "title": "สร้างสกิลไม่สำเร็จ",
-                                     "fallback": True}},
+            {"user": False, "card": {**base, "kind": "forging", "badge": {},
+                                     "title": "กำลังให้ Claude สร้างสกิล…"}},
+            {"user": False, "card": {**base, "kind": "forge-failed", "badge": {},
+                                     "title": "สร้างสกิลไม่สำเร็จ", "fallback": True}},
         ])  # fmt: skip
         settle(100)
         rows = [r for r in find_items(win, "forgedRow") if r.property("visible")]
@@ -369,11 +371,15 @@ class ShellCardTest(unittest.TestCase):
         skills = engine.rootContext().contextProperty("skills")
         self.assertTrue(find_items(win, "userSkillsEmpty")[0].property("visible"))
         root = Path(__file__).resolve().parent.parent
-        md = (root / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(encoding="utf-8")
+        md = (root / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(
+            encoding="utf-8"
+        )
         store = userskills.UserSkills(Path(os.environ["XDG_DATA_HOME"]) / "aipc" / "skills")
         builtin = manifest.load_builtin()
         m = store.install(md, builtin, request="เข้าโหมดประชุม")
-        store.install(md.replace("3. บอก:", "3. บอก: (รุ่น 2)"), [*builtin, m], request="x", replacing=m.id)
+        store.install(
+            md.replace("3. บอก:", "3. บอก: (รุ่น 2)"), [*builtin, m], request="x", replacing=m.id
+        )
         skills._user = store
         skills._reload()
         settle(100)

@@ -115,8 +115,10 @@ def warm(target: Target, system: str, tools: list[dict], timeout: float = 300) -
     }
     if tools:
         body["tools"], body["tool_choice"] = tools, "auto"
-    # เก็บแคชลงดิสก์ (ข้อเสนอ 2026-10-01 · docs/benchmarks/2026-10-01-llm-speed-ideas-pi5): เคยอุ่นชุดนี้แล้ว = โหลดคืน 7 ms
-    # แทนอ่านใหม่ 52.8 วิ · ต้องเปิด AI ด้วย --swa-full --slot-save-path (aipc-llm-start) · ไม่รองรับ = อุ่นแบบเดิม
+    # เก็บแคชลงดิสก์ (ข้อเสนอ 2026-10-01
+    # · docs/benchmarks/2026-10-01-llm-speed-ideas-pi5): เคยอุ่นชุดนี้แล้ว = โหลดคืน 7 ms
+    # แทนอ่านใหม่ 52.8 วิ · ต้องเปิด AI ด้วย --swa-full --slot-save-path (aipc-llm-start)
+    # · ไม่รองรับ = อุ่นแบบเดิม
     key = warm_key(system, tools)
     restored = _slot(target, "restore", key)
     try:
