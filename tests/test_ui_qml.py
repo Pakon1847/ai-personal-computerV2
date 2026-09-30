@@ -445,6 +445,14 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("กรมอุตุฯ (https://www.tmd.go.th/x) ฝน", t.property("text"))
         self.assertEqual(warnings, [])
 
+    def test_chat_input_has_focus_when_workspace_opens(self):
+        """ทดสอบบนจอ Pi 2026-10-01: เปิดหน้าผู้ช่วยแล้วต้องกด Tab หลายครั้งกว่าจะพิมพ์ได้."""
+        _, win, warnings = self.open_shell()
+        win.requestActivate()
+        settle(200)
+        self.assertTrue(find_all(win, "chatInput")[0].property("activeFocus"))
+        self.assertEqual(warnings, [])
+
     def test_onboarding_shows_once(self):
         """ฟีเจอร์ข้อ 8: หน้าแนะนำขึ้นครั้งแรก · กด "เข้าใจแล้ว" = จำในไฟล์ตั้งค่า ไม่ขึ้นอีก."""
         from aipc.ui import settings

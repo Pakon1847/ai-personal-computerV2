@@ -35,6 +35,10 @@ Item {
     function tidy(t) {
         return (t || "").replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, "$1 ($2)").replace(/\*\*([^*]+)\*\*/g, "$1")
     }
+    // เปิดหน้าผู้ช่วยแล้วพิมพ์ได้ทันที (ทดสอบบนจอ Pi: ต้องกด Tab หลายครั้งกว่าจะถึงช่องพิมพ์)
+    function focusInput() { if (visible && !historyPopup.opened) input.forceActiveFocus() }
+    onVisibleChanged: if (visible) Qt.callLater(focusInput)
+    Component.onCompleted: Qt.callLater(focusInput)
     function push(item) {
         items = items.concat([item])
     }

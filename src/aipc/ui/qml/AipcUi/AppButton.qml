@@ -28,6 +28,9 @@ Button {
     font.pixelSize: Theme.px(15)
     font.weight: (kind === "secondary" || kind === "ghost") ? Font.Normal : Font.DemiBold
     hoverEnabled: true
+    // Enter/Return กดปุ่มที่มีโฟกัสได้ (ค่าเริ่มต้นของ Qt ใช้ Space อย่างเดียว · ทดสอบบนจอ Pi 2026-10-01 กด Enter แล้วไม่มีอะไรเกิด)
+    Keys.onReturnPressed: (event) => { if (control.enabled) control.clicked(); event.accepted = true }
+    Keys.onEnterPressed: (event) => { if (control.enabled) control.clicked(); event.accepted = true }
     // ปุ่มที่ยังใช้ไม่ได้ต้องดูต่างจากปุ่มที่ใช้ได้ชัด ๆ ทั้งพื้นและตัวอักษร (H5)
     opacity: enabled ? 1.0 : 0.45
 
