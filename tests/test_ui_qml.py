@@ -418,6 +418,33 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
+    def test_ai_answer_is_plain_text_and_links_readable(self):
+        """พบบนจอ Pi 2026-10-01: ลิงก์ markdown ดิบ
+        · และข้อความหน้าตาเหมือน HTML ต้องไม่ถูกแสดงเป็น HTML (รูปจากเว็บ = รั่ว)."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        page.setProperty(
+            "items",
+            [
+                {
+                    "ai": True,
+                    "done": True,
+                    "skill": "",
+                    "note": "ตอบโดย Claude (cloud) · x",
+                    "text": "[กรมอุตุฯ](https://www.tmd.go.th/x) **ฝน** <img src='https://e.x/a.png'>",
+                }
+            ],
+        )
+        settle(100)
+        t = [o for o in find_items(win, "aiText") if o.property("visible")][0]
+        # PySide อ่าน enum textFormat ไม่ได้ · ตรวจในไฟล์ QML แทนว่าบังคับ PlainText
+        qml = (
+            Path(__file__).resolve().parent.parent / "src/aipc/ui/qml/AipcUi/WorkspacePage.qml"
+        ).read_text("utf-8")
+        self.assertIn("textFormat: Text.PlainText", qml)
+        self.assertIn("กรมอุตุฯ (https://www.tmd.go.th/x) ฝน", t.property("text"))
+        self.assertEqual(warnings, [])
+
     def test_onboarding_shows_once(self):
         """ฟีเจอร์ข้อ 8: หน้าแนะนำขึ้นครั้งแรก · กด "เข้าใจแล้ว" = จำในไฟล์ตั้งค่า ไม่ขึ้นอีก."""
         from aipc.ui import settings

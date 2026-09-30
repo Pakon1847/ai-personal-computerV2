@@ -30,6 +30,11 @@ Item {
         "reminder": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง"
     })
 
+    // คำตอบของ AI แสดงเป็นข้อความธรรมดาเสมอ (ไม่เปิด markdown/HTML: แท็กรูปในคำตอบอาจทำให้ Qt ไปดึงรูปจากเว็บ = ข้อมูลรั่ว T6)
+    // พบบนจอ Pi 2026-10-01: คำตอบของ Claude มี [ชื่อ](ลิงก์) และ **ตัวหนา** ดิบ ๆ → แปลงให้อ่านง่าย
+    function tidy(t) {
+        return (t || "").replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, "$1 ($2)").replace(/\*\*([^*]+)\*\*/g, "$1")
+    }
     function push(item) {
         items = items.concat([item])
     }
@@ -448,13 +453,16 @@ Item {
                     width: parent.width - 32
                     spacing: 6
                     AppText {
-                        text: "AI ในเครื่อง" + (row.modelData.skill ? " · " + row.modelData.skill : "")
+                        // ตอบโดย Claude = หัวต้องบอกว่า Claude (พบบนจอ Pi: หัวเขียน "AI ในเครื่อง" แต่หมายเหตุบอก Claude)
+                        text: ((row.modelData.note || "").indexOf("ตอบโดย Claude") === 0 ? "Claude (cloud)" : "AI ในเครื่อง")
+                              + (row.modelData.skill ? " · " + row.modelData.skill : "")
                         size: Theme.fontCaption; color: Theme.inkMuted
                     }
                     AppText {
                         objectName: "aiText"
                         Layout.fillWidth: true
-                        text: row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : "กำลังอ่านข้อความ…")
+                        textFormat: Text.PlainText  // ค่าเริ่มต้น AutoText เดาเป็น HTML ได้ถ้าคำตอบหน้าตาเหมือนแท็ก
+                        text: root.tidy(row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : "กำลังอ่านข้อความ…"))
                     }
                     AppText {
                         visible: !!row.modelData.note
