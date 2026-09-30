@@ -1,0 +1,836 @@
+{
+ "label": "gemma4-e2b-r2",
+ "server": {
+  "supports_tools": true,
+  "template_chars": 18807,
+  "template_sha256": "74a88f94c57c14e22dcdbe08e94127f42b87c6f584cb73838e73e32126f3f6b3",
+  "model": "models/gemma-4-E2B-it-Q4_K_M.gguf"
+ },
+ "summary": "gemma4-e2b-r2: ควรสร้าง เรียก 12/16 = 75% (เกณฑ์ ≥ 70%) · ไม่ควร เรียกผิด 0/22 = 0% (เกณฑ์ ≤ 10%) → ผ่าน",
+ "system_chars": 1518,
+ "date": "2026-09-30",
+ "create_hit": [
+  12,
+  16
+ ],
+ "no_false": [
+  0,
+  22
+ ],
+ "by_style": {
+  "explicit": [
+   8,
+   8
+  ],
+  "implicit": [
+   4,
+   8
+  ],
+  "knowledge": [
+   0,
+   7
+  ],
+  "chat": [
+   0,
+   3
+  ],
+  "live": [
+   0,
+   3
+  ],
+  "existing": [
+   0,
+   7
+  ],
+  "about": [
+   0,
+   2
+  ]
+ },
+ "rows": [
+  {
+   "id": "c01",
+   "expect": "create",
+   "style": "explicit",
+   "text": "อยากได้สกิลโหมดเช้า เปิด Gmail แล้วเปิด Google Maps ให้ทีเดียว",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 7.41,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 22,
+    "prompt_ms": 1204.11,
+    "prompt_per_token_ms": 54.73227272727272,
+    "prompt_per_second": 18.2707559940537,
+    "predicted_n": 39,
+    "predicted_ms": 6148.014,
+    "predicted_per_token_ms": 161.78984210526315,
+    "predicted_per_second": 6.1808577534143545
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c02",
+   "expect": "create",
+   "style": "explicit",
+   "text": "ช่วยทำคำสั่งประจำไว้ให้หน่อย พิมพ์ว่าโหมดดูหนังแล้วให้เปิดยูทูบกับปรับเสียงเป็น 80",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 8.21,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 34,
+    "prompt_ms": 1692.075,
+    "prompt_per_token_ms": 49.76691176470588,
+    "prompt_per_second": 20.093671970805076,
+    "predicted_n": 41,
+    "predicted_ms": 6468.303,
+    "predicted_per_token_ms": 161.707575,
+    "predicted_per_second": 6.184002202741584
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c03",
+   "expect": "create",
+   "style": "explicit",
+   "text": "สร้างสกิลแต่งกลอนอวยพรวันเกิดให้หน่อย จะได้ใช้บ่อย ๆ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.54,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1201.196,
+    "prompt_per_token_ms": 50.04983333333333,
+    "prompt_per_second": 19.980086513774605,
+    "predicted_n": 9,
+    "predicted_ms": 1292.268,
+    "predicted_per_token_ms": 161.5335,
+    "predicted_per_second": 6.190666332370685
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c04",
+   "expect": "create",
+   "style": "explicit",
+   "text": "อยากได้สกิลตั้งชื่อร้านค้าออนไลน์ ขอทีละ 5 ชื่อ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.37,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 20,
+    "prompt_ms": 1025.701,
+    "prompt_per_token_ms": 51.28505,
+    "prompt_per_second": 19.49885980417295,
+    "predicted_n": 9,
+    "predicted_ms": 1288.15,
+    "predicted_per_token_ms": 161.01875,
+    "predicted_per_second": 6.210456856732523
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c05",
+   "expect": "create",
+   "style": "explicit",
+   "text": "ทำสกิลอธิบายศัพท์คอมพิวเตอร์ให้ผู้สูงอายุเข้าใจได้ไหม",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 8.83,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 22,
+    "prompt_ms": 1144.423,
+    "prompt_per_token_ms": 52.01922727272727,
+    "prompt_per_second": 19.223661181224077,
+    "predicted_n": 48,
+    "predicted_ms": 7647.943,
+    "predicted_per_token_ms": 162.7221914893617,
+    "predicted_per_second": 6.145443291091474
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c06",
+   "expect": "create",
+   "style": "explicit",
+   "text": "ขอสกิลช่วยคิดคำถามสัมภาษณ์งานจากตำแหน่งที่บอก",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.37,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 20,
+    "prompt_ms": 1025.869,
+    "prompt_per_token_ms": 51.29344999999999,
+    "prompt_per_second": 19.49566660070633,
+    "predicted_n": 9,
+    "predicted_ms": 1289.319,
+    "predicted_per_token_ms": 161.164875,
+    "predicted_per_second": 6.20482595850988
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c07",
+   "expect": "create",
+   "style": "explicit",
+   "text": "อยากให้เครื่องมีคำสั่งเตรียมค้นรายงาน เปิดวิกิพีเดียกับ Google พร้อมกัน",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 7.82,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 25,
+    "prompt_ms": 1259.616,
+    "prompt_per_token_ms": 50.38464,
+    "prompt_per_second": 19.84731854787491,
+    "predicted_n": 41,
+    "predicted_ms": 6429.403,
+    "predicted_per_token_ms": 160.735075,
+    "predicted_per_second": 6.221417447311982
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c08",
+   "expect": "create",
+   "style": "explicit",
+   "text": "สร้างสกิลโหมดเงียบ ปิดเสียงเครื่องแล้วเปิดหน้าไฟล์ของฉัน",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.5,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 22,
+    "prompt_ms": 1145.349,
+    "prompt_per_token_ms": 52.06131818181818,
+    "prompt_per_second": 19.208119097323177,
+    "predicted_n": 9,
+    "predicted_ms": 1293.432,
+    "predicted_per_token_ms": 161.679,
+    "predicted_per_second": 6.185095157689001
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "c09",
+   "expect": "create",
+   "style": "implicit",
+   "text": "เปิดโหมดทำงานให้หน่อย",
+   "by": "rule",
+   "got": "create-skill",
+   "called": true
+  },
+  {
+   "id": "c10",
+   "expect": "create",
+   "style": "implicit",
+   "text": "เข้าโหมดประชุมให้ที",
+   "by": "rule",
+   "got": "create-skill",
+   "called": true
+  },
+  {
+   "id": "c11",
+   "expect": "create",
+   "style": "implicit",
+   "text": "จากนี้ไปทุกครั้งที่บอกว่าพักสายตา ให้ลดเสียงเหลือ 20 แล้วเปิดยูทูบ",
+   "by": "rule",
+   "got": "create-skill",
+   "called": true
+  },
+  {
+   "id": "c12",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ต่อไปถ้าพิมพ์ว่าเตรียมเดินทาง ให้เปิด Google Maps กับ Gmail เลยนะ",
+   "by": "rule",
+   "got": "create-skill",
+   "called": true
+  },
+  {
+   "id": "c13",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ช่วยตรวจการบ้านภาษาอังกฤษของลูกทุกวัน บอกคำผิดแล้วอธิบายแบบเด็กเข้าใจ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.84,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1197.946,
+    "prompt_per_token_ms": 49.91441666666666,
+    "prompt_per_second": 20.034292029857774,
+    "predicted_n": 48,
+    "predicted_ms": 7583.64,
+    "predicted_per_token_ms": 161.3540425531915,
+    "predicted_per_second": 6.197551571540844
+   },
+   "reply": "ฉันไม่สามารถตรวจการบ้านภาษาอังกฤษของลูกทุกวันได้โดยตรงค่ะ เนื่องจากฉันเป็น AI ที่ทำงานในเครื่อง และไม่มีความสามารถในการเข้าถึงการบ้านของลูกคุณโดยอัตโนมัติ\n\nอย่างไรก็ตาม ฉันสามารถช่วย",
+   "called": false
+  },
+  {
+   "id": "c14",
+   "expect": "create",
+   "style": "implicit",
+   "text": "อยากได้ตัวช่วยเปลี่ยนสูตรอาหารให้เป็นรายการซื้อของ ใช้ทุกสัปดาห์",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.88,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1207.845,
+    "prompt_per_token_ms": 50.326875,
+    "prompt_per_second": 19.870099226308014,
+    "predicted_n": 48,
+    "predicted_ms": 7624.444,
+    "predicted_per_token_ms": 162.22221276595747,
+    "predicted_per_second": 6.164383920978368
+   },
+   "reply": "ฉันสามารถช่วยคุณสร้างตัวช่วยเปลี่ยนสูตรอาหารให้เป็นรายการซื้อของได้ค่ะ เพื่อให้เป็นประโยชน์ที่สุด รบกวนคุณบอกรายละเอียดเพิ่มเติมหน่อยค่ะว่า:\n\n1.  **คุณต้องการให้ตัวช่วยนี้ทำอะไร",
+   "called": false
+  },
+  {
+   "id": "c15",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ขอตัวช่วยแปลงข้อความยาว ๆ ให้เป็นโพสต์ขายของสั้น ๆ ใช้ประจำ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.85,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1199.597,
+    "prompt_per_token_ms": 49.98320833333333,
+    "prompt_per_second": 20.006718923105012,
+    "predicted_n": 48,
+    "predicted_ms": 7606.188,
+    "predicted_per_token_ms": 161.83378723404255,
+    "predicted_per_second": 6.179179373425952
+   },
+   "reply": "คุณต้องการให้ฉันสร้าง \"สกิล\" ใหม่เพื่อให้สามารถแปลงข้อความยาว ๆ เป็นโพสต์ขายของสั้น ๆ ได้ใช่ไหมครับ?\n\nถ้าใช่ ผมสามารถใช้เครื่องมือ `create-skill` เพื่อให้ Claude ช่วยสร้าง",
+   "called": false
+  },
+  {
+   "id": "c16",
+   "expect": "create",
+   "style": "implicit",
+   "text": "ทำให้เครื่องมีโหมดอ่านหนังสือ ปิดเสียงแล้วเปิดวิกิพีเดีย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.86,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 23,
+    "prompt_ms": 1196.162,
+    "prompt_per_token_ms": 52.00704347826087,
+    "prompt_per_second": 19.228164746915553,
+    "predicted_n": 48,
+    "predicted_ms": 7601.699,
+    "predicted_per_token_ms": 161.73827659574468,
+    "predicted_per_second": 6.182828338770057
+   },
+   "reply": "ฉันไม่สามารถตั้งค่าโหมดหรือการทำงานของเครื่องโดยตรงได้ค่ะ แต่ฉันสามารถช่วยคุณสร้าง \"สกิล\" เพื่อให้การทำงานที่คุณต้องการทำซ้ำ ๆ เป็นไปอย่างรวดเร็วได้ หากคุณต้องการให้ฉัน",
+   "called": false
+  },
+  {
+   "id": "n01",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.4,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 713.064,
+    "prompt_per_token_ms": 54.85107692307692,
+    "prompt_per_second": 18.23118261474426,
+    "predicted_n": 48,
+    "predicted_ms": 7654.457,
+    "predicted_per_token_ms": 162.86078723404256,
+    "predicted_per_second": 6.140213473013174
+   },
+   "reply": "ท้องฟ้าเป็นสีฟ้าเนื่องจากปรากฏการณ์ที่เรียกว่า **การกระเจิงของแสง (Rayleigh scattering)** ครับ\n\nแสงอาทิตย์ที่ส่องมายังโลกเดินทางผ่านชั้นบรรยากาศ ซึ่งประกอบด้วยโมเล",
+   "called": false
+  },
+  {
+   "id": "n02",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "AI กับ Machine Learning ต่างกันยังไง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.35,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 714.773,
+    "prompt_per_token_ms": 54.98253846153846,
+    "prompt_per_second": 18.18759242444804,
+    "predicted_n": 48,
+    "predicted_ms": 7605.741,
+    "predicted_per_token_ms": 161.8242765957447,
+    "predicted_per_second": 6.179542532410714
+   },
+   "reply": "AI (ปัญญาประดิษฐ์) และ Machine Learning (การเรียนรู้ของเครื่อง) มีความสัมพันธ์กัน แต่มีความแตกต่างกันดังนี้ครับ\n\n**ปัญญาประดิษฐ์ (AI)** คือ **เป้าหมายที่ก",
+   "called": false
+  },
+  {
+   "id": "n03",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "ช่วยอธิบายวงจรชีวิตของผีเสื้อ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.5,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 843.206,
+    "prompt_per_token_ms": 56.21373333333334,
+    "prompt_per_second": 17.789247230214208,
+    "predicted_n": 48,
+    "predicted_ms": 7598.439,
+    "predicted_per_token_ms": 161.66891489361703,
+    "predicted_per_second": 6.185480991556291
+   },
+   "reply": "วงจรชีวิตของผีเสื้อแบ่งออกเป็น 4 ระยะหลักๆ ดังนี้ครับ:\n\n1. **ไข่ (Egg):** ผีเสื้อตัวเมียจะวางไข่บนใบไม้ที่เหมาะสม ซึ่งเป็นจุดเริ่มต้น",
+   "called": false
+  },
+  {
+   "id": "n04",
+   "expect": "no",
+   "style": "chat",
+   "text": "สวัสดีครับ วันนี้เหนื่อยจัง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.86,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 714.795,
+    "prompt_per_token_ms": 54.98423076923076,
+    "prompt_per_second": 18.1870326457236,
+    "predicted_n": 14,
+    "predicted_ms": 2099.401,
+    "predicted_per_token_ms": 161.4923846153846,
+    "predicted_per_second": 6.1922424539189995
+   },
+   "reply": "สวัสดีครับ ไม่เป็นไรนะครับ มีอะไรให้ช่วยไหมครับ?",
+   "called": false
+  },
+  {
+   "id": "n05",
+   "expect": "no",
+   "style": "chat",
+   "text": "ขอบคุณมากนะ",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.2,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 9,
+    "prompt_ms": 543.063,
+    "prompt_per_token_ms": 60.340333333333334,
+    "prompt_per_second": 16.572662840222957,
+    "predicted_n": 11,
+    "predicted_ms": 1611.377,
+    "predicted_per_token_ms": 161.1377,
+    "predicted_per_second": 6.2058723687876896
+   },
+   "reply": "ยินดีครับ มีอะไรให้ช่วยอีกไหมครับ",
+   "called": false
+  },
+  {
+   "id": "n06",
+   "expect": "no",
+   "style": "live",
+   "text": "วันนี้อากาศที่เชียงใหม่เป็นยังไง",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.13,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 14,
+    "prompt_ms": 781.013,
+    "prompt_per_token_ms": 55.78664285714286,
+    "prompt_per_second": 17.92543786082946,
+    "predicted_n": 9,
+    "predicted_ms": 1289.892,
+    "predicted_per_token_ms": 161.2365,
+    "predicted_per_second": 6.202069630635743
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n07",
+   "expect": "no",
+   "style": "live",
+   "text": "ราคาทองวันนี้เท่าไหร่",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.05,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 714.12,
+    "prompt_per_token_ms": 54.932307692307695,
+    "prompt_per_second": 18.20422337982412,
+    "predicted_n": 9,
+    "predicted_ms": 1287.934,
+    "predicted_per_token_ms": 160.99175,
+    "predicted_per_second": 6.211498415291467
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n08",
+   "expect": "no",
+   "style": "existing",
+   "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ฉันชอบกินข้าวเหนียวมะม่วง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.56,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1196.866,
+    "prompt_per_token_ms": 49.869416666666666,
+    "prompt_per_second": 20.052370106595056,
+    "predicted_n": 9,
+    "predicted_ms": 1309.55,
+    "predicted_per_token_ms": 163.69375,
+    "predicted_per_second": 6.108968729716315
+   },
+   "reply": "I like to eat mango sticky rice.",
+   "called": false
+  },
+  {
+   "id": "n09",
+   "expect": "no",
+   "style": "existing",
+   "text": "สรุปข้อความนี้ให้หน่อย: การนอนหลับที่เพียงพอช่วยให้ร่างกายฟื้นฟูและสมองจดจำได้ดีขึ้น ควรนอนวันละ 7-9 ชั่วโมง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 9.34,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 45,
+    "prompt_ms": 2188.899,
+    "prompt_per_token_ms": 48.642199999999995,
+    "prompt_per_second": 20.55828066987102,
+    "predicted_n": 45,
+    "predicted_ms": 7111.676,
+    "predicted_per_token_ms": 161.62900000000002,
+    "predicted_per_second": 6.187008519510731
+   },
+   "reply": "การนอนหลับที่เพียงพอมีความสำคัญต่อร่างกาย เพราะช่วยให้ร่างกายฟื้นฟู และช่วยให้สมองจดจำได้ดีขึ้น ควรนอนหลับให้ได้วันละ 7-9 ชั่วโมงครับ",
+   "called": false
+  },
+  {
+   "id": "n10",
+   "expect": "no",
+   "style": "existing",
+   "text": "เขียนจดหมายลาป่วยถึงหัวหน้าให้หน่อย",
+   "by": "ai",
+   "got": "letter-writer",
+   "seconds": 4.26,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 16,
+    "prompt_ms": 834.0,
+    "prompt_per_token_ms": 52.125,
+    "prompt_per_second": 19.18465227817746,
+    "predicted_n": 22,
+    "predicted_ms": 3389.645,
+    "predicted_per_token_ms": 161.41166666666666,
+    "predicted_per_second": 6.195339039928959
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n11",
+   "expect": "no",
+   "style": "existing",
+   "text": "เตือนโทรหาแม่พรุ่งนี้หกโมงเย็น",
+   "by": "ai",
+   "got": "reminder",
+   "seconds": 4.98,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 17,
+    "prompt_ms": 884.921,
+    "prompt_per_token_ms": 52.05417647058824,
+    "prompt_per_second": 19.210754406325535,
+    "predicted_n": 26,
+    "predicted_ms": 4052.143,
+    "predicted_per_token_ms": 162.08572,
+    "predicted_per_second": 6.169574963173807
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n12",
+   "expect": "no",
+   "style": "existing",
+   "text": "ทำไมเครื่องช้าจัง",
+   "by": "ai",
+   "got": "machine-status",
+   "seconds": 1.99,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 644.163,
+    "prompt_per_token_ms": 53.68025,
+    "prompt_per_second": 18.628825312847834,
+    "predicted_n": 9,
+    "predicted_ms": 1297.045,
+    "predicted_per_token_ms": 162.130625,
+    "predicted_per_second": 6.167866188143048
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n13",
+   "expect": "no",
+   "style": "existing",
+   "text": "แรมเหลือเท่าไหร่",
+   "by": "ai",
+   "got": "machine-status",
+   "seconds": 1.94,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 10,
+    "prompt_ms": 602.766,
+    "prompt_per_token_ms": 60.276599999999995,
+    "prompt_per_second": 16.590185909623305,
+    "predicted_n": 9,
+    "predicted_ms": 1293.846,
+    "predicted_per_token_ms": 161.73075,
+    "predicted_per_second": 6.18311607409228
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n14",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "เขียนโค้ด Python หาค่าเฉลี่ยของลิสต์",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.62,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 18,
+    "prompt_ms": 951.091,
+    "prompt_per_token_ms": 52.838388888888886,
+    "prompt_per_second": 18.92563382473391,
+    "predicted_n": 48,
+    "predicted_ms": 7599.686,
+    "predicted_per_token_ms": 161.69544680851064,
+    "predicted_per_second": 6.184466042412804
+   },
+   "reply": "```python\ndef calculate_average(numbers):\n    \"\"\"คำนวณค่าเฉลี่ยของลิสต์ตัวเลข\"\"\"\n    if not numbers:\n        return 0  # คืนค่า 0 ถ้าลิสต์",
+   "called": false
+  },
+  {
+   "id": "n15",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "1 ปีมีกี่วินาที",
+   "by": "ai",
+   "got": "none",
+   "seconds": 3.79,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 669.507,
+    "prompt_per_token_ms": 55.792249999999996,
+    "prompt_per_second": 17.92363634734215,
+    "predicted_n": 20,
+    "predicted_ms": 3066.265,
+    "predicted_per_token_ms": 161.38236842105263,
+    "predicted_per_second": 6.196463775961961
+   },
+   "reply": "1 ปีมีประมาณ 31,536,000 วินาทีครับ",
+   "called": false
+  },
+  {
+   "id": "n16",
+   "expect": "no",
+   "style": "chat",
+   "text": "เล่าเรื่องตลกให้ฟังหน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.36,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 713.098,
+    "prompt_per_token_ms": 54.853692307692306,
+    "prompt_per_second": 18.23031336506343,
+    "predicted_n": 48,
+    "predicted_ms": 7602.521,
+    "predicted_per_token_ms": 161.7557659574468,
+    "predicted_per_second": 6.182159838821886
+   },
+   "reply": "ได้เลยครับ นี่คือเรื่องตลกให้ฟัง:\n\nมีชายคนหนึ่งเดินเข้าไปในร้านอาหาร แล้วถามบริกรว่า \"มีอะไรที่อร่อยที่สุดในร้านนี้บ้าง?\"\n\nบริกรตอบกลับมาว่า \"ถ้าถาม",
+   "called": false
+  },
+  {
+   "id": "n17",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "แนะนำวิธีอ่านหนังสือสอบให้จำได้นาน",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.43,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 14,
+    "prompt_ms": 781.666,
+    "prompt_per_token_ms": 55.833285714285715,
+    "prompt_per_second": 17.91046303664225,
+    "predicted_n": 48,
+    "predicted_ms": 7605.496,
+    "predicted_per_token_ms": 161.81906382978724,
+    "predicted_per_second": 6.179741597392201
+   },
+   "reply": "การอ่านหนังสือสอบให้จำได้นานมีหลายเทคนิค ลองนำไปปรับใช้ดูนะคะ:\n\n1. **ทำความเข้าใจก่อนจำ:** อย่าอ่านแบบผ่าน ๆ ให้พยายามทำความเข้าใจเนื้อหาเป็นหลักก่อน จะช่วย",
+   "called": false
+  },
+  {
+   "id": "n18",
+   "expect": "no",
+   "style": "about",
+   "text": "เครื่องนี้ทำอะไรได้บ้าง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.31,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 11,
+    "prompt_ms": 667.957,
+    "prompt_per_token_ms": 60.723363636363636,
+    "prompt_per_second": 16.468125942238796,
+    "predicted_n": 48,
+    "predicted_ms": 7602.534,
+    "predicted_per_token_ms": 161.7560425531915,
+    "predicted_per_second": 6.182149267599462
+   },
+   "reply": "ฉันเป็นผู้ช่วย AI ภาษาไทยที่ทำงานบนเครื่องของคุณ ซึ่งมีความสามารถดังนี้:\n\n*   **ตอบคำถาม:** ตอบคำถามทั่วไป ความรู้ วิทยาศาสตร์ ประวัติศาสตร์ คณิตศาสตร์ และเขียนโค้ดได้\n*   ",
+   "called": false
+  },
+  {
+   "id": "n19",
+   "expect": "no",
+   "style": "about",
+   "text": "ข้อมูลของฉันถูกส่งออกไปข้างนอกไหม",
+   "by": "ai",
+   "got": "none",
+   "seconds": 5.77,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 842.014,
+    "prompt_per_token_ms": 56.13426666666667,
+    "prompt_per_second": 17.81443063892049,
+    "predicted_n": 31,
+    "predicted_ms": 4889.299,
+    "predicted_per_token_ms": 162.97663333333333,
+    "predicted_per_second": 6.135848922309721
+   },
+   "reply": "ฉันไม่ทราบว่าข้อมูลของคุณถูกส่งออกไปข้างนอกหรือไม่ เนื่องจากฉันไม่มีข้อมูลเกี่ยวกับกิจกรรมหรือการตั้งค่าความปลอดภัยของอุปกรณ์ของคุณโดยตรง",
+   "called": false
+  },
+  {
+   "id": "n20",
+   "expect": "no",
+   "style": "live",
+   "text": "ข่าวเด่นวันนี้มีอะไรบ้าง",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 1.99,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 645.744,
+    "prompt_per_token_ms": 53.812000000000005,
+    "prompt_per_second": 18.583215639634282,
+    "predicted_n": 9,
+    "predicted_ms": 1305.678,
+    "predicted_per_token_ms": 163.20975,
+    "predicted_per_second": 6.1270849321195575
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "n21",
+   "expect": "no",
+   "style": "knowledge",
+   "text": "ช่วยคิดเมนูมื้อเย็นวันนี้ให้หน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.47,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 842.07,
+    "prompt_per_token_ms": 56.138000000000005,
+    "prompt_per_second": 17.813245929673304,
+    "predicted_n": 48,
+    "predicted_ms": 7583.212,
+    "predicted_per_token_ms": 161.34493617021278,
+    "predicted_per_second": 6.197901364224024
+   },
+   "reply": "วันนี้เป็นวันพุธที่ 30 กันยายน พ.ศ. 2569 ครับ เพื่อให้แนะนำเมนูมื้อเย็นได้ตรงใจ รบกวนขอข้อมูลเพิ่มเติมสักเล็กน้อยครับ เช่น:\n\n1",
+   "called": false
+  },
+  {
+   "id": "n22",
+   "expect": "no",
+   "style": "existing",
+   "text": "แปลคำว่า resilience เป็นภาษาไทย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 2.64,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 12,
+    "prompt_ms": 643.549,
+    "prompt_per_token_ms": 53.629083333333334,
+    "prompt_per_second": 18.646598782687875,
+    "predicted_n": 13,
+    "predicted_ms": 1954.674,
+    "predicted_per_token_ms": 162.8895,
+    "predicted_per_second": 6.139131128771345
+   },
+   "reply": "ความยืดหยุ่น หรือ ความสามารถในการฟื้นตัว",
+   "called": false
+  }
+ ]
+}
