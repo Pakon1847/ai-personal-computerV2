@@ -1,0 +1,115 @@
+{
+ "label": "typhoon25-4b-hybrid",
+ "model": "Typhoon2.5-Qwen3-4B",
+ "cloud": true,
+ "date": "2026-09-30T13:28",
+ "system_chars": 1383,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "เพราะแสงอาทิตย์ส่องผ่านชั้นบรรยากาศของโลก ทำให้แสงสีต่าง ๆ สลายตัวออกเป็นสีเล็ก ๆ โดยแสงสีฟ้ามีความยาวคลื่นสั้นจึงถูกดูดซับและกระจายไปทั่วทั้งท้องฟ้ามากกว่าสีอื่น ๆ",
+   "ttft": 95.07,
+   "seconds": 123.49,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 659,
+    "prompt_n": 1130,
+    "prompt_ms": 94853.164,
+    "prompt_per_token_ms": 83.94085309734514,
+    "prompt_per_second": 11.913150308828918,
+    "predicted_n": 90,
+    "predicted_ms": 28430.664,
+    "predicted_per_token_ms": 319.44566292134834,
+    "predicted_per_second": 3.130422842041255
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "น้ำเดือดที่ระดับน้ำทะเลมีอุณหภูมิ 100 องศาเซลเซียส",
+   "ttft": 3.49,
+   "seconds": 14.38,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 35,
+    "prompt_ms": 3418.114,
+    "prompt_per_token_ms": 97.6604,
+    "prompt_per_second": 10.239564859451733,
+    "predicted_n": 35,
+    "predicted_ms": 10886.695,
+    "predicted_per_token_ms": 320.1969117647059,
+    "predicted_per_second": 3.1230782161160944
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมีทั้งหมด 76 จังหวัด",
+   "ttft": 1.46,
+   "seconds": 6.51,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1771,
+    "prompt_n": 14,
+    "prompt_ms": 1414.292,
+    "prompt_per_token_ms": 101.02085714285714,
+    "prompt_per_second": 9.898945903674772,
+    "predicted_n": 17,
+    "predicted_ms": 5056.13,
+    "predicted_per_token_ms": 316.008125,
+    "predicted_per_second": 3.1644755969486544
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 3,
+  "auto_ok": 3,
+  "to_check": 0,
+  "cloud": 0,
+  "ttft_median": 3.49,
+  "seconds_total": 144.4,
+  "by_cat": {
+   "A": {
+    "n": 3,
+    "ok": 3,
+    "check": 0,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}
