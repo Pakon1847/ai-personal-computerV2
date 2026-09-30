@@ -154,6 +154,20 @@ def _volume(t: str, heard: str) -> Command | None:
     return None
 
 
+VOLUME_CUES = ("ปิดเสียง", "เปิดเสียง", "เพิ่มเสียง", "ลดเสียง", "เร่งเสียง", "เบาเสียง", "ปรับเสียง", "ดังขึ้น", "เบาลง")
+
+
+def _several_actions(t: str) -> bool:
+    """มีทั้งคำสั่งเสียงและ "เปิด…" อย่างอื่นในประโยคเดียว (เช่น "เปิดยูทูบแล้วเพิ่มเสียง").
+
+    ชุดอิสระชุดที่ 2 (การ์ด 0017): "…เปิด YouTube แล้วเพิ่มเสียง" เคยเพิ่มเสียงอย่างเดียว ทิ้งส่วนที่เหลือเงียบ ๆ
+    """
+    if not any(c in t for c in VOLUME_CUES):
+        return False
+    rest = t.replace("เปิดเสียง", "")
+    return "เปิด" in rest or "open" in rest
+
+
 def _discovered_aliases() -> dict[str, tuple[str, ...]]:
     from aipc.skills import apps
 
@@ -166,6 +180,9 @@ def parse(text: str) -> Command | None:
     t = normalize(text)
     if not t or any(w in t for w in LATER_WORDS + NEGATIONS + DEFINE_WORDS) or when.mentions_time(heard):
         return None  # ให้ทำทีหลัง / สั่งไม่ให้ทำ → ไม่ใช่คำสั่งตอนนี้ (ส่งต่อให้สกิลนัดหมายหรือแชท)
+
+    if _several_actions(t):
+        return None  # สั่งหลายอย่างในประโยคเดียว = ไม่ใช่คำสั่งเดี่ยว → AI (สร้างสกิล/ตอบ) · เดิมทำแค่บางส่วน
 
     vol = _volume(t, heard)
     if vol:

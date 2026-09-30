@@ -52,6 +52,14 @@ class DefineIntentTest(unittest.TestCase):
         for t in ("โหมดเครื่องบินในมือถือคืออะไร", "เปิดหน้าสกิล", "ปิดเสียงหน่อย", "สกิลในเครื่องนี้มีอะไรบ้าง"):
             self.assertNotEqual(router.route_ai_first(t, builtin).kind, "create", t)
 
+    def test_several_actions_are_not_one_command(self):
+        from aipc.skills import command
+
+        self.assertIsNone(command.parse("เปิด YouTube แล้วเพิ่มเสียง"))  # เดิม: เพิ่มเสียงอย่างเดียว
+        self.assertIsNone(command.parse("ปิดเสียงแล้วเปิดยูทูบ"))
+        self.assertEqual(command.parse("เปิดเสียง").plan.action, "unmute")
+        self.assertEqual(command.parse("ปิดเสียงหน่อย").plan.action, "mute")
+
     def test_existing_mode_skill_is_used_not_recreated(self):
         from aipc.skills import router
 
