@@ -15,7 +15,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
 class FakeLlama(BaseHTTPRequestHandler):
-    mode = "ok"  # ok | slow | crash | loading | tool (AI เลือกสกิล machine-status)
+    mode = "ok"  # ok | slow | crash | loading | tool (AI เลือกสกิล tool_name)
+    tool_name = "machine-status"
     seen: list = []
 
     def log_message(self, *a):
@@ -43,7 +44,7 @@ class FakeLlama(BaseHTTPRequestHandler):
         self.end_headers()
         if self.mode == "tool":  # รูปแบบ OpenAI ที่ llama-server ส่ง: ชื่อก่อน แล้วอาร์กิวเมนต์ทีละส่วน
             call = {"index": 0, "id": "c1", "type": "function",
-                    "function": {"name": "machine-status", "arguments": ""}}  # fmt: skip
+                    "function": {"name": self.tool_name, "arguments": ""}}  # fmt: skip
             for delta in (
                 {"tool_calls": [call]},
                 {"tool_calls": [{"index": 0, "function": {"arguments": '{"x": "ลบไฟล์"}'}}]},
@@ -281,6 +282,58 @@ class ControllerTest(ServerCase):
         pump(lambda: done)
         real = FakeLlama.seen[-1]
         self.assertEqual(real["messages"][0], warm["messages"][0], "ส่วนต้นตรงกันทุกตัวอักษร แคชจึงใช้ได้")
+
+    def test_hybrid_hands_hard_questions_to_claude(self):
+        """การ์ด 0016: AI ในเครื่องเลือก ask-cloud → Claude ตอบ · ป้ายบอกว่าออกนอกเครื่อง · บันทึกเป็นคำตอบ."""
+        from aipc.cloud.ask import CloudReply
+        from aipc.skills import catalog
+
+        asked = []
+
+        def cloud(question, history):
+            asked.append((question, list(history)))
+            return CloudReply(True, "กรุงเทพวันนี้ 25–35 องศา")
+
+        FakeLlama.mode, FakeLlama.tool_name = "tool", catalog.ASK_CLOUD
+        self.addCleanup(setattr, FakeLlama, "tool_name", "machine-status")
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           cloud=cloud)  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        done, picked = [], []
+        c.finished.connect(lambda text, note: done.append((text, note)))
+        c.skillRequested.connect(lambda sid, text: picked.append(sid))
+        FakeLlama.seen.clear()
+        self.assertTrue(c.send("วันนี้อากาศเป็นไง", ""))
+        pump(lambda: done)
+        self.assertEqual(done[0], ("กรุงเทพวันนี้ 25–35 องศา", c.CLOUD_NOTE))
+        self.assertEqual(picked, [], "ask-cloud ไม่ใช่สกิล")
+        self.assertEqual(asked[0][0], "วันนี้อากาศเป็นไง")
+        real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1][-1]
+        self.assertEqual(real["tools"][0]["function"]["name"], catalog.ASK_CLOUD)
+        self.assertIn("ask-cloud", real["messages"][0]["content"])
+
+    def test_hybrid_offline_is_told(self):
+        from aipc.cloud.ask import CloudReply
+        from aipc.skills import catalog
+
+        FakeLlama.mode, FakeLlama.tool_name = "tool", catalog.ASK_CLOUD
+        self.addCleanup(setattr, FakeLlama, "tool_name", "machine-status")
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        offline = CloudReply(False, error="ติดต่อ Claude ไม่ได้ (ไม่มีอินเทอร์เน็ต?)")
+        c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           cloud=lambda q, h: offline)  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        done = []
+        c.finished.connect(lambda text, note: done.append((text, note)))
+        c.send("ข่าววันนี้มีอะไร", "")
+        pump(lambda: done)
+        self.assertEqual(done[0][0], "")
+        self.assertIn("ไม่มีอินเทอร์เน็ต", done[0][1])
 
     def test_not_ready_refuses(self):
         c = ChatController(target=client.Target(), poll_ms=100000)

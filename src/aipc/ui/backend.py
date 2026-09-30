@@ -1022,8 +1022,11 @@ class ChatController(QObject):
     _health = Signal(str)
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
-                 tools=None):  # fmt: skip
+                 tools=None, cloud=None, model_name: str = ""):  # fmt: skip
         super().__init__()
+        # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
+        self._cloud = cloud
+        self._model_name = model_name
         self._tools = tools or (
             lambda: []
         )  # สกิลที่ AI เลือกได้ ณ ตอนส่ง (SkillsController.tool_catalog)
@@ -1110,6 +1113,23 @@ class ChatController(QObject):
             self._status = status
             self.statusChanged.emit()
 
+    def _system(self, tools: list) -> str:
+        """system prompt ชุดเดียวกับตัววัด (catalog.system_prompt) · มีวันที่ของวันนี้ · ส่งต่อ Claude ได้ถ้ามี."""
+        from datetime import date
+
+        from aipc.skills import catalog
+
+        base = catalog.system_prompt(date.today(), cloud=self._cloud is not None,
+                                     model=self._model_name)  # fmt: skip
+        return base + (self.TOOLS_HINT if tools else "")
+
+    def _all_tools(self) -> list:
+        """ask-cloud (ถ้ามี Claude) ไว้หน้าสุด + สกิล · ลำดับคงที่ แคชจึงใช้ได้."""
+        from aipc.skills import catalog
+
+        cloud = catalog.tools([], set(), cloud=True) if self._cloud is not None else []
+        return cloud + list(self._tools())
+
     def _warm_up(self) -> None:
         """AI เพิ่งพร้อม (login ใหม่ / AI เริ่มใหม่) → อ่านรายการสกิลไว้ในแคชทันที ข้อความแรกไม่ต้องรอ ~1 นาที.
 
@@ -1120,9 +1140,8 @@ class ChatController(QObject):
 
         from aipc.chat import client
 
-        tools = self._tools()
-        system = self.SYSTEM + (self.TOOLS_HINT if tools else "")
-        args = (self._target, system, tools)
+        tools = self._all_tools()
+        args = (self._target, self._system(tools), tools)
         threading.Thread(target=client.warm, args=args, daemon=True).start()
 
     # ---------- คำสั่งจาก QML ----------
@@ -1137,12 +1156,11 @@ class ChatController(QObject):
 
         self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
-        tools = self._tools() if (use_tools and not prompt) else []
+        tools = self._all_tools() if (use_tools and not prompt) else []
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
-            system = self.SYSTEM + (self.TOOLS_HINT if tools else "")
-            messages, trimmed = client.fit_context(system, self._conv["messages"])
+            messages, trimmed = client.fit_context(self._system(tools), self._conv["messages"])
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""
         stream = self._stream = client.Stream(self._target, messages, tools=tools)
@@ -1173,6 +1191,11 @@ class ChatController(QObject):
 
     def _on_done(self, reply) -> None:
         self._busy, self._stream = False, None
+        from aipc.skills import catalog
+
+        if reply.tool_call == catalog.ASK_CLOUD and not reply.reason and self._cloud is not None:
+            self._ask_cloud()
+            return
         if reply.tool_call and not reply.reason:
             # AI เลือกสกิล: เอาข้อความของผู้ใช้ออกจากบทสนทนา (ทางของสกิลจะส่งข้อความนี้เองอีกครั้ง) · ไม่บันทึก
             text = self._conv["messages"].pop()["content"]
@@ -1183,6 +1206,8 @@ class ChatController(QObject):
             self.refresh()
             return
         note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
+        if getattr(reply, "cloud", False):
+            note = self.CLOUD_NOTE
         if reply.text:
             self._conv["messages"].append({"role": "assistant", "content": reply.text})
         if not self._temporary:
@@ -1198,6 +1223,30 @@ class ChatController(QObject):
         if reply.reason == "crashed":
             self._on_health("down")
         self.refresh()
+
+    CLOUD_NOTE = "ตอบโดย Claude (cloud) · ค้นเว็บได้ · คำถามนี้ถูกส่งออกนอกเครื่อง"
+
+    def _ask_cloud(self) -> None:
+        """AI ในเครื่องเลือกส่งต่อ (ข้อมูลสด / ยาก / ไม่แน่ใจ) → ถาม Claude ในเธรดแยก · ระหว่างรอบอกตรง ๆ."""
+        import threading
+
+        from aipc.chat import client
+
+        question = self._conv["messages"][-1]["content"]
+        history = self._conv["messages"][:-1]
+        self._busy = True
+        self._stream_text = "กำลังถาม Claude (cloud) · ต้องใช้ข้อมูลสดหรือยากเกินกว่า AI ในเครื่อง…"
+        self.changed.emit()
+        self.streamChanged.emit()
+
+        def work():
+            c = self._cloud(question, history)
+            reply = client.Reply(text=c.text if c.ok else "", reason="" if c.ok else "error",
+                                 detail="" if c.ok else c.error)  # fmt: skip
+            reply.cloud = c.ok  # type: ignore[attr-defined]
+            self._done.emit(reply)
+
+        threading.Thread(target=work, daemon=True).start()
 
     @Slot(bool)
     def newChat(self, temporary: bool) -> None:  # noqa: N802

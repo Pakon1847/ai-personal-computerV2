@@ -57,6 +57,31 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
+def _cloud_client():
+    """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0."""
+    import os
+    import shutil
+
+    if os.environ.get("AIPC_CLOUD", "1") == "0" or shutil.which("claude") is None:
+        return None
+    from aipc.cloud import ask
+
+    return lambda question, history: ask.ask(question, history)
+
+
+def _local_model_name() -> str:
+    """ชื่อโมเดลจาก /etc/aipc/llm.conf (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · อ่านไม่ได้ = ""."""
+    from pathlib import Path
+
+    try:
+        for line in Path("/etc/aipc/llm.conf").read_text(encoding="utf-8").splitlines():
+            if line.startswith("MODEL="):
+                return Path(line.split("=", 1)[1].strip()).stem
+    except OSError:
+        pass
+    return ""
+
+
 def _face_client(short: bool = False):
     """ตัวต่อ visiond (การ์ด 0015) · ไม่ได้ติดตั้ง = None (ใช้รหัสผ่านตามเดิม).
 
@@ -102,7 +127,9 @@ def build(opts: Options, argv: list[str] | None = None):
     def tools() -> list:
         return holder["skills"].tool_catalog() if "skills" in holder else []
 
-    chat = ChatController(active=not opts.greeter_session, tools=tools)
+    chat = ChatController(active=not opts.greeter_session, tools=tools,
+                          cloud=None if opts.greeter_session else _cloud_client(),
+                          model_name=_local_model_name())  # fmt: skip
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
