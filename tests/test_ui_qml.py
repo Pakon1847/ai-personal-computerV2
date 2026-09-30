@@ -130,6 +130,17 @@ def find_all(root, name):
     return [o for o in root.findChildren(QObject) if o.objectName() == name]
 
 
+def find_items(win, name):
+    """ค้นตามต้นไม้ภาพ (childItems) · ของใน delegate ของ ListView ไม่ได้เป็นลูกแบบ QObject ของหน้าต่าง"""
+    out, stack = [], [win.contentItem()]
+    while stack:
+        item = stack.pop()
+        if item.objectName() == name:
+            out.append(item)
+        stack.extend(item.childItems())
+    return out
+
+
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")
 class PasswordThaiHintTest(unittest.TestCase):
     """พบ 2026-09-29: หน้า Login เคยมีแต่แป้นอังกฤษ · เมื่อสลับไทยได้แล้ว ช่องรหัสผ่านต้องเตือนถ้ามีตัวอักษรไทย
@@ -321,6 +332,28 @@ class ShellCardTest(unittest.TestCase):
         ])  # fmt: skip
         settle(100)
         self.assertEqual(find_all(win, "chatList")[0].property("count"), 4)
+        self.assertEqual(warnings, [])
+
+    def test_claude_made_skill_cards_draw_with_undo_and_wrong_buttons(self):
+        """การ์ด 0017: กำลังสร้าง / สร้างไม่สำเร็จ / สกิลที่ Claude สร้าง (มีปุ่ม) วาดได้ · ปุ่ม "ไม่ใช่แบบนี้" เปลี่ยนช่องพิมพ์."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        base = {"chips": [], "lines": ["x"], "confirmToken": "", "page": ""}
+        page.setProperty("items", [
+            # การ์ดที่ต้องตรวจอยู่บนสุด (ListView สร้างเฉพาะแถวที่อยู่ในจอ)
+            {"user": False, "card": {**base, "kind": "steps", "title": "ทำครบ 2 ขั้นแล้ว",
+                                     "badge": {"name": "โหมดทำงาน", "reason": "r", "worker": "โค้ด",
+                                               "forgedId": "work-mode", "forgedVersion": 1}}},
+            {"user": False, "card": {**base, "kind": "forging", "badge": {}, "title": "กำลังให้ Claude สร้างสกิล…"}},
+            {"user": False, "card": {**base, "kind": "forge-failed", "badge": {}, "title": "สร้างสกิลไม่สำเร็จ",
+                                     "fallback": True}},
+        ])  # fmt: skip
+        settle(100)
+        rows = [r for r in find_items(win, "forgedRow") if r.property("visible")]
+        self.assertEqual(len(rows), 1, "ปุ่มลบ/ไม่ใช่แบบนี้ขึ้นเฉพาะการ์ดของสกิลที่ Claude สร้าง")
+        page.setProperty("feedbackFor", {"id": "work-mode", "name": "โหมดทำงาน"})
+        settle(50)
+        self.assertIn("โหมดทำงาน", find_all(win, "chatInput")[0].property("placeholderText"))
         self.assertEqual(warnings, [])
 
     def test_next_reminder_card_empty_then_real(self):
