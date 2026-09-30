@@ -112,7 +112,7 @@ class Outcome:
 Runner = Callable[[list[str]], int]
 
 # โปรแกรมที่เปิดแอปอื่น · แอปที่เปิดขึ้นมาทำงานต่อหลังคำสั่งจบ จึงห้ามรอ output ของมัน
-LAUNCHERS = ("xdg-open", "gtk-launch")
+LAUNCHERS = ("xdg-open", "gtk-launch", "gio")
 LAUNCH_SETTLE_S = 1.5  # รอดูแค่ว่าตัวเปิดล้มทันทีไหม (เช่น ไม่พบแอป) · ยังทำงานอยู่ = กำลังเปิดแอป
 
 
@@ -142,13 +142,37 @@ def _launch(args: list[str], quiet: dict) -> int:
         return 0
 
 
+DESKTOP_DIRS = (
+    "~/.local/share/applications",
+    "/usr/local/share/applications",
+    "/usr/share/applications",
+)
+
+
+def _app_command(desktop: str) -> list[str]:
+    """gtk-launch ถ้ามี · ไม่มี = gio launch <ไฟล์ .desktop> (มากับ glib ทุกเครื่อง).
+
+    พบบน Pi 5 (2026-10-01): Raspberry Pi OS ของเครื่องนี้ไม่มี gtk-launch
+    → "เปิดเทอร์มินัล" และคำสั่งเปิดแอปทุกตัวเปิดไม่ขึ้น
+    """
+    import shutil
+    from pathlib import Path
+
+    if shutil.which("gtk-launch") is None and shutil.which("gio") is not None:
+        for d in DESKTOP_DIRS:
+            f = Path(d).expanduser() / desktop
+            if f.is_file():
+                return ["gio", "launch", str(f)]
+    return ["gtk-launch", desktop]
+
+
 def command_for(plan: Plan) -> list[str] | None:
     """แปลง Plan เป็นคำสั่งแบบ list · None = ไม่ต้องรันโปรแกรม (เช่น เปลี่ยนหน้าในระบบ)."""
     p = plan.params
     if plan.action == "open_url":
         return ["xdg-open", p["url"] if "url" in p else SITES[p["site"]][1]]
     if plan.action == "open_app":
-        return ["gtk-launch", app_table()[p["app"]][1]]  # KeyError = แอปถูกถอนไปแล้ว
+        return _app_command(app_table()[p["app"]][1])  # KeyError = แอปถูกถอนไปแล้ว
     if plan.action == "set_volume":
         return ["wpctl", "set-volume", SINK, f"{int(p['percent'])}%"]
     if plan.action == "change_volume":

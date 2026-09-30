@@ -186,6 +186,24 @@ class ExecutorTest(unittest.TestCase):
         self.assertFalse(out.ok)
 
 
+class AppCommandTest(unittest.TestCase):
+    """พบ 2026-10-01: Pi 5 ไม่มี gtk-launch → เปิดแอปไม่ขึ้นเลย · ใช้ gio launch <ไฟล์ .desktop> แทน."""
+
+    def test_gio_when_no_gtk_launch(self):
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "lxterminal.desktop").write_text("[Desktop Entry]\n", encoding="utf-8")
+            which = {"gio": "/usr/bin/gio"}.get
+            with mock.patch("shutil.which", which), mock.patch.object(actions, "DESKTOP_DIRS", (d,)):
+                self.assertEqual(actions._app_command("lxterminal.desktop"),
+                                 ["gio", "launch", str(Path(d) / "lxterminal.desktop")])  # fmt: skip
+            with mock.patch("shutil.which", lambda n: "/usr/bin/" + n):  # มี gtk-launch = ใช้ตามเดิม
+                self.assertEqual(actions._app_command("lxterminal.desktop"), ["gtk-launch", "lxterminal.desktop"])
+        self.assertIn("gio", actions.LAUNCHERS)  # ไม่รอ output ของแอปที่เปิด
+
+
 class LauncherTest(unittest.TestCase):
     """พบ 2026-09-28: รอ output ของแอปที่เปิด (capture_output) → แอปถือ pipe ค้าง หน้าจอค้าง 10 วิ
     แล้วบอกว่า "ทำไม่สำเร็จ" ทั้งที่แอปเปิดแล้ว · ตัวเปิดแอปต้องไม่รอแอป."""
