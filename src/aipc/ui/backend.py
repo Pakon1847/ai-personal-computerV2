@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import getpass
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
@@ -813,6 +813,32 @@ class SkillsController(QObject):
         if t.due or t.save_failed:
             self.remindersChanged.emit()
 
+    def _agenda_card(self, text: str) -> dict | None:
+        """ "วันนี้ต้องทำอะไร" (ฟีเจอร์ข้อ 5) · None = ไม่ใช่คำถามเรื่องตารางนัด."""
+        from aipc.skills import agenda
+
+        q = agenda.parse(text, self._now().date())
+        if q is None:
+            return None
+        items = agenda.items_for(self._store, q)
+        day = thaidate.short_date(q.start)
+        span = (
+            day
+            if q.days == 1
+            else f"{day}–{thaidate.short_date(q.start + timedelta(days=q.days - 1))}"
+        )
+        reminder = next((s for s in self._skills if s.id == "reminder"), None)
+        card = self._plain("reminder", f"{q.label} ({span}) มี {len(items)} นัด" if items
+                           else f"{q.label} ({span}) ยังไม่มีนัด")  # fmt: skip
+        if reminder is not None:
+            card["badge"] = self._badge(reminder, "ถามตารางนัด · อ่านจากนัดที่บันทึกไว้")
+        now = self._now()
+        card["lines"] = [
+            f"{'✓ ' if r.fired or r.when < now else ''}{self._when_text(r.when)} · {r.what}"
+            for r in items
+        ] or ["จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"]
+        return card
+
     def _reminder_card(self, route, text: str) -> dict:
         from aipc.skills import reminders, when
 
@@ -1069,6 +1095,8 @@ class SkillsController(QObject):
 
         if skill_id == catalog.CREATE_SKILL:  # AI ในเครื่องขอให้ Claude สร้างสกิล (การ์ด 0017)
             return self._start_forge(text)
+        if skill_id == "reminder" and (card := self._agenda_card(text)):  # AI เลือกนัด แต่เป็นคำถาม
+            return card
         skill = next((s for s in self._skills if s.id == skill_id), None)
 
         if (
@@ -1086,6 +1114,8 @@ class SkillsController(QObject):
         """AI ในเครื่องพร้อม = แบบผสม (router.route_ai_first) · ไม่พร้อม = กฎก่อน (router.route)."""
         from aipc.skills import router
 
+        if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
+            return card
         if self._llm_ready():
             r = router.route_ai_first(text, self._skills)
             if r.kind == "create":  # ตั้งโหมด/งานประจำที่ยังไม่มีสกิล (การ์ด 0017)

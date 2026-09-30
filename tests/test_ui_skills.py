@@ -23,6 +23,23 @@ class SkillsControllerTest(unittest.TestCase):
         self.now = datetime(2026, 9, 23, 10, 0).astimezone()
         self.s = SkillsController(executor=ex, reminders_path=self.path, clock=lambda: self.now)
 
+    def test_agenda_question_lists_reminders_and_creates_nothing(self):
+        # พบ 2026-10-01: "วันนี้มีนัดอะไร" เคยถูกตีเป็นคำขอจดนัดใหม่ชื่อ "มีนัดอะไร"
+        for text in ("เตือนส่งรายงานวันนี้บ่ายสาม", "เตือนโทรหาแม่พรุ่งนี้หกโมงเย็น"):
+            self.s.confirm(self.s.handle(text)["confirmToken"], True)
+        before = len(self.s._store.items)
+        card = self.s.handle("วันนี้มีนัดอะไร")
+        self.assertEqual(card["title"][:6], "วันนี้")
+        self.assertIn("มี 1 นัด", card["title"])
+        self.assertIn("ส่งรายงาน", card["lines"][0])
+        self.assertEqual(card["confirmToken"], "")
+        card = self.s.handle("พรุ่งนี้มีอะไรบ้าง")
+        self.assertIn("โทรหาแม่", card["lines"][0])
+        self.assertIn("ยังไม่มีนัด", self.s.handle("มะรืนนี้ต้องทำอะไรบ้าง")["title"])
+        self.assertIn("ส่งรายงาน", self.s.handleAs("reminder", "วันนี้ต้องทำอะไรบ้าง")["lines"][0])
+        self.assertEqual(len(self.s._store.items), before, "ถามแล้วต้องไม่เกิดนัดใหม่")
+        self.assertEqual(self.s.handle("เตือนประชุมพรุ่งนี้บ่ายสอง")["kind"], "reminder")  # จดนัดยังได้
+
     def test_sure_command_runs_immediately(self):
         card = self.s.handle("เปิดยูทูบ")
         self.assertEqual(card["kind"], "command")
