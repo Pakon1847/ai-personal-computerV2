@@ -216,6 +216,15 @@ class ControllerTest(ServerCase):
         c._on_health("down")
         self.assertEqual(c.status, "down")
 
+    def test_warm_up_runs_after_ready_so_ai_skills_are_listed(self):
+        c = ChatController(target=self.target, store=store.ChatStore(Path(tempfile.mkdtemp())),
+                           poll_ms=100000)  # fmt: skip
+        self.addCleanup(c.shutdown)
+        seen = []
+        c._warm_up = lambda: seen.append(c.ready)  # สกิลที่ใช้ AI ดู chat.ready ตอนสร้างรายการ
+        c._on_health("ready")
+        self.assertEqual(seen, [True])
+
     def test_first_load_is_not_called_restart(self):
         c = ChatController(target=self.target, store=store.ChatStore(Path(tempfile.mkdtemp())),
                            poll_ms=100000)  # fmt: skip

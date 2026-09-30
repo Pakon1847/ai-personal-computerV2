@@ -1122,10 +1122,12 @@ class ChatController(QObject):
             if now - self._lost_at < self.RESTART_GRACE_S:
                 status = "restarting"
         if status != self._status:
-            if status == "ready":
-                self._warm_up()
             self._status = status
             self.statusChanged.emit()
+            # หลังตั้งสถานะ: สกิลที่ต้องใช้ AI (สรุป แปล ...) นับว่ามีเมื่อ chat.ready · อุ่นก่อนตั้ง = รายการสกิลไม่ครบ
+            # ส่วนต้นไม่ตรงกับคำขอจริง แคชใช้ไม่ได้ (Pi 5 2026-09-30: อุ่น 603 token แต่ข้อความแรกยังอ่านใหม่ 916 token 45 วิ)
+            if status == "ready":
+                self._warm_up()
 
     def _system(self, tools: list) -> str:
         """system prompt ชุดเดียวกับตัววัด (catalog.system_prompt) · มีวันที่ของวันนี้ · ส่งต่อ Claude ได้ถ้ามี."""
