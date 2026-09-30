@@ -80,6 +80,69 @@ ColumnLayout {
         }
     }
 
+    // สำรอง/กู้ลงไดรฟ์ USB (ฟีเจอร์ข้อ 7 · ADR-012)
+    Card {
+        objectName: "backupCard"
+        Layout.fillWidth: true
+        implicitHeight: bkCol.implicitHeight + 40
+        property int confirmRestore: -1
+        id: bkCard
+        ColumnLayout {
+            id: bkCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+                    AppText { text: "สำรองข้อมูลลงไดรฟ์ USB"; strong: true }
+                    AppText {
+                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        text: "แชท นัด สกิล ตั้งค่า และไฟล์ของฉัน · ไม่รวมใบหน้า (สมัครใหม่ได้) · ไฟล์ในไดรฟ์ไม่เข้ารหัส เก็บไดรฟ์ให้ดี"
+                    }
+                }
+                AppButton { text: "หาไดรฟ์"; kind: "secondary"; enabled: !backupCtl.busy; onClicked: backupCtl.refresh() }
+            }
+            AppText {
+                visible: backupCtl.drives.length === 0
+                text: "ยังไม่เจอไดรฟ์ · เสียบไดรฟ์ USB แล้วกด “หาไดรฟ์”"
+                size: Theme.fontSmall; color: Theme.inkFaint; Layout.fillWidth: true
+            }
+            Repeater {
+                model: backupCtl.drives
+                RowLayout {
+                    required property var modelData
+                    required property int index
+                    Layout.fillWidth: true
+                    spacing: 8
+                    AppText {
+                        Layout.fillWidth: true; size: Theme.fontSmall
+                        text: modelData.name + (modelData.count > 0 ? " · ชุดล่าสุด " + modelData.latest : " · ยังไม่มีชุดสำรอง")
+                    }
+                    AppButton { text: "สำรองลงไดรฟ์นี้"; enabled: !backupCtl.busy; onClicked: backupCtl.backupTo(index) }
+                    AppButton {
+                        visible: modelData.count > 0
+                        enabled: !backupCtl.busy
+                        text: bkCard.confirmRestore === index ? "กดอีกครั้งเพื่อกู้" : "กู้จากชุดล่าสุด"
+                        kind: bkCard.confirmRestore === index ? "danger" : "secondary"
+                        onClicked: {
+                            if (bkCard.confirmRestore === index) { bkCard.confirmRestore = -1; backupCtl.restoreLatest(index) }
+                            else bkCard.confirmRestore = index
+                        }
+                    }
+                }
+            }
+            AppText {
+                objectName: "backupMessage"
+                visible: backupCtl.message !== ""
+                text: backupCtl.message
+                size: Theme.fontSmall; color: backupCtl.busy ? Theme.accentInk : Theme.inkMuted; Layout.fillWidth: true
+            }
+        }
+    }
+
     // Claude (ไฮบริด + สกิลอัตโนมัติ): ใช้ไปเท่าไรวันนี้ + เพดานต่อวัน · ครบแล้วไม่เรียก Claude จนวันใหม่
     Card {
         objectName: "cloudUsageCard"

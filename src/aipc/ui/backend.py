@@ -68,6 +68,106 @@ class UiSettings(QObject):
             self.changed.emit()
 
 
+class BackupController(QObject):
+    """สำรอง/กู้ข้อมูลลงไดรฟ์ USB (ฟีเจอร์ข้อ 7 · ADR-012) · ทำในเธรดแยก หน้าจอไม่ค้าง."""
+
+    changed = Signal()
+    _done = Signal(object)
+
+    def __init__(self, home: Path | None = None, user: str | None = None, drives=None):
+        super().__init__()
+        import getpass
+
+        self._home = home or Path.home()
+        self._user = user or getpass.getuser()
+        self._drives_fn = drives  # เทสต์ใส่รายการไดรฟ์ปลอม
+        self._busy, self._message = False, ""
+        self._drives: list[Path] = []
+        self._done.connect(self._on_done)
+        self.refresh()
+
+    @Slot()
+    def refresh(self) -> None:
+        from aipc import backup
+
+        if self._drives_fn:
+            self._drives = self._drives_fn()
+        else:
+            errors = backup.mount_usb()  # เสียบแล้วยังไม่ถูกต่อ = ต่อให้ก่อน
+            self._drives = backup.drives()
+            if errors and not self._drives:
+                self._message = errors[0]
+        self.changed.emit()
+
+    @Property("QVariantList", notify=changed)
+    def drives(self) -> list:
+        from aipc import backup
+
+        out = []
+        for d in self._drives:
+            sets = backup.backups(d, self._user)
+            out.append({"name": d.name, "latest": sets[0].name if sets else "", "count": len(sets)})
+        return out
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    @Property(str, notify=changed)
+    def message(self) -> str:
+        return self._message
+
+    def _run(self, work, start_msg: str) -> None:
+        import threading
+
+        if self._busy:
+            return
+        self._busy, self._message = True, start_msg
+        self.changed.emit()
+
+        def go():
+            try:
+                r = work()
+            except Exception as e:  # noqa: BLE001 · ไดรฟ์ถูกถอด ฯลฯ = บอกผู้ใช้ ไม่ค้าง
+                from aipc.backup import Result
+
+                r = Result(False, f"ทำไม่สำเร็จ: {e}")
+            self._done.emit(r)
+
+        threading.Thread(target=go, daemon=True).start()
+
+    def _on_done(self, r) -> None:
+        self._busy = False
+        extra = f" · ข้ามไฟล์ที่เปิดไม่ได้ {len(r.skipped)} ไฟล์" if r.skipped else ""
+        self._message = r.message + extra
+        self.refresh()
+
+    @Slot(int)
+    def backupTo(self, index: int) -> None:  # noqa: N802
+        from aipc import backup
+
+        if 0 <= index < len(self._drives):
+            d = self._drives[index]
+            self._run(
+                lambda: backup.backup(self._home, d, self._user),
+                f"กำลังสำรองลง {d.name}… อย่าเพิ่งถอดไดรฟ์",
+            )
+
+    @Slot(int)
+    def restoreLatest(self, index: int) -> None:  # noqa: N802
+        from aipc import backup
+
+        if 0 <= index < len(self._drives):
+            sets = backup.backups(self._drives[index], self._user)
+            if not sets:
+                self._message = "ไดรฟ์นี้ไม่มีชุดสำรองของบัญชีนี้"
+                self.changed.emit()
+                return
+            self._run(
+                lambda: backup.restore(sets[0], self._home), f"กำลังตรวจและกู้จากชุด {sets[0].name}…"
+            )
+
+
 class CloudUsage(QObject):
     """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget
     · ไม่มี Claude = available False."""

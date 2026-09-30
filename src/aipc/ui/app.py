@@ -13,6 +13,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
 from aipc.ui.backend import (
+    BackupController,
     ChatController,
     CloudUsage,
     FilesBrowser,
@@ -207,6 +208,8 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None),
+        # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
+        "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),
         # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
         "face": FaceController(active=not opts.greeter_session),

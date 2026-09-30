@@ -8,6 +8,7 @@ warning ของ QML มักแปลว่ามีอะไรบนจอ�
 import os
 import shutil
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -394,6 +395,27 @@ class ShellCardTest(unittest.TestCase):
         skills.removeSkill(m.id)
         settle(50)
         self.assertEqual(skills.userSkills, [])
+        self.assertEqual(warnings, [])
+
+    def test_backup_card_backs_up_to_a_drive(self):
+        """ฟีเจอร์ข้อ 7: การ์ดสำรองในหน้าตั้งค่า · ไดรฟ์ปลอม (โฟลเดอร์) · สำรองในเธรด แล้วบอกผล."""
+        engine, win, warnings = self.open_shell("settings")
+        ctl = engine.rootContext().contextProperty("backupCtl")
+        home = Path(os.environ["XDG_DATA_HOME"]) / "home"
+        (home / ".local/share/aipc").mkdir(parents=True)
+        (home / ".local/share/aipc/x.json").write_text("{}", encoding="utf-8")
+        usb = Path(os.environ["XDG_DATA_HOME"]) / "usb"
+        usb.mkdir()
+        ctl._home, ctl._drives_fn = home, lambda: [usb]
+        ctl.refresh()
+        settle(50)
+        self.assertEqual(ctl.drives[0]["count"], 0)
+        ctl.backupTo(0)
+        end = time.monotonic() + 10
+        while ctl.busy and time.monotonic() < end:
+            settle(50)
+        self.assertIn("สำรองแล้ว", ctl.message)
+        self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
     def test_onboarding_shows_once(self):
