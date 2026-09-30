@@ -74,6 +74,33 @@ def health(target: Target, timeout: float = 2.0) -> str:
     return "ready" if code == 200 else "loading" if code == 503 else "down"
 
 
+def warm(target: Target, system: str, tools: list[dict], timeout: float = 300) -> dict:
+    """อ่าน system prompt + รายการสกิลไว้ในแคชของ llama-server ล่วงหน้า (ตอบ 1 token แล้วทิ้ง).
+
+    Pi 5 2026-09-30: ข้อความแรกหลัง login ต้องอ่าน 981 token ก่อนตอบ = รอ 68 วิ · ข้อความถัดไป 2.4 วิ
+    (ส่วนต้นอยู่ในแคชแล้ว) · อุ่นตอน AI เพิ่งพร้อม ผู้ใช้ยังไม่ทันพิมพ์ · คืน timings ของ llama-server หรือ {}
+    """
+    messages = [{"role": "system", "content": system}, {"role": "user", "content": "สวัสดี"}]
+    body = {
+        "messages": messages,
+        "stream": False,
+        "cache_prompt": True,
+        "max_tokens": 1,
+        **SAMPLING,
+    }
+    if tools:
+        body["tools"], body["tool_choice"] = tools, "auto"
+    try:
+        conn = target.connect(timeout)
+        conn.request("POST", "/v1/chat/completions", body=json.dumps(body),
+                     headers={"Content-Type": "application/json"})  # fmt: skip
+        data = json.loads(conn.getresponse().read())
+        conn.close()
+    except (OSError, http.client.HTTPException, ValueError):
+        return {}
+    return data.get("timings", {}) if isinstance(data, dict) else {}
+
+
 @dataclass
 class Reply:
     text: str = ""

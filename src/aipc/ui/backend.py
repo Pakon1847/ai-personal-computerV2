@@ -1105,8 +1105,25 @@ class ChatController(QObject):
 
     def _on_health(self, status: str) -> None:
         if status != self._status:
+            if status == "ready":
+                self._warm_up()
             self._status = status
             self.statusChanged.emit()
+
+    def _warm_up(self) -> None:
+        """AI เพิ่งพร้อม (login ใหม่ / AI เริ่มใหม่) → อ่านรายการสกิลไว้ในแคชทันที ข้อความแรกไม่ต้องรอ ~1 นาที.
+
+        ใช้ system prompt + รายการสกิลชุดเดียวกับ send() ทุกตัวอักษร (ส่วนต้นของคำขอต้องตรงกันแคชจึงใช้ได้)
+        ผู้ใช้พิมพ์ระหว่างอุ่น = คำขอรอคิวต่อจากการอุ่น (ไม่ช้ากว่าไม่อุ่น)
+        """
+        import threading
+
+        from aipc.chat import client
+
+        tools = self._tools()
+        system = self.SYSTEM + (self.TOOLS_HINT if tools else "")
+        args = (self._target, system, tools)
+        threading.Thread(target=client.warm, args=args, daemon=True).start()
 
     # ---------- คำสั่งจาก QML ----------
     @Slot(str, str, result=bool)

@@ -266,6 +266,22 @@ class ControllerTest(ServerCase):
         pump(lambda: done)
         self.assertNotIn("tools", FakeLlama.seen[-1])
 
+    def test_warms_the_prompt_cache_when_ai_becomes_ready(self):
+        """ข้อความแรกหลัง login ไม่ต้องรออ่านรายการสกิล ~1 นาที (Pi 5 2026-09-30: 68 วิ → 2.4 วิ)."""
+        params = {"type": "object", "properties": {}}
+        fn = {"name": "machine-status", "description": "x", "parameters": params}
+        tools = [{"type": "function", "function": fn}]
+        FakeLlama.seen.clear()
+        c, done, _ = self.make(tools=lambda: tools)
+        pump(lambda: any(b.get("max_tokens") == 1 for b in FakeLlama.seen))
+        warm = next(b for b in FakeLlama.seen if b.get("max_tokens") == 1)
+        self.assertTrue(warm["cache_prompt"])
+        self.assertEqual(warm["tools"], tools)
+        c.send("ทำไมเครื่องช้า", "")
+        pump(lambda: done)
+        real = FakeLlama.seen[-1]
+        self.assertEqual(real["messages"][0], warm["messages"][0], "ส่วนต้นตรงกันทุกตัวอักษร แคชจึงใช้ได้")
+
     def test_not_ready_refuses(self):
         c = ChatController(target=client.Target(), poll_ms=100000)
         self.addCleanup(c.shutdown)
