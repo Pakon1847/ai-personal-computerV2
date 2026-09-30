@@ -26,8 +26,16 @@ labwc_alive() {
   [ -n "$st" ] && [ "${st:0:1}" != "Z" ]
 }
 
+# รุ่นที่เซสชันนี้เริ่มถูกลบไประหว่างใช้ (อัปเดตแอป · พบบน Pi 5 2026-10-01: เปิดใหม่ได้รหัส 127 สองครั้ง
+# แล้วเด้งกลับหน้า Login) → เปิดจากรุ่นปัจจุบัน /opt/aipc-v2 แทน
+CURRENT="${AIPC_CURRENT_APP:-/opt/aipc-v2}"
 recent=""   # เวลาที่ล่มในช่วง WINDOW วินาทีล่าสุด คั่นด้วยช่องว่าง
 while labwc_alive; do
+  if [ -z "${AIPC_SHELL_CMD:-}" ] && [ ! -x "$APP/.venv/bin/python" ] && [ -x "$CURRENT/.venv/bin/python" ]; then
+    log "รุ่นเดิม ($APP) ถูกลบแล้ว · เปิดจากรุ่นปัจจุบัน"
+    APP="$(readlink -f "$CURRENT")"
+    CMD="$APP/.venv/bin/python -m aipc.ui --session --fullscreen"
+  fi
   $CMD
   code=$?
   labwc_alive || break

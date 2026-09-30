@@ -147,6 +147,12 @@ say "+ สลับ $LINK → $RELEASES/$NEWID"
 for d in "$RELEASES"/*/; do
   id="$(basename "$d")"
   case "$id" in "$NEWID"|"$OLD"|wheels) continue ;; esac
+  # ยังมีโปรเซสใช้รุ่นนี้อยู่ (เซสชันที่ login ไว้ก่อนอัปเดต) = เก็บไว้ ลบรอบหน้า
+  # พบบน Pi 5 2026-10-01: ลบรุ่นที่เซสชันใช้อยู่ → หน้าจอล่มครั้งเดียวก็เปิดใหม่ไม่ได้ เด้งกลับหน้า Login
+  if pgrep -f "$RELEASES/$id/" >/dev/null 2>&1; then
+    say "+ เก็บรุ่น $id ไว้ (ยังมีคนใช้อยู่)"
+    continue
+  fi
   rm -rf "${RELEASES:?}/$id" && say "+ ลบรุ่นเก่า $id"
 done
 

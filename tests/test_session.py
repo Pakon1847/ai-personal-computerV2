@@ -76,6 +76,38 @@ class ShellLoopTest(unittest.TestCase):
                 sleeper.wait()
         self.assertEqual((code, runs), (0, 4))
 
+    def test_relaunches_from_current_release_when_own_release_was_deleted(self):
+        # พบบน Pi 5 2026-10-01: อัปเดตแอปลบรุ่นที่เซสชันใช้อยู่ → เปิดใหม่ได้รหัส 127 → เด้งกลับหน้า Login
+        with tempfile.TemporaryDirectory() as tmp:
+            gone = Path(tmp) / "releases/old/scripts/pi/session"
+            gone.mkdir(parents=True)
+            loop = gone / "aipc-shell-loop"
+            loop.write_text(LOOP.read_text(encoding="utf-8"), encoding="utf-8")
+            cur = Path(tmp) / "releases/new/.venv/bin"
+            cur.mkdir(parents=True)
+            sleeper = subprocess.Popen(["sleep", "30"])
+            try:
+                py = cur / "python"
+                py.write_text(
+                    f'#!/bin/sh\necho "$@" > {tmp}/ran\nkill {sleeper.pid}\n', encoding="utf-8"
+                )
+                py.chmod(0o755)
+                e = {
+                    k: v for k, v in os.environ.items() if k not in ("LABWC_PID", "AIPC_SHELL_CMD")
+                }
+                e.update(
+                    LABWC_PID=str(sleeper.pid), AIPC_CURRENT_APP=str(Path(tmp) / "releases/new")
+                )
+                p = subprocess.run(
+                    ["bash", str(loop)], env=e, capture_output=True, text=True, timeout=30
+                )
+            finally:
+                sleeper.kill()
+                sleeper.wait()
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertIn("aipc.ui --session", (Path(tmp) / "ran").read_text())
+            self.assertIn("รุ่นเดิม", p.stderr)
+
     def test_stops_when_labwc_is_gone(self):
         # ผู้ใช้กด "ออก" → labwc จบ → ห้ามเปิดหน้าจอใหม่
         sleeper = subprocess.Popen(["sleep", "30"])
