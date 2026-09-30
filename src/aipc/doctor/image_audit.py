@@ -30,6 +30,23 @@ REMOTE_UNITS = [
 # ยืนยันกับ Pi 4 trixie 2026-09-24: ลิงก์อยู่ที่ ~/.config/systemd/user/default.target.wants/
 USER_REMOTE_UNITS = ["rpi-connect.service", "rpi-connect-wayvnc.service", "wayvnc.service"]
 LOOPBACK6 = "00000000000000000000000001000000"
+# กฎ NOPASSWD ที่ระบบตั้งใจใส่: ผู้ใช้ระบบเรียกตัวช่วยบัญชีได้คำสั่งเดียว ห้ามใส่อาร์กิวเมนต์ (การ์ด 0012, 0015)
+# นับว่าผ่านเฉพาะเมื่อตรงทุกตัวอักษร (ไม่สนช่องว่าง) · กฎอื่นหรือกฎที่กว้างกว่านี้ = ไม่ผ่านเหมือนเดิม
+# (ผลตรวจบน Pi 5 2026-09-30 เคยนับกฎพวกนี้เป็นช่องโหว่)
+EXPECTED_NOPASSWD = frozenset(
+    {
+        '_greetd ALL=(root) NOPASSWD: /usr/local/sbin/aipc-accounts ""',
+        '_aipcvision ALL=(root) NOPASSWD: /usr/local/sbin/aipc-accounts ""',
+    }
+)
+
+
+def _norm(rule: str) -> str:
+    return " ".join(rule.split())
+
+
+def is_expected_rule(body: str) -> bool:
+    return _norm(body) in {_norm(r) for r in EXPECTED_NOPASSWD}
 
 
 def parse_sudoers_nopasswd(text: str, source: str) -> list[str]:
@@ -48,14 +65,16 @@ def check_sudo_nopasswd(root: Path) -> Check:
         files += sorted(_p(root, "/etc/sudoers.d").iterdir())
     except OSError:
         pass
-    hits, unreadable = [], []
+    hits, unreadable, expected = [], [], []
     for f in files:
         try:
             text = f.read_text(encoding="utf-8", errors="replace")
         except OSError:
             unreadable.append(f.name)
             continue
-        hits += parse_sudoers_nopasswd(text, "/" + f.relative_to(root).as_posix())
+        for hit in parse_sudoers_nopasswd(text, "/" + f.relative_to(root).as_posix()):
+            body = hit.split("`", 2)[1]
+            (expected if is_expected_rule(body) else hits).append(hit)
     title = "sudo แบบไม่ใส่รหัส"
     if hits:
         return Check(
@@ -67,6 +86,8 @@ def check_sudo_nopasswd(root: Path) -> Check:
         )
     if unreadable:
         return Check("sudo", title, UNKNOWN, f"อ่านไม่ได้: {', '.join(unreadable)}", "รันด้วย sudo")
+    if expected:
+        return Check("sudo", title, PASS, f"มีแต่กฎคำสั่งเดียวที่ระบบตั้งใจใส่ ({len(expected)} ข้อ)")
     return Check("sudo", title, PASS, "ไม่พบ NOPASSWD")
 
 

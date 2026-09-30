@@ -27,6 +27,25 @@ class SudoTest(unittest.TestCase):
         self.assertEqual(audit.check_sudo_nopasswd(m.root).status, FAIL)
         m.close()
 
+    def test_our_single_command_rules_pass_but_wider_ones_do_not(self):
+        """กฎคำสั่งเดียวของตัวช่วยบัญชี (การ์ด 0012/0015) = ตั้งใจ · กว้างกว่านี้แม้นิดเดียว = ไม่ผ่าน."""
+        m = FakeMachine()
+        m.write("/etc/sudoers", "%sudo ALL=(ALL:ALL) ALL\n")
+        helper = '/usr/local/sbin/aipc-accounts ""'
+        m.write(
+            "/etc/sudoers.d/aipc-accounts", f"# หน้า Login\n_greetd ALL=(root) NOPASSWD: {helper}\n"
+        )
+        m.write("/etc/sudoers.d/aipc-visiond", f"_aipcvision  ALL=(root)  NOPASSWD: {helper}\n")
+        c = audit.check_sudo_nopasswd(m.root)
+        self.assertEqual(c.status, PASS)
+        self.assertIn("2 ข้อ", c.detail)
+        m.write("/etc/sudoers.d/aipc-visiond",
+                "_aipcvision ALL=(root) NOPASSWD: /usr/local/sbin/aipc-accounts\n")  # fmt: skip
+        c = audit.check_sudo_nopasswd(m.root)
+        self.assertEqual(c.status, FAIL, 'ไม่มี "" = ใส่อาร์กิวเมนต์อะไรก็ได้ · กว้างกว่า')
+        self.assertNotIn("aipc-accounts:2", c.detail, "กฎที่ตั้งใจไม่ต้องขึ้นในรายการปัญหา")
+        m.close()
+
     def test_unreadable_sudoers_is_unknown(self):
         m = FakeMachine()
         self.assertEqual(audit.check_sudo_nopasswd(m.root).status, UNKNOWN)
