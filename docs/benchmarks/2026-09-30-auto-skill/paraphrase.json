@@ -1,0 +1,151 @@
+{
+ "summary": "สำนวนอื่น: เรียกสกิลที่ Claude สร้างถูก 11/15 = 73% (เกณฑ์ ≥ 70%) · กฎตัดสิน 4 · AI ตัดสิน 11 (ถูก 8) · ขอสร้างซ้ำ 0",
+ "rows": [
+  {
+   "id": "p01",
+   "expect": "morning-mode",
+   "from": "c01",
+   "text": "เข้าโหมดเช้าหน่อย",
+   "by": "rule",
+   "got": "morning-mode",
+   "ok": true
+  },
+  {
+   "id": "p02",
+   "expect": "morning-mode",
+   "from": "c01",
+   "text": "เปิดชุดเช้าให้ที Gmail กับแผนที่",
+   "by": "ai",
+   "got": "morning-mode",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p03",
+   "expect": "morning-mode",
+   "from": "c01",
+   "text": "เช้าแล้ว เอาโหมดเช้ามาเลย",
+   "by": "ai",
+   "got": "morning-mode",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p04",
+   "expect": "shop-name-ideas",
+   "from": "c04",
+   "text": "คิดชื่อร้านออนไลน์ให้ 5 ชื่อหน่อย",
+   "by": "ai",
+   "got": "shop-name-ideas",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p05",
+   "expect": "shop-name-ideas",
+   "from": "c04",
+   "text": "ขอไอเดียชื่อร้านค้าออนไลน์มาอีกชุด ห้าชื่อพอ",
+   "by": "ai",
+   "got": "shop-name-ideas",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p06",
+   "expect": "shop-name-ideas",
+   "from": "c04",
+   "text": "ช่วยตั้งชื่อร้านให้หน่อย เอา 5 ชื่อ",
+   "by": "ai",
+   "got": "none",
+   "reply": "คุณอยากให้ช่วยตั้งชื่อร้านประเภทไหนคะ? เช่น ร้านอาหาร ร้านเสื้อผ้า หรือร้านกาแฟ จะได้ช่วยคิดชื่อที่ตรงใจมากขึ้นค่ะ",
+   "ok": false
+  },
+  {
+   "id": "p07",
+   "expect": "report-research-mode",
+   "from": "c07",
+   "text": "เตรียมค้นรายงานให้หน่อย",
+   "by": "rule",
+   "got": "report-research-mode",
+   "ok": true
+  },
+  {
+   "id": "p08",
+   "expect": "report-research-mode",
+   "from": "c07",
+   "text": "เปิดวิกิกับกูเกิลรอไว้เลย จะทำรายงาน",
+   "by": "rule",
+   "got": "system-command",
+   "ok": false
+  },
+  {
+   "id": "p09",
+   "expect": "report-research-mode",
+   "from": "c07",
+   "text": "สั่งชุดค้นรายงานที เอาวิกิพีเดียกับ Google มาคู่กัน",
+   "by": "ai",
+   "got": "report-research-mode",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p10",
+   "expect": "meeting-mode",
+   "from": "c10",
+   "text": "เข้าโหมดประชุมให้ที",
+   "by": "rule",
+   "got": "meeting-mode",
+   "ok": true
+  },
+  {
+   "id": "p11",
+   "expect": "meeting-mode",
+   "from": "c10",
+   "text": "จะประชุมแล้ว เปิดโหมดประชุมเลย",
+   "by": "ai",
+   "got": "meeting-mode",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p12",
+   "expect": "meeting-mode",
+   "from": "c10",
+   "text": "โหมดประชุมเอาขึ้นมาหน่อย",
+   "by": "ai",
+   "got": "meeting-mode",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p13",
+   "expect": "english-homework-check",
+   "from": "c13",
+   "text": "ตรวจการบ้านอังกฤษของลูกวันนี้หน่อย",
+   "by": "ai",
+   "got": "english-homework-check",
+   "reply": "",
+   "ok": true
+  },
+  {
+   "id": "p14",
+   "expect": "english-homework-check",
+   "from": "c13",
+   "text": "เอางานภาษาอังกฤษลูกมาเช็กให้ที บอกคำผิดแบบเด็กฟังรู้เรื่อง",
+   "by": "ai",
+   "got": "none",
+   "reply": "เรียกใช้ `english-homework-check` ครับ",
+   "ok": false
+  },
+  {
+   "id": "p15",
+   "expect": "english-homework-check",
+   "from": "c13",
+   "text": "ถึงเวลาตรวจการบ้านลูกแล้ว ช่วยดูให้หน่อย",
+   "by": "ai",
+   "got": "none",
+   "reply": "เรียกใช้เครื่องมือ `english-homework-check` เพื่อตรวจการบ้านภาษาอังกฤษของลูกของคุณได้เลยค่ะ",
+   "ok": false
+  }
+ ]
+}
