@@ -100,10 +100,11 @@ class SkillSelectTest(unittest.TestCase):
         items = [
             {"text": "เปิดยูทูบ", "expect": "system-command", "kind": "direct"},
             {"text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร", "expect": "none", "kind": "trap"},
-            {"text": "เตือนส่งรายงานวันศุกร์บ่ายสอง", "expect": "reminder", "kind": "direct"},
+            # ไม่ใช่ตัวอย่างของสกิลเป๊ะ ๆ (ตรงตัวอย่างเป๊ะ = กฎเลือกเลย · router.repeat_of การ์ด 0017)
+            {"text": "เตือนส่งรายงานวันศุกร์บ่ายสามโมง", "expect": "reminder", "kind": "direct"},
         ]
         res = skill_select.evaluate(
-            items, self.skills, self.ai({"เตือนส่งรายงานวันศุกร์บ่ายสอง": "reminder"}), "ai-first"
+            items, self.skills, self.ai({"เตือนส่งรายงานวันศุกร์บ่ายสามโมง": "reminder"}), "ai-first"
         )
         self.assertEqual([t for t, _ in self.asked], [items[1]["text"], items[2]["text"]])
         self.assertEqual(res["correct"], 3, "ประโยคหลอกที่กฎเลือกผิด (machine-status) ถึงมือ AI")

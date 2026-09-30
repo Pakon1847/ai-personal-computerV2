@@ -60,6 +60,20 @@ class DefineIntentTest(unittest.TestCase):
         self.assertEqual(command.parse("เปิดเสียง").plan.action, "unmute")
         self.assertEqual(command.parse("ปิดเสียงหน่อย").plan.action, "mute")
 
+    def test_same_sentence_as_request_uses_that_skill(self):
+        from aipc.skills import router
+
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        store = userskills.UserSkills(Path(d.name))
+        builtin = manifest.load_builtin()
+        store.install(GOOD_LLM, builtin, request="x")
+        m = store.load()[0]
+        req = m.extra["request"]  # คำขอเดิมที่ stamp ไว้ในไฟล์
+        r = router.route_ai_first(req + " ครับ", [*builtin, m])
+        self.assertEqual((r.kind, r.skill.id), ("skill", m.id))
+        self.assertIsNone(router.repeat_of("ประโยคอื่นที่ไม่เคยเห็น", [*builtin, m]))
+
     def test_existing_mode_skill_is_used_not_recreated(self):
         from aipc.skills import router
 

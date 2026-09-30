@@ -96,6 +96,8 @@ def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
     by_id = {m.id: m for m in manifests}
     if r := command_route(text, by_id):
         return r
+    if m := repeat_of(text, manifests):  # ประโยคเดิมที่ใช้สร้าง/เป็นตัวอย่างของสกิล = ใช้สกิลนั้นเลย (การ์ด 0017)
+        return Route("skill", m, "ประโยคเดียวกับตัวอย่างของสกิลนี้")
     if define_intent(text):  # ตั้งโหมด/งานประจำ (การ์ด 0017): มีสกิลที่ตรงแล้ว = ใช้เลย · ยังไม่มี = ให้ Claude สร้าง
         ranked = sorted(((score(text, m), m) for m in manifests if m.id != "system-command"),
                         key=lambda x: x[0], reverse=True)  # fmt: skip
@@ -115,6 +117,24 @@ def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
 DEFINE_START = re.compile(r"^(ช่วย|ขอ)?(ทำ|สร้าง|อยากได้|เพิ่ม|เปิด|เข้า|เริ่ม|ใช้)(ให้)?โหมด")
 DEFINE_ANY = ("ทุกครั้งที่", "ต่อไปถ้า", "ต่อไปเวลา", "จากนี้ถ้า", "จากนี้ไปถ้า", "จากนี้ไปทุกครั้ง",
               "พอพูดว่า", "ถ้าพูดว่า", "ถ้าพิมพ์ว่า", "ถ้าบอกว่า", "เวลาพูดว่า", "เวลาพิมพ์ว่า")  # fmt: skip
+
+
+def repeat_of(text: str, manifests: list[Manifest]) -> Manifest | None:
+    """สกิลที่ประโยคนี้ตรงกับคำขอที่ใช้สร้าง (request) หรือตัวอย่างของมันเป๊ะ (ไม่สนช่องว่าง/คำสุภาพหัวท้าย).
+
+    ปลายทางจริงรอบ 1 (การ์ด 0017): สั่งประโยคเดิมซ้ำ AI ในเครื่องเรียกสกิลใหม่ได้ 3/5 · 1 ข้อขอให้สร้างซ้ำ
+    ตรงเป๊ะเท่านั้น (ไม่เดา) · ประโยคอื่นยังให้ AI เลือกตามเดิม
+    """
+    key = command.normalize(text)
+    if not key:
+        return None
+    for m in manifests:
+        if m.id == "system-command":
+            continue
+        pool = [*m.examples, str(m.extra.get("request", ""))]
+        if any(command.normalize(p) == key for p in pool if p):
+            return m
+    return None
 
 
 def define_intent(text: str) -> bool:
