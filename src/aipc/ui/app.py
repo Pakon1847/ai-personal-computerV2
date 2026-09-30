@@ -69,6 +69,23 @@ def _cloud_client():
     return lambda question, history: ask.ask(question, history)
 
 
+def _skill_forge():
+    """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้ · ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0."""
+    import os
+    import shutil
+
+    exe = shutil.which("claude")
+    if exe is None or "0" in (os.environ.get("AIPC_CLOUD", "1"), os.environ.get("AIPC_FORGE", "1")):
+        return None
+    from aipc.skills import forge
+
+    def run(request, **kw):  # เธรดแยก · อ่านรุ่นของ claude ตอนใช้ (ไม่ให้เปิดแอปช้าลง)
+        version = forge.run_process([exe, "--version"], "", ".", 30)[1].strip()
+        return forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
+
+    return run
+
+
 def _local_model_name() -> str:
     """ชื่อโมเดลจาก /etc/aipc/llm.conf (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · อ่านไม่ได้ = ""."""
     from pathlib import Path
@@ -127,9 +144,16 @@ def build(opts: Options, argv: list[str] | None = None):
     def tools() -> list:
         return holder["skills"].tool_catalog() if "skills" in holder else []
 
-    chat = ChatController(active=not opts.greeter_session, tools=tools,
-                          cloud=None if opts.greeter_session else _cloud_client(),
-                          model_name=_local_model_name())  # fmt: skip
+    in_session = not opts.greeter_session
+    skill_forge = _skill_forge() if in_session else None
+    user_skills = None
+    if in_session:
+        from aipc.skills.userskills import UserSkills
+
+        user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
+    chat = ChatController(active=in_session, tools=tools,
+                          cloud=_cloud_client() if in_session else None,
+                          model_name=_local_model_name(), forge=skill_forge is not None)  # fmt: skip
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
@@ -149,7 +173,8 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(
-            run_timer=not opts.greeter_session, llm_ready=lambda: chat.ready
+            run_timer=not opts.greeter_session, llm_ready=lambda: chat.ready,
+            forge=skill_forge, user_skills=user_skills,
         ),
         "chat": chat,
         "session": SessionController(opts.session and not opts.greeter_session),

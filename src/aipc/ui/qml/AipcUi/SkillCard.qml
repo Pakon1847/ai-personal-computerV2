@@ -8,6 +8,10 @@ Rectangle {
     property var info: ({})
     property bool answered: false
     signal answer(bool yes)
+    // สกิลที่ Claude สร้าง (การ์ด 0017 ชั้นที่ 2): ลบทิ้ง หรือบอกว่าผิดตรงไหนให้ Claude แก้
+    signal removeSkill(string skillId)
+    signal wrongSkill(string skillId, string name)
+    readonly property bool forged: hasBadge && (info.badge.forgedId || "") !== ""
 
     readonly property bool hasBadge: info.badge !== undefined && info.badge.name !== undefined
     implicitHeight: col.implicitHeight + 28
@@ -59,6 +63,25 @@ Rectangle {
             spacing: 8
             AppButton { text: "ใช่ ทำเลย"; onClicked: card.answer(true) }
             AppButton { text: "ไม่ใช่"; kind: "secondary"; onClicked: card.answer(false) }
+        }
+
+        RowLayout {
+            objectName: "forgedRow"
+            visible: card.forged
+            Layout.fillWidth: true
+            spacing: 8
+            AppText {
+                text: card.forged ? "สกิลที่ Claude สร้าง · รุ่น " + card.info.badge.forgedVersion : ""
+                size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; Layout.fillWidth: true
+            }
+            AppButton {
+                text: "ไม่ใช่แบบนี้"; kind: "ghost"
+                onClicked: card.wrongSkill(card.info.badge.forgedId, card.info.badge.name)
+            }
+            AppButton {
+                text: "ลบสกิลนี้"; kind: "ghost"
+                onClicked: card.removeSkill(card.info.badge.forgedId)
+            }
         }
     }
 }

@@ -18,6 +18,12 @@ ASK_CLOUD = "ask-cloud"
 ASK_CLOUD_DESC = ("ถามผู้ช่วยบน cloud ที่ค้นเว็บได้: ใช้เมื่อคำถามต้องใช้ข้อมูลสดหรือล่าสุด (อากาศ ข่าว ราคา "
                   "ผลกีฬา อัตราแลกเปลี่ยน เหตุการณ์ปัจจุบัน) หรือเป็นคำถามยาก คิดหลายขั้น คำนวณซับซ้อน "
                   "หรือคุณไม่แน่ใจคำตอบ")  # fmt: skip
+# สกิลอัตโนมัติ (การ์ด 0017): ให้ Claude สร้างสกิลใหม่ แล้วติดตั้งและทำงานนั้นทันที
+# ข้อความนี้เขียนก่อนวัดด้วย tests/data/create_skill_calls.json (H9) · ห้ามปรับโดยดูผลของชุดนั้น
+CREATE_SKILL = "create-skill"
+CREATE_SKILL_DESC = ("สร้างสกิลใหม่ให้เครื่องนี้ (Claude เขียนให้แล้วติดตั้งเอง): ใช้เมื่อผู้ใช้อยากได้สกิล โหมด หรือคำสั่งประจำ "
+                     "สำหรับงานที่จะทำซ้ำ เช่น เปิดเว็บหรือแอปหลายอย่างรวดเดียว ปรับเสียง หรืองานเขียน/งานภาษาแบบเดิมทุกครั้ง "
+                     "และยังไม่มีเครื่องมือตัวอื่นทำได้ · ไม่ใช้กับคำถามความรู้ คุยเล่น ข้อมูลสด หรืองานที่มีเครื่องมืออยู่แล้ว")  # fmt: skip
 # ข้อเท็จจริงเกี่ยวกับตัวระบบ (กรรมการสอบถามได้ · ชุดสอบจบกลุ่ม H) · ต้องตรงกับของจริงเสมอ
 ABOUT = (
     "เกี่ยวกับระบบนี้: ทำงานบน Raspberry Pi 5 RAM 8 GB · "
@@ -38,7 +44,7 @@ RULES = ("กติกา: ตอบภาษาไทย กระชับ ไ
          "เรื่องพวกนี้ห้ามเดาตัวเลข ให้บอกตรง ๆ · ปฏิเสธเฉพาะคำขอที่ผิดกฎหมายหรืออันตราย")  # fmt: skip
 
 
-def system_prompt(today=None, cloud: bool = False, model: str = "") -> str:
+def system_prompt(today=None, cloud: bool = False, model: str = "", forge: bool = False) -> str:
     """system prompt ของแชท (แอปและตัววัดใช้ตัวเดียวกัน) · เปลี่ยนแค่วันละครั้ง แคชของ llama-server จึงใช้ได้ทั้งวัน.
 
     today = วันที่ของเครื่อง (ตอบเรื่องวันเวลาได้) · cloud = มีทางส่งต่อ Claude (การ์ด 0016)
@@ -56,6 +62,9 @@ def system_prompt(today=None, cloud: bool = False, model: str = "") -> str:
     if cloud:
         parts.append(f"ถ้าต้องใช้ข้อมูลสด หรือคำถามยากหรือไม่แน่ใจ ให้เรียกเครื่องมือ {ASK_CLOUD} แทนการเดา "
                      "(ส่งเฉพาะคำถามออกนอกเครื่อง)")  # fmt: skip
+    if forge:
+        parts.append(f"ถ้าผู้ใช้อยากได้งานที่ทำซ้ำได้แต่ยังไม่มีเครื่องมือไหนทำ ให้เรียก {CREATE_SKILL} "
+                     "(Claude สร้างสกิลให้ ครั้งหน้าคุณเรียกสกิลนั้นได้เอง)")  # fmt: skip
     return "\n".join(parts)
 
 
@@ -63,12 +72,16 @@ def system_prompt(today=None, cloud: bool = False, model: str = "") -> str:
 TOOLS_HINT = " · ถ้าคำขอตรงกับเครื่องมือที่มี ให้เรียกเครื่องมือนั้นโดยไม่ต้องตอบเอง ถ้าไม่ตรงให้ตอบเองตามปกติ"
 
 
-def tools(skills: list[Manifest], available: set[str], cloud: bool = False) -> list[dict]:
+def tools(skills: list[Manifest], available: set[str], cloud: bool = False,
+          forge: bool = False) -> list[dict]:  # fmt: skip
     out = []
+    empty = {"type": "object", "properties": {}}
     if cloud:  # ไว้หน้าสุด: รายการเครื่องมือคงที่ แคชของ llama-server จึงใช้ส่วนต้นซ้ำได้
-        fn = {"name": ASK_CLOUD, "description": ASK_CLOUD_DESC,
-              "parameters": {"type": "object", "properties": {}}}  # fmt: skip
-        out.append({"type": "function", "function": fn})
+        out.append({"type": "function", "function": {"name": ASK_CLOUD, "description": ASK_CLOUD_DESC,
+                                                     "parameters": empty}})  # fmt: skip
+    if forge:  # คงที่เหมือนกัน · ไว้ก่อนสกิล (สกิลของผู้ใช้เพิ่ม/ลดได้ ต่อท้าย)
+        out.append({"type": "function", "function": {"name": CREATE_SKILL, "description": CREATE_SKILL_DESC,
+                                                     "parameters": empty}})  # fmt: skip
     for s in skills:
         if s.id in NOT_FOR_AI or any(n not in available for n in s.needs):
             continue

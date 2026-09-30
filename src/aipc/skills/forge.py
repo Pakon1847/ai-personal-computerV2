@@ -68,7 +68,8 @@ class Reply:
 def ask_claude(prompt: str, *, claude: str, model: str | None, runner: Runner) -> Reply:
     """เรียก `claude -p` แบบข้อความล้วน จากโฟลเดอร์ว่าง · prompt ส่งทาง stdin (ไม่อยู่ใน argv)."""
     args = [claude, "-p", "--output-format", "json", "--tools", "", "--permission-prompts", "none",
-            "--no-session-persistence", "--max-budget-usd", BUDGET_USD]  # fmt: skip
+            "--no-session-persistence", "--max-budget-usd", BUDGET_USD,
+            "--strict-mcp-config", "--disable-slash-commands"]  # fmt: skip  # ไม่โหลด MCP/สกิลของบัญชี (การ์ด 0016)
     if model:
         args += ["--model", model]
     with tempfile.TemporaryDirectory(prefix="aipc-forge-") as cwd:
@@ -206,10 +207,17 @@ def _validate(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
 
 def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run_process,
           claude: str = "claude", model: str | None = None, claude_version: str = "",
-          today: date | None = None, extra_sentences: list[str] = ()) -> Proposal:  # fmt: skip
+          today: date | None = None, extra_sentences: list[str] = (),
+          revise: tuple[str, str] | None = None,
+          check: Callable[[str], list[str]] | None = None) -> Proposal:  # fmt: skip
+    """revise = (ไฟล์รุ่นที่ใช้อยู่, คำติของผู้ใช้) → รุ่นใหม่ id เดิม (การ์ด 0017 ชั้นที่ 2) · skills ต้องไม่มีสกิลตัวที่แก้."""
     p = Proposal(False, request, claude_version=claude_version)
     fix: list[str] = []
     previous = ""
+    if revise is not None:
+        previous = revise[0]
+        fix = [f"ผู้ใช้ใช้สกิลนี้แล้วบอกว่าไม่ถูก: “{' '.join(revise[1].split())[:300]}” · "
+               "แก้ให้ตรงกับที่ผู้ใช้ต้องการ · ใช้ id เดิม"]  # fmt: skip
     ids = {s.id for s in skills}
     for attempt in range(1, MAX_ATTEMPTS + 1):
         p.attempts = attempt
@@ -232,6 +240,9 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
         if new is None:
             fix = p.errors = errors
             continue
+        if check is not None and (errors := check(previous)):  # ประตูของผู้เรียก (สกิลอัตโนมัติ · การ์ด 0017)
+            fix = p.errors = errors
+            continue
         should = [s for s in data.get("should_trigger", []) if isinstance(s, str)]
         should_not = [s for s in data.get("should_not_trigger", []) if isinstance(s, str)]
         t = trial(new, skills, should, should_not, extra_sentences)
@@ -240,6 +251,14 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
         p.skill_id, p.note, p.errors = new.id, str(data.get("note", ""))[:500], []
         p.trial = {**asdict(t), "should_trigger": should, "should_not_trigger": should_not}
         p.ok = t.ok
+        # อัตโนมัติ: เรียกผิด/แย่งประโยค = ให้ Claude แก้อีกรอบ · "ควรเรียกแต่ไม่เรียก" ไม่แก้ (วัดด้วยตัวคัดแบบกฎ
+        # แต่ในแอป AI เลือกจากคำอธิบาย · สกิลดีของ Claude เช่น ตัวอย่าง "meeting mode" กฎจับไม่ได้ ไม่ใช่เรื่องความปลอดภัย)
+        if (t.not_trigger_fail or t.stolen) and check is not None and attempt < MAX_ATTEMPTS:
+            fix = p.errors = (
+                [f"ประโยคนี้ไม่ควรเรียกสกิลใหม่แต่เรียก: {x}" for x in t.not_trigger_fail]
+                + [f"แย่งประโยคของสกิลเดิม: {x} (เดิมคือ {k})" for x, k in t.stolen]
+            )
+            continue
         return p
     return p
 

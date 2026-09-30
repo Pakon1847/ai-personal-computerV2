@@ -17,6 +17,8 @@ Item {
     // รายการข้อความเป็น JS array ธรรมดา: { user: true, text } · { user: false, card } · { ai: true, text, note, done }
     property var items: []
     property var answered: ({})   // token ของการ์ดที่ตอบ "ใช่/ไม่ใช่" ไปแล้ว
+    // กด "ไม่ใช่แบบนี้" ที่สกิลที่ Claude สร้าง → ข้อความถัดไปคือคำติ ส่งให้ Claude แก้สกิล (การ์ด 0017) · null = แชทปกติ
+    property var feedbackFor: null
     property int copiedRow: -1    // คำตอบ AI ที่เพิ่งกดคัดลอก (ปุ่มขึ้นว่า "คัดลอกแล้ว")
     readonly property bool home: items.length === 0
     readonly property int colWidth: Math.min(760, width - 48)
@@ -40,6 +42,12 @@ Item {
         if (text === "" || chat.busy) return
         push({ user: true, text: text })
         input.text = ""
+        if (feedbackFor !== null) {
+            const id = feedbackFor.id
+            feedbackFor = null
+            showCard(skills.reviseSkill(id, text, ""))
+            return
+        }
         dispatch(skills.handle(text), text)
     }
     // การ์ดจากสกิล → แสดง และ/หรือส่งให้ AI ในเครื่อง · ใช้ทั้งตอนผู้ใช้พิมพ์ และตอน AI เลือกสกิลให้ (skillRequested)
@@ -73,6 +81,19 @@ Item {
             if (i.length === 0 || !i[i.length - 1].ai) return
             i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true })
             root.items = i
+        }
+    }
+    // สกิลอัตโนมัติ (การ์ด 0017): Claude สร้าง/แก้เสร็จ → ทำงานนั้นทันที · ไม่สำเร็จ = ให้ Claude ตอบคำขอนี้แทน
+    Connections {
+        target: skills
+        function onForgeDone(card, text) {
+            if (card.fallback === true) {
+                root.showCard(card)
+                if (chat.askCloudFor(text))
+                    root.push({ ai: true, text: "", note: "", done: false, skill: "" })
+                return
+            }
+            root.dispatch(card, text)
         }
     }
     function sendText(text) {
@@ -407,6 +428,11 @@ Item {
                 info: row.modelData.card || ({})
                 answered: !!root.answered[(row.modelData.card || {}).confirmToken]
                 onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
+                onRemoveSkill: (skillId) => root.showCard(skills.removeSkill(skillId))
+                onWrongSkill: (skillId, name) => {
+                    root.feedbackFor = { id: skillId, name: name }
+                    input.forceActiveFocus()
+                }
             }
         }
     }
@@ -435,7 +461,9 @@ Item {
                 TextArea {
                     id: input
                     objectName: "chatInput"
-                    placeholderText: "พิมพ์ข้อความถึงผู้ช่วย AI"
+                    placeholderText: root.feedbackFor !== null
+                                     ? "บอกว่าสกิล “" + root.feedbackFor.name + "” ผิดตรงไหน เช่น ให้เปิด Gmail แทน · Esc = ยกเลิก"
+                                     : "พิมพ์ข้อความถึงผู้ช่วย AI"
                     placeholderTextColor: Theme.inkFaint
                     color: Theme.ink
                     font.family: Theme.family
@@ -450,6 +478,9 @@ Item {
                         if (enter && !(event.modifiers & Qt.ShiftModifier) && !input.inputMethodComposing) {
                             event.accepted = true
                             root.send()
+                        } else if (event.key === Qt.Key_Escape && root.feedbackFor !== null) {
+                            event.accepted = true
+                            root.feedbackFor = null
                         } else if (event.key === Qt.Key_Escape && chat.busy) {
                             event.accepted = true
                             chat.stop()   // BRIEF 5.4 ข้อ 7: หยุดการตอบด้วย Esc

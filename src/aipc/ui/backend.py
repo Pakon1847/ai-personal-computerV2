@@ -655,15 +655,23 @@ class SkillsController(QObject):
     remindersChanged = Signal()  # noqa: N815
 
     skillsChanged = Signal()  # noqa: N815
+    forgeDone = Signal("QVariantMap", str)  # noqa: N815 · สกิลอัตโนมัติ (การ์ด 0017): การ์ดผลลัพธ์, ข้อความเดิมของผู้ใช้
+    _forged = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
-                 run_timer: bool = True, llm_ready=None):  # fmt: skip
+                 run_timer: bool = True, llm_ready=None, forge=None, user_skills=None):  # fmt: skip
         super().__init__()
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
         from aipc.skills import actions, manifest, reminders
 
-        self._skills = manifest.load_builtin()
+        # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal · None = ไม่มี Claude
+        self._forge = forge
+        self._forging = False
+        self._user = user_skills
+        self._builtin = manifest.load_builtin()
+        self._skills = self._builtin + (user_skills.load() if user_skills is not None else [])
+        self._forged.connect(self._on_forged)
         self._exec = executor or actions.Executor()
         self._root = root
         self._pending: dict[str, object] = {}
@@ -688,7 +696,13 @@ class SkillsController(QObject):
             self._timer.start()
 
     def _badge(self, skill, reason: str) -> dict:
-        return {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}
+        badge = {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}
+        if self._is_user(skill.id):  # สกิลที่ Claude สร้าง: การ์ดมีปุ่มลบ / ไม่ใช่แบบนี้ (การ์ด 0017 ชั้นที่ 2)
+            badge.update(forgedId=skill.id, forgedVersion=self._user.info(skill.id)["version"])
+        return badge
+
+    def _is_user(self, skill_id: str) -> bool:
+        return self._user is not None and all(s.id != skill_id for s in self._builtin)
 
     def available(self) -> set[str]:
         return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() else set())
@@ -702,6 +716,7 @@ class SkillsController(QObject):
                 "id": s.id, "name": s.name, "description": s.description,
                 "worker": self.WORKER_LABEL[s.worker], "permissions": s.permission_labels(),
                 "ready": not missing, "missing": [self.NEED_LABEL[n] for n in missing],
+                "byClaude": self._is_user(s.id),
             })  # fmt: skip
         return out
 
@@ -819,6 +834,7 @@ class SkillsController(QObject):
                 if out.page:
                     card["page"] = out.page
                 if not out.ok:
+                    self._record(skill, False)
                     lines.append(f"✗ {i}. {s.plan.summary} · {out.message}")
                     if i < total:
                         lines.append(f"ขั้นที่เหลือ {total - i} ขั้นไม่ได้ทำ")
@@ -826,6 +842,7 @@ class SkillsController(QObject):
                                 chips=[{"text": "ไม่สำเร็จ", "kind": "danger"}])  # fmt: skip
                     return card
                 lines.append(f"{'จำลอง' if out.simulated else '✓'} {i}. {s.plan.summary}")
+        self._record(skill, True)
         chip = {"text": "จำลอง", "kind": "warn"} if simulated else {"text": "ทำแล้ว", "kind": "ok"}
         title = f"ทำครบ {total} ขั้นแล้ว" + (" (จำลอง)" if simulated else "")
         card.update(title=title, lines=lines, confirmToken="", chips=[chip])
@@ -850,15 +867,122 @@ class SkillsController(QObject):
         """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog."""
         from aipc.skills import catalog
 
-        return catalog.tools(self._skills, self.available())
+        return catalog.tools(self._skills, self.available(), forge=self.canForge)
+
+    # ---------- สกิลอัตโนมัติ (การ์ด 0017) ----------
+    @Property(bool, constant=True)
+    def canForge(self) -> bool:  # noqa: N802
+        return self._forge is not None and self._user is not None
+
+    FORGING_LINES = ["ครั้งแรกรอประมาณ 30–60 วินาที · ครั้งหน้าสั่งแบบนี้ AI ในเครื่องทำเองได้เลย",
+                     "Claude เห็นเฉพาะประโยคนี้ ไม่เห็นแชท นัด หรือไฟล์ของคุณ"]  # fmt: skip
+
+    def _plain(self, kind: str, title: str, lines=(), chips=()) -> dict:
+        return {"kind": kind, "badge": {}, "title": title, "chips": list(chips), "lines": list(lines),
+                "confirmToken": "", "page": ""}  # fmt: skip
+
+    def _start_forge(self, text: str, revise_id: str = "", feedback: str = "") -> dict:
+        import threading
+
+        from aipc.skills import userskills
+
+        if not self.canForge:
+            return self._plain("needs", "สร้างสกิลใหม่ไม่ได้: เครื่องนี้ยังไม่มี Claude",
+                               ["ติดตั้งและเข้าสู่ระบบ Claude Code ก่อน (การ์ด 0016)"])  # fmt: skip
+        if self._forging:
+            return self._plain("forging", "กำลังสร้างสกิลอื่นอยู่ รอสักครู่แล้วสั่งใหม่")
+        self._forging = True
+        others = [s for s in self._skills if s.id != revise_id]
+        revise = (self._user.current_md(revise_id), feedback) if revise_id else None
+
+        def work():
+            try:
+                p = self._forge(text, skills=others, revise=revise,
+                                check=lambda md: userskills.gate(md, others, revise_id)[1])  # fmt: skip
+            except Exception as e:  # noqa: BLE001 · ทุกความผิดพลาด = บอกผู้ใช้ ไม่ให้หน้าจอรอค้าง
+                p = e
+            self._forged.emit((p, text, revise_id))
+
+        threading.Thread(target=work, daemon=True).start()
+        title = "กำลังให้ Claude แก้สกิลตามที่บอก…" if revise_id else "กำลังให้ Claude สร้างสกิลสำหรับงานนี้…"
+        chip = {"text": "ส่งออกนอกเครื่อง: เฉพาะประโยคนี้", "kind": "neutral"}
+        return self._plain("forging", title, self.FORGING_LINES, [chip])
+
+    def _on_forged(self, result) -> None:
+        from aipc.skills import manifest
+
+        p, text, revise_id = result
+        self._forging = False
+        errors = [str(p)] if isinstance(p, Exception) else list(p.errors)
+        new = None
+        if not isinstance(p, Exception) and p.skill_md:
+            try:
+                new = self._user.install(p.skill_md, self._skills, request=text, model=p.model,
+                                         cost_usd=p.cost_usd, replacing=revise_id)  # fmt: skip
+            except manifest.InvalidSkill as e:
+                errors = list(e.errors)
+            except OSError as e:
+                errors = [f"บันทึกไม่ได้: {e}"]
+        if new is None:
+            title = "แก้สกิลไม่สำเร็จ" if revise_id else "สร้างสกิลไม่สำเร็จ"
+            card = self._plain("forge-failed", title, [*errors[:2], "ไม่ได้ติดตั้งอะไร"])
+            card["fallback"] = not revise_id  # หน้าจอให้ Claude ตอบคำขอนี้แทน (การ์ด 0016)
+            self.forgeDone.emit(card, text)
+            return
+        self._reload()
+        card = dict(self.handleAs(new.id, text))
+        v = self._user.info(new.id)["version"]
+        note = (f"แก้สกิล “{new.name}” แล้ว (รุ่น {v})" if revise_id
+                else f"สร้างสกิลใหม่ “{new.name}” แล้ว (Claude สร้าง) · ครั้งหน้าสั่งแบบนี้ได้เลย")  # fmt: skip
+        card["lines"] = [note, *card.get("lines", [])]
+        self.forgeDone.emit(card, text)
+
+    def _reload(self) -> None:
+        self._skills = self._builtin + self._user.load()
+        self.skillsChanged.emit()
+
+    def _record(self, skill, ok: bool) -> None:
+        if self._is_user(skill.id) and self._user.record(skill.id, ok):
+            self._reload()  # ทำไม่สำเร็จ 2 ครั้งติด = ปิดเอง (ชั้นที่ 3)
+
+    @Slot(str, result="QVariantMap")
+    def removeSkill(self, skill_id: str) -> dict:  # noqa: N802
+        if not self._is_user(skill_id) or not self._user.remove(skill_id):
+            return self._plain("command", "ลบไม่ได้: ไม่ใช่สกิลที่ Claude สร้าง")
+        self._reload()
+        return self._plain("command", "ลบสกิลนี้แล้ว",
+                           ["กลับไปเหมือนไม่เคยมีสกิลนี้ · สั่งใหม่เมื่อไหร่ก็สร้างใหม่ได้"],
+                           [{"text": "ลบแล้ว", "kind": "ok"}])  # fmt: skip
+
+    @Slot(str, bool)
+    def setSkillEnabled(self, skill_id: str, on: bool) -> None:  # noqa: N802
+        if self._is_user(skill_id):
+            self._user.set_enabled(skill_id, on)
+            self._reload()
+
+    @Slot(str, str, str, result="QVariantMap")
+    def reviseSkill(self, skill_id: str, feedback: str, text: str) -> dict:  # noqa: N802
+        """ผู้ใช้บอกว่าสกิลผิด (ชั้นที่ 2) · ผิดครั้งที่ 2 ติดกัน = ปิดแทนการแก้ (ชั้นที่ 3)."""
+        if not self._is_user(skill_id):
+            return self._plain("command", "แก้ไม่ได้: ไม่ใช่สกิลที่ Claude สร้าง")
+        if self._user.wrong(skill_id):
+            self._reload()
+            return self._plain("command", "ปิดสกิลนี้แล้ว",
+                               ["บอกว่าไม่ถูก 2 ครั้งติดกัน จึงหยุดใช้ไว้ก่อน · เปิดคืนหรือลบได้ที่หน้า Skill"],
+                               [{"text": "ปิดแล้ว", "kind": "warn"}])  # fmt: skip
+        request = text or self._user.info(skill_id).get("request", "")
+        return self._start_forge(request, skill_id, feedback)
 
     @Slot(str, str, result="QVariantMap")
     def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802
         """AI ในเครื่องเลือกสกิลนี้ → ทำทางเดียวกับที่ตัวคัดสกิลเลือก (ยืนยันก่อนถ้าเป็นงานที่แตะเครื่อง)."""
         from aipc.skills import router
 
-        skill = next((s for s in self._skills if s.id == skill_id), None)
         from aipc.skills import catalog
+
+        if skill_id == catalog.CREATE_SKILL:  # AI ในเครื่องขอให้ Claude สร้างสกิล (การ์ด 0017)
+            return self._start_forge(text)
+        skill = next((s for s in self._skills if s.id == skill_id), None)
 
         if (
             skill is None or skill.id in catalog.NOT_FOR_AI
@@ -1026,10 +1150,11 @@ class ChatController(QObject):
     _health = Signal(str)
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
-                 tools=None, cloud=None, model_name: str = ""):  # fmt: skip
+                 tools=None, cloud=None, model_name: str = "", forge: bool = False):  # fmt: skip
         super().__init__()
         # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
+        self._forge = forge  # มีเครื่องมือ create-skill (การ์ด 0017) → บอก AI ใน system prompt
         self._model_name = model_name
         self._tools = tools or (
             lambda: []
@@ -1136,7 +1261,7 @@ class ChatController(QObject):
         from aipc.skills import catalog
 
         base = catalog.system_prompt(date.today(), cloud=self._cloud is not None,
-                                     model=self._model_name)  # fmt: skip
+                                     model=self._model_name, forge=self._forge)  # fmt: skip
         return base + (self.TOOLS_HINT if tools else "")
 
     def _all_tools(self) -> list:
@@ -1269,6 +1394,15 @@ class ChatController(QObject):
             self._done.emit(reply)
 
         threading.Thread(target=work, daemon=True).start()
+
+    @Slot(str, result=bool)
+    def askCloudFor(self, text: str) -> bool:  # noqa: N802
+        """สร้างสกิลไม่สำเร็จ → ให้ Claude ตอบคำขอนี้แทน (การ์ด 0017 ข้อ 4.5) · ไม่มี Claude / กำลังตอบ = False."""
+        if self._cloud is None or self._busy or not text.strip():
+            return False
+        self._conv["messages"].append({"role": "user", "content": text})
+        self._ask_cloud()
+        return True
 
     @Slot(bool)
     def newChat(self, temporary: bool) -> None:  # noqa: N802
