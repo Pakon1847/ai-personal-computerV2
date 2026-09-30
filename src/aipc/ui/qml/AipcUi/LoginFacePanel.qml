@@ -45,6 +45,18 @@ Card {
             }
         }
 
+        // ภาพสดระหว่างสแกน (เห็นหน้าตัวเอง · Pakon ขอ 2026-09-30)
+        EnrollPreview {
+            objectName: "loginFaceEnrollPreview"
+            visible: loginFace.busy && loginFace.state === "disabled"
+            Layout.fillWidth: true
+            Layout.maximumWidth: 640
+            Layout.alignment: Qt.AlignHCenter
+            view: loginFaceEnroll
+            provider: "loginface"
+            running: loginFace.busy
+        }
+
         AppCheck {
             id: consentBox
             objectName: "loginFaceConsent"

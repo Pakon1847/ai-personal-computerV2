@@ -95,6 +95,34 @@ class HandlerTest(unittest.TestCase):
         self.assertFalse(self.h.root({"op": "?"}, 0)["ok"])
 
 
+class EnrollStatusTest(unittest.TestCase):
+    """ภาพย่อ + ท่าถัดไประหว่างลงทะเบียน (Pakon ขอให้เห็นหน้าตัวเอง 2026-09-30)."""
+
+    def test_status_has_mirror_preview_next_pose_and_reach(self):
+        import base64
+        from types import SimpleNamespace
+
+        r = SimpleNamespace(
+            advice="", box=(10, 10, 50, 60), quality=SimpleNamespace(yaw=8.0, pitch=0.0)
+        )
+        msg = daemon.enroll_status(
+            r, {"front": 2}, object(), lambda f, b: (b"JPEGDATA", [0.1, 0.2, 0.3, 0.4])
+        )
+        self.assertEqual(msg["pose"], "left")
+        self.assertEqual(msg["hint"], "หันซ้ายเล็กน้อย")
+        self.assertEqual(msg["reach"], 1.0)
+        self.assertEqual(base64.b64decode(msg["jpeg"]), b"JPEGDATA")
+        self.assertEqual(msg["box"], [0.1, 0.2, 0.3, 0.4])
+
+    def test_no_preview_function_means_no_image(self):
+        from types import SimpleNamespace
+
+        r = SimpleNamespace(advice="แสงน้อยไป", box=None, quality=None)
+        msg = daemon.enroll_status(r, {}, object(), None)
+        self.assertNotIn("jpeg", msg)
+        self.assertEqual(msg["hint"], "แสงน้อยไป")
+
+
 class FacePassTest(unittest.TestCase):
     """pam_exec: มีตั๋ว = 0 (เข้าได้) · อย่างอื่นทั้งหมด = 1 (PAM ไปถามรหัสผ่าน)."""
 

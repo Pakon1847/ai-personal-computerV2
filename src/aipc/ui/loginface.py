@@ -18,7 +18,7 @@ from PySide6.QtCore import Property, QObject, Signal, Slot
 class LoginFaceController(QObject):
     changed = Signal()
     _done = Signal(object)
-    _hint = Signal(str)
+    _hint = Signal(object)
 
     def __init__(self, face=None, user: str | None = None):
         super().__init__()
@@ -29,6 +29,9 @@ class LoginFaceController(QObject):
         self._message = ""
         self._done.connect(self._on_done)
         self._hint.connect(self._on_hint)
+        from aipc.ui.enrollview import EnrollView
+
+        self.enroll_view = EnrollView()  # ภาพสดตอนเปิดใช้ (QML: loginFaceEnroll · image://loginface)
         self.refresh()
 
     @Property(str, notify=changed)
@@ -60,7 +63,7 @@ class LoginFaceController(QObject):
         self.changed.emit()
 
         def work():
-            self._done.emit(self._face(req, lambda m: self._hint.emit(str(m.get("hint", "")))))
+            self._done.emit(self._face(req, self._hint.emit))
 
         threading.Thread(target=work, daemon=True).start()
         return True
@@ -76,13 +79,16 @@ class LoginFaceController(QObject):
     def disable(self, password: str) -> bool:
         return self._run({"op": "remove", "username": self._user, "password": password})
 
-    def _on_hint(self, hint: str) -> None:
+    def _on_hint(self, m: dict) -> None:
+        self.enroll_view.update(m)
+        hint = str(m.get("hint", ""))
         if hint and hint != self._message:
             self._message = hint
             self.changed.emit()
 
     def _on_done(self, res: dict) -> None:
         self._busy = False
+        self.enroll_view.clear()
         state = res.get("state")
         if state == "saved":
             self._message = "เปิดแล้ว · ครั้งหน้าที่หน้า Login แค่มองกล้องก็เข้าได้"

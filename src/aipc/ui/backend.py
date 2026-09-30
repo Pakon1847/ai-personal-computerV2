@@ -475,7 +475,7 @@ class SignupController(QObject):
     # ขั้นใบหน้า (การ์ด 0015 หัวข้อ 11): ลงทะเบียนผ่าน visiond หลังสร้างบัญชีแล้ว
     faceProgress = Signal(str, "QVariantMap")  # noqa: N815 · คำแนะนำ, จำนวนเฟรมต่อท่า
     faceFinished = Signal("QVariantMap")  # noqa: N815
-    _face_progress = Signal(str, object)
+    _face_progress = Signal(object)
     _face_result = Signal(object)
 
     def __init__(self, real: bool = False, dev: bool = False, runner=None, face=None):
@@ -485,7 +485,10 @@ class SignupController(QObject):
         self._face = face  # face(req, on_progress) → dict · ตัวจริง = aipc.vision.client.request
         self._busy = False
         self._result.connect(self._on_result)
-        self._face_progress.connect(lambda h, poses: self.faceProgress.emit(h, dict(poses)))
+        self._face_progress.connect(self._on_face_progress)
+        from aipc.ui.enrollview import EnrollView
+
+        self.enroll_view = EnrollView()  # ภาพสดตอนลงทะเบียน (QML: signupEnroll · image://signupface)
         self._face_result.connect(self._on_face_result)
 
     @Property(bool, constant=True)
@@ -516,7 +519,7 @@ class SignupController(QObject):
         self.changed.emit()
 
         def progress(m: dict) -> None:
-            self._face_progress.emit(str(m.get("hint", "")), m.get("poses") or {})
+            self._face_progress.emit(m)
 
         def work():
             self._face_result.emit(self._face(req, progress))
@@ -524,7 +527,12 @@ class SignupController(QObject):
         threading.Thread(target=work, daemon=True).start()
         return True
 
+    def _on_face_progress(self, m: dict) -> None:
+        self.enroll_view.update(m)
+        self.faceProgress.emit(str(m.get("hint", "")), dict(m.get("poses") or {}))
+
     def _on_face_result(self, res: dict) -> None:
+        self.enroll_view.clear()  # ไม่เก็บภาพหน้าไว้หลังจบงาน
         self._busy = False
         self.changed.emit()
         self.faceFinished.emit(dict(res))

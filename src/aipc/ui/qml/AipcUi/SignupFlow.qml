@@ -15,8 +15,7 @@ Rectangle {
     color: Theme.bg
     property int page: 0                 // 0 บัญชี 1 PIN กู้คืน 2 ใบหน้า 3 เสร็จ
     property bool faceDone: false
-    property string faceHint: ""
-    property var facePoses: ({})
+    property string faceHint: ""         // ผลหลังสแกน (สำเร็จ/เหตุผลที่ไม่ผ่าน) · ระหว่างสแกนคำแนะนำอยู่ใน EnrollPreview
     property bool simulated: false       // หน้าต่างพัฒนา: ผลจำลอง ต้องเขียนว่า "จำลอง" (H5)
     property string loginError: ""
 
@@ -32,6 +31,8 @@ Rectangle {
         if (page >= 2) simulated = true  // ถ่ายภาพ/ทดสอบหน้าจอ
     }
 
+    Timer { id: doneTimer; interval: 1200; onTriggered: root.page = 3 }
+
     Connections {
         target: signup
         function onFinished(r) {
@@ -45,15 +46,11 @@ Rectangle {
                 createMsg.text = r.message
             }
         }
-        function onFaceProgress(hint, poses) {
-            root.faceHint = hint
-            root.facePoses = poses
-        }
         function onFaceFinished(r) {
             root.faceHint = r.message || ""
             if (r.ok) {
                 root.faceDone = true
-                root.page = 3
+                doneTimer.start()   // ให้เห็น "ลงทะเบียนสำเร็จ" ครู่หนึ่ง แล้วไปหน้าพร้อมใช้
             }
         }
     }
@@ -250,55 +247,69 @@ Rectangle {
             }
 
             // ---------- 3. ใบหน้า (ไม่บังคับ · การ์ด 0015) ----------
+            // ซ้าย = เวทีกล้อง (เห็นหน้าตัวเองแบบกระจก · Pakon ขอ 2026-09-30) · ขวา = ยินยอม และปุ่ม
             Card {
-                ColumnLayout {
+                RowLayout {
                     anchors.fill: parent
-                    anchors.margins: 32
-                    spacing: 14
-                    RowLayout {
-                        spacing: 12
-                        Rectangle {
-                            width: 44; height: 44; radius: Theme.radiusCard; color: Theme.accentSoft
-                            Icon { anchors.centerIn: parent; path: Icons.shield; color: Theme.accentInk; width: 22; height: 22 }
-                        }
-                        AppText { text: "เข้าเครื่องด้วยใบหน้า (ไม่บังคับ)"; size: Theme.fontTitle; strong: true }
-                    }
-                    AppText { Layout.fillWidth: true; color: Theme.inkMuted
-                              text: "เปิดแล้ว ที่หน้า Login แค่มองกล้องก็เข้าเครื่องได้ ไม่ต้องพิมพ์รหัสผ่าน · รหัสผ่านยังใช้ได้เสมอ และยังต้องใช้กับงานสำคัญ เช่น เปลี่ยนรหัสผ่าน" }
-                    AppCheck {
-                        id: faceConsent
-                        objectName: "faceConsent"
+                    anchors.margins: 28
+                    spacing: 28
+
+                    EnrollPreview {
+                        objectName: "signupEnrollPreview"
                         Layout.fillWidth: true
-                        boxed: true
-                        enabled: !signup.busy
-                        text: "ยินยอมให้เก็บข้อมูลใบหน้า และเปิดเข้าเครื่องด้วยใบหน้า"
-                        detail: "เก็บเป็นตัวเลข 128 ค่าในเครื่องนี้เท่านั้น ไม่เก็บรูป (ข้อมูลชีวภาพ · พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล มาตรา 26) · ปิดและลบได้ในหน้าตั้งค่า · ความเสี่ยง: รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ ถ้าระบบกันรูปปลอมพลาด"
+                        Layout.preferredWidth: 3
+                        Layout.alignment: Qt.AlignTop
+                        view: signupEnroll
+                        provider: "signupface"
+                        running: signup.busy
+                        done: root.faceDone
                     }
-                    RowLayout {
-                        spacing: 8
-                        Repeater {
-                            model: [["front", "ตรง"], ["left", "ซ้าย"], ["right", "ขวา"], ["up", "เงย"], ["down", "ก้ม"]]
-                            Chip {
-                                required property var modelData
-                                text: modelData[1]
-                                kind: (root.facePoses[modelData[0]] || 0) >= 2 ? "ok" : "neutral"
-                            }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 2
+                        Layout.fillHeight: true
+                        spacing: 14
+                        AppText { text: "เข้าเครื่องด้วยใบหน้า"; size: Theme.fontTitle; strong: true }
+                        Chip { text: "ไม่บังคับ · ข้ามได้"; kind: "neutral" }
+                        AppText { Layout.fillWidth: true; color: Theme.inkMuted
+                                  text: "เปิดแล้ว ที่หน้า Login แค่มองกล้องก็เข้าเครื่องได้ ไม่ต้องพิมพ์รหัสผ่าน · รหัสผ่านยังใช้ได้เสมอ และยังต้องใช้กับงานสำคัญ" }
+                        AppCheck {
+                            id: faceConsent
+                            objectName: "faceConsent"
+                            Layout.fillWidth: true
+                            boxed: true
+                            enabled: !signup.busy && !root.faceDone
+                            text: "ยินยอมให้เก็บข้อมูลใบหน้า"
+                            detail: "เก็บเป็นตัวเลข 128 ค่าในเครื่องนี้ ไม่เก็บรูป (ข้อมูลชีวภาพ · PDPA มาตรา 26) · ปิดและลบได้ในหน้าตั้งค่า · รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ถ้าระบบกันรูปปลอมพลาด"
                         }
-                    }
-                    AppText { objectName: "faceHint"; Layout.fillWidth: true; visible: root.faceHint !== ""; text: root.faceHint
-                              color: root.faceDone ? Theme.okInk : Theme.inkMuted }
-                    AppText { visible: signup.busy; text: "กำลังสแกน… มองกล้อง แล้วค่อย ๆ หันซ้าย ขวา เงย และก้มทีละท่า"; color: Theme.inkMuted
-                              Layout.fillWidth: true }
-                    Item { Layout.fillHeight: true }
-                    RowLayout {
-                        Layout.alignment: Qt.AlignRight
-                        spacing: 12
-                        AppButton { text: "ข้าม"; kind: "secondary"; enabled: !signup.busy; onClicked: root.page = 3 }
-                        AppButton {
-                            objectName: "faceStart"
-                            text: "เริ่มสแกนใบหน้า"
-                            enabled: faceConsent.checked && !signup.busy
-                            onClicked: signup.enrollFace(userField.text, pw1.text)
+                        AppText {
+                            objectName: "faceHint"
+                            Layout.fillWidth: true
+                            visible: !signup.busy && root.faceHint !== ""
+                            text: root.faceHint
+                            color: root.faceDone ? Theme.okInk : Theme.danger
+                        }
+                        AppText {
+                            Layout.fillWidth: true
+                            visible: !signup.busy && !root.faceDone
+                            size: Theme.fontSmall
+                            color: Theme.inkMuted
+                            text: "เคล็ดลับ: นั่งห่างกล้อง 40–70 ซม. · แสงส่องจากด้านหน้า · ถอดหมวกและหน้ากาก"
+                        }
+                        Item { Layout.fillHeight: true }
+                        RowLayout {
+                            Layout.alignment: Qt.AlignRight
+                            spacing: 12
+                            AppButton { text: "ข้าม"; kind: "secondary"; enabled: !signup.busy; visible: !root.faceDone
+                                        onClicked: root.page = 3 }
+                            AppButton {
+                                objectName: "faceStart"
+                                text: root.faceHint !== "" && !root.faceDone ? "ลองอีกครั้ง" : "เริ่มสแกน"
+                                visible: !root.faceDone
+                                enabled: faceConsent.checked && !signup.busy
+                                onClicked: { root.faceHint = ""; signup.enrollFace(userField.text, pw1.text) }
+                            }
                         }
                     }
                 }

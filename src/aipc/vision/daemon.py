@@ -62,6 +62,27 @@ def check_password_via_helper(user: str, password: str) -> bool:
         return False
 
 
+def enroll_status(r, counts: dict, frame, preview) -> dict:
+    """สถานะระหว่างลงทะเบียน 1 เฟรม: คำแนะนำ ท่าที่ได้ ท่าถัดไป หันถึงแค่ไหน + ภาพย่อแบบกระจก (base64 JPEG).
+
+    ภาพส่งเฉพาะผู้ที่ขอลงทะเบียน (หน้าสมัคร/เจ้าของบัญชีที่อยู่หน้ากล้อง) · ไม่เขียนดิสก์ ไม่ลง log
+    """
+    import base64
+
+    from aipc.vision import guide
+
+    target = guide.next_pose(counts)
+    msg = {"state": "enrolling", "hint": guide.advice(r, counts), "poses": dict(counts),
+           "pose": target, "reach": 0.0, "box": []}  # fmt: skip
+    if preview is not None and frame is not None:
+        jpeg, box = preview(frame, getattr(r, "box", None))
+        msg["jpeg"], msg["box"] = base64.b64encode(jpeg).decode("ascii"), box
+        q = getattr(r, "quality", None)
+        if q is not None and box:
+            msg["reach"] = guide.pose_reach(target, q.yaw, q.pitch)
+    return msg
+
+
 class Handler:
     """ตัดสินคำขอ 1 ก้อนจาก uid ของผู้ต่อ · ไม่แตะ socket (เทสต์ได้ทุกระบบ).
 
@@ -74,8 +95,11 @@ class Handler:
         frames: Callable,
         greeter_uid: int | None,
         uid_of: Callable[[str], int | None] = uid_of,
+        preview: Callable | None = None,
     ):
         self.face, self.frames, self.greeter_uid, self._uid_of = face, frames, greeter_uid, uid_of
+        # preview(frame, box) → (jpeg, กรอบหน้า) · ให้ผู้ใช้เห็นหน้าตัวเองตอนลงทะเบียน (Pakon 2026-09-30)
+        self.preview = preview
         self._camera = threading.Lock()
 
     def _may_manage(self, uid: int, user: str) -> bool:
@@ -121,13 +145,21 @@ class Handler:
             return vars(self.face.remove(user, password))
         if op == "enroll":
             consent = req.get("consent_at") if isinstance(req.get("consent_at"), str) else ""
+            last: dict = {}
+
+            def tap(frames):  # จำเฟรมล่าสุดไว้ทำภาพย่อ (เฟรมเดียวกับที่วิเคราะห์ ไม่อ่านกล้องซ้ำ)
+                for f in frames:
+                    last["frame"] = f
+                    yield f
 
             def progress(r, counts):
-                send({"state": "enrolling", "hint": r.advice, "poses": counts})
+                send(enroll_status(r, counts, last.get("frame"), self.preview))
 
             return self._with_camera(
                 lambda: vars(
-                    self.face.enroll(user, password, self.frames(ENROLL_SECONDS), consent, progress)
+                    self.face.enroll(
+                        user, password, tap(self.frames(ENROLL_SECONDS)), consent, progress
+                    )
                 )
             )
         return {"ok": False, "state": "error", "message": "ไม่รู้จักคำขอนี้"}
@@ -222,7 +254,9 @@ def main() -> int:
     face = service.FaceLogin(
         camera.build_scanner(cfg), service.Gallery(), check_password_via_helper, log=log
     )
-    h = Handler(face, camera_frames, uid_of(GREETER))
+    from aipc.vision import guide
+
+    h = Handler(face, camera_frames, uid_of(GREETER), preview=guide.preview_jpeg)
     stop = threading.Event()
     serve(PUBLIC, 0o666, h.public, stop)
     serve(ROOT, 0o600, lambda req, uid, _send: h.root(req, uid), stop)

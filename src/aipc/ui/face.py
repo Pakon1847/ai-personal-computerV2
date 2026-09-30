@@ -27,16 +27,14 @@ from PySide6.QtCore import Property, QObject, QSize, Signal, Slot
 from PySide6.QtGui import QImage
 from PySide6.QtQuick import QQuickImageProvider
 
-POSES = ("front", "left", "right", "up", "down")  # ลำดับที่บอกผู้ใช้ (ตรงกับ pipeline.ENROLL_POSES)
-POSE_PROMPT = {
-    "front": "มองตรงมาที่กล้อง",
-    "left": "หันซ้ายเล็กน้อย",
-    "right": "หันขวาเล็กน้อย",
-    "up": "เงยหน้าเล็กน้อย",
-    "down": "ก้มหน้าเล็กน้อย",
-}
-PER_POSE = 2  # เท่ากับค่าเริ่มต้นของ pipeline.enroll
-PREVIEW_WIDTH = 480
+from aipc.vision.guide import (  # noqa: F401 · เทสต์และโค้ดเดิมเรียกผ่าน aipc.ui.face
+    PER_POSE,
+    POSE_PROMPT,
+    POSES,
+    PREVIEW_WIDTH,
+    next_pose,
+    pose_reach,
+)
 
 
 def make_preview(frame, box):
@@ -46,34 +44,13 @@ def make_preview(frame, box):
     """
     import cv2
 
-    h, w = frame.shape[:2]
-    small_h = max(1, round(h * PREVIEW_WIDTH / w))
-    small = cv2.resize(frame, (PREVIEW_WIDTH, small_h), interpolation=cv2.INTER_AREA)
-    rgb = cv2.cvtColor(cv2.flip(small, 1), cv2.COLOR_BGR2RGB)
-    img = QImage(rgb.data, PREVIEW_WIDTH, small_h, 3 * PREVIEW_WIDTH, QImage.Format.Format_RGB888)
-    frac = []
-    if box is not None:
-        x, y, bw, bh = (float(v) for v in box)
-        frac = [(w - x - bw) / w, y / h, bw / w, bh / h]  # กลับซ้ายขวาให้ตรงกับภาพ
+    from aipc.vision.guide import mirror
+
+    small, frac = mirror(frame, box)
+    rgb = cv2.cvtColor(small, cv2.COLOR_BGR2RGB)
+    h, w = rgb.shape[:2]
+    img = QImage(rgb.data, w, h, 3 * w, QImage.Format.Format_RGB888)
     return img.copy(), frac
-
-
-def pose_reach(pose: str, yaw: float, pitch: float) -> float:
-    """หันไปทางท่าเป้าหมายได้แค่ไหน 0–1 (1 = ถึงเกณฑ์นับท่าแล้ว) · ใช้วาดแถบบนจอเท่านั้น ไม่ได้ใช้ตัดสิน.
-
-    ทิศเดียวกับ pipeline.pose_of: yaw > 0 = ผู้ใช้หันซ้าย · pitch > 0 = ก้ม
-    """
-    from aipc.vision.pipeline import POSE_SPLIT_DEG as split
-
-    along = {"left": yaw, "right": -yaw, "up": -pitch, "down": pitch}
-    if pose == "front":  # อยู่ในกรอบ ±split = เต็ม · หันเกินออกไปเท่าไร แถบลดลงเท่านั้น
-        return max(0.0, min(1.0, 2 - max(abs(yaw), abs(pitch)) / split))
-    return max(0.0, min(1.0, along.get(pose, 0.0) / split))
-
-
-def next_pose(counts: dict) -> str:
-    """ท่าถัดไปที่ยังไม่ครบ ตามลำดับที่บอกผู้ใช้ · ครบหมด = "" ."""
-    return next((p for p in POSES if counts.get(p, 0) < PER_POSE), "")
 
 
 def release_memory() -> None:
