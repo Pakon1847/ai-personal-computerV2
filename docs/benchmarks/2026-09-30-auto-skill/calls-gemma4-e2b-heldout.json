@@ -1,0 +1,893 @@
+{
+ "label": "gemma4-e2b-heldout",
+ "server": {
+  "supports_tools": true,
+  "template_chars": 18807,
+  "template_sha256": "74a88f94c57c14e22dcdbe08e94127f42b87c6f584cb73838e73e32126f3f6b3",
+  "model": "models/gemma-4-E2B-it-Q4_K_M.gguf"
+ },
+ "summary": "gemma4-e2b-heldout: ควรสร้าง เรียก 14/20 = 70% (เกณฑ์ ≥ 70%) · ไม่ควร เรียกผิด 1/27 = 4% (เกณฑ์ ≤ 10%) → ผ่าน",
+ "system_chars": 1518,
+ "date": "2026-09-30",
+ "create_hit": [
+  14,
+  20
+ ],
+ "no_false": [
+  1,
+  27
+ ],
+ "by_style": {
+  "heldout": [
+   15,
+   47
+  ]
+ },
+ "rows": [
+  {
+   "id": "h01",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ช่วยสร้างสกิลโหมดเรียนหนังสือให้หน่อย เปิดเว็บ Wikipedia กับ Google แล้วลดเสียงลงเหลือน้อยๆ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 7.97,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 28,
+    "prompt_ms": 1436.661,
+    "prompt_per_token_ms": 51.30932142857143,
+    "prompt_per_second": 19.489636038007575,
+    "predicted_n": 41,
+    "predicted_ms": 6487.915,
+    "predicted_per_token_ms": 162.197875,
+    "predicted_per_second": 6.165308885828498
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h02",
+   "expect": "create",
+   "style": "heldout",
+   "text": "อยากได้โหมดดูหนังตอนกลางคืน เปิด YouTube แล้วเพิ่มเสียงนิดหน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.76,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 21,
+    "prompt_ms": 1090.364,
+    "prompt_per_token_ms": 51.92209523809524,
+    "prompt_per_second": 19.259623391821446,
+    "predicted_n": 48,
+    "predicted_ms": 7630.666,
+    "predicted_per_token_ms": 162.35459574468086,
+    "predicted_per_second": 6.159357518727722
+   },
+   "reply": "ฉันไม่สามารถเปิดแอปพลิเคชันหรือควบคุมอุปกรณ์ของคุณโดยตรงได้ค่ะ\n\nแต่ฉันสามารถช่วยคุณสร้าง \"สกิล\" ที่จะทำสิ่งนี้ได้ หากคุณต้องการให้ฉันช่วยเขียนขั้นตอนหรือโค้ดสำหรับทำ",
+   "called": false
+  },
+  {
+   "id": "h03",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ทำสกิลตอนเช้าให้หน่อย เปิด Gmail กับ Google Maps ให้ในคำสั่งเดียว",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.55,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 23,
+    "prompt_ms": 1196.347,
+    "prompt_per_token_ms": 52.015086956521735,
+    "prompt_per_second": 19.225191353344805,
+    "predicted_n": 9,
+    "predicted_ms": 1294.743,
+    "predicted_per_token_ms": 161.842875,
+    "predicted_per_second": 6.178832401488172
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h04",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ทุกเช้าผมต้องเปิดเมลกับยูทูปเสมอ ทำเป็นทางลัดให้หน่อย",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 5.46,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1201.53,
+    "prompt_per_token_ms": 50.06375,
+    "prompt_per_second": 19.97453247109935,
+    "predicted_n": 27,
+    "predicted_ms": 4217.236,
+    "predicted_per_token_ms": 162.2013846153846,
+    "predicted_per_second": 6.165175484606506
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h05",
+   "expect": "create",
+   "style": "heldout",
+   "text": "สร้างสกิลแปลอีเมลภาษาไทยเป็นภาษาอังกฤษแบบสุภาพทางการ ผมใช้บ่อย",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.54,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1203.856,
+    "prompt_per_token_ms": 50.160666666666664,
+    "prompt_per_second": 19.93593918209487,
+    "predicted_n": 9,
+    "predicted_ms": 1297.353,
+    "predicted_per_token_ms": 162.169125,
+    "predicted_per_second": 6.166401896785223
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h06",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ช่วยทำโหมดประชุมหน่อย ปิดเสียงแล้วเปิด Gmail",
+   "by": "ai",
+   "got": "none",
+   "seconds": 6.13,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 17,
+    "prompt_ms": 885.843,
+    "prompt_per_token_ms": 52.10841176470588,
+    "prompt_per_second": 19.190759536396403,
+    "predicted_n": 33,
+    "predicted_ms": 5205.4,
+    "predicted_per_token_ms": 162.66875,
+    "predicted_per_second": 6.147462250739617
+   },
+   "reply": "ไม่ทราบว่าคุณต้องการให้ฉันทำอะไรเกี่ยวกับ \"โหมดประชุม\" ครับ? คุณต้องการให้ฉันสร้างคำสั่งหรือตั้งค่าอะไรเป็นพิเศษหรือไม่?",
+   "called": false
+  },
+  {
+   "id": "h07",
+   "expect": "create",
+   "style": "heldout",
+   "text": "อยากได้สกิลเขียนจดหมายลาป่วยส่งหัวหน้า แบบที่ใช้เป็นประจำ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.58,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 23,
+    "prompt_ms": 1201.053,
+    "prompt_per_token_ms": 52.21969565217392,
+    "prompt_per_second": 19.149862662180603,
+    "predicted_n": 9,
+    "predicted_ms": 1304.691,
+    "predicted_per_token_ms": 163.086375,
+    "predicted_per_second": 6.131720077780869
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h08",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ทำให้หน่อย พอพูดว่า พักผ่อน ให้เปิด YouTube แล้วเพิ่มเสียง",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "h09",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ผมเขียนคำขอบคุณลูกค้าบ่อยมาก ทำเป็นสกิลให้เลย ขอแนวสุภาพๆ อบอุ่นๆ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 2.84,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 30,
+    "prompt_ms": 1496.247,
+    "prompt_per_token_ms": 49.874900000000004,
+    "prompt_per_second": 20.05016551411632,
+    "predicted_n": 9,
+    "predicted_ms": 1297.436,
+    "predicted_per_token_ms": 162.1795,
+    "predicted_per_second": 6.166007417706924
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h10",
+   "expect": "create",
+   "style": "heldout",
+   "text": "สร้างโหมดทำงานให้ที เปิดเบราว์เซอร์ ตัวจัดการไฟล์ แล้วปิดเสียง",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 7.35,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 22,
+    "prompt_ms": 1151.266,
+    "prompt_per_token_ms": 52.33027272727273,
+    "prompt_per_second": 19.109397828130074,
+    "predicted_n": 39,
+    "predicted_ms": 6162.985,
+    "predicted_per_token_ms": 162.18381578947367,
+    "predicted_per_second": 6.1658433372789325
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h11",
+   "expect": "create",
+   "style": "heldout",
+   "text": "เพิ่มสกิลสรุปข่าวเป็น 3 ข้อสั้นๆ ทุกครั้งที่ผมวางข้อความให้",
+   "by": "rule",
+   "got": "summarize-text",
+   "called": false
+  },
+  {
+   "id": "h12",
+   "expect": "create",
+   "style": "heldout",
+   "text": "อยากได้ปุ่มลัดสำหรับตรวจเครื่อง เปิดหน้าสุขภาพเครื่องแล้วเปิดตั้งค่าต่อเลย",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 6.3,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 24,
+    "prompt_ms": 1198.976,
+    "prompt_per_token_ms": 49.95733333333334,
+    "prompt_per_second": 20.017081242660403,
+    "predicted_n": 32,
+    "predicted_ms": 5017.849,
+    "predicted_per_token_ms": 161.86609677419355,
+    "predicted_per_second": 6.177945968481714
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h13",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ช่วยทำชุดคำสั่งก่อนนอน ปิดเสียงแล้วเปิด Google ค้นหาพรุ่งนี้ให้",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 8.95,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 25,
+    "prompt_ms": 1262.844,
+    "prompt_per_token_ms": 50.513760000000005,
+    "prompt_per_second": 19.796586118317066,
+    "predicted_n": 48,
+    "predicted_ms": 7620.544,
+    "predicted_per_token_ms": 162.1392340425532,
+    "predicted_per_second": 6.167538695400223
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h14",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ผมส่งไลน์ขอโทษเพื่อนที่มาสายบ่อย ทำเทมเพลตให้หน่อยได้ไหม",
+   "by": "ai",
+   "got": "letter-writer",
+   "seconds": 5.82,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 26,
+    "prompt_ms": 1353.709,
+    "prompt_per_token_ms": 52.06573076923077,
+    "prompt_per_second": 19.206491203057674,
+    "predicted_n": 28,
+    "predicted_ms": 4374.856,
+    "predicted_per_token_ms": 162.0317037037037,
+    "predicted_per_second": 6.171631706277876
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "h15",
+   "expect": "create",
+   "style": "heldout",
+   "text": "สร้างสกิลเปิดแผนที่ Google Maps กับ Wikipedia ไว้เวลาไปเที่ยว",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 5.8,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 19,
+    "prompt_ms": 1021.099,
+    "prompt_per_token_ms": 53.74205263157895,
+    "prompt_per_second": 18.607402416416036,
+    "predicted_n": 30,
+    "predicted_ms": 4681.257,
+    "predicted_per_token_ms": 161.42265517241378,
+    "predicted_per_second": 6.194917305330598
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h16",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ทำโหมดอ่านหนังสือ เปิดไฟล์ของฉันกับ Wikipedia แล้วลดเสียงเหลือครึ่งหนึ่ง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.86,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 23,
+    "prompt_ms": 1202.242,
+    "prompt_per_token_ms": 52.27139130434782,
+    "prompt_per_second": 19.130923724175332,
+    "predicted_n": 48,
+    "predicted_ms": 7601.514,
+    "predicted_per_token_ms": 161.7343404255319,
+    "predicted_per_second": 6.182978811852481
+   },
+   "reply": "ฉันไม่สามารถทำตามคำขอนั้นได้ค่ะ เนื่องจากฉันไม่มีฟังก์ชันสำหรับ \"โหมดอ่านหนังสือ\" หรือการควบคุมเสียงโดยตรง\n\nอย่างไรก็ตาม ฉันสามารถช่วยคุณทำสิ่งเหล่านี้ได้:\n\n1.  **เปิด",
+   "called": false
+  },
+  {
+   "id": "h17",
+   "expect": "create",
+   "style": "heldout",
+   "text": "ช่วยสร้างงานแปลคำศัพท์ไทยเป็นอังกฤษพร้อมยกตัวอย่างประโยค ผมจะใช้ทุกวัน",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 8.16,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 26,
+    "prompt_ms": 1324.726,
+    "prompt_per_token_ms": 50.95100000000001,
+    "prompt_per_second": 19.62670016290161,
+    "predicted_n": 43,
+    "predicted_ms": 6786.251,
+    "predicted_per_token_ms": 161.57740476190477,
+    "predicted_per_second": 6.188984168136427
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h18",
+   "expect": "create",
+   "style": "heldout",
+   "text": "จำไว้เลยนะ ต่อไปถ้าผมพูดว่า เริ่มงาน ให้เปิดเบราว์เซอร์กับ Gmail",
+   "by": "rule",
+   "got": "create-skill",
+   "called": true
+  },
+  {
+   "id": "h19",
+   "expect": "create",
+   "style": "heldout",
+   "text": "อยากได้สกิลเขียนอีเมลตามงานลูกค้าแบบมีหัวข้อ ทักทาย เนื้อหา ปิดท้าย ตามฟอร์แมตเดิมทุกครั้ง",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 3.13,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 36,
+    "prompt_ms": 1747.213,
+    "prompt_per_token_ms": 48.53369444444444,
+    "prompt_per_second": 20.604242299021355,
+    "predicted_n": 9,
+    "predicted_ms": 1334.694,
+    "predicted_per_token_ms": 166.83675,
+    "predicted_per_second": 5.993883242151385
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "h20",
+   "expect": "create",
+   "style": "heldout",
+   "text": "สร้างโหมดฟังเพลง เปิด YouTube แล้วเร่งเสียงขึ้นสองระดับ",
+   "by": "ai",
+   "got": "create-skill",
+   "seconds": 8.69,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 19,
+    "prompt_ms": 1019.626,
+    "prompt_per_token_ms": 53.66452631578947,
+    "prompt_per_second": 18.634283551027533,
+    "predicted_n": 48,
+    "predicted_ms": 7617.837,
+    "predicted_per_token_ms": 162.08163829787236,
+    "predicted_per_second": 6.169730331588875
+   },
+   "reply": "",
+   "called": true
+  },
+  {
+   "id": "g01",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เปิด YouTube ให้หน่อย",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g02",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เพิ่มเสียงหน่อย",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g03",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ปิดเสียงเลย",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g04",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เปิดหน้าตั้งค่า",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g05",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เปิดตัวจัดการไฟล์",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g06",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เปิด Gmail",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g07",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เปิดหน้าสุขภาพเครื่องให้ดูหน่อย",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g08",
+   "expect": "no",
+   "style": "heldout",
+   "text": "วันนี้อากาศที่เชียงใหม่เป็นยังไงบ้าง",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.18,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 15,
+    "prompt_ms": 843.376,
+    "prompt_per_token_ms": 56.22506666666666,
+    "prompt_per_second": 17.78566143689173,
+    "predicted_n": 9,
+    "predicted_ms": 1294.441,
+    "predicted_per_token_ms": 161.805125,
+    "predicted_per_second": 6.180273956093789
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "g09",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ราคาทองวันนี้เท่าไหร่",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.07,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 714.614,
+    "prompt_per_token_ms": 54.97030769230769,
+    "prompt_per_second": 18.191639122659225,
+    "predicted_n": 9,
+    "predicted_ms": 1311.641,
+    "predicted_per_token_ms": 163.955125,
+    "predicted_per_second": 6.099229895985258
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "g10",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ข่าวล่าสุดวันนี้มีอะไรบ้าง",
+   "by": "ai",
+   "got": "ask-cloud",
+   "seconds": 2.02,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 11,
+    "prompt_ms": 666.208,
+    "prompt_per_token_ms": 60.56436363636363,
+    "prompt_per_second": 16.5113598155531,
+    "predicted_n": 9,
+    "predicted_ms": 1293.898,
+    "predicted_per_token_ms": 161.73725,
+    "predicted_per_second": 6.18286758307069
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "g11",
+   "expect": "no",
+   "style": "heldout",
+   "text": "แปลประโยคนี้เป็นภาษาอังกฤษ ฉันหิวข้าวมาก",
+   "by": "ai",
+   "got": "none",
+   "seconds": 3.0,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 19,
+    "prompt_ms": 1016.448,
+    "prompt_per_token_ms": 53.497263157894736,
+    "prompt_per_second": 18.692545019518953,
+    "predicted_n": 13,
+    "predicted_ms": 1941.693,
+    "predicted_per_token_ms": 161.80775,
+    "predicted_per_second": 6.180173693781663
+   },
+   "reply": "translate{text:<|\"|>ฉันหิวข้าวมาก<|\"|>}",
+   "called": false
+  },
+  {
+   "id": "g12",
+   "expect": "no",
+   "style": "heldout",
+   "text": "สรุปข้อความนี้ให้หน่อย วันนี้ประชุมทีมตอนเก้าโมง ตกลงเลื่อนส่งงานไปวันศุกร์",
+   "by": "ai",
+   "got": "none",
+   "seconds": 9.23,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 32,
+    "prompt_ms": 1568.538,
+    "prompt_per_token_ms": 49.0168125,
+    "prompt_per_second": 20.401163376341536,
+    "predicted_n": 48,
+    "predicted_ms": 7610.599,
+    "predicted_per_token_ms": 161.92763829787233,
+    "predicted_per_second": 6.1755980048350985
+   },
+   "reply": "ฉันสามารถสรุปข้อความนั้นให้คุณได้ดังนี้:\n\n*   **การประชุมทีม:** วันนี้เวลาเก้าโมง\n*   **การส่งงาน:** ได้ตกลงเลื่อนกำหนดส่งงานไปเป็นวันศ",
+   "called": false
+  },
+  {
+   "id": "g13",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เขียนอีเมลลางานพรุ่งนี้ให้หน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 6.28,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 16,
+    "prompt_ms": 837.065,
+    "prompt_per_token_ms": 52.3165625,
+    "prompt_per_second": 19.114405691314293,
+    "predicted_n": 34,
+    "predicted_ms": 5401.564,
+    "predicted_per_token_ms": 163.6837575757576,
+    "predicted_per_second": 6.109341664747469
+   },
+   "reply": "คุณต้องการให้ฉันร่างอีเมลลาป่วยหรือลาพักร้อนคะ? โปรดระบุรายละเอียดเพิ่มเติม เช่น เหตุผลในการลา และจะลาถึงวันไหนค่ะ",
+   "called": false
+  },
+  {
+   "id": "g14",
+   "expect": "no",
+   "style": "heldout",
+   "text": "จดนัดหมอฟันวันพฤหัสบ่ายสองโมง แล้วเตือนก่อนหนึ่งชั่วโมง",
+   "by": "ai",
+   "got": "reminder",
+   "seconds": 7.09,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 27,
+    "prompt_ms": 1391.702,
+    "prompt_per_token_ms": 51.544518518518515,
+    "prompt_per_second": 19.4007050359919,
+    "predicted_n": 36,
+    "predicted_ms": 5661.091,
+    "predicted_per_token_ms": 161.74545714285716,
+    "predicted_per_second": 6.182553857551485
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "g15",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เครื่องช้าจัง แรมเหลือเท่าไหร่",
+   "by": "ai",
+   "got": "machine-status",
+   "seconds": 2.2,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 16,
+    "prompt_ms": 838.535,
+    "prompt_per_token_ms": 52.4084375,
+    "prompt_per_second": 19.080897040672124,
+    "predicted_n": 9,
+    "predicted_ms": 1311.149,
+    "predicted_per_token_ms": 163.893625,
+    "predicted_per_second": 6.101518591708494
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "g16",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ตอนนี้เครื่องร้อนไหม",
+   "by": "ai",
+   "got": "machine-status",
+   "seconds": 1.89,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 9,
+    "prompt_ms": 542.698,
+    "prompt_per_token_ms": 60.29977777777778,
+    "prompt_per_second": 16.58380904296681,
+    "predicted_n": 9,
+    "predicted_ms": 1296.053,
+    "predicted_per_token_ms": 162.006625,
+    "predicted_per_second": 6.172587077843267
+   },
+   "reply": "",
+   "called": false
+  },
+  {
+   "id": "g17",
+   "expect": "no",
+   "style": "heldout",
+   "text": "โหมดเครื่องบินคืออะไร ใช้ทำอะไร",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.47,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 14,
+    "prompt_ms": 781.619,
+    "prompt_per_token_ms": 55.829928571428574,
+    "prompt_per_second": 17.911540021417085,
+    "predicted_n": 48,
+    "predicted_ms": 7619.238,
+    "predicted_per_token_ms": 162.11144680851064,
+    "predicted_per_second": 6.168595862210893
+   },
+   "reply": "โหมดเครื่องบิน (Airplane Mode) คือการตั้งค่าในอุปกรณ์ที่ทำให้การเชื่อมต่อเครือข่ายไร้สายทั้งหมด เช่น Wi-Fi, Bluetooth, และข้อมูลมือถือ (Cellular data) ถูกปิดใช้งานชั่ว",
+   "called": false
+  },
+  {
+   "id": "g18",
+   "expect": "no",
+   "style": "heldout",
+   "text": "สกิลในเกม RPG หมายถึงอะไร",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.43,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 717.812,
+    "prompt_per_token_ms": 55.216307692307694,
+    "prompt_per_second": 18.110591631234918,
+    "predicted_n": 48,
+    "predicted_ms": 7654.473,
+    "predicted_per_token_ms": 162.86112765957446,
+    "predicted_per_second": 6.140200638241195
+   },
+   "reply": "สกิลในเกม RPG (Role-Playing Game) หมายถึง ความสามารถพิเศษหรือทักษะที่ตัวละครสามารถใช้เพื่อทำกิจกรรมต่างๆ ในเกมได้ครับ เช่น การโจมตี การป้องกัน การใช้เวทมนตร์ การใช้",
+   "called": false
+  },
+  {
+   "id": "g19",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ทำไมต้องปิดเครื่องทุกครั้งก่อนถอดปลั๊ก Raspberry Pi",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.66,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 20,
+    "prompt_ms": 1038.119,
+    "prompt_per_token_ms": 51.90595,
+    "prompt_per_second": 19.265614057733266,
+    "predicted_n": 48,
+    "predicted_ms": 7590.287,
+    "predicted_per_token_ms": 161.49546808510638,
+    "predicted_per_second": 6.19212422402473
+   },
+   "reply": "การปิดเครื่องทุกครั้งก่อนถอดปลั๊ก Raspberry Pi เป็นวิธีที่ดีเพื่อป้องกันข้อมูลเสียหายและรักษาความเสถียรของระบบครับ\n\nสาเหตุหลักคือ:\n\n1.  **ป้องกันข้อมูลเสียหาย (Data Corruption):",
+   "called": false
+  },
+  {
+   "id": "g20",
+   "expect": "no",
+   "style": "heldout",
+   "text": "โหมดประหยัดพลังงานในโทรศัพท์ทำงานยังไง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.6,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 18,
+    "prompt_ms": 951.12,
+    "prompt_per_token_ms": 52.84,
+    "prompt_per_second": 18.925056775170326,
+    "predicted_n": 48,
+    "predicted_ms": 7581.117,
+    "predicted_per_token_ms": 161.30036170212767,
+    "predicted_per_second": 6.1996141201883574
+   },
+   "reply": "โหมดประหยัดพลังงานในโทรศัพท์จะช่วยลดการใช้พลังงานของอุปกรณ์ต่างๆ เพื่อยืดอายุการใช้งานแบตเตอรี่ให้ยาวนานขึ้นครับ โดยปกติแล้วมันจะทำงานโดยการจำกัดการทำงานของ",
+   "called": false
+  },
+  {
+   "id": "g21",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ทุกครั้งที่ล้างจานควรใช้น้ำยาเท่าไหร่ถึงพอดี",
+   "by": "rule",
+   "got": "create-skill",
+   "called": true
+  },
+  {
+   "id": "g22",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เมืองหลวงของออสเตรเลียคืออะไร",
+   "by": "ai",
+   "got": "none",
+   "seconds": 3.32,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 16,
+    "prompt_ms": 840.866,
+    "prompt_per_token_ms": 52.554125,
+    "prompt_per_second": 19.02800208356623,
+    "predicted_n": 16,
+    "predicted_ms": 2414.869,
+    "predicted_per_token_ms": 160.9912666666667,
+    "predicted_per_second": 6.211517063658524
+   },
+   "reply": "เมืองหลวงของออสเตรเลียคือแคนเบอร์รา",
+   "called": false
+  },
+  {
+   "id": "g23",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เล่าเรื่องตลกให้ฟังหน่อย",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.5,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 13,
+    "prompt_ms": 721.407,
+    "prompt_per_token_ms": 55.49284615384616,
+    "prompt_per_second": 18.020340806230045,
+    "predicted_n": 48,
+    "predicted_ms": 7585.407,
+    "predicted_per_token_ms": 161.39163829787233,
+    "predicted_per_second": 6.196107868701047
+   },
+   "reply": "ได้เลย นี่คือเรื่องตลกให้ฟังครับ:\n\nมีคนถามเพื่อนว่า \"ทำไมคอมพิวเตอร์ถึงชอบนอน?\"\n\nเพื่อนตอบว่า \"ก็เพราะมันเป็น **คอมพิวเตอร์** ไง... มันอยากจะ",
+   "called": false
+  },
+  {
+   "id": "g24",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เหนื่อยจัง วันนี้เจอลูกค้าเรื่องมากมาก",
+   "by": "ai",
+   "got": "none",
+   "seconds": 5.72,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 18,
+    "prompt_ms": 963.316,
+    "prompt_per_token_ms": 53.51755555555556,
+    "prompt_per_second": 18.685457316187,
+    "predicted_n": 30,
+    "predicted_ms": 4696.526,
+    "predicted_per_token_ms": 161.9491724137931,
+    "predicted_per_second": 6.174776845694031
+   },
+   "reply": "เสียใจที่วันนี้คุณต้องเจอเรื่องที่ทำให้เหนื่อยนะคะ ลองพักผ่อนให้เพียงพอ แล้วพรุ่งนี้ค่อยจัดการใหม่ค่ะ 😊",
+   "called": false
+  },
+  {
+   "id": "g25",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ผมเปิด Google Maps ไปสยามพารากอนได้ยังไง",
+   "by": "ai",
+   "got": "none",
+   "seconds": 8.67,
+   "timings": {
+    "cache_n": 1175,
+    "prompt_n": 20,
+    "prompt_ms": 1032.709,
+    "prompt_per_token_ms": 51.635450000000006,
+    "prompt_per_second": 19.366539848108225,
+    "predicted_n": 48,
+    "predicted_ms": 7601.382,
+    "predicted_per_token_ms": 161.73153191489362,
+    "predicted_per_second": 6.18308618090763
+   },
+   "reply": "คุณสามารถเปิด Google Maps ไปที่สยามพารากอนได้โดยการเปิดแอปพลิเคชัน Google Maps บนโทรศัพท์มือถือของคุณ แล้วพิมพ์ \"สยามพารากอน\" ในช่องค้นหา จากนั้น",
+   "called": false
+  },
+  {
+   "id": "g26",
+   "expect": "no",
+   "style": "heldout",
+   "text": "เปิด Wikipedia แล้วค้นหาเรื่องช้างไทย",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  },
+  {
+   "id": "g27",
+   "expect": "no",
+   "style": "heldout",
+   "text": "ลดเสียงลงหน่อย เบาไปนิดนึง",
+   "by": "rule",
+   "got": "system-command",
+   "called": false
+  }
+ ]
+}
