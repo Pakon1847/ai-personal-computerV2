@@ -313,7 +313,7 @@ class LoginController(QObject):
             self._timer.setSingleShot(True)
             self._timer.timeout.connect(lambda: self._face_sign_in(n))
             self._timer.start(self.AUTO_LOGIN_MS)
-        elif state in ("unavailable", "no-templates"):
+        elif state in ("unavailable", "no-templates", "no-camera"):
             self._state = "unavailable"
         elif state == "locked":
             self._state = "manual"

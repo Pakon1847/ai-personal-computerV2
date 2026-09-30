@@ -3,7 +3,7 @@
 ส่วนนี้เป็น Python ล้วน ไม่แตะกล้อง socket หรือ PAM เอง (ส่งเข้ามาทางพารามิเตอร์) → เทสต์บนวินโดวส์ได้
 
 - **Gallery** แม่แบบของบัญชีที่ **เจ้าของเปิด** "เข้าเครื่องด้วยใบหน้า" เท่านั้น (ข้อ 2 = ก.) · ไฟล์ละบัญชีใน
-  `/var/lib/aipc/face-login/<ชื่อ>.json` รูปแบบเดียวกับ FaceStore (มีบันทึกความยินยอม · ผูก sha256 ของโมเดล)
+  `/var/lib/aipc-vision/face-login/<ชื่อ>.json` รูปแบบเดียวกับ FaceStore (มีความยินยอม · ผูกโมเดล)
 - **Tickets** สแกนผ่าน = ตั๋ว 1 ใบผูกกับบัญชีนั้น อายุ 30 วิ ใช้ได้ครั้งเดียว · อยู่ในหน่วยความจำเท่านั้น ·
   PAM ของหน้า Login (`aipc-face-pass`) ขอใช้ตั๋ว → มี = เข้าเลย · ไม่มี = ถามรหัสผ่านตามเดิม
 - **Lockout** สแกนไม่ผ่านติดกัน 5 ครั้ง → ปิดการสแกนจนกว่าจะเข้าด้วยรหัสผ่านสำเร็จ 1 ครั้ง (BRIEF 5.1 ข้อ 9)
@@ -22,7 +22,7 @@ from pathlib import Path
 
 from aipc.vision import models, pipeline, store
 
-LOGIN_DIR = Path("/var/lib/aipc/face-login")
+LOGIN_DIR = Path("/var/lib/aipc-vision/face-login")
 TICKET_TTL_S = 30.0
 LOCK_AFTER = 5
 USER_RE = re.compile(r"^[a-z_][a-z0-9_-]{0,31}$")  # ชื่อบัญชี Linux · กันชื่อไฟล์แปลก ("../")

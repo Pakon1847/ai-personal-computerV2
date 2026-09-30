@@ -19,7 +19,7 @@ import socket
 import sys
 from pathlib import Path
 
-ROOT = Path("/run/aipc/visiond-root.sock")
+ROOT = Path("/run/aipc-vision/visiond-root.sock")
 TIMEOUT_S = 3.0
 
 

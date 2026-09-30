@@ -30,7 +30,7 @@ from aipc.accounts import validation
 
 CALLER = "_greetd"  # ผู้ใช้ของหน้า Login · คนอื่นเรียกไม่ได้ แม้ผ่าน sudo
 VISION = "_aipcvision"  # visiond (การ์ด 0015) · เรียกได้เฉพาะ check-password
-PAM_SERVICE = "aipc-accounts"  # /etc/pam.d/aipc-accounts (pam_unix · ติดตั้งโดย install-accounts.sh)
+PAM_SERVICE = "aipc-face-check"  # /etc/pam.d/aipc-face-check · ติดตั้งโดย install-visiond.sh
 GROUPS = ("video", "render", "audio")  # จอ กล้อง เสียง · ใส่เฉพาะกลุ่มที่เครื่องมีจริง
 STATE = Path("/var/lib/aipc")
 REQUEST_MAX = 4096

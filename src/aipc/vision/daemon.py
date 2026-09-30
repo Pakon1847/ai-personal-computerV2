@@ -3,12 +3,12 @@
     python -m aipc.vision.daemon            (systemd เรียก · ดู scripts/pi/install-visiond.sh)
 
 socket 2 ตัว · ข้อความ JSON บรรทัดละ 1 ก้อน:
-- `/run/aipc/visiond.sock` (0666 · ใครก็ต่อได้ แต่ตรวจ uid ของผู้ต่อด้วย SO_PEERCRED ทุกคำขอ):
+- `/run/aipc-vision/visiond.sock` (0666 · ใครก็ต่อได้ แต่ตรวจ uid ของผู้ต่อด้วย SO_PEERCRED ทุกคำขอ):
     identify {timeout_s}                      หน้า Login (`_greetd`) เท่านั้น · ตอบสถานะทีละบรรทัด
     enroll {username, password, consent_at}   หน้า Login (ตอนสมัคร) หรือเจ้าของบัญชีเอง (หน้าตั้งค่า)
     remove {username, password}               เหมือน enroll
     enabled {username}                        เจ้าของบัญชีหรือหน้า Login · บอกว่าเปิดเข้าด้วยใบหน้าไหม
-- `/run/aipc/visiond-root.sock` (0600 · เฉพาะ uid 0 = `aipc-face-pass` ที่ PAM ของ greetd เรียก):
+- `/run/aipc-vision/visiond-root.sock` (0600 · เฉพาะ uid 0 = `aipc-face-pass` ที่ PAM เรียก):
     consume {username}    ใช้ตั๋ว → {"ok": true} = เข้าระบบได้เลย
     login-ok {}           เข้าระบบสำเร็จ (ด้วยวิธีใดก็ได้) → ปลดล็อกการสแกน
 
@@ -29,8 +29,8 @@ from pathlib import Path
 
 from aipc.vision import service
 
-PUBLIC = Path("/run/aipc/visiond.sock")
-ROOT = Path("/run/aipc/visiond-root.sock")
+PUBLIC = Path("/run/aipc-vision/visiond.sock")
+ROOT = Path("/run/aipc-vision/visiond-root.sock")
 GREETER = "_greetd"
 REQUEST_MAX = 4096
 HELPER = ["sudo", "-n", "/usr/local/sbin/aipc-accounts"]
@@ -86,6 +86,12 @@ class Handler:
             return {"ok": False, "state": "busy", "message": "กล้องกำลังใช้อยู่ · ลองใหม่อีกครั้ง"}
         try:
             return work()
+        except RuntimeError as e:  # เปิดกล้องไม่ได้ / ถอดกล้องกลางคัน
+            return {
+                "ok": False,
+                "state": "no-camera",
+                "message": f"ใช้กล้องไม่ได้ · ใช้รหัสผ่านได้เลย ({e})",
+            }
         finally:
             self._camera.release()
 

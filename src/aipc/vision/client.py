@@ -10,7 +10,7 @@ import socket
 from collections.abc import Callable
 from pathlib import Path
 
-PUBLIC = Path("/run/aipc/visiond.sock")
+PUBLIC = Path("/run/aipc-vision/visiond.sock")
 UNAVAILABLE = {"ok": False, "state": "unavailable", "message": "ระบบใบหน้าไม่พร้อม · ใช้รหัสผ่านได้เลย"}
 
 

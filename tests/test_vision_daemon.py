@@ -80,6 +80,15 @@ class HandlerTest(unittest.TestCase):
         gate.set()
         t.join(5)
 
+    def test_no_camera_is_reported_not_crashed(self):
+        def broken(_s):
+            raise RuntimeError("ไม่พบกล้อง")
+
+        self.h.frames = broken
+        r = self.pub(GREETER, op="identify")
+        self.assertEqual(r["state"], "no-camera")
+        self.assertEqual(self.pub(GREETER, op="identify")["state"], "no-camera", "ปล่อยกล้องแล้ว")
+
     def test_unknown_or_malformed_requests(self):
         self.assertFalse(self.pub(NAMFON, op="format-disk", username="namfon")["ok"])
         self.assertFalse(self.pub(NAMFON, op="remove", username="namfon")["ok"], "ไม่มีรหัสผ่าน")
