@@ -23,6 +23,7 @@ from aipc.ui.backend import (
     UiSettings,
 )
 from aipc.ui.face import FaceController
+from aipc.ui.loginface import LoginFaceController
 
 HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
@@ -56,11 +57,21 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
-def _face_client():
-    """ตัวต่อ visiond ของหน้า Login (การ์ด 0015) · ไม่ได้ติดตั้ง = None (ใช้รหัสผ่านตามเดิม)."""
+def _face_client(short: bool = False):
+    """ตัวต่อ visiond (การ์ด 0015) · ไม่ได้ติดตั้ง = None (ใช้รหัสผ่านตามเดิม).
+
+    short = หน้าตั้งค่า: ถามสถานะ ("enabled") รอไม่เกิน 5 วิ เพราะเรียกจากเธรดหน้าจอ
+    """
     from aipc.vision import client
 
-    return client.request if client.available() else None
+    if not client.available():
+        return None
+
+    def ask(req, on_progress=None):
+        timeout = 5.0 if short and req.get("op") == "enabled" else 120.0
+        return client.request(req, on_progress, timeout=timeout)
+
+    return ask
 
 
 def build(opts: Options, argv: list[str] | None = None):
@@ -117,6 +128,10 @@ def build(opts: Options, argv: list[str] | None = None):
         "session": SessionController(opts.session and not opts.greeter_session),
         # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
         "face": FaceController(active=not opts.greeter_session),
+        # เจ้าของบัญชีเปิด/ปิดเข้าเครื่องด้วยใบหน้าเอง (การ์ด 0015) · หน้า Login ไม่มีสวิตช์นี้
+        "loginFace": LoginFaceController(
+            face=None if opts.greeter_session or not real else _face_client(short=True)
+        ),
     }
     chat.statusChanged.connect(engine._backends["skills"].skillsChanged)  # สกิลแปลพร้อมเมื่อ AI พร้อม
     holder["skills"] = engine._backends["skills"]

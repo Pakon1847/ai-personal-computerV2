@@ -32,3 +32,4 @@ SkillsPage 1.0 SkillsPage.qml
 ReminderToast 1.0 ReminderToast.qml
 PageScroll 1.0 PageScroll.qml
 FacePanel 1.0 FacePanel.qml
+LoginFacePanel 1.0 LoginFacePanel.qml

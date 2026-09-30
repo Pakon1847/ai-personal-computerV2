@@ -53,6 +53,7 @@ ColumnLayout {
     }
 
     FacePanel { Layout.fillWidth: true }
+    LoginFacePanel { Layout.fillWidth: true }
 
     // ประวัติแชทอยู่ใน home ของคุณเท่านั้น · ลบทั้งหมดได้ทันที (การ์ด 0013 ข้อ 4)
     Card {
