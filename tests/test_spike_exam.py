@@ -35,7 +35,7 @@ class DatasetTest(unittest.TestCase):
 class PromptTest(unittest.TestCase):
     def test_prompt_has_date_rules_and_about(self):
         p = catalog.system_prompt(date(2026, 9, 30), cloud=True, model="Typhoon2.5 4B")
-        for part in ("วันพุธที่ 30 กันยายน พ.ศ. 2569", "ไม่มีข้อมูลสด", "Raspberry Pi 5", "PIN",
+        for part in ("วันพุธที่ 30 กันยายน พ.ศ. 2569", "ข้อมูลสด", "ห้ามเดาตัวเลขของเครื่อง", "PIN",
                      catalog.ASK_CLOUD, "Typhoon2.5 4B"):  # fmt: skip
             self.assertIn(part, p)
         self.assertNotIn(catalog.ASK_CLOUD, catalog.system_prompt(date(2026, 9, 30)))

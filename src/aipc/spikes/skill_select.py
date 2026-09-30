@@ -30,7 +30,10 @@ from aipc.skills import catalog, manifest, router
 
 REPO = Path(__file__).resolve().parents[3]
 DATASET = REPO / "tests" / "data" / "skill_selection.json"
-SAMPLING = {"temperature": 0.6, "top_p": 0.95, "max_tokens": 48}  # เลือกเครื่องมือ = ไม่ต้องตอบยาว
+SAMPLING = {"temperature": 0.6, "top_p": 0.95, "max_tokens": 48,
+            "chat_template_kwargs": {"enable_thinking": False}}  # fmt: skip
+# system prompt ชุดเดียวกับแชทของแอป (ไม่มีไฮบริด) · ก่อน 2026-09-30 บ่ายใช้ catalog.SYSTEM สั้น ๆ
+SYSTEM_PROMPT = catalog.system_prompt() + catalog.TOOLS_HINT  # เลือกเครื่องมือ = ไม่ต้องตอบยาว
 MODES = ("rules-first", "ai-first")
 
 
@@ -50,7 +53,7 @@ def server_info(server: str, timeout: float = 30) -> dict:
 
 def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300) -> dict:
     """ถาม llama-server 1 ข้อพร้อมรายการสกิล · คืนชื่อเครื่องมือที่ AI เรียก ("" = ตอบเอง) + เวลา."""
-    body = {"messages": [{"role": "system", "content": catalog.SYSTEM + catalog.TOOLS_HINT},
+    body = {"messages": [{"role": "system", "content": SYSTEM_PROMPT},
                          {"role": "user", "content": text}],
             "tools": tools, "tool_choice": "auto", "stream": False, "cache_prompt": True,
             **SAMPLING}  # fmt: skip
