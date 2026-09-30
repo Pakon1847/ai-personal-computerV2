@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from aipc.skills import forge
+from aipc.skills.catalog import ABOUT
 
 MODEL = "sonnet"
 BUDGET_USD = "0.50"
@@ -58,7 +59,11 @@ def instructions(today: date | None = None) -> str:
         "คุณตอบแทนผู้ช่วย AI ในเครื่องของผู้ใช้ชาวไทย (AI PC บน Raspberry Pi) ที่ส่งคำถามนี้มาเพราะต้องใช้ข้อมูลสด"
         f"หรือคำถามยาก · วันนี้คือ{when} · ตอบภาษาไทย กระชับ ไม่เกินประมาณ 8 บรรทัด · "
         "ถ้าใช้ข้อมูลจากเว็บให้บอกแหล่งสั้น ๆ 1–2 แหล่งท้ายคำตอบ · ถ้าหาไม่ได้หรือไม่แน่ใจให้บอกตรง ๆ ห้ามเดา · "
-        "ปฏิเสธคำขอที่ผิดกฎหมายหรืออันตราย"
+        "ปฏิเสธคำขอที่ผิดกฎหมายหรืออันตราย · "
+        "ผู้ใช้เห็นคุณเป็นผู้ช่วยของเครื่องนี้ ถ้าถามถึง \"คุณ\" หรือ \"เครื่องนี้\" ให้ตอบในฐานะผู้ช่วยของ AI PC "
+        "ห้ามเล่าเครื่องมือหรือบริการของ Claude เอง · ผู้ช่วยของเครื่องทำได้: คุยตอบคำถาม · เปิดเว็บ/แอป ปรับเสียง · "
+        "นัดหมายและเตือน · ดูสถานะเครื่อง · สกิล (สรุป แปล เขียนจดหมาย และสกิลที่ Claude สร้างเพิ่ม) · "
+        "ค้นข้อมูลสดผ่าน Claude เมื่อต่อเน็ต · " + ABOUT
     )
 
 
@@ -104,8 +109,12 @@ def ask(
         BUDGET_USD,
         "--model",
         model,
-        "--append-system-prompt",
+        # แทน system prompt ทั้งหมด + ไม่โหลด MCP/สกิลของบัญชี: เดิม append ต่อท้าย prompt ของ Claude Code
+        # ถาม "ทำอะไรได้บ้าง" แล้ว Claude เล่าความสามารถของตัวเอง (Claude Docs, PDF) แทนของเครื่อง (ชุดสอบจบ H07)
+        "--system-prompt",
         instructions(today),
+        "--strict-mcp-config",
+        "--disable-slash-commands",
     ]
     t0 = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="aipc-cloud-") as cwd:

@@ -138,6 +138,12 @@ class CloudTest(unittest.TestCase):
         self.assertIn("--no-session-persistence", args)
         self.assertNotIn("ข้อความ 5", seen["prompt"], "ส่งบริบทแค่ 4 ข้อความล่าสุด")
         self.assertIn("ข้อความ 9", seen["prompt"])
+        # แทน prompt ของ Claude Code ทั้งหมด ไม่โหลด MCP ของบัญชี · Claude ตอบในฐานะผู้ช่วยของเครื่อง
+        self.assertNotIn("--append-system-prompt", args)
+        self.assertIn("--strict-mcp-config", args)
+        system = args[args.index("--system-prompt") + 1]
+        self.assertIn("ผู้ช่วยของ AI PC", system)
+        self.assertIn("Raspberry Pi 5", system)
 
     def test_offline_is_reported(self):
         r = ask.ask("x", claude="claude", runner=lambda *a: (1, "", "network error"))
