@@ -472,13 +472,62 @@ class SignupController(QObject):
     changed = Signal()
     finished = Signal("QVariantMap")
     _result = Signal("QVariantMap")
+    # ขั้นใบหน้า (การ์ด 0015 หัวข้อ 11): ลงทะเบียนผ่าน visiond หลังสร้างบัญชีแล้ว
+    faceProgress = Signal(str, "QVariantMap")  # noqa: N815 · คำแนะนำ, จำนวนเฟรมต่อท่า
+    faceFinished = Signal("QVariantMap")  # noqa: N815
+    _face_progress = Signal(str, object)
+    _face_result = Signal(object)
 
-    def __init__(self, real: bool = False, dev: bool = False, runner=None):
+    def __init__(self, real: bool = False, dev: bool = False, runner=None, face=None):
         super().__init__()
         self._real, self._dev = real, dev
         self._run = runner or run_accounts_helper
+        self._face = face  # face(req, on_progress) → dict · ตัวจริง = aipc.vision.client.request
         self._busy = False
         self._result.connect(self._on_result)
+        self._face_progress.connect(lambda h, poses: self.faceProgress.emit(h, dict(poses)))
+        self._face_result.connect(self._on_face_result)
+
+    @Property(bool, constant=True)
+    def faceAvailable(self) -> bool:  # noqa: N802
+        """ลงทะเบียนใบหน้าตอนสมัครได้ไหม · หน้าต่างพัฒนา = ได้แบบจำลอง."""
+        return self._face is not None or (self._dev and not self._real)
+
+    @Slot(str, str, result=bool)
+    def enrollFace(self, username: str, password: str) -> bool:  # noqa: N802
+        """ผู้ใช้ติ๊กยินยอมแล้วกดเริ่ม · visiond ตรวจรหัสผ่านก่อนเปิดกล้องเสมอ (ไม่เชื่อหน้าจอนี้)."""
+        if self._busy:
+            return False
+        if self._face is None:
+            if self._dev and not self._real:
+                msg = "จำลอง (โหมดพัฒนา) · ไม่ได้เปิดกล้องหรือเก็บใบหน้าจริง"
+                done = {"ok": True, "simulated": True, "state": "saved", "message": msg}
+                self.faceFinished.emit(done)
+                return True
+            self.faceFinished.emit({"ok": False, "state": "unavailable",
+                                    "message": "ระบบใบหน้าไม่พร้อม · ข้ามขั้นนี้ได้"})  # fmt: skip
+            return True
+        import threading
+
+        consent = datetime.now().astimezone().isoformat(timespec="seconds")
+        req = {"op": "enroll", "username": username.strip(), "password": password,
+               "consent_at": consent}  # fmt: skip
+        self._busy = True
+        self.changed.emit()
+
+        def progress(m: dict) -> None:
+            self._face_progress.emit(str(m.get("hint", "")), m.get("poses") or {})
+
+        def work():
+            self._face_result.emit(self._face(req, progress))
+
+        threading.Thread(target=work, daemon=True).start()
+        return True
+
+    def _on_face_result(self, res: dict) -> None:
+        self._busy = False
+        self.changed.emit()
+        self.faceFinished.emit(dict(res))
 
     @Property(bool, notify=changed)
     def busy(self) -> bool:

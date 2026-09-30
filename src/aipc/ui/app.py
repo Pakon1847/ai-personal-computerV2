@@ -104,7 +104,11 @@ def build(opts: Options, argv: list[str] | None = None):
             face=_face_client() if opts.greeter_session else None,
         ),
         # สมัคร/กู้คืนจริงเฉพาะหน้า Login จริง · หน้าต่างพัฒนาเป็นแบบจำลองที่บอกว่า "จำลอง" (การ์ด 0012)
-        "signup": SignupController(real=bool(opts.greeter_session), dev=opts.dev and not real),
+        "signup": SignupController(
+            real=bool(opts.greeter_session),
+            dev=opts.dev and not real,
+            face=_face_client() if opts.greeter_session else None,
+        ),
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(
             run_timer=not opts.greeter_session, llm_ready=lambda: chat.ready
@@ -125,7 +129,7 @@ def build(opts: Options, argv: list[str] | None = None):
     screen = "shell" if opts.session else opts.screen
     ctx.setContextProperty("startScreen", screen if screen in SCREENS else "login")
     ctx.setContextProperty("startPage", opts.page if opts.page in PAGES else "workspace")
-    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 2)))
+    ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 3)))
     dev = (opts.dev or opts.demo_scan is not None) and not real
     ctx.setContextProperty("devMode", dev)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)

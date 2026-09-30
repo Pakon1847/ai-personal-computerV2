@@ -1,9 +1,10 @@
 // สมัครบัญชีจากหน้า Login (การ์ด 0012 · BRIEF 5.1 ข้อ 3–4)
-// ลำดับ: บัญชี+รหัสผ่าน → ตั้ง PIN กู้คืน (กด "สร้างบัญชี" = สร้างจริง) → พร้อมใช้
+// ลำดับ: บัญชี+รหัสผ่าน → ตั้ง PIN กู้คืน (กด "สร้างบัญชี" = สร้างจริง) → ใบหน้า (ไม่บังคับ) → พร้อมใช้
 // PIN แทนรหัสกู้คืนสุ่ม 24 ตัว (Pakon 2026-09-29: จำง่ายกว่า · การ์ด 0012 หัวข้อ 11)
 // สมัครเสรี ไม่ต้องมีผู้ดูแลอนุมัติ (Pakon 2026-09-29)
 // หน้าจอตรวจฟอร์มเพื่อบอกผู้ใช้เร็ว ๆ เท่านั้น · ตัวช่วย root ตรวจซ้ำทุกข้อก่อนสร้าง (H7)
-// ลงทะเบียนใบหน้าอยู่ในหน้าตั้งค่าหลังเข้าครั้งแรก (BRIEF 5.1 ข้อ 6: ต้องยืนยันตัวตนก่อน)
+// ขั้นใบหน้า (การ์ด 0015 หัวข้อ 11 · Pakon 2026-09-30): ยินยอมแล้ว visiond ตรวจรหัสผ่านของบัญชีที่เพิ่งสร้าง
+// ก่อนเปิดกล้อง (BRIEF 5.1 ข้อ 6) · สแกน 5 ท่า · เปิด "เข้าเครื่องด้วยใบหน้า" · ข้ามได้ ไปทำในหน้าตั้งค่าทีหลังได้
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -12,7 +13,10 @@ import AipcUi
 Rectangle {
     id: root
     color: Theme.bg
-    property int page: 0                 // 0 บัญชี 1 PIN กู้คืน 2 เสร็จ
+    property int page: 0                 // 0 บัญชี 1 PIN กู้คืน 2 ใบหน้า 3 เสร็จ
+    property bool faceDone: false
+    property string faceHint: ""
+    property var facePoses: ({})
     property bool simulated: false       // หน้าต่างพัฒนา: ผลจำลอง ต้องเขียนว่า "จำลอง" (H5)
     property string loginError: ""
 
@@ -36,9 +40,20 @@ Rectangle {
                 pin2.text = ""
                 root.simulated = r.simulated === true
                 createMsg.text = ""
-                root.page = 2
+                root.page = signup.faceAvailable ? 2 : 3
             } else {
                 createMsg.text = r.message
+            }
+        }
+        function onFaceProgress(hint, poses) {
+            root.faceHint = hint
+            root.facePoses = poses
+        }
+        function onFaceFinished(r) {
+            root.faceHint = r.message || ""
+            if (r.ok) {
+                root.faceDone = true
+                root.page = 3
             }
         }
     }
@@ -149,7 +164,7 @@ Rectangle {
                         AppText { Layout.fillWidth: true; color: Theme.bubbleInk
                                   text: "ทุกบัญชีเป็นบัญชีของเครื่องจริง ไฟล์ แชท และนัดหมายของคุณอยู่ในโฟลเดอร์ที่ผู้ใช้คนอื่นเปิดไม่ได้" }
                         AppText { Layout.fillWidth: true; color: Theme.bubbleInk
-                                  text: "ลืมรหัสผ่านได้ ใช้ PIN ที่ตั้งในขั้นถัดไปตั้งรหัสใหม่ · ลงทะเบียนใบหน้าได้ในหน้าตั้งค่าหลังเข้าใช้" }
+                                  text: "ลืมรหัสผ่านได้ ใช้ PIN ที่ตั้งในขั้นถัดไปตั้งรหัสใหม่ · ขั้นถัดไปเลือกเข้าเครื่องด้วยใบหน้าได้ (ไม่บังคับ)" }
                         Item { Layout.fillHeight: true }
                     }
                 }
@@ -234,7 +249,62 @@ Rectangle {
                 }
             }
 
-            // ---------- 3. พร้อมใช้ ----------
+            // ---------- 3. ใบหน้า (ไม่บังคับ · การ์ด 0015) ----------
+            Card {
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 32
+                    spacing: 14
+                    RowLayout {
+                        spacing: 12
+                        Rectangle {
+                            width: 44; height: 44; radius: Theme.radiusCard; color: Theme.accentSoft
+                            Icon { anchors.centerIn: parent; path: Icons.shield; color: Theme.accentInk; width: 22; height: 22 }
+                        }
+                        AppText { text: "เข้าเครื่องด้วยใบหน้า (ไม่บังคับ)"; size: Theme.fontTitle; strong: true }
+                    }
+                    AppText { Layout.fillWidth: true; color: Theme.inkMuted
+                              text: "เปิดแล้ว ที่หน้า Login แค่มองกล้องก็เข้าเครื่องได้ ไม่ต้องพิมพ์รหัสผ่าน · รหัสผ่านยังใช้ได้เสมอ และยังต้องใช้กับงานสำคัญ เช่น เปลี่ยนรหัสผ่าน" }
+                    AppCheck {
+                        id: faceConsent
+                        objectName: "faceConsent"
+                        Layout.fillWidth: true
+                        boxed: true
+                        enabled: !signup.busy
+                        text: "ยินยอมให้เก็บข้อมูลใบหน้า และเปิดเข้าเครื่องด้วยใบหน้า"
+                        detail: "เก็บเป็นตัวเลข 128 ค่าในเครื่องนี้เท่านั้น ไม่เก็บรูป (ข้อมูลชีวภาพ · พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล มาตรา 26) · ปิดและลบได้ในหน้าตั้งค่า · ความเสี่ยง: รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ ถ้าระบบกันรูปปลอมพลาด"
+                    }
+                    RowLayout {
+                        spacing: 8
+                        Repeater {
+                            model: [["front", "ตรง"], ["left", "ซ้าย"], ["right", "ขวา"], ["up", "เงย"], ["down", "ก้ม"]]
+                            Chip {
+                                required property var modelData
+                                text: modelData[1]
+                                kind: (root.facePoses[modelData[0]] || 0) >= 2 ? "ok" : "neutral"
+                            }
+                        }
+                    }
+                    AppText { objectName: "faceHint"; Layout.fillWidth: true; visible: root.faceHint !== ""; text: root.faceHint
+                              color: root.faceDone ? Theme.okInk : Theme.inkMuted }
+                    AppText { visible: signup.busy; text: "กำลังสแกน… มองกล้อง แล้วค่อย ๆ หันซ้าย ขวา เงย และก้มทีละท่า"; color: Theme.inkMuted
+                              Layout.fillWidth: true }
+                    Item { Layout.fillHeight: true }
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: 12
+                        AppButton { text: "ข้าม"; kind: "secondary"; enabled: !signup.busy; onClicked: root.page = 3 }
+                        AppButton {
+                            objectName: "faceStart"
+                            text: "เริ่มสแกนใบหน้า"
+                            enabled: faceConsent.checked && !signup.busy
+                            onClicked: signup.enrollFace(userField.text, pw1.text)
+                        }
+                    }
+                }
+            }
+
+            // ---------- 4. พร้อมใช้ ----------
             Card {
                 ColumnLayout {
                     anchors.centerIn: parent
@@ -258,6 +328,11 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         color: Theme.warnInk
                         text: "หน้าต่างพัฒนา: ไม่ได้สร้างบัญชีจริง · บัญชีจริงสร้างได้จากหน้า Login ของเครื่องเท่านั้น"
+                    }
+                    AppText {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: root.faceDone ? "เข้าเครื่องด้วยใบหน้า: เปิดแล้ว" : "เข้าเครื่องด้วยใบหน้า: ยังไม่เปิด (เปิดได้ในหน้าตั้งค่า)"
+                        color: root.faceDone ? Theme.okInk : Theme.inkMuted
                     }
                     AppText { visible: root.loginError !== ""; text: root.loginError; color: Theme.danger; Layout.fillWidth: true }
                     RowLayout {

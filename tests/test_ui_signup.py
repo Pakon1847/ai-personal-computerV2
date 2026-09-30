@@ -78,5 +78,53 @@ class SignupControllerTest(unittest.TestCase):
         self.assertTrue(r["message"])
 
 
+@unittest.skipIf(SignupController is None, "ไม่มี PySide6")
+class SignupFaceTest(unittest.TestCase):
+    """ขั้นใบหน้าตอนสมัคร (การ์ด 0015 หัวข้อ 11) · visiond ปลอม."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QGuiApplication.instance() or QGuiApplication([])
+
+    def test_enroll_goes_to_visiond_with_password_and_consent_time(self):
+        sent = []
+
+        def face(req, on_progress):
+            sent.append(req)
+            on_progress({"state": "enrolling", "hint": "หันซ้าย", "poses": {"front": 2}})
+            return {"ok": True, "state": "saved", "user": "namfon", "message": ""}
+
+        s = SignupController(real=True, face=face)
+        self.assertTrue(s.faceAvailable)
+        progress, done = [], []
+        s.faceProgress.connect(lambda h, p: progress.append((h, dict(p))))
+        s.faceFinished.connect(lambda r: done.append(dict(r)))
+        self.assertTrue(s.enrollFace(" namfon ", "correct-horse-9"))
+        wait_for(done)
+        self.assertEqual(done[0]["state"], "saved")
+        self.assertEqual(progress[0], ("หันซ้าย", {"front": 2}))
+        self.assertEqual(sent[0]["op"], "enroll")
+        self.assertEqual(sent[0]["username"], "namfon")
+        self.assertEqual(sent[0]["password"], "correct-horse-9")
+        self.assertRegex(sent[0]["consent_at"], r"^\d{4}-\d{2}-\d{2}T")
+        self.assertFalse(s.busy)
+
+    def test_without_visiond_the_step_is_skipped_honestly(self):
+        s = SignupController(real=True, face=None)
+        self.assertFalse(s.faceAvailable)
+        done = []
+        s.faceFinished.connect(lambda r: done.append(dict(r)))
+        s.enrollFace("namfon", "x")
+        self.assertFalse(done[0]["ok"])
+
+    def test_dev_window_is_simulated(self):
+        s = SignupController(dev=True)
+        self.assertTrue(s.faceAvailable)
+        done = []
+        s.faceFinished.connect(lambda r: done.append(dict(r)))
+        s.enrollFace("namfon", "x")
+        self.assertTrue(done[0]["simulated"])
+
+
 if __name__ == "__main__":
     unittest.main()
