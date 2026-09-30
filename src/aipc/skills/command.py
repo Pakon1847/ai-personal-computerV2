@@ -99,6 +99,18 @@ def normalize(text: str) -> str:
 AMBIGUOUS = 0.8  # คำเรียกยาวเท่ากันแต่ชี้คนละเป้า → ต่ำกว่า 0.9 = ถามก่อน
 
 
+def _two_targets(t: str, tables: list[dict]) -> bool:
+    """มีเว็บ/แอปมากกว่าหนึ่งอย่างคั่นด้วยคำเชื่อม ("เปิดวิกิกับกูเกิล") · คำเรียกที่ซ้อนในคำที่ยาวกว่าไม่นับ.
+
+    ต้องมีคำเชื่อม: "เปิดแผนที่กูเกิล" (ไม่มีคำเชื่อม) ยังเป็นคำสั่งเดี่ยวที่ถามยืนยันก่อนตามเดิม (การ์ด 0008)
+    """
+    if not any(c in t for c in ("กับ", "และ", "แล้ว", ",", "+", "&")):
+        return False
+    names = {(key, n) for table in tables for key, ns in table.items() for n in ns if n in t}
+    keys = {k for k, n in names if not any(n != m and n in m for _, m in names)}
+    return len(keys) > 1
+
+
 def _match(targets: list[str], groups: list[tuple[str, dict]]) -> tuple[str, str, float] | None:
     """หาเป้าหมายจากทุกกลุ่มพร้อมกัน · คืน (กลุ่ม, id, ความมั่นใจ) หรือ None.
 
@@ -200,6 +212,8 @@ def parse(text: str) -> Command | None:
     # แอปที่ติดตั้งจริง (ไฟล์ .desktop) เป็นกลุ่มสุดท้าย · คำเรียกไทยของตารางคงที่มาก่อนเสมอ
     table = app_table()
     found = {k: a for k, a in _discovered_aliases().items() if k in table}
+    if _two_targets(raw, [SITE_ALIASES, {**found, **APP_ALIASES}]):
+        return None  # "เปิดวิกิกับกูเกิล" = สองอย่าง ไม่ใช่คำสั่งเดี่ยว → AI (เดิมเปิดแค่อย่างเดียว · การ์ด 0017)
     hit = _match(
         [raw, target],
         [("page", PAGE_ALIASES), ("site", SITE_ALIASES), ("app", {**found, **APP_ALIASES})],

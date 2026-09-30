@@ -59,6 +59,9 @@ class DefineIntentTest(unittest.TestCase):
         self.assertIsNone(command.parse("ปิดเสียงแล้วเปิดยูทูบ"))
         self.assertEqual(command.parse("เปิดเสียง").plan.action, "unmute")
         self.assertEqual(command.parse("ปิดเสียงหน่อย").plan.action, "mute")
+        self.assertIsNone(command.parse("เปิดวิกิกับกูเกิลรอไว้เลย"))  # เดิม: เปิด Google อย่างเดียว
+        self.assertIsNone(command.parse("เปิด Gmail และ Google"))
+        self.assertEqual(command.parse("เปิดกูเกิลแมพ").plan.params, {"site": "maps"})  # คำซ้อนไม่นับสองอย่าง
 
     def test_same_sentence_as_request_uses_that_skill(self):
         from aipc.skills import router
