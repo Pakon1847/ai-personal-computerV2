@@ -67,6 +67,19 @@ def instructions(today: date | None = None) -> str:
     )
 
 
+def find_claude() -> str | None:
+    """คำสั่ง claude ของผู้ใช้คนนี้ · PATH ก่อน แล้ว ~/.local/bin (ตัวติดตั้งทางการวางไว้ที่นี่ แต่ PATH ของเซสชันไม่มี)
+    · ติดตั้งแยกต่อบัญชี = แต่ละคนเข้าสู่ระบบ Claude ของตัวเอง (Pi 5 2026-10-01)."""
+    import os
+    from pathlib import Path
+
+    exe = shutil.which("claude")
+    if exe:
+        return exe
+    local = Path.home() / ".local" / "bin" / "claude"
+    return str(local) if local.is_file() and os.access(local, os.X_OK) else None
+
+
 def build_input(question: str, history: list[dict]) -> str:
     """ข้อความที่ส่งทาง stdin: บริบทล่าสุด (ถ้ามี) + คำถาม."""
     recent = [m for m in history if m.get("role") in ("user", "assistant")][-CONTEXT_TURNS:]
@@ -90,7 +103,7 @@ def ask(
     runner=forge.run_process,
     today: date | None = None,
 ) -> CloudReply:
-    exe = claude or shutil.which("claude")
+    exe = claude or find_claude()
     if not exe:
         return CloudReply(False, error="ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในเครื่องนี้")
     args = [
@@ -110,7 +123,8 @@ def ask(
         "--model",
         model,
         # แทน system prompt ทั้งหมด + ไม่โหลด MCP/สกิลของบัญชี: เดิม append ต่อท้าย prompt ของ Claude Code
-        # ถาม "ทำอะไรได้บ้าง" แล้ว Claude เล่าความสามารถของตัวเอง (Claude Docs, PDF) แทนของเครื่อง (ชุดสอบจบ H07)
+        # ถาม "ทำอะไรได้บ้าง" แล้ว Claude เล่าความสามารถของตัวเอง (Claude Docs, PDF)
+        # แทนของเครื่อง (ชุดสอบจบ H07)
         "--system-prompt",
         instructions(today),
         "--strict-mcp-config",

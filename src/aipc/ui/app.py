@@ -60,21 +60,25 @@ def load_fonts() -> list[str]:
 def _cloud_client():
     """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0."""
     import os
-    import shutil
 
-    if os.environ.get("AIPC_CLOUD", "1") == "0" or shutil.which("claude") is None:
-        return None
     from aipc.cloud import ask
+
+    if os.environ.get("AIPC_CLOUD", "1") == "0" or ask.find_claude() is None:
+        return None
 
     return lambda question, history: ask.ask(question, history)
 
 
 def _skill_forge():
-    """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้ · ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0."""
-    import os
-    import shutil
+    """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้.
 
-    exe = shutil.which("claude")
+    ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0
+    """
+    import os
+
+    from aipc.cloud.ask import find_claude
+
+    exe = find_claude()
     if exe is None or "0" in (os.environ.get("AIPC_CLOUD", "1"), os.environ.get("AIPC_FORGE", "1")):
         return None
     from aipc.skills import forge
@@ -153,7 +157,8 @@ def build(opts: Options, argv: list[str] | None = None):
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client() if in_session else None,
-                          model_name=_local_model_name(), forge=skill_forge is not None)  # fmt: skip
+                          model_name=_local_model_name(),
+                          forge=skill_forge is not None)  # fmt: skip
     engine._backends = {
         "uiSettings": UiSettings(opts.settings_path, opts.theme),
         "system": SystemStatus(),
