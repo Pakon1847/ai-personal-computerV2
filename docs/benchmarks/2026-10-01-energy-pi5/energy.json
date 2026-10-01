@@ -1,0 +1,67 @@
+{
+ "note": "วัตต์บนบอร์ดจาก PMIC · ไม่รวมอะแดปเตอร์/USB · ไม่ใช้สูตรแก้",
+ "answers": [
+  {
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "tokens": 256,
+   "chars": 728,
+   "seconds": 43.29,
+   "samples": 155,
+   "mean_w": 6.88,
+   "joules": 296.8,
+   "extra_joules": 196.15
+  },
+  {
+   "q": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย",
+   "tokens": 256,
+   "chars": 733,
+   "seconds": 44.65,
+   "samples": 160,
+   "mean_w": 6.595,
+   "joules": 293.26,
+   "extra_joules": 189.45
+  },
+  {
+   "q": "สรุปประโยชน์ของการออกกำลังกาย 3 ข้อ",
+   "tokens": 256,
+   "chars": 820,
+   "seconds": 44.54,
+   "samples": 159,
+   "mean_w": 6.572,
+   "joules": 289.95,
+   "extra_joules": 186.39
+  },
+  {
+   "q": "อธิบายภาวะโลกร้อนแบบเข้าใจง่าย",
+   "tokens": 256,
+   "chars": 774,
+   "seconds": 44.44,
+   "samples": 159,
+   "mean_w": 6.634,
+   "joules": 292.91,
+   "extra_joules": 189.59
+  },
+  {
+   "q": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้สามชื่อ",
+   "tokens": 256,
+   "chars": 661,
+   "seconds": 44.58,
+   "samples": 160,
+   "mean_w": 6.192,
+   "joules": 274.73,
+   "extra_joules": 171.08
+  }
+ ],
+ "idle": {
+  "seconds": 20.0,
+  "samples": 73,
+  "mean_w": 2.325,
+  "joules": 45.79
+ },
+ "tts_cold": {
+  "seconds": 12.01,
+  "samples": 44,
+  "mean_w": 4.019,
+  "joules": 47.6
+ }
+}
