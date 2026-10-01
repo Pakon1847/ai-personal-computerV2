@@ -8,7 +8,6 @@ set -euo pipefail
 OUT="${1:-$HOME/voice-bench/result.json}"
 DIR="$HOME/voice-bench"
 WHISPER_TAG="${WHISPER_TAG:-v1.9.4}"
-PIPER_VER="${PIPER_VER:-2023.11.14-2}"
 mkdir -p "$DIR" && cd "$DIR"
 
 if [ ! -x whisper.cpp/build/bin/whisper-cli ]; then
@@ -18,9 +17,13 @@ if [ ! -x whisper.cpp/build/bin/whisper-cli ]; then
 fi
 [ -f thonburian-medium-q5_0.bin ] || curl -fsSL -o thonburian-medium-q5_0.bin \
   https://huggingface.co/suebphatt/thonburian-whisper-ggml/resolve/main/thonburian-medium-q5_0.bin
-if [ ! -x piper/piper ]; then
-  curl -fsSL -o piper.tgz "https://github.com/rhasspy/piper/releases/download/$PIPER_VER/piper_linux_aarch64.tar.gz"
-  tar xzf piper.tgz && rm piper.tgz
+# Piper รุ่นเก่า (ไบนารี 2023.11.14-2) อ่านเสียง tsync2 ไม่ได้ ("Phonemes must be one codepoint") → ใช้ piper-tts จาก pip
+# ตัวแปลงหน่วยเสียงไทยของ piper-tts ใช้ tltk · tltk ระบุ scikit-learn~=1.2 ซึ่ง build บน Python 3.13 ไม่ได้
+# → ติดตั้ง tltk แบบ --no-deps แล้วเติมโมดูลที่ขาดเอง (ต้นทุนจริงที่ต้องรายงาน: ไลบรารีหนักหลายตัว)
+if [ ! -x venv/bin/python ]; then
+  python3 -m venv venv
+  venv/bin/pip install -q piper-tts && venv/bin/pip install -q --no-deps tltk
+  venv/bin/pip install -q nltk scikit-learn pandas sklearn_crfsuite requests gensim unicode_rbnf
 fi
 V=https://huggingface.co/rhasspy/piper-voices/resolve/main/th/th_TH/tsync2/medium
 [ -f th_TH-tsync2-medium.onnx ] || curl -fsSL -o th_TH-tsync2-medium.onnx "$V/th_TH-tsync2-medium.onnx"
@@ -38,7 +41,7 @@ rows = []
 for i, s in enumerate(sents):
     wav = f"{d}/s{i}.wav"
     t0 = time.monotonic()
-    subprocess.run([f"{d}/piper/piper", "--model", f"{d}/th_TH-tsync2-medium.onnx", "--output_file", wav],
+    subprocess.run([f"{d}/venv/bin/python", "-m", "piper", "-m", f"{d}/th_TH-tsync2-medium.onnx", "-f", wav],
                    input=s.encode(), capture_output=True, check=True)
     tts = time.monotonic() - t0
     with wave.open(wav) as w:
