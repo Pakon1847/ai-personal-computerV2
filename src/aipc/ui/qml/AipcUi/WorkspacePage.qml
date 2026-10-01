@@ -64,6 +64,19 @@ Item {
     function focusInput() { if (visible && !historyPopup.opened) input.forceActiveFocus() }
     onVisibleChanged: if (visible) Qt.callLater(focusInput)
     Component.onCompleted: Qt.callLater(focusInput)
+    // ข้อความสรุปวันนี้: ทักทาย · วันที่ · นัดใกล้สุด 3 รายการ · สถานะเครื่อง (ไม่เดา: อ่านไม่ได้ก็บอกว่าไม่รู้)
+    function briefingText() {
+        const lines = [system.greeting + " " + system.userName, "วันนี้" + system.longDate]
+        const up = skills.upcoming
+        if (skills.reminderWarning !== "") lines.push(skills.reminderWarning)
+        else if (up.length === 0) lines.push("ยังไม่มีนัด")
+        else {
+            lines.push("มีนัด " + up.length + " รายการ")
+            for (let i = 0; i < Math.min(3, up.length); i++) lines.push(up[i].when + " " + up[i].what)
+        }
+        lines.push("เครื่อง" + machineCard.summary)
+        return lines.join("\n")
+    }
     function push(item) {
         items = items.concat([item])
     }
@@ -266,6 +279,16 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 text: "วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้"
                 color: Theme.inkMuted; oneLine: true
+            }
+            // อ่านสรุปวันนี้ให้ฟัง (การ์ด 0019) · สำหรับคนที่ไม่สะดวกอ่านจอ · ใช้ข้อมูลเดียวกับการ์ดข้างล่าง
+            AppButton {
+                objectName: "briefingButton"
+                Layout.alignment: Qt.AlignHCenter
+                visible: voice.available
+                kind: "ghost"
+                iconPath: Icons.chat
+                text: voice.speakingKey === -2 ? "หยุดอ่าน" : "อ่านสรุปวันนี้ให้ฟัง"
+                onClicked: voice.speakingKey === -2 ? voice.stop() : voice.speak(-2, root.briefingText())
             }
         }
 

@@ -473,6 +473,49 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(fb.searchResults, [])
         self.assertEqual(warnings, [])
 
+    def test_briefing_button_reads_today_summary(self):
+        """อ่านสรุปวันนี้ให้ฟัง: ทักทาย วันที่ นัด สถานะเครื่อง · ไม่มีตัวอ่าน = ไม่มีปุ่ม."""
+        engine, win, warnings = self.open_shell()
+        voice = engine._backends["voice"]
+        said = []
+
+        class FakeSpeaker:
+            available, current = True, -1
+
+            def say(self, text):
+                said.append(text)
+                self.current = 3
+                return 3
+
+            def stop(self):
+                self.current = -1
+
+            def idle_check(self):
+                return False
+
+            def close(self):
+                pass
+
+        voice._speaker = None
+        voice.changed.emit()
+        settle(30)
+        btn = find_items(win, "briefingButton")[0]
+        self.assertFalse(btn.property("visible"))
+        voice._speaker = FakeSpeaker()
+        voice.changed.emit()
+        settle(30)
+        self.assertTrue(btn.property("visible"))
+        btn.clicked.emit()
+        settle(30)
+        text = said[0]
+        system = engine._backends["system"]
+        self.assertIn(system.greeting, text)
+        self.assertIn(system.longDate, text)
+        self.assertIn("ยังไม่มีนัด", text)  # ไฟล์นัดว่างในเทสต์
+        self.assertIn("เครื่อง", text)
+        self.assertEqual(btn.property("text"), "หยุดอ่าน")
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()
