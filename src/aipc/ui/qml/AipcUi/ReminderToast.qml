@@ -19,7 +19,12 @@ Rectangle {
 
     Connections {
         target: skills
-        function onReminderDue(r) { toast.show(r) }
+        function onReminderDue(r) {
+            toast.show(r)
+            // อ่านเตือนออกเสียง (การ์ด 0019) · เปิดเองในหน้าตั้งค่า · ไม่ขัดคำตอบที่กำลังอ่านอยู่
+            if (uiSettings.speakReminders && voice.available && voice.speakingKey === -1)
+                voice.speak(-3, "ถึงเวลาแล้ว " + r.what + " " + r.when)
+        }
     }
 
     ColumnLayout {

@@ -516,6 +516,43 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(btn.property("text"), "หยุดอ่าน")
         self.assertEqual(warnings, [])
 
+    def test_reminder_is_spoken_only_when_enabled(self):
+        """เตือนนัดด้วยเสียง: ปิดอยู่ (ค่าเริ่มต้น) = เงียบ · เปิดในหน้าตั้งค่า = อ่านว่าถึงเวลาแล้ว + เรื่อง."""
+        engine, win, warnings = self.open_shell()
+        voice, ui, skills = (engine._backends[k] for k in ("voice", "uiSettings", "skills"))
+        said = []
+
+        class FakeSpeaker:
+            available, current = True, -1
+
+            def say(self, text):
+                said.append(text)
+                return 5
+
+            def stop(self):
+                pass
+
+            def idle_check(self):
+                return False
+
+            def close(self):
+                pass
+
+        voice._speaker = FakeSpeaker()
+        voice.changed.emit()
+        self.assertFalse(ui.speakReminders)
+        skills.reminderDue.emit({"what": "กินยา", "when": "วันนี้ 20:00", "id": "x"})
+        settle(30)
+        self.assertEqual(said, [])
+        ui.setSpeakReminders(True)
+        skills.reminderDue.emit({"what": "โทรหาแม่", "when": "วันนี้ 20:30", "id": "y"})
+        settle(30)
+        self.assertEqual(said, ["ถึงเวลาแล้ว โทรหาแม่ วันนี้ 20:30"])
+        from aipc.ui import settings
+
+        self.assertTrue(settings.load(ui._path).speak_reminders)  # จำไว้ในไฟล์ตั้งค่า
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()

@@ -52,6 +52,17 @@ class UiSettings(QObject):
     def onboarded(self) -> bool:
         return self._prefs.onboarded
 
+    @Property(bool, notify=changed)
+    def speakReminders(self) -> bool:  # noqa: N802
+        return self._prefs.speak_reminders
+
+    @Slot(bool)
+    def setSpeakReminders(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.speak_reminders:
+            self._prefs.speak_reminders = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     @Slot()
     def finishOnboarding(self) -> None:  # noqa: N802
         """ปิดหน้าแนะนำการใช้งานครั้งแรก · จำไว้ในไฟล์ตั้งค่าของผู้ใช้ (ไม่ขึ้นอีก)."""

@@ -193,6 +193,34 @@ ColumnLayout {
         }
     }
 
+    // เสียง (การ์ด 0019): อ่านออกเสียงในเครื่อง · ตั้งให้อ่านเตือนนัดได้
+    Card {
+        objectName: "voiceCard"
+        Layout.fillWidth: true
+        implicitHeight: voiceCol.implicitHeight + 40
+        ColumnLayout {
+            id: voiceCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 8
+            AppText { text: "เสียง"; strong: true }
+            AppText {
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                text: voice.available
+                      ? "อ่านออกเสียงในเครื่อง (Piper เสียงไทย tsync2) · กดอ่านครั้งแรกรอราว 7 วิ ครั้งต่อไปราว 1 วิ · ไม่ส่งเสียงออกนอกเครื่อง"
+                      : "ยังไม่ได้ติดตั้งตัวอ่านออกเสียง (sudo ./scripts/pi/install-voice.sh --apply) หรือไม่มีตัวเล่นเสียง"
+            }
+            AppCheck {
+                objectName: "speakRemindersCheck"
+                visible: voice.available
+                text: "อ่านเตือนนัดออกเสียงเมื่อถึงเวลา"
+                detail: "ใช้ลำโพงของจอหรือที่ต่อกับเครื่อง"
+                checked: uiSettings.speakReminders
+                onClicked: uiSettings.setSpeakReminders(checked)
+            }
+        }
+    }
+
     // สิ่งที่ส่งออกนอกเครื่อง: ทุกครั้งที่ส่งข้อความไป Claude (ข้อความที่ส่งจริง เวลา ค่าใช้จ่าย) · ล้างได้
     Card {
         id: outCard
