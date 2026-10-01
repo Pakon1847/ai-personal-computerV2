@@ -26,13 +26,20 @@ BRANDS = re.compile(r"google\s*translate|กูเกิล\s*แปลภาษ
 ASKQ = r"(อะไร|ยังไง|ไง|อย่างไร)"
 TR_HEAD = re.compile(rf"{VERB}|translat|เป็น\s*(ภาษา)?\s*อังกฤษ|in english|into english", re.I)
 TO_THAI = re.compile(r"(เป็น|ให้เป็น)\s*(ภาษา)?\s*ไทย")
-SUM_STRONG = re.compile(r"สรุป(?!แล้ว|ว่า)|ย่อ(?!มาจาก|หน้า|ย)|ใจความ|ประเด็น|tl;?dr|summar", re.I)
+SUM_STRONG = re.compile(
+    r"สรุป(?!แล้ว|ว่า)|ย่อ(?!มาจาก|หน้า|ย)|ใจความ|ประเด็น|สาระ|tl;?dr|summar|gist|boil\b.*\bdown|"
+    r"bullet points|key points|(ต้อง|ให้|อยากให้|ต้องการให้)\s*(เรา|ฉัน|ผม|หนู)?\s*ทำอะไร",
+    re.I,
+)
 # คำอ่อน: นับเมื่อหัวไม่ได้สั่งให้เขียน/แก้งานใหม่ ("เขียนแคปชันสั้น ๆ: …" ไม่ใช่สรุป)
 SUM_WEAK = re.compile(
-    r"กลั่น|(พูดถึง|เกี่ยวกับ|ว่าด้วย)(เรื่อง)?อะไร|บอกอะไร|สั้นลง|สั้น\s*ๆ|"
-    r"(ต้อง|ให้|อยากให้)\s*(เรา|ฉัน|ผม|หนู)?\s*ทำอะไร"
+    r"กลั่น|บีบ|(พูดถึง|เกี่ยวกับ|ว่าด้วย)(เรื่อง)?อะไร|บอกอะไร|สั้นลง|สั้น\s*ๆ|"
+    r"(บอก|เขียน\S{0,3}|คุย)\s*(ว่า)?\s*อะไร(กัน|บ้าง)?"
 )
-CREATE = re.compile(r"เขียน|แต่ง|ร่าง|ตอบกลับ|ตอบ(อีเมล|เมล|ข้อความ)|แก้|ตรวจ|ตั้งชื่อ|ปรับ|เรียบเรียง")
+# สั่งให้เขียน/แก้งาน (ขึ้นต้นหัว) · "เขาเขียนมาว่าอะไร" ไม่ใช่คำสั่งเขียน
+CREATE = re.compile(
+    r"(^((ช่วย|ขอ|รบกวน)\s*)*|ช่วย\s*|แล้ว\s*)(เขียน|แต่ง|ร่าง|ตอบ|แก้|ตรวจ|ตั้งชื่อ|ปรับ|เรียบเรียง)"
+)
 
 
 def summary_cue(head: str) -> bool:
@@ -43,7 +50,7 @@ def summary_cue(head: str) -> bool:
 PASTED = re.compile(r"ข่าว|ข้อความ|อีเมล|เมล|ประกาศ|บทความ|เนื้อหา|แชท|โพสต์|จดหมาย|ต่อไปนี้|ข้างล่าง")
 # "แปลว่า…" ขึ้นต้นประโยคในภาษาพูด = "หมายความว่า" ไม่ใช่คำสั่ง (ถ้ามีคำอังกฤษจะเข้า QUOTED+MEANING เอง)
 TR_START = re.compile(
-    rf"^(ช่วย|ขอ|รบกวน|อยากให้)?\s*{VERB}(?!ว่า)|^(please\s+|can you\s+)?translate", re.I
+    rf"^((ช่วย|ขอ|รบกวน|อยากให้)\s*)*{VERB}(?!ว่า)|^(please\s+|can you\s+)?translate", re.I
 )
 QUOTED = re.compile(r"[A-Za-z]{2,}|['\"‘“][^'\"’”]{2,}['\"’”]")
 MEANING = re.compile(
@@ -55,7 +62,14 @@ MEANING = re.compile(
 # ถามว่าพูดเป็นภาษาอังกฤษว่าอะไร ชัดพอโดยไม่ต้องมีเครื่องหมายคำพูด
 ASK_HOW = re.compile(
     rf"(ภาษา)?อังกฤษ.{{0,15}}?(พูด|เขียน|เรียก|ใช้คำ)\s*ว่า\s*{ASKQ}|"
-    rf"(พูด|เขียน)\s*เป็น\s*(ภาษา)?\s*(อังกฤษ|ไทย)\s*(แบบ\S+\s*)?ว่า\s*{ASKQ}"
+    rf"(พูด|เขียน)\s*เป็น\s*(ภาษา)?\s*(อังกฤษ|ไทย)\s*(แบบ\S+\s*)?ว่า\s*{ASKQ}|"
+    rf"(พูด|เขียน)\s*เป็น\s*(ภาษา)?\s*(อังกฤษ|ไทย)\s*{ASKQ}\s*ว่า|"
+    r"ภาษาอังกฤษของ\s*(คำว่า|ประโยค|['\"‘“])"
+)
+# จบประโยคด้วยการถามว่าภาษาอังกฤษพูด/เขียนยังไง ("ห้องน้ำอยู่ที่ไหน ภาษาอังกฤษเขียนยังไง")
+ASK_END = re.compile(
+    rf"(ภาษา)?อังกฤษ\S{{0,12}}?(พูด|เขียน|เรียก|ใช้คำ)\s*(ว่า)?\s*{ASKQ}\s*"
+    r"(ครับ|ค่ะ|คะ|ดี|บ้าง|นะ|อะ|เหรอ|หรอ|\s)*[?？]?\s*$"
 )
 # ข้อความยาวไม่มีตัวแบ่ง: "สรุป/ย่อ" ต้องตามด้วยคำขอ (ให้ หน่อย ที) หรือคำที่ชี้ข้อความที่วาง
 # ("สรุปสูตรพื้นที่วงกลมให้หน่อย …" = ถามความรู้ ไม่ใช่สรุปข้อความ)
@@ -65,12 +79,34 @@ SUM_START = re.compile(
     r"|^(summar|tl;?dr)",
     re.I,
 )
+# ข้อความยาวไม่มีตัวแบ่ง: หัว = ท่อนแรกก่อนเว้นวรรค · "สรุป/ย่อ" ต้องตามด้วยคำขอหรือคำชี้ข้อความ ·
+# คำนาม (ใจความ ประเด็น สาระ) ต้องอยู่ในรูปขอ ("ประเด็นร้อนวันนี้มีอะไร" ไม่ใช่)
+SUM_VERB_OK = re.compile(
+    r"(สรุป(?!แล้ว|ว่า)|ย่อ(?!มาจาก|หน้า))(ความ)?\s*"
+    r"(ให้|หน่อย|ที|เป็นข้อ|สั้น|ประเด็น|ใจความ|ข่าว|ข้อความ|อีเมล|เมล|ประกาศ|บทความ|เนื้อหา|แชท|"
+    r"โพสต์|จดหมาย|เรื่องนี้|นี้)"
+)
+SUM_NOUN_OK = re.compile(
+    r"(ขอ|เอา|อยากได้|บอก|ดึง|เก็บ)\s*(แค่|แต่|เฉพาะ)?\s*(ใจความ|ประเด็น|สาระ)|"
+    r"(ใจความ|ประเด็น|สาระ)\s*(สำคัญ|หลัก)?\s*(หน่อย|ที|ให้|พอ|นะ|คืออะไร|ว่าอย่างไร)|"
+    r"gist|boil\b.*\bdown|summar|tl;?dr|bullet points|key points|สั้นลง|บีบ|กลั่น",
+    re.I,
+)
+# "แปล" ในความหมายตีความ (ฝัน ผลตรวจ) · แปลงโค้ด · ภาษาอื่นที่สกิลไม่ได้ทำ (สกิลแปลไทย ↔ อังกฤษเท่านั้น) → ให้ AI
+TR_VETO = re.compile(
+    r"ฝัน|ลาง|ไพ่|ดวง|ผลตรวจ|ผลเลือด|ผลแล็บ|ผลการตรวจ|โค้ด|\bcode\b|python|javascript|\bjava\b|\bsql\b|"
+    r"\bhtml\b|ภาษามือ|ภาษา\s*(จีน|ญี่ปุ่น|เกาหลี|ฝรั่งเศส|เยอรมัน|สเปน|รัสเซีย|ลาว|เวียดนาม|พม่า|อิตาลี)|"
+    r"\b(chinese|japanese|korean|french|german|spanish)\b",
+    re.I,
+)
+# "สรุปให้ฟังหน่อยว่าสงครามโลกเกิดขึ้นยังไง" = ถามความรู้ ไม่ได้วางข้อความมา
+TOPIC_Q = re.compile(r"ว่า.{0,60}?(ยังไง|อย่างไร|ทำไม|ไหม|หรือเปล่า|อะไรบ้าง|เท่าไ)")
 BARE = re.compile(r"(ช่วย|ขอ|รบกวน)?\s*(แปล|สรุป|ย่อ)\s*(ให้)?\s*(หน่อย|ที)?\s*(ครับ|ค่ะ|คะ|นะ)?\s*")
 
 
 def split(text: str) -> tuple[str, str]:
-    """หัวคำสั่ง, เนื้อที่วางมาหลัง ":" หรือบรรทัดแรก (ตัวไหนมาก่อน) · ไม่มี = เนื้อว่าง."""
-    m = re.search(r"[:：\n]", text)
+    """หัวคำสั่ง, เนื้อที่วางมาหลัง ":" บรรทัดแรก หรือ "? " (ตัวไหนมาก่อน) · ไม่มี = เนื้อว่าง."""
+    m = re.search(r"[:：\n]|[?？](?=\s)", text)
     if not m:
         return text, ""
     return text[: m.start()], text[m.end() :].strip()
@@ -87,17 +123,36 @@ def lang_intent(text: str) -> str | None:
     if BARE.fullmatch(t):  # "แปล" เฉย ๆ ไม่มีอะไรให้แปล → ให้ AI ถามกลับ
         return None
     head, body = split(t)
-    if len(body) >= PAYLOAD_MIN:
+    has_body = len(body) >= PAYLOAD_MIN
+    tr_ok = not TR_VETO.search(head if has_body else t)
+    if has_body:
         # "เป็นภาษาไทย" นับเมื่อเนื้อเป็นภาษาอังกฤษ ("ปรับให้สุภาพ แต่ยังเป็นภาษาไทยอยู่: …" ไม่ใช่แปล)
-        if TR_HEAD.search(head) or (TO_THAI.search(head) and _latin_share(body) > 0.5):
+        if tr_ok and (
+            TR_HEAD.search(head)
+            or ASK_HOW.search(head)
+            or (TO_THAI.search(head) and _latin_share(body) > 0.5)
+        ):
             return "translate"
         if summary_cue(head):
             return "summarize"
         return None
-    if TR_START.search(t) or ASK_HOW.search(t) or (QUOTED.search(t) and MEANING.search(t)):
+    if tr_ok and (TR_START.search(t) or ASK_HOW.search(t) or ASK_END.search(t)):
+        return "translate"
+    if tr_ok and QUOTED.search(t) and MEANING.search(t):
         return "translate"
     if len(t) >= SUMMARY_LEN_MIN:
         lead = t[:LEAD]
+        if TOPIC_Q.search(t[:80]) and not PASTED.search(lead):
+            return None
         if SUM_START.search(t) or (summary_cue(lead) and PASTED.search(lead)):
             return "summarize"
+        m = re.search(r"\s", t[6:])  # ท่อนแรก (อย่างน้อย 6 ตัวอักษร) = คำสั่ง · ที่เหลือ = ข้อความที่วาง
+        if m:
+            first = t[: 6 + m.start()]
+            if (
+                SUM_VERB_OK.search(first)
+                or SUM_NOUN_OK.search(first)
+                or (SUM_WEAK.search(first) and not CREATE.search(first))
+            ):
+                return "summarize"
     return None
