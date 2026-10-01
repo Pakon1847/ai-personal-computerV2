@@ -38,7 +38,6 @@ PART_OF_DAY = {"เช้า": time(9, 0), "บ่าย": time(13, 0), "เย�
 
 # คำที่บอกว่าเป็นรูปแบบที่ยังไม่รองรับ → ต้องไม่ตีความเอง (การ์ด 0001: ไม่บันทึกผิดเงียบ ๆ)
 UNSUPPORTED = {
-    "ทุก": "นัดซ้ำ (ทุกวัน/ทุกสัปดาห์) ยังไม่รองรับ",
     "สิ้นเดือน": "“สิ้นเดือน” ยังไม่รองรับ ระบุวันที่แทน",
     "ต้นเดือน": "“ต้นเดือน” ยังไม่รองรับ ระบุวันที่แทน",
     "กลางเดือน": "“กลางเดือน” ยังไม่รองรับ ระบุวันที่แทน",
@@ -62,6 +61,77 @@ class WhenResult:
     assumptions: list[str] = field(default_factory=list)
     confident: bool = True
     problem: str = ""
+    repeat: str = ""  # นัดซ้ำ: daily | weekdays | weekends | weekly:<0–6> · "" = ครั้งเดียว
+
+
+# ---------- นัดซ้ำ (Pakon เลือก 2026-10-02 · docs/benchmarks/2026-10-02-repeat) ----------
+# เดิมคำว่า "ทุก" = ปฏิเสธทั้งประโยค ทำให้ "เตือนให้บอกทุกคน…" จดไม่ได้ด้วย → จับเฉพาะรูปนัดซ้ำจริง
+_WD = "จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์|อาทิตย์"
+REPEAT_UNSUPPORTED = re.compile(
+    r"ทุก\s*(เดือน|ปี|\d+|สอง|สาม|สี่|ห้า|หก)\s*(ชั่วโมง|ชม|นาที|วัน|เดือน|สัปดาห์)?|ทุก\s*ชั่วโมง|วันเว้นวัน"
+)
+REPEAT_NAMES = {"daily": "ทุกวัน", "weekdays": "ทุกวันจันทร์–ศุกร์", "weekends": "ทุกเสาร์–อาทิตย์"}
+_DAYNAMES = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"]
+
+
+def repeat_name(rule: str) -> str:
+    if rule.startswith("weekly:"):
+        return "ทุกวัน" + _DAYNAMES[int(rule.split(":")[1])]
+    return REPEAT_NAMES.get(rule, "")
+
+
+def repeat_rule(text: str) -> tuple[str, str, list[str], bool]:
+    """(กฎซ้ำ, ข้อความที่ตัดคำบอกการซ้ำออกแล้ว, หมายเหตุ, มั่นใจไหม) · ไม่ใช่นัดซ้ำ = ("", text, [], True)."""
+    t = text
+    notes: list[str] = []
+    sure = True
+    if re.search(r"จันทร์\s*(ถึง|[-–])\s*ศุกร์|วันธรรมดา|วันทำงาน", t):
+        rule = "weekdays"
+    elif re.search(r"เสาร์\s*[-–]?\s*อาทิตย์|สุดสัปดาห์", t) and re.search(r"ทุก|วันหยุด|ซ้ำ", t):
+        rule = "weekends"
+    elif m := re.search(rf"ทุก\s*(วัน)?\s*({_WD})", t):
+        rule = f"weekly:{WEEKDAYS[m[2]]}"
+        if m[2] == "อาทิตย์" and not m[1]:  # "ทุกอาทิตย์" อาจแปลว่าทุกสัปดาห์
+            notes.append("“ทุกอาทิตย์” ถือว่าเป็นทุกวันอาทิตย์ · ถ้าหมายถึงทุกสัปดาห์ ระบุวันให้ชัด")
+            sure = False
+    elif re.search(r"ทุก\s*(วัน|คืน|เช้า|เย็น|ค่ำ)|วันละ\s*(ครั้ง|หน)|ซ้ำทุกวัน", t):
+        rule = "daily"
+    else:
+        return "", text, [], True
+    # ตัดคำบอกการซ้ำออก (คงคำ เช้า/เย็น/คืน ไว้ให้ตัวอ่านเวลา)
+    for pat in (rf"ทุก\s*(วัน)?\s*({_WD})(?!\s*[-–]|\s*ถึง)", r"(เตือน)?ซ้ำ", r"วันละ\s*(ครั้ง|หน)",
+                r"ทุก\s*สุดสัปดาห์|สุดสัปดาห์", r"(วันหยุด)?\s*(ทุก\s*)?(วัน)?\s*เสาร์\s*[-–]?\s*อาทิตย์",
+                r"(ทุก\s*)?(วัน)?\s*จันทร์\s*(ถึง|[-–])\s*ศุกร์", r"(ทุก\s*)?วัน(ธรรมดา|ทำงาน)",
+                r"ทุก\s*(สัปดาห์|วัน)", r"ทุก(?=\s*(คืน|เช้า|เย็น|ค่ำ))"):  # fmt: skip
+        t = re.sub(pat, " ", t)
+    t = re.sub(r"(?<![ก-๙])คืน(?![ก-๙]*นี้)", " ค่ำ ", t)  # "ทุกคืน 4 ทุ่ม" → เหลือ "ค่ำ"
+    return rule, t, notes, sure
+
+
+def matches(rule: str, d: date) -> bool:
+    wd = d.weekday()
+    if rule == "daily":
+        return True
+    if rule == "weekdays":
+        return wd < 5
+    if rule == "weekends":
+        return wd >= 5
+    if rule.startswith("weekly:"):
+        return wd == int(rule.split(":")[1])
+    return False
+
+
+def next_on(rule: str, tm: time, after: datetime) -> datetime:
+    """ครั้งถัดไปหลัง after ที่ตรงกฎ (เวลา tm)."""
+    d = after.date()
+    for _ in range(8):
+        cand = datetime.combine(d, tm)
+        if after.tzinfo is not None:
+            cand = cand.replace(tzinfo=after.tzinfo)
+        if matches(rule, d) and cand > after:
+            return cand
+        d += timedelta(days=1)
+    raise ValueError(rule)
 
 
 def _n(token: str) -> int | None:
@@ -105,29 +175,31 @@ def _time(t: _Text, notes: list[str]) -> tuple[time | None, bool]:
     if m:
         h = 1 if m[1] else _n(m[2])
         return (mk(12 + h, 0, m[3]) if h and 1 <= h <= 5 else None), True
-    m = t.take(NUM + r"\s*โมง\s*เย็น" + half)
+    # "ครึ่ง" มาก่อนหรือหลัง เช้า/เย็น ก็ได้: "หกโมงครึ่งเย็น" "หกโมงเย็นครึ่ง" (พบในชุดนัดซ้ำ 2026-10-02)
+    m = t.take(NUM + r"\s*โมง\s*(ครึ่ง)?\s*เย็น" + half)
     if m:
         h = _n(m[1])
-        return (mk(12 + h if h and h < 12 else h, 0, m[2])), True
+        return (mk(12 + h if h and h < 12 else h, 0, m[2] or m[3])), True
     m = t.take(NUM + r"\s*ทุ่ม" + half)
     if m:
         h = _n(m[1])
         return (mk(18 + h, 0, m[2]) if h and 1 <= h <= 5 else None), True
     m = t.take(r"ตี\s*" + NUM + half)
+    if m:  # ตีหนึ่ง–ตีหก (ตีหก = 06:00 ใช้กันทั่วไป · เดิมรับถึงตีห้า)
+        h = _n(m[1])
+        return (mk(h, 0, m[2]) if h and 1 <= h <= 6 else None), True
+    m = t.take(NUM + r"\s*โมง\s*(ครึ่ง)?\s*(เช้า)?" + half)
     if m:
         h = _n(m[1])
-        return (mk(h, 0, m[2]) if h and 1 <= h <= 5 else None), True
-    m = t.take(NUM + r"\s*โมง\s*(เช้า)?" + half)
-    if m:
-        h = _n(m[1])
+        halfmark = m[2] or m[4]
         if h is None or h > 12:
             return None, True
-        if m[2]:  # โมงเช้า: แบบดั้งเดิม หนึ่งโมงเช้า–ห้าโมงเช้า = 7–11 น.
-            return mk(h + 6 if h <= 5 else h, 0, m[3]), True
+        if m[3]:  # โมงเช้า: แบบดั้งเดิม หนึ่งโมงเช้า–ห้าโมงเช้า = 7–11 น.
+            return mk(h + 6 if h <= 5 else h, 0, halfmark), True
         if h <= 6:  # "สามโมง" ไม่มีเช้า/เย็น — คนส่วนใหญ่หมายถึงบ่าย
             notes.append(f"“{m[1]}โมง” ตีความเป็น {12 + h}:00 น.")
-            return mk(12 + h, 0, m[3]), True
-        return mk(h, 0, m[3]), True
+            return mk(12 + h, 0, halfmark), True
+        return mk(h, 0, halfmark), True
     m = t.take(r"(?:ตอน)?(เช้า|บ่าย|เย็น|ค่ำ|กลางคืน)")
     if m:
         pt = PART_OF_DAY[m[1]]
@@ -222,6 +294,25 @@ def _date(t: _Text, now: datetime, notes: list[str]) -> tuple[date | None, str, 
 
 
 def parse(text: str, now: datetime) -> WhenResult:
+    if REPEAT_UNSUPPORTED.search(text):
+        why = "รองรับนัดซ้ำแค่ ทุกวัน · ทุกวัน<จันทร์–อาทิตย์> · วันธรรมดา · เสาร์อาทิตย์"
+        return WhenResult(None, text.strip(), confident=False, problem=why)
+    rule, rest, rnotes, sure = repeat_rule(text)
+    if rule:
+        w = _parse_once(rest, now)
+        if w.at is None and w.problem == "ไม่พบวันหรือเวลาในประโยค":
+            w = _parse_once(rest + " 09:00", now)  # "ทุกวันจันทร์ ประชุมทีม" ไม่บอกเวลา
+            w.assumptions.append(f"ไม่ได้บอกเวลา ใช้ {DEFAULT_TIME:%H:%M} น.")
+            sure = False  # นัดซ้ำที่เดาเวลา = ถามยืนยันก่อนบันทึก (การ์ด 0001: ไม่บันทึกผิดเงียบ ๆ)
+        if w.at is None:
+            return WhenResult(None, w.what, confident=False, problem=w.problem, repeat=rule)
+        at = next_on(rule, w.at.time(), now)
+        notes = [n for n in w.assumptions if "พรุ่งนี้" not in n and "ผ่านไปแล้ว" not in n] + rnotes
+        return WhenResult(at, w.what, notes, confident=w.confident and sure, repeat=rule)
+    return _parse_once(text, now)
+
+
+def _parse_once(text: str, now: datetime) -> WhenResult:
     notes: list[str] = []
     for word, why in UNSUPPORTED.items():
         if word in text:
