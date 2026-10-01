@@ -1,0 +1,266 @@
+[
+ {
+  "file": "single-00.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.9963125
+ },
+ {
+  "file": "pair-00.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.612375
+ },
+ {
+  "file": "single-01.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.602875
+ },
+ {
+  "file": "pair-01.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.7213125
+ },
+ {
+  "file": "single-02.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.2600625
+ },
+ {
+  "file": "pair-02.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.1369375
+ },
+ {
+  "file": "single-03.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.8675
+ },
+ {
+  "file": "pair-03.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.323
+ },
+ {
+  "file": "single-04.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.3265
+ },
+ {
+  "file": "pair-04.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.7911875
+ },
+ {
+  "file": "single-05.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.4018125
+ },
+ {
+  "file": "pair-05.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.3406875
+ },
+ {
+  "file": "single-06.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.87725
+ },
+ {
+  "file": "pair-06.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.9476875
+ },
+ {
+  "file": "single-07.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.00925
+ },
+ {
+  "file": "pair-07.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.6034375
+ },
+ {
+  "file": "single-08.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.63825
+ },
+ {
+  "file": "pair-08.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.5778125
+ },
+ {
+  "file": "single-09.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.8609375
+ },
+ {
+  "file": "pair-09.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.1676875
+ },
+ {
+  "file": "single-10.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.3535
+ },
+ {
+  "file": "pair-10.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.7025625
+ },
+ {
+  "file": "single-11.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.4445625
+ },
+ {
+  "file": "pair-11.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.1375
+ },
+ {
+  "file": "single-12.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.6536875
+ },
+ {
+  "file": "pair-12.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.9456875
+ },
+ {
+  "file": "single-13.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.2914375
+ },
+ {
+  "file": "pair-13.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.4825625
+ },
+ {
+  "file": "single-14.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.1924375
+ },
+ {
+  "file": "pair-14.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.550875
+ },
+ {
+  "file": "single-15.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.3831875
+ },
+ {
+  "file": "pair-15.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.5569375
+ },
+ {
+  "file": "single-16.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 2.3406875
+ },
+ {
+  "file": "pair-16.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 4.2691875
+ },
+ {
+  "file": "single-17.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.8769375
+ },
+ {
+  "file": "pair-17.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.55525
+ },
+ {
+  "file": "single-18.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.6619375
+ },
+ {
+  "file": "pair-18.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.56925
+ },
+ {
+  "file": "single-19.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.9211875
+ },
+ {
+  "file": "pair-19.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.774125
+ },
+ {
+  "file": "single-20.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.809875
+ },
+ {
+  "file": "pair-20.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.387125
+ },
+ {
+  "file": "single-21.wav",
+  "kind": "single",
+  "speech_start": 0.5,
+  "speech_end": 1.575875
+ },
+ {
+  "file": "pair-21.wav",
+  "kind": "pair",
+  "speech_start": 0.5,
+  "speech_end": 3.530125
+ }
+]

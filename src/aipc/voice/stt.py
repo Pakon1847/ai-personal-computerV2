@@ -28,6 +28,68 @@ MIN_S = 0.4  # กดแล้วปล่อยทันที = ไม่ถ�
 TAGS = re.compile(r"\[[^\]]*\]|\([^)]*\)")
 
 
+class Endpointer:
+    """จับจุดจบเสียงพูดจากความดัง (การ์ด 0019 ข้อ 10) · ป้อน PCM 16-bit mono 16 kHz ทีละก้อน.
+
+    ระดับเสียงพื้นหลังวัดจาก 0.3 วิแรก (ก่อนเริ่มพูด) · เริ่มพูด = ดังเกินเกณฑ์ 3 ช่องติด (90 ms) ·
+    จบ = หลังเริ่มพูดแล้วเงียบต่อกัน silence_s วิ · ไม่ใช้โมเดล (CPU น้อย ไม่แย่ง AI)
+    feed() คืน None (ฟังต่อ) · "end" · "no_speech" · "max"
+    """
+
+    FRAME = 480  # 30 ms
+
+    def __init__(self, silence_s: float = 1.0, no_speech_s: float = 5.0, max_s: float = MAX_S,
+                 sr: int = 16000):  # fmt: skip
+        self.frame_s = self.FRAME / sr
+        self.silence_frames = round(silence_s / self.frame_s)
+        self.no_speech_frames = round(no_speech_s / self.frame_s)
+        self.max_frames = round(max_s / self.frame_s)
+        self._buf = b""
+        self._levels: list[float] = []
+        self._noise: float | None = None
+        self.frames = 0
+        self.speaking = False
+        self._loud = 0
+        self._quiet = 0
+
+    def feed(self, data: bytes) -> str | None:
+        import array
+
+        self._buf += data
+        n = self.FRAME * 2
+        while len(self._buf) >= n:
+            frame, self._buf = self._buf[:n], self._buf[n:]
+            a = array.array("h")
+            a.frombytes(frame)
+            level = (sum(x * x for x in a) / len(a)) ** 0.5
+            if (r := self._frame(level)) is not None:
+                return r
+        return None
+
+    def _frame(self, level: float) -> str | None:
+        self.frames += 1
+        if self._noise is None:
+            self._levels.append(level)
+            if len(self._levels) < 10:  # 0.3 วิแรก = ระดับเสียงพื้นหลัง
+                return None
+            self._noise = sorted(self._levels)[len(self._levels) // 2]
+            return None
+        threshold = max(3.0 * self._noise, 400.0)
+        if not self.speaking:
+            self._loud = self._loud + 1 if level > threshold else 0
+            if self._loud >= 3:
+                self.speaking = True
+            elif level < threshold:  # ปรับระดับพื้นหลังช้า ๆ ระหว่างยังไม่พูด
+                self._noise = 0.95 * self._noise + 0.05 * level
+            if not self.speaking and self.frames >= self.no_speech_frames:
+                return "no_speech"
+        else:
+            self._quiet = self._quiet + 1 if level < 0.7 * threshold else 0
+            if self._quiet >= self.silence_frames:
+                return "end"
+        return "max" if self.frames >= self.max_frames else None
+
+
 def clean(text: str) -> str:
     return re.sub(r"\s+", " ", TAGS.sub(" ", text)).strip()
 
