@@ -36,8 +36,18 @@ MONTHS = {"ม.ค.": "มกราคม", "ก.พ.": "กุมภาพั�
 ABBR = {**MONTHS, "พ.ศ.": "พุทธศักราช", "ค.ศ.": "คริสต์ศักราช", "กม.": "กิโลเมตร", "ซม.": "เซนติเมตร",
         "มม.": "มิลลิเมตร", "กก.": "กิโลกรัม", "ชม.": "ชั่วโมง", "จ.": "จังหวัด",
         "อ.": "อำเภอ"}  # fmt: skip
-SYMBOLS = {"°C": " องศาเซลเซียส ", "°": " องศา ", "%": " เปอร์เซ็นต์ ", "&": " และ ", "+": " บวก ",
-           "=": " เท่ากับ ", "฿": " บาท "}  # fmt: skip
+SYMBOLS = {"°C": " องศาเซลเซียส ", "° C": " องศาเซลเซียส ", "°": " องศา ", "%": " เปอร์เซ็นต์ ",
+           "&": " และ ", "+": " บวก ",
+           "=": " เท่ากับ ", "฿": " บาท ", "×": " คูณ ", "÷": " หาร ", "√": " รากที่สองของ ",
+           "π": " พาย ", "≤": " น้อยกว่าหรือเท่ากับ ", "≥": " มากกว่าหรือเท่ากับ ", "≠": " ไม่เท่ากับ ",
+           "≈": " ประมาณ ", "±": " บวกลบ ", "→": " ไปเป็น ", "²": " กำลังสอง ",
+           "³": " กำลังสาม "}  # fmt: skip
+# ตัวห้อยจากหน้าจอ (H₂O · tidy() แปลง LaTeX) อ่านเป็นตัวเลขปกติ · ตัวยกอื่นอ่านว่า "ยกกำลัง"
+SUBSCRIPTS = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
+SUPERSCRIPT_RE = re.compile("[⁰¹⁴⁵⁶⁷⁸⁹]+")
+SUPERSCRIPTS = str.maketrans("⁰¹⁴⁵⁶⁷⁸⁹", "01456789")
+# เศษส่วน 1/4 (ไม่ใช่วันที่ 1/10/2569)
+FRACTION_RE = re.compile(r"(?<![\d/])(\d+)/(\d+)(?![\d/])")
 
 THAI_DIGITS = str.maketrans("๐๑๒๓๔๕๖๗๘๙", "0123456789")
 URL_RE = re.compile(r"(https?://|www\.)\S+")
@@ -101,6 +111,8 @@ def _latin(m: re.Match) -> str:
         return f" {WORDS[w.lower()]} "
     if w.isupper() and 2 <= len(w) <= 5 and w.isalpha():
         return " " + "".join(LETTERS[c] for c in w) + " "
+    if len(w) == 1:  # ตัวแปร/ธาตุ (a × b · H₂O) อ่านชื่อตัวอักษร
+        return f" {LETTERS[w.upper()]} "
     return " "  # Piper อ่านไม่ได้อยู่แล้ว (ตัดทิ้งเงียบ ๆ) · ตัดเองให้ช่องว่างไม่เพี้ยน
 
 
@@ -114,7 +126,9 @@ def _plain(text: str) -> str:
 
 def to_speech(text: str) -> str:
     """ข้อความ (อาจมี markdown) → คำอ่านภาษาไทยบรรทัดเดียว · ว่าง = ไม่มีอะไรให้อ่าน."""
-    text = _plain(text[:MAX_CHARS]).translate(THAI_DIGITS)
+    text = _plain(text[:MAX_CHARS]).translate(THAI_DIGITS).translate(SUBSCRIPTS)
+    text = SUPERSCRIPT_RE.sub(lambda m: " ยกกำลัง " + m.group(0).translate(SUPERSCRIPTS) + " ", text)
+    text = FRACTION_RE.sub(r" เศษ \1 ส่วน \2 ", text)
     text = TIME_RE.sub(_time, text)
     for abbr, word in sorted(ABBR.items(), key=lambda kv: -len(kv[0])):
         text = text.replace(abbr, f" {word} ")

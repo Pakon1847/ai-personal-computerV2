@@ -54,6 +54,15 @@ class SpeechTextTest(unittest.TestCase):
             with self.subTest(n=n):
                 self.assertEqual(number_words(n), words)
 
+    def test_math_from_screen_text(self):
+        # หน้าจอแปลง LaTeX เป็น H₂O · 1/4 · π r² (WorkspacePage.tidy) → ตัวอ่านต้องอ่านเป็นคำ
+        cases = {"H₂O": "เอชสองโอ", "1/4": "เศษหนึ่งส่วนสี่", "π r²": "พายอาร์กำลังสอง",
+                 "a × b ÷ 2": "เอคูณบีหารสอง", "x⁵": "เอ็กซ์ยกกำลังห้า", "100° C": "หนึ่งร้อยองศาเซลเซียส",
+                 "วันที่ 1/10/2569": "วันที่หนึ่งสิบสองพันห้าร้อยหกสิบเก้า"}  # fmt: skip
+        for text, want in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(to_speech(text).replace(" ", ""), want)
+
     def test_time_out_of_range_is_left_as_numbers(self):
         self.assertNotIn("นาฬิกา", to_speech("สกอร์ 30:45"))
 

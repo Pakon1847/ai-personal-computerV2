@@ -34,7 +34,31 @@ Item {
     // คำตอบของ AI แสดงเป็นข้อความธรรมดาเสมอ (ไม่เปิด markdown/HTML: แท็กรูปในคำตอบอาจทำให้ Qt ไปดึงรูปจากเว็บ = ข้อมูลรั่ว T6)
     // พบบนจอ Pi 2026-10-01: คำตอบของ Claude มี [ชื่อ](ลิงก์) และ **ตัวหนา** ดิบ ๆ → แปลงให้อ่านง่าย
     function tidy(t) {
-        return (t || "").replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, "$1 ($2)").replace(/\*\*([^*]+)\*\*/g, "$1")
+        return plainMath((t || "").replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, "$1 ($2)").replace(/\*\*([^*]+)\*\*/g, "$1"))
+    }
+    // พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX ($\text{H}_2\text{O}$ · $\frac{1}{4}$) → แปลงเป็นข้อความธรรมดา
+    // ตัวห้อย/ตัวยกที่เป็นตัวเลขใช้อักขระ Unicode (H₂O · x²) · คำสั่งที่ไม่รู้จักตัดทิ้ง
+    readonly property var mathSymbols: ({ "times": "×", "div": "÷", "cdot": "·", "pm": "±", "le": "≤", "leq": "≤",
+        "ge": "≥", "geq": "≥", "neq": "≠", "approx": "≈", "pi": "π", "infty": "∞", "circ": "°", "degree": "°",
+        "rightarrow": "→", "to": "→", "alpha": "α", "beta": "β", "theta": "θ", "Delta": "Δ", "%": "%" })
+    function plainMath(t) {
+        if (t.indexOf("\\") < 0 && t.indexOf("$") < 0) return t
+        const sub = "₀₁₂₃₄₅₆₇₈₉", sup = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+        const conv = (s, table) => s.replace(/[0-9]/g, d => table[+d])
+        return t.replace(/\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$|\\\(([\s\S]+?)\\\)|\\\[([\s\S]+?)\\\]/g, (m, a, b, c, d) => {
+            let x = a || b || c || d
+            if (b && !/[\\^_{]/.test(b)) return m   // "$5 กับ $10" = ราคา ไม่ใช่สูตร
+            for (let i = 0; i < 3; i++)
+                x = x.replace(/\\(?:d|t)?frac\{([^{}]*)\}\{([^{}]*)\}/g, "$1/$2")
+                     .replace(/\\sqrt\{([^{}]*)\}/g, "√$1")
+                     .replace(/\\(?:text|mathrm|mathbf|textbf|operatorname)\{([^{}]*)\}/g, "$1")
+            x = x.replace(/\^\{?\\circ\}?/g, "°")
+                 .replace(/_\{([0-9]+)\}|_([0-9])/g, (m2, p, q) => conv(p || q, sub))
+                 .replace(/\^\{([0-9]+)\}|\^([0-9])/g, (m2, p, q) => conv(p || q, sup))
+                 .replace(/\\([A-Za-z]+|%)/g, (m2, name) => root.mathSymbols[name] !== undefined ? root.mathSymbols[name] : "")
+                 .replace(/[{}]/g, "").replace(/\\,|\\;|\\!|~/g, " ")
+            return x.replace(/\s+/g, " ").trim()
+        })
     }
     // เปิดหน้าผู้ช่วยแล้วพิมพ์ได้ทันที (ทดสอบบนจอ Pi: ต้องกด Tab หลายครั้งกว่าจะถึงช่องพิมพ์)
     function focusInput() { if (visible && !historyPopup.opened) input.forceActiveFocus() }

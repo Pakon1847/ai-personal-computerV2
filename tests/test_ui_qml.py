@@ -418,6 +418,22 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
+    def test_latex_answers_become_plain_text(self):
+        """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        cases = {
+            r"สูตรเคมีของน้ำคือ $\text{H}_2\text{O}$ ครับ": "สูตรเคมีของน้ำคือ H₂O ครับ",
+            r"0.25 เท่ากับ $\frac{1}{4}$": "0.25 เท่ากับ 1/4",
+            r"พื้นที่ $\pi r^2$ และ $$a \times b \div 2$$": "พื้นที่ π r² และ a × b ÷ 2",
+            r"น้ำเดือดที่ $100^\circ C$": "น้ำเดือดที่ 100° C",
+            "ราคา $5 กับ $10": "ราคา $5 กับ $10",
+        }
+        for src, want in cases.items():
+            with self.subTest(src=src):
+                self.assertEqual(page.tidy(src), want)
+        self.assertEqual(warnings, [])
+
     def test_speak_button_reads_answer_and_stops(self):
         """การ์ด 0019: ปุ่มอ่านออกเสียงขึ้นเฉพาะเมื่อมีตัวอ่าน · กดแล้วเป็น "หยุดอ่าน" · กดอีกครั้งหยุด."""
         engine, win, warnings = self.open_shell()

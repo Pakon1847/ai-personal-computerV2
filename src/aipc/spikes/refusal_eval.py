@@ -1,6 +1,7 @@
 """วัด "ปฏิเสธเกินเหตุ" และ "แต่งข้อมูลสด" ของ AI ในเครื่อง (tests/data/refusal_heldout.json).
 
-    python -m aipc.spikes.refusal_eval --server http://127.0.0.1:18080 --label before --out <ไฟล์.json>
+    python -m aipc.spikes.refusal_eval --server http://127.0.0.1:18080 --label before
+        --out <ไฟล์.json>
 
 system prompt + รายการสกิลชุดเดียวกับแอป (catalog.system_prompt / tools) · ถามสองแบบต่อข้อ:
 - local: ไม่มี Claude (เครื่องที่ไม่มีอินเทอร์เน็ต)
@@ -99,7 +100,8 @@ def main(argv: list[str] | None = None) -> int:
             summary[f"{mode}_{exp}"] = {"ok": sum(x["ok"] for x in sel), "n": len(sel),
                                         "refused": sum(x["refused"] for x in sel),
                                         "fabricated": sum(x["fabricated"] for x in sel),
-                                        "ask_cloud": sum(x["tool"] == catalog.ASK_CLOUD for x in sel)}  # fmt: skip
+                                        "ask_cloud": sum(x["tool"] == catalog.ASK_CLOUD
+                                                         for x in sel)}  # fmt: skip
     out = {
         "label": a.label,
         "system_chars": len(modes["local"][0]),
