@@ -1,0 +1,67 @@
+"""ค้นไฟล์ในเครื่องด้วยเนื้อหา · ไม่ใช้โมเดล (ไม่แย่ง RAM/CPU กับ AI ในเครื่อง).
+
+ผล docs/benchmarks/2026-10-01-file-search
+
+TF-IDF ของ n-gram ตัวอักษร (ภาษาไทยไม่เว้นวรรค · แบบเดียวกับการ์ด 0018) บนชื่อไฟล์ + เนื้อหาแบ่งเป็นท่อน ·
+คะแนนไฟล์ = ท่อนที่ตรงที่สุด · ได้ข้อความตัวอย่างจากท่อนนั้นไปแสดง
+"""
+
+from __future__ import annotations
+
+import math
+import re
+from collections import Counter
+from dataclasses import dataclass
+
+CHUNK = 300  # ตัวอักษรต่อท่อน · ไฟล์ยาวแบ่งท่อนเพื่อไม่ให้ไฟล์ยาวได้เปรียบ
+N = (2, 3)
+
+
+def grams(text: str) -> Counter:
+    t = re.sub(r"\s+", "", text.lower())
+    return Counter(t[i : i + k] for k in N for i in range(len(t) - k + 1))
+
+
+@dataclass
+class Hit:
+    name: str
+    score: float
+    snippet: str
+
+
+def _chunks(text: str) -> list[str]:
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= CHUNK:
+        return [text] if text else []
+    step = CHUNK * 2 // 3  # ซ้อนกัน 1/3 ไม่ให้ประโยคขาดกลางท่อน
+    return [text[i : i + CHUNK] for i in range(0, len(text) - CHUNK // 3, step)]
+
+
+class Index:
+    def __init__(self, files: list[tuple[str, str]]):
+        """files = [(ชื่อ, ข้อความ)]."""
+        self.items: list[tuple[str, str]] = []  # (ชื่อไฟล์, ข้อความท่อน)
+        for name, text in files:
+            stem = re.sub(r"\.[A-Za-z0-9]+$", "", name).replace("-", " ").replace("_", " ")
+            for c in _chunks(text) or [""]:
+                self.items.append((name, f"{stem} {c}"))
+        docs = [grams(t) for _, t in self.items]
+        df = Counter(g for d in docs for g in d)
+        n = len(docs)
+        self.idf = {g: math.log((1 + n) / (1 + c)) + 1 for g, c in df.items()}
+        self.vecs = [self._vec(d) for d in docs]
+
+    def _vec(self, c: Counter) -> dict:
+        v = {g: (1 + math.log(x)) * self.idf.get(g, 0) for g, x in c.items()}
+        norm = math.sqrt(sum(x * x for x in v.values())) or 1
+        return {g: x / norm for g, x in v.items()}
+
+    def search(self, query: str, k: int = 5) -> list[Hit]:
+        q = self._vec(grams(query))
+        best: dict[str, tuple[float, str]] = {}
+        for (name, text), v in zip(self.items, self.vecs, strict=True):
+            s = sum(w * v.get(g, 0) for g, w in q.items())
+            if s > best.get(name, (-1, ""))[0]:
+                best[name] = (s, text)
+        ranked = sorted(best.items(), key=lambda kv: -kv[1][0])
+        return [Hit(name, round(s, 4), text[:160]) for name, (s, text) in ranked[:k] if s > 0]
