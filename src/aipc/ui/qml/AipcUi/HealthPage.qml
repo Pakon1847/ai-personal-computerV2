@@ -10,6 +10,50 @@ ColumnLayout {
         title: "สุขภาพเครื่อง"
         subtitle: "ตรวจจริงทุก 10 วินาที · อ่านอย่างเดียว ไม่แก้อะไรบนเครื่อง"
         AppButton { text: "ตรวจตอนนี้"; kind: "secondary"; onClicked: system.refresh() }
+        AppButton {
+            objectName: "readyButton"
+            text: system.readyBusy ? "กำลังตรวจ…" : "ตรวจความพร้อมก่อนสาธิต"
+            kind: "primary"; iconPath: Icons.check
+            enabled: !system.readyBusy
+            onClicked: system.checkReady()
+        }
+    }
+
+    // ผลตรวจความพร้อมก่อนสาธิต: เรื่องที่เจอจริง (ไฟเลี้ยง เน็ต นาฬิกา ความร้อน) พร้อมวิธีแก้
+    Card {
+        objectName: "readyCard"
+        visible: system.readyChecks.length > 0
+        Layout.fillWidth: true
+        implicitHeight: readyCol.implicitHeight + 32
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: readyCol
+            anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+            anchors.margins: 16
+            spacing: 8
+            AppText { objectName: "readySummary"; text: system.readySummary; strong: true; Layout.fillWidth: true }
+            Repeater {
+                model: system.readyChecks
+                delegate: ColumnLayout {
+                    id: rc
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: 2
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        Chip { text: rc.modelData.status; kind: rc.modelData.level }
+                        AppText { text: rc.modelData.title; strong: true }
+                        AppText { text: rc.modelData.detail; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                    }
+                    AppText {
+                        visible: rc.modelData.fix !== "" && rc.modelData.level !== "ok"
+                        text: "วิธีแก้: " + rc.modelData.fix
+                        size: Theme.fontSmall; color: Theme.warnInk; Layout.fillWidth: true
+                    }
+                }
+            }
+        }
     }
 
     GridLayout {

@@ -778,6 +778,23 @@ class ShellCardTest(unittest.TestCase):
         settle(50)
         self.assertEqual(warnings, [])
 
+    def test_ready_check_on_health_page(self):
+        """ตรวจความพร้อมก่อนสาธิต: กดแล้วตรวจในเธรดแยก · การ์ดสรุปพร้อมวิธีแก้."""
+        engine, win, warnings = self.open_shell("health")
+        system = engine._backends["system"]
+        inputs = {"ai_ready": False, "voice_available": True, "mic_available": True,
+                  "claude": "/usr/bin/claude"}  # fmt: skip
+        system.ready_inputs = lambda: inputs
+        find_items(win, "readyButton")[0].clicked.emit()
+        end = time.monotonic() + 15
+        while (system.readyBusy or not system.readyChecks) and time.monotonic() < end:
+            settle(50)
+        self.assertTrue(find_items(win, "readyCard")[0].property("visible"))
+        self.assertIn("ยังไม่พร้อม", system.readySummary)  # AI ไม่พร้อม = ต้องแก้
+        ai = [c for c in system.readyChecks if c["title"] == "AI ในเครื่อง"][0]
+        self.assertEqual(ai["level"], "danger")
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()

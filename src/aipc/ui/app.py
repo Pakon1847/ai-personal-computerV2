@@ -245,6 +245,15 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
     }
     chat.statusChanged.connect(engine._backends["skills"].skillsChanged)  # สกิลแปลพร้อมเมื่อ AI พร้อม
+    voice = engine._backends["voice"]
+
+    def ready_inputs() -> dict:
+        from aipc.cloud.ask import find_claude
+
+        return {"ai_ready": chat.ready, "voice_available": voice.available,
+                "mic_available": voice.micAvailable, "claude": find_claude()}  # fmt: skip
+
+    engine._backends["system"].ready_inputs = ready_inputs  # ตรวจความพร้อมก่อนสาธิต (หน้าเครื่อง)
     holder["skills"] = engine._backends["skills"]
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():

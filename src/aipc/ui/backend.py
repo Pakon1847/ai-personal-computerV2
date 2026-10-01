@@ -437,10 +437,20 @@ class SystemStatus(QObject):
 
     changed = Signal()
     healthChanged = Signal()  # noqa: N815
+    readyChanged = Signal()  # noqa: N815
+    _readyDone = Signal(object)  # noqa: N815
 
     def __init__(self, root: Path = Path("/")):
         super().__init__()
         self._root = root
+        # ตรวจความพร้อมก่อนสาธิต (aipc.doctor.ready) · app ใส่ ready_inputs ให้
+        # (AI พร้อม · เสียง · ไมค์ · Claude)
+        self.ready_inputs = lambda: {
+            "ai_ready": False, "voice_available": False, "mic_available": False, "claude": None
+        }  # fmt: skip
+        self._ready: list[dict] = []
+        self._ready_busy = False
+        self._readyDone.connect(self._on_ready)
         self._now = datetime.now()
         self._checks: list[dict] = []
         self._temp: float | None = None
@@ -453,9 +463,63 @@ class SystemStatus(QObject):
         self._probe.start()
         self.refresh()
 
+    @Slot()
     def _tick(self) -> None:
         self._now = datetime.now()
         self.changed.emit()
+
+    # ---------- ตรวจความพร้อมก่อนสาธิต ----------
+    @Property("QVariantList", notify=readyChanged)
+    def readyChecks(self) -> list:  # noqa: N802
+        return self._ready
+
+    @Property(bool, notify=readyChanged)
+    def readyBusy(self) -> bool:  # noqa: N802
+        return self._ready_busy
+
+    @Property(str, notify=readyChanged)
+    def readySummary(self) -> str:  # noqa: N802
+        if not self._ready:
+            return ""
+        bad = sum(c["level"] == "danger" for c in self._ready)
+        warn = sum(c["level"] in ("warn", "neutral") for c in self._ready)
+        ok = len(self._ready) - bad - warn
+        if bad:
+            return f"ยังไม่พร้อม · ต้องแก้ {bad} ข้อ · ผ่าน {ok}/{len(self._ready)}"
+        if warn:
+            return f"พร้อมสาธิต แต่ควรดู {warn} ข้อ · ผ่าน {ok}/{len(self._ready)}"
+        return f"พร้อมสาธิต · ผ่านครบ {ok}/{len(self._ready)}"
+
+    @Slot()
+    def checkReady(self) -> None:  # noqa: N802
+        import threading
+
+        from aipc.doctor import ready
+
+        if self._ready_busy:
+            return
+        self._ready_busy = True
+        self.readyChanged.emit()
+        inputs, root = self.ready_inputs(), self._root
+
+        def work():
+            try:
+                checks = ready.run_all(home=Path.home(), root=root, **inputs)
+            except Exception as e:  # noqa: BLE001 · บอกผู้ใช้แทนการค้าง
+                checks = [
+                    hardware.Check("ready", "ตรวจความพร้อม", hardware.UNKNOWN, f"ตรวจไม่สำเร็จ: {e}")
+                ]
+            self._readyDone.emit(checks)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(object)
+    def _on_ready(self, checks) -> None:
+        level = {hardware.PASS: "ok", hardware.WARN: "warn", hardware.FAIL: "danger"}
+        self._ready = [{"title": c.title, "status": c.status, "detail": c.detail, "fix": c.fix,
+                        "level": level.get(c.status, "neutral")} for c in checks]  # fmt: skip
+        self._ready_busy = False
+        self.readyChanged.emit()
 
     @Slot()
     def refresh(self) -> None:
