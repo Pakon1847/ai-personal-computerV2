@@ -585,7 +585,7 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(warnings, [])
 
     def test_auto_speak_reads_finished_answer(self):
-        """อ่านคำตอบอัตโนมัติ: ปิด (ค่าเริ่มต้น) = ไม่อ่าน · เปิด = อ่านเมื่อตอบจบ · ตอบไม่จบไม่อ่าน."""
+        """อ่านคำตอบออกเสียง: ค่าเริ่มต้นเปิด · ปุ่มลำโพงในหน้าแชทปิดได้ทันที · ตอบไม่จบไม่อ่าน."""
         engine, win, warnings = self.open_shell()
         voice, ui, chat = (engine._backends[k] for k in ("voice", "uiSettings", "chat"))
         said = []
@@ -616,13 +616,21 @@ class ShellCardTest(unittest.TestCase):
             chat.finished.emit(text, note)
             settle(30)
 
-        answer("ตอบครั้งแรก")
-        self.assertEqual(said, [])
-        ui.setAutoSpeak(True)
+        self.assertTrue(ui.speakAnswers)  # ค่าเริ่มต้นเปิด
         answer("น้ำคือ **H2O**")
         self.assertEqual(said, ["น้ำคือ H2O"])
         answer("ครึ่ง", "หยุดแล้ว")
+        self.assertEqual(len(said), 1)  # ตอบไม่จบไม่อ่าน
+        toggle = find_items(win, "speakToggle")[0]
+        self.assertEqual(toggle.property("Accessible.name") or "ปิดเสียงพูด", "ปิดเสียงพูด")
+        toggle.clicked.emit()  # ปิดเสียงพูดจากหน้าแชท
+        settle(30)
+        self.assertFalse(ui.speakAnswers)
+        answer("ตอบอีกครั้ง")
         self.assertEqual(len(said), 1)
+        toggle.clicked.emit()
+        settle(30)
+        self.assertTrue(ui.speakAnswers)
         self.assertEqual(warnings, [])
 
     def test_files_by_time_from_chat(self):
@@ -724,6 +732,46 @@ class ShellCardTest(unittest.TestCase):
         settle(50)
         self.assertFalse(voice.transcribing)
         self.assertEqual(find_all(win, "chatInput")[0].property("text"), "ตั้ง เสียง สามสิบ")
+        self.assertEqual(warnings, [])
+
+    def test_weather_asks_city_then_answers_without_claude(self):
+        """สกิลอากาศ: ไม่บอกเมือง = ถามกลับ · ตอบชื่อเมือง = พยากรณ์ Open-Meteo · ความรู้ไม่เข้าสกิล."""
+        from aipc.skills.weather import Weather
+
+        engine, win, warnings = self.open_shell()
+        skills = engine._backends["skills"]
+        sent = []
+        fc = {"current": {"temperature_2m": 30.2, "relative_humidity_2m": 60, "weather_code": 3},
+              "daily": {"temperature_2m_max": [33.0], "temperature_2m_min": [24.0],
+                        "precipitation_probability_max": [70], "weather_code": [61]}}  # fmt: skip
+        geo = {
+            "results": [
+                {"name": "เชียงใหม่", "country_code": "TH", "latitude": 18.79, "longitude": 98.98}
+            ]
+        }
+
+        def get(url, params, timeout=10):
+            return geo if "geocoding" in url else fc
+
+        skills._weather = Weather(get=get,
+                                  record=sent.append)  # fmt: skip
+        card = skills.handle("อากาศวันนี้เป็นยังไงบ้าง")
+        self.assertEqual((card["kind"], card["title"]), ("weather", "อากาศที่เมืองไหนครับ"))
+        self.assertEqual(sent, [])  # ยังไม่ส่งอะไรออก
+        card = skills.handle("เชียงใหม่")
+        self.assertEqual(card["title"], "เชียงใหม่ วันนี้ ฝนตกเล็กน้อย")
+        self.assertIn("โอกาสฝนตก 70% · พกร่มไปด้วยดีกว่า", card["lines"])
+        self.assertEqual(len(sent), 2)
+        self.assertNotEqual(skills.handle("ทำไมอากาศร้อนขึ้นทุกปี")["kind"], "weather")
+
+        def offline(*a, **k):
+            raise OSError("no network")
+
+        skills._weather = Weather(get=offline)
+        self.assertEqual(skills.handle("ตอนนี้กรุงเทพฝนตกไหม")["title"], "ดูพยากรณ์อากาศไม่ได้ตอนนี้")
+        page = find_all(win, "workspace")[0]
+        page.showCard(card)
+        settle(50)
         self.assertEqual(warnings, [])
 
     def test_latex_answers_become_plain_text(self):

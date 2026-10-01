@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 
 KEEP = 200
-KINDS = {"ask": "ถาม Claude", "skill": "ให้ Claude สร้างสกิล"}
+KINDS = {"ask": "ถาม Claude", "skill": "ให้ Claude สร้างสกิล", "weather": "ขอพยากรณ์อากาศ (Open-Meteo)"}
 
 
 def default_path() -> Path:

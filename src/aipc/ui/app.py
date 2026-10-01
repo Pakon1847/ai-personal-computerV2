@@ -119,6 +119,15 @@ def _skill_forge(budget=None, ledger=None):
     return run
 
 
+def _weather(ledger=None):
+    """สกิลอากาศ (Open-Meteo · Pakon อนุมัติ 2026-10-02) · ทุกครั้งที่ส่งชื่อเมือง/พิกัดออก = บันทึกใน ledger."""
+    from aipc.skills.weather import Weather
+
+    if ledger is None:
+        return Weather()
+    return Weather(record=lambda sent: ledger.record("weather", sent))
+
+
 def _local_model_name() -> str:
     """ชื่อโมเดลจาก /etc/aipc/llm.conf (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · อ่านไม่ได้ = ""."""
     from pathlib import Path
@@ -219,6 +228,7 @@ def build(opts: Options, argv: list[str] | None = None):
             llm_ready=lambda: chat.ready,
             forge=skill_forge,
             user_skills=user_skills,
+            weather=_weather(ledger) if in_session else None,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),

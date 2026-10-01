@@ -77,7 +77,9 @@ class Ask:
 def place_in(text: str) -> str:
     """ชื่อจังหวัด/เมืองในประโยค (ชื่อเต็มที่ใช้ค้นพิกัด) · ไม่มี = ""."""
     for p in PLACES:
-        if p in text:
+        for m in re.finditer(re.escape(p), text):
+            if p == "ตาก" and re.match(r"ตาก\s*(ผ้า|แดด|เสื้อ|ปลา)", text[m.start() :]):
+                continue  # "ตากผ้า" ไม่ใช่จังหวัดตาก (พบในชุดอิสระ 2026-10-02)
             return ALIASES.get(p, p)
     return ""
 

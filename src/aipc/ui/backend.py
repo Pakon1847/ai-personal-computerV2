@@ -53,13 +53,13 @@ class UiSettings(QObject):
         return self._prefs.onboarded
 
     @Property(bool, notify=changed)
-    def autoSpeak(self) -> bool:  # noqa: N802
-        return self._prefs.auto_speak
+    def speakAnswers(self) -> bool:  # noqa: N802
+        return self._prefs.speak_answers
 
     @Slot(bool)
-    def setAutoSpeak(self, on: bool) -> None:  # noqa: N802
-        if bool(on) != self._prefs.auto_speak:
-            self._prefs.auto_speak = bool(on)
+    def setSpeakAnswers(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.speak_answers:
+            self._prefs.speak_answers = bool(on)
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
@@ -1135,7 +1135,8 @@ class SkillsController(QObject):
     _forged = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
-                 run_timer: bool = True, llm_ready=None, forge=None, user_skills=None):  # fmt: skip
+                 run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
+                 weather=None):  # fmt: skip
         super().__init__()
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
@@ -1152,6 +1153,9 @@ class SkillsController(QObject):
         self._exec = executor or actions.Executor()
         self._root = root
         self._home = Path.home()  # หาไฟล์ด้วยการพิมพ์ในแชท ค้นใน home ของผู้ใช้
+        # สกิลอากาศ (aipc.skills.weather.Weather · Open-Meteo) · None = ไม่มี (หน้า Login)
+        self._weather = weather
+        self._weather_day: str | None = None  # ถามเมืองกลับแล้ว รอผู้ใช้ตอบชื่อเมือง
         self._file_search = None
         self._pending: dict[str, object] = {}
         self._counter = 0
@@ -1599,6 +1603,21 @@ class SkillsController(QObject):
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
             return card
         from aipc.skills.fileintent import file_intent, file_time
+        from aipc.skills.weather import place_in, weather_intent
+
+        if self._weather is not None:
+            if self._weather_day is not None:  # ตอบชื่อเมืองที่ถามกลับไป
+                day, self._weather_day = self._weather_day, None
+                city = place_in(text) or (text.strip() if len(text.strip()) <= 30 else "")
+                if city:
+                    return self._weather_card(day, city)
+            if ask := weather_intent(text):  # อากาศจริง = Open-Meteo โดยตรง ไม่ผ่าน Claude
+                if not ask.city:
+                    self._weather_day = ask.day
+                    return {"kind": "weather", "badge": {}, "chips": [], "confirmToken": "",
+                            "page": "", "title": "อากาศที่เมืองไหนครับ",
+                            "lines": ["พิมพ์ชื่อจังหวัดหรือเมือง เช่น เชียงใหม่ · กทม. · หาดใหญ่"]}  # fmt: skip
+                return self._weather_card(ask.day, ask.city)
 
         if label := file_time(text):  # ดูไฟล์ตามช่วงเวลา ("ไฟล์ที่แก้เมื่อวาน")
             return self._files_card(text, label)
@@ -1614,6 +1633,21 @@ class SkillsController(QObject):
                 )
             return self._card(r, text)
         return self._card(router.route(text, self._skills, self.available()), text)
+
+    def _weather_card(self, day: str, city: str) -> dict:
+        from aipc.skills.weather import Ask, answer
+
+        card = {"kind": "weather", "badge": {}, "chips": [], "confirmToken": "", "page": ""}
+        try:
+            place, fc = self._weather.lookup(city)
+        except LookupError:
+            return {**card, "title": f"ไม่รู้จักเมือง “{city}”", "lines": ["ลองพิมพ์ชื่อจังหวัดเต็ม ๆ อีกครั้ง"]}
+        except (OSError, ValueError):
+            return {**card, "title": "ดูพยากรณ์อากาศไม่ได้ตอนนี้",
+                    "lines": ["เครื่องต่ออินเทอร์เน็ตไม่ได้ หรือบริการพยากรณ์อากาศไม่ตอบ",
+                              "ลองใหม่อีกครั้ง"]}  # fmt: skip
+        title, lines = answer(Ask(day, city), place, fc)
+        return {**card, "title": title, "lines": lines}
 
     def _files_card(self, text: str, label: str | None = None) -> dict:
         """ผลค้นไฟล์ใน home (aipc.files_search) · ผล docs/benchmarks/2026-10-01-file-intent."""
