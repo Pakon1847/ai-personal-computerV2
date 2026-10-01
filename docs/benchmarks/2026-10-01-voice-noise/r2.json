@@ -1,0 +1,4405 @@
+{
+ "model": "thonburian-distill-small-f16.bin",
+ "rows": [
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 1.98
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.11
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ไปหน้า ผู้ ช่วย หน่อย",
+   "seconds": 2.2
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ใครหน้าผู้ช่วยหน่อย",
+   "seconds": 2.25
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ใครหน้าผู้ช่วยหน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ปฏิไปหน้าพวกช่วยหน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ปฏิบายหน้าพวกช่วยหน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ปฏิบัยหน้าพุ่งช่วยหน่อย",
+   "seconds": 2.34
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ไปหน้าพวกช่วยหน่อย",
+   "seconds": 2.27
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ปฏิไปหน้าพุ่งช่วยหน่อย",
+   "seconds": 2.34
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ใบหน้าผู้ช่วยหน่อย",
+   "seconds": 2.27
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ใบหน้าผู้ช่วยหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ใบหน้าพวกช่วยหน่อย",
+   "seconds": 2.43
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ใบหน้าผู้ช่วยหน่อย",
+   "seconds": 2.25
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.22
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.24
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.25
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.25
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.24
+  },
+  {
+   "i": 0,
+   "text": "ไปหน้าผู้ช่วยหน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ไปหน้าผู้ช่วยหน่อย",
+   "seconds": 2.22
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิด หน้า ไฟ",
+   "seconds": 2.38
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.12
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิด หน้า ไฟ",
+   "seconds": 2.12
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิด หน้า ไฟ",
+   "seconds": 2.14
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิด หน้า ไฟ",
+   "seconds": 2.12
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.29
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.24
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดหน้าไฟ เปิดโปรด",
+   "seconds": 2.27
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.22
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.25
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.25
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.32
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.23
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.28
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.28
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.13
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.12
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.08
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.1
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.08
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.12
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.07
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.08
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.1
+  },
+  {
+   "i": 1,
+   "text": "เปิดหน้าไฟล์",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดหน้าไฟ",
+   "seconds": 2.09
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.51
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิด เค้าเปิดไฟของฉันครับ",
+   "seconds": 2.46
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิด เค้าเปิดไฟของฉันครับ",
+   "seconds": 2.5
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดท้อเปิดไฟของฉันครับ",
+   "seconds": 2.49
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เพราะเปิดไฟของฉันครับ",
+   "seconds": 2.5
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเคราะห์เปิดไฟของฉันครับ",
+   "seconds": 2.46
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.47
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดขอเปิดไฟของฉันครับ",
+   "seconds": 2.4
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.25
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.42
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.37
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.35
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.25
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เด็ดขอเปิดไฟของฉันครับ",
+   "seconds": 2.39
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.35
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.37
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.37
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.35
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.28
+  },
+  {
+   "i": 2,
+   "text": "ขอเปิดไฟล์ของฉันครับ",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดไฟของฉันครับ",
+   "seconds": 2.26
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ขอ ดู สกิม ทั้งหมด",
+   "seconds": 2.59
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ขอ ดู สกิม ทั้งหมด",
+   "seconds": 2.28
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ขอ ดู สกิล ทั้งหมด",
+   "seconds": 2.25
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ขอ ดู สกิม ทั้ง หมด",
+   "seconds": 2.32
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอ ดู สกิม ทั้ง หมด",
+   "seconds": 2.33
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดตัวจำเอง ขอดูดกินทั้งหมด เปิดอีเมร์",
+   "seconds": 2.73
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดๆ ขอดูดกินทั้งหมด เปิดๆ ขอดูดกินทั้งหมด เปิดๆ อีเมล์",
+   "seconds": 3.03
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดต้วนจำกลังไปทั้งหมด เปิดต้วนจำกลังไปทั้งหมด อีเมร์",
+   "seconds": 2.91
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ขอดูลยังกินทั้งหมด อีเมร์",
+   "seconds": 2.46
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอดูกิ่งทั้งหมด อีเมล์",
+   "seconds": 2.38
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ขอดูสกรีมทั้งหมด",
+   "seconds": 2.35
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ขอดูสกรีมทั้งหมด",
+   "seconds": 2.35
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอดูกินทั้งหมด",
+   "seconds": 2.21
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.35
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอดูกินทั้งหมด",
+   "seconds": 2.2
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.27
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.27
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ขอดูสกินทั้งหมด",
+   "seconds": 2.25
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ขอดูสกินทั้งหมด",
+   "seconds": 2.28
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอดูสกินทั้งหมด",
+   "seconds": 2.24
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.24
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.24
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ขอดูสกินทั้งหมด",
+   "seconds": 2.23
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.28
+  },
+  {
+   "i": 3,
+   "text": "ขอดูสกิลทั้งหมด",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอดูสกิลทั้งหมด",
+   "seconds": 2.26
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ขอ เข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.52
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ขอ เข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.52
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ขอ เข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.52
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.54
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.53
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.52
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.56
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดเข้าความเป็นส่วนตัวครับ เปิดกุ้ง",
+   "seconds": 2.62
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ขอข้าวความเป็นส่วนตัวครับ",
+   "seconds": 2.43
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.4
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.73
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.73
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.71
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.47
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.86
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.43
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.52
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.42
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.43
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.43
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.46
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.45
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.76
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.58
+  },
+  {
+   "i": 4,
+   "text": "ขอเข้าความเป็นส่วนตัวครับ",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเข้าความเป็นส่วนตัวครับ",
+   "seconds": 2.51
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.39
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.35
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.34
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.42
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ในหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.37
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.48
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.5
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.47
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.5
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.43
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.49
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.44
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.63
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ไปหน้าสุขภาพเคลื่อนหน่อย",
+   "seconds": 2.75
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.63
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.66
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.73
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.72
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 3.48
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.33
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.4
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.39
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.31
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.33
+  },
+  {
+   "i": 5,
+   "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ไปหน้าสุขภาพเครื่องหน่อย",
+   "seconds": 2.37
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.11
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.12
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.16
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.21
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.11
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดการตั้งค้า ดังขึ้นอีก",
+   "seconds": 2.37
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดการตั้งค้า ดังขึ้นอีก",
+   "seconds": 2.35
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดการตั้งค่า ดังขึ้นอีก",
+   "seconds": 2.39
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดการตั้งค้า ดังขึ้นอีก",
+   "seconds": 2.56
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดการตั้งค้า ดังขึ้นอีก",
+   "seconds": 2.57
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดการตั้งค้า",
+   "seconds": 2.14
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดการตั้งค่า ดังขึ้นเอง",
+   "seconds": 2.31
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.38
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดการตั้งค้า",
+   "seconds": 2.15
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดการตั้งข้าง",
+   "seconds": 2.11
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.22
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.12
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.23
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.19
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.56
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.17
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.31
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.11
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.25
+  },
+  {
+   "i": 6,
+   "text": "เปิดการตั้งค่า",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดการตั้งค่า",
+   "seconds": 2.13
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.24
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.26
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.16
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.19
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิด YouTube ให้หน่อย เปิดหน่อย",
+   "seconds": 2.35
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิด YouTube ให้หน่อย เปิดหน่อย",
+   "seconds": 2.33
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิด youtube ให้หน่อย เปลี่ยนหน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิด YouTube ให้หน่อย เปิดน้อย",
+   "seconds": 2.26
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิด YouTube ให้หน่อย แต่หน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดยูทูปให้หน่อย เปิดน้อย",
+   "seconds": 2.36
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดยูทูปให้หน่อย เปิดน้อย",
+   "seconds": 2.38
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดyoutube ให้หน่อย เป็นหน่อย",
+   "seconds": 2.31
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดyoutube ให้หน่อย เปลี่ยนหน่อย",
+   "seconds": 2.42
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิด YouTube ให้หน่อย เปลี่ยนหน่อย",
+   "seconds": 2.31
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.17
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.16
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.37
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.16
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.16
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.17
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.16
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.17
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.19
+  },
+  {
+   "i": 7,
+   "text": "เปิดยูทูปให้หน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดยูทูปให้หน่อย",
+   "seconds": 2.14
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.07
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.07
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.11
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.11
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "สวัสดี แมน",
+   "seconds": 2.1
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ขอเสียเกิดอีเมร์หน่อย",
+   "seconds": 5.57
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ขอเสียเกิดอีเมร์หน่อย",
+   "seconds": 2.6
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ขอเสียงเบาเบาเบาเบาหน่อย",
+   "seconds": 2.87
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ขอเสียงเปิดอีเมนด์ ขอด",
+   "seconds": 2.9
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เพราะเสียงบ่าเกิดอีเมนด์",
+   "seconds": 2.55
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.1
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.11
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.07
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.11
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.09
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.1
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.09
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เอิร์ดอีเมน",
+   "seconds": 2.13
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.54
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.1
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.1
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.11
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เอิร์ตอีเมน",
+   "seconds": 2.14
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.23
+  },
+  {
+   "i": 8,
+   "text": "เปิดอีเมล",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดอีเมน",
+   "seconds": 2.09
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.17
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.21
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ขอปิดแวบกลูบเติน ขอปิด",
+   "seconds": 2.42
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ขอเปิดแวบกลูกเติน ขอเปิด",
+   "seconds": 2.45
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดเว็บกูบเกิน ขอเปิด",
+   "seconds": 2.39
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ขอเปิดเว็บกูบเกิน ขอเปิด",
+   "seconds": 2.44
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดเว็บกลูบเดือน ขอเปิด",
+   "seconds": 2.43
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดเว็บกลูกเกิน",
+   "seconds": 2.3
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดเว็บกลูกเกิน",
+   "seconds": 2.36
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดเว็บกูเกิน ขอเปิด",
+   "seconds": 2.31
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.34
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดเว็บกูเกินขอเปิด",
+   "seconds": 2.43
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.23
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.24
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.2
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.18
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดแวบกูเกิน",
+   "seconds": 2.2
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 9,
+   "text": "เปิดเว็บกูเกิล",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเว็บกูเกิน",
+   "seconds": 2.19
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดวิกกี้",
+   "seconds": 2.07
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดวิกกี้",
+   "seconds": 2.06
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "อดวิกกี้",
+   "seconds": 2.06
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดวิกกี้",
+   "seconds": 2.09
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "อิธวิกกี้",
+   "seconds": 2.09
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดเสียงให้วิจัดการไฟ",
+   "seconds": 2.31
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดเสียงให้วิจัดการไฟ",
+   "seconds": 2.29
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดเสียงแพร่ไหว จัดการไฟ",
+   "seconds": 2.4
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดวิจัดการไฟ",
+   "seconds": 2.34
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเสียงแพร่หวิกิ",
+   "seconds": 2.2
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดวิกิ",
+   "seconds": 2.08
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดวิกิ",
+   "seconds": 2.06
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดวิ่งกี่",
+   "seconds": 2.11
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดวิกิ",
+   "seconds": 2.17
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดวิจากการไป",
+   "seconds": 2.11
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดวิกกี้",
+   "seconds": 5.48
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดวิกกี้",
+   "seconds": 5.84
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดวิกกี้",
+   "seconds": 5.41
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดวิกกี้",
+   "seconds": 2.03
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ออกวิกกี้",
+   "seconds": 2.05
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดวิกกี้",
+   "seconds": 2.11
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดวิกกี้",
+   "seconds": 2.06
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "อิธวิกกี้",
+   "seconds": 2.07
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดวิกกี้",
+   "seconds": 5.49
+  },
+  {
+   "i": 10,
+   "text": "เปิดวิกิ",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "อดวิกกี้",
+   "seconds": 2.04
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.25
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.29
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.29
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.31
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดแผลที่ Google หน่อย ตั้งเสียง",
+   "seconds": 2.47
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ตั้งเปิดแผลที่กูเกินหน่อย ตั้งเสียง",
+   "seconds": 2.65
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ไปนั่งเสียงแผลที่กูเกินหน่อย",
+   "seconds": 2.4
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดแผลที่กูเกินหน่อย",
+   "seconds": 2.66
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแผลที่กูเกินหน่อย",
+   "seconds": 2.26
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดแผลที่กูเกินหน่อย",
+   "seconds": 2.32
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดแผลที่กูเกินหน่อย",
+   "seconds": 2.29
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแผลที่กูเกินหน่อย",
+   "seconds": 2.24
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.31
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.29
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.28
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.29
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.31
+  },
+  {
+   "i": 11,
+   "text": "เปิดแผนที่กูเกิลหน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแผลที่ Google หน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.16
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.22
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.2
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "บราวเซอร์",
+   "seconds": 2.19
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.19
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดดังเปิดเปล่าเซอร์ เปิดดัง",
+   "seconds": 2.62
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดดัง เปิดดัง เปิดเปล่าเซอร์ เปิดดัง",
+   "seconds": 2.97
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิด ดัง เปิด ดัง เปิด ดัง เปิด ดัง",
+   "seconds": 5.8
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ดังเปิดเปล่าเซอร์",
+   "seconds": 2.53
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิด ดัง เปิด เปิด เปิด ดัง เปิด ดัง",
+   "seconds": 6.33
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดเปล่าวเซอร์",
+   "seconds": 2.65
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดเปล่าวเซอร์",
+   "seconds": 5.56
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิด เปิด เปิด เปิด เปิด เปิด ดัง",
+   "seconds": 2.53
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดเปราวน์เซอร์",
+   "seconds": 2.28
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.16
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.26
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.23
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.29
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดบราวเซอร์",
+   "seconds": 2.17
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.2
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.2
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.19
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.14
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.22
+  },
+  {
+   "i": 12,
+   "text": "เปิดบราวเซอร์",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดบราวน์เซอร์",
+   "seconds": 2.16
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิด เว็บ บราวเซอร์ หน่อย",
+   "seconds": 2.45
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิด เว็บ บราวเซอร์ หน่อย",
+   "seconds": 2.43
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิด เว็บ บราวเซอร์ หน่อย",
+   "seconds": 2.44
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เว็บเว็บเว็บเวลเซอร์หน่อย",
+   "seconds": 2.55
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิด เว็บ ราวเซอร์ หน่อย",
+   "seconds": 2.44
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ลดเปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.44
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ลดเปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.48
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ลดเปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.42
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ลดเปิดเว็บดราวเซอร์หน่อย",
+   "seconds": 2.73
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ลดเปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดเว็บดราวเซอร์หน่อย",
+   "seconds": 2.4
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เติดเว็บดราวเซอร์หน่อย",
+   "seconds": 2.43
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.38
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดเว็บดราวเซอร์หน่อย",
+   "seconds": 2.36
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเว็บดราวเซอร์หน่อย",
+   "seconds": 2.39
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.39
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.4
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.37
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.37
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.4
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.35
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.39
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดเว็บบราวเซอร์หน่อย",
+   "seconds": 2.45
+  },
+  {
+   "i": 13,
+   "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเว็บราวเซอร์หน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.35
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.38
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดตัวจัดการไฟรัฟ",
+   "seconds": 2.37
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.33
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ขอ เปิดตัวจัดการไฟล้า ขอ ดู เสียง",
+   "seconds": 2.75
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ขอ เปิดตัวจัดการไฟล้า ขอ ดู เสียง",
+   "seconds": 3.22
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดตัวจัดการไฟล้าขอดุเสียง",
+   "seconds": 2.6
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดตัวจัดการไฟล้า",
+   "seconds": 2.51
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเปิดตัวจัดการไฟราฟอร์ดูเสี่ยง",
+   "seconds": 2.55
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดตัวจัดการไฟล้า",
+   "seconds": 2.52
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดตัวจัดการไฟล้า",
+   "seconds": 2.43
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอเปิดตัวจัดการไฟราฟ",
+   "seconds": 2.56
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดตัวจัดการไฟราฟ",
+   "seconds": 2.33
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดตัวจัดการไฟราฟ",
+   "seconds": 2.5
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.31
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดตัวจัดการไฟรัฟ",
+   "seconds": 2.32
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.35
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดตัวจัดการไฟรัฟ",
+   "seconds": 2.32
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.33
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.3
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "จะเปิดตัวจัดการไฟรับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 14,
+   "text": "เปิดตัวจัดการไฟล์ครับ",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดตัวจัดการไฟรับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.21
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.22
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.24
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิด แอป จัด การ ไฟ",
+   "seconds": 2.28
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิด แอป จัด การ ไฟ",
+   "seconds": 2.27
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ขอเปิดแอปสันการไฟ",
+   "seconds": 2.46
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ขอเปิดแอปสัตว์การไฟ",
+   "seconds": 2.45
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดทีแอปสัตว์การไฟ ปิดเสียง",
+   "seconds": 2.46
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดในแอปสั่งการไฟ ปิดเสียง",
+   "seconds": 2.46
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดทีแอปสันการไฟ",
+   "seconds": 2.3
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดแอปสัตย์การไฟ",
+   "seconds": 2.29
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดแอปสัตย์การไฟ",
+   "seconds": 2.27
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดในแอปจากการไฟ",
+   "seconds": 2.25
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.24
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.27
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.24
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.23
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.22
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.25
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.43
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.23
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.23
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.21
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.24
+  },
+  {
+   "i": 15,
+   "text": "เปิดแอปจัดการไฟล์",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดแอปจัดการไฟ",
+   "seconds": 2.25
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.47
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.49
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.39
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.45
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.73
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ตั้งเสียเป็นยี่สิบห้าครับ",
+   "seconds": 2.56
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ตั้งเสียเป็นยี่สิบห้าครับ",
+   "seconds": 2.41
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้ากราฟไปนะ",
+   "seconds": 2.42
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ตั้งเสียเป็นยี่สิบห้าครับ",
+   "seconds": 2.42
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "สร้างเสี่ยงเป็นยี่สิบห้าครับ",
+   "seconds": 2.5
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ตั้งเสียงเป็น 25 ครับ",
+   "seconds": 2.73
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ตั้งเสียงเป็น 25 ครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.37
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.38
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.34
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.32
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "seconds": 2.33
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ตั้งเสียงเป็น 25 ครับ",
+   "seconds": 2.42
+  },
+  {
+   "i": 16,
+   "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ตั้งเสียงเป็น 25 ครับ",
+   "seconds": 2.35
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.15
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.2
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.2
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.26
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.29
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดดังขึ้นอีกหน่อย",
+   "seconds": 2.36
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดดังขึ้นอีกหน่อย",
+   "seconds": 2.34
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดการดังขึ้นอีกหน่อย",
+   "seconds": 2.65
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.34
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดดังขึ้นอีกหน่อย",
+   "seconds": 2.48
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.5
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.47
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดดังขึ้นอีกหน่อย",
+   "seconds": 2.54
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.5
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.32
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.42
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.43
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.44
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.42
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.43
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.41
+  },
+  {
+   "i": 17,
+   "text": "ดังขึ้นอีกหน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ดังขึ้นอีกหน่อย",
+   "seconds": 2.2
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ลด เสียง หน่อย",
+   "seconds": 2.11
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ลด เสียง หน่อย",
+   "seconds": 2.11
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ลด เสียง หน่อย",
+   "seconds": 2.51
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "รถ เสียง หน่อย",
+   "seconds": 2.18
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "รถ เสียง หน่อย",
+   "seconds": 2.13
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดรถเสียงหน่อย",
+   "seconds": 5.72
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดรถเสียงหน่อย",
+   "seconds": 5.46
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดยิโรสเสียงหน่อย",
+   "seconds": 2.3
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดรถเสียงหน่อย",
+   "seconds": 2.36
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดรถเสียงหน่อย",
+   "seconds": 2.35
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิด ลด เสียง หน่อย เปิด ได้",
+   "seconds": 2.36
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "รสเสียงหน่อย",
+   "seconds": 2.22
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดลดเสียงหน่อย",
+   "seconds": 2.37
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิด ลด เสียง หน่อย เปิด ได้",
+   "seconds": 2.35
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 5.5
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.06
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.11
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.11
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.12
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ลดเสียงหน่อย",
+   "seconds": 2.1
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.12
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.12
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.09
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.12
+  },
+  {
+   "i": 18,
+   "text": "ลดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "รถเสียงหน่อย",
+   "seconds": 2.09
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.23
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.25
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.22
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.3
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.27
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดอีแม่ ขอเสียงเบาลงครับ เปิดอีเมล์",
+   "seconds": 2.62
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดอีเมล์ ขอเสียงเบาลงครับ เปิดอีเมล์",
+   "seconds": 2.64
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดขอเสียงเบาลงครับ อีเมล์",
+   "seconds": 2.58
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "อี ขอเสียงเบาลงครับ อีเมล์",
+   "seconds": 2.44
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเสียงเบาลงครับ อีเมล์",
+   "seconds": 2.33
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.46
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.29
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอเสียงเบาลงครับ อีเมล์",
+   "seconds": 2.32
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 5.53
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดขอเสียงเบาลงครับ อีเมล์",
+   "seconds": 2.34
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.31
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.39
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.37
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.31
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.36
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.39
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.59
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 5.56
+  },
+  {
+   "i": 19,
+   "text": "ขอเสียงเบาลงครับ",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอเสียงเบาลงครับ",
+   "seconds": 2.2
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.22
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.19
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.22
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "ขอปีเสียงหน่อย",
+   "seconds": 2.16
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.18
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดให้เสียงหน่อย",
+   "seconds": 2.5
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 5.54
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.33
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 5.54
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.14
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.36
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.18
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.21
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.22
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 5.51
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.14
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.24
+  },
+  {
+   "i": 20,
+   "text": "ขอปิดเสียงหน่อย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ขอปิดเสียงหน่อย",
+   "seconds": 2.23
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "clean",
+   "filter": "none",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.09
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "clean",
+   "filter": "hp100",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.11
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "clean",
+   "filter": "rnnoise",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.09
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "clean",
+   "filter": "vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.17
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "clean",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "ก็เสียงด้วย",
+   "seconds": 2.11
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble5",
+   "filter": "none",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.48
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble5",
+   "filter": "hp100",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.27
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble5",
+   "filter": "rnnoise",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.32
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble5",
+   "filter": "vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.38
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.27
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room5",
+   "filter": "none",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.28
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room5",
+   "filter": "hp100",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.25
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room5",
+   "filter": "rnnoise",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.31
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room5",
+   "filter": "vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.32
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room5",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.42
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble20",
+   "filter": "none",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.31
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble20",
+   "filter": "hp100",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.28
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble20",
+   "filter": "rnnoise",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.43
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble20",
+   "filter": "vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.43
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "babble20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.29
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room20",
+   "filter": "none",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.28
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room20",
+   "filter": "hp100",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.43
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room20",
+   "filter": "rnnoise",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.09
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room20",
+   "filter": "vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.17
+  },
+  {
+   "i": 21,
+   "text": "เปิดเสียงด้วย",
+   "noise": "room20",
+   "filter": "hp100+rnnoise+vad",
+   "heard": "เปิดเสียงด้วย",
+   "seconds": 2.13
+  }
+ ]
+}
