@@ -63,7 +63,7 @@ def transcribe(path: str) -> tuple[str, float]:
 
 
 def main() -> int:
-    sents = json.load(open(sys.argv[1], encoding="utf-8"))
+    sents = json.load(open(sys.argv[1], encoding="utf-8"))[::2]  # 22 ประโยค (Pi ร้อนจนช้า · ดูหมายเหตุใน README)
     voice = PiperVoice.load(f"{D}/th_TH-tsync2-medium.onnx")
     rng = np.random.default_rng(20261001)
     rows = []
