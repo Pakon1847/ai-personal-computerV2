@@ -355,10 +355,12 @@ class FaceController(QObject):
         return False, f"ไม่ผ่าน: {res.advice}"
 
     # ---------- กลับมาที่เธรดหลัก ----------
+    @Slot(str, "QVariantMap")
     def _on_progress(self, advice: str, counts: dict) -> None:
         self._advice, self._poses = advice, counts
         self.changed.emit()
 
+    @Slot(list, float)
     def _on_preview(self, frac: list, reach: float) -> None:
         if not self._busy:  # ภาพที่มาถึงหลังงานจบแล้ว ไม่ต้องแสดง
             return
@@ -372,6 +374,7 @@ class FaceController(QObject):
         self._preview_serial, self._face_box, self._preview_on, self._reach = 0, [], False, 0.0
         self.previewChanged.emit()
 
+    @Slot(bool, str)
     def _on_done(self, ok: bool, message: str) -> None:
         self._busy, self._advice, self._poses = False, "", {}
         self._clear_preview()

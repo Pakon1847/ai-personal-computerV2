@@ -285,6 +285,11 @@ def shutdown(engine) -> None:
         voice.close()
     if shiboken6.isValid(engine):
         shiboken6.delete(engine)
+    # ชิ้นหน้าจอที่ Qt ตั้งให้ลบทีหลัง (deleteLater) ต้องหายก่อนปล่อย backend · ไม่งั้นมันทำงานต่อในรอบ event ถัดไป
+    # แล้วอ่าน backend ที่ถูกลบไปแล้ว (พบ 2026-10-01: เทสต์หน้าจอล้มสลับข้อ "voice/face เป็น undefined")
+    from PySide6.QtCore import QCoreApplication, QEvent
+
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     backends.clear()
 
 

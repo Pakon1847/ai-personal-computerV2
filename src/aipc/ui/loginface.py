@@ -79,6 +79,7 @@ class LoginFaceController(QObject):
     def disable(self, password: str) -> bool:
         return self._run({"op": "remove", "username": self._user, "password": password})
 
+    @Slot(object)
     def _on_hint(self, m: dict) -> None:
         self.enroll_view.update(m)
         hint = str(m.get("hint", ""))
@@ -86,6 +87,7 @@ class LoginFaceController(QObject):
             self._message = hint
             self.changed.emit()
 
+    @Slot(object)
     def _on_done(self, res: dict) -> None:
         self._busy = False
         self.enroll_view.clear()
