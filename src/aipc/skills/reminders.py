@@ -16,7 +16,7 @@ import json
 import os
 import shutil
 import uuid
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -56,6 +56,9 @@ class Reminder:
     created: datetime = field(default_factory=lambda: datetime.now().astimezone())
     remind_before_min: int = 0
     fired: bool = False
+    repeat: str = (
+        ""  # นัดซ้ำ (when.repeat_rule): daily | weekdays | weekends | weekly:<0–6> · "" = ครั้งเดียว
+    )
 
     @property
     def alert_at(self) -> datetime:
@@ -76,6 +79,21 @@ class Reminder:
             created=datetime.fromisoformat(d["created"]),
             remind_before_min=int(d.get("remind_before_min", 0)),
             fired=bool(d.get("fired", False)),
+            repeat=str(d.get("repeat", "")),
+        )
+
+    def advance(self, now: datetime) -> None:
+        """นัดซ้ำ: เลื่อนไปครั้งถัดไปที่ยังไม่ถึงเวลาเตือน.
+
+        ปิดเครื่องไปหลายวันก็ข้ามไปครั้งถัดไปทีเดียว ไม่เตือนย้อนทุกรอบ
+        """
+        from aipc.skills.when import next_on
+
+        when = aware(self.when)
+        self.when = next_on(
+            self.repeat,
+            when.time(),
+            max(when, aware(now) + timedelta(minutes=self.remind_before_min)),
         )
 
 
@@ -186,9 +204,14 @@ def tick(store: ReminderStore, now: datetime) -> Tick:
     """เรียกทุก ~30 วินาทีระหว่างเซสชัน · คืนรายการที่ต้องเตือนตอนนี้ แล้วบันทึกว่าเตือนแล้ว."""
     now = aware(now)
     back = clock_went_back(store, now)
-    due = [r for r in store.items if not r.fired and r.alert_at <= now]
-    for r in due:
-        r.fired = True
+    hit = [r for r in store.items if not r.fired and r.alert_at <= now]
+    due = []
+    for r in hit:
+        due.append(replace(r))  # สำเนา: หน้าจอแสดงเวลาของครั้งนี้ ไม่ใช่ครั้งถัดไป
+        if r.repeat:
+            r.advance(now)  # นัดซ้ำไม่ "เตือนแล้ว" · ตั้งครั้งถัดไปเอง
+        else:
+            r.fired = True
     stale = store.last_seen is None or now - store.last_seen >= SEEN_EVERY
     failed = False
     if due or (stale and not back):
@@ -202,6 +225,18 @@ def tick(store: ReminderStore, now: datetime) -> Tick:
 
 
 def missed_since_last_session(store: ReminderStore, now: datetime) -> list[Reminder]:
-    """ตอนเข้าใช้: นัดที่เลยเวลาไปแล้วโดยยังไม่ได้เตือน (เพราะปิดเครื่องหรือ Logout อยู่)."""
+    """ตอนเข้าใช้: นัดที่เลยเวลาไปแล้วโดยยังไม่ได้เตือน (เพราะปิดเครื่องหรือ Logout อยู่).
+
+    รายงานครั้งเดียว: นัดครั้งเดียวตั้ง fired · นัดซ้ำเลื่อนไปครั้งถัดไป · ผู้เรียกบันทึก
+    """
     now = aware(now)
-    return [r for r in store.items if not r.fired and aware(r.when) < now - CLOCK_SLACK]
+    out = []
+    for r in store.items:
+        if r.fired or aware(r.when) >= now - CLOCK_SLACK:
+            continue
+        out.append(replace(r))
+        if r.repeat:
+            r.advance(now)
+        else:
+            r.fired = True  # ไม่เตือนซ้ำเมื่อถึงรอบตรวจ
+    return out

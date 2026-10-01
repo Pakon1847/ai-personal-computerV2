@@ -145,6 +145,24 @@ class SchedulerTest(unittest.TestCase):
         missed = rm.missed_since_last_session(on_disk, due_at + timedelta(hours=1))
         self.assertEqual([r.what for r in missed], ["กินยา"])
 
+    def test_repeat_survives_disk_and_advances(self):
+        first = NOW.replace(hour=20)  # พุธ 20:00
+        self.s.add(rm.Reminder("กินยา", first, repeat="weekdays"), NOW)
+        again = rm.ReminderStore(self.s.path)
+        self.assertEqual(again.items[0].repeat, "weekdays")
+        due = rm.tick(again, first)
+        self.assertEqual([r.when for r in due.due], [first])  # หน้าจอเห็นเวลาของครั้งนี้
+        self.assertEqual(again.items[0].when, first + timedelta(days=1))  # พฤหัส
+        self.assertFalse(again.items[0].fired)
+        rm.tick(again, first + timedelta(days=2))  # ศุกร์ → ข้ามเสาร์อาทิตย์
+        self.assertEqual(again.items[0].when, first + timedelta(days=5))  # จันทร์
+        self.assertEqual(rm.ReminderStore(self.s.path).items[0].when, first + timedelta(days=5))
+
+    def test_old_file_without_repeat_still_loads(self):
+        d = rm.Reminder("ส่งงาน", NOW).to_json()
+        del d["repeat"]
+        self.assertEqual(rm.Reminder.from_json(d).repeat, "")
+
     def test_upcoming_sorted(self):
         self.s.add(rm.Reminder("สอง", NOW + timedelta(hours=2)), NOW)
         self.s.add(rm.Reminder("หนึ่ง", NOW + timedelta(hours=1)), NOW)

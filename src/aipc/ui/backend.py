@@ -1230,9 +1230,7 @@ class SkillsController(QObject):
         self._missed = [] if broken else reminders.missed_since_last_session(self._store, now)
         self._clock_back = reminders.clock_went_back(self._store, now)
         self._save_failed = False
-        if self._missed:
-            for r in self._missed:
-                r.fired = True  # รายงานครั้งเดียวว่าพลาด ไม่เตือนซ้ำเมื่อถึงรอบตรวจ
+        if self._missed:  # รายงานครั้งเดียว (นัดครั้งเดียว = fired · นัดซ้ำ = เลื่อนไปครั้งถัดไป)
             try:
                 self._store.save(now)
             except (OSError, reminders.Unreadable):
@@ -1277,8 +1275,14 @@ class SkillsController(QObject):
     def _when_text(dt) -> str:
         return f"{thaidate.short_date(dt)} {dt.year + thaidate.BE_OFFSET} · {dt:%H:%M} น."
 
+    @staticmethod
+    def _repeat_text(r) -> str:
+        from aipc.skills.when import repeat_name
+
+        return f" · ซ้ำ{repeat_name(r.repeat)}" if getattr(r, "repeat", "") else ""
+
     def _reminder_dict(self, r) -> dict:
-        return {"id": r.id, "what": r.what, "when": self._when_text(r.when)}
+        return {"id": r.id, "what": r.what, "when": self._when_text(r.when) + self._repeat_text(r)}
 
     @Property("QVariantList", notify=remindersChanged)
     def upcoming(self) -> list:
@@ -1336,6 +1340,7 @@ class SkillsController(QObject):
         now = self._now()
         card["lines"] = [
             f"{'✓ ' if r.fired or r.when < now else ''}{self._when_text(r.when)} · {r.what}"
+            + self._repeat_text(r)
             for r in items
         ] or ["จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"]
         return card
@@ -1357,16 +1362,25 @@ class SkillsController(QObject):
             card["lines"] = [self.reminderWarning]
             return card
         w = when.parse(text, self._now().replace(tzinfo=None))
-        if w.at is None or not w.confident:
+        # นัดซ้ำที่เดาเวลา/วัน (ไม่มั่นใจแต่มีเวลา) = การ์ดยืนยันพร้อมบอกว่าเดาตรงไหน · นัดครั้งเดียวที่ไม่มั่นใจ = ไม่จด
+        if w.at is None or not (w.confident or (w.repeat and not w.problem)):
             card["title"] = "ยังจดนัดนี้ไม่ได้"
             card["lines"] = [w.problem, "ลองระบุให้ชัด เช่น “พรุ่งนี้ 14:00 ส่งรายงาน”"]
             return card
         self._counter += 1
         token = f"r{self._counter}"
-        self._pending[token] = reminders.Reminder(w.what, reminders.aware(w.at))
+        r = reminders.Reminder(w.what, reminders.aware(w.at), created=self._now(), repeat=w.repeat)
+        self._pending[token] = r
         card["title"] = f"บันทึกนัด “{w.what}” ใช่ไหม"
         card["chips"] = [{"text": self._when_text(w.at), "kind": "accent"}]
+        if w.repeat:
+            name = f"ซ้ำ{when.repeat_name(w.repeat)} {w.at:%H:%M} น."
+            card["chips"].append({"text": name, "kind": "accent" if w.confident else "warn"})
         card["lines"] = [f"ตีความเอง: {a}" for a in w.assumptions]
+        if w.repeat:
+            card["lines"].insert(
+                0, f"เตือนครั้งแรก {self._when_text(w.at)} แล้วตั้งครั้งถัดไปเอง · ลบได้ในรายการนัด"
+            )
         card["lines"].append("วันที่คำนวณด้วยโค้ด ไม่ใช่ให้ AI เดา · ไม่ถูกให้กด “ไม่ใช่” แล้วพิมพ์ใหม่")
         card["confirmToken"] = token
         return card

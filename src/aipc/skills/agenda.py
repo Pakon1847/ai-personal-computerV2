@@ -48,8 +48,20 @@ def parse(text: str, today: date) -> Query | None:
 
 def items_for(store, q: Query) -> list:
     """นัดในช่วงวันของคำถาม (รวมที่เตือนไปแล้ว · เรียงตามเวลา)."""
+    from dataclasses import replace
+
+    from aipc.skills.when import matches
+
     out = []
     for r in store.items:
+        if getattr(r, "repeat", ""):  # นัดซ้ำ: ทุกวันในช่วงที่ตรงกฎ (ตั้งแต่ตอนที่จด) · วันที่ผ่านแล้วขึ้น ✓
+            when = r.when.astimezone()
+            since = r.created.astimezone()
+            for i in range(q.days):
+                at = datetime.combine(q.start + timedelta(days=i), when.timetz())
+                if at >= since and matches(r.repeat, at.date()):
+                    out.append(replace(r, when=at))
+            continue
         d = r.when.astimezone().date() if isinstance(r.when, datetime) else r.when
         if q.start <= d < q.start + timedelta(days=q.days):
             out.append(r)

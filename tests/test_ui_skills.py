@@ -119,6 +119,41 @@ class ReminderSkillTest(unittest.TestCase):
         self.assertEqual(card["title"], "ยังจดนัดนี้ไม่ได้")
         self.assertEqual(card["confirmToken"], "")
 
+    def test_repeating_reminder_fires_every_day(self):
+        # นัดซ้ำ (docs/benchmarks/2026-10-02-repeat) · 23 ก.ย. 2569 = วันพุธ 10:00
+        s = self.make()
+        card = s.handle("เตือนกินยาทุกวันแปดโมงเช้า")
+        self.assertIn("24 ก.ย. 2569 · 08:00", card["chips"][0]["text"])  # วันนี้ 8 โมงผ่านแล้ว
+        self.assertEqual(card["chips"][1]["text"], "ซ้ำทุกวัน 08:00 น.")
+        s.confirm(card["confirmToken"], True)
+        self.assertIn("ซ้ำทุกวัน", s.upcoming[0]["when"])
+        got = []
+        s.reminderDue.connect(got.append)
+        for day in (1, 2):
+            self.now = datetime(2026, 9, 23 + day, 8, 0).astimezone()
+            s.tick()
+            s.tick()
+        self.assertEqual([("24 ก.ย." in r["when"], "25 ก.ย." in r["when"]) for r in got],
+                         [(True, False), (False, True)])  # fmt: skip
+        self.assertIn("26 ก.ย. 2569 · 08:00", s.upcoming[0]["when"])  # ตั้งครั้งถัดไปเอง
+        week = s.handle("สัปดาห์นี้มีนัดอะไร")
+        self.assertGreaterEqual(sum("กินยา" in line for line in week["lines"]), 3)
+
+    def test_repeating_without_time_asks_with_warning(self):
+        card = self.make().handle("เตือนประชุมทีมทุกวันจันทร์")
+        self.assertTrue(card["confirmToken"], "มีเวลา (เดา) → ถามยืนยัน ไม่ปฏิเสธ")
+        self.assertEqual(card["chips"][1]["kind"], "warn")
+        self.assertTrue(any("09:00" in line for line in card["lines"]))
+
+    def test_repeat_missed_while_off_reports_once_then_moves_on(self):
+        s = self.make()
+        s.confirm(s.handle("เตือนกินยาทุกวันสองทุ่ม")["confirmToken"], True)
+        self.now = datetime(2026, 9, 27, 9, 0).astimezone()  # ปิดเครื่องไป 3 วันกว่า
+        later = self.make()
+        self.assertEqual([r["what"] for r in later.missed], ["กินยา"])
+        self.assertIn("27 ก.ย. 2569 · 20:00", later.upcoming[0]["when"])
+        self.assertEqual(self.make().missed, [])
+
     def test_fires_once_when_due(self):
         s = self.make()
         s.confirm(s.handle("เตือนกินยาอีก 30 นาที")["confirmToken"], True)
