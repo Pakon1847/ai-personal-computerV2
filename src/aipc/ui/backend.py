@@ -1515,8 +1515,8 @@ class SkillsController(QObject):
         for h in hits:
             parent = Path(h.name).parent.as_posix()
             folder = "ไฟล์ของฉัน" + ("" if parent == "." else " / " + parent.replace("/", " / "))
-            files.append({"name": Path(h.name).name, "abs": str(self._home / h.name), "folder": folder,
-                          "snippet": h.snippet})  # fmt: skip
+            files.append({"name": Path(h.name).name, "abs": str(self._home / h.name),
+                          "folder": folder, "snippet": h.snippet})  # fmt: skip
         more = f" · อ่านแค่ {n} ไฟล์ล่าสุด" if capped else ""
         return {"kind": "files", "badge": {}, "chips": [], "confirmToken": "", "page": "",
                 "title": f"พบ {len(files)} ไฟล์ที่ตรง" if files else "ไม่พบไฟล์ที่ตรง",
