@@ -1,0 +1,300 @@
+[
+ {
+  "text": "ไปหน้าผู้ช่วยหน่อย",
+  "action": "open_page",
+  "params": {
+   "page": "workspace"
+  }
+ },
+ {
+  "text": "เข้าหน้าแชทครับ",
+  "action": "open_page",
+  "params": {
+   "page": "workspace"
+  }
+ },
+ {
+  "text": "เปิดหน้าไฟล์",
+  "action": "open_page",
+  "params": {
+   "page": "files"
+  }
+ },
+ {
+  "text": "ไปไฟล์ของฉันหน่อย",
+  "action": "open_page",
+  "params": {
+   "page": "files"
+  }
+ },
+ {
+  "text": "ขอเปิดไฟล์ของฉันครับ",
+  "action": "open_page",
+  "params": {
+   "page": "files"
+  }
+ },
+ {
+  "text": "ไปหน้าสกิลหน่อย",
+  "action": "open_page",
+  "params": {
+   "page": "skills"
+  }
+ },
+ {
+  "text": "ขอดูสกิลทั้งหมด",
+  "action": "open_page",
+  "params": {
+   "page": "skills"
+  }
+ },
+ {
+  "text": "เปิดความเป็นส่วนตัวหน่อย",
+  "action": "open_page",
+  "params": {
+   "page": "privacy"
+  }
+ },
+ {
+  "text": "ขอเข้าความเป็นส่วนตัวครับ",
+  "action": "open_page",
+  "params": {
+   "page": "privacy"
+  }
+ },
+ {
+  "text": "เปิดสถานะเครื่อง",
+  "action": "open_page",
+  "params": {
+   "page": "health"
+  }
+ },
+ {
+  "text": "ไปหน้าสุขภาพเครื่องหน่อย",
+  "action": "open_page",
+  "params": {
+   "page": "health"
+  }
+ },
+ {
+  "text": "ขอดูสุขภาพเครื่องครับ",
+  "action": "open_page",
+  "params": {
+   "page": "health"
+  }
+ },
+ {
+  "text": "เปิดการตั้งค่า",
+  "action": "open_page",
+  "params": {
+   "page": "settings"
+  }
+ },
+ {
+  "text": "ไปตั้งค่าครับ",
+  "action": "open_page",
+  "params": {
+   "page": "settings"
+  }
+ },
+ {
+  "text": "เปิดยูทูปให้หน่อย",
+  "action": "open_url",
+  "params": {
+   "site": "youtube"
+  }
+ },
+ {
+  "text": "เข้ายูทิวบ์ครับ",
+  "action": "open_url",
+  "params": {
+   "site": "youtube"
+  }
+ },
+ {
+  "text": "เปิดอีเมล",
+  "action": "open_url",
+  "params": {
+   "site": "gmail"
+  }
+ },
+ {
+  "text": "เข้าจีเมลหน่อย",
+  "action": "open_url",
+  "params": {
+   "site": "gmail"
+  }
+ },
+ {
+  "text": "เปิดเว็บกูเกิล",
+  "action": "open_url",
+  "params": {
+   "site": "google"
+  }
+ },
+ {
+  "text": "เข้ากูเกิลครับ",
+  "action": "open_url",
+  "params": {
+   "site": "google"
+  }
+ },
+ {
+  "text": "เปิดวิกิ",
+  "action": "open_url",
+  "params": {
+   "site": "wikipedia"
+  }
+ },
+ {
+  "text": "ไปวิกิพีเดียหน่อย",
+  "action": "open_url",
+  "params": {
+   "site": "wikipedia"
+  }
+ },
+ {
+  "text": "เปิดแผนที่กูเกิลหน่อย",
+  "action": "open_url",
+  "params": {
+   "site": "maps"
+  }
+ },
+ {
+  "text": "ไปกูเกิลแมพครับ",
+  "action": "open_url",
+  "params": {
+   "site": "maps"
+  }
+ },
+ {
+  "text": "เปิดบราวเซอร์",
+  "action": "open_app",
+  "params": {
+   "app": "browser"
+  }
+ },
+ {
+  "text": "ขอเปิดโครเมียมครับ",
+  "action": "open_app",
+  "params": {
+   "app": "browser"
+  }
+ },
+ {
+  "text": "เปิดเว็บเบราว์เซอร์หน่อย",
+  "action": "open_app",
+  "params": {
+   "app": "browser"
+  }
+ },
+ {
+  "text": "เปิดเทอมินัล",
+  "action": "open_app",
+  "params": {
+   "app": "terminal"
+  }
+ },
+ {
+  "text": "เปิดตัวจัดการไฟล์ครับ",
+  "action": "open_app",
+  "params": {
+   "app": "filemanager"
+  }
+ },
+ {
+  "text": "เปิดโฟลเดอร์หน่อย",
+  "action": "open_app",
+  "params": {
+   "app": "filemanager"
+  }
+ },
+ {
+  "text": "เปิดแอปจัดการไฟล์",
+  "action": "open_app",
+  "params": {
+   "app": "filemanager"
+  }
+ },
+ {
+  "text": "เสียงสามสิบ",
+  "action": "set_volume",
+  "params": {
+   "percent": 30
+  }
+ },
+ {
+  "text": "ตั้งเสียงเป็นยี่สิบห้าครับ",
+  "action": "set_volume",
+  "params": {
+   "percent": 25
+  }
+ },
+ {
+  "text": "เพิ่มเสียงหน่อย",
+  "action": "change_volume",
+  "params": {
+   "step": 10
+  }
+ },
+ {
+  "text": "ดังขึ้นอีกหน่อย",
+  "action": "change_volume",
+  "params": {
+   "step": 10
+  }
+ },
+ {
+  "text": "ขอเสียงดังขึ้นครับ",
+  "action": "change_volume",
+  "params": {
+   "step": 10
+  }
+ },
+ {
+  "text": "ลดเสียงหน่อย",
+  "action": "change_volume",
+  "params": {
+   "step": -10
+  }
+ },
+ {
+  "text": "เบาลงอีกนิด",
+  "action": "change_volume",
+  "params": {
+   "step": -10
+  }
+ },
+ {
+  "text": "ขอเสียงเบาลงครับ",
+  "action": "change_volume",
+  "params": {
+   "step": -10
+  }
+ },
+ {
+  "text": "ปิดเสียงเลย",
+  "action": "mute",
+  "params": {}
+ },
+ {
+  "text": "ขอปิดเสียงหน่อย",
+  "action": "mute",
+  "params": {}
+ },
+ {
+  "text": "ปิดเสียงลำโพง",
+  "action": "mute",
+  "params": {}
+ },
+ {
+  "text": "เปิดเสียงด้วย",
+  "action": "unmute",
+  "params": {}
+ },
+ {
+  "text": "ขอเปิดเสียงคืนครับ",
+  "action": "unmute",
+  "params": {}
+ }
+]
