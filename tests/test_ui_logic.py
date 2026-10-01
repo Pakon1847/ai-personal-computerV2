@@ -47,7 +47,7 @@ class SettingsTest(unittest.TestCase):
             self.assertEqual(settings.load(p), settings.UiPrefs("dark", 1.5))
             self.assertFalse(p.with_name("ui.json.tmp").exists())  # ไม่มีไฟล์ชั่วคราวค้าง
             # ตัวเลือกเสียง (การ์ด 0019) ไม่สลับช่องกัน
-            voice = settings.UiPrefs("light", 1.0, auto_speak=True, speak_reminders=False)
+            voice = settings.UiPrefs("light", 1.0, speak_answers=False, speak_reminders=True)
             settings.save(voice, p)
             self.assertEqual(settings.load(p), voice)
 

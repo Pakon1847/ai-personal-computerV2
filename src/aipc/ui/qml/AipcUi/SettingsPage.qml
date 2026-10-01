@@ -211,12 +211,12 @@ ColumnLayout {
                       : "ยังไม่ได้ติดตั้งตัวอ่านออกเสียง (sudo ./scripts/pi/install-voice.sh --apply) หรือไม่มีตัวเล่นเสียง"
             }
             AppCheck {
-                objectName: "autoSpeakCheck"
+                objectName: "speakAnswersCheck"
                 visible: voice.available
-                text: "อ่านคำตอบของ AI ออกเสียงเองทุกครั้ง"
+                text: "อ่านคำตอบของ AI ออกเสียงเองทุกครั้ง (ปิด/เปิดได้จากปุ่มลำโพงในหน้าผู้ช่วย)"
                 detail: "สำหรับคนที่ไม่สะดวกอ่านจอ · กดหยุดอ่านที่คำตอบได้"
-                checked: uiSettings.autoSpeak
-                onClicked: uiSettings.setAutoSpeak(checked)
+                checked: uiSettings.speakAnswers
+                onClicked: uiSettings.setSpeakAnswers(checked)
             }
             AppCheck {
                 objectName: "speakRemindersCheck"
@@ -233,7 +233,7 @@ ColumnLayout {
     Card {
         id: outCard
         objectName: "outboundCard"
-        visible: cloudUsage.available
+        visible: cloudUsage.available || cloudUsage.outboundTotal > 0  // สกิลอากาศส่งออกได้แม้ไม่มี Claude
         Layout.fillWidth: true
         implicitHeight: outCol.implicitHeight + 40
         property bool confirmClear: false
@@ -254,7 +254,7 @@ ColumnLayout {
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                         text: cloudUsage.outboundTotal === 0
                               ? "ยังไม่เคยส่งอะไรออกไป · แชท นัด และไฟล์อยู่ในเครื่องนี้เท่านั้น"
-                              : "ส่งไป Claude แล้ว " + cloudUsage.outboundTotal + " ครั้ง · แสดงข้อความที่ส่งจริงตามตัวอักษร · แชทอื่น นัด และไฟล์ไม่เคยถูกส่ง"
+                              : "ส่งออกนอกเครื่องแล้ว " + cloudUsage.outboundTotal + " ครั้ง · แสดงข้อความที่ส่งจริงตามตัวอักษร · แชทอื่น นัด และไฟล์ไม่เคยถูกส่ง"
                     }
                 }
                 AppButton {

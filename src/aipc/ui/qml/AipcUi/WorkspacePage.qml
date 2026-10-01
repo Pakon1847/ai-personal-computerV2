@@ -144,7 +144,7 @@ Item {
             i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true })
             root.items = i
             // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
-            if (uiSettings.autoSpeak && voice.available && note === "" && text !== "")
+            if (uiSettings.speakAnswers && voice.available && note === "" && text !== "")
                 voice.speak(i.length - 1, root.tidy(text))
         }
     }
@@ -643,6 +643,22 @@ Item {
                             chat.stop()   // BRIEF 5.4 ข้อ 7: หยุดการตอบด้วย Esc
                         }
                     }
+                }
+            }
+            AppButton {
+                // เสียงพูด (Pakon: ค่าเริ่มต้นอ่านคำตอบออกเสียง · ปิดได้ตรงนี้เลย) · ปิดระหว่างอ่าน = หยุดทันที
+                objectName: "speakToggle"
+                visible: voice.available
+                kind: "ghost"
+                iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
+                text: ""
+                Accessible.name: uiSettings.speakAnswers ? "ปิดเสียงพูด" : "เปิดเสียงพูด"
+                ToolTip.visible: hovered
+                ToolTip.text: uiSettings.speakAnswers ? "อ่านคำตอบออกเสียงอยู่ · แตะเพื่อปิดเสียงพูด" : "ปิดเสียงพูดอยู่ · แตะเพื่อเปิด"
+                onClicked: {
+                    const on = !uiSettings.speakAnswers
+                    uiSettings.setSpeakAnswers(on)
+                    if (!on) voice.stop()
                 }
             }
             AppButton {
