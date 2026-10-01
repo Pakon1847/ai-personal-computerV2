@@ -241,9 +241,10 @@ class CloudUsage(QObject):
 
     changed = Signal()
 
-    def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000):
+    def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None):
         super().__init__()
         self._b = budget
+        self._ledger = ledger  # aipc.cloud.ledger.Ledger · ไม่มี = ไม่แสดงรายการ
         self._available = available and budget is not None
         self._timer = QTimer(
             self, interval=poll_ms, timeout=self.changed.emit
@@ -277,6 +278,40 @@ class CloudUsage(QObject):
     def setLimit(self, usd: float) -> None:  # noqa: N802
         if self._b is not None:
             self._b.set_limit(usd)
+            self.changed.emit()
+
+    # ---------- สิ่งที่ส่งออกนอกเครื่อง (ledger) ----------
+    @Property("QVariantList", notify=changed)
+    def outbound(self) -> list:
+        """รายการล่าสุด 20 รายการ (ใหม่สุดก่อน) สำหรับการ์ดในหน้าตั้งค่า."""
+        from aipc.cloud.ledger import KINDS
+
+        if self._ledger is None:
+            return []
+        out = []
+        for e in self._ledger.entries()[:20]:
+            when = str(e.get("time", ""))
+            try:
+                t = datetime.fromisoformat(when)
+                when = f"{thaidate.short_date(t)} {t:%H:%M}"
+            except ValueError:
+                pass
+            sent = str(e.get("sent", ""))
+            out.append({"when": when, "kind": KINDS.get(e.get("kind"), str(e.get("kind", ""))),
+                        "sent": sent, "preview": sent.replace("\n", " ")[:120],
+                        "chars": int(e.get("chars", len(sent))),
+                        "cost": float(e.get("cost_usd", 0)), "ok": bool(e.get("ok", True)),
+                        "note": str(e.get("note", ""))})  # fmt: skip
+        return out
+
+    @Property(int, notify=changed)
+    def outboundTotal(self) -> int:  # noqa: N802
+        return len(self._ledger.entries()) if self._ledger is not None else 0
+
+    @Slot()
+    def clearOutbound(self) -> None:  # noqa: N802
+        if self._ledger is not None:
+            self._ledger.clear()
             self.changed.emit()
 
 

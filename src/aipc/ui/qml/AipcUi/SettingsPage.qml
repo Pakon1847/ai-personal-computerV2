@@ -193,5 +193,87 @@ ColumnLayout {
         }
     }
 
+    // สิ่งที่ส่งออกนอกเครื่อง: ทุกครั้งที่ส่งข้อความไป Claude (ข้อความที่ส่งจริง เวลา ค่าใช้จ่าย) · ล้างได้
+    Card {
+        id: outCard
+        objectName: "outboundCard"
+        visible: cloudUsage.available
+        Layout.fillWidth: true
+        implicitHeight: outCol.implicitHeight + 40
+        property bool confirmClear: false
+        property int openRow: -1
+        ColumnLayout {
+            id: outCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+                    AppText { text: "สิ่งที่ส่งออกนอกเครื่อง"; strong: true }
+                    AppText {
+                        objectName: "outboundSummary"
+                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        text: cloudUsage.outboundTotal === 0
+                              ? "ยังไม่เคยส่งอะไรออกไป · แชท นัด และไฟล์อยู่ในเครื่องนี้เท่านั้น"
+                              : "ส่งไป Claude แล้ว " + cloudUsage.outboundTotal + " ครั้ง · แสดงข้อความที่ส่งจริงตามตัวอักษร · แชทอื่น นัด และไฟล์ไม่เคยถูกส่ง"
+                    }
+                }
+                AppButton {
+                    objectName: "clearOutbound"
+                    visible: cloudUsage.outboundTotal > 0
+                    kind: "ghost"
+                    text: outCard.confirmClear ? "กดอีกครั้งเพื่อล้าง" : "ล้างประวัติ"
+                    onClicked: {
+                        if (outCard.confirmClear) { cloudUsage.clearOutbound(); outCard.confirmClear = false }
+                        else outCard.confirmClear = true
+                    }
+                }
+            }
+            Repeater {
+                model: cloudUsage.outbound
+                delegate: ColumnLayout {
+                    id: outRow
+                    required property var modelData
+                    required property int index
+                    objectName: "outboundRow"
+                    Layout.fillWidth: true
+                    spacing: 2
+                    Rectangle { Layout.fillWidth: true; height: 1; color: Theme.line }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        AppText { text: outRow.modelData.when; size: Theme.fontSmall; color: Theme.inkMuted }
+                        AppText { text: outRow.modelData.kind; size: Theme.fontSmall; strong: true }
+                        AppText {
+                            Layout.fillWidth: true
+                            text: outRow.modelData.chars + " ตัวอักษร · $" + outRow.modelData.cost.toFixed(3)
+                                  + (outRow.modelData.ok ? "" : " · ไม่สำเร็จ")
+                            size: Theme.fontSmall; color: Theme.inkMuted
+                        }
+                        AppButton {
+                            kind: "ghost"
+                            text: outCard.openRow === outRow.index ? "ย่อ" : "ดูข้อความที่ส่ง"
+                            onClicked: outCard.openRow = outCard.openRow === outRow.index ? -1 : outRow.index
+                        }
+                    }
+                    AppText {
+                        Layout.fillWidth: true
+                        text: outCard.openRow === outRow.index ? outRow.modelData.sent : outRow.modelData.preview
+                        size: Theme.fontSmall
+                    }
+                    AppText {
+                        visible: outRow.modelData.note !== "" && outCard.openRow === outRow.index
+                        Layout.fillWidth: true
+                        text: outRow.modelData.note
+                        size: Theme.fontCaption; color: Theme.inkMuted
+                    }
+                }
+            }
+        }
+    }
+
     Item { Layout.fillHeight: true }
 }

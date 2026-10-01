@@ -60,10 +60,11 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
-def _cloud_client(budget=None):
+def _cloud_client(budget=None, ledger=None):
     """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0.
 
     budget (aipc.cloud.budget.Budget): ครบเพดานต่อวัน = ไม่เรียก Claude บอกผู้ใช้ตรง ๆ
+    ledger (aipc.cloud.ledger.Ledger): บันทึกข้อความที่ส่งออกจริงทุกครั้ง (หน้าตั้งค่าแสดงให้ผู้ใช้ตรวจ)
     """
     import os
 
@@ -78,12 +79,14 @@ def _cloud_client(budget=None):
         r = ask.ask(question, history)
         if budget is not None:
             budget.record(r.cost_usd, "ask")
+        if ledger is not None:
+            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok)
         return r
 
     return run
 
 
-def _skill_forge(budget=None):
+def _skill_forge(budget=None, ledger=None):
     """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้.
 
     ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0
@@ -104,6 +107,13 @@ def _skill_forge(budget=None):
         p = forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
         if budget is not None:
             budget.record(p.cost_usd, "skill")
+        if ledger is not None:
+            revise = kw.get("revise")
+            sent = request + (f"\nคำติ: {revise[1]}" if revise else "")
+            note = "พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง · ไม่มีแชท นัด หรือไฟล์"
+            if p.attempts > 1:
+                note += f" · ส่ง {p.attempts} ครั้ง (แก้ตามที่ประตูตรวจตีกลับ)"
+            ledger.record("skill", sent, p.cost_usd, ok=p.ok, note=note)
         return p
 
     return run
@@ -168,19 +178,22 @@ def build(opts: Options, argv: list[str] | None = None):
         return holder["skills"].tool_catalog(text) if "skills" in holder else []
 
     in_session = not opts.greeter_session
-    budget = None
+    budget = ledger = None
     if in_session:
         from aipc.cloud.budget import Budget
 
         budget = Budget()  # เพดานค่าใช้จ่าย Claude ต่อวันของผู้ใช้คนนี้
-    skill_forge = _skill_forge(budget) if in_session else None
+        from aipc.cloud.ledger import Ledger
+
+        ledger = Ledger()  # บันทึกสิ่งที่ส่งออกนอกเครื่อง
+    skill_forge = _skill_forge(budget, ledger) if in_session else None
     user_skills = None
     if in_session:
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
     chat = ChatController(active=in_session, tools=tools,
-                          cloud=_cloud_client(budget) if in_session else None,
+                          cloud=_cloud_client(budget, ledger) if in_session else None,
                           model_name=_local_model_name(),
                           forge=skill_forge is not None)  # fmt: skip
     engine._backends = {
@@ -208,7 +221,7 @@ def build(opts: Options, argv: list[str] | None = None):
             user_skills=user_skills,
         ),
         "chat": chat,
-        "cloudUsage": CloudUsage(budget, available=chat._cloud is not None),
+        "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session),
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง

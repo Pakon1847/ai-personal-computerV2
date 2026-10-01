@@ -418,6 +418,36 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
+    def test_outbound_card_lists_what_left_the_machine(self):
+        """บันทึกสิ่งที่ส่งออกนอกเครื่อง: การ์ดในหน้าตั้งค่าแสดงข้อความที่ส่งจริง · ล้างต้องกดสองครั้ง."""
+        from datetime import datetime
+
+        from aipc.cloud.budget import Budget
+        from aipc.cloud.ledger import Ledger
+
+        engine, win, warnings = self.open_shell("settings")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        led = Ledger(tmp / "outbound-test.json", now=lambda: datetime(2026, 10, 1, 14, 5))
+        led.record("ask", "คำถาม:\nอากาศเชียงใหม่วันนี้", 0.021)
+        usage._b, usage._ledger, usage._available = Budget(tmp / "usage-test.json"), led, True
+        usage.changed.emit()
+        settle(50)
+        card = find_items(win, "outboundCard")[0]
+        self.assertTrue(card.property("visible"))
+        self.assertIn("1 ครั้ง", find_items(win, "outboundSummary")[0].property("text"))
+        self.assertEqual(usage.outbound[0]["sent"], "คำถาม:\nอากาศเชียงใหม่วันนี้")
+        self.assertEqual(usage.outbound[0]["kind"], "ถาม Claude")
+        self.assertEqual(len(find_items(win, "outboundRow")), 1)
+        btn = find_items(win, "clearOutbound")[0]
+        btn.clicked.emit()
+        settle(30)
+        self.assertEqual(usage.outboundTotal, 1)  # ครั้งแรกแค่ถามยืนยัน
+        btn.clicked.emit()
+        settle(30)
+        self.assertEqual(usage.outboundTotal, 0)
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()
