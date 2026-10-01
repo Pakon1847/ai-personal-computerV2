@@ -24,7 +24,6 @@ import re
 from dataclasses import dataclass, field
 
 from aipc.skills import command, when
-from aipc.skills.langintent import lang_intent
 from aipc.skills.manifest import Manifest
 
 MAX_CANDIDATES = 3
@@ -109,11 +108,6 @@ def route_ai_first(text: str, manifests: list[Manifest]) -> Route:
             hits = [k for k in best.keywords if has_keyword(text, k)]
             return Route("skill", best, "เพราะมีคำว่า " + ", ".join(f"“{k}”" for k in hits[:2]))
         return Route("create", reason="ขอโหมดหรืองานประจำที่เครื่องยังไม่มี")
-    # คำขอแปล/สรุปที่ชัด (Pakon เลือกข้อ ก. 2026-10-01) · Gemma ไม่เรียกสกิลแปลเลยแม้ปรับคำอธิบาย
-    lang = {"translate": "translate", "summarize": "summarize-text"}.get(lang_intent(text) or "")
-    if lang and lang in by_id:
-        what = "แปล" if lang == "translate" else "สรุปข้อความ"
-        return Route("skill", by_id[lang], f"คำขอ{what}ที่ชัดเจน")
     return Route("chat")
 
 
