@@ -1043,6 +1043,8 @@ class SkillsController(QObject):
         self._forged.connect(self._on_forged)
         self._exec = executor or actions.Executor()
         self._root = root
+        self._home = Path.home()  # หาไฟล์ด้วยการพิมพ์ในแชท ค้นใน home ของผู้ใช้
+        self._file_search = None
         self._pending: dict[str, object] = {}
         self._counter = 0
         self._now = clock or (lambda: datetime.now().astimezone())
@@ -1487,6 +1489,10 @@ class SkillsController(QObject):
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
             return card
+        from aipc.skills.fileintent import file_intent
+
+        if file_intent(text):  # หาไฟล์ของผู้ใช้ = ค้นในเครื่องด้วยโค้ด (AI เปิดไฟล์ไม่ได้)
+            return self._files_card(text)
         if self._llm_ready():
             r = router.route_ai_first(text, self._skills)
             if r.kind == "create":  # ตั้งโหมด/งานประจำที่ยังไม่มีสกิล (การ์ด 0017)
@@ -1497,6 +1503,26 @@ class SkillsController(QObject):
                 )
             return self._card(r, text)
         return self._card(router.route(text, self._skills, self.available()), text)
+
+    def _files_card(self, text: str) -> dict:
+        """ผลค้นไฟล์ใน home (aipc.files_search) · ผล docs/benchmarks/2026-10-01-file-intent."""
+        from aipc.files_search import HomeSearch
+
+        if self._file_search is None:
+            self._file_search = HomeSearch(self._home)
+        hits, n, capped = self._file_search.search(text, 5)
+        files = []
+        for h in hits:
+            parent = Path(h.name).parent.as_posix()
+            folder = "ไฟล์ของฉัน" + ("" if parent == "." else " / " + parent.replace("/", " / "))
+            files.append({"name": Path(h.name).name, "abs": str(self._home / h.name), "folder": folder,
+                          "snippet": h.snippet})  # fmt: skip
+        more = f" · อ่านแค่ {n} ไฟล์ล่าสุด" if capped else ""
+        return {"kind": "files", "badge": {}, "chips": [], "confirmToken": "", "page": "",
+                "title": f"พบ {len(files)} ไฟล์ที่ตรง" if files else "ไม่พบไฟล์ที่ตรง",
+                "lines": [f"ค้นในเนื้อหา {n} ไฟล์ในโฟลเดอร์ของคุณ{more} · ไม่ออกนอกเครื่อง"
+                          + (" · ลองใช้คำที่อยู่ในไฟล์ เช่น ชื่อร้าน ชื่อคน" if not files else "")],
+                "files": files}  # fmt: skip
 
     def _card(self, r, text: str) -> dict:
         from aipc.skills import machine

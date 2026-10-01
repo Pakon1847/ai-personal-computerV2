@@ -553,6 +553,28 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(settings.load(ui._path).speak_reminders)  # จำไว้ในไฟล์ตั้งค่า
         self.assertEqual(warnings, [])
 
+    def test_find_file_from_chat_shows_hits(self):
+        """หาไฟล์ด้วยการพิมพ์ในแชท: กฎจับคำขอ → การ์ดผลค้นพร้อมปุ่มถาม AI · ไม่ผ่าน AI."""
+        engine, win, warnings = self.open_shell()
+        skills = engine._backends["skills"]
+        home = Path(os.environ["XDG_DATA_HOME"]) / "chat-home"
+        (home / "บ้าน").mkdir(parents=True)
+        (home / "บ้าน" / "scan_0412.txt").write_text(
+            "ใบเสร็จค่าซ่อมแอร์ ร้านช่างเอก 1,800 บาท", encoding="utf-8"
+        )
+        (home / "note.txt").write_text("สูตรต้มยำกุ้ง", encoding="utf-8")
+        skills._home, skills._file_search = home, None
+        card = skills.handle("หาไฟล์ใบเสร็จซ่อมแอร์ให้หน่อย")
+        self.assertEqual(card["kind"], "files")
+        self.assertEqual(card["files"][0]["name"], "scan_0412.txt")
+        self.assertTrue(card["files"][0]["abs"].endswith("scan_0412.txt"))
+        page = find_all(win, "workspace")[0]
+        page.showCard(card)
+        settle(50)
+        self.assertGreaterEqual(len(find_items(win, "chatFileHit")), 1)
+        self.assertEqual(skills.handle("แปลงไฟล์ Word เป็น PDF ยังไง")["kind"] != "files", True)
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()

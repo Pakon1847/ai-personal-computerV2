@@ -11,6 +11,7 @@ Rectangle {
     // สกิลที่ Claude สร้าง (การ์ด 0017 ชั้นที่ 2): ลบทิ้ง หรือบอกว่าผิดตรงไหนให้ Claude แก้
     signal removeSkill(string skillId)
     signal wrongSkill(string skillId, string name)
+    signal askFile(string path)  // การ์ดผลค้นไฟล์: ส่งไฟล์ให้ AI ในเครื่อง
     readonly property bool forged: hasBadge && (info.badge.forgedId || "") !== ""
 
     readonly property bool hasBadge: info.badge !== undefined && info.badge.name !== undefined
@@ -55,6 +56,26 @@ Rectangle {
                 size: Theme.fontSmall
                 color: Theme.inkMuted
                 Layout.fillWidth: true
+            }
+        }
+
+        // ผลค้นไฟล์ (หาไฟล์ด้วยการพิมพ์ในแชท)
+        Repeater {
+            model: card.info.files || []
+            RowLayout {
+                id: fileRow
+                required property var modelData
+                objectName: "chatFileHit"
+                Layout.fillWidth: true
+                spacing: 8
+                Icon { path: Icons.file; color: Theme.inkMuted }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+                    AppText { text: fileRow.modelData.name; strong: true; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
+                    AppText { text: fileRow.modelData.folder + " · " + fileRow.modelData.snippet; size: Theme.fontCaption; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
+                }
+                AppButton { text: "ถาม AI"; kind: "secondary"; onClicked: card.askFile(fileRow.modelData.abs) }
             }
         }
 

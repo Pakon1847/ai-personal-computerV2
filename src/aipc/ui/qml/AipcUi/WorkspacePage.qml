@@ -563,6 +563,11 @@ Item {
                 answered: !!root.answered[(row.modelData.card || {}).confirmToken]
                 onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
                 onRemoveSkill: (skillId) => root.showCard(skills.removeSkill(skillId))
+                onAskFile: (path) => {
+                    const err = chat.attachFile(path)
+                    if (err === "") input.forceActiveFocus()
+                    else root.showCard({ kind: "chat", title: err, chips: [], lines: [], confirmToken: "", page: "", badge: {} })
+                }
                 onWrongSkill: (skillId, name) => {
                     root.feedbackFor = { id: skillId, name: name }
                     input.forceActiveFocus()
