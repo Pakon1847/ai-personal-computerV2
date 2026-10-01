@@ -1,0 +1,18 @@
+{
+ "v2 ทำไมเครื่องช้าจ": {
+  "machine_status_calls": 10,
+  "says_dunno": 0
+ },
+ "v2 ช่วยตั้งชื่อโปร": {
+  "machine_status_calls": 0,
+  "says_dunno": 0
+ },
+ "v3 ทำไมเครื่องช้าจ": {
+  "machine_status_calls": 10,
+  "says_dunno": 0
+ },
+ "v3 ช่วยตั้งชื่อโปร": {
+  "machine_status_calls": 0,
+  "says_dunno": 0
+ }
+}
