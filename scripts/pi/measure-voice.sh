@@ -8,6 +8,8 @@ set -euo pipefail
 OUT="${1:-$HOME/voice-bench/result.json}"
 DIR="$HOME/voice-bench"
 WHISPER_TAG="${WHISPER_TAG:-v1.9.4}"
+# รุ่นถอดเสียง (ไฟล์ใน ~/voice-bench) · STT_ARGS เพิ่มตัวเลือกให้ whisper-cli เช่น "-ac 512"
+export STT_MODEL="${STT_MODEL:-thonburian-medium-q5_0.bin}" STT_ARGS="${STT_ARGS:-}"
 mkdir -p "$DIR" && cd "$DIR"
 
 if [ ! -x whisper.cpp/build/bin/whisper-cli ]; then
@@ -49,15 +51,17 @@ for i, s in enumerate(sents):
     wav16 = f"{d}/s{i}-16k.wav"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-ar", "16000", "-ac", "1", wav16], check=True)
     t0 = time.monotonic()
-    r = subprocess.run([f"{d}/whisper.cpp/build/bin/whisper-cli", "-m", f"{d}/thonburian-medium-q5_0.bin",
-                        "-l", "th", "-t", "4", "-nt", "-f", wav16], capture_output=True, text=True)
+    r = subprocess.run([f"{d}/whisper.cpp/build/bin/whisper-cli", "-m", f"{d}/{os.environ['STT_MODEL']}",
+                        "-l", "th", "-t", "4", "-nt", *os.environ["STT_ARGS"].split(), "-f", wav16],
+                       capture_output=True, text=True)
     stt = time.monotonic() - t0
     rows.append({"text": s, "audio_s": round(dur, 2), "tts_s": round(tts, 2), "stt_s": round(stt, 2),
                  "rtf": round(stt / dur, 2), "heard": r.stdout.strip()})
     print(f"{s} · เสียง {dur:.1f} วิ · TTS {tts:.1f} วิ · STT {stt:.1f} วิ (RTF {stt/dur:.2f}) · ได้ยิน: {r.stdout.strip()}")
 med = lambda k: sorted(x[k] for x in rows)[len(rows) // 2]
 out = {"rows": rows, "tts_s_median": med("tts_s"), "stt_s_median": med("stt_s"), "rtf_median": med("rtf"),
-       "models": {f: sha(f"{d}/{f}") for f in ("thonburian-medium-q5_0.bin", "th_TH-tsync2-medium.onnx")},
+       "models": {f: sha(f"{d}/{f}") for f in (os.environ["STT_MODEL"], "th_TH-tsync2-medium.onnx")},
+       "stt_args": os.environ["STT_ARGS"],
        "note": "เสียงสังเคราะห์จาก Piper · ใช้อ้างความเร็วเท่านั้น ไม่ใช่ความแม่น"}
 json.dump(out, open(sys.argv[1], "w"), ensure_ascii=False, indent=1)
 print("TTS มัธยฐาน", out["tts_s_median"], "วิ · STT มัธยฐาน", out["stt_s_median"], "วิ · RTF", out["rtf_median"])
