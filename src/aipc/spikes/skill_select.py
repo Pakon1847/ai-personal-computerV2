@@ -139,10 +139,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--server", default="", help="ว่าง = วัดกฎอย่างเดียว")
     ap.add_argument("--mode", choices=MODES, default="rules-first")
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--dataset", type=Path, default=DATASET, help="ชุดประโยค (ค่าเริ่มต้น = ชุด 58)")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    data = json.loads(DATASET.read_text(encoding="utf-8"))
+    data = json.loads(a.dataset.read_text(encoding="utf-8"))
     skills = manifest.load_builtin()
     ai = None
     info = {}
@@ -161,7 +162,7 @@ def main(argv: list[str] | None = None) -> int:
     res = evaluate(data["items"], skills, ai, a.mode)
     res.update(
         label=a.label, method="rules + AI" if ai else "rules only", skills=[s.id for s in skills],
-        server=info,
+        server=info, dataset=a.dataset.name,
     )  # fmt: skip
     from aipc.bench import machine
 
