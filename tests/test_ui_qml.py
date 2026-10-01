@@ -448,6 +448,31 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(usage.outboundTotal, 0)
         self.assertEqual(warnings, [])
 
+    def test_file_search_box_finds_by_content(self):
+        """ค้นไฟล์ด้วยเนื้อหาในหน้าไฟล์ของฉัน · ค้นในเธรดแยก แล้วผลขึ้นพร้อมปุ่มถาม AI."""
+        engine, win, warnings = self.open_shell("files")
+        fb = engine.rootContext().contextProperty("filesBrowser")
+        root = Path(os.environ["XDG_DATA_HOME"]) / "home-search"
+        (root / "บ้าน").mkdir(parents=True)
+        (root / "บ้าน" / "aircon.txt").write_text("ใบเสร็จค่าซ่อมแอร์ ร้านช่างเอก", encoding="utf-8")
+        (root / "food.txt").write_text("สูตรต้มยำกุ้ง", encoding="utf-8")
+        fb._root, fb._search = root, None
+        fb.search("ใบเสร็จแอร์")
+        end = time.monotonic() + 10
+        while fb.searching and time.monotonic() < end:
+            settle(30)
+        settle(50)
+        self.assertEqual(fb.searchResults[0]["name"], "aircon.txt")
+        self.assertEqual(fb.searchResults[0]["folder"], "ไฟล์ของฉัน / บ้าน")
+        self.assertTrue(find_items(win, "fileSearchResults")[0].property("visible"))
+        self.assertIn("ไม่ออกนอกเครื่อง", fb.searchNote)
+        self.assertTrue(fb.resultPath(fb.searchResults[0]["path"]).endswith("aircon.txt"))
+        self.assertEqual(fb.resultPath("../../etc/passwd"), "")  # ออกนอก home ไม่ได้
+        fb.search("")
+        settle(30)
+        self.assertEqual(fb.searchResults, [])
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()

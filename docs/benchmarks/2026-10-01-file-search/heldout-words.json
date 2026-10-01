@@ -1,0 +1,410 @@
+{
+ "method": "words",
+ "n": 40,
+ "recall_at_1": 36,
+ "recall_at_3": 39,
+ "build_s": 0.0,
+ "query_ms_max": 1.07,
+ "rows": [
+  {
+   "text": "ตอนไปให้ช่างล้างเครื่องปรับอากาศจ่ายไปเท่าไหร่",
+   "doc": "receipt-0718.txt",
+   "rank": 2,
+   "top3": [
+    "car-service.txt",
+    "receipt-0718.txt",
+    "party-shopping.txt"
+   ]
+  },
+  {
+   "text": "สูตรแกงเนื้อใส่มันฝรั่งกับถั่วลิสง",
+   "doc": "massaman.txt",
+   "rank": 1,
+   "top3": [
+    "massaman.txt",
+    "kaeng-khiao-wan.txt",
+    "airfryer-manual.txt"
+   ]
+  },
+  {
+   "text": "อ่านหนังสือแล้วอยากเอารองเท้าวิ่งไปวางหน้าประตู",
+   "doc": "book-notes.txt",
+   "rank": 1,
+   "top3": [
+    "book-notes.txt",
+    "net-info.txt",
+    "diary-0505.txt"
+   ]
+  },
+  {
+   "text": "ประวัติพารถไปเปลี่ยนน้ำมันเครื่องที่ศูนย์",
+   "doc": "car-service.txt",
+   "rank": 1,
+   "top3": [
+    "car-service.txt",
+    "book-notes.txt",
+    "moving-todo.txt"
+   ]
+  },
+  {
+   "text": "ตารางวิ่งที่สวนลุมกับยกเวท",
+   "doc": "workout-plan.txt",
+   "rank": 1,
+   "top3": [
+    "workout-plan.txt",
+    "moving-todo.txt",
+    "book-notes.txt"
+   ]
+  },
+  {
+   "text": "ผลเจาะเลือดกับไขมันของปีนี้",
+   "doc": "checkup-2026.txt",
+   "rank": 1,
+   "top3": [
+    "checkup-2026.txt",
+    "loan-notes.txt",
+    "meeting-0912.txt"
+   ]
+  },
+  {
+   "text": "จดว่าต้องซื้อไข่กับข้าวสารที่แม็คโคร",
+   "doc": "grocery.txt",
+   "rank": 1,
+   "top3": [
+    "grocery.txt",
+    "diary-0505.txt",
+    "book-notes.txt"
+   ]
+  },
+  {
+   "text": "เบี้ยประกันรายปีที่ต้องต่ออายุเดือนมกราคม",
+   "doc": "insurance.txt",
+   "rank": 1,
+   "top3": [
+    "insurance.txt",
+    "lease-agreement.txt",
+    "meeting-0912.txt"
+   ]
+  },
+  {
+   "text": "ถ้าเน็ตหลุดต้องรีสตาร์ตเราเตอร์ยังไง",
+   "doc": "net-info.txt",
+   "rank": 1,
+   "top3": [
+    "net-info.txt",
+    "moving-todo.txt",
+    "meeting-1003.txt"
+   ]
+  },
+  {
+   "text": "หมอสั่งยาอะไรให้พ่อกินตอนเช้า",
+   "doc": "bp-log.txt",
+   "rank": 1,
+   "top3": [
+    "bp-log.txt",
+    "grocery.txt",
+    "diary-0505.txt"
+   ]
+  },
+  {
+   "text": "ที่ประชุมเรื่องงบโฆษณาช่วงปลายปี",
+   "doc": "meeting-0912.txt",
+   "rank": 2,
+   "top3": [
+    "meeting-1003.txt",
+    "meeting-0912.txt",
+    "econ-report.txt"
+   ]
+  },
+  {
+   "text": "ที่จดสาระสำคัญของหนังสือเรื่องนิสัยเล็กๆ",
+   "doc": "book-notes.txt",
+   "rank": 1,
+   "top3": [
+    "book-notes.txt",
+    "econ-report.txt",
+    "moving-todo.txt"
+   ]
+  },
+  {
+   "text": "รหัสไวไฟที่บ้านอยู่ตรงไหน",
+   "doc": "net-info.txt",
+   "rank": 1,
+   "top3": [
+    "net-info.txt",
+    "moving-todo.txt",
+    "party-shopping.txt"
+   ]
+  },
+  {
+   "text": "เรื่องที่เขียนถึงวันฝนตกรถติดแยกรัชดา",
+   "doc": "diary-0505.txt",
+   "rank": 1,
+   "top3": [
+    "diary-0505.txt",
+    "bio-report.txt",
+    "book-notes.txt"
+   ]
+  },
+  {
+   "text": "งานส่งอาจารย์เรื่องของแพงขึ้นกระทบนักศึกษา",
+   "doc": "econ-report.txt",
+   "rank": 1,
+   "top3": [
+    "econ-report.txt",
+    "bio-report.txt",
+    "moving-todo.txt"
+   ]
+  },
+  {
+   "text": "รายงานที่เก็บแบบสอบถามคนแปดสิบคน",
+   "doc": "econ-report.txt",
+   "rank": 1,
+   "top3": [
+    "econ-report.txt",
+    "party-shopping.txt",
+    "bio-report.txt"
+   ]
+  },
+  {
+   "text": "เช็กลิสต์ก่อนขนของไปบ้านใหม่",
+   "doc": "moving-todo.txt",
+   "rank": 4,
+   "top3": [
+    "resign-letter.txt",
+    "net-info.txt",
+    "lease-agreement.txt"
+   ]
+  },
+  {
+   "text": "ที่เขียนไว้ว่ากลับไปอยู่บ้านที่ขอนแก่น",
+   "doc": "resign-letter.txt",
+   "rank": 1,
+   "top3": [
+    "resign-letter.txt",
+    "moving-todo.txt",
+    "diary-0505.txt"
+   ]
+  },
+  {
+   "text": "วิธีทำแกงกะทิใส่ไก่กับมะเขือเปราะ",
+   "doc": "kaeng-khiao-wan.txt",
+   "rank": 1,
+   "top3": [
+    "kaeng-khiao-wan.txt",
+    "krabi-trip.txt",
+    "massaman.txt"
+   ]
+  },
+  {
+   "text": "วิชาไหนเรียนวันอังคารบ่าย",
+   "doc": "class-schedule.txt",
+   "rank": 1,
+   "top3": [
+    "class-schedule.txt",
+    "resign-letter.txt",
+    "school-fees.txt"
+   ]
+  },
+  {
+   "text": "หมอบอกให้ไปตรวจสายตาเพิ่ม",
+   "doc": "checkup-2026.txt",
+   "rank": 1,
+   "top3": [
+    "checkup-2026.txt",
+    "bp-log.txt",
+    "meeting-1003.txt"
+   ]
+  },
+  {
+   "text": "เดือนไหนที่โอนค่าที่พักช้า",
+   "doc": "rent-payments.txt",
+   "rank": 1,
+   "top3": [
+    "rent-payments.txt",
+    "lease-agreement.txt",
+    "loan-notes.txt"
+   ]
+  },
+  {
+   "text": "ประชุมที่คุยเรื่องโปรโมชั่นส่งท้ายปี",
+   "doc": "meeting-1003.txt",
+   "rank": 1,
+   "top3": [
+    "meeting-1003.txt",
+    "book-notes.txt",
+    "meeting-0912.txt"
+   ]
+  },
+  {
+   "text": "เอกสารข้อตกลงกับเจ้าของคอนโดที่เช่าอยู่",
+   "doc": "lease-agreement.txt",
+   "rank": 3,
+   "top3": [
+    "landlord-letter.txt",
+    "meeting-1003.txt",
+    "lease-agreement.txt"
+   ]
+  },
+  {
+   "text": "ถ้าอยากปิดสินเชื่อรถก่อนกำหนดเสียค่าธรรมเนียมเท่าไหร่",
+   "doc": "loan-notes.txt",
+   "rank": 1,
+   "top3": [
+    "loan-notes.txt",
+    "net-info.txt",
+    "lease-agreement.txt"
+   ]
+  },
+  {
+   "text": "ใบเสร็จร้านซ่อมแอร์อยู่ไหน",
+   "doc": "receipt-0718.txt",
+   "rank": 1,
+   "top3": [
+    "receipt-0718.txt",
+    "receipt-0802.txt",
+    "landlord-letter.txt"
+   ]
+  },
+  {
+   "text": "ที่จดสูตรแกงเขียวหวาน",
+   "doc": "kaeng-khiao-wan.txt",
+   "rank": 1,
+   "top3": [
+    "kaeng-khiao-wan.txt",
+    "massaman.txt",
+    "bio-report.txt"
+   ]
+  },
+  {
+   "text": "ถ้าอยากย้ายออกก่อนครบปี ต้องบอกล่วงหน้ากี่วัน",
+   "doc": "lease-agreement.txt",
+   "rank": 1,
+   "top3": [
+    "lease-agreement.txt",
+    "moving-todo.txt",
+    "rent-payments.txt"
+   ]
+  },
+  {
+   "text": "เครื่องซักผ้าขึ้นรหัส E4 ต้องทำยังไง",
+   "doc": "washer-manual.txt",
+   "rank": 1,
+   "top3": [
+    "washer-manual.txt",
+    "moving-todo.txt",
+    "meeting-1003.txt"
+   ]
+  },
+  {
+   "text": "ร้านที่เปลี่ยนอะไหล่ตู้เย็นให้ รับประกันกี่เดือน",
+   "doc": "receipt-0802.txt",
+   "rank": 1,
+   "top3": [
+    "receipt-0802.txt",
+    "receipt-0718.txt",
+    "moving-todo.txt"
+   ]
+  },
+  {
+   "text": "บันทึกประจำวันตอนที่ได้ข่าวผ่านสัมภาษณ์ธนาคาร",
+   "doc": "diary-0505.txt",
+   "rank": 1,
+   "top3": [
+    "diary-0505.txt",
+    "meeting-0912.txt",
+    "meeting-1003.txt"
+   ]
+  },
+  {
+   "text": "ตารางคาบเรียนกับวันสอบกลางภาค",
+   "doc": "class-schedule.txt",
+   "rank": 1,
+   "top3": [
+    "class-schedule.txt",
+    "diary-0505.txt",
+    "school-fees.txt"
+   ]
+  },
+  {
+   "text": "ตั้งอุณหภูมิกี่องศาเวลาทำปีกไก่ในหม้อทอดลมร้อน",
+   "doc": "airfryer-manual.txt",
+   "rank": 1,
+   "top3": [
+    "airfryer-manual.txt",
+    "grocery.txt",
+    "meeting-1003.txt"
+   ]
+  },
+  {
+   "text": "ช่างบอกว่ายางรถต้องเปลี่ยนเมื่อไหร่",
+   "doc": "car-service.txt",
+   "rank": 1,
+   "top3": [
+    "car-service.txt",
+    "book-notes.txt",
+    "moving-todo.txt"
+   ]
+  },
+  {
+   "text": "สั่งเค้กกับบอลลูนสำหรับงานเลี้ยงที่บ้านพี่สาว",
+   "doc": "party-shopping.txt",
+   "rank": 1,
+   "top3": [
+    "party-shopping.txt",
+    "moving-todo.txt",
+    "krabi-trip.txt"
+   ]
+  },
+  {
+   "text": "ค่าเหมาเรือไปเกาะต่างๆ เท่าไหร่",
+   "doc": "krabi-trip.txt",
+   "rank": 1,
+   "top3": [
+    "krabi-trip.txt",
+    "bio-report.txt",
+    "receipt-0802.txt"
+   ]
+  },
+  {
+   "text": "ใบแจ้งหนี้จากโรงเรียนที่รวมค่ารถรับส่งด้วย",
+   "doc": "school-fees.txt",
+   "rank": 1,
+   "top3": [
+    "school-fees.txt",
+    "moving-todo.txt",
+    "resign-letter.txt"
+   ]
+  },
+  {
+   "text": "จดหมายถึงเจ้าของหอเรื่องรอยขีดที่ผนัง",
+   "doc": "landlord-letter.txt",
+   "rank": 1,
+   "top3": [
+    "landlord-letter.txt",
+    "bio-report.txt",
+    "book-notes.txt"
+   ]
+  },
+  {
+   "text": "จดหมายบอกนายจ้างว่าจะออกจากงาน",
+   "doc": "resign-letter.txt",
+   "rank": 1,
+   "top3": [
+    "resign-letter.txt",
+    "moving-todo.txt",
+    "workout-plan.txt"
+   ]
+  },
+  {
+   "text": "อาหารที่ลองทำช่วงเทศกาลเมษายนแล้วหวานเกินไป",
+   "doc": "massaman.txt",
+   "rank": 1,
+   "top3": [
+    "massaman.txt",
+    "moving-todo.txt",
+    "book-notes.txt"
+   ]
+  }
+ ]
+}

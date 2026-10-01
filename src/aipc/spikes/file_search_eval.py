@@ -60,7 +60,8 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     res = evaluate(json.loads(a.dataset.read_text(encoding="utf-8")), a.method)
     n = res["n"]
-    print(f"{a.dataset.name} [{a.method}]: R@1 {res['recall_at_1']}/{n} · R@3 {res['recall_at_3']}/{n}"
+    r1, r3 = res["recall_at_1"], res["recall_at_3"]
+    print(f"{a.dataset.name} [{a.method}]: R@1 {r1}/{n} · R@3 {r3}/{n}"
           f" · สร้างดัชนี {res['build_s']} วิ · ค้นช้าสุด {res['query_ms_max']} ms")  # fmt: skip
     if a.show:
         for r in res["rows"]:

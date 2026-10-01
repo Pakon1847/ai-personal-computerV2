@@ -414,6 +414,8 @@ class FilesBrowser(QObject):
     """หน้า "ไฟล์ของฉัน" · อ่านไฟล์จริงใน home แบบอ่านอย่างเดียว ออกนอก home ไม่ได้."""
 
     changed = Signal()
+    searchChanged = Signal()  # noqa: N815
+    _found = Signal(object)
 
     def __init__(self, root: Path | None = None):
         super().__init__()
@@ -421,6 +423,11 @@ class FilesBrowser(QObject):
         self._rel = ""
         self._entries: list[dict] = []
         self._error = ""
+        # ค้นในเนื้อหาไฟล์ (aipc.files_search) · ทำในเธรดแยก (อ่าน PDF ครั้งแรกอาจนาน)
+        self._search = None
+        self._results: list[dict] = []
+        self._searching, self._search_note, self._search_round = False, "", 0
+        self._found.connect(self._on_found)
         self._load()
 
     def _load(self) -> None:
@@ -476,6 +483,84 @@ class FilesBrowser(QObject):
     @Slot()
     def up(self) -> None:
         parent = str(Path(self._rel).parent)
+        self._rel = "" if parent == "." else parent
+        self._load()
+
+    # ---------- ค้นในเนื้อหาไฟล์ ----------
+    @Property("QVariantList", notify=searchChanged)
+    def searchResults(self) -> list:  # noqa: N802
+        return self._results
+
+    @Property(bool, notify=searchChanged)
+    def searching(self) -> bool:
+        return self._searching
+
+    @Property(str, notify=searchChanged)
+    def searchNote(self) -> str:  # noqa: N802
+        return self._search_note
+
+    @Slot(str)
+    def search(self, query: str) -> None:
+        import threading
+        import time
+
+        from aipc.files_search import HomeSearch
+
+        query = query.strip()
+        self._search_round += 1
+        if not query:
+            self._results, self._searching, self._search_note = [], False, ""
+            self.searchChanged.emit()
+            return
+        if self._search is None:
+            self._search = HomeSearch(self._root)
+        self._searching, self._search_note = True, "กำลังค้นในไฟล์…"
+        self.searchChanged.emit()
+        rnd, engine = self._search_round, self._search
+
+        def work():
+            t0 = time.monotonic()
+            try:
+                hits, n, capped = engine.search(query)
+                self._found.emit((rnd, hits, n, capped, time.monotonic() - t0, ""))
+            except Exception as e:  # noqa: BLE001 · บอกผู้ใช้แทนการค้างเงียบ
+                self._found.emit((rnd, [], 0, False, 0.0, str(e)))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _on_found(self, res) -> None:
+        rnd, hits, n, capped, secs, err = res
+        if rnd != self._search_round:  # มีการค้นใหม่แล้ว
+            return
+        self._searching = False
+        self._results = []
+        for h in hits:
+            parent = Path(h.name).parent.as_posix()
+            folder = "ไฟล์ของฉัน" + ("" if parent == "." else " / " + parent.replace("/", " / "))
+            self._results.append({"path": h.name, "name": Path(h.name).name, "folder": folder,
+                                  "snippet": h.snippet})  # fmt: skip
+        if err:
+            self._search_note = f"ค้นไม่สำเร็จ: {err}"
+        elif not hits:
+            self._search_note = f"ไม่พบไฟล์ที่ตรง (ค้นใน {n} ไฟล์)"
+        else:
+            more = f" · อ่านแค่ {n} ไฟล์ล่าสุด" if capped else ""
+            self._search_note = (
+                f"พบ {len(hits)} ไฟล์ · ค้นใน {n} ไฟล์ {secs:.1f} วิ{more} · ไม่ออกนอกเครื่อง"
+            )
+        self.searchChanged.emit()
+
+    @Slot(str, result=str)
+    def resultPath(self, rel: str) -> str:  # noqa: N802
+        """path จริงของผลค้น (ต้องอยู่ใน home)."""
+        try:
+            return str(files.inside(self._root, self._root / rel))
+        except (OSError, files.OutsideHome):
+            return ""
+
+    @Slot(str)
+    def openFolderOf(self, rel: str) -> None:  # noqa: N802
+        parent = str(Path(rel).parent)
         self._rel = "" if parent == "." else parent
         self._load()
 

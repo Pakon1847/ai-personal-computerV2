@@ -9,9 +9,11 @@ TF-IDF ของ n-gram ตัวอักษร (ภาษาไทยไม่
 from __future__ import annotations
 
 import math
+import os
 import re
 from collections import Counter
 from dataclasses import dataclass
+from pathlib import Path
 
 CHUNK = 300  # ตัวอักษรต่อท่อน · ไฟล์ยาวแบ่งท่อนเพื่อไม่ให้ไฟล์ยาวได้เปรียบ
 N = (2, 3)
@@ -65,3 +67,64 @@ class Index:
                 best[name] = (s, text)
         ranked = sorted(best.items(), key=lambda kv: -kv[1][0])
         return [Hit(name, round(s, 4), text[:160]) for name, (s, text) in ranked[:k] if s > 0]
+
+
+# ---------- ค้นใน home ของผู้ใช้ (หน้า "ไฟล์ของฉัน") ----------
+SKIP_DIRS = {"node_modules", "__pycache__", "venv", "snap", "site-packages"}
+MAX_FILES = 400  # อ่านไม่เกินนี้ต่อการค้น (ไฟล์ใหม่สุดก่อน) · บอกผู้ใช้ถ้าถึงเพดาน
+
+
+def candidates(root: Path, max_files: int = MAX_FILES) -> tuple[list[Path], bool]:
+    """ไฟล์ที่อ่านได้ (txt md csv pdf) ใน root · ข้ามโฟลเดอร์ซ่อน/โปรแกรม · คืน (ไฟล์, ถึงเพดานไหม)."""
+    from aipc import files_qa
+
+    found: list[tuple[float, Path]] = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if not d.startswith(".") and d not in SKIP_DIRS]
+        for name in filenames:
+            if name.startswith(".") or not files_qa.supported(name):
+                continue
+            p = Path(dirpath) / name
+            try:
+                st = p.stat()
+            except OSError:
+                continue
+            if st.st_size <= files_qa.MAX_FILE_BYTES:
+                found.append((st.st_mtime, p))
+    found.sort(reverse=True)
+    return [p for _, p in found[:max_files]], len(found) > max_files
+
+
+class HomeSearch:
+    """จำข้อความที่อ่านแล้วตาม (path, mtime, size) · ค้นครั้งต่อไปอ่านเฉพาะไฟล์ใหม่/ที่แก้."""
+
+    def __init__(self, root: Path):
+        self.root = root
+        self._cache: dict[str, tuple[float, int, str]] = {}
+
+    def search(self, query: str, k: int = 8) -> tuple[list[Hit], int, bool]:
+        """(ผล · จำนวนไฟล์ที่ค้น · ถึงเพดานไหม) · Hit.name = path เทียบกับ root."""
+        from aipc import files_qa
+
+        paths, capped = candidates(self.root)
+        files, keep = [], {}
+        for p in paths:
+            key = str(p)
+            try:
+                st = p.stat()
+            except OSError:
+                continue
+            old = self._cache.get(key)
+            if old and old[0] == st.st_mtime and old[1] == st.st_size:
+                text = old[2]
+            else:
+                try:
+                    text = files_qa.extract(p)
+                except files_qa.Unsupported:
+                    text = ""
+            keep[key] = (st.st_mtime, st.st_size, text)
+            files.append((str(p.relative_to(self.root)), text))
+        self._cache = keep
+        if not files or not query.strip():
+            return [], len(files), capped
+        return Index(files).search(query, k), len(files), capped

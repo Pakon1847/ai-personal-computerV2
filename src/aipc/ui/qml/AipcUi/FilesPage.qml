@@ -14,6 +14,68 @@ ColumnLayout {
         AppText { text: filesBrowser.quotaText; color: Theme.inkMuted; oneLine: true }
     }
 
+    // ค้นในเนื้อหาไฟล์ (txt md csv pdf) · ทำในเครื่อง ไม่ใช้ AI · ผล docs/benchmarks/2026-10-01-file-search
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: 8
+        AppField {
+            id: searchBox
+            objectName: "fileSearchBox"
+            Layout.fillWidth: true
+            placeholder: "ค้นในเนื้อหาไฟล์ เช่น ใบเสร็จซ่อมแอร์ · ค่าเทอมลูก"
+            field.onAccepted: filesBrowser.search(text)
+        }
+        AppButton { objectName: "fileSearchButton"; text: "ค้น"; iconPath: Icons.search; kind: "primary"; onClicked: filesBrowser.search(searchBox.text) }
+        AppButton {
+            visible: filesBrowser.searchResults.length > 0 || filesBrowser.searchNote !== ""
+            text: "ล้าง"; kind: "ghost"
+            onClicked: { searchBox.text = ""; filesBrowser.search("") }
+        }
+    }
+    AppText { objectName: "fileSearchNote"; visible: filesBrowser.searchNote !== ""; text: filesBrowser.searchNote; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+    Card {
+        objectName: "fileSearchResults"
+        visible: filesBrowser.searchResults.length > 0
+        Layout.fillWidth: true
+        implicitHeight: resultCol.implicitHeight + 24
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: resultCol
+            anchors.fill: parent
+            anchors.margins: 12
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            spacing: 6
+            Repeater {
+                model: filesBrowser.searchResults
+                delegate: RowLayout {
+                    id: hit
+                    required property var modelData
+                    objectName: "fileSearchHit"
+                    Layout.fillWidth: true
+                    spacing: 12
+                    Icon { path: Icons.file; color: Theme.inkMuted }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 0
+                        AppText { text: hit.modelData.name; strong: true; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
+                        AppText { text: hit.modelData.folder; size: Theme.fontCaption; color: Theme.inkMuted; oneLine: true; Layout.fillWidth: true }
+                        AppText { text: hit.modelData.snippet; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
+                    }
+                    AppButton {
+                        text: "ถาม AI"; kind: "secondary"; iconPath: Icons.chat
+                        onClicked: {
+                            const err = chat.attachFile(filesBrowser.resultPath(hit.modelData.path))
+                            if (err === "") AppState.page = "workspace"
+                            else fileError.text = err
+                        }
+                    }
+                    AppButton { text: "เปิดโฟลเดอร์"; kind: "ghost"; onClicked: filesBrowser.openFolderOf(hit.modelData.path) }
+                }
+            }
+        }
+    }
+
     RowLayout {
         Layout.fillWidth: true
         spacing: 8
