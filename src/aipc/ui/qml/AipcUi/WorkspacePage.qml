@@ -134,6 +134,9 @@ Item {
             if (i.length === 0 || !i[i.length - 1].ai) return
             i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true })
             root.items = i
+            // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
+            if (uiSettings.autoSpeak && voice.available && note === "" && text !== "")
+                voice.speak(i.length - 1, root.tidy(text))
         }
     }
     // สกิลอัตโนมัติ (การ์ด 0017): Claude สร้าง/แก้เสร็จ → ทำงานนั้นทันที · ไม่สำเร็จ = ให้ Claude ตอบคำขอนี้แทน

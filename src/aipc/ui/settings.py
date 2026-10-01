@@ -28,15 +28,22 @@ class UiPrefs:
     theme: str = "light"
     font_scale: float = 1.0
     onboarded: bool = False  # เห็นหน้าแนะนำการใช้งานครั้งแรกแล้ว (ฟีเจอร์ข้อ 8)
-    speak_reminders: bool = (
-        False  # ถึงเวลานัด = อ่านออกเสียงด้วย (การ์ด 0019) · ค่าเริ่มต้นปิด ไม่ให้มีเสียงดังโดยไม่ตั้งใจ
-    )
+    # อ่านคำตอบ AI ออกเสียงเองเมื่อตอบจบ (การ์ด 0019 · สำหรับคนที่ไม่สะดวกอ่านจอ)
+    auto_speak: bool = False
+    # ถึงเวลานัด = อ่านออกเสียงด้วย · ค่าเริ่มต้นปิดทั้งคู่ ไม่ให้มีเสียงดังโดยไม่ตั้งใจ
+    speak_reminders: bool = False
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
         theme = self.theme if self.theme in THEMES else "light"
         scale = self.font_scale if self.font_scale in FONT_SCALES else 1.0
-        return UiPrefs(theme, scale, self.onboarded is True, self.speak_reminders is True)
+        return UiPrefs(
+            theme=theme,
+            font_scale=scale,
+            onboarded=self.onboarded is True,
+            auto_speak=self.auto_speak is True,
+            speak_reminders=self.speak_reminders is True,
+        )
 
 
 def load(path: Path | None = None) -> UiPrefs:
@@ -47,6 +54,7 @@ def load(path: Path | None = None) -> UiPrefs:
             theme=str(data.get("theme", "light")),
             font_scale=float(data.get("font_scale", 1.0)),
             onboarded=data.get("onboarded") is True,
+            auto_speak=data.get("auto_speak") is True,
             speak_reminders=data.get("speak_reminders") is True,
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):

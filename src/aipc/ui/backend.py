@@ -53,6 +53,17 @@ class UiSettings(QObject):
         return self._prefs.onboarded
 
     @Property(bool, notify=changed)
+    def autoSpeak(self) -> bool:  # noqa: N802
+        return self._prefs.auto_speak
+
+    @Slot(bool)
+    def setAutoSpeak(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.auto_speak:
+            self._prefs.auto_speak = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Property(bool, notify=changed)
     def speakReminders(self) -> bool:  # noqa: N802
         return self._prefs.speak_reminders
 

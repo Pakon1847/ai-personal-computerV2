@@ -575,6 +575,47 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(skills.handle("แปลงไฟล์ Word เป็น PDF ยังไง")["kind"] != "files", True)
         self.assertEqual(warnings, [])
 
+    def test_auto_speak_reads_finished_answer(self):
+        """อ่านคำตอบอัตโนมัติ: ปิด (ค่าเริ่มต้น) = ไม่อ่าน · เปิด = อ่านเมื่อตอบจบ · ตอบไม่จบไม่อ่าน."""
+        engine, win, warnings = self.open_shell()
+        voice, ui, chat = (engine._backends[k] for k in ("voice", "uiSettings", "chat"))
+        said = []
+
+        class FakeSpeaker:
+            available, current = True, -1
+
+            def say(self, text):
+                said.append(text)
+                return 9
+
+            def stop(self):
+                pass
+
+            def idle_check(self):
+                return False
+
+            def close(self):
+                pass
+
+        voice._speaker = FakeSpeaker()
+        voice.changed.emit()
+        page = find_all(win, "workspace")[0]
+
+        def answer(text, note=""):
+            pending = {"ai": True, "text": "", "note": "", "done": False, "skill": ""}
+            page.setProperty("items", [{"user": True, "text": "q"}, pending])
+            chat.finished.emit(text, note)
+            settle(30)
+
+        answer("ตอบครั้งแรก")
+        self.assertEqual(said, [])
+        ui.setAutoSpeak(True)
+        answer("น้ำคือ **H2O**")
+        self.assertEqual(said, ["น้ำคือ H2O"])
+        answer("ครึ่ง", "หยุดแล้ว")
+        self.assertEqual(len(said), 1)
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()

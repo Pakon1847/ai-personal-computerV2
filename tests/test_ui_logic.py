@@ -46,6 +46,10 @@ class SettingsTest(unittest.TestCase):
             settings.save(settings.UiPrefs("dark", 1.5), p)
             self.assertEqual(settings.load(p), settings.UiPrefs("dark", 1.5))
             self.assertFalse(p.with_name("ui.json.tmp").exists())  # ไม่มีไฟล์ชั่วคราวค้าง
+            # ตัวเลือกเสียง (การ์ด 0019) ไม่สลับช่องกัน
+            voice = settings.UiPrefs("light", 1.0, auto_speak=True, speak_reminders=False)
+            settings.save(voice, p)
+            self.assertEqual(settings.load(p), voice)
 
     def test_broken_or_edited_file_falls_back(self):
         with tempfile.TemporaryDirectory() as tmp:

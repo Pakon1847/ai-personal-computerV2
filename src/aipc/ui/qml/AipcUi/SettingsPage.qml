@@ -211,6 +211,14 @@ ColumnLayout {
                       : "ยังไม่ได้ติดตั้งตัวอ่านออกเสียง (sudo ./scripts/pi/install-voice.sh --apply) หรือไม่มีตัวเล่นเสียง"
             }
             AppCheck {
+                objectName: "autoSpeakCheck"
+                visible: voice.available
+                text: "อ่านคำตอบของ AI ออกเสียงเองทุกครั้ง"
+                detail: "สำหรับคนที่ไม่สะดวกอ่านจอ · กดหยุดอ่านที่คำตอบได้"
+                checked: uiSettings.autoSpeak
+                onClicked: uiSettings.setAutoSpeak(checked)
+            }
+            AppCheck {
                 objectName: "speakRemindersCheck"
                 visible: voice.available
                 text: "อ่านเตือนนัดออกเสียงเมื่อถึงเวลา"
