@@ -217,6 +217,9 @@ class VoiceController(QObject):
         self._listener = (listener or stt.Listener(self._weak("_heard"))) if active else None
         self._key, self._job, self._message = -1, -1, ""
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
+        # ตัวอัดหยุดเองเมื่อพูดจบ (การ์ด 0019 ข้อ 10) จากเธรดของมัน → ดูสถานะทุก 0.15 วิระหว่างฟัง
+        self._awaiting = False
+        self._mic_poll = QTimer(self, interval=150, timeout=self._poll_mic)
         self._state.connect(self._on_state)
         self._heard.connect(self._on_heard)
         self._idle = QTimer(self, interval=idle_poll_ms, timeout=self._idle_check)
@@ -305,18 +308,33 @@ class VoiceController(QObject):
             self.stop()
         err = self._listener.start()
         self._mic_message = err
+        self._awaiting = err == ""
+        if self._awaiting:
+            self._mic_poll.start()
+        self.micChanged.emit()
+
+    @Slot()
+    def _poll_mic(self) -> None:
+        if self._listener is None or self._listener.listening:
+            return
+        self._mic_poll.stop()
+        if self._awaiting:  # หยุดเองแล้ว กำลังถอด (ผลยังไม่มา)
+            self._transcribing, self._mic_message = True, "กำลังถอดเสียง…"
         self.micChanged.emit()
 
     @Slot()
     def stopListening(self) -> None:  # noqa: N802
         if self._listener is None or not self._listener.listening:
             return
+        self._mic_poll.stop()
         self._transcribing, self._mic_message = True, "กำลังถอดเสียง…"
         self.micChanged.emit()
         self._listener.stop()
 
     @Slot(str, str, float)
     def _on_heard(self, text: str, err: str, secs: float) -> None:
+        self._awaiting = False
+        self._mic_poll.stop()
         self._transcribing, self._last_stt_s = False, secs
         self._mic_message = err or f"ถอดเสียงใน {secs:.1f} วิ · ตรวจข้อความแล้วกดส่ง"
         self.micChanged.emit()

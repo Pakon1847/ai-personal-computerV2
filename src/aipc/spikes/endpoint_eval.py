@@ -56,7 +56,13 @@ def main(argv: list[str] | None = None) -> int:
         speech = load(a.folder / m["file"])
         start, end = int(m["speech_start"] * SR), int(m["speech_end"] * SR)
         p = np.mean(speech[start:end] ** 2)
-        for cond, snr in (("clean", None), ("brown", 20), ("babble", 20), ("brown", 5), ("babble", 5)):
+        for cond, snr in (
+            ("clean", None),
+            ("brown", 20),
+            ("babble", 20),
+            ("brown", 5),
+            ("babble", 5),
+        ):
             x = speech.copy()
             if snr is not None:
                 if cond == "brown":
@@ -69,20 +75,25 @@ def main(argv: list[str] | None = None) -> int:
             result, t = run(x)
             tag = cond if snr is None else f"{cond}{snr}"
             rows.append({"file": m["file"], "kind": m["kind"], "noise": tag, "result": result,
-                         "stop_s": round(t, 2), "after_end_s": round(t - m["speech_end"], 2)})  # fmt: skip
+                         "stop_s": round(t, 2),
+                         "after_end_s": round(t - m["speech_end"], 2)})  # fmt: skip
     summary = {}
     for tag in dict.fromkeys(r["noise"] for r in rows):
         sel = [r for r in rows if r["noise"] == tag]
         ok = [r for r in sel if r["result"] == "end" and 0 <= r["after_end_s"] <= 1.5]
         cut = [r for r in sel if r["after_end_s"] < 0]
-        lat = sorted(r["after_end_s"] for r in sel if r["result"] == "end" and r["after_end_s"] >= 0)
+        lat = sorted(
+            r["after_end_s"] for r in sel if r["result"] == "end" and r["after_end_s"] >= 0
+        )
         summary[tag] = {"n": len(sel), "stop_within_1_5s": len(ok), "cut_early": len(cut),
                         "cut_early_pairs": sum(r["kind"] == "pair" for r in cut),
-                        "results": {k: sum(r["result"] == k for r in sel) for k in ("end", "no_speech", "max", "eof")},
+                        "results": {k: sum(r["result"] == k for r in sel)
+                                    for k in ("end", "no_speech", "max", "eof")},
                         "after_end_median": lat[len(lat) // 2] if lat else None}  # fmt: skip
         print(tag, summary[tag])
     if a.out:
-        a.out.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1),
+        doc = json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1)
+        a.out.write_text(doc,
                          encoding="utf-8", newline="\n")  # fmt: skip
     return 0
 

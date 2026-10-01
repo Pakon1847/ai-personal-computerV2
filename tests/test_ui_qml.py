@@ -651,7 +651,7 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(warnings, [])
 
     def test_push_to_talk_fills_input_without_sending(self):
-        """กดค้างเพื่อพูด: ป้ายไมค์เปิดตอนกดค้าง · ข้อความที่ถอดได้ใส่ช่องพิมพ์ ไม่ส่งเอง · ไม่มีตัวถอด = ไม่มีปุ่ม."""
+        """แตะเพื่อพูด: ป้ายไมค์เปิดตอนฟัง · แตะซ้ำ = หยุด · ข้อความใส่ช่องพิมพ์ ไม่ส่งเอง · ไม่มีตัวถอด = ไม่มีปุ่ม."""
         engine, win, warnings = self.open_shell()
         voice = engine._backends["voice"]
 
@@ -680,15 +680,50 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(mic.property("visible"))
         page = find_all(win, "workspace")[0]
         before = len(page.property("items").toVariant())
-        mic.pressed.emit()
+        mic.clicked.emit()
         settle(30)
         self.assertIn("ไมค์เปิด", find_items(win, "micIndicator")[0].property("text"))
-        mic.released.emit()
+        mic.clicked.emit()  # แตะซ้ำ = หยุดทันที
         settle(50)
         self.assertEqual(find_all(win, "chatInput")[0].property("text"), "เปิด ยูทูบ")
         self.assertEqual(len(page.property("items").toVariant()), before)  # ไม่ได้ส่งเอง
         self.assertEqual(find_items(win, "micIndicator")[0].property("text"), "ไมค์ปิด")
         self.assertIn("ตรวจข้อความ", voice.micMessage)
+        self.assertEqual(warnings, [])
+
+    def test_tap_to_talk_stops_by_itself(self):
+        """แตะครั้งเดียว: ตัวอัดหยุดเองเมื่อพูดจบ → หน้าจอขึ้น "กำลังถอด" แล้วข้อความเข้าช่องพิมพ์."""
+        engine, win, warnings = self.open_shell()
+        voice = engine._backends["voice"]
+
+        class SelfStopping:
+            available, listening = True, False
+
+            def start(self):
+                self.listening = True
+                return ""
+
+            def stop(self):
+                self.listening = False
+
+            def cancel(self):
+                self.listening = False
+
+        fake = voice._listener = SelfStopping()
+        voice.micChanged.emit()
+        settle(30)
+        mic = find_items(win, "micButton")[0]
+        mic.clicked.emit()
+        settle(30)
+        self.assertTrue(voice.listening)
+        fake.listening = False  # Endpointer: พูดจบแล้วเงียบ 1 วิ → หยุดเอง (จากเธรดของตัวอัด)
+        settle(400)
+        self.assertTrue(voice.transcribing)
+        self.assertEqual(mic.property("text"), "กำลังถอด…")
+        voice._heard.emit("ตั้ง เสียง สามสิบ", "", 2.1)
+        settle(50)
+        self.assertFalse(voice.transcribing)
+        self.assertEqual(find_all(win, "chatInput")[0].property("text"), "ตั้ง เสียง สามสิบ")
         self.assertEqual(warnings, [])
 
     def test_latex_answers_become_plain_text(self):

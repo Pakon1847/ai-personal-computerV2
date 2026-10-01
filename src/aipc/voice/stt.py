@@ -90,16 +90,31 @@ class Endpointer:
         return "max" if self.frames >= self.max_frames else None
 
 
+def _remove(path: Path) -> None:
+    """ลบไฟล์เสียง · Windows ปล่อยไฟล์ช้าหลังปิดโปรแกรมอัด (เทสต์) → ลองซ้ำสั้น ๆ."""
+    for _ in range(20):
+        try:
+            path.unlink(missing_ok=True)
+            return
+        except PermissionError:
+            time.sleep(0.05)
+
+
 def clean(text: str) -> str:
     return re.sub(r"\s+", " ", TAGS.sub(" ", text)).strip()
 
 
 class Listener:
-    """start() เริ่มอัด · stop() หยุดแล้วถอดในเธรดแยก → on_done(ข้อความ, ข้อผิดพลาด, วินาทีที่ถอด)."""
+    """start() เริ่มอัด · stop() หยุดแล้วถอดในเธรดแยก → on_done(ข้อความ, ข้อผิดพลาด, วินาทีที่ถอด).
+
+    auto_stop=True (แตะครั้งเดียว · การ์ด 0019 ข้อ 10): อ่านไฟล์ที่กำลังอัดทุก 0.1 วิ ป้อน Endpointer ·
+    พูดจบแล้วเงียบ 1 วิ = หยุดและถอดเอง · ไม่ได้ยินเสียงพูด 5 วิ = ทิ้งแล้วบอกผู้ใช้
+    """
 
     def __init__(self, on_done: Callable[[str, str, float], None] = lambda *a: None,
                  voice_dir: Path = VOICE_DIR, record_cmd: list[str] | None = None,
-                 transcribe_cmd: list[str] | None = None, max_s: float = MAX_S):  # fmt: skip
+                 transcribe_cmd: list[str] | None = None, max_s: float = MAX_S,
+                 auto_stop: bool = True, endpointer=None):  # fmt: skip
         self._on_done = on_done
         self._voice_dir = voice_dir
         rec = shutil.which("pw-record")
@@ -110,6 +125,8 @@ class Listener:
             "-ac", "512", "-f"]  # fmt: skip
         self._custom = transcribe_cmd is not None
         self._max_s = max_s
+        self._auto_stop = auto_stop
+        self._make_endpointer = endpointer or (lambda: Endpointer(max_s=max_s))
         self._proc: subprocess.Popen | None = None
         self._path: Path | None = None
         self._started = 0.0
@@ -147,10 +164,41 @@ class Listener:
                 self._proc = None
                 return f"เปิดไมค์ไม่ได้: {e}"
             self._started = time.monotonic()
-            self._timer = threading.Timer(self._max_s, self.stop)  # กดค้างนานเกิน = หยุดเอง
+            self._timer = threading.Timer(self._max_s + 1, self.stop)  # กันไมค์ค้าง (ไฟล์ไม่โต)
             self._timer.daemon = True
             self._timer.start()
+            if self._auto_stop:
+                threading.Thread(
+                    target=self._watch, args=(self._proc, self._path), daemon=True
+                ).start()
             return ""
+
+    def _watch(self, proc: subprocess.Popen, path: Path) -> None:
+        """อ่านเสียงที่อัดเพิ่มทุก 0.1 วิ · Endpointer บอกจบ = หยุดเอง."""
+        ep, offset = self._make_endpointer(), None
+        while self._proc is proc:
+            time.sleep(0.1)
+            try:
+                with path.open("rb") as f:
+                    if offset is None:  # หาจุดเริ่มข้อมูลเสียงใน WAV ("data" + ขนาด 4 ไบต์)
+                        head = f.read(4096)
+                        i = head.find(b"data")
+                        if i < 0:
+                            continue
+                        offset = i + 8
+                    f.seek(offset)
+                    chunk = f.read()
+            except OSError:
+                continue
+            offset += len(chunk) - len(chunk) % 2
+            result = ep.feed(chunk[: len(chunk) - len(chunk) % 2]) if chunk else None
+            if result == "no_speech":
+                self.cancel()
+                self._on_done("", "ไม่ได้ยินเสียงพูด ลองแตะแล้วพูดใกล้ไมค์อีกครั้ง", 0.0)
+                return
+            if result is not None:
+                self.stop()
+                return
 
     def stop(self) -> None:
         """หยุดอัด แล้วถอดในเธรดแยก · กดสั้นเกิน = ทิ้ง."""
@@ -170,7 +218,7 @@ class Listener:
         except subprocess.TimeoutExpired:
             proc.kill()
         if held < MIN_S:
-            path.unlink(missing_ok=True)
+            _remove(path)
             self._on_done("", "กดค้างไว้ระหว่างพูด แล้วปล่อยเมื่อพูดจบ", 0.0)
             return
         threading.Thread(target=self._transcribe, args=(path,), daemon=True).start()
@@ -185,7 +233,7 @@ class Listener:
             proc.kill()
             proc.wait()
         if path is not None:
-            path.unlink(missing_ok=True)
+            _remove(path)
 
     def _transcribe(self, path: Path) -> None:
         t0 = time.monotonic()
@@ -196,7 +244,7 @@ class Listener:
         except (OSError, subprocess.TimeoutExpired):
             text, err = "", "ถอดเสียงไม่สำเร็จ"
         finally:
-            path.unlink(missing_ok=True)  # ไม่เก็บเสียงไว้
+            _remove(path)  # ไม่เก็บเสียงไว้
         if not text and not err:
             err = "ไม่ได้ยินเสียงพูด ลองพูดใกล้ไมค์อีกครั้ง"
         self._on_done(text, err, round(time.monotonic() - t0, 2))

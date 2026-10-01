@@ -646,17 +646,16 @@ Item {
                 }
             }
             AppButton {
-                // กดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · ปล่อย = ถอดเสียง → ข้อความใส่ช่องพิมพ์ ไม่ส่งเอง
+                // แตะครั้งเดียวเพื่อพูด (การ์ด 0019 ข้อ 10 · Pakon เลือก) · พูดจบแล้วเงียบ ~1 วิ = หยุดเอง · แตะซ้ำ = หยุดทันที
+                // ข้อความที่ถอดได้ใส่ช่องพิมพ์ ไม่ส่งเอง
                 objectName: "micButton"
                 visible: voice.micAvailable
                 enabled: !voice.transcribing && !chat.busy
                 kind: voice.listening ? "warn" : "secondary"
                 iconPath: Icons.mic
-                text: voice.listening ? "ปล่อยเมื่อพูดจบ" : voice.transcribing ? "กำลังถอด…" : ""
-                Accessible.name: "กดค้างเพื่อพูด"
-                onPressed: voice.startListening()
-                onReleased: voice.stopListening()
-                onCanceled: voice.stopListening()
+                text: voice.listening ? "กำลังฟัง · แตะเพื่อหยุด" : voice.transcribing ? "กำลังถอด…" : ""
+                Accessible.name: "แตะเพื่อพูด"
+                onClicked: voice.listening ? voice.stopListening() : voice.startListening()
             }
             AppButton {
                 objectName: "sendButton"
@@ -727,7 +726,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         objectName: "chatHint"
         text: chat.notice !== "" ? chat.notice
-              : voice.listening ? "กำลังฟัง · ปล่อยปุ่มเมื่อพูดจบ (ยาวสุด 15 วิ)"
+              : voice.listening ? "กำลังฟัง · พูดจบแล้วเงียบสักครู่ ระบบหยุดเอง (หรือแตะไมค์อีกครั้ง)"
               : voice.micMessage !== "" ? voice.micMessage
               : chat.busy ? "Esc หรือปุ่มหยุด = หยุดตอบ" : "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
         size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true

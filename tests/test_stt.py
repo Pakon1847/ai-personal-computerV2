@@ -10,12 +10,26 @@ import time
 import unittest
 from pathlib import Path
 
-from aipc.voice.stt import Listener, clean
+from aipc.voice.stt import Endpointer, Listener, clean
 
 # ตัวอัดปลอม: เขียนไฟล์แล้วรอจนถูกหยุด · ตัวถอดปลอม: พิมพ์ข้อความคงที่
 FAKE_REC = [sys.executable, "-c",
             "import sys, time; open(sys.argv[1], 'wb').write(b'RIFF'); time.sleep(30)"]  # fmt: skip
 FAKE_STT = [sys.executable, "-c", "import sys; print('[BLANK_AUDIO] เปิด ยูทูบ ')", "-f"]
+# ตัวอัดปลอมแบบเวลาจริง: เขียน WAV เงียบ 0.4 วิ → เสียงดัง 0.6 วิ → เงียบไปเรื่อย ๆ (ทีละ 0.1 วิ)
+TALKER = r"""
+import math, struct, sys, time
+f = open(sys.argv[1], "wb")
+fmt = struct.pack("<IHHIIHH", 16, 1, 1, 16000, 32000, 2, 16)
+f.write(b"RIFF" + struct.pack("<I", 0) + b"WAVEfmt " + fmt + b"data" + struct.pack("<I", 0))
+f.flush()
+for k in range(80):
+    loud = 4 <= k < 10
+    amp = 8000 if loud else 30
+    f.write(b"".join(struct.pack("<h", int(amp * math.sin(i * 0.3))) for i in range(1600)))
+    f.flush()
+    time.sleep(0.1)
+"""
 
 
 class SttTest(unittest.TestCase):
@@ -71,6 +85,45 @@ class SttTest(unittest.TestCase):
         self.l.cancel()
         self.assertFalse(self.done.wait(1))
         self.assertEqual(self._files(), [])
+
+    def test_tap_once_stops_by_itself_after_silence(self):
+        talker = Path(self.tmp.name) / "talker.py"
+        talker.write_text(TALKER, encoding="utf-8")
+        lis = Listener(lambda t, e, s: (self.result.append((t, e)), self.done.set()),
+                     record_cmd=[sys.executable, str(talker)], transcribe_cmd=FAKE_STT)  # fmt: skip
+        self.assertEqual(lis.start(), "")
+        t0 = time.monotonic()
+        self.assertTrue(self.done.wait(15))
+        self.assertEqual(self.result, [("เปิด ยูทูบ", "")])
+        # พูด 0.4–1.0 วิ · เงียบ 1 วิ = หยุด → ราว 2 วิ (+ เวลาเปิดโปรแกรม/ถอด)
+        self.assertLess(time.monotonic() - t0, 6)
+        self.assertFalse(lis.listening)
+
+    def test_no_speech_gives_up(self):
+        talker = Path(self.tmp.name) / "quiet.py"
+        talker.write_text(TALKER.replace("4 <= k < 10", "False"), encoding="utf-8")
+        lis = Listener(lambda t, e, s: (self.result.append((t, e)), self.done.set()),
+                     record_cmd=[sys.executable, str(talker)], transcribe_cmd=FAKE_STT,
+                     endpointer=lambda: Endpointer(no_speech_s=0.8))  # fmt: skip
+        lis.start()
+        self.assertTrue(self.done.wait(15))
+        self.assertEqual(self.result[0][0], "")
+        self.assertIn("ไม่ได้ยินเสียงพูด", self.result[0][1])
+        self.assertEqual(self._files(), [])
+
+    def test_endpointer_keeps_listening_through_short_pause(self):
+        import math
+        import struct
+
+        def tone(sec, amp):
+            return b"".join(
+                struct.pack("<h", int(amp * math.sin(i * 0.3))) for i in range(int(16000 * sec))
+            )
+
+        ep = Endpointer()
+        audio = tone(0.4, 30) + tone(0.6, 8000) + tone(0.5, 30) + tone(0.6, 8000)
+        self.assertIsNone(ep.feed(audio))  # เว้น 0.5 วิกลางประโยค ไม่ตัด
+        self.assertEqual(ep.feed(tone(1.2, 30)), "end")
 
     def test_unavailable_without_recorder_or_model(self):
         missing = Listener(voice_dir=Path(self.tmp.name) / "none", record_cmd=FAKE_REC)
