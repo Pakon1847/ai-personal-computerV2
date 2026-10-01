@@ -616,6 +616,31 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(len(said), 1)
         self.assertEqual(warnings, [])
 
+    def test_files_by_time_from_chat(self):
+        """ดูไฟล์ตามเวลา: "ไฟล์ที่แก้เมื่อวาน" กรองตามเวลาแก้ไข · มีเรื่องที่ค้นก็จัดอันดับตามเนื้อหา."""
+        from datetime import datetime, timedelta
+
+        engine, win, warnings = self.open_shell()
+        skills = engine._backends["skills"]
+        home = Path(os.environ["XDG_DATA_HOME"]) / "time-home"
+        home.mkdir(parents=True)
+        now = datetime.now()
+        yday = (now - timedelta(days=1)).replace(hour=12, minute=0).timestamp()
+        old = (now - timedelta(days=40)).timestamp()
+        for name, text, t in (("a.txt", "รายงานยอดขาย", yday), ("b.txt", "สูตรแกงเขียวหวาน", yday),
+                              ("c.txt", "รายงานเก่า", old)):  # fmt: skip
+            (home / name).write_text(text, encoding="utf-8")
+            os.utime(home / name, (t, t))
+        skills._home, skills._file_search = home, None
+        card = skills.handle("ขอดูไฟล์ที่แก้เมื่อวานหน่อย")
+        self.assertEqual(card["kind"], "files")
+        self.assertEqual(sorted(f["name"] for f in card["files"]), ["a.txt", "b.txt"])  # ไม่มีไฟล์เก่า
+        self.assertEqual(card["title"], "ไฟล์ที่แก้ไขเมื่อวาน")
+        card = skills.handle("หาไฟล์รายงานที่แก้เมื่อวาน")
+        self.assertEqual(card["files"][0]["name"], "a.txt")
+        self.assertIn("รายงาน", card["title"])
+        self.assertEqual(warnings, [])
+
     def test_latex_answers_become_plain_text(self):
         """พบในผลสอบ 2026-10-01: Gemma ตอบเป็น LaTeX → หน้าจอแสดงข้อความอ่านง่าย."""
         _, win, warnings = self.open_shell()

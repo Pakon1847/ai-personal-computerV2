@@ -83,3 +83,22 @@ def time_range(label: str, now):
         "this_month": (month, (month + timedelta(days=32)).replace(day=1)),
         "last_month": (prev_month, month),
     }.get(label, (None, None))
+
+
+LABELS = {"today": "วันนี้", "yesterday": "เมื่อวาน", "this_week": "สัปดาห์นี้",
+          "last_week": "สัปดาห์ที่แล้ว", "this_month": "เดือนนี้", "last_month": "เดือนที่แล้ว",
+          "latest": "ล่าสุด"}  # fmt: skip
+_WORDS = """ขอ ดู หา ค้น ช่วย แสดง ให้ หน่อย ที ทั้งหมด อะไร บ้าง ไหน อยู่ ตรง ไป ที่ ฉัน ผม เรา ของ ใน
+เมื่อ ไว้ ไฟล์ เอกสาร โน้ต รายการ list มี ครับ ค่ะ คะ นะ เคย แก้ไข แก้ สร้าง ทำ เขียน จด เปิด เซฟ บันทึก
+เพิ่ง คือ ล่าสุด วันนี้ เมื่อวาน สัปดาห์ อาทิตย์ เดือน ที่แล้ว ก่อน นี้""".split()
+# คำยาวก่อน ("เมื่อวาน" ก่อน "เมื่อ" · "แก้ไข" ก่อน "แก้")
+# ตัดเลขและเครื่องหมาย ASCII เท่านั้น (สระ/วรรณยุกต์ไทยไม่ใช่ \w จึงห้ามตัดด้วย \W)
+FILLER = re.compile("|".join(sorted(_WORDS, key=len, reverse=True)), re.I)
+
+
+def topic(text: str) -> str:
+    """คำที่เหลือหลังตัดคำขอ/เวลา ("หาไฟล์รายงานที่แก้เมื่อวาน" → "รายงาน") · ว่าง = ดูตามเวลาอย่างเดียว."""
+    rest = FILLER.sub(" ", text)
+    rest = re.sub(r"[0-9!-/:-@\[-`{-~]", " ", rest)
+    rest = re.sub(r"\s+", " ", rest).strip()
+    return rest if len(rest.replace(" ", "")) >= 3 else ""

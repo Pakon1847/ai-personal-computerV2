@@ -1500,8 +1500,10 @@ class SkillsController(QObject):
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
             return card
-        from aipc.skills.fileintent import file_intent
+        from aipc.skills.fileintent import file_intent, file_time
 
+        if label := file_time(text):  # ดูไฟล์ตามช่วงเวลา ("ไฟล์ที่แก้เมื่อวาน")
+            return self._files_card(text, label)
         if file_intent(text):  # หาไฟล์ของผู้ใช้ = ค้นในเครื่องด้วยโค้ด (AI เปิดไฟล์ไม่ได้)
             return self._files_card(text)
         if self._llm_ready():
@@ -1515,13 +1517,24 @@ class SkillsController(QObject):
             return self._card(r, text)
         return self._card(router.route(text, self._skills, self.available()), text)
 
-    def _files_card(self, text: str) -> dict:
+    def _files_card(self, text: str, label: str | None = None) -> dict:
         """ผลค้นไฟล์ใน home (aipc.files_search) · ผล docs/benchmarks/2026-10-01-file-intent."""
         from aipc.files_search import HomeSearch
 
         if self._file_search is None:
             self._file_search = HomeSearch(self._home)
-        hits, n, capped = self._file_search.search(text, 5)
+        when = ""
+        if label is None:
+            hits, n, capped = self._file_search.search(text, 5)
+        else:
+            from aipc.skills.fileintent import LABELS, time_range, topic
+
+            since, until = time_range(label, self._now().replace(tzinfo=None))
+            about = topic(text)
+            hits, n, capped = self._file_search.search(about, 5, since=since, until=until,
+                                                       by_time=not about)  # fmt: skip
+            when = f"แก้ไข{LABELS[label]}" if label != "latest" else "แก้ไขล่าสุด"
+            when += f" เรื่อง “{about}”" if about else ""
         files = []
         for h in hits:
             parent = Path(h.name).parent.as_posix()
@@ -1530,9 +1543,11 @@ class SkillsController(QObject):
                           "folder": folder, "snippet": h.snippet})  # fmt: skip
         more = f" · อ่านแค่ {n} ไฟล์ล่าสุด" if capped else ""
         return {"kind": "files", "badge": {}, "chips": [], "confirmToken": "", "page": "",
-                "title": f"พบ {len(files)} ไฟล์ที่ตรง" if files else "ไม่พบไฟล์ที่ตรง",
-                "lines": [f"ค้นในเนื้อหา {n} ไฟล์ในโฟลเดอร์ของคุณ{more} · ไม่ออกนอกเครื่อง"
-                          + (" · ลองใช้คำที่อยู่ในไฟล์ เช่น ชื่อร้าน ชื่อคน" if not files else "")],
+                "title": (f"ไฟล์ที่{when}" if when else f"พบ {len(files)} ไฟล์ที่ตรง") if files
+                else (f"ไม่พบไฟล์ที่{when}" if when else "ไม่พบไฟล์ที่ตรง"),
+                "lines": [(f"มี {n} ไฟล์ในช่วงนี้ (ดูจากเวลาแก้ไขไฟล์){more} · ไม่ออกนอกเครื่อง" if label else
+                           f"ค้นในเนื้อหา {n} ไฟล์ในโฟลเดอร์ของคุณ{more} · ไม่ออกนอกเครื่อง"
+                           + (" · ลองใช้คำที่อยู่ในไฟล์ เช่น ชื่อร้าน ชื่อคน" if not files else ""))],
                 "files": files}  # fmt: skip
 
     def _card(self, r, text: str) -> dict:

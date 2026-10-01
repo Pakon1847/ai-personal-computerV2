@@ -102,11 +102,35 @@ class HomeSearch:
         self.root = root
         self._cache: dict[str, tuple[float, int, str]] = {}
 
-    def search(self, query: str, k: int = 8) -> tuple[list[Hit], int, bool]:
-        """(ผล · จำนวนไฟล์ที่ค้น · ถึงเพดานไหม) · Hit.name = path เทียบกับ root."""
+    def search(self, query: str, k: int = 8, since=None, until=None,
+               by_time: bool = False) -> tuple[list[Hit], int, bool]:  # fmt: skip
+        """(ผล · จำนวนไฟล์ที่ค้น · ถึงเพดานไหม) · Hit.name = path เทียบกับ root.
+
+        since/until (datetime) = กรองตามเวลาแก้ไข · by_time = เรียงใหม่สุดก่อน ไม่ใช้คำค้น
+        """
+        from datetime import datetime
+
         from aipc import files_qa
 
         paths, capped = candidates(self.root)
+        if since is not None or until is not None:
+
+            def inside(p: Path) -> bool:
+                t = datetime.fromtimestamp(p.stat().st_mtime)
+                return (since is None or t >= since) and (until is None or t < until)
+
+            paths = [p for p in paths if inside(p)]
+        if by_time:  # candidates() เรียงใหม่สุดก่อนอยู่แล้ว
+            hits = []
+            for p in paths[:k]:
+                try:
+                    text = files_qa.extract(p)
+                except files_qa.Unsupported:
+                    text = ""
+                hits.append(
+                    Hit(str(p.relative_to(self.root)), 0.0, re.sub(r"\s+", " ", text)[:160])
+                )
+            return hits, len(paths), capped
         files, keep = [], {}
         for p in paths:
             key = str(p)
