@@ -63,6 +63,16 @@ class CameraFlowTest(unittest.TestCase):
     def test_frames_stop_when_camera_fails(self):
         self.assertEqual(sum(1 for _ in camera.frames(FakeCap(3), seconds=60)), 3)
 
+    def test_decoder_error_becomes_camera_error(self):
+        # T11 บน Pi 5: กล้องส่งภาพว่าง → cv2.error หลุดออกไปจนคำขอสแกนตาย
+        # · ต้องเป็น RuntimeError (= "ใช้กล้องไม่ได้")
+        class Broken:
+            def read(self):
+                raise ValueError("(-215:Assertion failed) !buf.empty() in function 'imdecode_'")
+
+        with self.assertRaises(RuntimeError):
+            list(camera.frames(Broken(), seconds=60))
+
     def test_enroll_without_consent_saves_nothing(self):
         sc = FakeScanner(pipeline.Template(self.vec, 6, "t"))
         rc = camera.cmd_enroll(FakeCap(10), sc, self.fs, 5, ask=lambda _: "ไม่", out=self.out.append)

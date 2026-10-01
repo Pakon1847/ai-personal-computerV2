@@ -1,0 +1,184 @@
+2026-09-30T20:06:54+07:00 start hours=12
+2026-09-30T20:07:00+07:00 chat {"ok": true, "s": 5.5, "reason": "", "chars": 70, "tool": ""}
+2026-09-30T20:07:05+07:00 scan no-face False
+2026-09-30T20:12:11+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-09-30T20:17:24+07:00 chat {"ok": true, "s": 12.2, "reason": "", "chars": 257, "tool": ""}
+2026-09-30T20:23:00+07:00 chat {"ok": true, "s": 35.2, "reason": "", "chars": 652, "tool": ""}
+2026-09-30T20:23:05+07:00 scan no-face False
+2026-09-30T20:28:38+07:00 chat {"ok": true, "s": 31.6, "reason": "", "chars": 593, "tool": ""}
+2026-09-30T20:33:56+07:00 chat {"ok": true, "s": 16.9, "reason": "", "chars": 351, "tool": ""}
+2026-09-30T20:39:37+07:00 chat {"ok": true, "s": 40.8, "reason": "", "chars": 745, "tool": ""}
+2026-09-30T20:39:43+07:00 scan no-face False
+2026-09-30T20:45:27+07:00 chat {"ok": true, "s": 43.9, "reason": "", "chars": 771, "tool": ""}
+2026-09-30T20:50:46+07:00 chat {"ok": true, "s": 17.3, "reason": "", "chars": 372, "tool": ""}
+2026-09-30T20:55:57+07:00 chat {"ok": true, "s": 9.9, "reason": "", "chars": 150, "tool": ""}
+2026-09-30T20:56:02+07:00 scan no-face False
+2026-09-30T21:01:18+07:00 chat {"ok": true, "s": 14.8, "reason": "", "chars": 324, "tool": ""}
+2026-09-30T21:06:40+07:00 chat {"ok": true, "s": 21.4, "reason": "", "chars": 439, "tool": ""}
+2026-09-30T21:11:53+07:00 chat {"ok": true, "s": 11.7, "reason": "", "chars": 259, "tool": ""}
+2026-09-30T21:11:58+07:00 scan no-face False
+2026-09-30T21:17:09+07:00 chat {"ok": true, "s": 10.5, "reason": "", "chars": 181, "tool": ""}
+2026-09-30T21:22:15+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-09-30T21:27:25+07:00 chat {"ok": true, "s": 9.2, "reason": "", "chars": 142, "tool": ""}
+2026-09-30T21:27:31+07:00 scan no-face False
+2026-09-30T21:32:42+07:00 chat {"ok": true, "s": 10.9, "reason": "", "chars": 217, "tool": ""}
+2026-09-30T21:38:00+07:00 chat {"ok": true, "s": 16.5, "reason": "", "chars": 338, "tool": ""}
+2026-09-30T21:43:11+07:00 chat {"ok": true, "s": 9.7, "reason": "", "chars": 150, "tool": ""}
+2026-09-30T21:43:15+07:00 scan unavailable False
+2026-09-30T21:48:25+07:00 chat {"ok": true, "s": 9.0, "reason": "", "chars": 140, "tool": ""}
+2026-09-30T21:53:39+07:00 chat {"ok": true, "s": 13.2, "reason": "", "chars": 271, "tool": ""}
+2026-09-30T21:58:54+07:00 chat {"ok": true, "s": 14.4, "reason": "", "chars": 290, "tool": ""}
+2026-09-30T21:58:55+07:00 scan unavailable False
+2026-09-30T22:04:14+07:00 chat {"ok": true, "s": 18.7, "reason": "", "chars": 379, "tool": ""}
+2026-09-30T22:09:31+07:00 chat {"ok": true, "s": 15.4, "reason": "", "chars": 317, "tool": ""}
+2026-09-30T22:14:37+07:00 chat {"ok": true, "s": 5.5, "reason": "", "chars": 70, "tool": ""}
+2026-09-30T22:14:38+07:00 scan unavailable False
+2026-09-30T22:19:53+07:00 chat {"ok": true, "s": 14.6, "reason": "", "chars": 292, "tool": ""}
+2026-09-30T22:25:02+07:00 chat {"ok": true, "s": 8.4, "reason": "", "chars": 134, "tool": ""}
+2026-09-30T22:30:18+07:00 chat {"ok": true, "s": 14.3, "reason": "", "chars": 289, "tool": ""}
+2026-09-30T22:30:18+07:00 scan unavailable False
+2026-09-30T22:35:35+07:00 chat {"ok": true, "s": 16.0, "reason": "", "chars": 319, "tool": ""}
+2026-09-30T22:40:46+07:00 chat {"ok": true, "s": 10.1, "reason": "", "chars": 204, "tool": ""}
+2026-09-30T22:46:00+07:00 chat {"ok": true, "s": 12.5, "reason": "", "chars": 257, "tool": ""}
+2026-09-30T22:46:05+07:00 scan no-face False
+2026-09-30T22:51:20+07:00 chat {"ok": true, "s": 14.3, "reason": "", "chars": 283, "tool": ""}
+2026-09-30T22:56:50+07:00 chat {"ok": true, "s": 29.0, "reason": "", "chars": 546, "tool": ""}
+2026-09-30T23:02:05+07:00 chat {"ok": true, "s": 14.4, "reason": "", "chars": 329, "tool": ""}
+2026-09-30T23:02:06+07:00 scan unavailable False
+2026-09-30T23:07:17+07:00 chat {"ok": true, "s": 10.4, "reason": "", "chars": 176, "tool": ""}
+2026-09-30T23:12:34+07:00 chat {"ok": true, "s": 15.7, "reason": "", "chars": 349, "tool": ""}
+2026-09-30T23:17:44+07:00 chat {"ok": true, "s": 8.9, "reason": "", "chars": 155, "tool": ""}
+2026-09-30T23:17:44+07:00 scan unavailable False
+2026-09-30T23:22:56+07:00 chat {"ok": true, "s": 10.9, "reason": "", "chars": 216, "tool": ""}
+2026-09-30T23:28:06+07:00 chat {"ok": true, "s": 8.7, "reason": "", "chars": 143, "tool": ""}
+2026-09-30T23:33:17+07:00 chat {"ok": true, "s": 10.8, "reason": "", "chars": 189, "tool": ""}
+2026-09-30T23:33:18+07:00 scan unavailable False
+2026-09-30T23:38:49+07:00 chat {"ok": true, "s": 29.9, "reason": "", "chars": 548, "tool": ""}
+2026-09-30T23:43:58+07:00 chat {"ok": true, "s": 8.0, "reason": "", "chars": 132, "tool": ""}
+2026-09-30T23:49:26+07:00 chat {"ok": true, "s": 27.8, "reason": "", "chars": 560, "tool": ""}
+2026-09-30T23:49:27+07:00 scan unavailable False
+2026-09-30T23:54:40+07:00 chat {"ok": true, "s": 12.0, "reason": "", "chars": 233, "tool": ""}
+2026-10-01T00:00:00+07:00 chat {"ok": true, "s": 18.9, "reason": "", "chars": 413, "tool": ""}
+2026-10-01T00:06:16+07:00 chat {"ok": true, "s": 35.7, "reason": "", "chars": 648, "tool": ""}
+2026-10-01T00:06:17+07:00 scan unavailable False
+2026-10-01T00:11:31+07:00 chat {"ok": true, "s": 13.6, "reason": "", "chars": 279, "tool": ""}
+2026-10-01T00:16:47+07:00 chat {"ok": true, "s": 14.2, "reason": "", "chars": 306, "tool": ""}
+2026-10-01T00:22:20+07:00 chat {"ok": true, "s": 32.3, "reason": "", "chars": 580, "tool": ""}
+2026-10-01T00:22:21+07:00 scan unavailable False
+2026-10-01T00:27:39+07:00 chat {"ok": true, "s": 17.7, "reason": "", "chars": 344, "tool": ""}
+2026-10-01T00:32:49+07:00 chat {"ok": true, "s": 8.4, "reason": "", "chars": 125, "tool": ""}
+2026-10-01T00:38:08+07:00 chat {"ok": true, "s": 18.7, "reason": "", "chars": 373, "tool": ""}
+2026-10-01T00:38:14+07:00 scan no-face False
+2026-10-01T00:43:30+07:00 chat {"ok": true, "s": 15.7, "reason": "", "chars": 311, "tool": ""}
+2026-10-01T00:48:43+07:00 chat {"ok": true, "s": 11.8, "reason": "", "chars": 170, "tool": ""}
+2026-10-01T00:53:50+07:00 chat {"ok": true, "s": 5.7, "reason": "", "chars": 70, "tool": ""}
+2026-10-01T00:53:55+07:00 scan no-face False
+2026-10-01T00:59:06+07:00 chat {"ok": true, "s": 9.6, "reason": "", "chars": 160, "tool": ""}
+2026-10-01T01:04:12+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T01:09:30+07:00 chat {"ok": true, "s": 16.8, "reason": "", "chars": 338, "tool": ""}
+2026-10-01T01:09:35+07:00 scan no-face False
+2026-10-01T01:14:55+07:00 chat {"ok": true, "s": 19.5, "reason": "", "chars": 440, "tool": ""}
+2026-10-01T01:20:05+07:00 chat {"ok": true, "s": 9.2, "reason": "", "chars": 153, "tool": ""}
+2026-10-01T01:25:29+07:00 chat {"ok": true, "s": 22.6, "reason": "", "chars": 439, "tool": ""}
+2026-10-01T01:25:34+07:00 scan no-face False
+2026-10-01T01:30:42+07:00 chat {"ok": true, "s": 6.8, "reason": "", "chars": 107, "tool": ""}
+2026-10-01T01:35:53+07:00 chat {"ok": true, "s": 9.8, "reason": "", "chars": 155, "tool": ""}
+2026-10-01T01:41:02+07:00 chat {"ok": true, "s": 5.5, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T01:41:07+07:00 scan no-face False
+2026-10-01T01:46:28+07:00 chat {"ok": true, "s": 20.1, "reason": "", "chars": 392, "tool": ""}
+2026-10-01T01:51:34+07:00 chat {"ok": true, "s": 5.2, "reason": "", "chars": 62, "tool": ""}
+2026-10-01T01:56:50+07:00 chat {"ok": true, "s": 14.8, "reason": "", "chars": 308, "tool": ""}
+2026-10-01T01:56:55+07:00 scan no-face False
+2026-10-01T02:02:01+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 56, "tool": ""}
+2026-10-01T02:07:17+07:00 chat {"ok": true, "s": 15.1, "reason": "", "chars": 336, "tool": ""}
+2026-10-01T02:12:23+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T02:12:28+07:00 scan no-face False
+2026-10-01T02:17:42+07:00 chat {"ok": true, "s": 12.6, "reason": "", "chars": 259, "tool": ""}
+2026-10-01T02:22:48+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T02:28:19+07:00 chat {"ok": true, "s": 30.6, "reason": "", "chars": 566, "tool": ""}
+2026-10-01T02:28:24+07:00 scan no-face False
+2026-10-01T02:33:46+07:00 chat {"ok": true, "s": 19.0, "reason": "", "chars": 380, "tool": ""}
+2026-10-01T02:39:07+07:00 chat {"ok": true, "s": 19.8, "reason": "", "chars": 421, "tool": ""}
+2026-10-01T02:44:13+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T02:44:18+07:00 scan no-face False
+2026-10-01T02:49:48+07:00 chat {"ok": true, "s": 28.9, "reason": "", "chars": 546, "tool": ""}
+2026-10-01T02:54:58+07:00 chat {"ok": true, "s": 9.1, "reason": "", "chars": 157, "tool": ""}
+2026-10-01T03:00:08+07:00 chat {"ok": true, "s": 9.6, "reason": "", "chars": 146, "tool": ""}
+2026-10-01T03:00:13+07:00 scan no-face False
+2026-10-01T03:05:31+07:00 chat {"ok": true, "s": 16.1, "reason": "", "chars": 352, "tool": ""}
+2026-10-01T03:10:41+07:00 chat {"ok": true, "s": 9.1, "reason": "", "chars": 197, "tool": ""}
+2026-10-01T03:15:55+07:00 chat {"ok": true, "s": 13.2, "reason": "", "chars": 271, "tool": ""}
+2026-10-01T03:16:00+07:00 scan no-face False
+2026-10-01T03:21:33+07:00 chat {"ok": true, "s": 32.5, "reason": "", "chars": 619, "tool": ""}
+2026-10-01T03:27:08+07:00 chat {"ok": true, "s": 33.7, "reason": "", "chars": 633, "tool": ""}
+2026-10-01T03:32:35+07:00 chat {"ok": true, "s": 26.1, "reason": "", "chars": 565, "tool": ""}
+2026-10-01T03:32:41+07:00 scan no-face False
+2026-10-01T03:37:58+07:00 chat {"ok": true, "s": 16.4, "reason": "", "chars": 336, "tool": ""}
+2026-10-01T03:43:09+07:00 chat {"ok": true, "s": 10.4, "reason": "", "chars": 218, "tool": ""}
+2026-10-01T03:48:28+07:00 chat {"ok": true, "s": 17.6, "reason": "", "chars": 363, "tool": ""}
+2026-10-01T03:48:33+07:00 scan no-face False
+2026-10-01T03:53:48+07:00 chat {"ok": true, "s": 13.9, "reason": "", "chars": 272, "tool": ""}
+2026-10-01T03:58:54+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T04:04:00+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T04:04:05+07:00 scan no-face False
+2026-10-01T04:09:20+07:00 chat {"ok": true, "s": 13.9, "reason": "", "chars": 325, "tool": ""}
+2026-10-01T04:14:40+07:00 chat {"ok": true, "s": 19.0, "reason": "", "chars": 374, "tool": ""}
+2026-10-01T04:19:52+07:00 chat {"ok": true, "s": 11.2, "reason": "", "chars": 180, "tool": ""}
+2026-10-01T04:19:57+07:00 scan no-face False
+2026-10-01T04:25:14+07:00 chat {"ok": true, "s": 16.3, "reason": "", "chars": 380, "tool": ""}
+2026-10-01T04:30:48+07:00 chat {"ok": true, "s": 32.5, "reason": "", "chars": 606, "tool": ""}
+2026-10-01T04:36:00+07:00 chat {"ok": true, "s": 10.8, "reason": "", "chars": 231, "tool": ""}
+2026-10-01T04:36:05+07:00 scan no-face False
+2026-10-01T04:41:11+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T04:46:24+07:00 chat {"ok": true, "s": 12.1, "reason": "", "chars": 225, "tool": ""}
+2026-10-01T04:51:55+07:00 chat {"ok": true, "s": 30.5, "reason": "", "chars": 568, "tool": ""}
+2026-10-01T04:52:01+07:00 scan no-face False
+2026-10-01T04:57:06+07:00 chat {"ok": true, "s": 4.8, "reason": "", "chars": 60, "tool": ""}
+2026-10-01T05:02:19+07:00 chat {"ok": true, "s": 11.3, "reason": "", "chars": 223, "tool": ""}
+2026-10-01T05:07:36+07:00 chat {"ok": true, "s": 15.8, "reason": "", "chars": 309, "tool": ""}
+2026-10-01T05:07:41+07:00 scan no-face False
+2026-10-01T05:13:05+07:00 chat {"ok": true, "s": 23.4, "reason": "", "chars": 502, "tool": ""}
+2026-10-01T05:18:42+07:00 chat {"ok": true, "s": 35.6, "reason": "", "chars": 646, "tool": ""}
+2026-10-01T05:23:52+07:00 chat {"ok": true, "s": 8.9, "reason": "", "chars": 147, "tool": ""}
+2026-10-01T05:23:57+07:00 scan no-face False
+2026-10-01T05:29:02+07:00 chat {"ok": true, "s": 4.7, "reason": "", "chars": 52, "tool": ""}
+2026-10-01T05:34:32+07:00 chat {"ok": true, "s": 28.9, "reason": "", "chars": 542, "tool": ""}
+2026-10-01T05:39:42+07:00 chat {"ok": true, "s": 8.2, "reason": "", "chars": 137, "tool": ""}
+2026-10-01T05:39:47+07:00 scan no-face False
+2026-10-01T05:44:56+07:00 chat {"ok": true, "s": 8.6, "reason": "", "chars": 182, "tool": ""}
+2026-10-01T05:50:07+07:00 chat {"ok": true, "s": 9.6, "reason": "", "chars": 218, "tool": ""}
+2026-10-01T05:55:17+07:00 chat {"ok": true, "s": 9.2, "reason": "", "chars": 183, "tool": ""}
+2026-10-01T05:55:22+07:00 scan no-face False
+2026-10-01T06:00:44+07:00 chat {"ok": true, "s": 20.2, "reason": "", "chars": 405, "tool": ""}
+2026-10-01T06:06:01+07:00 chat {"ok": true, "s": 16.6, "reason": "", "chars": 367, "tool": ""}
+2026-10-01T06:11:11+07:00 chat {"ok": true, "s": 8.9, "reason": "", "chars": 144, "tool": ""}
+2026-10-01T06:11:16+07:00 scan no-face False
+2026-10-01T06:16:26+07:00 chat {"ok": true, "s": 8.3, "reason": "", "chars": 165, "tool": ""}
+2026-10-01T06:22:04+07:00 chat {"ok": true, "s": 37.2, "reason": "", "chars": 681, "tool": ""}
+2026-10-01T06:27:38+07:00 chat {"ok": true, "s": 33.4, "reason": "", "chars": 623, "tool": ""}
+2026-10-01T06:27:43+07:00 scan no-face False
+2026-10-01T06:33:03+07:00 chat {"ok": true, "s": 18.9, "reason": "", "chars": 386, "tool": ""}
+2026-10-01T06:38:13+07:00 chat {"ok": true, "s": 8.3, "reason": "", "chars": 142, "tool": ""}
+2026-10-01T06:43:18+07:00 chat {"ok": true, "s": 4.9, "reason": "", "chars": 55, "tool": ""}
+2026-10-01T06:43:24+07:00 scan no-face False
+2026-10-01T06:48:34+07:00 chat {"ok": true, "s": 9.0, "reason": "", "chars": 133, "tool": ""}
+2026-10-01T06:53:54+07:00 chat {"ok": true, "s": 19.1, "reason": "", "chars": 374, "tool": ""}
+2026-10-01T06:59:06+07:00 chat {"ok": true, "s": 10.9, "reason": "", "chars": 247, "tool": ""}
+2026-10-01T06:59:11+07:00 scan no-face False
+2026-10-01T07:04:44+07:00 chat {"ok": true, "s": 32.4, "reason": "", "chars": 604, "tool": ""}
+2026-10-01T07:09:50+07:00 chat {"ok": true, "s": 4.7, "reason": "", "chars": 52, "tool": ""}
+2026-10-01T07:15:01+07:00 chat {"ok": true, "s": 10.5, "reason": "", "chars": 180, "tool": ""}
+2026-10-01T07:15:07+07:00 scan no-face False
+2026-10-01T07:20:23+07:00 chat {"ok": true, "s": 15.9, "reason": "", "chars": 335, "tool": ""}
+2026-10-01T07:25:59+07:00 chat {"ok": true, "s": 34.5, "reason": "", "chars": 650, "tool": ""}
+2026-10-01T07:31:09+07:00 chat {"ok": true, "s": 9.4, "reason": "", "chars": 146, "tool": ""}
+2026-10-01T07:31:15+07:00 scan no-face False
+2026-10-01T07:36:30+07:00 chat {"ok": true, "s": 14.8, "reason": "", "chars": 317, "tool": ""}
+2026-10-01T07:41:40+07:00 chat {"ok": true, "s": 8.7, "reason": "", "chars": 188, "tool": ""}
+2026-10-01T07:47:14+07:00 chat {"ok": true, "s": 33.5, "reason": "", "chars": 620, "tool": ""}
+2026-10-01T07:47:20+07:00 scan no-face False
+2026-10-01T07:52:53+07:00 chat {"ok": true, "s": 31.8, "reason": "", "chars": 581, "tool": ""}
+2026-10-01T07:58:03+07:00 chat {"ok": true, "s": 9.5, "reason": "", "chars": 160, "tool": ""}
+2026-10-01T08:03:21+07:00 chat {"ok": true, "s": 16.7, "reason": "", "chars": 324, "tool": ""}
+2026-10-01T08:03:26+07:00 scan no-face False
+2026-10-01T08:07:27+07:00 done linger=Linger=no

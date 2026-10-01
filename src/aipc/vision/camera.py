@@ -89,7 +89,14 @@ def frames(cap, seconds: float, clock=time.monotonic) -> Iterator:
     """อ่านเฟรมจนหมดเวลา · กล้องให้เฟรมไม่ได้ = หยุด (ไม่วนค้าง)."""
     end = clock() + seconds
     while clock() < end:
-        ok, frame = cap.read()
+        try:
+            ok, frame = cap.read()
+        except Exception as e:  # noqa: BLE001 · cv2.error
+            # T11 บน Pi 5 (2026-09-30 21:43–00:22): กล้องส่งภาพ MJPG ว่าง → cv2.error
+            # "!buf.empty()" หลุดออกไป
+            # คำขอสแกนตายกลางทาง ผู้เรียกได้แค่ "unavailable" → แปลงเป็น RuntimeError =
+            # "ใช้กล้องไม่ได้" ตามปกติ
+            raise RuntimeError(f"กล้องส่งภาพเสีย ({type(e).__name__})") from e
         if not ok:
             return
         yield frame
