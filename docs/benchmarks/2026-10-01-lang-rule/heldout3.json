@@ -1,0 +1,1078 @@
+{
+ "hit": {
+  "translate": 42,
+  "summarize": 33
+ },
+ "total": {
+  "translate": 49,
+  "summarize": 46
+ },
+ "false": 0,
+ "other": 57,
+ "rows": [
+  {
+   "expect": "translate",
+   "text": "แปลให้หน่อย: ขอบคุณมากสำหรับความช่วยเหลือเมื่อวานนี้",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลเป็นภาษาอังกฤษ ประชุมถูกเลื่อนไปเป็นวันพฤหัสบดีหน้า",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "\"break a leg\" แปลว่าอะไร",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ประโยคนี้ภาษาอังกฤษพูดว่ายังไง: ผมขอนัดพบแพทย์วันศุกร์ได้ไหมครับ",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลไทยเป็นอังกฤษ: ห้องน้ำอยู่ที่ไหนคะ",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "Please translate this into Thai: The package will arrive within three business days.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "\"under the weather\" แปลเป็นไทยว่าอะไร",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลอีเมลนี้เป็นภาษาไทยหน่อย Dear Mr. Smith, thank you for your prompt reply. We will send the contract by Monday.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "เขียนเป็นภาษาอังกฤษยังไงว่า ขอโทษที่มาสาย รถติดมาก",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลว่าอะไรอะ \"I'm good, thanks\"",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลประโยคนี้หน่อยครับ \"The deadline has been extended to the end of the month.\"",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "คำว่า reluctant แปลว่าอะไรครับ",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "แปลเป็นอังกฤษให้ที ฉันแพ้อาหารทะเล กินกุ้งไม่ได้",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "What does \"ไม่เป็นไร\" mean in English?",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ขอรบกวนแปลข้อความนี้เป็นภาษาอังกฤษด้วยค่ะ ทางร้านขออภัยในความไม่สะดวก สินค้าหมดชั่วคราว",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลภาษาไทยให้หน่อย she's been feeling blue lately",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "เวลาจะบอกว่า \"เกรงใจ\" เป็นภาษาอังกฤษ พูดว่ายังไงดี",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "Can you translate \"ขอให้เดินทางโดยสวัสดิภาพ\" into English?",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "แปลหน่อยจ้า see you later alligator",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลประโยคนี้เป็นไทย: I would appreciate it if you could review the attached document.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ภาษาอังกฤษของ \"ค่าใช้จ่ายรวมภาษีแล้ว\" คืออะไร",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลให้หน่อยว่า piece of cake ในที่นี้หมายถึงอะไร",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ถ้าจะพูดกับเพื่อนต่างชาติว่า \"เดี๋ยวโทรกลับนะ\" พูดเป็นอังกฤษยังไง",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "แปลเป็นภาษาอังกฤษแบบสุภาพ: กรุณาส่งใบเสร็จรับเงินมาทางอีเมลภายในวันนี้",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "translate to thai pls: hang in there, things will get better",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "สรุปให้หน่อย: กรมอุตุนิยมวิทยาประกาศเตือนฝนตกหนักถึงหนักมากในพื้นที่ภาคใต้ตอนล่างระหว่างวันที่ 3-6 ตุลาคม เนื่องจากมีมรสุมกำลังแรงพัดปกคลุม ประชาชนในพื้นที่เสี่ยงน้ำท่วมฉับพลันและน้ำป่าไหลหลากควรเตรียมพร้อมอพยพ และหลีกเลี่ยงการเดินเรือในทะเล",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ช่วยย่อให้สั้น ๆ หน่อย บริษัทขอแจ้งว่าระบบอีเมลภายในจะปิดปรับปรุงในวันเสาร์ที่ 10 ตุลาคม เวลา 22.00-02.00 น. ในช่วงเวลาดังกล่าวพนักงานจะไม่สามารถส่งหรือรับอีเมลได้ ขอให้ทุกท่านบันทึกงานที่ค้างอยู่ก่อนเวลาที่กำหนด",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ข้อความนี้พูดถึงอะไรบ้าง ผู้ว่าฯ กรุงเทพมหานครแถลงว่าจะเริ่มโครงการปลูกต้นไม้ 1 ล้านต้นภายในปีหน้า โดยจะร่วมมือกับภาคเอกชนและโรงเรียนในทุกเขต งบประมาณส่วนหนึ่งมาจากเงินบริจาค คาดว่าจะช่วยลดฝุ่น PM2.5 ได้ในระยะยาว",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "เนื้อหาข้างล่างนี้ต้องทำอะไรบ้าง เรียนผู้ปกครองนักเรียนชั้น ม.2 ทุกท่าน โรงเรียนขอเชิญประชุมผู้ปกครองวันที่ 15 ตุลาคม เวลา 9.00 น. ที่ห้องประชุมใหญ่ กรุณานำสมุดพกมาด้วย และชำระค่าทัศนศึกษาจำนวน 450 บาทภายในวันที่ 12 ตุลาคม",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ขอใจความสั้น ๆ ของข่าวนี้ ตำรวจจับกุมแก๊งหลอกลงทุนออนไลน์ได้ 5 คน หลังมีผู้เสียหายกว่า 200 ราย มูลค่าความเสียหายรวมกว่า 80 ล้านบาท ผู้ต้องหาใช้วิธีโฆษณาผ่านโซเชียลมีเดียว่าลงทุนแล้วได้ผลตอบแทนสูง ตำรวจเตือนประชาชนอย่าเชื่อคำชวนที่ให้ผลตอบแทนเกินจริง",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "TL;DR หน่อย ทีมครับ พรุ่งนี้ประชุมสไปรท์ย้ายเป็น 14.00 น. นะ ใครยังไม่ส่งรายงานความคืบหน้าให้ส่งก่อนเที่ยง แล้วก็อย่าลืมอัปเดตสถานะงานในบอร์ดด้วย ส่วนเรื่องเดโมลูกค้า เลื่อนไปสัปดาห์หน้า",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ย่อเมลนี้ให้หน่อย สวัสดีครับคุณสมชาย ตามที่ได้คุยกันทางโทรศัพท์เมื่อวาน ผมขอส่งใบเสนอราคาฉบับปรับปรุงมาให้พิจารณา ราคาลดลง 10 เปอร์เซ็นต์หากสั่งซื้อเกิน 100 ชิ้น หากสนใจกรุณาตอบกลับภายในวันศุกร์นี้ ทางเราจะได้จัดสรรสินค้าให้ทัน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "อ่านให้หน่อยว่าข้อความนี้ใจความสำคัญคืออะไร ปัจจุบันผู้สูงอายุในประเทศไทยมีสัดส่วนเกินร้อยละ 20 ของประชากรทั้งหมด ทำให้ประเทศเข้าสู่สังคมสูงวัยอย่างสมบูรณ์ รัฐบาลจึงเตรียมเพิ่มเบี้ยยังชีพและขยายบริการสาธารณสุขในชุมชน แต่ผู้เชี่ยวชาญเห็นว่างบประมาณยังไม่เพียงพอ",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "แชทกลุ่มห้องนี้ยาวมาก ช่วยสรุปให้ที\nแอน: พรุ่งนี้ไปเที่ยวทะเลกันกี่โมงดี\nบอล: ออกตี 6 เลย จะได้ไม่ติด\nแอน: โอเค งั้นนัดเจอที่ปั๊มเชลล์หน้าหมู่บ้าน\nมด: เดี๋ยวฉันเอาเต็นท์ไปเอง ใครจะเอาอาหารบ้าง\nบอล: ฉันเอาน้ำกับน้ำแข็ง",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ตัดเหลือแค่ประเด็นหลักได้ไหม ธนาคารแห่งประเทศไทยประกาศคงอัตราดอกเบี้ยนโยบายไว้ที่ร้อยละ 2.25 ต่อปี โดยระบุว่าเศรษฐกิจฟื้นตัวช้ากว่าที่คาด ขณะที่เงินเฟ้อยังอยู่ในกรอบเป้าหมาย คณะกรรมการจะติดตามความเสี่ยงจากเศรษฐกิจโลกอย่างใกล้ชิด",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "บทความนี้บอกว่าอะไร การนอนหลับไม่เพียงพอส่งผลต่อสุขภาพหลายด้าน ทั้งความจำที่ลดลง ภูมิคุ้มกันที่อ่อนแอ และความเสี่ยงโรคหัวใจที่สูงขึ้น ผู้เชี่ยวชาญแนะนำให้ผู้ใหญ่นอนวันละ 7-9 ชั่วโมง และหลีกเลี่ยงหน้าจอก่อนนอนอย่างน้อยหนึ่งชั่วโมง",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "ช่วยสรุปเป็นข้อ ๆ ให้หน่อย การท่องเที่ยวแห่งประเทศไทยเปิดเผยว่าช่วงไตรมาสสามมีนักท่องเที่ยวต่างชาติเข้ามาแล้ว 6.5 ล้านคน เพิ่มขึ้นร้อยละ 12 จากปีก่อน นักท่องเที่ยวจากจีนและมาเลเซียมากที่สุด ส่วนรายได้รวมอยู่ที่ประมาณ 3 แสนล้านบาท",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "สั้น ๆ พอ ประกาศหอพัก ตั้งแต่วันที่ 1 พฤศจิกายนเป็นต้นไป ค่าน้ำจะคิดหน่วยละ 20 บาท และค่าไฟหน่วยละ 8 บาท ผู้พักอาศัยต้องชำระค่าเช่าภายในวันที่ 5 ของทุกเดือน หากชำระล่าช้าจะมีค่าปรับวันละ 50 บาท",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "แล้วในข้อความนี้ฉันต้องทำอะไรบ้าง เรียนคุณลูกค้า บัตรเครดิตของท่านจะหมดอายุสิ้นเดือนนี้ ธนาคารได้จัดส่งบัตรใหม่ทางไปรษณีย์แล้ว เมื่อได้รับบัตรกรุณาโทรเปิดใช้งานที่เบอร์ 1234 และทำลายบัตรใบเก่าทิ้ง",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ขอแค่ใจความนะ นักวิทยาศาสตร์ค้นพบดาวเคราะห์ดวงใหม่ที่อยู่ห่างจากโลก 40 ปีแสง ดาวดวงนี้มีขนาดใกล้เคียงโลกและอยู่ในเขตที่น้ำอาจเป็นของเหลวได้ แต่ยังต้องศึกษาบรรยากาศเพิ่มเติมก่อนสรุปว่าสิ่งมีชีวิตอาศัยอยู่ได้หรือไม่",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "ย่อความให้หน่อย โครงการรถไฟฟ้าสายสีม่วงใต้ได้รับอนุมัติแล้ว ใช้งบ 1.2 แสนล้านบาท มีกำหนดก่อสร้าง 5 ปี ผู้รับเหมาจะเริ่มเข้าพื้นที่ต้นปีหน้า ประชาชนที่อยู่ตามแนวเส้นทางจะได้รับค่าชดเชยตามราคาประเมิน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ข้อความข้างล่างนี้เกี่ยวกับอะไร สวัสดีค่ะทุกคน พรุ่งนี้ฝ่ายบุคคลจะมาตรวจสุขภาพประจำปีที่ชั้น 3 ตั้งแต่ 9 โมงถึงบ่ายสอง ขอให้งดอาหารและน้ำหลังเที่ยงคืน และแต่งกายสะดวกต่อการเจาะเลือด ใครมีนัดสำคัญให้แจ้งล่วงหน้า",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "เอาแค่สาระสำคัญ ร้านกาแฟสาขาใหม่เปิดที่สยามสแควร์วันนี้ ลูกค้า 100 คนแรกรับกาแฟฟรี และสมาชิกรับส่วนลด 20 เปอร์เซ็นต์ตลอดสัปดาห์ ร้านเปิดบริการตั้งแต่ 7 โมงเช้าถึง 4 ทุ่ม และมีบริการส่งถึงที่ในรัศมี 3 กิโลเมตร",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "ช่วยกลั่นให้เหลือไม่กี่บรรทัด รายงานระบุว่ายอดขายรถยนต์ไฟฟ้าในไทยเติบโตเกือบสองเท่าเมื่อเทียบกับปีก่อน แต่ปัญหาสถานีชาร์จที่ยังมีไม่เพียงพอทำให้ผู้บริโภคจำนวนมากยังลังเล ภาครัฐจึงตั้งเป้าเพิ่มสถานีชาร์จเป็น 12,000 แห่งภายในสองปี",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "Summarize this for me please: ผู้ใช้งานแอปธนาคารพบปัญหาล็อกอินไม่ได้ตั้งแต่เมื่อคืน ธนาคารชี้แจงว่าเกิดจากการอัปเดตระบบผิดพลาด ขณะนี้แก้ไขเสร็จแล้ว และจะคืนค่าธรรมเนียมที่เกิดจากความล่าช้าให้ลูกค้าภายใน 7 วัน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ตกลงเรื่องนี้ว่าไงบ้าง ช่วยบอกใจความ: ที่ประชุมสภามีมติรับหลักการร่างกฎหมายคุ้มครองข้อมูลส่วนบุคคลฉบับแก้ไข ด้วยคะแนน 320 ต่อ 45 เสียง จากนี้จะส่งให้คณะกรรมาธิการพิจารณาภายใน 60 วัน โดยมีประเด็นถกเถียงเรื่องโทษปรับของหน่วยงานรัฐ",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "สรุปประเด็นให้ที ลูกค้าบ่นว่าของที่สั่งมาถึงช้าไป 5 วัน กล่องบุบ และสินค้าข้างในแตกหนึ่งชิ้น ขอคืนเงินเต็มจำนวนและอยากให้ร้านเปลี่ยนบริษัทขนส่ง ไม่เช่นนั้นจะรีวิวต่ำและแจ้งสคบ.",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "บีบให้สั้นลงหน่อย ผลการศึกษาชี้ว่าการออกกำลังกายสม่ำเสมอ 30 นาทีต่อวัน ช่วยลดความเสี่ยงโรคเบาหวานชนิดที่สองได้ร้อยละ 30 ทีมวิจัยติดตามกลุ่มตัวอย่าง 5,000 คนเป็นเวลา 10 ปี และพบว่าการเดินเร็วให้ผลไม่ต่างจากการวิ่ง",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "other",
+   "text": "ฝันว่าฟันหลุด แปลว่าอะไร",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ฝันเห็นงู ความฝันนี้แปลว่าอะไรคะ ใครว่าเป็นลางบอกเหตุ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "วันนี้แปลกจัง ทำไมฟ้าถึงมืดตอนบ่ายสอง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยแปลงไฟล์ Word เป็น PDF ให้หน่อย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "สรุปแล้วคืนนี้เราจะกินอะไรกันดี",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ตกลงสรุปว่าพรุ่งนี้ฝนจะตกไหม",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ฟ.ฟัน ย่อมาจากอะไรในตัวย่อภาษาไทย ไม่เคยรู้เลย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ประโยค present perfect ใช้เมื่อไหร่ อธิบายหน่อย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เรียนภาษาอังกฤษให้เก่งเร็ว ๆ ต้องทำยังไง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ต่างกันยังไงระหว่าง make กับ do",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยเขียนอีเมลลาป่วยเป็นภาษาอังกฤษให้หน่อย ถึงหัวหน้าชื่อ David",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เขียนข้อความขอบคุณลูกค้าเป็นภาษาอังกฤษให้หน่อย สั้น ๆ สุภาพ ๆ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "Write a cover letter in English for a marketing job",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยร่างจดหมายสมัครงานภาษาอังกฤษ ตำแหน่งนักบัญชี",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แก้คำผิดให้หน่อย วันนี้ผมไปซื้อของที่ตรลาด แล้วเจอเพื่อนเก่าที่ไม่ได้เจอกันมานาน เลยชวนไปกินกาแฟ คุยกันเพลินจนลืมเวลา กลับบ้านมืดค่ำ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยตอบกลับอีเมลนี้ให้หน่อย สวัสดีครับ ผมสนใจสินค้ารุ่น X200 ไม่ทราบว่ายังมีของพร้อมส่งไหม และราคาพิเศษสำหรับสั่งซื้อหลายชิ้นเป็นเท่าไร ขอบคุณครับ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เขียนต่อให้หน่อย เมื่อสายฝนโปรยปรายลงมาในคืนนั้น เธอก็รู้ว่าทุกอย่างจะไม่เหมือนเดิมอีกต่อไป ประตูบ้านหลังเก่าแง้มออกอย่างช้า ๆ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ตั้งชื่อเรื่องให้หน่อย วันนี้ผมพาแมวไปหาหมอ หมอบอกว่าน้ำหนักเกินต้องคุมอาหาร ผมเลยต้องเปลี่ยนอาหารเม็ดใหม่ แมวไม่ยอมกินสองวัน แต่วันที่สามก็เริ่มกินแล้ว",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยตรวจไวยากรณ์ย่อหน้านี้ให้หน่อย ทางบริษัทมีความยินดีเป็นอย่างยิ่งที่จะแจ้งให้ทราบว่า ท่านได้รับคัดเลือกเข้าสู่รอบสัมภาษณ์ กรุณามาตามวันและเวลาที่นัดหมาย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "อ่านข้อความนี้แล้วช่วยแต่งคำตอบสั้น ๆ ปฏิเสธอย่างสุภาพ: พี่คะ ว่างไปงานเลี้ยงวันเสาร์ไหม ที่บ้านพี่แอนจัดปาร์ตี้ฉลองบ้านใหม่ มากันเยอะเลย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แต่งกลอนแปดเกี่ยวกับฤดูฝนให้หน่อย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ไวยากรณ์ภาษาอังกฤษประโยค \"I have went home\" ผิดตรงไหน",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ผู้แปลภาษามืออาชีพต้องเรียนจบสาขาอะไร รายได้ดีไหม",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แอปแปลภาษาตัวไหนดีที่สุดสำหรับนักท่องเที่ยว",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยแปลงหน่วย 5 ไมล์ เป็นกิโลเมตรหน่อย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เมื่อกี้เธอพูดว่าสรุปว่าไม่ไปใช่ไหม ฉันฟังไม่ทัน",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ผลสรุปการแข่งบอลเมื่อคืนใครชนะ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เอาข้อความนี้ไปเปลี่ยนเป็นตัวหนา แล้วจัดกึ่งกลางหน้าให้หน่อย ประกาศปิดทำการชั่วคราว ร้านขอหยุดพักผ่อนวันที่ 20-25 ตุลาคม เปิดทำการตามปกติวันที่ 26",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ฝันเห็นคนตาย ทำนายว่าเป็นลางดีหรือร้าย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "แปลประโยคนี้เป็นภาษาอังกฤษให้หน่อย: พรุ่งนี้ฉันต้องไปพบแพทย์ตอนเก้าโมงเช้า",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลเป็นไทยหน่อย The meeting has been postponed until next Thursday due to unforeseen circumstances.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "คำว่า serendipity แปลว่าอะไร",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ขอบคุณมากครับที่ช่วยเหลือ พูดเป็นภาษาอังกฤษว่ายังไง",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "Can you translate this into Thai? I would like to book a table for two at seven o'clock.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "แปลให้หน่อยค่ะ ขออนุญาตสอบถามราคาห้องพักสำหรับสองท่านค่ะ เป็นภาษาอังกฤษ",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "break a leg แปลว่าอะไรเหรอ",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "What does 'under the weather' mean in Thai?",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลอีเมลนี้เป็นอังกฤษที: เรียนคุณสมชาย ตามที่ได้นัดหมายไว้ ผมขอเลื่อนการประชุมเป็นวันศุกร์หน้า",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ห้องน้ำอยู่ที่ไหน ภาษาอังกฤษเขียนยังไง",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลเป็นภาษาไทยให้หน่อยนะ: The package will arrive within three to five business days.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "อยากรู้ว่า ไม่เป็นไร ภาษาอังกฤษพูดว่าอะไรได้บ้าง",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "Please translate to English: ฉันคิดถึงบ้านมากเลย",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "คำว่า appointment แปลเป็นไทยว่าอะไร",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ช่วยแปลข้อความนี้ให้หน่อย 'Thank you for your patience and understanding.' เป็นภาษาไทยแบบสุภาพ",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "แปลไทยเป็นอังกฤษ: เดี๋ยวเจอกันที่หน้าห้างนะ อย่าลืมเอากระเป๋ามาด้วย",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ประโยค It's a piece of cake เนี่ย แปลว่าอะไร",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ผมอยากบอกลูกค้าว่า สินค้าหมดชั่วคราว เป็นภาษาอังกฤษต้องเขียนยังไงครับ",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลหน่อยๆ ขอโทษที่มาสาย รถติดมาก",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "Translate this for me: ขอใบเสร็จด้วยครับ",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "idiom ที่ว่า cost an arm and a leg แปลเป็นไทยว่ายังไง",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "รบกวนแปลเป็นภาษาอังกฤษทีค่ะ ดิฉันแพ้อาหารทะเล กรุณาอย่าใส่กุ้งในอาหารของดิฉัน",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "translate",
+   "text": "ภาษาอังกฤษของคำว่า เกรงใจ คืออะไร",
+   "want": "translate",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "translate",
+   "text": "แปลให้หน่อย: I'm looking forward to hearing from you soon.",
+   "want": "translate",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "สรุปให้หน่อย: กรมอุตุนิยมวิทยาประกาศเตือนฝนตกหนักถึงหนักมากในพื้นที่ภาคใต้ตั้งแต่วันนี้ถึงวันศุกร์ โดยเฉพาะจังหวัดนครศรีธรรมราชและสุราษฎร์ธานี ประชาชนควรเฝ้าระวังน้ำท่วมฉับพลันและดินถล่ม หน่วยงานท้องถิ่นเตรียมพร้อมศูนย์พักพิงชั่วคราวไว้แล้ว",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ช่วยย่อข้อความนี้ให้สั้นลงหน่อย ตามที่บริษัทได้ประกาศปรับเวลาทำงานใหม่ พนักงานทุกคนจะเริ่มงานเวลา 8.30 น. และเลิกงาน 17.30 น. ตั้งแต่วันที่ 1 พฤศจิกายนเป็นต้นไป การลางานต้องแจ้งล่วงหน้าอย่างน้อยสามวัน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ข้อความนี้พูดถึงอะไร สวัสดีครับทุกคน พรุ่งนี้เราจะมีประชุมทีมตอนบ่ายสอง ที่ห้องประชุมชั้น 3 รบกวนทุกคนเตรียมรายงานความคืบหน้ามาคนละหนึ่งหน้า และอย่าลืมส่งไฟล์ให้ผมก่อนเที่ยงด้วยครับ",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "Summarize this please: The city council voted on Tuesday to approve a new bike lane network spanning 40 kilometers. Construction will begin in January and is expected to take two years. Critics argue the budget is too high, while supporters say it will reduce traffic.",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ขอใจความสำคัญหน่อยครับ ธนาคารแห่งประเทศไทยคงอัตราดอกเบี้ยนโยบายไว้ที่ร้อยละ 2.25 ตามที่ตลาดคาดการณ์ โดยระบุว่าเศรษฐกิจฟื้นตัวช้าและเงินเฟ้ออยู่ในระดับต่ำ คณะกรรมการจะติดตามสถานการณ์อย่างใกล้ชิดก่อนพิจารณาในการประชุมครั้งหน้า",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "อ่านให้หน่อยว่าอีเมลนี้ต้องการให้ฉันทำอะไร เรียนคุณลูกค้า บัญชีของท่านมียอดค้างชำระ 1,250 บาท กรุณาชำระภายในวันที่ 15 ตุลาคม มิฉะนั้นบริการจะถูกระงับชั่วคราว สามารถชำระผ่านแอปหรือที่เคาน์เตอร์ได้",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ย่อให้เหลือสามข้อ ทีมวิจัยจากมหาวิทยาลัยแห่งหนึ่งพบว่าการนอนหลับไม่เพียงพอส่งผลต่อความจำระยะสั้น ผู้เข้าร่วมที่นอนน้อยกว่าหกชั่วโมงมีคะแนนทดสอบต่ำกว่ากลุ่มอื่นร้อยละ 20 นักวิจัยแนะนำให้นอนอย่างน้อยเจ็ดชั่วโมงต่อคืน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "แชทกลุ่มยาวมาก ช่วยบอกทีว่าเขาคุยอะไรกัน A: พรุ่งนี้ไปเที่ยวทะเลกันไหม B: ไปๆ ออกกี่โมง C: หกโมงเช้าเลย ผมขับรถเอง D: งั้นฉันเอาอาหารไปเอง A: โอเค อย่าลืมครีมกันแดด",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "TL;DR หน่อย บทความนี้ยาวเกินไป การลงทุนในกองทุนรวมดัชนีเหมาะกับมือใหม่เพราะค่าธรรมเนียมต่ำ และกระจายความเสี่ยงได้ดี อย่างไรก็ตามผู้ลงทุนควรมีเป้าหมายระยะยาวอย่างน้อยห้าปี และไม่ควรตื่นตระหนกเมื่อตลาดผันผวน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "Can you give me the gist of this? Our office will be closed on October 23 for a public holiday. All deliveries scheduled for that day will be moved to the following Monday. Urgent requests can be sent to the support hotline.",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "สรุปประกาศนี้ให้ที ประกาศมหาวิทยาลัย เรื่องการลงทะเบียนเรียนภาคเรียนที่ 2 นักศึกษาสามารถลงทะเบียนผ่านระบบออนไลน์ตั้งแต่วันที่ 5 ถึง 12 พฤศจิกายน หากพ้นกำหนดต้องเสียค่าปรับวันละ 50 บาท",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "เนื้อหาข้างล่างนี้ใจความหลักคืออะไร โครงการปลูกป่าชุมชนในจังหวัดน่านประสบความสำเร็จอย่างมาก ชาวบ้านร่วมกันปลูกต้นไม้กว่าหนึ่งหมื่นต้นในปีที่ผ่านมา ส่งผลให้แหล่งน้ำในพื้นที่กลับมาอุดมสมบูรณ์และมีรายได้จากการท่องเที่ยวเชิงนิเวศเพิ่มขึ้น",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ย่อความให้หน่อยค่ะ ร้านอาหารแห่งนี้เปิดมาสิบปีแล้ว อาหารรสชาติดี ราคาไม่แพง แต่ที่จอดรถน้อยและช่วงเที่ยงคนเยอะมาก ต้องรอคิวนานประมาณครึ่งชั่วโมง พนักงานบริการดีและยิ้มแย้ม",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "ข้อความนี้บอกให้ผมทำอะไรบ้าง ถึงผู้ปกครองทุกท่าน โรงเรียนขอแจ้งว่าวันศุกร์นี้มีการตรวจสุขภาพนักเรียน กรุณาให้บุตรหลานงดอาหารเช้า และนำสมุดสุขภาพมาด้วย พร้อมส่งใบยินยอมกลับมาภายในวันพฤหัสบดี",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "สั้นๆ ว่าข่าวนี้เกี่ยวกับอะไร นักวิทยาศาสตร์ประกาศค้นพบดาวเคราะห์ดวงใหม่นอกระบบสุริยะที่อาจมีน้ำเป็นของเหลว ดาวดวงนี้อยู่ห่างจากโลกราว 40 ปีแสง กล้องโทรทรรศน์อวกาศจะศึกษาบรรยากาศเพิ่มเติมในปีหน้า",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "Give me a short summary: The company reported a 15 percent increase in quarterly revenue, driven by strong sales in Southeast Asia. However, profit margins declined slightly because of rising logistics costs. Management expects growth to continue next quarter.",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "เอาแต่ประเด็นหลักพอ ตามระเบียบใหม่ ผู้เข้าพักต้องแสดงบัตรประชาชนทุกครั้งเมื่อเช็กอิน ห้ามนำสัตว์เลี้ยงเข้าห้องพัก และต้องคืนกุญแจก่อนเที่ยงของวันเช็กเอาต์ มิฉะนั้นจะคิดค่าบริการเพิ่ม",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "ช่วยสรุปเป็นข้อๆ ที่ประชุมมีมติให้ขึ้นค่าส่วนกลางเป็นตารางเมตรละ 40 บาท เพื่อนำไปปรับปรุงระบบรักษาความปลอดภัย นอกจากนี้ยังมีมติให้ซ่อมสระว่ายน้ำภายในสองเดือน และจัดหาผู้รับเหมาใหม่ดูแลสวน",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "เขาเขียนมาว่าอะไรบ้าง ช่วยดูให้หน่อย พี่ครับ ผมติดธุระด่วนที่ต่างจังหวัด เลยไม่สามารถเข้าประชุมวันจันทร์ได้ ฝากพี่จดรายละเอียดให้ผมด้วย และผมจะส่งงานที่ค้างไว้ให้ภายในวันพุธครับ",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "ขอสาระสำคัญของบทความนี้ การเดินเร็ววันละ 30 นาทีช่วยลดความเสี่ยงโรคหัวใจได้อย่างมีนัยสำคัญ แพทย์แนะนำให้เริ่มจากเดินช้าๆ แล้วค่อยเพิ่มความเร็ว ผู้ที่มีโรคประจำตัวควรปรึกษาแพทย์ก่อนเริ่มออกกำลังกาย",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "ย่อเนื้อหานี้หน่อยครับ ผมอ่านไม่ทัน รัฐบาลประกาศมาตรการช่วยเหลือเกษตรกรที่ได้รับผลกระทบจากภัยแล้ง โดยจะจ่ายเงินช่วยเหลือไร่ละ 1,000 บาท สูงสุดไม่เกิน 10 ไร่ เกษตรกรต้องลงทะเบียนผ่านแอปภายในสิ้นเดือนนี้",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "summarize",
+   "text": "Boil this down for me in a few bullet points: Thailand's tourism sector is recovering faster than expected. Arrivals from China and India have risen sharply, while European visitors remain steady. Hotels in Phuket report occupancy above 80 percent during the high season.",
+   "want": "summarize",
+   "got": "other",
+   "ok": false
+  },
+  {
+   "expect": "summarize",
+   "text": "สรุปให้ฟังหน่อยว่าในกลุ่มไลน์เขาตกลงอะไรกัน ป้า: วันเสาร์นี้ทำบุญที่บ้านนะ ลูกชาย: ผมไปรับยายเอง น้องสาว: หนูซื้อขนมกับดอกไม้ ป้า: งั้นพี่สะใภ้ทำอาหาร เริ่มพิธีเก้าโมง",
+   "want": "summarize",
+   "got": "summarize",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แปลกจังเลย ทำไมวันนี้ฝนไม่ตกทั้งที่พยากรณ์บอกว่าตก",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แปลงไฟล์ PDF เป็น Word ทำยังไง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "สรุปว่าเธอจะไปงานเลี้ยงไหม",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ความหมายของสีแดงในธงชาติไทยแปลว่าอะไรในเชิงสัญลักษณ์",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยเขียนอีเมลภาษาอังกฤษถึงหัวหน้า เพื่อขอลาพักร้อนสามวันหน่อย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เขียนข้อความขอบคุณลูกค้าเป็นภาษาอังกฤษให้หน่อย ไม่ต้องแปลอะไร เขียนใหม่ได้เลย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ควรเรียนภาษาอังกฤษจากอะไรดี ดูหนังหรืออ่านหนังสือ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ความแตกต่างระหว่าง much กับ many คืออะไร",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "Google Translate แม่นแค่ไหนเมื่อเทียบกับนักแปลคน",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "อยากเป็นนักแปลต้องเรียนอะไรบ้าง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยแก้คำผิดในข้อความนี้ให้หน่อย พรุ่งนี้เราจะไปประชุมที่บริษัทตอนเช้า แต่ผมลืมเอาเอกสารมาด้วย เลยต้องกลับไปเอาที่บ้านก่อนนะครับ ขอโทษที่ทำให้เสียเวลา",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยตอบกลับอีเมลนี้ให้หน่อย สวัสดีครับ ผมสนใจสินค้าของร้านคุณ อยากทราบว่ามีสีอื่นนอกจากสีดำไหม และจัดส่งต่างจังหวัดได้หรือเปล่า รอคำตอบนะครับ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "เขียนต่อให้หน่อย ฝนตกหนักในคืนนั้น เด็กชายวิ่งเข้าไปหลบในบ้านร้างริมทาง เขาได้ยินเสียงบางอย่างดังมาจากชั้นสอง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ตั้งชื่อเรื่องให้บทความนี้หน่อย การปลูกผักสวนครัวในคอนโดเป็นเรื่องที่ทำได้ง่าย เพียงมีแสงแดดพอและกระถางขนาดเหมาะสม ผักที่แนะนำคือกะเพรา โหระพา และผักบุ้ง ใช้เวลาเพียงสี่สัปดาห์ก็เก็บเกี่ยวได้",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยปรับข้อความนี้ให้สุภาพขึ้นหน่อย เฮ้ย ส่งงานมาเร็วๆ หน่อยได้ไหม รอมานานแล้วนะ ไม่ไหวแล้วจริงๆ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยหาคำผิดในประกาศนี้ที ทางหมู่บ้านจะทำการตัดหญ้าส่วนกลางในวันเสาร์นี้ ขอความร่วมมือลูกบ้านงดจอดรถริมถนนเพื่ออำนวยความสะดวก ขอขอบคุณทุกท่านที่ให้ความร่วมมือเป็นอย่างดี",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แปลกใจจังที่เขาไม่มางานแต่ง น่าจะมีอะไรเกิดขึ้นรึเปล่า",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ฝันเห็นงูใหญ่ในบ้าน ตีความได้ว่ายังไง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ค่าแปลเอกสารทางการต่อหน้าราคาเท่าไหร่",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "How do you say hello in Japanese? Also, is it rude to say it to elders?",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "สรุปผลบอลเมื่อคืนยังไงบ้าง ใครชนะ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "อยากแปลงเลขฐานสิบเป็นเลขฐานสองต้องทำยังไง",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยเขียนคำอวยพรวันเกิดเป็นภาษาอังกฤษให้เพื่อนหน่อย เอาแบบน่ารักๆ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "คำว่า ASAP ย่อมาจากอะไร แล้วใช้ตอนไหน",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ผลของการประชุมครั้งก่อนสรุปไว้ในไฟล์ไหน ช่วยหาให้หน่อย",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "ช่วยตอบแชทนี้ให้หน่อย เพื่อน: เสาร์นี้ว่างไหม ไปกินข้าวกัน ฉันอยากไปร้านใหม่แถวสยาม บอกว่าว่างแต่ขอไปช่วงบ่ายนะ",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "Write me a cover letter in English for a marketing assistant position.",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  },
+  {
+   "expect": "other",
+   "text": "แปลว่าอะไรที่หมอทำนายว่าปีนี้ดวงการเงินจะดีขึ้น แล้วควรลงทุนอะไรดี",
+   "want": "other",
+   "got": "other",
+   "ok": true
+  }
+ ]
+}
