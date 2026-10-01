@@ -2,9 +2,10 @@
 
 import json
 import unittest
+from datetime import datetime
 from pathlib import Path
 
-from aipc.skills.fileintent import file_intent
+from aipc.skills.fileintent import file_intent, file_time, time_range
 
 DATA = Path(__file__).parent / "data"
 
@@ -28,6 +29,26 @@ class FileIntentTest(unittest.TestCase):
         items = json.loads((DATA / "file_intent_dev.json").read_text("utf-8"))["items"]
         wrong = [i["text"] for i in items if file_intent(i["text"]) != (i["expect"] == "find")]
         self.assertLessEqual(len(wrong), 1, wrong)
+
+    def test_file_time_labels(self):
+        cases = {"ขอดูไฟล์ที่แก้เมื่อวานหน่อย": "yesterday", "โน้ตที่เขียนสัปดาห์นี้": "this_week",
+                 "หาเอกสารที่ทำอาทิตย์ที่แล้ว": "last_week", "ไฟล์ล่าสุดที่ฉันแก้": "latest",
+                 "บันทึกนัดหมอเมื่อวานว่าอะไรนะ": None, "ไฟล์ล่าสุดของ Windows อัปเดตคืออะไร": None,
+                 "ตั้งเตือนพรุ่งนี้เช้าให้ส่งเอกสาร": None}  # fmt: skip
+        for t, want in cases.items():
+            with self.subTest(t=t):
+                self.assertEqual(file_time(t), want)
+
+    def test_time_range(self):
+        now = datetime(2026, 10, 1, 15, 0)  # วันพฤหัส
+        self.assertEqual(
+            time_range("yesterday", now), (datetime(2026, 9, 30), datetime(2026, 10, 1))
+        )
+        self.assertEqual(time_range("this_week", now)[0], datetime(2026, 9, 28))  # จันทร์
+        self.assertEqual(
+            time_range("last_month", now), (datetime(2026, 9, 1), datetime(2026, 10, 1))
+        )
+        self.assertEqual(time_range("latest", now), (None, None))
 
 
 if __name__ == "__main__":

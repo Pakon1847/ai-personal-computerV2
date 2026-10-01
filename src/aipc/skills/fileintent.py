@@ -30,3 +30,56 @@ def file_intent(text: str) -> bool:
     if not t or NOT_FIND.search(t):
         return False
     return bool(FIND_VERB.search(t) or WHERE.search(t) or HAVE.search(t) or NOTED.search(t))
+
+
+# ---------- ดูไฟล์ตามช่วงเวลา ("ไฟล์ที่แก้เมื่อวาน" · "เอกสารล่าสุด") ----------
+# ผล: docs/benchmarks/2026-10-01-file-intent (หัวข้อค้นไฟล์ตามเวลา)
+TIME_THING = r"(ไฟล์|เอกสาร|โน้ต|สไลด์|ที่(เคย)?จด)"
+TIMES = [
+    ("yesterday", r"เมื่อวาน(?!ซืน)"),
+    ("today", r"วันนี้"),
+    ("last_week", r"(สัปดาห์|อาทิตย์)\s*(ที่แล้ว|ก่อน)"),
+    ("this_week", r"(สัปดาห์|อาทิตย์)\s*นี้"),
+    ("last_month", r"เดือน\s*(ที่แล้ว|ก่อน)"),
+    ("this_month", r"เดือน\s*นี้"),
+    ("latest", r"ล่าสุด|เพิ่ง\s*(แก้|สร้าง|ทำ|เขียน|เปิด|จด)"),
+]
+FILE_VERB = r"(แก้|สร้าง|ทำ|เขียน|จด|เปิด|เซฟ|บันทึก)"
+TIME_NOT = re.compile(
+    r"แปลงไฟล์|ยังไง|อย่างไร|ต้อง(ใช้|เตรียม|ส่ง)|ส่งไฟล์|ตั้ง(เตือน|ปลุก)|"
+    r"^(ช่วย)?\s*(สร้าง|ลบ|ร่าง|เขียน|สรุป|แปล|แก้ไข|จด)"
+)
+
+
+def file_time(text: str) -> str | None:
+    """ช่วงเวลาของคำขอดูไฟล์ (today yesterday … latest) · ไม่ใช่คำขอดูไฟล์ตามเวลา = None."""
+    t = text.strip()
+    if not t or TIME_NOT.search(t) or not re.search(TIME_THING, t, re.I):
+        return None
+    for label, pat in TIMES:
+        m = re.search(pat, t)
+        if not m:
+            continue
+        # คำกริยาเกี่ยวกับไฟล์อยู่ใกล้คำบอกเวลา (ก่อนหรือหลัง ไม่เกิน ~20 ตัวอักษร)
+        near = t[max(0, m.start() - 20) : m.end() + 20]
+        if re.search(FILE_VERB, near):
+            return label
+    return None
+
+
+def time_range(label: str, now):
+    """(เริ่ม, จบ) ของช่วงเวลา · latest = (None, None) (เรียงใหม่สุดเฉย ๆ)."""
+    from datetime import datetime, timedelta
+
+    day = datetime(now.year, now.month, now.day)
+    week = day - timedelta(days=day.weekday())
+    month = day.replace(day=1)
+    prev_month = (month - timedelta(days=1)).replace(day=1)
+    return {
+        "today": (day, day + timedelta(days=1)),
+        "yesterday": (day - timedelta(days=1), day),
+        "this_week": (week, week + timedelta(days=7)),
+        "last_week": (week - timedelta(days=7), week),
+        "this_month": (month, (month + timedelta(days=32)).replace(day=1)),
+        "last_month": (prev_month, month),
+    }.get(label, (None, None))
