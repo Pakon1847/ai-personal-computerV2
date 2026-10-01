@@ -621,16 +621,16 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(said, ["น้ำคือ H2O"])
         answer("ครึ่ง", "หยุดแล้ว")
         self.assertEqual(len(said), 1)  # ตอบไม่จบไม่อ่าน
-        on, off = find_items(win, "speakOn")[0], find_items(win, "speakOff")[0]
-        self.assertTrue(find_items(win, "speakChoice")[0].property("visible"))
-        self.assertEqual((on.property("kind"), off.property("kind")), ("primary", "secondary"))
-        off.clicked.emit()  # เลือก "ไม่อ่านออกเสียง" จากหน้าแชท
+        sw = find_items(win, "speakSwitch")[0]
+        self.assertTrue(sw.property("visible"))
+        self.assertEqual(sw.property("text"), "อ่านคำตอบออกเสียง: เปิด")  # สถานะเป็นคำ ไม่ใช่แค่สี
+        sw.clicked.emit()  # ปิดจากแถวบนของหน้าแชท
         settle(30)
         self.assertFalse(ui.speakAnswers)
-        self.assertEqual((on.property("kind"), off.property("kind")), ("secondary", "primary"))
+        self.assertEqual(sw.property("text"), "อ่านคำตอบออกเสียง: ปิด")
         answer("ตอบอีกครั้ง")
         self.assertEqual(len(said), 1)
-        on.clicked.emit()  # เปลี่ยนกลับได้ตลอด
+        sw.clicked.emit()  # เปลี่ยนกลับได้ตลอด
         settle(30)
         self.assertTrue(ui.speakAnswers)
         answer("ตอบครั้งที่สาม")
@@ -830,14 +830,14 @@ class ShellCardTest(unittest.TestCase):
         voice.changed.emit()
         settle(30)
         self.assertTrue(btn.property("visible"))
-        self.assertEqual(btn.property("text"), "อ่านออกเสียง")
+        self.assertEqual(btn.property("text"), "ฟังคำตอบนี้")
         btn.clicked.emit()
         settle(30)
         self.assertEqual(fake.said, ["เปิด YouTube แล้ว"])  # ข้อความหลัง tidy()
         self.assertEqual(btn.property("text"), "หยุดอ่าน")
         voice._on_state(7, False, "")  # อ่านจบ
         settle(30)
-        self.assertEqual(btn.property("text"), "อ่านออกเสียง")
+        self.assertEqual(btn.property("text"), "ฟังคำตอบนี้")
         btn.clicked.emit()
         btn.clicked.emit()  # กดซ้ำระหว่างอ่าน = หยุด
         settle(30)

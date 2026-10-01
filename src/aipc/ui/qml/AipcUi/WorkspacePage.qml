@@ -183,6 +183,20 @@ Item {
         anchors.top: parent.top
         anchors.rightMargin: 24
         spacing: 8
+        // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
+        AppButton {
+            objectName: "speakSwitch"
+            visible: voice.available
+            kind: uiSettings.speakAnswers ? "primary" : "secondary"
+            iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
+            text: "อ่านคำตอบออกเสียง: " + (uiSettings.speakAnswers ? "เปิด" : "ปิด")
+            Accessible.name: text + " · แตะเพื่อ" + (uiSettings.speakAnswers ? "ปิด" : "เปิด")
+            onClicked: {
+                const on = !uiSettings.speakAnswers
+                uiSettings.setSpeakAnswers(on)
+                if (!on) voice.stop()
+            }
+        }
         AppButton {
             id: historyButton
             text: "ประวัติ"; kind: "secondary"; iconPath: Icons.chat
@@ -549,7 +563,7 @@ Item {
                         AppButton {
                             objectName: "speakAnswer"
                             visible: voice.available
-                            text: voice.speakingKey === row.index ? "หยุดอ่าน" : "อ่านออกเสียง"
+                            text: voice.speakingKey === row.index ? "หยุดอ่าน" : "ฟังคำตอบนี้"
                             kind: "ghost"
                             onClicked: {
                                 root.speakRow = row.index
@@ -718,44 +732,17 @@ Item {
             AppButton { text: "เลิกแนบ"; kind: "ghost"; onClicked: chat.detachFile() }
         }
     }
-    // แถวใต้ช่องพิมพ์: เลือกอ่าน/ไม่อ่านคำตอบออกเสียง (Pakon: ให้เลือกได้ชัด ๆ และเปลี่ยนได้ตลอด · ค่าเริ่มต้นอ่าน) + คำแนะนำ
-    RowLayout {
+    AppText {
         id: hint
         parent: composer.parent
         anchors.top: composer.bottom
         anchors.topMargin: 6
-        x: composer.x
-        width: composer.width
-        spacing: 6
-        RowLayout {
-            objectName: "speakChoice"
-            visible: voice.available
-            spacing: 4
-            AppButton {
-                objectName: "speakOn"
-                text: "อ่านออกเสียง"; iconPath: Icons.speaker
-                kind: uiSettings.speakAnswers ? "primary" : "secondary"
-                Accessible.name: "อ่านคำตอบออกเสียง" + (uiSettings.speakAnswers ? " (เลือกอยู่)" : "")
-                onClicked: uiSettings.setSpeakAnswers(true)
-            }
-            AppButton {
-                objectName: "speakOff"
-                text: "ไม่อ่านออกเสียง"; iconPath: Icons.speakerOff
-                kind: uiSettings.speakAnswers ? "secondary" : "primary"
-                Accessible.name: "ไม่อ่านคำตอบออกเสียง" + (uiSettings.speakAnswers ? "" : " (เลือกอยู่)")
-                onClicked: { uiSettings.setSpeakAnswers(false); voice.stop() }
-            }
-        }
-        AppText {
-            Layout.fillWidth: true
-            horizontalAlignment: voice.available ? Text.AlignRight : Text.AlignHCenter
-            elide: Text.ElideRight
-            objectName: "chatHint"
-            text: chat.notice !== "" ? chat.notice
-                  : voice.listening ? "กำลังฟัง · พูดจบแล้วเงียบสักครู่ ระบบหยุดเอง (หรือแตะไมค์อีกครั้ง)"
-                  : voice.micMessage !== "" ? voice.micMessage
-                  : chat.busy ? "Esc หรือปุ่มหยุด = หยุดตอบ" : "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
-            size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true
-        }
+        anchors.horizontalCenter: parent.horizontalCenter
+        objectName: "chatHint"
+        text: chat.notice !== "" ? chat.notice
+              : voice.listening ? "กำลังฟัง · พูดจบแล้วเงียบสักครู่ ระบบหยุดเอง (หรือแตะไมค์อีกครั้ง)"
+              : voice.micMessage !== "" ? voice.micMessage
+              : chat.busy ? "Esc หรือปุ่มหยุด = หยุดตอบ" : "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
+        size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true
     }
 }
