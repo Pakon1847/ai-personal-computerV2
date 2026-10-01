@@ -1,0 +1,410 @@
+{
+ "method": "words",
+ "n": 40,
+ "recall_at_1": 38,
+ "recall_at_3": 39,
+ "build_s": 0.0,
+ "query_ms_max": 1.81,
+ "rows": [
+  {
+   "text": "จดประชุมชมรมปั่นจักรยานที่จะไปเขาใหญ่",
+   "doc": "note_old.txt",
+   "rank": 1,
+   "top3": [
+    "note_old.txt",
+    "ayutthaya.txt",
+    "note3.txt"
+   ]
+  },
+  {
+   "text": "สูตรเส้นจันท์ผัดซอสมะขามที่ลองทำวันเกิดน้องมะปราง",
+   "doc": "ผัดไทย.txt",
+   "rank": 1,
+   "top3": [
+    "ผัดไทย.txt",
+    "ayutthaya.txt",
+    "back_pain.txt"
+   ]
+  },
+  {
+   "text": "อีเมลขอบคุณลูกค้าที่จัดดอกไม้งานแต่ง",
+   "doc": "thanks_cust.txt",
+   "rank": 1,
+   "top3": [
+    "thanks_cust.txt",
+    "scan_0413.txt",
+    "IMG_2208.txt"
+   ]
+  },
+  {
+   "text": "จดหมายถามราคาเครื่องพิมพ์เลเซอร์สีห้าเครื่อง",
+   "doc": "mail_quote.txt",
+   "rank": 1,
+   "top3": [
+    "mail_quote.txt",
+    "scan_0413.txt",
+    "plan_krabi.txt"
+   ]
+  },
+  {
+   "text": "ค่าซ่อมตู้เย็นที่ต้องเติมน้ำยา",
+   "doc": "doc-017.txt",
+   "rank": 1,
+   "top3": [
+    "doc-017.txt",
+    "reply_intv.txt",
+    "vaccine.txt"
+   ]
+  },
+  {
+   "text": "อีเมลขอย้ายห้องประชุมจากชั้นสามไปชั้นห้า เพราะคนเยอะ",
+   "doc": "room_change.txt",
+   "rank": 1,
+   "top3": [
+    "room_change.txt",
+    "mt0912.txt",
+    "meet-0928.txt"
+   ]
+  },
+  {
+   "text": "ตอนที่เอาไอโฟนไปเปลี่ยนหน้าจอที่ห้างจ่ายไปเท่าไหร่",
+   "doc": "receipt final.txt",
+   "rank": 7,
+   "top3": [
+    "eye_test.txt",
+    "room_change.txt",
+    "scan_0413.txt"
+   ]
+  },
+  {
+   "text": "ใบบันทึกตอนไปฉีดป้องกันไข้หวัดใหญ่ ที่แขนปวดนิดหน่อย",
+   "doc": "vaccine.txt",
+   "rank": 1,
+   "top3": [
+    "vaccine.txt",
+    "bp.txt",
+    "note_old.txt"
+   ]
+  },
+  {
+   "text": "แกงเนื้อใส่มันฝรั่งกับถั่วลิสง เคี่ยวสองชั่วโมง",
+   "doc": "d8.txt",
+   "rank": 1,
+   "top3": [
+    "d8.txt",
+    "back_pain.txt",
+    "food_02.txt"
+   ]
+  },
+  {
+   "text": "ใบเสร็จล้างแอร์ทั้งห้องนอนและห้องนั่งเล่น หน้าร้อนที่ผ่านมา",
+   "doc": "IMG_2208.txt",
+   "rank": 1,
+   "top3": [
+    "IMG_2208.txt",
+    "scan_0413.txt",
+    "doc-017.txt"
+   ]
+  },
+  {
+   "text": "แผนไปทะเลใกล้กรุงเทพ ขับรถไปนอนหนึ่งคืน ไปตลาดฉัตรไชย",
+   "doc": "huahin.txt",
+   "rank": 1,
+   "top3": [
+    "huahin.txt",
+    "trip_cm.txt",
+    "doc-231.txt"
+   ]
+  },
+  {
+   "text": "เมลขอเอกสารรับรองเงินเดือนไปกู้ซื้อบ้าน",
+   "doc": "ref_req.txt",
+   "rank": 1,
+   "top3": [
+    "ref_req.txt",
+    "hr_raise.txt",
+    "doc-017.txt"
+   ]
+  },
+  {
+   "text": "ใบเสร็จซ่อมเครื่องซักผ้าซัมซุง ที่เปลี่ยนสายพานตอนต้นปี จ่ายผ่านพร้อมเพย์",
+   "doc": "scan_0413.txt",
+   "rank": 1,
+   "top3": [
+    "scan_0413.txt",
+    "scan_0412.txt",
+    "receipt final.txt"
+   ]
+  },
+  {
+   "text": "ใบเสร็จซื้อของใช้เด็ก นม ไข่ ที่ห้างสาขารามอินทรา",
+   "doc": "new_1.txt",
+   "rank": 1,
+   "top3": [
+    "new_1.txt",
+    "doc-044.txt",
+    "IMG_2208.txt"
+   ]
+  },
+  {
+   "text": "อาการปวดหัวข้างเดียวที่คลื่นไส้และกลัวแสง หมอจ่ายยาซูมาทริปแทน",
+   "doc": "doc-310.txt",
+   "rank": 1,
+   "top3": [
+    "doc-310.txt",
+    "allergy.txt",
+    "back_pain.txt"
+   ]
+  },
+  {
+   "text": "อีเมลขอลาพักร้อนห้าวัน ช่วงไปเที่ยวกับครอบครัว",
+   "doc": "mail_leave.txt",
+   "rank": 1,
+   "top3": [
+    "mail_leave.txt",
+    "ayutthaya.txt",
+    "kanchana.txt"
+   ]
+  },
+  {
+   "text": "ไปหาหมอฟันครั้งที่อุดฟันกรามล่างขวา",
+   "doc": "teeth.txt",
+   "rank": 1,
+   "top3": [
+    "teeth.txt",
+    "back_pain.txt",
+    "doc-310.txt"
+   ]
+  },
+  {
+   "text": "วิธีตำส้มตำที่ใช้ปลาร้ากับปูเค็ม",
+   "doc": "somtam.txt",
+   "rank": 1,
+   "top3": [
+    "somtam.txt",
+    "IMG_2208.txt",
+    "doc-017.txt"
+   ]
+  },
+  {
+   "text": "ประชุมทีมดีไซน์ที่ลดขั้นตอนการจ่ายเงินในแอปให้เหลือสามขั้น",
+   "doc": "meet-0928.txt",
+   "rank": 1,
+   "top3": [
+    "meet-0928.txt",
+    "meeting_a.txt",
+    "mt0912.txt"
+   ]
+  },
+  {
+   "text": "ประชุมผู้ปกครองห้องลูกที่เก็บเงินพาไปพิพิธภัณฑ์วิทยาศาสตร์",
+   "doc": "doc-102.txt",
+   "rank": 1,
+   "top3": [
+    "doc-102.txt",
+    "IMG_2208.txt",
+    "meet-0928.txt"
+   ]
+  },
+  {
+   "text": "สูตรปลาทะเลนึ่งราดน้ำจิ้มรสจัด เคล็ดลับใช้น้ำแข็งรองใต้ตัวปลา",
+   "doc": "fish.txt",
+   "rank": 1,
+   "top3": [
+    "fish.txt",
+    "kitchen.txt",
+    "food_02.txt"
+   ]
+  },
+  {
+   "text": "ใบเสร็จร้านที่ซ่อมเครื่องซักผ้าเดือนที่แล้ว",
+   "doc": "scan_0412.txt",
+   "rank": 2,
+   "top3": [
+    "scan_0413.txt",
+    "scan_0412.txt",
+    "IMG_2208.txt"
+   ]
+  },
+  {
+   "text": "ทริปเกาหลีที่ไปช้อปเมียงดงและเข้าพักแถวฮงแด",
+   "doc": "seoul.txt",
+   "rank": 1,
+   "top3": [
+    "seoul.txt",
+    "note_old.txt",
+    "doc-310.txt"
+   ]
+  },
+  {
+   "text": "ตอนเล่นบอลแล้วเท้าพลิก เอกซเรย์ไม่พบกระดูกหัก",
+   "doc": "ankle.txt",
+   "rank": 1,
+   "top3": [
+    "ankle.txt",
+    "IMG_2208.txt",
+    "ayutthaya.txt"
+   ]
+  },
+  {
+   "text": "ตรวจร่างกายประจำปีที่ไขมันในเลือดสูง หมอให้ลดของทอด",
+   "doc": "checkup2569.txt",
+   "rank": 1,
+   "top3": [
+    "checkup2569.txt",
+    "lab_aug.txt",
+    "hr_raise.txt"
+   ]
+  },
+  {
+   "text": "ผลเลือดที่น้ำตาลสูงกว่าปกตินิดหน่อย หมอให้คุมของหวาน",
+   "doc": "lab_aug.txt",
+   "rank": 1,
+   "top3": [
+    "lab_aug.txt",
+    "kitchen.txt",
+    "fish.txt"
+   ]
+  },
+  {
+   "text": "สรุปประชุมยอดขายไตรมาสสาม ที่ภาคเหนือเด่นสุด",
+   "doc": "tmp_notes.txt",
+   "rank": 1,
+   "top3": [
+    "tmp_notes.txt",
+    "meet-0928.txt",
+    "meeting_a.txt"
+   ]
+  },
+  {
+   "text": "วิธีทำต้มยำน้ำใสสูตรยาย ที่เตือนว่าอย่าใส่มะนาวตอนไฟแรง",
+   "doc": "recipe1.txt",
+   "rank": 1,
+   "top3": [
+    "recipe1.txt",
+    "ผัดไทย.txt",
+    "fish.txt"
+   ]
+  },
+  {
+   "text": "จดความดันของคุณแม่ที่หมอปรับยาเป็นแอมโลดิพีน",
+   "doc": "bp.txt",
+   "rank": 1,
+   "top3": [
+    "bp.txt",
+    "hr_raise.txt",
+    "ref_req.txt"
+   ]
+  },
+  {
+   "text": "แผนทริปทะเลใต้ที่ต้องนั่งเรือสปีดโบ๊ทไปเกาะพีพี",
+   "doc": "phuket.txt",
+   "rank": 1,
+   "top3": [
+    "phuket.txt",
+    "ayutthaya.txt",
+    "IMG_2208.txt"
+   ]
+  },
+  {
+   "text": "บิลค่าไฟที่ใช้ไป 312 หน่วย",
+   "doc": "bill_09.txt",
+   "rank": 1,
+   "top3": [
+    "bill_09.txt",
+    "scan_0412.txt",
+    "IMG_2208.txt"
+   ]
+  },
+  {
+   "text": "สูตรกะเพราที่ใช้หมูสามชั้นทอดกรอบ",
+   "doc": "kitchen.txt",
+   "rank": 1,
+   "top3": [
+    "kitchen.txt",
+    "egg.txt",
+    "receipt final.txt"
+   ]
+  },
+  {
+   "text": "แผนขับรถเองไปชมทะเลหมอกต้นปีหน้า ที่จังหวัดติดลาว",
+   "doc": "nan_trip.txt",
+   "rank": 1,
+   "top3": [
+    "nan_trip.txt",
+    "eye_test.txt",
+    "vaccine.txt"
+   ]
+  },
+  {
+   "text": "ต้มอะไรที่ใส่กะทิทีหลังกันไม่ให้แตกมัน ใช้ไก่กับเห็ดฟาง",
+   "doc": "recipe_new.txt",
+   "rank": 1,
+   "top3": [
+    "recipe_new.txt",
+    "food_02.txt",
+    "new_1.txt"
+   ]
+  },
+  {
+   "text": "สูตรข้าวผัดที่ใส่เนื้อปูม้า แบบร้านในตลาดปากคลอง",
+   "doc": "doc-231.txt",
+   "rank": 1,
+   "top3": [
+    "doc-231.txt",
+    "d8.txt",
+    "doc-044.txt"
+   ]
+  },
+  {
+   "text": "ผลวัดสายตาที่บอกว่าสั้นข้างซ้ายมากกว่าและให้เปลี่ยนแว่น",
+   "doc": "eye_test.txt",
+   "rank": 1,
+   "top3": [
+    "eye_test.txt",
+    "doc-310.txt",
+    "bp.txt"
+   ]
+  },
+  {
+   "text": "อีเมลทวงเงินใบแจ้งหนี้ห้าหมื่นหกพันที่เลยกำหนดไปแล้ว",
+   "doc": "mail_chase.txt",
+   "rank": 1,
+   "top3": [
+    "mail_chase.txt",
+    "inv_0007.txt",
+    "bill_09.txt"
+   ]
+  },
+  {
+   "text": "ใบแจ้งหนี้งานทำโลโก้ให้ร้านขนมที่ยังค้างจ่ายอีกครึ่งหนึ่ง",
+   "doc": "inv_0007.txt",
+   "rank": 1,
+   "top3": [
+    "inv_0007.txt",
+    "mail_chase.txt",
+    "bill_09.txt"
+   ]
+  },
+  {
+   "text": "ทริปสั้น ๆ ที่นอนโฮมสเตย์บนดอยแล้วไปวัดสีขาว..วัดร่องขุ่น",
+   "doc": "chiangrai.txt",
+   "rank": 1,
+   "top3": [
+    "chiangrai.txt",
+    "nan_trip.txt",
+    "ayutthaya.txt"
+   ]
+  },
+  {
+   "text": "ประชุมการตลาดที่มีมติเลื่อนเปิดตัวแคมเปญไปกลางเดือนตุลาคม",
+   "doc": "note3.txt",
+   "rank": 1,
+   "top3": [
+    "note3.txt",
+    "meeting_a.txt",
+    "meet-0928.txt"
+   ]
+  }
+ ]
+}
