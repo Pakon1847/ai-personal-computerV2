@@ -119,6 +119,15 @@ Item {
                                                     : { ai: true, text: m.content, note: "", done: true })
         answered = ({})
     }
+    // ข้อความจากเสียง: ใส่ช่องพิมพ์ให้ตรวจ/แก้แล้วกดส่งเอง (ทดลองแล้ว: ถอดผิดทำให้ทำคำสั่งผิดโดยไม่ถาม)
+    Connections {
+        target: voice
+        function onTranscribed(text) {
+            input.text = input.text.trim() === "" ? text : input.text.trim() + " " + text
+            input.forceActiveFocus()
+            input.cursorPosition = input.text.length
+        }
+    }
     Connections {
         target: chat
         // AI ในเครื่องเลือกสกิล (อาจารย์ขอ · งานข้อ ④): เอาฟองคำตอบที่รออยู่ออก แล้วทำทางเดียวกับที่กฎเลือก
@@ -637,6 +646,19 @@ Item {
                 }
             }
             AppButton {
+                // กดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · ปล่อย = ถอดเสียง → ข้อความใส่ช่องพิมพ์ ไม่ส่งเอง
+                objectName: "micButton"
+                visible: voice.micAvailable
+                enabled: !voice.transcribing && !chat.busy
+                kind: voice.listening ? "warn" : "secondary"
+                iconPath: Icons.mic
+                text: voice.listening ? "ปล่อยเมื่อพูดจบ" : voice.transcribing ? "กำลังถอด…" : ""
+                Accessible.name: "กดค้างเพื่อพูด"
+                onPressed: voice.startListening()
+                onReleased: voice.stopListening()
+                onCanceled: voice.stopListening()
+            }
+            AppButton {
                 objectName: "sendButton"
                 text: chat.busy ? "หยุด" : "ส่ง"; iconPath: chat.busy ? Icons.stop : Icons.send
                 enabled: chat.busy || input.text.trim() !== ""
@@ -705,6 +727,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         objectName: "chatHint"
         text: chat.notice !== "" ? chat.notice
+              : voice.listening ? "กำลังฟัง · ปล่อยปุ่มเมื่อพูดจบ (ยาวสุด 15 วิ)"
+              : voice.micMessage !== "" ? voice.micMessage
               : chat.busy ? "Esc หรือปุ่มหยุด = หยุดตอบ" : "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
         size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true
     }

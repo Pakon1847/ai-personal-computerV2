@@ -33,7 +33,9 @@ Item {
             kind: face.busy ? "warn" : "neutral"
             iconPath: system.cameraPresent || face.busy ? Icons.camera : Icons.cameraOff
         }
-        Chip { objectName: "micIndicator"; text: "ไมค์ปิด"; iconPath: Icons.mic }
+        // H3: ไมค์เปิดเฉพาะตอนกดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · ต้องเห็นชัดทุกหน้า
+        Chip { objectName: "micIndicator"; text: voice.listening ? "ไมค์เปิด · กำลังฟัง" : "ไมค์ปิด"; iconPath: Icons.mic
+               kind: voice.listening ? "warn" : "neutral" }
         // สถานะจริงจาก /health ของ llama-server (การ์ด 0013 · H5)
         Chip { objectName: "modelIndicator"; text: chat.statusText; iconPath: Icons.cpu; compact: bar.tight
                kind: chat.ready ? "ok" : (chat.status === "loading" || chat.status === "restarting") ? "accent" : "warn" }

@@ -241,6 +241,7 @@ class AiPicksSkillQmlTest(unittest.TestCase):
 
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")
 class ShellCardTest(unittest.TestCase):
+    maxDiff = None
     """เกณฑ์การ์ด 0002 ข้อ 8: ไฟกล้อง/ไมค์ทุกหน้า และการ์ดนัดถัดไปจาก upcoming จริง."""
 
     def open_shell(self, page="workspace"):
@@ -647,6 +648,47 @@ class ShellCardTest(unittest.TestCase):
         card = skills.handle("หาไฟล์รายงานที่แก้เมื่อวาน")
         self.assertEqual(card["files"][0]["name"], "a.txt")
         self.assertIn("รายงาน", card["title"])
+        self.assertEqual(warnings, [])
+
+    def test_push_to_talk_fills_input_without_sending(self):
+        """กดค้างเพื่อพูด: ป้ายไมค์เปิดตอนกดค้าง · ข้อความที่ถอดได้ใส่ช่องพิมพ์ ไม่ส่งเอง · ไม่มีตัวถอด = ไม่มีปุ่ม."""
+        engine, win, warnings = self.open_shell()
+        voice = engine._backends["voice"]
+
+        class FakeListener:
+            available, listening = True, False
+
+            def start(self):
+                self.listening = True
+                return ""
+
+            def stop(self):
+                self.listening = False
+                voice._heard.emit("เปิด ยูทูบ", "", 1.8)
+
+            def cancel(self):
+                self.listening = False
+
+        voice._listener = None
+        voice.micChanged.emit()
+        settle(30)
+        mic = find_items(win, "micButton")[0]
+        self.assertFalse(mic.property("visible"))
+        voice._listener = FakeListener()
+        voice.micChanged.emit()
+        settle(30)
+        self.assertTrue(mic.property("visible"))
+        page = find_all(win, "workspace")[0]
+        before = len(page.property("items").toVariant())
+        mic.pressed.emit()
+        settle(30)
+        self.assertIn("ไมค์เปิด", find_items(win, "micIndicator")[0].property("text"))
+        mic.released.emit()
+        settle(50)
+        self.assertEqual(find_all(win, "chatInput")[0].property("text"), "เปิด ยูทูบ")
+        self.assertEqual(len(page.property("items").toVariant()), before)  # ไม่ได้ส่งเอง
+        self.assertEqual(find_items(win, "micIndicator")[0].property("text"), "ไมค์ปิด")
+        self.assertIn("ตรวจข้อความ", voice.micMessage)
         self.assertEqual(warnings, [])
 
     def test_latex_answers_become_plain_text(self):

@@ -158,6 +158,7 @@ class BackupController(QObject):
 
         threading.Thread(target=go, daemon=True).start()
 
+    @Slot(object)
     def _on_done(self, r) -> None:
         self._busy = False
         extra = f" · ข้ามไฟล์ที่เปิดไม่ได้ {len(r.skipped)} ไฟล์" if r.skipped else ""
@@ -197,16 +198,27 @@ class VoiceController(QObject):
     key = แถวของคำตอบที่กดอ่าน (หน้าจอใช้เปลี่ยนปุ่มเป็น "หยุดอ่าน")
     """
 
+    # เมธอดที่ต่อกับ signal ต้องมี @Slot: ไม่มี = PySide เพิ่ม slot ให้ตอนรัน ทำให้ QML อ่าน backend ผิดตัวแบบสุ่ม
+    # (เทสต์หน้าจอล้มสลับข้อ 2026-10-01 · ใส่ @Slot แล้วผ่าน 4/4 รอบ)
     changed = Signal()
+    micChanged = Signal()  # noqa: N815
+    transcribed = Signal(str)  # ข้อความที่ถอดได้ · หน้าจอใส่ช่องพิมพ์ (ไม่ส่งเอง · การ์ด 0019 ข้อ 9)
     _state = Signal(int, bool, str)
+    _heard = Signal(str, str, float)
 
-    def __init__(self, speaker=None, active: bool = True, idle_poll_ms: int = 60_000):
+    def __init__(
+        self, speaker=None, active: bool = True, idle_poll_ms: int = 60_000, listener=None
+    ):
         super().__init__()
-        from aipc.voice import tts
+        from aipc.voice import stt, tts
 
-        self._speaker = (speaker or tts.Speaker(self._state.emit)) if active else None
+        self._speaker = (speaker or tts.Speaker(self._weak("_state"))) if active else None
+        # กดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · None = หน้า Login
+        self._listener = (listener or stt.Listener(self._weak("_heard"))) if active else None
         self._key, self._job, self._message = -1, -1, ""
+        self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
         self._state.connect(self._on_state)
+        self._heard.connect(self._on_heard)
         self._idle = QTimer(self, interval=idle_poll_ms, timeout=self._idle_check)
         if self._speaker is not None:
             self._idle.start()
@@ -242,6 +254,7 @@ class VoiceController(QObject):
         self._key = -1
         self.changed.emit()
 
+    @Slot(int, bool, str)
     def _on_state(self, job: int, speaking: bool, error: str) -> None:
         if error:
             self._message = error
@@ -249,12 +262,72 @@ class VoiceController(QObject):
             self._key = -1
         self.changed.emit()
 
+    def _weak(self, name: str):
+        """callback ให้เธรดของตัวอ่าน/ตัวอัด ส่ง signal กลับ โดยไม่ถือ VoiceController ไว้ (ไม่สร้างวงอ้างอิง
+        Python ↔ QObject ที่ GC เก็บในจังหวะสุ่มระหว่างหน้าจออื่นกำลังใช้)."""
+        import weakref
+
+        ref = weakref.ref(self)
+
+        def emit(*args) -> None:
+            me = ref()
+            if me is not None:
+                getattr(me, name).emit(*args)
+
+        return emit
+
+    @Slot()
     def _idle_check(self) -> None:
         self._speaker.idle_check()
+
+    # ---------- กดค้างเพื่อพูด ----------
+    @Property(bool, notify=micChanged)
+    def micAvailable(self) -> bool:  # noqa: N802
+        return self._listener is not None and self._listener.available
+
+    @Property(bool, notify=micChanged)
+    def listening(self) -> bool:
+        return self._listener is not None and self._listener.listening
+
+    @Property(bool, notify=micChanged)
+    def transcribing(self) -> bool:
+        return self._transcribing
+
+    @Property(str, notify=micChanged)
+    def micMessage(self) -> str:  # noqa: N802
+        return self._mic_message
+
+    @Slot()
+    def startListening(self) -> None:  # noqa: N802
+        if self._listener is None or self._transcribing:
+            return
+        if self._key != -1:  # กำลังอ่านออกเสียงอยู่ = หยุดก่อน ไม่ให้ไมค์ได้ยินลำโพง
+            self.stop()
+        err = self._listener.start()
+        self._mic_message = err
+        self.micChanged.emit()
+
+    @Slot()
+    def stopListening(self) -> None:  # noqa: N802
+        if self._listener is None or not self._listener.listening:
+            return
+        self._transcribing, self._mic_message = True, "กำลังถอดเสียง…"
+        self.micChanged.emit()
+        self._listener.stop()
+
+    @Slot(str, str, float)
+    def _on_heard(self, text: str, err: str, secs: float) -> None:
+        self._transcribing, self._last_stt_s = False, secs
+        self._mic_message = err or f"ถอดเสียงใน {secs:.1f} วิ · ตรวจข้อความแล้วกดส่ง"
+        self.micChanged.emit()
+        if text:
+            self.transcribed.emit(text)
 
     def close(self) -> None:
         if self._speaker is not None:
             self._speaker.close()
+        if self._listener is not None:
+            self._listener.cancel()
 
 
 class CloudUsage(QObject):
@@ -550,6 +623,7 @@ class FilesBrowser(QObject):
 
         threading.Thread(target=work, daemon=True).start()
 
+    @Slot(object)
     def _on_found(self, res) -> None:
         rnd, hits, n, capped, secs, err = res
         if rnd != self._search_round:  # มีการค้นใหม่แล้ว
@@ -693,6 +767,7 @@ class LoginController(QObject):
 
         threading.Thread(target=work, daemon=True).start()
 
+    @Slot(int, object)
     def _on_progress(self, n: int, m: dict) -> None:
         if n != self._round or self._state != "scanning":
             return
@@ -702,6 +777,7 @@ class LoginController(QObject):
             self._message = hint
             self.changed.emit()
 
+    @Slot(int, object)
     def _on_scanned(self, n: int, res: dict) -> None:
         if n != self._round or self._state != "scanning":
             return
@@ -930,10 +1006,12 @@ class SignupController(QObject):
         threading.Thread(target=work, daemon=True).start()
         return True
 
+    @Slot(object)
     def _on_face_progress(self, m: dict) -> None:
         self.enroll_view.update(m)
         self.faceProgress.emit(str(m.get("hint", "")), dict(m.get("poses") or {}))
 
+    @Slot(object)
     def _on_face_result(self, res: dict) -> None:
         self.enroll_view.clear()  # ไม่เก็บภาพหน้าไว้หลังจบงาน
         self._busy = False
@@ -963,6 +1041,7 @@ class SignupController(QObject):
         threading.Thread(target=lambda: self._result.emit(self._run(request)), daemon=True).start()
         return True
 
+    @Slot("QVariantMap")
     def _on_result(self, result: dict) -> None:
         self._busy = False
         self.changed.emit()
@@ -1325,6 +1404,7 @@ class SkillsController(QObject):
         chip = {"text": "ส่งออกนอกเครื่อง: เฉพาะประโยคนี้", "kind": "neutral"}
         return self._plain("forging", title, self.FORGING_LINES, [chip])
 
+    @Slot(object)
     def _on_forged(self, result) -> None:
         from aipc.skills import manifest
 
@@ -1784,6 +1864,7 @@ class ChatController(QObject):
             target=lambda: self._health.emit(client.health(target)), daemon=True
         ).start()
 
+    @Slot(str)
     def _on_health(self, status: str) -> None:
         import time
 
@@ -1889,10 +1970,12 @@ class ChatController(QObject):
         if board is not None:
             board.setText(text)
 
+    @Slot(str)
     def _on_token(self, token: str) -> None:
         self._stream_text += token
         self.streamChanged.emit()
 
+    @Slot(object)
     def _on_done(self, reply) -> None:
         self._busy, self._stream = False, None
         from aipc.skills import catalog
