@@ -33,3 +33,7 @@
 | Gemma 4 E2B-it GGUF (`unsloth/gemma-4-E2B-it-GGUF` · ฐาน `google/gemma-4-E2B-it`) | Apache-2.0 | ได้ | Hugging Face API | 2026-09-29 |
 | Qwen3-0.6B GGUF (`Qwen/Qwen3-0.6B-GGUF` · ตัวช่วยร่างสำหรับทดลอง) | Apache-2.0 | ได้ | Hugging Face API | 2026-09-29 |
 | llama.cpp (`llama-server`, `llama-bench` · build บน Pi 5 · commit `86ea01d`) | MIT | ได้ | github.com/ggml-org/llama.cpp/LICENSE | 2026-09-29 |
+| piper-tts 1.8.0 (`OHF-voice/piper1-gpl` · ตัวอ่านออกเสียง การ์ด 0019) | GPL-3.0-or-later | ได้แต่ต้องเปิดซอร์สตาม GPL ถ้าแจกจ่าย · แอปเรียกเป็นโปรเซสแยก | `pip show piper-tts` บน Pi | 2026-10-01 |
+| เสียง Piper `th_TH-tsync2-medium` (ชุดข้อมูล NECTEC TSync2 ผ่าน `dubbing-ai/vaja-thai`) | CC BY-NC-SA 3.0 | **ไม่** | MODEL_CARD ใน `rhasspy/piper-voices` | 2026-10-01 |
+| tltk 1.11 (ตัวแปลงหน่วยเสียงไทยของ piper-tts) | BSD-3-Clause | ได้ | `pip show tltk` บน Pi | 2026-10-01 |
+| onnxruntime 1.30.0 | MIT | ได้ | `pip show onnxruntime` บน Pi | 2026-10-01 |

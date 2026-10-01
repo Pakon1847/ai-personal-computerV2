@@ -168,6 +168,73 @@ class BackupController(QObject):
             )
 
 
+class VoiceController(QObject):
+    """ปุ่ม "อ่านออกเสียง" ที่คำตอบ AI (การ์ด 0019 · Pakon เลือกทำแค่อ่านออกเสียง 2026-10-01).
+
+    available=False (ยังไม่ได้ติดตั้ง /opt/aipc-voice หรือไม่มีตัวเล่นเสียง) = ซ่อนปุ่ม · หน้า Login ไม่มีปุ่มนี้
+    key = แถวของคำตอบที่กดอ่าน (หน้าจอใช้เปลี่ยนปุ่มเป็น "หยุดอ่าน")
+    """
+
+    changed = Signal()
+    _state = Signal(int, bool, str)
+
+    def __init__(self, speaker=None, active: bool = True, idle_poll_ms: int = 60_000):
+        super().__init__()
+        from aipc.voice import tts
+
+        self._speaker = (speaker or tts.Speaker(self._state.emit)) if active else None
+        self._key, self._job, self._message = -1, -1, ""
+        self._state.connect(self._on_state)
+        self._idle = QTimer(self, interval=idle_poll_ms, timeout=self._idle_check)
+        if self._speaker is not None:
+            self._idle.start()
+
+    @Property(bool, notify=changed)
+    def available(self) -> bool:
+        return self._speaker is not None and self._speaker.available
+
+    @Property(int, notify=changed)
+    def speakingKey(self) -> int:  # noqa: N802
+        return self._key
+
+    @Property(str, notify=changed)
+    def message(self) -> str:
+        return self._message
+
+    @Slot(int, str)
+    def speak(self, key: int, text: str) -> None:
+        if not self.available:
+            return
+        self._message = ""
+        job = self._speaker.say(text)
+        if job < 0:
+            self._key, self._message = -1, "ไม่มีข้อความที่อ่านออกเสียงได้"
+        elif self._speaker.current == job:  # เปิดตัวอ่านไม่ได้ = _on_state แจ้งข้อผิดพลาดไปแล้ว
+            self._key, self._job = key, job
+        self.changed.emit()
+
+    @Slot()
+    def stop(self) -> None:
+        if self._speaker is not None:
+            self._speaker.stop()
+        self._key = -1
+        self.changed.emit()
+
+    def _on_state(self, job: int, speaking: bool, error: str) -> None:
+        if error:
+            self._message = error
+        if not speaking and job == self._job:
+            self._key = -1
+        self.changed.emit()
+
+    def _idle_check(self) -> None:
+        self._speaker.idle_check()
+
+    def close(self) -> None:
+        if self._speaker is not None:
+            self._speaker.close()
+
+
 class CloudUsage(QObject):
     """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget
     · ไม่มี Claude = available False."""

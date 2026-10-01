@@ -20,6 +20,7 @@ Item {
     // กด "ไม่ใช่แบบนี้" ที่สกิลที่ Claude สร้าง → ข้อความถัดไปคือคำติ ส่งให้ Claude แก้สกิล (การ์ด 0017) · null = แชทปกติ
     property var feedbackFor: null
     property int copiedRow: -1    // คำตอบ AI ที่เพิ่งกดคัดลอก (ปุ่มขึ้นว่า "คัดลอกแล้ว")
+    property int speakRow: -1     // คำตอบที่กดอ่านออกเสียงล่าสุด (แสดงข้อความผิดพลาดของตัวอ่านใต้แถวนี้)
     readonly property bool home: items.length === 0
     readonly property int colWidth: Math.min(760, width - 48)
 
@@ -76,6 +77,7 @@ Item {
             push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
     }
     function loadChat(messages) {
+        voice.stop()  // แถวที่กำลังอ่านจะเป็นของแชทอื่นแล้ว
         items = messages.map(m => m.role === "user" ? { user: true, text: m.shown || m.content }
                                                     : { ai: true, text: m.content, note: "", done: true })
         answered = ({})
@@ -140,12 +142,12 @@ Item {
         AppButton {
             visible: !root.home
             text: "แชทใหม่"; kind: "secondary"; iconPath: Icons.plus
-            onClicked: { chat.newChat(false); root.items = []; root.answered = ({}) }
+            onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
         }
         AppButton {
             text: chat.temporary ? "แชทชั่วคราว ✓" : "แชทชั่วคราว"; kind: "secondary"
             ToolTip.visible: hovered; ToolTip.text: "ไม่บันทึกประวัติของบทสนทนานี้"
-            onClicked: { chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
+            onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
         }
     }
     Popup {
@@ -475,12 +477,33 @@ Item {
                         size: Theme.fontSmall; color: Theme.warnInk
                     }
                     // เอาคำตอบไปใช้ต่อ (เช่น จดหมายที่ร่าง) · คลิปบอร์ดอยู่ในเครื่อง ไม่ได้ส่งไปไหน
-                    AppButton {
-                        objectName: "copyAnswer"
+                    RowLayout {
+                        spacing: 4
                         visible: !!row.modelData.done && (row.modelData.text || "") !== ""
-                        text: root.copiedRow === row.index ? "คัดลอกแล้ว" : "คัดลอก"
-                        kind: "ghost"
-                        onClicked: { chat.copyText(row.modelData.text); root.copiedRow = row.index }
+                        AppButton {
+                            objectName: "copyAnswer"
+                            text: root.copiedRow === row.index ? "คัดลอกแล้ว" : "คัดลอก"
+                            kind: "ghost"
+                            onClicked: { chat.copyText(row.modelData.text); root.copiedRow = row.index }
+                        }
+                        // อ่านออกเสียงในเครื่อง (การ์ด 0019) · ไม่ได้ติดตั้งตัวอ่าน = ไม่มีปุ่ม
+                        AppButton {
+                            objectName: "speakAnswer"
+                            visible: voice.available
+                            text: voice.speakingKey === row.index ? "หยุดอ่าน" : "อ่านออกเสียง"
+                            kind: "ghost"
+                            onClicked: {
+                                root.speakRow = row.index
+                                voice.speakingKey === row.index ? voice.stop() : voice.speak(row.index, root.tidy(row.modelData.text))
+                            }
+                        }
+                    }
+                    AppText {
+                        objectName: "speakError"
+                        visible: root.speakRow === row.index && voice.message !== ""
+                        Layout.fillWidth: true
+                        text: voice.message
+                        size: Theme.fontSmall; color: Theme.warnInk
                     }
                 }
             }

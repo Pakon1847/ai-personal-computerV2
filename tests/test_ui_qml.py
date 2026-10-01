@@ -418,6 +418,56 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
+    def test_speak_button_reads_answer_and_stops(self):
+        """การ์ด 0019: ปุ่มอ่านออกเสียงขึ้นเฉพาะเมื่อมีตัวอ่าน · กดแล้วเป็น "หยุดอ่าน" · กดอีกครั้งหยุด."""
+        engine, win, warnings = self.open_shell()
+        voice = engine._backends["voice"]
+        page = find_all(win, "workspace")[0]
+        answer = {"ai": True, "text": "เปิด **YouTube** แล้ว", "note": "", "done": True, "skill": ""}
+        page.setProperty("items", [answer])
+        settle(100)
+        btn = [b for b in find_items(win, "speakAnswer")][0]
+        voice._speaker = None
+        voice.changed.emit()
+        settle(30)
+        self.assertFalse(btn.property("visible"))  # ไม่มีตัวอ่าน = ไม่มีปุ่ม
+
+        class FakeSpeaker:
+            available, current, said, stopped = True, -1, [], 0
+
+            def say(self, text):
+                self.said.append(text)
+                self.current = 7
+                return 7
+
+            def stop(self):
+                self.stopped += 1
+                self.current = -1
+
+            def idle_check(self):
+                return False
+
+            def close(self):
+                pass
+
+        fake = voice._speaker = FakeSpeaker()
+        voice.changed.emit()
+        settle(30)
+        self.assertTrue(btn.property("visible"))
+        self.assertEqual(btn.property("text"), "อ่านออกเสียง")
+        btn.clicked.emit()
+        settle(30)
+        self.assertEqual(fake.said, ["เปิด YouTube แล้ว"])  # ข้อความหลัง tidy()
+        self.assertEqual(btn.property("text"), "หยุดอ่าน")
+        voice._on_state(7, False, "")  # อ่านจบ
+        settle(30)
+        self.assertEqual(btn.property("text"), "อ่านออกเสียง")
+        btn.clicked.emit()
+        btn.clicked.emit()  # กดซ้ำระหว่างอ่าน = หยุด
+        settle(30)
+        self.assertGreaterEqual(fake.stopped, 1)
+        self.assertEqual(warnings, [])
+
     def test_ai_answer_is_plain_text_and_links_readable(self):
         """พบบนจอ Pi 2026-10-01: ลิงก์ markdown ดิบ
         · และข้อความหน้าตาเหมือน HTML ต้องไม่ถูกแสดงเป็น HTML (รูปจากเว็บ = รั่ว)."""

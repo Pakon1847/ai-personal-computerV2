@@ -23,6 +23,7 @@ from aipc.ui.backend import (
     SkillsController,
     SystemStatus,
     UiSettings,
+    VoiceController,
 )
 from aipc.ui.face import FaceController
 from aipc.ui.loginface import LoginFaceController
@@ -208,6 +209,8 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None),
+        # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
+        "voice": VoiceController(active=in_session),
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),
@@ -264,6 +267,9 @@ def shutdown(engine) -> None:
     chat = backends.get("chat")
     if chat is not None:  # หยุดคำตอบที่ค้างและตัวจับเวลาตรวจสถานะ AI
         chat.shutdown()
+    voice = backends.get("voice")
+    if voice is not None:  # ปิดตัวสังเคราะห์เสียงที่เปิดค้าง (คืน RAM ~670 MB)
+        voice.close()
     if shiboken6.isValid(engine):
         shiboken6.delete(engine)
     backends.clear()
