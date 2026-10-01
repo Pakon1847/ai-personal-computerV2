@@ -621,16 +621,20 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(said, ["น้ำคือ H2O"])
         answer("ครึ่ง", "หยุดแล้ว")
         self.assertEqual(len(said), 1)  # ตอบไม่จบไม่อ่าน
-        toggle = find_items(win, "speakToggle")[0]
-        self.assertEqual(toggle.property("Accessible.name") or "ปิดเสียงพูด", "ปิดเสียงพูด")
-        toggle.clicked.emit()  # ปิดเสียงพูดจากหน้าแชท
+        on, off = find_items(win, "speakOn")[0], find_items(win, "speakOff")[0]
+        self.assertTrue(find_items(win, "speakChoice")[0].property("visible"))
+        self.assertEqual((on.property("kind"), off.property("kind")), ("primary", "secondary"))
+        off.clicked.emit()  # เลือก "ไม่อ่านออกเสียง" จากหน้าแชท
         settle(30)
         self.assertFalse(ui.speakAnswers)
+        self.assertEqual((on.property("kind"), off.property("kind")), ("secondary", "primary"))
         answer("ตอบอีกครั้ง")
         self.assertEqual(len(said), 1)
-        toggle.clicked.emit()
+        on.clicked.emit()  # เปลี่ยนกลับได้ตลอด
         settle(30)
         self.assertTrue(ui.speakAnswers)
+        answer("ตอบครั้งที่สาม")
+        self.assertEqual(said[-1], "ตอบครั้งที่สาม")
         self.assertEqual(warnings, [])
 
     def test_files_by_time_from_chat(self):
