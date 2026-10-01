@@ -566,6 +566,12 @@ Item {
                 answered: !!root.answered[(row.modelData.card || {}).confirmToken]
                 onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
                 onRemoveSkill: (skillId) => root.showCard(skills.removeSkill(skillId))
+                onSummarizeFile: (path) => {
+                    const err = chat.attachFile(path)
+                    if (err !== "") { root.showCard({ kind: "chat", title: err, chips: [], lines: [], confirmToken: "", page: "", badge: {} }); return }
+                    input.text = "สรุปเนื้อหาไฟล์นี้เป็นข้อ ๆ สั้น ๆ"
+                    root.send()
+                }
                 onAskFile: (path) => {
                     const err = chat.attachFile(path)
                     if (err === "") input.forceActiveFocus()

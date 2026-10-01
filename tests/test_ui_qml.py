@@ -572,6 +572,14 @@ class ShellCardTest(unittest.TestCase):
         page.showCard(card)
         settle(50)
         self.assertGreaterEqual(len(find_items(win, "chatFileHit")), 1)
+        chat = engine._backends["chat"]
+        find_items(win, "summarizeFileButton")[
+            0
+        ].clicked.emit()  # AI ไม่พร้อมในเทสต์ = ส่งไม่ออก แต่แนบและขึ้นข้อความแล้ว
+        settle(30)
+        self.assertEqual(chat.attachedFile, "scan_0412.txt")
+        items = find_all(win, "workspace")[0].property("items").toVariant()
+        self.assertTrue(any("สรุปเนื้อหาไฟล์นี้" in (i.get("text") or "") for i in items))
         self.assertEqual(skills.handle("แปลงไฟล์ Word เป็น PDF ยังไง")["kind"] != "files", True)
         self.assertEqual(warnings, [])
 

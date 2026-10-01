@@ -12,6 +12,7 @@ Rectangle {
     signal removeSkill(string skillId)
     signal wrongSkill(string skillId, string name)
     signal askFile(string path)  // การ์ดผลค้นไฟล์: ส่งไฟล์ให้ AI ในเครื่อง
+    signal summarizeFile(string path)  // แนบไฟล์แล้วสั่งสรุปทันที
     readonly property bool forged: hasBadge && (info.badge.forgedId || "") !== ""
 
     readonly property bool hasBadge: info.badge !== undefined && info.badge.name !== undefined
@@ -75,7 +76,8 @@ Rectangle {
                     AppText { text: fileRow.modelData.name; strong: true; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
                     AppText { text: fileRow.modelData.folder + " · " + fileRow.modelData.snippet; size: Theme.fontCaption; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
                 }
-                AppButton { text: "ถาม AI"; kind: "secondary"; onClicked: card.askFile(fileRow.modelData.abs) }
+                AppButton { objectName: "summarizeFileButton"; text: "สรุป"; kind: "secondary"; onClicked: card.summarizeFile(fileRow.modelData.abs) }
+                AppButton { text: "ถาม AI"; kind: "ghost"; onClicked: card.askFile(fileRow.modelData.abs) }
             }
         }
 
