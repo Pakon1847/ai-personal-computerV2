@@ -10,6 +10,9 @@
 - ชื่อ/รหัส/ชื่อที่แสดง → กฎชุดเดียวกับหน้าจอ (aipc.accounts.validation)
 - PIN กู้คืน → เทียบ hash · ผิดหลายครั้งต้องรอ (สิ่งนี้คือตัวกันการเดา PIN จริง)
 
+ลบบัญชี (ข้อเสนอ 2026-10-03 · สิทธิ์ขอให้ลบตาม PDPA): ทำที่หน้า Login ด้วยรหัสผ่าน + พิมพ์ชื่อผู้ใช้ยืนยัน ·
+ลบทุกที่ที่ระบบเก็บข้อมูลของบัญชี แล้ว **ตรวจซ้ำทีละที่** ส่งผลกลับเป็นใบยืนยัน · ห้ามลบผู้ดูแล (กลุ่ม sudo)
+
 หลัก H1: สร้างบัญชีแบบ "ครบหรือไม่มีเลย" — จดงานค้างก่อน useradd แล้วลบเมื่อสำเร็จ
 ไฟดับกลางคัน → เรียกครั้งถัดไปลบบัญชีครึ่ง ๆ ทิ้งก่อนทำงานใหม่ (ไม่มีบัญชีที่ไม่มีรหัสผ่านค้าง)
 ทุกอย่างที่แตะ OS อยู่ในคลาส System → เทสต์ใส่ของปลอมแทนได้ รันบนวินโดวส์ได้
@@ -21,6 +24,7 @@ import hashlib
 import hmac
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -94,6 +98,59 @@ class System:
         from aipc.accounts import pam
 
         return pam.authenticate(PAM_SERVICE, user, password)
+
+    # ---------- ใช้ตอนลบบัญชี ----------
+    vision_dir = Path("/var/lib/aipc-vision/face-login")  # แม่แบบใบหน้าสำหรับเข้าเครื่อง (visiond)
+    leftover_roots = (Path("/tmp"), Path("/var/tmp"), Path("/dev/shm"))
+
+    def uid_of(self, name: str) -> int | None:
+        import pwd
+
+        try:
+            return pwd.getpwnam(name).pw_uid
+        except KeyError:
+            return None
+
+    def in_group(self, name: str, group: str) -> bool:
+        import grp
+
+        try:
+            return name in grp.getgrnam(group).gr_mem
+        except KeyError:
+            return False
+
+    def has_processes(self, uid: int) -> bool:
+        """ยังเข้าใช้อยู่ (มีโปรเซสของบัญชีนี้) = ห้ามลบ."""
+        return self.run(["pgrep", "-u", str(uid)]) == 0
+
+    def system_files(self, name: str) -> list[Path]:
+        """ไฟล์ของบัญชีนอก home ที่ userdel -r ไม่ได้ลบให้ทุกเครื่อง."""
+        return [Path("/var/spool/cron/crontabs") / name, Path("/var/mail") / name,
+                Path("/var/spool/mail") / name, Path("/var/lib/systemd/linger") / name]  # fmt: skip
+
+    def owned_by(self, uid: int) -> list[Path]:
+        """ไฟล์ค้างที่ยังเป็นของเลขผู้ใช้นี้ · ต้องลบ ไม่งั้นบัญชีใหม่ที่ได้เลขเดิมจะเปิดอ่านได้."""
+        found = []
+        for top in self.leftover_roots:
+            for d, dirs, files in os.walk(top, followlinks=False):
+                for n in dirs + files:
+                    p = Path(d) / n
+                    try:
+                        if p.lstat().st_uid == uid:
+                            found.append(p)
+                    except OSError:
+                        pass
+        return found
+
+    def remove(self, path: Path) -> None:
+        """ลบโดยไม่ตามลิงก์ (ลิงก์ที่ชี้ไปไฟล์ของคนอื่นต้องไม่ทำให้ไฟล์นั้นหาย)."""
+        try:
+            if path.is_dir() and not path.is_symlink():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+        except FileNotFoundError:
+            pass
 
     def lock(self):
         """ทำทีละคำขอ (สองคำขอพร้อมกันอาจสร้างชื่อเดียวกันสองครั้ง)."""
@@ -263,6 +320,100 @@ def check_password(request: dict, system: System) -> dict:
     return {"ok": True, "message": "รหัสผ่านถูกต้อง"}
 
 
+# ---------- ลบบัญชี ----------
+
+PROTECTED_GROUPS = ("sudo", "adm")  # ผู้ดูแลเครื่อง ลบจากหน้า Login ไม่ได้
+LIMITS = [
+    "ลบไฟล์บน microSD ไม่รับประกันว่าข้อมูลเก่าหายจากชิปจริง (ต้องเข้ารหัส home ตาม ADR-003 · ยังไม่มีในรุ่นนี้)",
+    "ข้อความที่เคยส่งให้ Claude หรือ Open-Meteo ลบจากเครื่องนี้แล้ว แต่ลบจากฝั่งผู้ให้บริการไม่ได้",
+    "สำเนาสำรองบนไดรฟ์ USB (ถ้าเคยทำ) อยู่นอกเครื่อง ต้องลบเอง",
+]
+
+
+def _deleting_file(system: System, user: str) -> Path:
+    return system.state / "deleting" / user
+
+
+def _faces(system: System, user: str) -> list[Path]:
+    return sorted(system.vision_dir.glob(f"{user}.json*"))  # หลัก สำรอง ชั่วคราว
+
+
+def _wipe(system: System, user: str, uid: int | None, home: Path | None) -> list[dict]:
+    """ลบทุกที่ที่เก็บข้อมูลของบัญชี แล้วตรวจซ้ำทีละที่ · คืนรายการสำหรับใบยืนยัน."""
+    if system.user_home(user) is not None:
+        system.run(["userdel", "-r", user])
+    if home is not None and home.exists():
+        system.remove(home)  # userdel ลบ home ไม่ครบ (เช่น มีไฟล์ของคนอื่นอยู่ข้างใน)
+    for p in [_recovery_file(system, user), _check_file(system, user), *_faces(system, user),
+              *system.system_files(user)]:  # fmt: skip
+        system.remove(p)
+    if uid is not None:  # ลึกสุดก่อน: ลบไฟล์ข้างในก่อนโฟลเดอร์
+        for p in sorted(system.owned_by(uid), key=lambda p: len(p.parts), reverse=True):
+            system.remove(p)
+    left = system.owned_by(uid) if uid is not None else []
+    others = not any(p.exists() for p in system.system_files(user))
+    return [
+        {"what": "บัญชีผู้ใช้ในระบบ", "gone": system.user_home(user) is None},
+        {"what": "โฟลเดอร์ส่วนตัว (แชท นัด ไฟล์ การตั้งค่า สกิล ประวัติส่งออก แม่แบบใบหน้าในโฟลเดอร์)",
+         "gone": home is None or not home.exists()},
+        {"what": "PIN กู้คืน", "gone": not _recovery_file(system, user).exists()},
+        {"what": "ตัวนับรหัสผ่านผิด", "gone": not _check_file(system, user).exists()},
+        {"what": "แม่แบบใบหน้าสำหรับเข้าเครื่อง", "gone": not _faces(system, user)},
+        {"what": "งานตั้งเวลา · กล่องจดหมาย · บริการค้าง", "gone": others},
+        {"what": "ไฟล์ค้างที่ยังผูกกับเลขผู้ใช้เดิม (/tmp /var/tmp /dev/shm)", "gone": not left},
+    ]  # fmt: skip
+
+
+def delete(request: dict, system: System) -> dict:
+    vals = _strings(request, "username", "password", "confirm")
+    if vals is None:
+        return _fail("คำขอไม่ครบ")
+    user, password, confirm = vals
+    if confirm.strip() != user:
+        return _fail("พิมพ์ชื่อผู้ใช้ยืนยันไม่ตรง · ยังไม่ได้ลบอะไร")
+    uid = system.uid_of(user) if validation.check_username(user).ok else None
+    if uid is None or system.user_home(user) is None:
+        return _fail("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")  # ไม่บอกว่ามีบัญชีนี้หรือไม่
+    # ผิดหลายครั้งต้องรอ (ตัวนับเดียวกับ check-password · ใช้ลบเป็นทางเดารหัสไม่ได้)
+    if not check_password({"username": user, "password": password}, system)["ok"]:
+        return _fail("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+    if uid < 1000 or any(system.in_group(user, g) for g in PROTECTED_GROUPS):
+        return _fail("บัญชีผู้ดูแลเครื่องลบจากหน้า Login ไม่ได้")
+    if system.has_processes(uid):
+        return _fail("บัญชีนี้ยังเปิดใช้อยู่ · ออกจากระบบบัญชีนี้ก่อน แล้วลองใหม่")
+    home = system.user_home(user)
+    marker = _deleting_file(system, user)
+    _write_private(marker, {"uid": uid, "home": str(home), "since": int(system.now())})
+    checks = _wipe(system, user, uid, home)
+    ok = all(c["gone"] for c in checks)
+    if ok:
+        marker.unlink(missing_ok=True)
+    when = time.strftime("%Y-%m-%d %H:%M", time.localtime(system.now()))
+    system.log(f"ลบบัญชี {user} ({'ครบ' if ok else 'ไม่ครบ'})")
+    return {"ok": ok, "user": user, "at": when, "checks": checks, "limits": LIMITS,
+            "message": f"ลบบัญชี {user} แล้ว" if ok else "ลบไม่ครบ · ดูรายการที่ยังเหลือ"}  # fmt: skip
+
+
+def _resume_deleting(system: System) -> None:
+    """ไฟดับกลางการลบ → ลบต่อให้จบก่อนทำงานใหม่ (ไม่ทิ้งบัญชีครึ่ง ๆ)."""
+    folder = system.state / "deleting"
+    if not folder.is_dir():
+        return
+    for marker in folder.iterdir():
+        try:
+            info = json.loads(marker.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            info = {}
+        name = marker.name
+        if not validation.check_username(name).ok:
+            marker.unlink(missing_ok=True)
+            continue
+        home = Path(info["home"]) if info.get("home") else None
+        if all(c["gone"] for c in _wipe(system, name, info.get("uid"), home)):
+            marker.unlink(missing_ok=True)
+        system.log(f"ลบบัญชีที่ค้างจากไฟดับต่อ: {name}")
+
+
 def handle(raw: bytes, system: System) -> dict:
     caller = system.caller()
     if caller not in (CALLER, VISION):
@@ -276,7 +427,7 @@ def handle(raw: bytes, system: System) -> dict:
     if not isinstance(request, dict):
         return _fail("คำขออ่านไม่ได้")
     ops = (
-        {"create": create, "recover": recover}
+        {"create": create, "recover": recover, "delete": delete}
         if caller == CALLER
         else {"check-password": check_password}
     )
@@ -284,6 +435,7 @@ def handle(raw: bytes, system: System) -> dict:
     if op is None:
         return _fail("ไม่รู้จักคำขอนี้")
     _cleanup_pending(system)
+    _resume_deleting(system)
     return op(request, system)
 
 

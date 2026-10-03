@@ -35,3 +35,4 @@ FacePanel 1.0 FacePanel.qml
 LoginFacePanel 1.0 LoginFacePanel.qml
 EnrollPreview 1.0 EnrollPreview.qml
 WhyPanel 1.0 WhyPanel.qml
+DeleteFlow 1.0 DeleteFlow.qml

@@ -1111,10 +1111,13 @@ class SignupController(QObject):
         if not self._real:
             if self._dev:
                 msg = "จำลอง (โหมดพัฒนา) · ไม่ได้สร้างหรือเปลี่ยนบัญชีจริง"
-                self.finished.emit({"ok": True, "simulated": True, "message": msg})
+                done = {"ok": True, "simulated": True, "message": msg}
+                if request.get("op") == "delete":  # ให้เห็นหน้าใบยืนยัน แต่ทุกบรรทัดเขียนว่าจำลอง
+                    done["checks"] = [{"what": "จำลอง: ไม่ได้ลบอะไรจริง", "gone": False}]
+                self.finished.emit(done)
             else:
                 self.finished.emit(
-                    {"ok": False, "message": "สมัครและกู้คืนได้เฉพาะหน้า Login จริงของเครื่อง"}
+                    {"ok": False, "message": "สมัคร กู้คืน และลบบัญชีได้เฉพาะหน้า Login จริงของเครื่อง"}
                 )
             return True
         import threading
@@ -1139,6 +1142,12 @@ class SignupController(QObject):
     def recover(self, username: str, pin: str, new_password: str) -> bool:
         return self._submit({"op": "recover", "username": username.strip(), "pin": pin,
                              "new_password": new_password})  # fmt: skip
+
+    @Slot(str, str, str, result=bool)
+    def deleteAccount(self, username: str, password: str, confirm: str) -> bool:  # noqa: N802
+        """ลบบัญชีถาวร (ข้อเสนอ 2026-10-03) · ตัวช่วย root ตรวจทุกข้อเองและตอบใบยืนยันกลับมา."""
+        return self._submit({"op": "delete", "username": username.strip(), "password": password,
+                             "confirm": confirm.strip()})  # fmt: skip
 
     @Slot(str, str, result="QVariantMap")
     def checkPin(self, pin: str, confirm: str) -> dict:  # noqa: N802

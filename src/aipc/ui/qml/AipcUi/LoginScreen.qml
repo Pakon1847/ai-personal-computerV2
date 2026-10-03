@@ -242,10 +242,18 @@ Rectangle {
             color: Theme.danger
         }
 
-        AppButton {
+        RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            text: "ลืมรหัสผ่าน? ใช้ PIN กู้คืน"; kind: "ghost"
-            onClicked: AppState.go("recover")   // การ์ด 0012
+            spacing: 4
+            AppButton {
+                text: "ลืมรหัสผ่าน? ใช้ PIN กู้คืน"; kind: "ghost"
+                onClicked: AppState.go("recover")   // การ์ด 0012
+            }
+            AppButton {
+                objectName: "deleteAccountLink"
+                text: "ลบบัญชี"; kind: "ghost"
+                onClicked: AppState.go("delete")   // ข้อเสนอ 2026-10-03
+            }
         }
     }
     }

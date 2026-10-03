@@ -46,6 +46,7 @@ ApplicationWindow {
             Layout.fillHeight: true
             sourceComponent: AppState.screen === "signup" ? signupPage
                            : AppState.screen === "recover" ? recoverPage
+                           : AppState.screen === "delete" ? deletePage
                            : AppState.screen === "shell" ? shellPage : loginPage
         }
     }
@@ -53,5 +54,6 @@ ApplicationWindow {
     Component { id: loginPage; LoginScreen {} }
     Component { id: signupPage; SignupFlow {} }
     Component { id: recoverPage; RecoverFlow {} }
+    Component { id: deletePage; DeleteFlow {} }
     Component { id: shellPage; ShellScreen {} }
 }

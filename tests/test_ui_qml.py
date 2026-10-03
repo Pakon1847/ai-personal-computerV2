@@ -45,6 +45,8 @@ CASES = [
     *({"screen": "signup", "signup_step": n, "dev": True} for n in range(3)),
     {"screen": "recover", "dev": True},
     {"screen": "recover", "greeter_session": ["labwc"]},
+    {"screen": "delete", "dev": True},
+    {"screen": "delete", "greeter_session": ["labwc"], "theme": "dark"},
     {"screen": "signup", "signup_step": 1, "theme": "dark"},
     *(({"screen": "shell", "page": p} for p in uiapp.PAGES) if uiapp else ()),
     {"screen": "shell", "page": "workspace", "theme": "dark"},
@@ -140,6 +142,38 @@ def find_items(win, name):
             out.append(item)
         stack.extend(item.childItems())
     return out
+
+
+@unittest.skipIf(uiapp is None, "ไม่มี PySide6")
+class DeleteAccountScreenTest(unittest.TestCase):
+    """ลบบัญชี (ข้อเสนอ 2026-10-03): ปุ่มลบกดได้เมื่อกรอกครบ ยืนยันชื่อตรง และติ๊กเข้าใจ · ผลเป็นใบยืนยัน."""
+
+    def test_button_needs_everything_then_shows_certificate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            opts = uiapp.Options(software=True, settings_path=Path(tmp) / "ui.json", screen="login",
+                                 dev=True)  # fmt: skip
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            win = engine.rootObjects()[0]
+            find_all(win, "deleteAccountLink")[0].clicked.emit()
+            settle(100)
+            button = find_all(win, "deleteButton")[0]
+            find_all(win, "deleteUser")[0].setProperty("text", "namfon")
+            find_all(win, "deletePassword")[0].setProperty("text", "correct-horse-9")
+            find_all(win, "deleteConfirm")[0].setProperty("text", "namfo")
+            find_all(win, "deleteUnderstood")[0].setProperty("checked", True)
+            settle(50)
+            self.assertFalse(button.property("enabled"), "ยืนยันชื่อไม่ตรง = กดไม่ได้")
+            find_all(win, "deleteConfirm")[0].setProperty("text", "namfon")
+            settle(50)
+            self.assertTrue(button.property("enabled"))
+            button.clicked.emit()
+            settle(100)
+            self.assertTrue(find_all(win, "deleteCertificate")[0].property("visible"))
+            self.assertEqual(len(find_items(win, "deleteCheck")), 1)  # จำลอง: บรรทัดเดียว "ไม่ได้ลบจริง"
+            self.assertEqual(warnings, [])
+            win.close()
+            uiapp.shutdown(engine)
 
 
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")

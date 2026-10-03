@@ -61,6 +61,22 @@ class SignupControllerTest(unittest.TestCase):
         self.assertTrue(results[0]["simulated"])
         self.assertIn("จำลอง", results[0]["message"])
 
+    def test_delete_sends_only_what_is_needed(self):
+        seen = []
+        s, results = self.make(
+            real=True, runner=lambda r: seen.append(r) or {"ok": True, "checks": []}
+        )
+        s.deleteAccount(" namfon ", "correct-horse-9", "namfon ")
+        wait_for(results)
+        self.assertEqual(seen[0], {"op": "delete", "username": "namfon",
+                                   "password": "correct-horse-9", "confirm": "namfon"})  # fmt: skip
+
+    def test_dev_delete_shows_a_simulated_certificate(self):
+        s, results = self.make(dev=True)
+        s.deleteAccount("namfon", "x", "namfon")
+        self.assertTrue(results[0]["simulated"])
+        self.assertFalse(results[0]["checks"][0]["gone"])  # จำลอง = ไม่บอกว่าลบแล้ว
+
     def test_plain_window_refuses(self):
         s, results = self.make()
         s.create("น้ำฝน", "namfon", "correct-horse-9", "482917")
