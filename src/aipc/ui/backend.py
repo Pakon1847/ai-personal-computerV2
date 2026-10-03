@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import getpass
 import shutil
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -1453,6 +1454,10 @@ class SkillsController(QObject):
     @Slot(str, result="QVariantMap")
     def undo(self, token: str) -> dict:
         """ปุ่ม "ย้อนกลับ" ใต้การ์ดคำสั่ง · ใช้ได้ครั้งเดียว และเฉพาะคำสั่งล่าสุด."""
+        t0 = time.monotonic()
+        return self._why(self._undo(token), t0)
+
+    def _undo(self, token: str) -> dict:
         item = self._pending.pop(token, None) if token == self._undo_token else None
         card = {"kind": "command", "badge": {}, "title": "", "chips": [], "lines": [],
                 "confirmToken": "", "page": ""}  # fmt: skip
@@ -1699,6 +1704,10 @@ class SkillsController(QObject):
     @Slot(str, str, result="QVariantMap")
     def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802
         """AI ในเครื่องเลือกสกิลนี้ → ทำทางเดียวกับที่ตัวคัดสกิลเลือก (ยืนยันก่อนถ้าเป็นงานที่แตะเครื่อง)."""
+        t0 = time.monotonic()
+        return self._why(self._handle_as(skill_id, text), t0)
+
+    def _handle_as(self, skill_id: str, text: str) -> dict:
         from aipc.skills import catalog, router
 
         if skill_id == catalog.CREATE_SKILL:  # AI ในเครื่องขอให้ Claude สร้างสกิล (การ์ด 0017)
@@ -1717,9 +1726,47 @@ class SkillsController(QObject):
                              missing=missing, candidates=[skill.id])  # fmt: skip
         return self._card(route, text)
 
+    # ---------- ทำไมได้คำตอบนี้ (ข้อเสนอ 2026-10-03) ----------
+    WHO = {"weather": "สกิลอากาศ · โค้ดในเครื่อง + บริการ Open-Meteo", "files": "ค้นไฟล์ · โค้ดในเครื่อง",
+           "forging": "Claude (cloud) กำลังสร้างสกิล", "forge-failed": "Claude (cloud)"}  # fmt: skip
+    WHY = {"weather": "ตรงรูปประโยคถามอากาศ (กฎ) · ไม่ผ่าน AI จึงไม่เดาตัวเลข",
+           "files": "ตรงรูปประโยคหาไฟล์ (กฎ) · AI ในเครื่องเปิดไฟล์เองไม่ได้",
+           "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล"}  # fmt: skip
+
+    def _why(self, card: dict, t0: float) -> dict:
+        """เติม card["why"] = [{k, v}] จากสิ่งที่เกิดจริง.
+
+        การ์ดที่ส่งต่อให้ AI ตอบ = ChatController อธิบายเองตอนตอบเสร็จ
+        """
+        out = card.pop("_outbound", None)
+        if card.get("llm") and card.get("kind") != "steps":
+            return card
+        badge = card.get("badge") or {}
+        kind = card.get("kind", "")
+        if badge.get("name"):
+            who = f"สกิล “{badge['name']}” · {badge.get('worker', '')}"
+        else:
+            who = self.WHO.get(kind, "โค้ดในเครื่อง")
+        why = badge.get("reason") or self.WHY.get(kind, "")
+        if out is None and kind == "forging" and card.get("chips"):
+            out = "ส่งเฉพาะประโยคนี้ไป Claude · ดูได้ที่ ตั้งค่า › สิ่งที่ส่งออกนอกเครื่อง"
+        elif out is None:
+            out = "ไม่มี · ทำในเครื่องทั้งหมด"
+        rows = [{"k": "ใครตอบ", "v": who}]
+        if why:
+            rows.append({"k": "ทำไมทางนี้", "v": why})
+        rows += [{"k": "ข้อมูลออกนอกเครื่อง", "v": out},
+                 {"k": "ใช้เวลา", "v": f"{time.monotonic() - t0:.2f} วินาที"}]  # fmt: skip
+        card["why"] = rows
+        return card
+
     @Slot(str, result="QVariantMap")
     def handle(self, text: str) -> dict:
         """AI ในเครื่องพร้อม = แบบผสม (router.route_ai_first) · ไม่พร้อม = กฎก่อน (router.route)."""
+        t0 = time.monotonic()
+        return self._why(self._handle(text), t0)
+
+    def _handle(self, text: str) -> dict:
         from aipc.skills import router
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
@@ -1769,7 +1816,9 @@ class SkillsController(QObject):
                     "lines": ["เครื่องต่ออินเทอร์เน็ตไม่ได้ หรือบริการพยากรณ์อากาศไม่ตอบ",
                               "ลองใหม่อีกครั้ง"]}  # fmt: skip
         title, lines = answer(Ask(day, city), place, fc)
-        return {**card, "title": title, "lines": lines}
+        sent = getattr(self._weather, "last_sent", [])
+        out = ("ส่งไป Open-Meteo: " + " · ".join(sent)) if sent else ("ไม่มี · ใช้ผลที่ดึงไว้ไม่เกิน 15 นาที")
+        return {**card, "title": title, "lines": lines, "_outbound": out}
 
     def _files_card(self, text: str, label: str | None = None) -> dict:
         """ผลค้นไฟล์ใน home (aipc.files_search) · ผล docs/benchmarks/2026-10-01-file-intent."""
@@ -1882,6 +1931,10 @@ class SkillsController(QObject):
 
     @Slot(str, bool, result="QVariantMap")
     def confirm(self, token: str, yes: bool) -> dict:
+        t0 = time.monotonic()
+        return self._why(self._confirm(token, yes), t0)
+
+    def _confirm(self, token: str, yes: bool) -> dict:
         plan = self._pending.pop(token, None)
         card = {
             "kind": "command",
@@ -1973,6 +2026,8 @@ class ChatController(QObject):
         self._lost_at = None  # เวลาที่ AI ซึ่งเคยพร้อมหยุดตอบ (None = ยังไม่เคยพร้อม หรือพร้อมอยู่)
         self._busy, self._stream_text, self._stream = False, "", None
         self._trimmed, self._save_error = False, ""
+        self._trace: dict = {}  # ระหว่างตอบ: เริ่มเมื่อไหร่ ทำไมทางนี้ (ทำไมได้คำตอบนี้ · ข้อเสนอ 2026-10-03)
+        self._last_trace: list = []
         self._token.connect(self._on_token)
         self._done.connect(self._on_done)
         self._health.connect(self._on_health)
@@ -2116,6 +2171,16 @@ class ChatController(QObject):
             self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
         tools = self._all_tools(text) if (use_tools and not prompt) else []
+        if self._conv["messages"][-1].get("file"):
+            why = (f"ถามเกี่ยวกับไฟล์ “{self._file[0]}” · ตอบในเครื่องเท่านั้น "
+                   "(เนื้อหาไฟล์ห้ามออกนอกเครื่อง)")  # fmt: skip
+        elif prompt:
+            why = "ทำตามสกิลที่เลือกไว้ (งานภาษา เช่น แปล สรุป)"
+        else:
+            why = "ไม่ตรงสกิลไหน จึงให้ AI ในเครื่องตอบ" + (
+                f" · เลือกใช้สกิลเองได้ {len(tools)} ตัว แต่เลือกตอบเอง" if tools else ""
+            )
+        self._trace = {"t0": time.monotonic(), "why": why}
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
@@ -2164,10 +2229,11 @@ class ChatController(QObject):
             from aipc.cloud.ask import local_gave_up
 
             # AI ในเครื่องเลือกส่งต่อเอง หรือตอบว่าไม่รู้ = ถามพี่ใหญ่ (การ์ด 0016)
-            if reply.tool_call == catalog.ASK_CLOUD or (
-                not reply.tool_call and local_gave_up(reply.text)
-            ):
-                self._ask_cloud()
+            if reply.tool_call == catalog.ASK_CLOUD:
+                self._ask_cloud("AI ในเครื่องเลือกส่งต่อ: ต้องใช้ข้อมูลสด หรือยากเกินกว่า AI ในเครื่อง")
+                return
+            if not reply.tool_call and local_gave_up(reply.text):
+                self._ask_cloud("AI ในเครื่องตอบว่าไม่รู้ จึงถาม Claude แทน")
                 return
         if reply.tool_call and not reply.reason:
             # AI เลือกสกิล: เอาข้อความของผู้ใช้ออกจากบทสนทนา (ทางของสกิลจะส่งข้อความนี้เองอีกครั้ง) · ไม่บันทึก
@@ -2190,6 +2256,7 @@ class ChatController(QObject):
             except OSError as e:  # บันทึกไม่ได้ = บอก ไม่หายเงียบ (H2)
                 self._save_error = f"บันทึกประวัติไม่สำเร็จ ({e.strerror or e})"
         self._stream_text = ""
+        self._last_trace = self._explain(reply)
         self.changed.emit()
         self.streamChanged.emit()
         self.finished.emit(reply.text, note)
@@ -2199,14 +2266,53 @@ class ChatController(QObject):
 
     CLOUD_NOTE = "ตอบโดย Claude (cloud) · ค้นเว็บได้ · คำถามนี้ถูกส่งออกนอกเครื่อง"
 
-    def _ask_cloud(self) -> None:
+    @Property("QVariantList", notify=changed)
+    def lastTrace(self) -> list:  # noqa: N802
+        """ทำไมได้คำตอบล่าสุด: [{k, v}] · หน้าจอเก็บไว้กับฟองคำตอบตอน finished."""
+        return self._last_trace
+
+    def _explain(self, reply) -> list:
+        """ใครตอบ · ทำไมทางนี้ · ข้อมูลออกนอกเครื่องไหม · ใช้เวลาเท่าไหร่ (ข้อเสนอ 2026-10-03).
+
+        สร้างจากสิ่งที่เกิดจริงในรอบนี้ ไม่ใช่ให้ AI อธิบายตัวเอง (AI เล่าเหตุผลของตัวเองผิดได้)
+        """
+        t = self._trace
+        cloud = t.get("cloud")
+        if cloud:
+            who = "Claude (cloud)" if getattr(reply, "cloud", False) else "Claude (ถามไม่สำเร็จ)"
+            why = f"{t.get('why', '')} → {cloud['why']}"
+            ctx = f" + บทสนทนาล่าสุด {cloud['turns']} ข้อความ" if cloud["turns"] else ""
+            out = (f"ส่งคำถาม{ctx} ({cloud['chars']} ตัวอักษร) ไป Claude · "
+                   "ข้อความที่ส่งจริงดูได้ที่ ตั้งค่า › สิ่งที่ส่งออกนอกเครื่อง")  # fmt: skip
+        else:
+            who = "AI ในเครื่อง" + (f" ({self._model_name})" if self._model_name else "")
+            why = t.get("why", "")
+            out = "ไม่มี · ตอบในเครื่องทั้งหมด"
+        rows = [{"k": "ใครตอบ", "v": who}, {"k": "ทำไมทางนี้", "v": why},
+                {"k": "ข้อมูลออกนอกเครื่อง", "v": out}]  # fmt: skip
+        if "t0" in t:
+            took = f"{time.monotonic() - t['t0']:.1f} วินาที"
+            n, tps = reply.timings.get("predicted_n"), reply.timings.get("predicted_per_second")
+            if not cloud and n and tps:
+                took += f" · {n} โทเคน ({tps:.1f} โทเคน/วิ)"
+            rows.append({"k": "ใช้เวลา", "v": took})
+        if self._trimmed:
+            rows.append({"k": "หมายเหตุ", "v": "บทสนทนายาวเกิน จึงตัดข้อความเก่าออกก่อนส่งให้ AI"})
+        return rows
+
+    def _ask_cloud(self, why: str) -> None:
         """AI ในเครื่องเลือกส่งต่อ (ข้อมูลสด / ยาก / ไม่แน่ใจ) → ถาม Claude ในเธรดแยก · ระหว่างรอบอกตรง ๆ."""
         import threading
 
         from aipc.chat import client
+        from aipc.cloud.ask import CONTEXT_TURNS, build_input
 
         question = self._conv["messages"][-1]["content"]
         history = self._conv["messages"][:-1]
+        turns = min(CONTEXT_TURNS, sum(m.get("role") in ("user", "assistant") for m in history))
+        self._trace.setdefault("t0", time.monotonic())
+        chars = len(build_input(question, history))
+        self._trace["cloud"] = {"why": why, "turns": turns, "chars": chars}
         self._busy = True
         self._stream_text = "กำลังถาม Claude (cloud) · ต้องใช้ข้อมูลสดหรือยากเกินกว่า AI ในเครื่อง…"
         self.changed.emit()
@@ -2251,7 +2357,8 @@ class ChatController(QObject):
         if self._cloud is None or self._busy or not text.strip():
             return False
         self._conv["messages"].append({"role": "user", "content": text})
-        self._ask_cloud()
+        self._trace = {"t0": time.monotonic(), "why": "ขอให้ Claude สร้างสกิลแต่ไม่สำเร็จ"}
+        self._ask_cloud("จึงให้ Claude ตอบคำขอนี้แทน")
         return True
 
     @Slot(bool)

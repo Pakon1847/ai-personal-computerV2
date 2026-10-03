@@ -141,7 +141,7 @@ Item {
         function onFinished(text, note) {
             const i = root.items.slice()
             if (i.length === 0 || !i[i.length - 1].ai) return
-            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true })
+            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace })
             root.items = i
             // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
             if (uiSettings.speakAnswers && voice.available && note === "" && text !== "")
@@ -570,6 +570,11 @@ Item {
                                 voice.speakingKey === row.index ? voice.stop() : voice.speak(row.index, root.tidy(row.modelData.text))
                             }
                         }
+                    }
+                    WhyPanel {
+                        visible: !!row.modelData.done && (row.modelData.why || []).length > 0
+                        rows: row.modelData.why || []
+                        Layout.fillWidth: true
                     }
                     AppText {
                         objectName: "speakError"

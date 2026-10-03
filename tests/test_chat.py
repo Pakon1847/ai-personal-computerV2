@@ -392,6 +392,39 @@ class ControllerTest(ServerCase):
         pump(lambda: done)
         self.assertEqual(done[0], ("ข่าวเด่นวันนี้ …", c.CLOUD_NOTE))
 
+    def test_why_local_answer(self):
+        """ทำไมได้คำตอบนี้ (ข้อเสนอ 2026-10-03): สร้างจากสิ่งที่เกิดจริง พร้อมก่อน finished."""
+        c, done, _ = self.make()
+        seen = []
+        c.finished.connect(lambda text, note: seen.append({r["k"]: r["v"] for r in c.lastTrace}))
+        c.send("สวัสดี", "")
+        pump(lambda: seen)
+        r = seen[0]
+        self.assertTrue(r["ใครตอบ"].startswith("AI ในเครื่อง"))
+        self.assertIn("ไม่ตรงสกิลไหน", r["ทำไมทางนี้"])
+        self.assertEqual(r["ข้อมูลออกนอกเครื่อง"], "ไม่มี · ตอบในเครื่องทั้งหมด")
+        self.assertIn("วินาที", r["ใช้เวลา"])
+
+    def test_why_claude_answer_counts_what_was_sent(self):
+        from aipc.cloud.ask import CloudReply, build_input
+
+        FakeLlama.mode = "dunno"
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           cloud=lambda q, h: CloudReply(True, "ข่าวเด่นวันนี้ …"))  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        done = []
+        c.finished.connect(lambda text, note: done.append(text))
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: done)
+        r = {x["k"]: x["v"] for x in c.lastTrace}
+        self.assertEqual(r["ใครตอบ"], "Claude (cloud)")
+        self.assertIn("ตอบว่าไม่รู้", r["ทำไมทางนี้"])
+        n = len(build_input("ข่าวเด่นวันนี้มีอะไร", []))
+        self.assertIn(f"({n} ตัวอักษร) ไป Claude", r["ข้อมูลออกนอกเครื่อง"])  # ตรงกับที่ ledger บันทึก
+
     def test_local_dont_know_stays_without_cloud(self):
         FakeLlama.mode = "dunno"
         c, done, _ = self.make()

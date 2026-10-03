@@ -134,13 +134,19 @@ class Weather:
         self._record = record
         self._now = now
         self._cache: dict[str, tuple[float, dict, dict]] = {}
+        self.last_sent: list[str] = []  # สิ่งที่ส่งออกใน lookup ล่าสุด ([] = ใช้ผลที่จำไว้) · ทำไมได้คำตอบนี้
+
+    def _send(self, sent: str) -> None:
+        self.last_sent.append(sent)
+        self._record(sent)
 
     def lookup(self, city: str) -> tuple[dict, dict]:
         """(สถานที่, พยากรณ์) · ไม่พบเมือง = LookupError · เน็ตไม่ได้ = OSError."""
+        self.last_sent = []
         hit = self._cache.get(city)
         if hit and self._now() - hit[0] < self.CACHE_S:
             return hit[1], hit[2]
-        self._record(f"ค้นพิกัดเมือง: {city}")
+        self._send(f"ค้นพิกัดเมือง: {city}")
         geo = self._get(GEO, {"name": city, "count": 5, "language": "th", "format": "json"})
         places = (
             [p for p in geo.get("results") or [] if p.get("country_code") == "TH"]
@@ -151,7 +157,7 @@ class Weather:
             raise LookupError(city)
         place = places[0]
         lat, lon = round(place["latitude"], 2), round(place["longitude"], 2)
-        self._record(f"ขอพยากรณ์อากาศที่พิกัด {lat}, {lon}")
+        self._send(f"ขอพยากรณ์อากาศที่พิกัด {lat}, {lon}")
         fc = self._get(FORECAST, {
             "latitude": lat, "longitude": lon, "timezone": "Asia/Bangkok", "forecast_days": 2,
             "current": CURRENT, "daily": DAILY,

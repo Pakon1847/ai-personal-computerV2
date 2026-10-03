@@ -99,6 +99,8 @@ Rectangle {
             onClicked: card.undo()
         }
 
+        WhyPanel { rows: card.info.why || []; Layout.fillWidth: true }
+
         RowLayout {
             objectName: "forgedRow"
             visible: card.forged

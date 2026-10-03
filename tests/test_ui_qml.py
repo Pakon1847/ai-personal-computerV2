@@ -385,6 +385,29 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(find_all(win, "chatList")[0].property("count"), 3)  # การ์ดผลต่อท้าย
         self.assertEqual(warnings, [])
 
+    def test_why_panel_opens_on_cards_and_ai_answers(self):
+        """ทำไมได้คำตอบนี้ (ข้อเสนอ 2026-10-03): ปิดไว้ก่อน · กดแล้วเห็นทุกแถว · ไม่มีข้อมูล = ไม่มีปุ่ม."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        why = [{"k": "ใครตอบ", "v": "AI ในเครื่อง"}, {"k": "ข้อมูลออกนอกเครื่อง", "v": "ไม่มี"}]
+        base = {"chips": [], "lines": [], "confirmToken": "", "page": "", "badge": {}}
+        page.setProperty("items", [
+            {"user": False, "card": {**base, "kind": "command", "title": "เปิด YouTube",
+                                     "why": why}},
+            {"ai": True, "text": "สวัสดีครับ", "note": "", "done": True, "why": why},
+            {"user": False, "card": {**base, "kind": "command", "title": "ไม่มีเหตุผล"}},
+        ])  # fmt: skip
+        settle(100)
+        buttons = [b for b in find_items(win, "whyButton") if b.property("visible")]
+        self.assertEqual(len(buttons), 2)
+        self.assertEqual(find_items(win, "whyRow"), [])
+        for b in buttons:
+            b.clicked.emit()
+        settle(50)
+        texts = [r.property("text") for r in find_items(win, "whyRow")]
+        self.assertEqual(texts.count("ใครตอบ: AI ในเครื่อง"), 2)
+        self.assertEqual(warnings, [])
+
     def test_skills_page_manages_claude_made_skills(self):
         """หน้า Skill (การ์ด 0017 ชั้นที่ 3): สกิลที่ Claude สร้างมีการ์ดของตัวเอง · ปิด/ย้อนรุ่น/ลบได้ไม่มี warning."""
         from aipc.skills import manifest, userskills
