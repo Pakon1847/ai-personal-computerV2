@@ -365,6 +365,26 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(banner[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_undo_button_shows_once_and_reports(self):
+        """ปุ่มย้อนกลับ (ข้อเสนอ 2026-10-03): ขึ้นเฉพาะการ์ดที่มี undoToken · กดแล้วหาย และขึ้นการ์ดผล."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        base = {"chips": [], "lines": [], "confirmToken": "", "page": "", "badge": {}}
+        page.setProperty("items", [
+            {"user": False, "card": {**base, "kind": "command", "title": "ตั้งเสียง 90%",
+                                     "undoToken": "u-old"}},
+            {"user": False, "card": {**base, "kind": "command", "title": "เปิด YouTube"}},
+        ])  # fmt: skip
+        settle(100)
+        buttons = [b for b in find_items(win, "undoButton") if b.property("visible")]
+        self.assertEqual(len(buttons), 1)
+        buttons[0].clicked.emit()
+        settle(100)
+        visible = [b for b in find_items(win, "undoButton") if b.property("visible")]
+        self.assertEqual(visible, [], "กดแล้วต้องหาย ไม่ให้กดซ้ำ")  # แถวถูกสร้างใหม่ จึงหาใหม่
+        self.assertEqual(find_all(win, "chatList")[0].property("count"), 3)  # การ์ดผลต่อท้าย
+        self.assertEqual(warnings, [])
+
     def test_skills_page_manages_claude_made_skills(self):
         """หน้า Skill (การ์ด 0017 ชั้นที่ 3): สกิลที่ Claude สร้างมีการ์ดของตัวเอง · ปิด/ย้อนรุ่น/ลบได้ไม่มี warning."""
         from aipc.skills import manifest, userskills

@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 import threading
@@ -107,9 +108,40 @@ class Outcome:
     message: str
     simulated: bool = False
     page: str = ""  # สำหรับ open_page: หน้าที่หน้าจอต้องเปลี่ยนไป
+    undo: tuple[Plan, ...] = ()  # ทำตามลำดับเพื่อคืนสภาพเดิม · () = ย้อนไม่ได้ หรืออ่านสภาพเดิมไม่ได้
 
 
 Runner = Callable[[list[str]], int]
+Reader = Callable[[list[str]], str | None]
+
+# ย้อนกลับได้ (ข้อเสนอ 2026-10-03): ผลวัดเสียงพบว่าเสียงคนพูดแทรกทำให้ "เปิดวิกิ" กลายเป็น
+# "เปิดเสียง…" แล้วทำเลยโดยไม่ถาม
+# (docs/benchmarks/2026-10-01-voice-noise) · ห้ามพลาดไม่ได้ 100% จึงทำให้คืนได้ในกดเดียว
+# อ่านสภาพก่อนทำทุกครั้ง · อ่านไม่ได้ = ไม่เสนอปุ่มย้อน (ไม่เดาว่าเดิมเป็นเท่าไหร่)
+VOLUME_ACTIONS = ("set_volume", "change_volume", "mute", "unmute")
+
+
+def read_output(args: list[str]) -> str | None:
+    try:
+        r = subprocess.run(args, capture_output=True, text=True, timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return r.stdout if r.returncode == 0 else None
+
+
+def parse_volume(text: str | None) -> tuple[int, bool] | None:
+    """ผลของ wpctl get-volume เช่น "Volume: 0.40 [MUTED]" → (40, True)."""
+    m = re.match(r"\s*Volume:\s*(\d+(?:\.\d+)?)(\s*\[MUTED\])?", text or "")
+    return (round(float(m[1]) * 100), bool(m[2])) if m else None
+
+
+def undo_plans(before: tuple[int, bool]) -> tuple[Plan, ...]:
+    percent, muted = before
+    return (
+        Plan("set_volume", {"percent": percent}, f"คืนระดับเสียงเป็น {percent}%"),
+        Plan("mute" if muted else "unmute", {}, "ปิดเสียงเหมือนเดิม" if muted else "เปิดเสียงเหมือนเดิม"),
+    )
+
 
 # โปรแกรมที่เปิดแอปอื่น · แอปที่เปิดขึ้นมาทำงานต่อหลังคำสั่งจบ จึงห้ามรอ output ของมัน
 LAUNCHERS = ("xdg-open", "gtk-launch", "gio")
@@ -184,8 +216,14 @@ def command_for(plan: Plan) -> list[str] | None:
 
 
 class Executor:
-    def __init__(self, runner: Runner = run_process, dry_run: bool | None = None):
+    def __init__(
+        self,
+        runner: Runner = run_process,
+        dry_run: bool | None = None,
+        reader: Reader = read_output,
+    ):
         self._run = runner
+        self._read = reader
         self.dry_run = (not sys.platform.startswith("linux")) if dry_run is None else dry_run
 
     def execute(self, plan: Plan) -> Outcome:
@@ -200,9 +238,14 @@ class Executor:
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)
+        before = None
+        if plan.action in VOLUME_ACTIONS:
+            before = parse_volume(self._read(["wpctl", "get-volume", SINK]))
         code = self._run(args)
         if code == 0:
-            return Outcome(True, plan.summary or "เรียบร้อย")
+            return Outcome(
+                True, plan.summary or "เรียบร้อย", undo=undo_plans(before) if before else ()
+            )
         if plan.action == "open_app":
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
         return Outcome(False, f"ทำไม่สำเร็จ (รหัส {code})")

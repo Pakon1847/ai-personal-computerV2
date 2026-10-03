@@ -588,6 +588,14 @@ Item {
                 info: row.modelData.card || ({})
                 answered: !!root.answered[(row.modelData.card || {}).confirmToken]
                 onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
+                undone: !!root.answered[(row.modelData.card || {}).undoToken]
+                onUndo: {
+                    const t = row.modelData.card.undoToken
+                    const a = Object.assign({}, root.answered)
+                    a[t] = true
+                    root.answered = a
+                    root.showCard(skills.undo(t))
+                }
                 onRemoveSkill: (skillId) => root.showCard(skills.removeSkill(skillId))
                 onSummarizeFile: (path) => {
                     const err = chat.attachFile(path)

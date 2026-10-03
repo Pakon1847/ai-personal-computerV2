@@ -1223,6 +1223,7 @@ class SkillsController(QObject):
         self._file_search = None
         self._pending: dict[str, object] = {}
         self._counter = 0
+        self._undo_token = ""  # ย้อนได้เฉพาะคำสั่งล่าสุด (คำสั่งเก่ากว่าอาจถูกคำสั่งใหม่ทับไปแล้ว)
         self._now = clock or (lambda: datetime.now().astimezone())
         self._store = reminders.ReminderStore(reminders_path)
         now = self._now()
@@ -1409,6 +1410,7 @@ class SkillsController(QObject):
     def _run_steps(self, skill, text: str, card: dict) -> dict:
         """ทำทีละขั้นตามลำดับ · ขั้นไหนไม่สำเร็จ = หยุดตรงนั้นและบอกว่าเหลือกี่ขั้นที่ไม่ได้ทำ."""
         lines, simulated, total = [], False, len(skill.steps)
+        undo, irreversible = [], False
         for i, s in enumerate(skill.steps, 1):
             if s.kind == "say":
                 lines.append(s.text)
@@ -1429,10 +1431,47 @@ class SkillsController(QObject):
                                 chips=[{"text": "ไม่สำเร็จ", "kind": "danger"}])  # fmt: skip
                     return card
                 lines.append(f"{'จำลอง' if out.simulated else '✓'} {i}. {s.plan.summary}")
+                undo = list(out.undo) + undo  # ย้อนจากขั้นหลังสุดก่อน
+                irreversible = irreversible or not out.undo
         self._record(skill, True)
         chip = {"text": "จำลอง", "kind": "warn"} if simulated else {"text": "ทำแล้ว", "kind": "ok"}
         title = f"ทำครบ {total} ขั้นแล้ว" + (" (จำลอง)" if simulated else "")
         card.update(title=title, lines=lines, confirmToken="", chips=[chip])
+        if undo:
+            card["undoToken"] = self._offer_undo(undo)
+            if irreversible:
+                lines.append("ย้อนกลับได้เฉพาะขั้นที่ปรับเสียง")
+        return card
+
+    def _offer_undo(self, plans) -> str:
+        self._pending.pop(self._undo_token, None)  # ปุ่มย้อนของคำสั่งก่อนหน้าใช้ไม่ได้แล้ว
+        self._counter += 1
+        self._undo_token = f"u{self._counter}"
+        self._pending[self._undo_token] = ("undo", tuple(plans))
+        return self._undo_token
+
+    @Slot(str, result="QVariantMap")
+    def undo(self, token: str) -> dict:
+        """ปุ่ม "ย้อนกลับ" ใต้การ์ดคำสั่ง · ใช้ได้ครั้งเดียว และเฉพาะคำสั่งล่าสุด."""
+        item = self._pending.pop(token, None) if token == self._undo_token else None
+        card = {"kind": "command", "badge": {}, "title": "", "chips": [], "lines": [],
+                "confirmToken": "", "page": ""}  # fmt: skip
+        if not (isinstance(item, tuple) and item[0] == "undo"):
+            card["title"] = "ย้อนกลับไม่ได้แล้ว (ย้อนได้เฉพาะคำสั่งล่าสุด ครั้งเดียว)"
+            return card
+        self._undo_token = ""
+        done = []
+        for plan in item[1]:
+            out = self._exec.execute(plan)
+            if not out.ok:
+                card["title"] = f"ย้อนกลับไม่สำเร็จ: {out.message}"
+                card["chips"] = [{"text": "ไม่สำเร็จ", "kind": "danger"}]
+                card["lines"] = [f"✓ {d}" for d in done]
+                return card
+            done.append(plan.summary)
+        card["title"] = "ย้อนกลับแล้ว"
+        card["chips"] = [{"text": "คืนสภาพเดิม", "kind": "ok"}]
+        card["lines"] = done
         return card
 
     def _run_plan(self, plan) -> dict:
@@ -1441,13 +1480,18 @@ class SkillsController(QObject):
             title = plan.summary + " (จำลอง)"
         else:
             title = plan.summary if out.ok else out.message
-        return {
+        card = {
             "title": title,
             "chips": [{"text": "จำลอง" if out.simulated else ("ทำแล้ว" if out.ok else "ไม่สำเร็จ"),
                        "kind": "warn" if out.simulated else ("ok" if out.ok else "danger")}],
             "lines": [out.message] if out.simulated else [],
             "page": out.page,
         }  # fmt: skip
+        if out.undo:
+            card["undoToken"] = self._offer_undo(out.undo)
+        elif out.ok and not out.simulated and plan.action in ("open_url", "open_app"):
+            card["lines"].append("คำสั่งนี้ย้อนกลับไม่ได้ · ปิดหน้าต่างที่เปิดขึ้นมาเองได้")
+        return card
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
     def tool_catalog(self, text: str = "") -> list:

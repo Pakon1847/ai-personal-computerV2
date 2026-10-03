@@ -7,7 +7,9 @@ Rectangle {
     id: card
     property var info: ({})
     property bool answered: false
+    property bool undone: false  // กดย้อนกลับไปแล้ว
     signal answer(bool yes)
+    signal undo()  // คำสั่งที่ทำไปแล้ว (ปรับเสียง): คืนสภาพเดิม
     // สกิลที่ Claude สร้าง (การ์ด 0017 ชั้นที่ 2): ลบทิ้ง หรือบอกว่าผิดตรงไหนให้ Claude แก้
     signal removeSkill(string skillId)
     signal wrongSkill(string skillId, string name)
@@ -86,6 +88,15 @@ Rectangle {
             spacing: 8
             AppButton { text: "ใช่ ทำเลย"; onClicked: card.answer(true) }
             AppButton { text: "ไม่ใช่"; kind: "secondary"; onClicked: card.answer(false) }
+        }
+
+        // ย้อนกลับ (ข้อเสนอ 2026-10-03): ถอดเสียงผิดจนทำคำสั่งผิด แก้คืนได้ในกดเดียว · เฉพาะคำสั่งล่าสุด
+        AppButton {
+            objectName: "undoButton"
+            visible: (card.info.undoToken || "") !== "" && !card.undone
+            text: "ย้อนกลับ"
+            kind: "secondary"
+            onClicked: card.undo()
         }
 
         RowLayout {
