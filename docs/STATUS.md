@@ -52,8 +52,10 @@ flash attention ทำให้ generation ช้าลง ([ผล](benchmarks/
   `aipc.spikes.outbound_watch` (T6 แบบใหม่) · `aipc.spikes.study_prep` (เตรียมบัญชีทดสอบกับผู้ใช้) · หน้าให้คะแนนไทยแบบออฟไลน์
 - เอกสาร: [ร่างข้ออ้างรอบ 4](reviews/2026-10-05-claims-hybrid.md) (รออาจารย์) · [results-summary หัวข้อ 0](evaluation/results-summary.md) ·
   [image การ์ด](runbooks/pi5-image-and-restore.md) · [ข้อเสนอสิ่งที่ควรเพิ่ม](reviews/2026-10-05-ideas-night.md)
-- **ความร้อน:** พัดลม 9,711 rpm แต่ 84–85°C และถูกลดความเร็ว (0xe0008) ขณะ AI ตัวเดียวตอบ → ตรวจ Active Cooler
-- กำลังรัน: คำตอบไทย 30 ข้อ × 3 โมเดลสำหรับให้คน 2 คนให้คะแนน (ADR-007 ข้อ 1)
+- **ความร้อน** ([ผล](benchmarks/2026-10-05-thermal/README.md)): ถึง 80°C ใน 10–20 วิของการตอบต่อเนื่อง · ถอดโครงพัดลมของเคสทางการแล้วไม่ช่วย → สงสัยแผ่นนำความร้อน ·
+  **Pakon ตัดสิน: ไม่แก้ฮาร์ดแวร์ก่อนสอบ เขียนเป็นเงื่อนไขของผล** · ทางเลือกต่อ: สั่ง Active Cooler ตัวสำรอง แล้วค่อยถอดดูแผ่นและวัดซ้ำด้วย `scripts/pi/thermal-test.sh`
+- คำตอบไทย 30 ข้อ × 3 โมเดลพร้อมให้คะแนน ([แบบให้คะแนน](benchmarks/2026-10-05-llm-thai/README.md)) · รอคน 2 คน
+- ไฮบริด Gemma + Claude ชุดสอบ 100 ข้อ ([ผล](benchmarks/2026-10-06-exam-hybrid-gemma/README.md)): ในเครื่อง 93 · ไฮบริด 95 (ชั่วคราว) · ส่งต่อ 16% · $0.56
 
 **ยังเปิดอยู่:** memory cgroup ปิด (MemoryMax ไม่มีผล) · ความร้อน 78–83°C ขณะโหลด · โค้ด 65 ข้อใน [audit หัวข้อ 4](reviews/2026-09-30-pi5-audit.md) · ทดสอบกับผู้ใช้ 5 คน ([ชุดทดสอบ](eval/user-study/README.md) · ยังไม่ได้นัด) · เล่ม ([โครง](thesis/outline.md))
 
