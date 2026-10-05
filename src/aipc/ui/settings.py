@@ -16,6 +16,9 @@ from pathlib import Path
 
 THEMES = ("light", "dark")
 FONT_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0)  # BRIEF 5.7: 100–200%
+# ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด) และนาทีหลังล็อกก่อนออกจากระบบเอง
+LOCK_CHOICES = (0, 1, 5, 10, 15)
+LOGOUT_CHOICES = (5, 10, 30)
 
 
 def default_path() -> Path:
@@ -35,6 +38,9 @@ class UiPrefs:
     speak_reminders: bool = False
     # ส่งคำถามที่ยาก/ต้องใช้ข้อมูลสด และคำขอสร้างสกิลให้ Claude (การ์ด 0016/0017) · Pakon: ค่าเริ่มต้นเปิด
     use_claude: bool = True
+    # ลืมออกจากระบบแล้วลุกไป = คนต่อไปเห็นงาน แชท และ Gmail ที่ login ค้าง → ล็อกแล้วออกเอง · ค่าเริ่มต้นเปิด
+    lock_min: int = 5
+    logout_min: int = 10
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
@@ -47,6 +53,8 @@ class UiPrefs:
             speak_answers=self.speak_answers is not False,
             speak_reminders=self.speak_reminders is True,
             use_claude=self.use_claude is not False,
+            lock_min=self.lock_min if self.lock_min in LOCK_CHOICES and type(self.lock_min) is int else 5,
+            logout_min=self.logout_min if self.logout_min in LOGOUT_CHOICES and type(self.logout_min) is int else 10,
         )
 
 
@@ -61,6 +69,8 @@ def load(path: Path | None = None) -> UiPrefs:
             speak_answers=data.get("speak_answers", True) is not False,
             speak_reminders=data.get("speak_reminders") is True,
             use_claude=data.get("use_claude", True) is not False,
+            lock_min=data.get("lock_min", 5),
+            logout_min=data.get("logout_min", 10),
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()

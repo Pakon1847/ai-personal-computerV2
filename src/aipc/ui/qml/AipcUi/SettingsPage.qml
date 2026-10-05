@@ -203,6 +203,59 @@ ColumnLayout {
         }
     }
 
+    // ล็อกเมื่อไม่ได้ใช้เครื่อง (aipc.ui.idle · ขั้น A 2026-10-06): ลืมออกแล้วลุกไป → ล็อกทุกหน้าต่าง → ออกเอง
+    Card {
+        objectName: "idleLockCard"
+        Layout.fillWidth: true
+        implicitHeight: idleCol.implicitHeight + 40
+        ColumnLayout {
+            id: idleCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            AppText { text: "ล็อกเมื่อไม่ได้ใช้เครื่อง"; strong: true }
+            AppText {
+                objectName: "idleLockText"
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                text: uiSettings.lockMin === 0
+                      ? "ปิดอยู่: ถ้าลืมกดออกแล้วลุกไป คนต่อไปจะเห็นงาน แชท และบัญชีเว็บที่เข้าไว้"
+                      : "ไม่ได้แตะคีย์บอร์ดหรือเมาส์ " + uiSettings.lockMin + " นาที → ล็อกทุกหน้าต่าง (ปลดด้วยรหัสผ่าน) · ล็อกค้างอีก "
+                        + uiSettings.logoutMin + " นาที → ออกจากระบบเอง งานที่ยังไม่บันทึกจะหาย"
+            }
+            Flow {
+                Layout.fillWidth: true
+                spacing: 8
+                AppText { text: "ล็อกหลังไม่ได้ใช้"; size: Theme.fontSmall; color: Theme.inkMuted; height: 44; verticalAlignment: Text.AlignVCenter }
+                Repeater {
+                    model: uiSettings.lockChoices
+                    AppButton {
+                        required property int modelData
+                        objectName: "lockMin" + modelData
+                        text: modelData === 0 ? "ปิด" : modelData + " นาที"
+                        kind: uiSettings.lockMin === modelData ? "primary" : "secondary"
+                        onClicked: uiSettings.setLockMin(modelData)
+                    }
+                }
+            }
+            Flow {
+                Layout.fillWidth: true
+                visible: uiSettings.lockMin !== 0
+                spacing: 8
+                AppText { text: "ออกจากระบบหลังล็อก"; size: Theme.fontSmall; color: Theme.inkMuted; height: 44; verticalAlignment: Text.AlignVCenter }
+                Repeater {
+                    model: uiSettings.logoutChoices
+                    AppButton {
+                        required property int modelData
+                        objectName: "logoutMin" + modelData
+                        text: modelData + " นาที"
+                        kind: uiSettings.logoutMin === modelData ? "primary" : "secondary"
+                        onClicked: uiSettings.setLogoutMin(modelData)
+                    }
+                }
+            }
+        }
+    }
+
     // เสียง (การ์ด 0019): อ่านออกเสียงในเครื่อง · ตั้งให้อ่านเตือนนัดได้
     Card {
         objectName: "voiceCard"

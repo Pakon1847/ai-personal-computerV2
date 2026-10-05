@@ -87,6 +87,37 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
+    # ล็อกเมื่อไม่ได้ใช้เครื่อง (aipc.ui.idle · ขั้น A 2026-10-06)
+    @Property(int, notify=changed)
+    def lockMin(self) -> int:  # noqa: N802
+        return self._prefs.lock_min
+
+    @Property(int, notify=changed)
+    def logoutMin(self) -> int:  # noqa: N802
+        return self._prefs.logout_min
+
+    @Property("QVariantList", constant=True)
+    def lockChoices(self) -> list:  # noqa: N802
+        return list(settings.LOCK_CHOICES)
+
+    @Property("QVariantList", constant=True)
+    def logoutChoices(self) -> list:  # noqa: N802
+        return list(settings.LOGOUT_CHOICES)
+
+    @Slot(int)
+    def setLockMin(self, minutes: int) -> None:  # noqa: N802
+        if minutes in settings.LOCK_CHOICES and minutes != self._prefs.lock_min:
+            self._prefs.lock_min = int(minutes)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Slot(int)
+    def setLogoutMin(self, minutes: int) -> None:  # noqa: N802
+        if minutes in settings.LOGOUT_CHOICES and minutes != self._prefs.logout_min:
+            self._prefs.logout_min = int(minutes)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     @Slot()
     def finishOnboarding(self) -> None:  # noqa: N802
         """ปิดหน้าแนะนำการใช้งานครั้งแรก · จำไว้ในไฟล์ตั้งค่าของผู้ใช้ (ไม่ขึ้นอีก)."""

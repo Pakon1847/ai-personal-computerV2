@@ -128,6 +128,34 @@ def _weather(ledger=None):
     return Weather(record=lambda sent: ledger.record("weather", sent))
 
 
+def _start_idle_lock(ui_settings, app):
+    """ล็อกจอเมื่อไม่ได้ใช้เครื่อง แล้วออกเอง (aipc.ui.idle · ขั้น A) · เฉพาะเซสชันจริง · ค่าเปลี่ยน = เริ่ม swayidle ใหม่."""
+    import getpass
+    import pwd
+
+    from aipc.ui import idle
+
+    try:
+        name = (pwd.getpwnam(getpass.getuser()).pw_gecos or "").split(",")[0] or getpass.getuser()
+    except (KeyError, OSError):
+        name = ""
+    screen = app.primaryScreen()
+    size = (1920, 1080)
+    if screen is not None:
+        g, r = screen.geometry(), screen.devicePixelRatio()
+        size = (max(640, int(g.width() * r)), max(480, int(g.height() * r)))
+    lock = idle.IdleLock()
+    idle.clear_orphans()
+
+    def apply() -> None:
+        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size)
+
+    apply()
+    ui_settings.changed.connect(apply)  # ค่าเดิม = IdleLock ไม่ทำอะไร (ธีม/ตัวอักษรเปลี่ยนไม่กระทบ)
+    app.aboutToQuit.connect(lock.stop)
+    return lock
+
+
 def _local_model_name() -> str:
     """ชื่อโมเดลจาก /etc/aipc/llm.conf (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · อ่านไม่ได้ = ""."""
     from pathlib import Path
@@ -257,6 +285,9 @@ def build(opts: Options, argv: list[str] | None = None):
             engine._backends["skills"].skillsChanged.emit()
 
     ui_settings.changed.connect(on_settings)
+    # เฉพาะเซสชันจริงบนจอ Wayland (เทสต์ใช้ offscreen = ไม่เริ่ม swayidle และไม่เขียนภาพจอล็อก)
+    if opts.session and not opts.greeter_session and app.platformName() == "wayland":
+        engine._idle = _start_idle_lock(ui_settings, app)
     voice = engine._backends["voice"]
 
     def ready_inputs() -> dict:
