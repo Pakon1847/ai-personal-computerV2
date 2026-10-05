@@ -176,8 +176,18 @@ ColumnLayout {
                     dot: true
                 }
             }
-            RowLayout {
+            AppCheck {
+                objectName: "useClaudeCheck"
                 visible: cloudUsage.available
+                text: "ส่งคำถามที่ยากหรือต้องใช้ข้อมูลสดให้ Claude และให้ Claude สร้างสกิลใหม่"
+                detail: uiSettings.useClaude
+                        ? "ส่งเฉพาะคำถามและข้อความล่าสุดไม่เกิน 4 ข้อความ · ไม่ส่งไฟล์ นัด ใบหน้า · ดูสิ่งที่ส่งจริงได้ข้างล่าง"
+                        : "ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีข้อมูลออกไป Anthropic"
+                checked: uiSettings.useClaude
+                onClicked: uiSettings.setUseClaude(checked)
+            }
+            RowLayout {
+                visible: cloudUsage.available && uiSettings.useClaude
                 spacing: 8
                 AppText { text: "เพดานต่อวัน"; size: Theme.fontSmall; color: Theme.inkMuted }
                 Repeater {

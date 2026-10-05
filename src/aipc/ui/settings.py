@@ -33,6 +33,8 @@ class UiPrefs:
     speak_answers: bool = True
     # ถึงเวลานัด = อ่านออกเสียงด้วย · ค่าเริ่มต้นปิด
     speak_reminders: bool = False
+    # ส่งคำถามที่ยาก/ต้องใช้ข้อมูลสด และคำขอสร้างสกิลให้ Claude (การ์ด 0016/0017) · Pakon: ค่าเริ่มต้นเปิด
+    use_claude: bool = True
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
@@ -44,6 +46,7 @@ class UiPrefs:
             onboarded=self.onboarded is True,
             speak_answers=self.speak_answers is not False,
             speak_reminders=self.speak_reminders is True,
+            use_claude=self.use_claude is not False,
         )
 
 
@@ -57,6 +60,7 @@ def load(path: Path | None = None) -> UiPrefs:
             onboarded=data.get("onboarded") is True,
             speak_answers=data.get("speak_answers", True) is not False,
             speak_reminders=data.get("speak_reminders") is True,
+            use_claude=data.get("use_claude", True) is not False,
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()

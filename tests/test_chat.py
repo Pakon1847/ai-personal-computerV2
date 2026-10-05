@@ -432,6 +432,36 @@ class ControllerTest(ServerCase):
         pump(lambda: done)
         self.assertEqual(done[0][0], "ไม่รู้")
 
+    def test_claude_switch_off_keeps_everything_local(self):
+        """สวิตช์ Claude ในหน้าตั้งค่า (2026-10-05): ปิด = ไม่ส่งคำถามออก · ไม่มี ask-cloud ในเครื่องมือ · ไม่มีใน prompt."""
+        from aipc.cloud.ask import CloudReply
+
+        asked = []
+        FakeLlama.mode = "dunno"
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        on = [False]
+        c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           cloud=lambda q, h: asked.append(q) or CloudReply(True, "จาก Claude"),
+                           claude_on=lambda: on[0])  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        done = []
+        c.finished.connect(lambda text, note: done.append(text))
+        FakeLlama.seen.clear()
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: done)
+        self.assertEqual((done[0], asked), ("ไม่รู้", []))
+        real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1][-1]
+        names = [t["function"]["name"] for t in real.get("tools", [])]
+        self.assertNotIn("ask-cloud", names)
+        self.assertNotIn("ask-cloud", real["messages"][0]["content"])
+        self.assertFalse(c.askCloudFor("ข่าววันนี้"))
+        on[0] = True  # เปิดกลับ = ส่งต่อได้ตามเดิม
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: len(done) > 1)
+        self.assertEqual((done[1], asked), ("จาก Claude", ["ข่าวเด่นวันนี้มีอะไร"]))
+
     def test_hybrid_offline_is_told(self):
         from aipc.cloud.ask import CloudReply
         from aipc.skills import catalog

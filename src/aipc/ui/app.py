@@ -201,12 +201,14 @@ def build(opts: Options, argv: list[str] | None = None):
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
+    ui_settings = UiSettings(opts.settings_path, opts.theme)
+    claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client(budget, ledger) if in_session else None,
                           model_name=_local_model_name(),
-                          forge=skill_forge is not None)  # fmt: skip
+                          forge=skill_forge is not None, claude_on=claude_on)  # fmt: skip
     engine._backends = {
-        "uiSettings": UiSettings(opts.settings_path, opts.theme),
+        "uiSettings": ui_settings,
         "system": SystemStatus(),
         # โหมด greeter ห้ามมีทางลัดของโหมดพัฒนาหรือสถานะสาธิตเด็ดขาด
         "login": LoginController(
@@ -229,6 +231,7 @@ def build(opts: Options, argv: list[str] | None = None):
             forge=skill_forge,
             user_skills=user_skills,
             weather=_weather(ledger) if in_session else None,
+            claude_on=claude_on,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
@@ -245,6 +248,15 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
     }
     chat.statusChanged.connect(engine._backends["skills"].skillsChanged)  # สกิลแปลพร้อมเมื่อ AI พร้อม
+    last_claude = [ui_settings.useClaude]
+
+    def on_settings() -> None:  # สวิตช์ Claude เปลี่ยนจริง (ไม่ใช่ธีม/ขนาดตัวอักษร) → เครื่องมือของ AI เปลี่ยน
+        if ui_settings.useClaude != last_claude[0]:
+            last_claude[0] = ui_settings.useClaude
+            chat.claudeSwitched()
+            engine._backends["skills"].skillsChanged.emit()
+
+    ui_settings.changed.connect(on_settings)
     voice = engine._backends["voice"]
 
     def ready_inputs() -> dict:

@@ -242,6 +242,20 @@ class ControllerTest(unittest.TestCase):
         s.forgeDone.connect(lambda card, text: done.append((card, text)))
         return s, done
 
+    def test_claude_switch_off_blocks_forge(self):
+        """สวิตช์ Claude ปิด (2026-10-05): ไม่มี create-skill ให้ AI · สั่งสร้างแล้วบอกตรง ๆ · ไม่เรียก Claude."""
+        s, done = self.make(GOOD)
+        on = [False]
+        s._claude_on = lambda: on[0]
+        self.assertFalse(s.canForge)
+        self.assertNotIn("create-skill", [t["function"]["name"] for t in s.tool_catalog()])
+        card = s.handleAs("create-skill", "เข้าโหมดประชุมให้หน่อย")
+        self.assertEqual(card["kind"], "needs")
+        self.assertIn("ปิดการใช้ Claude", card["title"])
+        self.assertEqual(self.seen, [])
+        on[0] = True
+        self.assertTrue(s.canForge)
+
     def test_create_installs_then_runs_and_ai_sees_it_next_time(self):
         s, done = self.make(GOOD)
         names = [t["function"]["name"] for t in s.tool_catalog()]

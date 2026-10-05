@@ -75,6 +75,18 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
+    @Property(bool, notify=changed)
+    def useClaude(self) -> bool:  # noqa: N802
+        return self._prefs.use_claude
+
+    @Slot(bool)
+    def setUseClaude(self, on: bool) -> None:  # noqa: N802
+        """สวิตช์ส่งต่อ Claude (การ์ด 0016 หัวข้อ 1) · ปิด = ไม่ถาม Claude และไม่สร้างสกิล ข้อมูลไม่ออกไป Anthropic."""
+        if bool(on) != self._prefs.use_claude:
+            self._prefs.use_claude = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     @Slot()
     def finishOnboarding(self) -> None:  # noqa: N802
         """ปิดหน้าแนะนำการใช้งานครั้งแรก · จำไว้ในไฟล์ตั้งค่าของผู้ใช้ (ไม่ขึ้นอีก)."""
@@ -1210,7 +1222,7 @@ class SkillsController(QObject):
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
-                 weather=None):  # fmt: skip
+                 weather=None, claude_on=None):  # fmt: skip
         super().__init__()
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
@@ -1219,6 +1231,7 @@ class SkillsController(QObject):
         # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal
         # · None = ไม่มี Claude
         self._forge = forge
+        self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า (ผู้ใช้ปิดเองได้)
         self._forging = False
         self._user = user_skills
         self._builtin = manifest.load_builtin()
@@ -1520,9 +1533,9 @@ class SkillsController(QObject):
         )
 
     # ---------- สกิลอัตโนมัติ (การ์ด 0017) ----------
-    @Property(bool, constant=True)
+    @Property(bool, notify=skillsChanged)
     def canForge(self) -> bool:  # noqa: N802
-        return self._forge is not None and self._user is not None
+        return self._forge is not None and self._user is not None and bool(self._claude_on())
 
     FORGING_LINES = ["ครั้งแรกรอประมาณ 30–60 วินาที · ครั้งหน้าสั่งแบบนี้ AI ในเครื่องทำเองได้เลย",
                      "Claude เห็นเฉพาะประโยคนี้ ไม่เห็นแชท นัด หรือไฟล์ของคุณ"]  # fmt: skip
@@ -1537,6 +1550,9 @@ class SkillsController(QObject):
 
         from aipc.skills import userskills
 
+        if self._forge is not None and self._user is not None and not self._claude_on():
+            return self._plain("needs", "สร้างสกิลใหม่ไม่ได้: ปิดการใช้ Claude ไว้",
+                               ["เปิดได้ที่หน้าตั้งค่า › Claude · ระหว่างปิด ไม่มีข้อมูลออกไป Anthropic"])  # fmt: skip
         if not self.canForge:
             return self._plain("needs", "สร้างสกิลใหม่ไม่ได้: เครื่องนี้ยังไม่มี Claude",
                                ["ติดตั้งและเข้าสู่ระบบ Claude Code ก่อน (การ์ด 0016)"])  # fmt: skip
@@ -2013,10 +2029,12 @@ class ChatController(QObject):
     _health = Signal(str)
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
-                 tools=None, cloud=None, model_name: str = "", forge: bool = False):  # fmt: skip
+                 tools=None, cloud=None, model_name: str = "", forge: bool = False,
+                 claude_on=None):  # fmt: skip
         super().__init__()
         # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
+        self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
         self._forge = forge  # มีเครื่องมือ create-skill (การ์ด 0017) → บอก AI ใน system prompt
         self._model_name = model_name
         self._tools = tools or (
@@ -2122,14 +2140,24 @@ class ChatController(QObject):
             if status == "ready":
                 self._warm_up()
 
+    def _cloud_ok(self) -> bool:
+        """มี Claude ในบัญชีนี้ และผู้ใช้เปิดสวิตช์ไว้."""
+        return self._cloud is not None and bool(self._claude_on())
+
+    @Slot()
+    def claudeSwitched(self) -> None:  # noqa: N802
+        """เปิด/ปิด Claude → รายการเครื่องมือและ system prompt เปลี่ยน → อุ่นแคชใหม่ให้ข้อความถัดไปไม่ต้องรอ."""
+        if self._status == "ready":
+            self._warm_up()
+
     def _system(self, tools: list) -> str:
         """system prompt ชุดเดียวกับตัววัด (catalog.system_prompt) · มีวันที่ของวันนี้ · ส่งต่อ Claude ได้ถ้ามี."""
         from datetime import date
 
         from aipc.skills import catalog
 
-        base = catalog.system_prompt(date.today(), cloud=self._cloud is not None,
-                                     model=self._model_name, forge=self._forge)  # fmt: skip
+        base = catalog.system_prompt(date.today(), cloud=self._cloud_ok(),
+                                     model=self._model_name, forge=self._forge and self._cloud_ok())  # fmt: skip
         return base + (self.TOOLS_HINT if tools else "")
 
     def _all_tools(self, text: str = "") -> list:
@@ -2137,7 +2165,7 @@ class ChatController(QObject):
         · text = ข้อความที่ใช้เลือกสกิล (0018)."""
         from aipc.skills import catalog
 
-        cloud = catalog.tools([], set(), cloud=True) if self._cloud is not None else []
+        cloud = catalog.tools([], set(), cloud=True) if self._cloud_ok() else []
         try:
             skills = self._tools(text)
         except TypeError:  # ตัวให้รายการแบบเก่าที่ไม่รับข้อความ
@@ -2230,7 +2258,7 @@ class ChatController(QObject):
 
         with_file = bool(self._conv["messages"] and self._conv["messages"][-1].get("file"))
         if (
-            self._cloud is not None
+            self._cloud_ok()
             and not with_file  # คำถามเกี่ยวกับไฟล์ = เนื้อหาไฟล์อยู่ในข้อความ ห้ามส่งออกนอกเครื่อง
             and not reply.reason
             and not getattr(reply, "cloud", False)
@@ -2363,7 +2391,7 @@ class ChatController(QObject):
     def askCloudFor(self, text: str) -> bool:  # noqa: N802
         """สร้างสกิลไม่สำเร็จ → ให้ Claude ตอบคำขอนี้แทน (การ์ด 0017 ข้อ 4.5)
         · ไม่มี Claude / กำลังตอบ = False."""
-        if self._cloud is None or self._busy or not text.strip():
+        if not self._cloud_ok() or self._busy or not text.strip():
             return False
         self._conv["messages"].append({"role": "user", "content": text})
         self._trace = {"t0": time.monotonic(), "why": "ขอให้ Claude สร้างสกิลแต่ไม่สำเร็จ"}
