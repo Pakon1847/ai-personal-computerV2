@@ -82,8 +82,23 @@ def find_claude() -> str | None:
 
 
 def build_input(question: str, history: list[dict]) -> str:
-    """ข้อความที่ส่งทาง stdin: บริบทล่าสุด (ถ้ามี) + คำถาม."""
-    recent = [m for m in history if m.get("role") in ("user", "assistant")][-CONTEXT_TURNS:]
+    """ข้อความที่ส่งทาง stdin: บริบทล่าสุด (ถ้ามี) + คำถาม.
+
+    ไม่ส่งรอบที่ถามเกี่ยวกับไฟล์ (ข้อความมีเนื้อหาไฟล์) และคำตอบของรอบนั้น (สรุปจากไฟล์) ·
+    พบ 2026-10-05: เดิมติดไปเป็นบริบทเมื่อคำถามถัดไปถูกส่งต่อ Claude
+    """
+    kept, skip_answer = [], False
+    for m in history:
+        role = m.get("role")
+        if role == "user":
+            skip_answer = bool(m.get("file"))
+            if not skip_answer:
+                kept.append(m)
+        elif role == "assistant":
+            if not skip_answer:
+                kept.append(m)
+            skip_answer = False
+    recent = kept[-CONTEXT_TURNS:]
     lines = []
     if recent:
         lines.append("บทสนทนาก่อนหน้า (เพื่อเข้าใจบริบท):")

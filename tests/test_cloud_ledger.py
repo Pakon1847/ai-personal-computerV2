@@ -76,3 +76,21 @@ class LedgerTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FileNeverLeavesTest(unittest.TestCase):
+    """พบ 2026-10-05: ถามไฟล์ก่อน แล้วถามเรื่องที่ส่งต่อ Claude → เนื้อหาไฟล์ติดไปในบริบท."""
+
+    def test_file_turn_and_its_answer_are_not_sent(self):
+        history = [
+            {"role": "user", "content": "สวัสดี"},
+            {"role": "assistant", "content": "สวัสดีครับ"},
+            {"role": "user", "content": "[ใบเสร็จ.pdf] ค่าซ่อมแอร์ 3,500 บาท เลขบัตร 1234\nคำถาม: จ่ายเท่าไร",
+             "shown": "จ่ายเท่าไร", "file": "ใบเสร็จ.pdf"},
+            {"role": "assistant", "content": "จ่ายไป 3,500 บาท"},
+        ]
+        sent = ask.build_input("ข่าววันนี้", history)
+        for secret in ("ใบเสร็จ", "3,500", "1234"):
+            self.assertNotIn(secret, sent)
+        self.assertIn("สวัสดีครับ", sent)  # บทสนทนาอื่นยังเป็นบริบทได้
+        self.assertIn("ข่าววันนี้", sent)
