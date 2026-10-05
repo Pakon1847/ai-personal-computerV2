@@ -1,0 +1,732 @@
+{
+ "label": "typhoon25-4b-q4km",
+ "date": "2026-10-05",
+ "sampling": {
+  "temperature": 0.6,
+  "top_p": 0.95,
+  "max_tokens": 512
+ },
+ "questions_file": "llm_thai_questions.json",
+ "answers": [
+  {
+   "id": "q01",
+   "answer": "เพราะแสงแดดผ่านบรรยากาศของโลกมา แล้วแสงสีต่างๆจะถูกกระจายไปทั่วท้องฟ้า โดยแสงสีฟ้ากระจายได้ดีที่สุด จึงทำให้ท้องฟ้าดูเป็นสีฟ้าเมื่อแดดขึ้นมา",
+   "seconds": 24.81,
+   "usage": {
+    "completion_tokens": 74,
+    "prompt_tokens": 96,
+    "total_tokens": 170,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   },
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 96,
+    "prompt_ms": 6049.959,
+    "prompt_per_token_ms": 63.02040625,
+    "prompt_per_second": 15.86787612940848,
+    "predicted_n": 74,
+    "predicted_ms": 18686.709,
+    "predicted_per_token_ms": 255.98231506849314,
+    "predicted_per_second": 3.906519869282494
+   }
+  },
+  {
+   "id": "q02",
+   "answer": "ประเทศไทยมีทั้งหมด 76 จังหวัด  \nจังหวัดที่ใหญ่ที่สุดคือ จังหวัดขอนแก่น",
+   "seconds": 13.56,
+   "usage": {
+    "completion_tokens": 41,
+    "prompt_tokens": 98,
+    "total_tokens": 139,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 2701.168,
+    "prompt_per_token_ms": 79.44611764705883,
+    "prompt_per_second": 12.587147485828353,
+    "predicted_n": 41,
+    "predicted_ms": 10826.336,
+    "predicted_per_token_ms": 270.6584,
+    "predicted_per_second": 3.6946941236628907
+   }
+  },
+  {
+   "id": "q03",
+   "answer": "สงกรานต์คือเทศกาลปีใหม่ไทย ตรงกับวันที่ 13 เมษายนทุกปี",
+   "seconds": 10.3,
+   "usage": {
+    "completion_tokens": 31,
+    "prompt_tokens": 92,
+    "total_tokens": 123,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 28,
+    "prompt_ms": 2183.106,
+    "prompt_per_token_ms": 77.96807142857143,
+    "prompt_per_second": 12.825762926765808,
+    "predicted_n": 31,
+    "predicted_ms": 8086.284,
+    "predicted_per_token_ms": 269.5428,
+    "predicted_per_second": 3.7099859465732345
+   }
+  },
+  {
+   "id": "q04",
+   "answer": "RAM และพื้นที่เก็บข้อมูลในคอมพิวเตอร์ต่างกันดังนี้:\n\n- **RAM (Random Access Memory)**  \n  เป็นหน่วยความจำส่วนกลางที่ใช้เก็บข้อมูลชั่วคราวขณะทำงาน เช่น เนื้อหาหน้าจอ โปรแกรมที่กำลังรัน ข้อมูลชั่วคราว  \n  - เร็วมาก แต่หายไปเมื่อเครื่องปิด  \n  - ใช้ในการประมวลผลข้อมูลจริงเวลาทำงาน\n\n- **พื้นที่เก็บข้อมูล (Storage)**  \n  เช่น HDD, SSD ใช้เก็บข้อมูลระยะยาว เช่น ไฟล์เอกสาร โปรแกรม รูปภาพ เสียง  \n  - เก็บข้อมูลไว้ตลอดเวลาแม้เครื่องปิด  \n  - เร็วกว่า RAM ในการเข้าถึงข้อมูลระยะยาว\n\nสรุป: RAM เก็บข้อมูลชั่วคราวเพื่อทำงานจริง ส่วนพื้นที่เก็บข้อมูลเก็บข้อมูลไว้ระยะยาว",
+   "seconds": 77.29,
+   "usage": {
+    "completion_tokens": 273,
+    "prompt_tokens": 98,
+    "total_tokens": 371,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 2718.476,
+    "prompt_per_token_ms": 79.95517647058824,
+    "prompt_per_second": 12.507007602789209,
+    "predicted_n": 273,
+    "predicted_ms": 74555.914,
+    "predicted_per_token_ms": 274.102625,
+    "predicted_per_second": 3.6482686001274156
+   }
+  },
+  {
+   "id": "q05",
+   "answer": "ควรดูแลตัวเองดังนี้:\n\n- พักผ่อนให้เพียงพอ  \n- เตรียมน้ำอุ่น น้ำสมุนไพร หรือเครื่องดื่มให้น้ำตาลต่ำเพื่อเสริมภูมิคุ้มกัน  \n- กินอาหารที่มีประโยชน์ เช่น ผัก ผลไม้ และโปรตีน  \n- ล้างมือบ่อย ๆ และหลีกเลี่ยงการสัมผัสผู้ป่วยคนอื่น  \n- หากมีอาการรุนแรง เช่น เจ็บหน้าอก เจ็บคอ หายใจลำบาก หรือไข้สูงเกิน 38.5°C ควรไปพบแพทย์ทันที",
+   "seconds": 52.72,
+   "usage": {
+    "completion_tokens": 186,
+    "prompt_tokens": 96,
+    "total_tokens": 282,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 32,
+    "prompt_ms": 2450.549,
+    "prompt_per_token_ms": 76.57965625,
+    "prompt_per_second": 13.058298364978624,
+    "predicted_n": 186,
+    "predicted_ms": 50227.237,
+    "predicted_per_token_ms": 271.4985783783784,
+    "predicted_per_second": 3.683260538500256
+   }
+  },
+  {
+   "id": "q06",
+   "answer": "เรียน อาจารย์ที่เคารพครับ/ค่ะ\n\nขออนุญาตขอเลื่อนนัดพบจากวันพฤหัสบดีเป็นวันศุกร์ เนื่องจากติดสอบในวันดังกล่าวครับ/ค่ะ\n\nขอแสดงความนับถือด้วยครับ/ค่ะ",
+   "seconds": 26.47,
+   "usage": {
+    "completion_tokens": 83,
+    "prompt_tokens": 119,
+    "total_tokens": 202,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 55,
+    "prompt_ms": 4281.191,
+    "prompt_per_token_ms": 77.83983636363637,
+    "prompt_per_second": 12.846892371772247,
+    "predicted_n": 83,
+    "predicted_ms": 22154.12,
+    "predicted_per_token_ms": 270.17219512195123,
+    "predicted_per_second": 3.7013431361751223
+   }
+  },
+  {
+   "id": "q07",
+   "answer": "ขออนุญาตลาป่วย 1 วัน เนื่องจากมีอาการไม่สบายตัว กรุณาช่วยอนุมัติครับ",
+   "seconds": 13.31,
+   "usage": {
+    "completion_tokens": 39,
+    "prompt_tokens": 104,
+    "total_tokens": 143,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 40,
+    "prompt_ms": 3056.807,
+    "prompt_per_token_ms": 76.420175,
+    "prompt_per_second": 13.085549725579666,
+    "predicted_n": 39,
+    "predicted_ms": 10218.934,
+    "predicted_per_token_ms": 268.91931578947367,
+    "predicted_per_second": 3.7185874769325253
+   }
+  },
+  {
+   "id": "q08",
+   "answer": "1. กาแฟเชียงใหม่  \nเหตุผล: เน้นความเป็นเอกลักษณ์ของเมือง เชียงใหม่ สื่อถึงความรู้สึกอบอุ่นและเป็นธรรมชาติ\n\n2. ร้านลมเย็น  \nเหตุผล: เน้นบรรยากาศนุ่มนวล เหมาะกับคนชอบกาแฟร้อน ๆ ในอากาศเย็น ๆ เชียงใหม่\n\n3. ป่ากาแฟ  \nเหตุผล: สื่อถึงธรรมชาติและแรงบันดาลใจจากป่าเชียงใหม่ ช่วยสร้างภาพลักษณ์ให้ร้านดูเป็นกันเอง\n\n4. เด็กหมู  \nเหตุ่ผล: ใช้ชื่อแปลกใหม่ เข้ากับวัฒนธรรมเด็กน้อยในเชียงใหม่ สร้างความน่าจดจำ\n\n5. กาแฟเมย์  \nเหตุผล: เน้นเสียงร้องและจังหวะช้า ๆ เหมือนกับบรรยากาศชุมชนในเชียงใหม่",
+   "seconds": 71.83,
+   "usage": {
+    "completion_tokens": 251,
+    "prompt_tokens": 108,
+    "total_tokens": 359,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 44,
+    "prompt_ms": 3360.5,
+    "prompt_per_token_ms": 76.375,
+    "prompt_per_second": 13.093289689034371,
+    "predicted_n": 251,
+    "predicted_ms": 68447.204,
+    "predicted_per_token_ms": 273.788816,
+    "predicted_per_second": 3.652450142448478
+   }
+  },
+  {
+   "id": "q09",
+   "answer": "แม่คะ วันเกิดของแม่สุดพิเศษนะคะ  \nขอให้แม่สุขภาพแข็งแรง เส้นทางชีวิตมีแต่ความสุข ความรัก และรอยยิ้มเสมอใจ  \nรักแม่มากๆ เลยค่ะ",
+   "seconds": 21.96,
+   "usage": {
+    "completion_tokens": 73,
+    "prompt_tokens": 96,
+    "total_tokens": 169,
+    "prompt_tokens_details": {
+     "cached_tokens": 66
+    }
+   },
+   "timings": {
+    "cache_n": 66,
+    "prompt_n": 30,
+    "prompt_ms": 2373.126,
+    "prompt_per_token_ms": 79.1042,
+    "prompt_per_second": 12.6415537986605,
+    "predicted_n": 73,
+    "predicted_ms": 19530.571,
+    "predicted_per_token_ms": 271.25793055555556,
+    "predicted_per_second": 3.686528161414226
+   }
+  },
+  {
+   "id": "q10",
+   "answer": "แจ้งสุดท้ายครับ เพื่อความปลอดภัยและสุขภาพ เรียนบ่ายพรุ่งนี้ยกเลิก และให้ส่งงานทางอีเมลแทนครับ",
+   "seconds": 16.85,
+   "usage": {
+    "completion_tokens": 49,
+    "prompt_tokens": 114,
+    "total_tokens": 163,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 50,
+    "prompt_ms": 3870.951,
+    "prompt_per_token_ms": 77.41902,
+    "prompt_per_second": 12.916722531491615,
+    "predicted_n": 49,
+    "predicted_ms": 12952.694,
+    "predicted_per_token_ms": 269.84779166666664,
+    "predicted_per_second": 3.7057927871993277
+   }
+  },
+  {
+   "id": "q11",
+   "answer": "ระบบนี้ทำงานบน Raspberry Pi 5 โดยไม่ต้องใช้อินเทอร์เน็ต และรองรับผู้ใช้หลายคนได้โดยแยกข้อมูลผ่านบัญชี Linux  \nการควบคุมและนัดหมายใช้โค้ดตัดสินแทน AI เพื่อความแม่นยำ และทุกการกระทำต้องตรวจสอบผลได้จริงบนเครื่อง",
+   "seconds": 36.48,
+   "usage": {
+    "completion_tokens": 94,
+    "prompt_tokens": 209,
+    "total_tokens": 303,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 145,
+    "prompt_ms": 10875.201,
+    "prompt_per_token_ms": 75.00138620689654,
+    "prompt_per_second": 13.333086901106473,
+    "predicted_n": 94,
+    "predicted_ms": 25581.297,
+    "predicted_per_token_ms": 275.0677096774193,
+    "predicted_per_second": 3.6354685221785275
+   }
+  },
+  {
+   "id": "q12",
+   "answer": "ข้อดี:  \n1. ประหยัดเวลาเดินทาง  \n2. มีความยืดหยุ่นในการจัดสรรเวลาทำงาน  \n3. ลดค่าใช้จ่ายด้านการเดินทางและเครื่องมือทำงาน  \n\nข้อเสีย:  \n1. ขาดสภาพแวดล้อมการทำงานที่ชัดเจน  \n2. เน้นการทำงานมากเกินไปจนส่งผลต่อสุขภาพร่างกายและจิตใจ  \n3. เสี่ยงต่อการสูญเสียความตั้งใจหรือสมาธิในการทำงาน",
+   "seconds": 39.54,
+   "usage": {
+    "completion_tokens": 139,
+    "prompt_tokens": 95,
+    "total_tokens": 234,
+    "prompt_tokens_details": {
+     "cached_tokens": 69
+    }
+   },
+   "timings": {
+    "cache_n": 69,
+    "prompt_n": 26,
+    "prompt_ms": 2118.264,
+    "prompt_per_token_ms": 81.47169230769231,
+    "prompt_per_second": 12.2742018936261,
+    "predicted_n": 139,
+    "predicted_ms": 37380.184,
+    "predicted_per_token_ms": 270.87089855072463,
+    "predicted_per_second": 3.6917956316105878
+   }
+  },
+  {
+   "id": "q13",
+   "answer": "AI ทำงานในเครื่อง (Edge AI) ประมวลผลข้อมูลที่เครื่องใช้เอง โดยไม่ต้องส่งข้อมูลออกไปนอกเครื่อง จึงช่วยรักษาความเป็นส่วนตัวได้ดีกว่า AI บนคลาวด์ที่ต้องส่งข้อมูลไปยังเซิร์ฟเวอร์ภายนอกเพื่อประมวลผล",
+   "seconds": 30.55,
+   "usage": {
+    "completion_tokens": 99,
+    "prompt_tokens": 115,
+    "total_tokens": 214,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 51,
+    "prompt_ms": 3976.369,
+    "prompt_per_token_ms": 77.96801960784315,
+    "prompt_per_second": 12.825771451291365,
+    "predicted_n": 99,
+    "predicted_ms": 26536.9,
+    "predicted_per_token_ms": 270.78469387755104,
+    "predicted_per_second": 3.692970919738176
+   }
+  },
+  {
+   "id": "q14",
+   "answer": "Tomorrow I have a meeting at 2 PM. Can you remind me?",
+   "seconds": 7.53,
+   "usage": {
+    "completion_tokens": 16,
+    "prompt_tokens": 109,
+    "total_tokens": 125,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 45,
+    "prompt_ms": 3450.941,
+    "prompt_per_token_ms": 76.68757777777778,
+    "prompt_per_second": 13.039921575013889,
+    "predicted_n": 16,
+    "predicted_ms": 4049.835,
+    "predicted_per_token_ms": 269.989,
+    "predicted_per_second": 3.703854601483764
+   }
+  },
+  {
+   "id": "q15",
+   "answer": "การประชุมถูกย้ายไปในวันจันทร์หน้าเพราะผู้จัดการป่วย",
+   "seconds": 8.75,
+   "usage": {
+    "completion_tokens": 27,
+    "prompt_tokens": 89,
+    "total_tokens": 116,
+    "prompt_tokens_details": {
+     "cached_tokens": 68
+    }
+   },
+   "timings": {
+    "cache_n": 68,
+    "prompt_n": 21,
+    "prompt_ms": 1698.747,
+    "prompt_per_token_ms": 80.89271428571429,
+    "prompt_per_second": 12.362052736516974,
+    "predicted_n": 27,
+    "predicted_ms": 7044.428,
+    "predicted_per_token_ms": 270.93953846153846,
+    "predicted_per_second": 3.690860350904289
+   }
+  },
+  {
+   "id": "q16",
+   "answer": "I'm sorry for the late reply. I've been quite busy lately.",
+   "seconds": 7.04,
+   "usage": {
+    "completion_tokens": 16,
+    "prompt_tokens": 106,
+    "total_tokens": 122,
+    "prompt_tokens_details": {
+     "cached_tokens": 68
+    }
+   },
+   "timings": {
+    "cache_n": 68,
+    "prompt_n": 38,
+    "prompt_ms": 2976.648,
+    "prompt_per_token_ms": 78.33284210526317,
+    "prompt_per_second": 12.766037502586801,
+    "predicted_n": 16,
+    "predicted_ms": 4051.381,
+    "predicted_per_token_ms": 270.09206666666665,
+    "predicted_per_second": 3.702441216957872
+   }
+  },
+  {
+   "id": "q17",
+   "answer": "คำว่า \"เกรงใจ\" แปลเป็นภาษาอังกฤษว่า \"feel uneasy about\" หรือ \"be embarrassed/shy about\" ขึ้นอยู่กับบริบท\n\nแปลตรงตัวยาก เพราะคำว่า \"เกรงใจ\" ในภาษาไทยมีความหมายหลายแง่มุม เช่น เกรงใจว่าจะทำผิดพลาด เกรงใจความรู้สึกของผู้อื่น เกรงใจจะรับรู้ไม่ดี จากคนอื่น เป็นต้น ในขณะที่คำในภาษาอังกฤษไม่มีคำใดครอบคลุมความหมายทั้งหมดนี้ได้ครบถ้วน เช่น คำว่า \"feel uneasy\" เกี่ยวข้องแค่ความไม่สบายใจ ไม่ได้บ่งบอกถึงความรู้สึกอายหรือกลัวผลตอบแทนจากผู้อื่นเท่าที่ควร",
+   "seconds": 60.98,
+   "usage": {
+    "completion_tokens": 215,
+    "prompt_tokens": 98,
+    "total_tokens": 313,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 2677.117,
+    "prompt_per_token_ms": 78.73873529411765,
+    "prompt_per_second": 12.700229388554925,
+    "predicted_n": 215,
+    "predicted_ms": 58295.002,
+    "predicted_per_token_ms": 272.40655140186914,
+    "predicted_per_second": 3.670983663402224
+   }
+  },
+  {
+   "id": "q18",
+   "answer": "ราคาของ 3 ชิ้น = 3 × 45 = 135 บาท  \nจ่ายแบงก์ 500 บาท  \nเงินทอน = 500 - 135 = 365 บาท  \n\nตอบ: ได้เงินทอน 365 บาท",
+   "seconds": 23.19,
+   "usage": {
+    "completion_tokens": 71,
+    "prompt_tokens": 120,
+    "total_tokens": 191,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 56,
+    "prompt_ms": 4245.995,
+    "prompt_per_token_ms": 75.82133928571429,
+    "prompt_per_second": 13.188899186174265,
+    "predicted_n": 71,
+    "predicted_ms": 18903.024,
+    "predicted_per_token_ms": 270.0432,
+    "predicted_per_second": 3.703111205910758
+   }
+  },
+  {
+   "id": "q19",
+   "answer": "ถ้าวันนี้เป็นวันจันทร์ อีก 10 วันจะเป็นวันศุกร์",
+   "seconds": 11.4,
+   "usage": {
+    "completion_tokens": 33,
+    "prompt_tokens": 98,
+    "total_tokens": 131,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 34,
+    "prompt_ms": 2710.284,
+    "prompt_per_token_ms": 79.71423529411766,
+    "prompt_per_second": 12.544810802115203,
+    "predicted_n": 33,
+    "predicted_ms": 8656.237,
+    "predicted_per_token_ms": 270.50740625,
+    "predicted_per_second": 3.6967564543346034
+   }
+  },
+  {
+   "id": "q20",
+   "answer": "เก็บเดือนละ 3,600 บาท  \nเก็บได้ 1 ปีละ 43,200 บาท",
+   "seconds": 12.63,
+   "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 120,
+    "total_tokens": 152,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 56,
+    "prompt_ms": 4238.625,
+    "prompt_per_token_ms": 75.68973214285714,
+    "prompt_per_second": 13.211831667109028,
+    "predicted_n": 32,
+    "predicted_ms": 8365.597,
+    "predicted_per_token_ms": 269.85796774193545,
+    "predicted_per_second": 3.7056530454431407
+   }
+  },
+  {
+   "id": "q21",
+   "answer": "ควรเริ่มต้นทันทีโดยแบ่งเนื้อหาออกเป็นส่วนย่อยๆ  \nจัดเวลาฝึกฝนทุกวัน 3 วันต่อเนื่อง  \nเน้นทบทวนสิ่งที่เรียนแล้วบ่อยๆ  \nใช้เวลาสั้นๆ วิ่งอ่านหรือทบทวนสั้นๆ ก่อนนอน  \nหากยังไม่พอ ขอความช่วยเหลือจากครูหรือเพื่อนที่เรียนเก่ง",
+   "seconds": 36.16,
+   "usage": {
+    "completion_tokens": 125,
+    "prompt_tokens": 97,
+    "total_tokens": 222,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 33,
+    "prompt_ms": 2607.219,
+    "prompt_per_token_ms": 79.00663636363636,
+    "prompt_per_second": 12.657164588015045,
+    "predicted_n": 125,
+    "predicted_ms": 33525.739,
+    "predicted_per_token_ms": 270.3688629032258,
+    "predicted_per_second": 3.698650759048145
+   }
+  },
+  {
+   "id": "q22",
+   "answer": "นอนไม่หลับบ่อย ๆ อาจเกิดจากหลายปัจจัย เช่น เครียด ความเครียดเรื้อรัง หรือพฤติกรรม เช่น ใช้อุปกรณ์จอนแสงหน้าจอหน้าที่นอน เวลาเข้านอนควรหลีกเลี่ยงการดื่มกาแฟหรือเครื่องดื่มมีคาเฟอีนหลัง 16.00 น.  \n\nวิธีช่วยนอนไม่หลับโดยไม่ต้องใช้ยา เช่น  \n1. ทำกิจกรรมผ่อนคลายก่อนนอน เช่น อ่านหนังสือ ฟังเพลงเบา ๆ  \n2. พยายามนอนและตื่นในเวลาเดียวกันทุกวัน เพื่อฝึกสมดุลร่างกายให้แน่นอน  \n3. ฝึกสมาธิหรือหายใจลึก ๆ เพื่อลดความตึงเครียด  \n4. หลีกเลี่ยงการใช้โทรศัพท์หรือหน้าจอคอมพิวเตอร์ก่อนนอนอย่างน้อย 1 ชั่วโมง  \n5. สร้างสภาพแวดล้อมนอนที่เงียบ นุ่มนวล เช่น เงียบ เงา หรือมีกลิ่นหอม ๆ  \n\nหากนอนไม่หลับต่อเนื่อง ควรปรึกษาแพทย์หรือจิตแพทย์เพื่อประเมินปัญหาลึก ๆ ได้",
+   "seconds": 99.34,
+   "usage": {
+    "completion_tokens": 353,
+    "prompt_tokens": 97,
+    "total_tokens": 450,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 33,
+    "prompt_ms": 2528.684,
+    "prompt_per_token_ms": 76.62678787878788,
+    "prompt_per_second": 13.05026646271341,
+    "predicted_n": 353,
+    "predicted_ms": 96785.974,
+    "predicted_per_token_ms": 274.96015340909094,
+    "predicted_per_second": 3.636890609790216
+   }
+  },
+  {
+   "id": "q23",
+   "answer": "เมนูแนะนำ: ข้าวผัดไก่สับหมู + ผักกาดหอมย่างน้ำมันพืช  \n(ใช้แค่ส่วนผสมหลัก ง่าย ประหยัด)\n\nรายการของที่ต้องซื้อ (รวมเงิน 300 บาท):  \n- ไก่สับหรือหมูสับ (ราคาประมาณ 80 บาท)  \n- ข้าวสวย (ประมาณ 50 บาท)  \n- ผักกาดหอม (ประมาณ 30 บาท)  \n- น้ำมันพืช (ประมาณ 10 บาท)  \n- ซอสปรุงรส (ประมาณ 15 บาท)  \n- เสิร์ฟด้วยน้ำจิ้มแจ่วหรือซอสกะทิเล็กน้อย (ประมาณ 25 บาท)  \n\nรวมค่าใช้จ่ายประมาณ 210 บาท เหลือเงินอีกประมาณ 90 บาท เหลือใช้จ่ายเสริม เช่น ผักสดเพิ่มเติมหรือเครื่องดื่ม  \n\nหมายเหตุ: ทำอาหารง่าย ๆ เน้นคุณค่าทางโภชนาการและประหยัดเวลา",
+   "seconds": 80.0,
+   "usage": {
+    "completion_tokens": 280,
+    "prompt_tokens": 108,
+    "total_tokens": 388,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 44,
+    "prompt_ms": 3362.562,
+    "prompt_per_token_ms": 76.42186363636364,
+    "prompt_per_second": 13.085260584042764,
+    "predicted_n": 280,
+    "predicted_ms": 76581.53,
+    "predicted_per_token_ms": 274.485770609319,
+    "predicted_per_second": 3.6431761026451155
+   }
+  },
+  {
+   "id": "q24",
+   "answer": "ควรตรวจดังนี้:\n\n1. ล้างหน่วยความจำ (RAM) และดูว่ามีโปรแกรมใช้หน่วยความจำเยอะไหม  \n2. ลบโปรแกรมที่ไม่จำเป็นหรือโปรแกรมเก่า ๆ  \n3. ตรวจสอบว่ามีไวรัสหรือมัลแวร์หรือไม่  \n4. อัปเดตระบบปฏิบัติการและซอฟต์แวร์ให้ทันสมัย  \n5. ตรวจสอบ SSD/HDD ว่าใช้งานได้ปกติไหม เช่น มีข้อมูลเสียหรือไม่  \n6. ตรวจสอบการตั้งค่าพื้นหลัง เช่น การดาวน์โหลดอัตโนมัติหรือโปรแกรมทำงานพื้นหลัง  \n7. วิเคราะห์ประสิทธิภาพโดยใช้เครื่องมือเช่น Task Manager หรือโปรแกรมตรวจสอบระบบ  \n8. แล้วถึงจะต้องพิจารณาเปลี่ยนฮาร์ดแวร์ เช่น RAM หรือ SSD",
+   "seconds": 71.52,
+   "usage": {
+    "completion_tokens": 252,
+    "prompt_tokens": 99,
+    "total_tokens": 351,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 35,
+    "prompt_ms": 2811.976,
+    "prompt_per_token_ms": 80.34217142857143,
+    "prompt_per_second": 12.446763414765988,
+    "predicted_n": 252,
+    "predicted_ms": 68659.58,
+    "predicted_per_token_ms": 273.54414342629485,
+    "predicted_per_second": 3.6557170900258926
+   }
+  },
+  {
+   "id": "q25",
+   "answer": "ใช่",
+   "seconds": 3.75,
+   "usage": {
+    "completion_tokens": 3,
+    "prompt_tokens": 105,
+    "total_tokens": 108,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 41,
+    "prompt_ms": 3201.326,
+    "prompt_per_token_ms": 78.08112195121952,
+    "prompt_per_second": 12.80719301939259,
+    "predicted_n": 3,
+    "predicted_ms": 507.346,
+    "predicted_per_token_ms": 253.673,
+    "predicted_per_second": 3.942082917772092
+   }
+  },
+  {
+   "id": "q26",
+   "answer": "1. มังคุด  \n2. มะขาม  \n3. มะม่วง  \n4. ส้มโอ  \n5. กล้วย",
+   "seconds": 12.55,
+   "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 108,
+    "total_tokens": 143,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 44,
+    "prompt_ms": 3387.588,
+    "prompt_per_token_ms": 76.99063636363637,
+    "prompt_per_second": 12.988592473464895,
+    "predicted_n": 35,
+    "predicted_ms": 9156.514,
+    "predicted_per_token_ms": 269.3092352941176,
+    "predicted_per_second": 3.713203518282176
+   }
+  },
+  {
+   "id": "q27",
+   "answer": "ฝนตกหนักจนรถติดยาวนาน ทุกคนต้องพึ่งพาสติ๊กเกอร์ร่มกันอย่างแน่นอน",
+   "seconds": 13.66,
+   "usage": {
+    "completion_tokens": 41,
+    "prompt_tokens": 99,
+    "total_tokens": 140,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 35,
+    "prompt_ms": 2804.194,
+    "prompt_per_token_ms": 80.11982857142857,
+    "prompt_per_second": 12.481304788470412,
+    "predicted_n": 41,
+    "predicted_ms": 10833.094,
+    "predicted_per_token_ms": 270.82734999999997,
+    "predicted_per_second": 3.69238926570747
+   }
+  },
+  {
+   "id": "q28",
+   "answer": "ไม่รู้",
+   "seconds": 2.38,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 80,
+    "total_tokens": 85,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 16,
+    "prompt_ms": 1279.675,
+    "prompt_per_token_ms": 79.9796875,
+    "prompt_per_second": 12.503174634184461,
+    "predicted_n": 5,
+    "predicted_ms": 1074.125,
+    "predicted_per_token_ms": 268.53125,
+    "predicted_per_second": 3.7239613639008495
+   }
+  },
+  {
+   "id": "q29",
+   "answer": "ไม่รู้",
+   "seconds": 3.64,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 97,
+    "total_tokens": 102,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 33,
+    "prompt_ms": 2570.631,
+    "prompt_per_token_ms": 77.89790909090908,
+    "prompt_per_second": 12.837315040548411,
+    "predicted_n": 5,
+    "predicted_ms": 1066.028,
+    "predicted_per_token_ms": 266.507,
+    "predicted_per_second": 3.7522466576862894
+   }
+  },
+  {
+   "id": "q30",
+   "answer": "ไม่รู้",
+   "seconds": 3.04,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 89,
+    "total_tokens": 94,
+    "prompt_tokens_details": {
+     "cached_tokens": 64
+    }
+   },
+   "timings": {
+    "cache_n": 64,
+    "prompt_n": 25,
+    "prompt_ms": 1990.222,
+    "prompt_per_token_ms": 79.60888,
+    "prompt_per_second": 12.56141274691969,
+    "predicted_n": 5,
+    "predicted_ms": 1037.816,
+    "predicted_per_token_ms": 259.454,
+    "predicted_per_second": 3.8542477664634194
+   }
+  }
+ ]
+}
