@@ -37,6 +37,8 @@ def chat(server: str, system: str, question: str, timeout: float = 600) -> dict:
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": question}],
         "stream": False,
         **SAMPLING,
+        # Gemma 4 / Qwen3: ไม่ปิดโหมดคิด = คิดจนหมด max_tokens แล้วคำตอบว่าง (พบ 2026-09-30) · แอปส่งค่านี้ทุกครั้ง
+        "chat_template_kwargs": {"enable_thinking": False},
     }
     req = urllib.request.Request(
         server.rstrip("/") + "/v1/chat/completions",
