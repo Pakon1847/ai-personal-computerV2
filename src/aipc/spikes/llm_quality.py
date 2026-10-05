@@ -102,6 +102,20 @@ def sheet(answer_files: list[Path], questions: Path, out_dir: Path, seed: int = 
     (out_dir / "key.json").write_text(
         json.dumps(key, ensure_ascii=False, indent=1), encoding="utf-8"
     )
+    rubric = json.loads(questions.read_text(encoding="utf-8")).get("rubric", {})
+    (out_dir / "rate-me.html").write_text(rating_page(lines, rubric), encoding="utf-8")
+
+
+def rating_page(lines: list[dict], rubric: dict) -> str:
+    """หน้าให้คะแนนแบบออฟไลน์ (เปิดในเบราว์เซอร์) · ไม่มีชื่อโมเดล · ส่งออก CSV รูปแบบเดียวกับ rate-me.csv ให้ score อ่าน.
+
+    คะแนนที่กดเก็บใน localStorage ของเบราว์เซอร์นั้น (ปิดแล้วเปิดใหม่ทำต่อได้) · ไม่ส่งอะไรออกนอกเครื่อง
+    """
+    data = json.dumps({"rows": lines, "rubric": rubric}, ensure_ascii=False).replace("</", "<" + chr(92) + "/")
+    page = (Path(__file__).with_name("rating_page.html")).read_text(encoding="utf-8")
+    return page.replace("__DATA__", data)
+
+
 
 
 def score(key_file: Path, rating_files: list[Path], minimum: float = 3.5) -> dict:

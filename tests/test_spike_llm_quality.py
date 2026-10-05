@@ -66,6 +66,10 @@ class FlowTest(unittest.TestCase):
         text = (out / "rate-me.csv").read_text(encoding="utf-8-sig")
         self.assertNotIn("typhoon", text)
         self.assertNotIn("qwen", text)
+        page = (out / "rate-me.html").read_text(encoding="utf-8")  # หน้าให้คะแนนออฟไลน์ (2026-10-05)
+        self.assertNotIn("typhoon", page)
+        self.assertNotIn("__DATA__", page)
+        self.assertIn('"choice": "B"', page)
 
         key = json.loads((out / "key.json").read_text(encoding="utf-8"))
         # ผู้ให้คะแนน 2 คน: ให้ typhoon 5 และ qwen 3 ทุกข้อ

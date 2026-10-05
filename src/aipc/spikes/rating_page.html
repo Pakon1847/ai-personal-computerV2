@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ให้คะแนนคำตอบภาษาไทย</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--ink:#1d1d1b;--muted:#6b6b66;--line:#e2e1db;--acc:#3346b8}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,"Noto Sans Thai",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px}
+header{position:sticky;top:0;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);z-index:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.ans{white-space:pre-wrap;overflow-wrap:anywhere}.muted{color:var(--muted);font-size:14px}
+.sc button{min-width:44px;min-height:44px;margin:4px 6px 0 0;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:17px}
+.sc button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+nav button,.big{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:16px}
+details{margin-top:6px}
+</style></head><body><main>
+<header><b>ให้คะแนนคำตอบภาษาไทย</b> · <span id="prog"></span>
+<div class="muted">คำตอบ A/B/C มาจากคนละระบบ และสลับลำดับทุกข้อ · ให้คะแนนตามเกณฑ์ ไม่ต้องเดาว่าเป็นระบบไหน · คะแนนเก็บในเบราว์เซอร์นี้ ปิดแล้วเปิดใหม่ทำต่อได้</div>
+<nav><button onclick="go(-1)">ข้อก่อน</button> <button onclick="go(1)">ข้อถัดไป</button>
+ <input id="rater" placeholder="ชื่อย่อผู้ให้คะแนน" style="min-height:40px"> <button class="big" onclick="save()">ส่งออก CSV</button></nav>
+<details><summary>เกณฑ์ 1–5</summary><div id="rub"></div></details></header>
+<div id="q"></div></main>
+<script>
+const D=__DATA__;
+const ids=[...new Set(D.rows.map(r=>r.id))];let i=0;
+const K="aipc-rate:"+ids.length+":"+D.rows.length;
+let S={};try{S=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){}
+function put(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+document.getElementById("rub").innerHTML=Object.keys(D.rubric).sort().reverse()
+  .map(k=>"<div><b>"+k+"</b> "+esc(D.rubric[k])+"</div>").join("");
+function show(){
+  const id=ids[i];const rs=D.rows.filter(r=>r.id===id);
+  const done=D.rows.filter(r=>S[r.id+":"+r.choice]).length;
+  document.getElementById("prog").textContent="ข้อ "+(i+1)+"/"+ids.length+" · ให้คะแนนแล้ว "+done+"/"+D.rows.length;
+  let h='<div class="card"><div class="muted">'+esc(id)+'</div><b>'+esc(rs[0].question)+'</b></div>';
+  for(const r of rs){
+    const k=r.id+":"+r.choice;
+    h+='<div class="card"><b>คำตอบ '+esc(r.choice)+'</b><div class="ans">'+esc(r.answer)+'</div><div class="sc">';
+    for(let n=1;n<=5;n++){h+='<button data-k="'+esc(k)+'" data-n="'+n+'" class="'+(S[k]==n?"on":"")+'">'+n+'</button>'}
+    h+='</div></div>';
+  }
+  document.getElementById("q").innerHTML=h;window.scrollTo(0,0);
+}
+document.getElementById("q").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-k]");if(!b)return;
+  S[b.dataset.k]=Number(b.dataset.n);put();show();
+});
+function go(d){i=Math.min(ids.length-1,Math.max(0,i+d));show()}
+function cell(t){t=String(t);return /[",\n\r]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t}
+function save(){
+  const miss=D.rows.filter(r=>!S[r.id+":"+r.choice]).length;
+  if(miss&&!confirm("ยังไม่ได้ให้คะแนน "+miss+" คำตอบ · ส่งออกต่อไหม (ตัวรวมคะแนนจะไม่ยอมรวมจนกว่าจะครบ)"))return;
+  const lines=["id,question,choice,answer,score"].concat(
+    D.rows.map(r=>[r.id,r.question,r.choice,r.answer,S[r.id+":"+r.choice]||""].map(cell).join(",")));
+  const blob=new Blob(["﻿"+lines.join("\n")+"\n"],{type:"text/csv"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="rate-"+((document.getElementById("rater").value||"rater").replace(/[^A-Za-z0-9_-]/g,"")||"rater")+".csv";
+  a.click();
+}
+show();
+</script></body></html>
