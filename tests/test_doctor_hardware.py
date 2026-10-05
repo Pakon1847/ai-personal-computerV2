@@ -88,6 +88,17 @@ class HardwareTest(unittest.TestCase):
         self.m.write("/proc/mounts", "/dev/nvme0n1p2 / ext4 rw 0 0\n")
         self.assertIn("NVMe", hw.check_storage(self.m.root, self.m.root).detail)
 
+    def test_memory_cgroup(self):
+        """audit 2026-09-30 hw-os-1 · Pi 5 จริง: cmdline มี cgroup_disable=memory → MemoryMax ของ aipc-llm ไม่มีผล."""
+        self.m.write("/sys/fs/cgroup/cgroup.controllers", "cpuset cpu io pids\n")
+        self.m.write("/proc/cmdline", "console=tty1 root=PARTUUID=x cgroup_disable=memory rootwait\n")
+        c = hw.check_memory_cgroup(self.m.root)
+        self.assertEqual(c.status, hw.WARN)
+        self.assertIn("cgroup_enable=memory", c.fix)
+        self.assertIn("cgroup_disable=memory", c.detail)
+        self.m.write("/sys/fs/cgroup/cgroup.controllers", "cpuset cpu io memory pids\n")
+        self.assertEqual(hw.check_memory_cgroup(self.m.root).status, hw.PASS)
+
     def test_nothing_readable_never_passes(self):
         # เครื่องที่อ่านอะไรไม่ได้เลย (เช่นวินโดวส์) ต้องไม่มีข้อไหนแอบผ่าน
         # ยกเว้นพื้นที่ดิสก์ ซึ่งอ่านได้ทุกระบบ

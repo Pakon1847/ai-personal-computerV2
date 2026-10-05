@@ -89,6 +89,13 @@ class VerdictTest(unittest.TestCase):
         self.assertFalse(v.evidence_level4)
         self.assertEqual(v.throttled_runs, [2])
 
+    def test_sticky_bits_before_run_are_not_level4(self):
+        """audit 2026-09-30 evidence-1: บิต "เคยเกิด" ติดก่อนวัด = throttle ที่เกิดแล้วหายระหว่างรอบมองไม่เห็น."""
+        v = runner.judge(info(), self.records(), 0xE0000)
+        self.assertEqual(v.throttled_runs, [])
+        self.assertFalse(v.evidence_level4)
+        self.assertTrue(any("รีบูต" in w for w in v.warnings))
+
     def test_dirty_tree_is_not_level4(self):
         self.assertFalse(runner.judge(info(dirty=True), self.records(), 0).evidence_level4)
 

@@ -285,6 +285,21 @@ def check_audio(root: Path) -> Check:
     return Check("audio", "เสียง", PASS, " | ".join(names))
 
 
+def check_memory_cgroup(root: Path) -> Check:
+    """MemoryMax ของ aipc-llm.service มีผลเมื่อ cgroup v2 เปิด controller memory (audit 2026-09-30 hw-os-1)."""
+    ctl = _read(root, "/sys/fs/cgroup/cgroup.controllers")
+    if ctl is None:
+        return Check("memcg", "memory cgroup", UNKNOWN, "อ่าน /sys/fs/cgroup/cgroup.controllers ไม่ได้")
+    if "memory" in ctl.split():
+        return Check("memcg", "memory cgroup", PASS, "เปิดอยู่ · MemoryMax ของ AI มีผล")
+    cmd = _read(root, "/proc/cmdline") or ""
+    why = " (cmdline มี cgroup_disable=memory)" if "cgroup_disable=memory" in cmd else ""
+    return Check(
+        "memcg", "memory cgroup", WARN, f"ปิดอยู่{why} · MemoryMax ของ aipc-llm.service ไม่มีผล",
+        "สำรอง /boot/firmware/cmdline.txt แล้วเติม cgroup_enable=memory ท้ายบรรทัดเดียวกัน · รีบูต",
+    )
+
+
 def run_all(
     root: Path = Path("/"), run: Runner = run_command, usage_path: Path | None = None
 ) -> list[Check]:
@@ -300,4 +315,5 @@ def run_all(
         check_fscrypt_kernel(root),
         check_camera(root),
         check_audio(root),
+        check_memory_cgroup(root),
     ]

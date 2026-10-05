@@ -152,6 +152,13 @@ def judge(info: machine.MachineInfo, records: list[RunRecord], before: int | Non
     bad = [r.index for r in records if throttled_during(before, r.throttled_after)]
     if bad:
         warnings.append(f"ไฟตกหรือร้อนเกินระหว่างรอบ {bad} — ผลชุดนี้ใช้ไม่ได้ ต้องวัดใหม่")
+    # บิต "เคยเกิด" ติดมาก่อนวัด = throttle ที่เกิดแล้วหายระหว่างรอบตรวจไม่ได้ (audit 2026-09-30 evidence-1)
+    sticky = before is not None and bool(before & SINCE_BOOT_MASK)
+    if sticky:
+        warnings.append(
+            f"get_throttled ก่อนวัด = {before:#x} (เคยลดความเร็วตั้งแต่บูต) — ตรวจไม่ได้ว่าเกิดซ้ำระหว่างวัดไหม · "
+            "ไม่นับเป็นระดับ 4 · รีบูตแล้ววัดใหม่"
+        )
     unknown = all(r.throttled_after is None for r in records)
     if unknown:
         warnings.append("อ่าน get_throttled ไม่ได้ — ไม่รู้ว่าเครื่องถูกลดความเร็วไหม")
@@ -160,7 +167,7 @@ def judge(info: machine.MachineInfo, records: list[RunRecord], before: int | Non
     if info.git_commit is None:
         warnings.append("ไม่รู้ commit ที่วัด")
     return Verdict(
-        evidence_level4=level4 and not bad and not unknown and info.git_dirty is False,
+        evidence_level4=level4 and not bad and not sticky and not unknown and info.git_dirty is False,
         throttled_runs=bad,
         throttle_unknown=unknown,
         warnings=warnings,
