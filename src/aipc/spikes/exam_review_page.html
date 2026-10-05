@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตรวจคำตอบของ Claude</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--ink:#1d1d1b;--muted:#6b6b66;--line:#e2e1db;--acc:#3346b8}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,"Noto Sans Thai",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px}
+header{position:sticky;top:0;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);z-index:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.ans{white-space:pre-wrap;overflow-wrap:anywhere}.muted{color:var(--muted);font-size:14px}
+.v button{min-height:44px;margin:4px 6px 0 0;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:16px}
+.v button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+nav button,.big{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:16px}
+textarea{width:100%;box-sizing:border-box;min-height:56px;font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px}
+details{margin-top:6px}
+</style></head><body><main>
+<header><b>ตรวจคำตอบของ Claude</b> · <span id="prog"></span>
+<div class="muted">ตัดสินตามข้อเท็จจริง <b>ณ เวลาที่ถาม</b> (<span id="asked"></span>) · ข้อมูลสด (ราคา ข่าว อากาศ) เปิดแหล่งจริงเทียบได้ · ตรวจคนเดียว ไม่ปรึกษาผู้ตรวจอีกคน</div>
+<nav><button onclick="go(-1)">ข้อก่อน</button> <button onclick="go(1)">ข้อถัดไป</button>
+ <input id="rater" placeholder="ชื่อย่อผู้ตรวจ" style="min-height:40px"> <button class="big" onclick="save()">ส่งออก CSV</button></nav>
+<details><summary>เกณฑ์</summary><div>
+<b>ถูก</b> ตอบถูกตามข้อเท็จจริง ณ เวลาที่ถาม ·
+<b>ถูกบางส่วน</b> มีส่วนที่ผิดหรือไม่ครบจนใช้ไม่ได้ทั้งหมด ·
+<b>ผิด</b> ผิด หรือแต่งข้อมูล ·
+<b>บอกตรง ๆ ว่าไม่รู้</b> ไม่ได้ให้คำตอบ แต่บอกตรง ๆ ว่าหาไม่ได้/ยืนยันไม่ได้</div></details></header>
+<div id="q"></div></main>
+<script>
+const D=__DATA__;
+const L={correct:"ถูก",partial:"ถูกบางส่วน",wrong:"ผิด",honest:"บอกตรง ๆ ว่าไม่รู้"};
+const WHY={tool:"AI ในเครื่องเลือกส่งต่อเอง",fallback:"AI ในเครื่องตอบว่าไม่รู้ จึงส่งต่อ"};
+let i=0;const K="aipc-exam-review:"+D.asked;
+let S={};try{S=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){}
+function put(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+document.getElementById("asked").textContent=D.asked.replace("T"," ");
+function show(){
+  const r=D.rows[i];const s=S[r.id]||{};
+  const done=D.rows.filter(x=>S[x.id]&&S[x.id].v).length;
+  document.getElementById("prog").textContent="ข้อ "+(i+1)+"/"+D.rows.length+" · ตรวจแล้ว "+done+"/"+D.rows.length;
+  let h='<div class="card"><div class="muted">'+esc(r.id)+' · '+esc(WHY[r.why]||r.why)+'</div><b>'+esc(r.q)+'</b></div>';
+  h+='<div class="card"><b>คำตอบของ Claude</b><div class="ans">'+esc(r.claude)+'</div><div class="v">';
+  for(const k of Object.keys(L)){h+='<button data-v="'+k+'" class="'+(s.v===k?"on":"")+'">'+L[k]+'</button>'}
+  h+='</div><p class="muted">หมายเหตุ (ถ้ามี · เช่น แหล่งที่ใช้เทียบ)</p><textarea id="note">'+esc(s.n||"")+'</textarea></div>';
+  h+='<details class="card"><summary class="muted">คำตอบของ AI ในเครื่องก่อนส่งต่อ (ไว้ดูประกอบ)</summary><div class="ans">'+esc(r.local||"(เลือกส่งต่อโดยไม่ตอบ)")+'</div></details>';
+  document.getElementById("q").innerHTML=h;window.scrollTo(0,0);
+  document.getElementById("note").addEventListener("input",e=>{S[r.id]=Object.assign({},S[r.id],{n:e.target.value});put()});
+}
+document.getElementById("q").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-v]");if(!b)return;const id=D.rows[i].id;
+  S[id]=Object.assign({},S[id],{v:b.dataset.v});put();show();
+});
+function go(d){i=Math.min(D.rows.length-1,Math.max(0,i+d));show()}
+function cell(t){t=String(t);return /[",\n\r]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t}
+function save(){
+  const miss=D.rows.filter(r=>!(S[r.id]&&S[r.id].v)).length;
+  if(miss&&!confirm("ยังไม่ได้ตรวจ "+miss+" ข้อ · ส่งออกต่อไหม (ตัวรวมผลจะไม่ยอมรวมจนกว่าจะครบ)"))return;
+  const lines=["id,question,verdict,note"].concat(D.rows.map(r=>[r.id,r.q,(S[r.id]||{}).v||"",(S[r.id]||{}).n||""].map(cell).join(",")));
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob(["﻿"+lines.join("\n")+"\n"],{type:"text/csv"}));
+  a.download="review-"+((document.getElementById("rater").value||"rater").replace(/[^A-Za-z0-9_-]/g,"")||"rater")+".csv";a.click();
+}
+show();
+</script></body></html>
