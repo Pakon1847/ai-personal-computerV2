@@ -2140,6 +2140,19 @@ class ChatController(QObject):
             if status == "ready":
                 self._warm_up()
 
+    CLAUDE_LABEL = "[ข้อความนี้ Claude (cloud) ตอบโดยค้นเว็บ ไม่ใช่ความรู้ของ AI ในเครื่อง]\n"
+
+    @classmethod
+    def _for_local(cls, m: dict) -> dict:
+        """คำตอบของ Claude ในประวัติ → กำกับที่มาก่อนส่งให้ AI ในเครื่อง.
+
+        พบ 2026-10-05 บน Pi: ปิดสวิตช์ Claude แล้วถามข่าวซ้ำ · AI ในเครื่องอ้างว่าข่าวที่ Claude ค้นมา
+        "เป็นความรู้ ณ เวลาที่ฉันถูกฝึก" (H5) · เก็บในไฟล์แชทตามเดิม เปลี่ยนแค่สิ่งที่ส่ง
+        """
+        if m.get("by") == "claude":
+            return {**m, "content": cls.CLAUDE_LABEL + m["content"]}
+        return m
+
     def _cloud_ok(self) -> bool:
         """มี Claude ในบัญชีนี้ และผู้ใช้เปิดสวิตช์ไว้."""
         return self._cloud is not None and bool(self._claude_on())
@@ -2222,6 +2235,7 @@ class ChatController(QObject):
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
             messages, trimmed = client.fit_context(self._system(tools), self._conv["messages"])
+            messages = [self._for_local(m) for m in messages]
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""
         stream = self._stream = client.Stream(self._target, messages, tools=tools)
@@ -2285,7 +2299,10 @@ class ChatController(QObject):
         if getattr(reply, "cloud", False):
             note = self.CLOUD_NOTE
         if reply.text:
-            self._conv["messages"].append({"role": "assistant", "content": reply.text})
+            msg = {"role": "assistant", "content": reply.text}
+            if getattr(reply, "cloud", False):
+                msg["by"] = "claude"  # ส่งให้ AI ในเครื่องครั้งหน้าพร้อมป้ายที่มา (_for_local)
+            self._conv["messages"].append(msg)
         if not self._temporary:
             try:
                 self._store.save(self._conv)

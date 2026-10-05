@@ -461,6 +461,16 @@ class ControllerTest(ServerCase):
         c.send("ข่าวเด่นวันนี้มีอะไร", "")
         pump(lambda: len(done) > 1)
         self.assertEqual((done[1], asked), ("จาก Claude", ["ข่าวเด่นวันนี้มีอะไร"]))
+        # ปิดอีกครั้งแล้วถามต่อ: คำตอบของ Claude ในประวัติต้องมีป้ายที่มาเมื่อส่งให้ AI ในเครื่อง (พบ 2026-10-05)
+        on[0] = False
+        FakeLlama.seen.clear()
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: len(done) > 2)
+        real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1][-1]
+        sent = [m["content"] for m in real["messages"] if m["role"] == "assistant"]
+        self.assertIn(c.CLAUDE_LABEL + "จาก Claude", sent)
+        self.assertIn("ไม่รู้", sent)  # คำตอบของ AI ในเครื่องเองไม่มีป้าย
+        self.assertEqual(c._conv["messages"][-3]["content"], "จาก Claude")  # ไฟล์แชทเก็บข้อความเดิม
 
     def test_hybrid_offline_is_told(self):
         from aipc.cloud.ask import CloudReply
