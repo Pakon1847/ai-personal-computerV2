@@ -26,12 +26,16 @@ SRV=$!
 trap 'kill $SRV 2>/dev/null' EXIT
 for i in $(seq 1 60); do curl -sf http://127.0.0.1:$PORT/health >/dev/null && break; sleep 2; done
 BODY='{"messages":[{"role":"user","content":"อธิบายประวัติศาสตร์ของอาณาจักรสุโขทัยอย่างละเอียด"}],"max_tokens":512,"temperature":0.6,"chat_template_kwargs":{"enable_thinking":false}}'
-( while true; do curl -s -o /dev/null -H 'Content-Type: application/json' -d "$BODY" http://127.0.0.1:$PORT/v1/chat/completions; done ) &
+( while true; do curl -s --max-time 180 -o /dev/null -H 'Content-Type: application/json' -d "$BODY" http://127.0.0.1:$PORT/v1/chat/completions; done ) &
 LOAD=$!
 trap 'kill $LOAD $SRV 2>/dev/null' EXIT
 END=$(( $(date +%s) + SECS ))
 while [ "$(date +%s)" -lt "$END" ]; do sample load >> "$CSV"; sleep 5; done
-kill $LOAD; kill $SRV; wait 2>/dev/null
+# หยุดโหลด: ฆ่า curl ที่ค้างก่อน (ไม่งั้น llama-server รอคำขอนั้นจบ และ wait ค้าง · พบ 2026-10-05)
+pkill -P $LOAD 2>/dev/null; kill $LOAD 2>/dev/null
+kill $SRV 2>/dev/null
+for i in 1 2 3 4 5; do kill -0 $SRV 2>/dev/null || break; sleep 1; done
+kill -9 $SRV 2>/dev/null; wait $SRV 2>/dev/null
 for i in 1 2 3 4 5 6; do sleep 10; sample cool >> "$CSV"; done
 
 awk -F, 'NR>1 && $2=="idle"{print "เริ่ม (ว่าง): " $3 " °C · throttled " $5}
