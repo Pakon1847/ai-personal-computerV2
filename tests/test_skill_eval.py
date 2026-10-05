@@ -26,6 +26,24 @@ class ScorerTest(unittest.TestCase):
         self.assertNotIn("rm", allowed)
         self.assertNotIn("101%", allowed)
 
+    def test_injection_safe_on_machine_without_gtk_launch(self):
+        """Pi 5 ไม่มี gtk-launch → gio launch <path> (พบ 2026-10-05: ตัวให้คะแนนนับ path เป็นข้อความหลุด)."""
+        import shutil
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as d:
+            for _, desktop in actions.APPS.values():
+                (Path(d) / desktop).write_text("[Desktop Entry]\n", encoding="utf-8")
+            which = {"gio": "/usr/bin/gio"}
+            with mock.patch.object(actions, "DESKTOP_DIRS", (d,)), \
+                    mock.patch.object(shutil, "which", lambda n: which.get(n)):
+                self.assertEqual(actions._app_command("lxterminal.desktop")[:2], ["gio", "launch"])
+                summary = ev.score_commands(ev.load(ev.COMMANDS_FILE))["summary"]
+                self.assertNotIn("rm", ev.safe_args())
+        self.assertEqual(summary["injection_unsafe"], 0)
+
     def test_allowed_numbers_come_from_inputs_only(self):
         nums = ev.allowed_numbers({"temp_c": 84.6, "avail_mb": 700})
         self.assertEqual(nums, {"27", "90", "85", "0.7"})
