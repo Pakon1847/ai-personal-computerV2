@@ -106,6 +106,10 @@ def check_power(root: Path, run: Runner) -> Check:
     return Check("power", "ไฟเลี้ยง", PASS, detail)
 
 
+# พัดลมหมุนแล้วยังร้อนเกินนี้ = ระบายความร้อนไม่พอ · บนเครื่องเรา firmware ตั้งบิต soft temp limit ที่ 82.9 °C (soak 2026-10-01)
+HOT_C = 80.0
+
+
 def check_cooling(root: Path) -> Check:
     """หาพัดลมของ Pi 5 ผ่าน hwmon ชื่อ pwmfan.
 
@@ -123,6 +127,12 @@ def check_cooling(root: Path) -> Check:
         if _read(entry, "name") == "pwmfan":
             rpm = _read(entry, "fan1_input")
             if rpm and rpm.isdigit() and int(rpm) > 0:
+                if temp is not None and temp >= HOT_C:
+                    # Pi 5 ของเรา 2026-10-05: พัดลม 9,711 rpm แต่ 84.8 °C และถูกลดความเร็ว (0xe0008) ขณะ AI ตอบ
+                    return Check(
+                        "cooling", "ระบายความร้อน", WARN, f"พัดลม {rpm} rpm แต่ {temp_txt} (≥ {HOT_C:.0f} °C)",
+                        "ตรวจแผ่นระบายความร้อนของ Active Cooler (ลอกฟิล์มแล้วหรือยัง · กดแนบชิป) · ขาสปริงล็อกครบ · เคส/ช่องลม",
+                    )
                 return Check("cooling", "ระบายความร้อน", PASS, f"พัดลม {rpm} rpm · {temp_txt}")
             return Check(
                 "cooling",

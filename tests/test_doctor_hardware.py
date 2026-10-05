@@ -88,6 +88,17 @@ class HardwareTest(unittest.TestCase):
         self.m.write("/proc/mounts", "/dev/nvme0n1p2 / ext4 rw 0 0\n")
         self.assertIn("NVMe", hw.check_storage(self.m.root, self.m.root).detail)
 
+    def test_fan_spinning_but_hot_warns(self):
+        """Pi 5 2026-10-05: พัดลม 9,711 rpm แต่ 84.8 °C → เดิมขึ้นว่าผ่าน."""
+        self.m.write("/sys/class/hwmon/hwmon2/name", "pwmfan")
+        self.m.write("/sys/class/hwmon/hwmon2/fan1_input", "9711")
+        self.m.write("/sys/class/thermal/thermal_zone0/temp", "84800")
+        c = hw.check_cooling(self.m.root)
+        self.assertEqual(c.status, hw.WARN)
+        self.assertIn("แผ่นระบายความร้อน", c.fix)
+        self.m.write("/sys/class/thermal/thermal_zone0/temp", "62000")
+        self.assertEqual(hw.check_cooling(self.m.root).status, hw.PASS)
+
     def test_memory_cgroup(self):
         """audit 2026-09-30 hw-os-1 · Pi 5 จริง: cmdline มี cgroup_disable=memory → MemoryMax ของ aipc-llm ไม่มีผล."""
         self.m.write("/sys/fs/cgroup/cgroup.controllers", "cpuset cpu io pids\n")
