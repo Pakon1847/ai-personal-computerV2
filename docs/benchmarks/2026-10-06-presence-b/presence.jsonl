@@ -1,0 +1,1380 @@
+{"meta": {"capture": [640, 480], "fps": 2.0, "id_every_s": 2.0, "detect_side": 320, "threshold": 0.363, "start": "2026-10-06T23:00:41"}}
+{"t": 0.42, "faces": 1, "score": 0.904, "w": 126, "cpu": 0.87, "temp": 60.05}
+{"t": 0.51, "faces": 1, "score": 0.906, "w": 127, "cpu": 0.98, "temp": 61.7}
+{"t": 1.0, "faces": 1, "score": 0.903, "w": 127, "cpu": 1.08, "temp": 61.15}
+{"t": 1.5, "faces": 1, "score": 0.905, "w": 126, "cpu": 1.18, "temp": 62.25}
+{"t": 2.0, "faces": 1, "score": 0.905, "w": 125, "cpu": 1.27, "temp": 61.7}
+{"t": 2.5, "faces": 1, "score": 0.914, "w": 130, "cpu": 1.37, "temp": 61.7}
+{"t": 3.0, "faces": 1, "score": 0.911, "w": 130, "cpu": 1.46, "temp": 61.7}
+{"t": 3.5, "faces": 1, "score": 0.909, "w": 128, "cpu": 1.57, "temp": 61.15}
+{"t": 4.0, "faces": 1, "score": 0.914, "w": 131, "cpu": 1.7, "temp": 60.6}
+{"t": 4.5, "faces": 1, "score": 0.912, "w": 128, "cpu": 1.83, "temp": 60.05}
+{"t": 5.0, "faces": 1, "score": 0.911, "w": 128, "cpu": 1.97, "temp": 60.6}
+{"t": 5.5, "faces": 1, "score": 0.908, "w": 130, "cpu": 2.1, "temp": 60.05}
+{"t": 6.0, "faces": 1, "score": 0.907, "w": 127, "cpu": 2.23, "temp": 60.05}
+{"t": 6.5, "faces": 1, "score": 0.906, "w": 126, "cpu": 2.36, "temp": 61.15}
+{"t": 7.0, "faces": 1, "score": 0.91, "w": 125, "cpu": 2.46, "temp": 62.25}
+{"t": 7.5, "faces": 1, "score": 0.907, "w": 124, "cpu": 2.56, "temp": 60.6}
+{"t": 8.0, "faces": 1, "score": 0.907, "w": 127, "cpu": 2.65, "temp": 62.25}
+{"t": 8.5, "faces": 1, "score": 0.91, "w": 123, "cpu": 2.75, "temp": 62.8}
+{"t": 9.0, "faces": 1, "score": 0.91, "w": 122, "cpu": 2.84, "temp": 62.8}
+{"t": 9.5, "faces": 1, "score": 0.909, "w": 123, "cpu": 2.94, "temp": 62.8}
+{"t": 10.0, "faces": 1, "score": 0.909, "w": 125, "cpu": 3.04, "temp": 62.8}
+{"t": 10.5, "faces": 1, "score": 0.91, "w": 122, "cpu": 3.14, "temp": 61.7}
+{"t": 11.0, "faces": 1, "score": 0.888, "w": 119, "cpu": 3.23, "temp": 62.25}
+{"t": 11.5, "faces": 1, "score": 0.914, "w": 95, "cpu": 3.33, "temp": 61.15}
+{"t": 12.0, "faces": 1, "score": 0.906, "w": 82, "cpu": 3.47, "temp": 61.15}
+{"t": 12.5, "faces": 1, "score": 0.91, "w": 84, "cpu": 3.61, "temp": 61.15}
+{"t": 13.0, "faces": 1, "score": 0.922, "w": 105, "cpu": 3.74, "temp": 60.6}
+{"t": 13.5, "faces": 1, "score": 0.927, "w": 130, "cpu": 3.88, "temp": 59.5}
+{"t": 14.0, "faces": 1, "score": 0.933, "w": 133, "cpu": 4.02, "temp": 60.6}
+{"t": 14.5, "faces": 1, "score": 0.935, "w": 130, "cpu": 4.15, "temp": 60.6}
+{"t": 15.0, "enrolled": 29}
+{"t": 15.0, "faces": 1, "score": 0.933, "w": 123, "cpu": 4.28, "temp": 60.6}
+{"t": 15.5, "faces": 1, "score": 0.91, "w": 125, "cpu": 4.42, "temp": 59.5, "owner_sim": 0.689}
+{"t": 16.0, "faces": 1, "score": 0.919, "w": 120, "cpu": 4.56, "temp": 59.5}
+{"t": 16.5, "faces": 1, "score": 0.919, "w": 125, "cpu": 4.59, "temp": 60.05}
+{"t": 17.0, "faces": 1, "score": 0.917, "w": 122, "cpu": 4.62, "temp": 60.05}
+{"t": 17.5, "faces": 1, "score": 0.916, "w": 123, "cpu": 4.66, "temp": 59.5, "owner_sim": 0.932}
+{"t": 18.0, "faces": 1, "score": 0.908, "w": 113, "cpu": 4.79, "temp": 59.5}
+{"t": 18.5, "faces": 1, "score": 0.931, "w": 113, "cpu": 4.83, "temp": 59.5}
+{"t": 19.0, "faces": 1, "score": 0.927, "w": 109, "cpu": 4.86, "temp": 59.5}
+{"t": 19.5, "faces": 1, "score": 0.926, "w": 108, "cpu": 4.89, "temp": 58.95, "owner_sim": 0.667}
+{"t": 20.0, "faces": 1, "score": 0.932, "w": 109, "cpu": 5.03, "temp": 60.05}
+{"t": 20.5, "faces": 1, "score": 0.929, "w": 109, "cpu": 5.06, "temp": 60.05}
+{"t": 21.0, "faces": 1, "score": 0.927, "w": 110, "cpu": 5.09, "temp": 58.95}
+{"t": 21.5, "faces": 1, "score": 0.925, "w": 110, "cpu": 5.13, "temp": 58.95, "owner_sim": 0.687}
+{"t": 22.0, "faces": 1, "score": 0.927, "w": 106, "cpu": 5.26, "temp": 59.5}
+{"t": 22.5, "faces": 1, "score": 0.927, "w": 107, "cpu": 5.29, "temp": 59.5}
+{"t": 23.0, "faces": 1, "score": 0.929, "w": 108, "cpu": 5.33, "temp": 58.95}
+{"t": 23.5, "faces": 1, "score": 0.929, "w": 108, "cpu": 5.36, "temp": 59.5, "owner_sim": 0.693}
+{"t": 24.0, "faces": 1, "score": 0.935, "w": 106, "cpu": 5.5, "temp": 58.95}
+{"t": 24.5, "faces": 1, "score": 0.931, "w": 107, "cpu": 5.53, "temp": 58.4}
+{"t": 25.0, "faces": 1, "score": 0.931, "w": 108, "cpu": 5.56, "temp": 58.4}
+{"t": 25.5, "faces": 1, "score": 0.929, "w": 108, "cpu": 5.6, "temp": 58.95, "owner_sim": 0.684}
+{"t": 26.0, "faces": 1, "score": 0.928, "w": 108, "cpu": 5.73, "temp": 58.95}
+{"t": 26.5, "faces": 1, "score": 0.928, "w": 108, "cpu": 5.77, "temp": 59.5}
+{"t": 27.0, "faces": 1, "score": 0.929, "w": 107, "cpu": 5.8, "temp": 58.95}
+{"t": 27.5, "faces": 1, "score": 0.929, "w": 107, "cpu": 5.83, "temp": 58.4, "owner_sim": 0.689}
+{"t": 28.0, "faces": 1, "score": 0.932, "w": 107, "cpu": 5.97, "temp": 57.85}
+{"t": 28.5, "faces": 1, "score": 0.93, "w": 107, "cpu": 6.0, "temp": 58.95}
+{"t": 29.0, "faces": 1, "score": 0.929, "w": 107, "cpu": 6.03, "temp": 58.95}
+{"t": 29.5, "faces": 1, "score": 0.933, "w": 108, "cpu": 6.07, "temp": 60.05, "owner_sim": 0.657}
+{"t": 30.0, "faces": 1, "score": 0.927, "w": 108, "cpu": 6.2, "temp": 58.4}
+{"t": 30.5, "faces": 1, "score": 0.925, "w": 109, "cpu": 6.24, "temp": 58.95}
+{"t": 31.0, "faces": 1, "score": 0.927, "w": 111, "cpu": 6.27, "temp": 57.3}
+{"t": 31.5, "faces": 1, "score": 0.927, "w": 111, "cpu": 6.3, "temp": 57.85, "owner_sim": 0.692}
+{"t": 32.0, "faces": 1, "score": 0.928, "w": 111, "cpu": 6.43, "temp": 58.95}
+{"t": 32.5, "faces": 1, "score": 0.926, "w": 111, "cpu": 6.47, "temp": 58.4}
+{"t": 33.0, "faces": 1, "score": 0.927, "w": 108, "cpu": 6.5, "temp": 58.4}
+{"t": 33.5, "faces": 1, "score": 0.926, "w": 108, "cpu": 6.53, "temp": 58.4, "owner_sim": 0.705}
+{"t": 34.0, "faces": 1, "score": 0.927, "w": 111, "cpu": 6.67, "temp": 58.4}
+{"t": 34.5, "faces": 1, "score": 0.927, "w": 111, "cpu": 6.7, "temp": 58.95}
+{"t": 35.0, "faces": 1, "score": 0.925, "w": 111, "cpu": 6.74, "temp": 58.4}
+{"t": 35.5, "faces": 1, "score": 0.924, "w": 110, "cpu": 6.77, "temp": 58.95, "owner_sim": 0.7}
+{"t": 36.0, "faces": 1, "score": 0.922, "w": 110, "cpu": 6.9, "temp": 58.95}
+{"t": 36.5, "faces": 1, "score": 0.925, "w": 116, "cpu": 6.94, "temp": 58.95}
+{"t": 37.0, "faces": 1, "score": 0.922, "w": 120, "cpu": 6.97, "temp": 57.85}
+{"t": 37.5, "faces": 1, "score": 0.916, "w": 126, "cpu": 7.0, "temp": 57.85, "owner_sim": 0.851}
+{"t": 38.0, "faces": 1, "score": 0.917, "w": 130, "cpu": 7.14, "temp": 57.85}
+{"t": 38.5, "faces": 1, "score": 0.915, "w": 132, "cpu": 7.17, "temp": 58.95}
+{"t": 39.0, "faces": 1, "score": 0.919, "w": 128, "cpu": 7.2, "temp": 57.85}
+{"t": 39.5, "faces": 1, "score": 0.921, "w": 129, "cpu": 7.24, "temp": 57.3, "owner_sim": 0.869}
+{"t": 40.0, "faces": 1, "score": 0.919, "w": 126, "cpu": 7.37, "temp": 57.85}
+{"t": 40.5, "faces": 1, "score": 0.918, "w": 126, "cpu": 7.4, "temp": 56.75}
+{"t": 41.0, "faces": 1, "score": 0.914, "w": 126, "cpu": 7.44, "temp": 57.85}
+{"t": 41.5, "faces": 1, "score": 0.915, "w": 127, "cpu": 7.47, "temp": 58.95, "owner_sim": 0.873}
+{"t": 42.0, "faces": 1, "score": 0.916, "w": 126, "cpu": 7.61, "temp": 58.95}
+{"t": 42.5, "faces": 1, "score": 0.916, "w": 123, "cpu": 7.64, "temp": 57.85}
+{"t": 43.0, "faces": 1, "score": 0.917, "w": 125, "cpu": 7.67, "temp": 57.85}
+{"t": 43.5, "faces": 1, "score": 0.92, "w": 120, "cpu": 7.71, "temp": 57.85, "owner_sim": 0.797}
+{"t": 44.0, "faces": 1, "score": 0.918, "w": 117, "cpu": 7.84, "temp": 56.75}
+{"t": 44.5, "faces": 1, "score": 0.918, "w": 119, "cpu": 7.87, "temp": 58.4}
+{"t": 45.0, "faces": 1, "score": 0.912, "w": 136, "cpu": 7.91, "temp": 57.85}
+{"t": 45.5, "faces": 1, "score": 0.909, "w": 140, "cpu": 7.94, "temp": 57.85, "owner_sim": 0.721}
+{"t": 46.0, "faces": 1, "score": 0.917, "w": 144, "cpu": 8.08, "temp": 57.85}
+{"t": 46.5, "faces": 1, "score": 0.921, "w": 140, "cpu": 8.11, "temp": 58.4}
+{"t": 47.0, "faces": 1, "score": 0.903, "w": 126, "cpu": 8.14, "temp": 57.3}
+{"t": 47.5, "faces": 1, "score": 0.913, "w": 111, "cpu": 8.18, "temp": 58.4, "owner_sim": 0.565}
+{"t": 48.0, "faces": 1, "score": 0.908, "w": 103, "cpu": 8.31, "temp": 57.3}
+{"t": 48.5, "faces": 1, "score": 0.893, "w": 74, "cpu": 8.35, "temp": 57.85}
+{"t": 49.0, "faces": 1, "score": 0.919, "w": 85, "cpu": 8.38, "temp": 58.4}
+{"t": 49.5, "faces": 1, "score": 0.912, "w": 89, "cpu": 8.41, "temp": 56.75, "owner_sim": 0.706}
+{"t": 50.0, "faces": 1, "score": 0.927, "w": 92, "cpu": 8.55, "temp": 57.85}
+{"t": 50.5, "faces": 1, "score": 0.919, "w": 99, "cpu": 8.58, "temp": 57.85}
+{"t": 51.0, "faces": 1, "score": 0.891, "w": 106, "cpu": 8.61, "temp": 57.3}
+{"t": 51.5, "faces": 1, "score": 0.817, "w": 88, "cpu": 8.65, "temp": 57.3, "owner_sim": 0.306}
+{"t": 52.0, "faces": 1, "score": 0.836, "w": 107, "cpu": 8.78, "temp": 57.3}
+{"t": 52.5, "faces": 1, "score": 0.875, "w": 139, "cpu": 8.81, "temp": 57.3}
+{"t": 53.0, "faces": 1, "score": 0.806, "w": 117, "cpu": 8.85, "temp": 57.85}
+{"t": 53.5, "faces": 1, "score": 0.919, "w": 88, "cpu": 8.88, "temp": 57.85, "owner_sim": 0.546}
+{"t": 54.0, "faces": 1, "score": 0.897, "w": 64, "cpu": 9.02, "temp": 57.3}
+{"t": 54.5, "faces": 0, "score": null, "w": null, "cpu": 9.05, "temp": 57.85}
+{"t": 55.0, "faces": 0, "score": null, "w": null, "cpu": 9.08, "temp": 57.85}
+{"t": 55.5, "faces": 0, "score": null, "w": null, "cpu": 9.11, "temp": 57.85}
+{"t": 56.0, "faces": 0, "score": null, "w": null, "cpu": 9.14, "temp": 57.3}
+{"t": 56.5, "faces": 0, "score": null, "w": null, "cpu": 9.18, "temp": 56.75}
+{"t": 57.0, "faces": 0, "score": null, "w": null, "cpu": 9.21, "temp": 58.95}
+{"t": 57.5, "faces": 0, "score": null, "w": null, "cpu": 9.24, "temp": 57.85}
+{"t": 58.0, "faces": 0, "score": null, "w": null, "cpu": 9.27, "temp": 56.75}
+{"t": 58.5, "faces": 0, "score": null, "w": null, "cpu": 9.31, "temp": 58.4}
+{"t": 59.0, "faces": 0, "score": null, "w": null, "cpu": 9.34, "temp": 57.3}
+{"t": 59.5, "faces": 0, "score": null, "w": null, "cpu": 9.38, "temp": 57.3}
+{"t": 60.0, "faces": 0, "score": null, "w": null, "cpu": 9.41, "temp": 56.75}
+{"t": 60.5, "faces": 0, "score": null, "w": null, "cpu": 9.44, "temp": 57.3}
+{"t": 61.0, "faces": 0, "score": null, "w": null, "cpu": 9.47, "temp": 56.75}
+{"t": 61.5, "faces": 0, "score": null, "w": null, "cpu": 9.51, "temp": 57.3}
+{"t": 62.0, "faces": 0, "score": null, "w": null, "cpu": 9.54, "temp": 57.3}
+{"t": 62.5, "faces": 0, "score": null, "w": null, "cpu": 9.57, "temp": 57.3}
+{"t": 63.0, "faces": 0, "score": null, "w": null, "cpu": 9.61, "temp": 57.3}
+{"t": 63.5, "faces": 0, "score": null, "w": null, "cpu": 9.64, "temp": 57.85}
+{"t": 64.0, "faces": 0, "score": null, "w": null, "cpu": 9.67, "temp": 57.3}
+{"t": 64.5, "faces": 0, "score": null, "w": null, "cpu": 9.7, "temp": 55.65}
+{"t": 65.0, "faces": 0, "score": null, "w": null, "cpu": 9.74, "temp": 57.3}
+{"t": 65.5, "faces": 0, "score": null, "w": null, "cpu": 9.77, "temp": 57.3}
+{"t": 66.0, "faces": 0, "score": null, "w": null, "cpu": 9.8, "temp": 56.75}
+{"t": 66.5, "faces": 0, "score": null, "w": null, "cpu": 9.83, "temp": 57.3}
+{"t": 67.0, "faces": 0, "score": null, "w": null, "cpu": 9.87, "temp": 56.75}
+{"t": 67.5, "faces": 0, "score": null, "w": null, "cpu": 9.9, "temp": 56.75}
+{"t": 68.0, "faces": 0, "score": null, "w": null, "cpu": 9.93, "temp": 57.3}
+{"t": 68.5, "faces": 0, "score": null, "w": null, "cpu": 9.96, "temp": 57.3}
+{"t": 69.0, "faces": 0, "score": null, "w": null, "cpu": 10.0, "temp": 56.75}
+{"t": 69.5, "faces": 0, "score": null, "w": null, "cpu": 10.03, "temp": 56.75}
+{"t": 70.0, "faces": 0, "score": null, "w": null, "cpu": 10.06, "temp": 57.85}
+{"t": 70.5, "faces": 0, "score": null, "w": null, "cpu": 10.09, "temp": 56.2}
+{"t": 71.0, "faces": 0, "score": null, "w": null, "cpu": 10.13, "temp": 57.3}
+{"t": 71.5, "faces": 0, "score": null, "w": null, "cpu": 10.16, "temp": 57.3}
+{"t": 72.0, "faces": 0, "score": null, "w": null, "cpu": 10.19, "temp": 55.65}
+{"t": 72.5, "faces": 0, "score": null, "w": null, "cpu": 10.22, "temp": 57.3}
+{"t": 73.0, "faces": 0, "score": null, "w": null, "cpu": 10.26, "temp": 56.75}
+{"t": 73.5, "faces": 0, "score": null, "w": null, "cpu": 10.29, "temp": 57.3}
+{"t": 74.0, "faces": 0, "score": null, "w": null, "cpu": 10.32, "temp": 57.85}
+{"t": 74.5, "faces": 0, "score": null, "w": null, "cpu": 10.36, "temp": 56.75}
+{"t": 75.0, "faces": 0, "score": null, "w": null, "cpu": 10.39, "temp": 56.75}
+{"t": 75.5, "faces": 0, "score": null, "w": null, "cpu": 10.42, "temp": 56.2}
+{"t": 76.0, "faces": 0, "score": null, "w": null, "cpu": 10.45, "temp": 57.3}
+{"t": 76.5, "faces": 0, "score": null, "w": null, "cpu": 10.49, "temp": 56.75}
+{"t": 77.0, "faces": 0, "score": null, "w": null, "cpu": 10.52, "temp": 56.75}
+{"t": 77.5, "faces": 0, "score": null, "w": null, "cpu": 10.55, "temp": 56.75}
+{"t": 78.0, "faces": 0, "score": null, "w": null, "cpu": 10.59, "temp": 57.3}
+{"t": 78.5, "faces": 0, "score": null, "w": null, "cpu": 10.62, "temp": 57.3}
+{"t": 79.0, "faces": 0, "score": null, "w": null, "cpu": 10.65, "temp": 56.2}
+{"t": 79.5, "faces": 0, "score": null, "w": null, "cpu": 10.68, "temp": 56.2}
+{"t": 80.0, "faces": 0, "score": null, "w": null, "cpu": 10.72, "temp": 56.75}
+{"t": 80.5, "faces": 0, "score": null, "w": null, "cpu": 10.75, "temp": 56.2}
+{"t": 81.0, "faces": 0, "score": null, "w": null, "cpu": 10.78, "temp": 56.75}
+{"t": 81.5, "faces": 0, "score": null, "w": null, "cpu": 10.81, "temp": 56.2}
+{"t": 82.0, "faces": 0, "score": null, "w": null, "cpu": 10.85, "temp": 56.75}
+{"t": 82.5, "faces": 1, "score": 0.852, "w": 110, "cpu": 10.88, "temp": 57.3, "owner_sim": 0.211}
+{"t": 83.0, "faces": 1, "score": 0.881, "w": 129, "cpu": 11.01, "temp": 56.75}
+{"t": 83.5, "faces": 1, "score": 0.893, "w": 127, "cpu": 11.05, "temp": 56.2}
+{"t": 84.0, "faces": 1, "score": 0.927, "w": 76, "cpu": 11.08, "temp": 56.2}
+{"t": 84.5, "faces": 1, "score": 0.873, "w": 68, "cpu": 11.11, "temp": 56.75, "owner_sim": 0.418}
+{"t": 85.0, "faces": 1, "score": 0.914, "w": 71, "cpu": 11.25, "temp": 56.2}
+{"t": 85.5, "faces": 1, "score": 0.9, "w": 68, "cpu": 11.28, "temp": 56.2}
+{"t": 86.0, "faces": 1, "score": 0.916, "w": 68, "cpu": 11.32, "temp": 58.4}
+{"t": 86.5, "faces": 1, "score": 0.918, "w": 77, "cpu": 11.35, "temp": 57.3, "owner_sim": 0.648}
+{"t": 87.0, "faces": 1, "score": 0.915, "w": 109, "cpu": 11.48, "temp": 56.75}
+{"t": 87.5, "faces": 1, "score": 0.913, "w": 116, "cpu": 11.52, "temp": 57.3}
+{"t": 88.0, "faces": 1, "score": 0.914, "w": 121, "cpu": 11.55, "temp": 56.75}
+{"t": 88.5, "faces": 1, "score": 0.905, "w": 135, "cpu": 11.58, "temp": 56.75, "owner_sim": 0.722}
+{"t": 89.0, "faces": 1, "score": 0.902, "w": 139, "cpu": 11.72, "temp": 56.75}
+{"t": 89.5, "faces": 1, "score": 0.91, "w": 138, "cpu": 11.75, "temp": 56.2}
+{"t": 90.0, "faces": 1, "score": 0.914, "w": 140, "cpu": 11.79, "temp": 56.75}
+{"t": 90.5, "faces": 1, "score": 0.908, "w": 137, "cpu": 11.82, "temp": 56.75, "owner_sim": 0.816}
+{"t": 91.0, "faces": 1, "score": 0.91, "w": 146, "cpu": 11.95, "temp": 57.85}
+{"t": 91.5, "faces": 1, "score": 0.91, "w": 135, "cpu": 11.99, "temp": 56.75}
+{"t": 92.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 12.02, "temp": 56.75}
+{"t": 92.5, "faces": 1, "score": 0.936, "w": 102, "cpu": 12.05, "temp": 56.75, "owner_sim": 0.754}
+{"t": 93.0, "faces": 1, "score": 0.927, "w": 99, "cpu": 12.19, "temp": 57.3}
+{"t": 93.5, "faces": 1, "score": 0.928, "w": 104, "cpu": 12.22, "temp": 56.75}
+{"t": 94.0, "faces": 1, "score": 0.922, "w": 115, "cpu": 12.25, "temp": 56.2}
+{"t": 94.5, "faces": 1, "score": 0.924, "w": 122, "cpu": 12.29, "temp": 56.2, "owner_sim": 0.678}
+{"t": 95.0, "faces": 1, "score": 0.926, "w": 111, "cpu": 12.42, "temp": 57.3}
+{"t": 95.5, "faces": 1, "score": 0.929, "w": 107, "cpu": 12.44, "temp": 57.85}
+{"t": 96.0, "faces": 1, "score": 0.931, "w": 107, "cpu": 12.47, "temp": 58.95}
+{"t": 96.5, "faces": 1, "score": 0.932, "w": 106, "cpu": 12.49, "temp": 57.85, "owner_sim": 0.734}
+{"t": 97.0, "faces": 1, "score": 0.934, "w": 112, "cpu": 12.59, "temp": 57.3}
+{"t": 97.5, "faces": 1, "score": 0.936, "w": 110, "cpu": 12.61, "temp": 57.85}
+{"t": 98.0, "faces": 1, "score": 0.931, "w": 109, "cpu": 12.64, "temp": 57.85}
+{"t": 98.5, "faces": 1, "score": 0.932, "w": 109, "cpu": 12.66, "temp": 58.95, "owner_sim": 0.678}
+{"t": 99.0, "faces": 1, "score": 0.937, "w": 108, "cpu": 12.76, "temp": 58.95}
+{"t": 99.5, "faces": 1, "score": 0.926, "w": 107, "cpu": 12.78, "temp": 60.05}
+{"t": 100.0, "faces": 1, "score": 0.93, "w": 110, "cpu": 12.81, "temp": 57.85}
+{"t": 100.5, "faces": 1, "score": 0.932, "w": 115, "cpu": 12.85, "temp": 58.95, "owner_sim": 0.687}
+{"t": 101.0, "faces": 1, "score": 0.93, "w": 110, "cpu": 12.98, "temp": 58.4}
+{"t": 101.5, "faces": 1, "score": 0.931, "w": 109, "cpu": 13.01, "temp": 58.4}
+{"t": 102.0, "faces": 1, "score": 0.93, "w": 111, "cpu": 13.05, "temp": 57.85}
+{"t": 102.5, "faces": 1, "score": 0.922, "w": 114, "cpu": 13.08, "temp": 57.85, "owner_sim": 0.774}
+{"t": 103.0, "faces": 1, "score": 0.926, "w": 107, "cpu": 13.22, "temp": 57.85}
+{"t": 103.5, "faces": 1, "score": 0.924, "w": 106, "cpu": 13.25, "temp": 58.4}
+{"t": 104.0, "faces": 1, "score": 0.915, "w": 110, "cpu": 13.28, "temp": 57.3}
+{"t": 104.5, "faces": 1, "score": 0.912, "w": 114, "cpu": 13.32, "temp": 57.85, "owner_sim": 0.812}
+{"t": 105.0, "faces": 1, "score": 0.901, "w": 134, "cpu": 13.45, "temp": 57.3}
+{"t": 105.5, "faces": 1, "score": 0.904, "w": 130, "cpu": 13.48, "temp": 57.3}
+{"t": 106.0, "faces": 1, "score": 0.908, "w": 125, "cpu": 13.52, "temp": 57.85}
+{"t": 106.5, "faces": 1, "score": 0.903, "w": 121, "cpu": 13.55, "temp": 57.85, "owner_sim": 0.789}
+{"t": 107.0, "faces": 1, "score": 0.907, "w": 122, "cpu": 13.69, "temp": 58.4}
+{"t": 107.5, "faces": 1, "score": 0.909, "w": 121, "cpu": 13.72, "temp": 58.4}
+{"t": 108.0, "faces": 1, "score": 0.906, "w": 122, "cpu": 13.75, "temp": 57.3}
+{"t": 108.5, "faces": 1, "score": 0.901, "w": 122, "cpu": 13.79, "temp": 56.75, "owner_sim": 0.788}
+{"t": 109.0, "faces": 1, "score": 0.902, "w": 122, "cpu": 13.92, "temp": 56.75}
+{"t": 109.5, "faces": 1, "score": 0.9, "w": 122, "cpu": 13.95, "temp": 57.3}
+{"t": 110.0, "faces": 1, "score": 0.901, "w": 122, "cpu": 13.99, "temp": 57.85}
+{"t": 110.5, "faces": 1, "score": 0.903, "w": 127, "cpu": 14.02, "temp": 56.75, "owner_sim": 0.636}
+{"t": 111.0, "faces": 1, "score": 0.9, "w": 124, "cpu": 14.15, "temp": 57.3}
+{"t": 111.5, "faces": 1, "score": 0.896, "w": 122, "cpu": 14.18, "temp": 56.75}
+{"t": 112.0, "faces": 1, "score": 0.894, "w": 122, "cpu": 14.22, "temp": 57.85}
+{"t": 112.5, "faces": 1, "score": 0.908, "w": 130, "cpu": 14.25, "temp": 57.3, "owner_sim": 0.89}
+{"t": 113.0, "faces": 1, "score": 0.911, "w": 129, "cpu": 14.39, "temp": 57.85}
+{"t": 113.5, "faces": 1, "score": 0.91, "w": 127, "cpu": 14.42, "temp": 57.3}
+{"t": 114.0, "faces": 1, "score": 0.913, "w": 128, "cpu": 14.45, "temp": 57.3}
+{"t": 114.5, "faces": 1, "score": 0.906, "w": 129, "cpu": 14.48, "temp": 57.85, "owner_sim": 0.75}
+{"t": 115.0, "faces": 1, "score": 0.91, "w": 126, "cpu": 14.62, "temp": 55.65}
+{"t": 115.5, "faces": 1, "score": 0.908, "w": 126, "cpu": 14.65, "temp": 57.85}
+{"t": 116.0, "faces": 1, "score": 0.911, "w": 129, "cpu": 14.69, "temp": 57.85}
+{"t": 116.5, "faces": 1, "score": 0.913, "w": 128, "cpu": 14.72, "temp": 57.3, "owner_sim": 0.85}
+{"t": 117.0, "faces": 1, "score": 0.905, "w": 125, "cpu": 14.85, "temp": 57.3}
+{"t": 117.5, "faces": 1, "score": 0.905, "w": 121, "cpu": 14.89, "temp": 56.75}
+{"t": 118.0, "faces": 1, "score": 0.908, "w": 123, "cpu": 14.92, "temp": 56.2}
+{"t": 118.5, "faces": 1, "score": 0.916, "w": 122, "cpu": 14.95, "temp": 56.75, "owner_sim": 0.578}
+{"t": 119.0, "faces": 1, "score": 0.93, "w": 116, "cpu": 15.09, "temp": 57.3}
+{"t": 119.5, "faces": 1, "score": 0.933, "w": 118, "cpu": 15.12, "temp": 56.75}
+{"t": 120.0, "faces": 1, "score": 0.934, "w": 121, "cpu": 15.15, "temp": 56.75}
+{"t": 120.5, "faces": 1, "score": 0.935, "w": 121, "cpu": 15.19, "temp": 56.75, "owner_sim": 0.754}
+{"t": 121.0, "faces": 1, "score": 0.923, "w": 122, "cpu": 15.32, "temp": 57.3}
+{"t": 121.5, "faces": 1, "score": 0.927, "w": 127, "cpu": 15.35, "temp": 57.3}
+{"t": 122.0, "faces": 1, "score": 0.927, "w": 130, "cpu": 15.39, "temp": 57.3}
+{"t": 122.5, "faces": 1, "score": 0.925, "w": 124, "cpu": 15.42, "temp": 56.75, "owner_sim": 0.805}
+{"t": 123.0, "faces": 1, "score": 0.925, "w": 125, "cpu": 15.55, "temp": 57.3}
+{"t": 123.5, "faces": 1, "score": 0.935, "w": 123, "cpu": 15.58, "temp": 56.75}
+{"t": 124.0, "faces": 1, "score": 0.925, "w": 123, "cpu": 15.62, "temp": 57.3}
+{"t": 124.5, "faces": 1, "score": 0.93, "w": 123, "cpu": 15.65, "temp": 56.75, "owner_sim": 0.803}
+{"t": 125.0, "faces": 1, "score": 0.927, "w": 119, "cpu": 15.78, "temp": 56.75}
+{"t": 125.5, "faces": 1, "score": 0.928, "w": 118, "cpu": 15.82, "temp": 57.3}
+{"t": 126.0, "faces": 1, "score": 0.929, "w": 117, "cpu": 15.85, "temp": 57.85}
+{"t": 126.5, "faces": 1, "score": 0.932, "w": 117, "cpu": 15.88, "temp": 57.85, "owner_sim": 0.853}
+{"t": 127.0, "faces": 1, "score": 0.931, "w": 118, "cpu": 16.02, "temp": 57.3}
+{"t": 127.5, "faces": 1, "score": 0.917, "w": 122, "cpu": 16.05, "temp": 58.4}
+{"t": 128.0, "faces": 1, "score": 0.915, "w": 120, "cpu": 16.08, "temp": 57.85}
+{"t": 128.5, "faces": 1, "score": 0.913, "w": 120, "cpu": 16.12, "temp": 57.85, "owner_sim": 0.85}
+{"t": 129.0, "faces": 1, "score": 0.914, "w": 120, "cpu": 16.25, "temp": 56.75}
+{"t": 129.5, "faces": 1, "score": 0.915, "w": 121, "cpu": 16.29, "temp": 57.3}
+{"t": 130.0, "faces": 1, "score": 0.913, "w": 120, "cpu": 16.32, "temp": 56.75}
+{"t": 130.5, "faces": 1, "score": 0.931, "w": 122, "cpu": 16.35, "temp": 57.3, "owner_sim": 0.825}
+{"t": 131.0, "faces": 1, "score": 0.929, "w": 121, "cpu": 16.48, "temp": 57.3}
+{"t": 131.5, "faces": 1, "score": 0.93, "w": 120, "cpu": 16.52, "temp": 57.3}
+{"t": 132.0, "faces": 1, "score": 0.928, "w": 120, "cpu": 16.55, "temp": 57.3}
+{"t": 132.5, "faces": 1, "score": 0.931, "w": 120, "cpu": 16.58, "temp": 56.75, "owner_sim": 0.823}
+{"t": 133.0, "faces": 1, "score": 0.932, "w": 121, "cpu": 16.72, "temp": 57.85}
+{"t": 133.5, "faces": 1, "score": 0.916, "w": 121, "cpu": 16.75, "temp": 56.75}
+{"t": 134.0, "faces": 1, "score": 0.917, "w": 121, "cpu": 16.79, "temp": 57.3}
+{"t": 134.5, "faces": 1, "score": 0.916, "w": 122, "cpu": 16.82, "temp": 56.75, "owner_sim": 0.818}
+{"t": 135.0, "faces": 1, "score": 0.916, "w": 121, "cpu": 16.96, "temp": 56.75}
+{"t": 135.5, "faces": 1, "score": 0.916, "w": 120, "cpu": 16.99, "temp": 57.85}
+{"t": 136.0, "faces": 1, "score": 0.916, "w": 120, "cpu": 17.02, "temp": 57.3}
+{"t": 136.5, "faces": 1, "score": 0.917, "w": 120, "cpu": 17.05, "temp": 57.85, "owner_sim": 0.819}
+{"t": 137.0, "faces": 1, "score": 0.916, "w": 120, "cpu": 17.19, "temp": 55.65}
+{"t": 137.5, "faces": 1, "score": 0.914, "w": 120, "cpu": 17.22, "temp": 56.75}
+{"t": 138.0, "faces": 1, "score": 0.917, "w": 119, "cpu": 17.26, "temp": 56.75}
+{"t": 138.5, "faces": 1, "score": 0.917, "w": 120, "cpu": 17.29, "temp": 57.3, "owner_sim": 0.852}
+{"t": 139.0, "faces": 1, "score": 0.916, "w": 119, "cpu": 17.43, "temp": 57.3}
+{"t": 139.5, "faces": 1, "score": 0.916, "w": 118, "cpu": 17.46, "temp": 57.3}
+{"t": 140.0, "faces": 1, "score": 0.918, "w": 120, "cpu": 17.49, "temp": 57.85}
+{"t": 140.5, "faces": 1, "score": 0.934, "w": 123, "cpu": 17.53, "temp": 57.3, "owner_sim": 0.789}
+{"t": 141.0, "faces": 1, "score": 0.93, "w": 132, "cpu": 17.66, "temp": 56.2}
+{"t": 141.5, "faces": 1, "score": 0.919, "w": 125, "cpu": 17.69, "temp": 57.3}
+{"t": 142.0, "faces": 1, "score": 0.924, "w": 128, "cpu": 17.72, "temp": 56.2}
+{"t": 142.5, "faces": 1, "score": 0.927, "w": 126, "cpu": 17.76, "temp": 56.75, "owner_sim": 0.854}
+{"t": 143.0, "faces": 1, "score": 0.926, "w": 126, "cpu": 17.89, "temp": 57.3}
+{"t": 143.5, "faces": 1, "score": 0.924, "w": 127, "cpu": 17.92, "temp": 57.3}
+{"t": 144.0, "faces": 1, "score": 0.921, "w": 124, "cpu": 17.95, "temp": 56.75}
+{"t": 144.5, "faces": 1, "score": 0.919, "w": 122, "cpu": 17.99, "temp": 57.3, "owner_sim": 0.834}
+{"t": 145.0, "faces": 1, "score": 0.923, "w": 122, "cpu": 18.12, "temp": 56.75}
+{"t": 145.5, "faces": 1, "score": 0.921, "w": 122, "cpu": 18.15, "temp": 57.3}
+{"t": 146.0, "faces": 1, "score": 0.801, "w": 128, "cpu": 18.19, "temp": 57.85}
+{"t": 146.5, "faces": 1, "score": 0.859, "w": 112, "cpu": 18.22, "temp": 56.2, "owner_sim": 0.493}
+{"t": 147.0, "faces": 1, "score": 0.876, "w": 124, "cpu": 18.35, "temp": 56.75}
+{"t": 147.5, "faces": 1, "score": 0.894, "w": 125, "cpu": 18.39, "temp": 56.75}
+{"t": 148.0, "faces": 1, "score": 0.908, "w": 132, "cpu": 18.42, "temp": 56.75}
+{"t": 148.5, "faces": 1, "score": 0.917, "w": 123, "cpu": 18.45, "temp": 57.3, "owner_sim": 0.815}
+{"t": 149.0, "faces": 1, "score": 0.927, "w": 131, "cpu": 18.59, "temp": 57.3}
+{"t": 149.5, "faces": 1, "score": 0.914, "w": 121, "cpu": 18.62, "temp": 56.2}
+{"t": 150.0, "faces": 1, "score": 0.915, "w": 124, "cpu": 18.66, "temp": 56.2}
+{"t": 150.5, "faces": 1, "score": 0.904, "w": 121, "cpu": 18.69, "temp": 57.3, "owner_sim": 0.796}
+{"t": 151.0, "faces": 1, "score": 0.908, "w": 122, "cpu": 18.82, "temp": 56.75}
+{"t": 151.5, "faces": 1, "score": 0.886, "w": 130, "cpu": 18.86, "temp": 56.75}
+{"t": 152.0, "faces": 1, "score": 0.927, "w": 127, "cpu": 18.89, "temp": 56.75}
+{"t": 152.5, "faces": 1, "score": 0.93, "w": 124, "cpu": 18.92, "temp": 56.75, "owner_sim": 0.805}
+{"t": 153.0, "faces": 1, "score": 0.924, "w": 127, "cpu": 19.06, "temp": 56.75}
+{"t": 153.5, "faces": 1, "score": 0.921, "w": 125, "cpu": 19.09, "temp": 56.75}
+{"t": 154.0, "faces": 1, "score": 0.924, "w": 126, "cpu": 19.13, "temp": 56.75}
+{"t": 154.5, "faces": 1, "score": 0.925, "w": 128, "cpu": 19.16, "temp": 57.3, "owner_sim": 0.801}
+{"t": 155.0, "faces": 1, "score": 0.923, "w": 127, "cpu": 19.29, "temp": 56.2}
+{"t": 155.5, "faces": 1, "score": 0.923, "w": 128, "cpu": 19.33, "temp": 56.75}
+{"t": 156.0, "faces": 1, "score": 0.925, "w": 128, "cpu": 19.36, "temp": 57.3}
+{"t": 156.5, "faces": 1, "score": 0.918, "w": 129, "cpu": 19.39, "temp": 56.75, "owner_sim": 0.847}
+{"t": 157.0, "faces": 1, "score": 0.918, "w": 129, "cpu": 19.53, "temp": 57.3}
+{"t": 157.5, "faces": 1, "score": 0.916, "w": 129, "cpu": 19.56, "temp": 56.75}
+{"t": 158.0, "faces": 1, "score": 0.919, "w": 125, "cpu": 19.6, "temp": 56.2}
+{"t": 158.5, "faces": 1, "score": 0.918, "w": 123, "cpu": 19.63, "temp": 57.3, "owner_sim": 0.797}
+{"t": 159.0, "faces": 1, "score": 0.919, "w": 125, "cpu": 19.77, "temp": 57.3}
+{"t": 159.5, "faces": 1, "score": 0.919, "w": 125, "cpu": 19.8, "temp": 57.3}
+{"t": 160.0, "faces": 1, "score": 0.92, "w": 125, "cpu": 19.83, "temp": 56.75}
+{"t": 160.5, "faces": 1, "score": 0.918, "w": 126, "cpu": 19.87, "temp": 57.85, "owner_sim": 0.808}
+{"t": 161.0, "faces": 1, "score": 0.921, "w": 125, "cpu": 20.0, "temp": 56.75}
+{"t": 161.5, "faces": 1, "score": 0.919, "w": 126, "cpu": 20.03, "temp": 56.75}
+{"t": 162.0, "faces": 1, "score": 0.919, "w": 126, "cpu": 20.07, "temp": 56.75}
+{"t": 162.5, "faces": 1, "score": 0.92, "w": 126, "cpu": 20.1, "temp": 56.75, "owner_sim": 0.81}
+{"t": 163.0, "faces": 1, "score": 0.92, "w": 126, "cpu": 20.24, "temp": 56.75}
+{"t": 163.5, "faces": 1, "score": 0.919, "w": 126, "cpu": 20.27, "temp": 56.75}
+{"t": 164.0, "faces": 1, "score": 0.919, "w": 125, "cpu": 20.3, "temp": 56.75}
+{"t": 164.5, "faces": 1, "score": 0.92, "w": 126, "cpu": 20.34, "temp": 56.75, "owner_sim": 0.823}
+{"t": 165.0, "faces": 1, "score": 0.92, "w": 127, "cpu": 20.47, "temp": 57.3}
+{"t": 165.5, "faces": 1, "score": 0.92, "w": 126, "cpu": 20.51, "temp": 57.3}
+{"t": 166.0, "faces": 1, "score": 0.922, "w": 126, "cpu": 20.54, "temp": 56.75}
+{"t": 166.5, "faces": 1, "score": 0.926, "w": 128, "cpu": 20.57, "temp": 57.3, "owner_sim": 0.821}
+{"t": 167.0, "faces": 1, "score": 0.928, "w": 130, "cpu": 20.71, "temp": 56.75}
+{"t": 167.5, "faces": 1, "score": 0.924, "w": 131, "cpu": 20.74, "temp": 56.75}
+{"t": 168.0, "faces": 1, "score": 0.927, "w": 129, "cpu": 20.78, "temp": 57.3}
+{"t": 168.5, "faces": 1, "score": 0.917, "w": 126, "cpu": 20.81, "temp": 56.75, "owner_sim": 0.834}
+{"t": 169.0, "faces": 1, "score": 0.924, "w": 127, "cpu": 20.94, "temp": 56.75}
+{"t": 169.5, "faces": 1, "score": 0.924, "w": 119, "cpu": 20.97, "temp": 56.75}
+{"t": 170.0, "faces": 1, "score": 0.916, "w": 109, "cpu": 21.01, "temp": 56.75}
+{"t": 170.5, "faces": 1, "score": 0.933, "w": 115, "cpu": 21.04, "temp": 57.3, "owner_sim": 0.775}
+{"t": 171.0, "faces": 1, "score": 0.936, "w": 120, "cpu": 21.18, "temp": 56.75}
+{"t": 171.5, "faces": 1, "score": 0.932, "w": 124, "cpu": 21.21, "temp": 57.3}
+{"t": 172.0, "faces": 1, "score": 0.91, "w": 102, "cpu": 21.24, "temp": 57.3}
+{"t": 172.5, "faces": 1, "score": 0.924, "w": 123, "cpu": 21.27, "temp": 57.3, "owner_sim": 0.855}
+{"t": 173.0, "faces": 1, "score": 0.929, "w": 125, "cpu": 21.41, "temp": 57.3}
+{"t": 173.5, "faces": 1, "score": 0.934, "w": 126, "cpu": 21.45, "temp": 57.3}
+{"t": 174.0, "faces": 1, "score": 0.927, "w": 127, "cpu": 21.48, "temp": 56.75}
+{"t": 174.5, "faces": 1, "score": 0.926, "w": 126, "cpu": 21.51, "temp": 56.75, "owner_sim": 0.826}
+{"t": 175.0, "faces": 1, "score": 0.928, "w": 127, "cpu": 21.65, "temp": 57.85}
+{"t": 175.5, "faces": 1, "score": 0.925, "w": 124, "cpu": 21.68, "temp": 56.75}
+{"t": 176.0, "faces": 1, "score": 0.94, "w": 126, "cpu": 21.71, "temp": 57.85}
+{"t": 176.5, "faces": 1, "score": 0.936, "w": 118, "cpu": 21.74, "temp": 56.2, "owner_sim": 0.714}
+{"t": 177.0, "faces": 1, "score": 0.939, "w": 119, "cpu": 21.88, "temp": 57.3}
+{"t": 177.5, "faces": 1, "score": 0.938, "w": 119, "cpu": 21.91, "temp": 56.2}
+{"t": 178.0, "faces": 1, "score": 0.932, "w": 119, "cpu": 21.95, "temp": 57.3}
+{"t": 178.5, "faces": 1, "score": 0.928, "w": 121, "cpu": 21.98, "temp": 57.3, "owner_sim": 0.755}
+{"t": 179.0, "faces": 1, "score": 0.929, "w": 116, "cpu": 22.11, "temp": 57.3}
+{"t": 179.5, "faces": 1, "score": 0.926, "w": 110, "cpu": 22.15, "temp": 57.3}
+{"t": 180.0, "faces": 1, "score": 0.934, "w": 115, "cpu": 22.18, "temp": 56.2}
+{"t": 180.5, "faces": 1, "score": 0.928, "w": 116, "cpu": 22.21, "temp": 57.3, "owner_sim": 0.755}
+{"t": 181.0, "faces": 1, "score": 0.93, "w": 120, "cpu": 22.35, "temp": 56.75}
+{"t": 181.5, "faces": 1, "score": 0.934, "w": 117, "cpu": 22.38, "temp": 56.75}
+{"t": 182.0, "faces": 1, "score": 0.925, "w": 120, "cpu": 22.41, "temp": 56.75}
+{"t": 182.5, "faces": 1, "score": 0.923, "w": 118, "cpu": 22.45, "temp": 56.75, "owner_sim": 0.795}
+{"t": 183.0, "faces": 1, "score": 0.93, "w": 120, "cpu": 22.58, "temp": 57.3}
+{"t": 183.5, "faces": 1, "score": 0.927, "w": 107, "cpu": 22.61, "temp": 56.2}
+{"t": 184.0, "faces": 1, "score": 0.927, "w": 105, "cpu": 22.65, "temp": 56.75}
+{"t": 184.5, "faces": 1, "score": 0.927, "w": 108, "cpu": 22.68, "temp": 57.3, "owner_sim": 0.783}
+{"t": 185.0, "faces": 1, "score": 0.928, "w": 114, "cpu": 22.82, "temp": 56.75}
+{"t": 185.5, "faces": 1, "score": 0.929, "w": 108, "cpu": 22.85, "temp": 56.75}
+{"t": 186.0, "faces": 1, "score": 0.927, "w": 108, "cpu": 22.88, "temp": 56.75}
+{"t": 186.5, "faces": 1, "score": 0.924, "w": 115, "cpu": 22.92, "temp": 56.75, "owner_sim": 0.752}
+{"t": 187.0, "faces": 1, "score": 0.927, "w": 108, "cpu": 23.05, "temp": 56.75}
+{"t": 187.5, "faces": 1, "score": 0.934, "w": 110, "cpu": 23.09, "temp": 57.3}
+{"t": 188.0, "faces": 1, "score": 0.932, "w": 113, "cpu": 23.12, "temp": 57.3}
+{"t": 188.5, "faces": 1, "score": 0.933, "w": 114, "cpu": 23.15, "temp": 57.3, "owner_sim": 0.694}
+{"t": 189.0, "faces": 1, "score": 0.931, "w": 111, "cpu": 23.29, "temp": 57.85}
+{"t": 189.5, "faces": 1, "score": 0.929, "w": 112, "cpu": 23.32, "temp": 56.2}
+{"t": 190.0, "faces": 1, "score": 0.93, "w": 106, "cpu": 23.35, "temp": 57.3}
+{"t": 190.5, "faces": 1, "score": 0.93, "w": 107, "cpu": 23.38, "temp": 56.2, "owner_sim": 0.78}
+{"t": 191.0, "faces": 1, "score": 0.93, "w": 107, "cpu": 23.51, "temp": 57.85}
+{"t": 191.5, "faces": 1, "score": 0.931, "w": 108, "cpu": 23.55, "temp": 56.75}
+{"t": 192.0, "faces": 1, "score": 0.926, "w": 105, "cpu": 23.58, "temp": 56.75}
+{"t": 192.5, "faces": 1, "score": 0.928, "w": 111, "cpu": 23.61, "temp": 56.75, "owner_sim": 0.751}
+{"t": 193.0, "faces": 1, "score": 0.928, "w": 112, "cpu": 23.75, "temp": 57.85}
+{"t": 193.5, "faces": 1, "score": 0.934, "w": 109, "cpu": 23.78, "temp": 57.85}
+{"t": 194.0, "faces": 1, "score": 0.928, "w": 113, "cpu": 23.82, "temp": 57.85}
+{"t": 194.5, "faces": 1, "score": 0.92, "w": 106, "cpu": 23.85, "temp": 56.75, "owner_sim": 0.714}
+{"t": 195.0, "faces": 1, "score": 0.918, "w": 103, "cpu": 23.98, "temp": 56.75}
+{"t": 195.5, "faces": 1, "score": 0.915, "w": 108, "cpu": 24.02, "temp": 56.75}
+{"t": 196.0, "faces": 1, "score": 0.913, "w": 110, "cpu": 24.05, "temp": 56.75}
+{"t": 196.5, "faces": 1, "score": 0.922, "w": 107, "cpu": 24.09, "temp": 57.3, "owner_sim": 0.606}
+{"t": 197.0, "faces": 1, "score": 0.922, "w": 104, "cpu": 24.22, "temp": 57.3}
+{"t": 197.5, "faces": 1, "score": 0.909, "w": 98, "cpu": 24.26, "temp": 56.75}
+{"t": 198.0, "faces": 1, "score": 0.887, "w": 80, "cpu": 24.29, "temp": 56.2}
+{"t": 198.5, "faces": 1, "score": 0.919, "w": 95, "cpu": 24.32, "temp": 56.75, "owner_sim": 0.469}
+{"t": 199.0, "faces": 1, "score": 0.922, "w": 114, "cpu": 24.46, "temp": 57.3}
+{"t": 199.5, "faces": 1, "score": 0.929, "w": 117, "cpu": 24.49, "temp": 57.3}
+{"t": 200.0, "faces": 1, "score": 0.931, "w": 124, "cpu": 24.52, "temp": 57.3}
+{"t": 200.5, "faces": 1, "score": 0.928, "w": 126, "cpu": 24.56, "temp": 57.3, "owner_sim": 0.775}
+{"t": 201.0, "faces": 1, "score": 0.924, "w": 127, "cpu": 24.69, "temp": 56.75}
+{"t": 201.5, "faces": 1, "score": 0.93, "w": 127, "cpu": 24.72, "temp": 56.2}
+{"t": 202.0, "faces": 1, "score": 0.931, "w": 126, "cpu": 24.76, "temp": 57.85}
+{"t": 202.5, "faces": 1, "score": 0.929, "w": 126, "cpu": 24.79, "temp": 57.85, "owner_sim": 0.788}
+{"t": 203.0, "faces": 1, "score": 0.931, "w": 128, "cpu": 24.93, "temp": 57.3}
+{"t": 203.5, "faces": 1, "score": 0.926, "w": 124, "cpu": 24.96, "temp": 55.65}
+{"t": 204.0, "faces": 1, "score": 0.936, "w": 118, "cpu": 24.99, "temp": 57.3}
+{"t": 204.5, "faces": 1, "score": 0.932, "w": 118, "cpu": 25.03, "temp": 56.75, "owner_sim": 0.78}
+{"t": 205.0, "faces": 1, "score": 0.933, "w": 120, "cpu": 25.16, "temp": 56.75}
+{"t": 205.5, "faces": 1, "score": 0.929, "w": 123, "cpu": 25.2, "temp": 56.75}
+{"t": 206.0, "faces": 1, "score": 0.931, "w": 120, "cpu": 25.23, "temp": 56.75}
+{"t": 206.5, "faces": 1, "score": 0.931, "w": 120, "cpu": 25.26, "temp": 56.75, "owner_sim": 0.769}
+{"t": 207.0, "faces": 1, "score": 0.93, "w": 120, "cpu": 25.4, "temp": 56.75}
+{"t": 207.5, "faces": 1, "score": 0.927, "w": 117, "cpu": 25.43, "temp": 57.3}
+{"t": 208.0, "faces": 1, "score": 0.924, "w": 120, "cpu": 25.46, "temp": 56.75}
+{"t": 208.5, "faces": 1, "score": 0.924, "w": 119, "cpu": 25.5, "temp": 57.3, "owner_sim": 0.799}
+{"t": 209.0, "faces": 1, "score": 0.924, "w": 120, "cpu": 25.63, "temp": 56.75}
+{"t": 209.5, "faces": 1, "score": 0.924, "w": 122, "cpu": 25.67, "temp": 55.65}
+{"t": 210.0, "faces": 1, "score": 0.925, "w": 121, "cpu": 25.7, "temp": 56.75}
+{"t": 210.5, "faces": 1, "score": 0.924, "w": 124, "cpu": 25.73, "temp": 57.3, "owner_sim": 0.791}
+{"t": 211.0, "faces": 1, "score": 0.924, "w": 125, "cpu": 25.87, "temp": 56.75}
+{"t": 211.5, "faces": 1, "score": 0.925, "w": 125, "cpu": 25.9, "temp": 57.3}
+{"t": 212.0, "faces": 1, "score": 0.925, "w": 124, "cpu": 25.93, "temp": 56.75}
+{"t": 212.5, "faces": 1, "score": 0.924, "w": 126, "cpu": 25.97, "temp": 56.75, "owner_sim": 0.781}
+{"t": 213.0, "faces": 1, "score": 0.923, "w": 124, "cpu": 26.1, "temp": 56.75}
+{"t": 213.5, "faces": 1, "score": 0.924, "w": 125, "cpu": 26.14, "temp": 56.75}
+{"t": 214.0, "faces": 1, "score": 0.925, "w": 124, "cpu": 26.17, "temp": 57.3}
+{"t": 214.5, "faces": 1, "score": 0.929, "w": 125, "cpu": 26.2, "temp": 56.75, "owner_sim": 0.787}
+{"t": 215.0, "faces": 1, "score": 0.924, "w": 123, "cpu": 26.34, "temp": 57.3}
+{"t": 215.5, "faces": 1, "score": 0.924, "w": 125, "cpu": 26.38, "temp": 56.75}
+{"t": 216.0, "faces": 1, "score": 0.937, "w": 122, "cpu": 26.41, "temp": 56.75}
+{"t": 216.5, "faces": 1, "score": 0.933, "w": 123, "cpu": 26.44, "temp": 56.75, "owner_sim": 0.785}
+{"t": 217.0, "faces": 1, "score": 0.928, "w": 123, "cpu": 26.57, "temp": 56.2}
+{"t": 217.5, "faces": 1, "score": 0.937, "w": 121, "cpu": 26.61, "temp": 56.2}
+{"t": 218.0, "faces": 1, "score": 0.929, "w": 124, "cpu": 26.64, "temp": 56.75}
+{"t": 218.5, "faces": 1, "score": 0.922, "w": 126, "cpu": 26.67, "temp": 56.2, "owner_sim": 0.768}
+{"t": 219.0, "faces": 1, "score": 0.924, "w": 124, "cpu": 26.81, "temp": 57.3}
+{"t": 219.5, "faces": 1, "score": 0.924, "w": 124, "cpu": 26.84, "temp": 56.75}
+{"t": 220.0, "faces": 1, "score": 0.922, "w": 121, "cpu": 26.88, "temp": 56.75}
+{"t": 220.5, "faces": 1, "score": 0.93, "w": 117, "cpu": 26.91, "temp": 56.75, "owner_sim": 0.77}
+{"t": 221.0, "faces": 1, "score": 0.924, "w": 122, "cpu": 27.05, "temp": 57.3}
+{"t": 221.5, "faces": 1, "score": 0.923, "w": 120, "cpu": 27.08, "temp": 56.75}
+{"t": 222.0, "faces": 1, "score": 0.925, "w": 119, "cpu": 27.12, "temp": 56.2}
+{"t": 222.5, "faces": 1, "score": 0.925, "w": 119, "cpu": 27.15, "temp": 56.75, "owner_sim": 0.775}
+{"t": 223.0, "faces": 1, "score": 0.925, "w": 120, "cpu": 27.28, "temp": 57.85}
+{"t": 223.5, "faces": 1, "score": 0.932, "w": 122, "cpu": 27.31, "temp": 57.3}
+{"t": 224.0, "faces": 1, "score": 0.923, "w": 121, "cpu": 27.35, "temp": 56.75}
+{"t": 224.5, "faces": 1, "score": 0.922, "w": 120, "cpu": 27.38, "temp": 57.3, "owner_sim": 0.71}
+{"t": 225.0, "faces": 1, "score": 0.922, "w": 119, "cpu": 27.52, "temp": 57.3}
+{"t": 225.5, "faces": 1, "score": 0.923, "w": 119, "cpu": 27.55, "temp": 56.75}
+{"t": 226.0, "faces": 1, "score": 0.921, "w": 120, "cpu": 27.58, "temp": 56.2}
+{"t": 226.5, "faces": 1, "score": 0.924, "w": 119, "cpu": 27.62, "temp": 56.75, "owner_sim": 0.768}
+{"t": 227.0, "faces": 1, "score": 0.926, "w": 117, "cpu": 27.75, "temp": 57.3}
+{"t": 227.5, "faces": 1, "score": 0.925, "w": 118, "cpu": 27.78, "temp": 56.75}
+{"t": 228.0, "faces": 1, "score": 0.92, "w": 119, "cpu": 27.82, "temp": 57.3}
+{"t": 228.5, "faces": 1, "score": 0.925, "w": 119, "cpu": 27.85, "temp": 56.2, "owner_sim": 0.793}
+{"t": 229.0, "faces": 1, "score": 0.925, "w": 119, "cpu": 27.99, "temp": 57.3}
+{"t": 229.5, "faces": 1, "score": 0.925, "w": 121, "cpu": 28.02, "temp": 57.3}
+{"t": 230.0, "faces": 1, "score": 0.924, "w": 119, "cpu": 28.05, "temp": 57.3}
+{"t": 230.5, "faces": 1, "score": 0.925, "w": 119, "cpu": 28.08, "temp": 56.2, "owner_sim": 0.808}
+{"t": 231.0, "faces": 1, "score": 0.925, "w": 120, "cpu": 28.22, "temp": 57.3}
+{"t": 231.5, "faces": 1, "score": 0.924, "w": 119, "cpu": 28.25, "temp": 56.2}
+{"t": 232.0, "faces": 1, "score": 0.925, "w": 119, "cpu": 28.29, "temp": 57.85}
+{"t": 232.5, "faces": 1, "score": 0.925, "w": 118, "cpu": 28.32, "temp": 57.3, "owner_sim": 0.81}
+{"t": 233.0, "faces": 1, "score": 0.924, "w": 119, "cpu": 28.45, "temp": 57.85}
+{"t": 233.5, "faces": 1, "score": 0.926, "w": 118, "cpu": 28.49, "temp": 56.75}
+{"t": 234.0, "faces": 1, "score": 0.926, "w": 120, "cpu": 28.52, "temp": 56.75}
+{"t": 234.5, "faces": 1, "score": 0.925, "w": 118, "cpu": 28.55, "temp": 57.3, "owner_sim": 0.804}
+{"t": 235.0, "faces": 1, "score": 0.926, "w": 118, "cpu": 28.69, "temp": 57.3}
+{"t": 235.5, "faces": 1, "score": 0.927, "w": 119, "cpu": 28.72, "temp": 56.75}
+{"t": 236.0, "faces": 1, "score": 0.928, "w": 119, "cpu": 28.76, "temp": 57.3}
+{"t": 236.5, "faces": 1, "score": 0.928, "w": 119, "cpu": 28.79, "temp": 56.75, "owner_sim": 0.808}
+{"t": 237.0, "faces": 1, "score": 0.926, "w": 119, "cpu": 28.92, "temp": 57.3}
+{"t": 237.5, "faces": 1, "score": 0.927, "w": 120, "cpu": 28.95, "temp": 57.85}
+{"t": 238.0, "faces": 1, "score": 0.927, "w": 119, "cpu": 28.99, "temp": 58.4}
+{"t": 238.5, "faces": 1, "score": 0.927, "w": 119, "cpu": 29.02, "temp": 57.3, "owner_sim": 0.781}
+{"t": 239.0, "faces": 1, "score": 0.927, "w": 119, "cpu": 29.16, "temp": 57.85}
+{"t": 239.5, "faces": 1, "score": 0.931, "w": 119, "cpu": 29.19, "temp": 56.2}
+{"t": 240.0, "faces": 1, "score": 0.935, "w": 114, "cpu": 29.22, "temp": 56.75}
+{"t": 240.5, "faces": 1, "score": 0.934, "w": 116, "cpu": 29.25, "temp": 57.85, "owner_sim": 0.718}
+{"t": 241.0, "faces": 1, "score": 0.934, "w": 117, "cpu": 29.39, "temp": 56.75}
+{"t": 241.5, "faces": 1, "score": 0.931, "w": 117, "cpu": 29.42, "temp": 57.3}
+{"t": 242.0, "faces": 1, "score": 0.933, "w": 115, "cpu": 29.46, "temp": 56.75}
+{"t": 242.5, "faces": 1, "score": 0.935, "w": 116, "cpu": 29.49, "temp": 56.75, "owner_sim": 0.705}
+{"t": 243.0, "faces": 1, "score": 0.926, "w": 116, "cpu": 29.62, "temp": 56.75}
+{"t": 243.5, "faces": 1, "score": 0.937, "w": 118, "cpu": 29.66, "temp": 56.75}
+{"t": 244.0, "faces": 1, "score": 0.93, "w": 114, "cpu": 29.69, "temp": 57.3}
+{"t": 244.5, "faces": 1, "score": 0.926, "w": 111, "cpu": 29.72, "temp": 56.2, "owner_sim": 0.785}
+{"t": 245.0, "faces": 1, "score": 0.931, "w": 116, "cpu": 29.86, "temp": 57.3}
+{"t": 245.5, "faces": 1, "score": 0.926, "w": 112, "cpu": 29.89, "temp": 56.2}
+{"t": 246.0, "faces": 1, "score": 0.925, "w": 115, "cpu": 29.93, "temp": 57.3}
+{"t": 246.5, "faces": 1, "score": 0.927, "w": 114, "cpu": 29.96, "temp": 57.3, "owner_sim": 0.765}
+{"t": 247.0, "faces": 1, "score": 0.926, "w": 111, "cpu": 30.09, "temp": 57.3}
+{"t": 247.5, "faces": 1, "score": 0.93, "w": 113, "cpu": 30.13, "temp": 57.3}
+{"t": 248.0, "faces": 1, "score": 0.928, "w": 110, "cpu": 30.16, "temp": 56.75}
+{"t": 248.5, "faces": 1, "score": 0.918, "w": 103, "cpu": 30.19, "temp": 56.75, "owner_sim": 0.798}
+{"t": 249.0, "faces": 1, "score": 0.925, "w": 107, "cpu": 30.32, "temp": 57.3}
+{"t": 249.5, "faces": 1, "score": 0.928, "w": 114, "cpu": 30.36, "temp": 57.3}
+{"t": 250.0, "faces": 1, "score": 0.924, "w": 116, "cpu": 30.39, "temp": 55.65}
+{"t": 250.5, "faces": 1, "score": 0.933, "w": 113, "cpu": 30.42, "temp": 56.75, "owner_sim": 0.702}
+{"t": 251.0, "faces": 1, "score": 0.928, "w": 113, "cpu": 30.56, "temp": 57.3}
+{"t": 251.5, "faces": 1, "score": 0.931, "w": 109, "cpu": 30.59, "temp": 56.75}
+{"t": 252.0, "faces": 1, "score": 0.931, "w": 110, "cpu": 30.62, "temp": 56.2}
+{"t": 252.5, "faces": 1, "score": 0.932, "w": 110, "cpu": 30.66, "temp": 57.3, "owner_sim": 0.748}
+{"t": 253.0, "faces": 1, "score": 0.924, "w": 114, "cpu": 30.78, "temp": 57.3}
+{"t": 253.5, "faces": 1, "score": 0.923, "w": 114, "cpu": 30.82, "temp": 56.75}
+{"t": 254.0, "faces": 1, "score": 0.926, "w": 112, "cpu": 30.85, "temp": 57.3}
+{"t": 254.5, "faces": 1, "score": 0.921, "w": 111, "cpu": 30.88, "temp": 56.75, "owner_sim": 0.773}
+{"t": 255.0, "faces": 1, "score": 0.926, "w": 113, "cpu": 31.02, "temp": 57.3}
+{"t": 255.5, "faces": 1, "score": 0.938, "w": 114, "cpu": 31.05, "temp": 55.1}
+{"t": 256.0, "faces": 1, "score": 0.932, "w": 123, "cpu": 31.08, "temp": 57.3}
+{"t": 256.5, "faces": 1, "score": 0.927, "w": 135, "cpu": 31.12, "temp": 56.75, "owner_sim": 0.687}
+{"t": 257.0, "faces": 1, "score": 0.931, "w": 128, "cpu": 31.25, "temp": 56.75}
+{"t": 257.5, "faces": 1, "score": 0.917, "w": 127, "cpu": 31.28, "temp": 57.85}
+{"t": 258.0, "faces": 1, "score": 0.915, "w": 129, "cpu": 31.31, "temp": 57.3}
+{"t": 258.5, "faces": 1, "score": 0.915, "w": 130, "cpu": 31.35, "temp": 57.3, "owner_sim": 0.872}
+{"t": 259.0, "faces": 1, "score": 0.916, "w": 128, "cpu": 31.48, "temp": 57.85}
+{"t": 259.5, "faces": 1, "score": 0.92, "w": 130, "cpu": 31.51, "temp": 57.3}
+{"t": 260.0, "faces": 1, "score": 0.902, "w": 139, "cpu": 31.55, "temp": 56.75}
+{"t": 260.5, "faces": 1, "score": 0.902, "w": 140, "cpu": 31.58, "temp": 56.75, "owner_sim": 0.803}
+{"t": 261.0, "faces": 1, "score": 0.912, "w": 139, "cpu": 31.71, "temp": 57.3}
+{"t": 261.5, "faces": 1, "score": 0.905, "w": 138, "cpu": 31.75, "temp": 57.3}
+{"t": 262.0, "faces": 1, "score": 0.907, "w": 141, "cpu": 31.78, "temp": 57.3}
+{"t": 262.5, "faces": 1, "score": 0.91, "w": 136, "cpu": 31.81, "temp": 56.2, "owner_sim": 0.82}
+{"t": 263.0, "faces": 1, "score": 0.917, "w": 136, "cpu": 31.95, "temp": 57.3}
+{"t": 263.5, "faces": 1, "score": 0.907, "w": 134, "cpu": 31.98, "temp": 56.75}
+{"t": 264.0, "faces": 1, "score": 0.908, "w": 132, "cpu": 32.02, "temp": 57.3}
+{"t": 264.5, "faces": 1, "score": 0.911, "w": 134, "cpu": 32.05, "temp": 56.75, "owner_sim": 0.84}
+{"t": 265.0, "faces": 1, "score": 0.909, "w": 130, "cpu": 32.18, "temp": 56.75}
+{"t": 265.5, "faces": 1, "score": 0.905, "w": 130, "cpu": 32.21, "temp": 56.75}
+{"t": 266.0, "faces": 1, "score": 0.906, "w": 133, "cpu": 32.25, "temp": 56.75}
+{"t": 266.5, "faces": 1, "score": 0.905, "w": 132, "cpu": 32.28, "temp": 56.75, "owner_sim": 0.837}
+{"t": 267.0, "faces": 1, "score": 0.895, "w": 132, "cpu": 32.41, "temp": 56.2}
+{"t": 267.5, "faces": 1, "score": 0.899, "w": 132, "cpu": 32.45, "temp": 56.75}
+{"t": 268.0, "faces": 1, "score": 0.901, "w": 133, "cpu": 32.48, "temp": 57.3}
+{"t": 268.5, "faces": 1, "score": 0.898, "w": 134, "cpu": 32.51, "temp": 57.85, "owner_sim": 0.871}
+{"t": 269.0, "faces": 1, "score": 0.897, "w": 135, "cpu": 32.64, "temp": 57.3}
+{"t": 269.5, "faces": 1, "score": 0.902, "w": 133, "cpu": 32.68, "temp": 57.3}
+{"t": 270.0, "faces": 1, "score": 0.9, "w": 134, "cpu": 32.71, "temp": 57.3}
+{"t": 270.5, "faces": 1, "score": 0.897, "w": 133, "cpu": 32.74, "temp": 56.75, "owner_sim": 0.853}
+{"t": 271.0, "faces": 1, "score": 0.908, "w": 128, "cpu": 32.88, "temp": 57.3}
+{"t": 271.5, "faces": 1, "score": 0.906, "w": 131, "cpu": 32.91, "temp": 56.75}
+{"t": 272.0, "faces": 1, "score": 0.91, "w": 130, "cpu": 32.95, "temp": 56.75}
+{"t": 272.5, "faces": 1, "score": 0.911, "w": 134, "cpu": 32.98, "temp": 56.75, "owner_sim": 0.817}
+{"t": 273.0, "faces": 1, "score": 0.876, "w": 125, "cpu": 33.11, "temp": 58.95}
+{"t": 273.5, "faces": 1, "score": 0.929, "w": 115, "cpu": 33.14, "temp": 57.3}
+{"t": 274.0, "faces": 1, "score": 0.931, "w": 100, "cpu": 33.16, "temp": 58.95}
+{"t": 274.5, "faces": 1, "score": 0.927, "w": 103, "cpu": 33.19, "temp": 58.4, "owner_sim": 0.735}
+{"t": 275.0, "faces": 1, "score": 0.935, "w": 112, "cpu": 33.28, "temp": 60.6}
+{"t": 275.5, "faces": 1, "score": 0.928, "w": 106, "cpu": 33.31, "temp": 59.5}
+{"t": 276.0, "faces": 1, "score": 0.924, "w": 98, "cpu": 33.33, "temp": 59.5}
+{"t": 276.5, "faces": 1, "score": 0.921, "w": 113, "cpu": 33.36, "temp": 60.05, "owner_sim": 0.734}
+{"t": 277.0, "faces": 1, "score": 0.92, "w": 118, "cpu": 33.45, "temp": 59.5}
+{"t": 277.5, "faces": 1, "score": 0.919, "w": 127, "cpu": 33.48, "temp": 60.05}
+{"t": 278.0, "faces": 1, "score": 0.921, "w": 127, "cpu": 33.51, "temp": 57.85}
+{"t": 278.5, "faces": 1, "score": 0.922, "w": 128, "cpu": 33.54, "temp": 57.85, "owner_sim": 0.781}
+{"t": 279.0, "faces": 1, "score": 0.916, "w": 119, "cpu": 33.68, "temp": 58.95}
+{"t": 279.5, "faces": 1, "score": 0.914, "w": 127, "cpu": 33.71, "temp": 58.4}
+{"t": 280.0, "faces": 1, "score": 0.916, "w": 127, "cpu": 33.75, "temp": 57.85}
+{"t": 280.5, "faces": 1, "score": 0.919, "w": 127, "cpu": 33.78, "temp": 57.85, "owner_sim": 0.828}
+{"t": 281.0, "faces": 1, "score": 0.917, "w": 128, "cpu": 33.91, "temp": 57.85}
+{"t": 281.5, "faces": 1, "score": 0.926, "w": 119, "cpu": 33.95, "temp": 57.85}
+{"t": 282.0, "faces": 1, "score": 0.93, "w": 124, "cpu": 33.98, "temp": 57.85}
+{"t": 282.5, "faces": 1, "score": 0.919, "w": 134, "cpu": 34.01, "temp": 58.4, "owner_sim": 0.759}
+{"t": 283.0, "faces": 1, "score": 0.923, "w": 137, "cpu": 34.15, "temp": 57.85}
+{"t": 283.5, "faces": 1, "score": 0.908, "w": 134, "cpu": 34.18, "temp": 58.4}
+{"t": 284.0, "faces": 1, "score": 0.911, "w": 137, "cpu": 34.21, "temp": 57.85}
+{"t": 284.5, "faces": 1, "score": 0.909, "w": 132, "cpu": 34.25, "temp": 57.3, "owner_sim": 0.816}
+{"t": 285.0, "faces": 1, "score": 0.91, "w": 129, "cpu": 34.38, "temp": 57.3}
+{"t": 285.5, "faces": 1, "score": 0.91, "w": 129, "cpu": 34.41, "temp": 57.85}
+{"t": 286.0, "faces": 1, "score": 0.914, "w": 133, "cpu": 34.45, "temp": 57.85}
+{"t": 286.5, "faces": 1, "score": 0.911, "w": 132, "cpu": 34.48, "temp": 57.3, "owner_sim": 0.804}
+{"t": 287.0, "faces": 1, "score": 0.914, "w": 133, "cpu": 34.62, "temp": 57.85}
+{"t": 287.5, "faces": 1, "score": 0.915, "w": 137, "cpu": 34.65, "temp": 57.85}
+{"t": 288.0, "faces": 1, "score": 0.907, "w": 133, "cpu": 34.69, "temp": 57.3}
+{"t": 288.5, "faces": 1, "score": 0.909, "w": 133, "cpu": 34.72, "temp": 57.3, "owner_sim": 0.819}
+{"t": 289.0, "faces": 1, "score": 0.913, "w": 134, "cpu": 34.85, "temp": 57.3}
+{"t": 289.5, "faces": 1, "score": 0.913, "w": 134, "cpu": 34.88, "temp": 57.3}
+{"t": 290.0, "faces": 1, "score": 0.916, "w": 133, "cpu": 34.91, "temp": 57.3}
+{"t": 290.5, "faces": 1, "score": 0.907, "w": 129, "cpu": 34.95, "temp": 57.85, "owner_sim": 0.838}
+{"t": 291.0, "faces": 1, "score": 0.919, "w": 131, "cpu": 35.08, "temp": 57.3}
+{"t": 291.5, "faces": 1, "score": 0.924, "w": 131, "cpu": 35.11, "temp": 57.85}
+{"t": 292.0, "faces": 1, "score": 0.921, "w": 131, "cpu": 35.14, "temp": 57.3}
+{"t": 292.5, "faces": 1, "score": 0.924, "w": 131, "cpu": 35.18, "temp": 57.85, "owner_sim": 0.883}
+{"t": 293.0, "faces": 1, "score": 0.923, "w": 129, "cpu": 35.31, "temp": 58.95}
+{"t": 293.5, "faces": 1, "score": 0.923, "w": 128, "cpu": 35.34, "temp": 57.3}
+{"t": 294.0, "faces": 1, "score": 0.921, "w": 131, "cpu": 35.38, "temp": 57.3}
+{"t": 294.5, "faces": 1, "score": 0.913, "w": 129, "cpu": 35.41, "temp": 57.3, "owner_sim": 0.864}
+{"t": 295.0, "faces": 1, "score": 0.914, "w": 131, "cpu": 35.55, "temp": 57.3}
+{"t": 295.5, "faces": 1, "score": 0.921, "w": 130, "cpu": 35.58, "temp": 57.3}
+{"t": 296.0, "faces": 1, "score": 0.926, "w": 129, "cpu": 35.62, "temp": 57.3}
+{"t": 296.5, "faces": 1, "score": 0.926, "w": 130, "cpu": 35.65, "temp": 57.3, "owner_sim": 0.893}
+{"t": 297.0, "faces": 1, "score": 0.926, "w": 131, "cpu": 35.79, "temp": 57.3}
+{"t": 297.5, "faces": 1, "score": 0.923, "w": 132, "cpu": 35.82, "temp": 58.4}
+{"t": 298.0, "faces": 1, "score": 0.926, "w": 136, "cpu": 35.85, "temp": 57.3}
+{"t": 298.5, "faces": 1, "score": 0.924, "w": 138, "cpu": 35.88, "temp": 57.3, "owner_sim": 0.81}
+{"t": 299.0, "faces": 1, "score": 0.919, "w": 139, "cpu": 36.02, "temp": 57.3}
+{"t": 299.5, "faces": 1, "score": 0.919, "w": 140, "cpu": 36.05, "temp": 57.85}
+{"t": 300.0, "faces": 1, "score": 0.917, "w": 137, "cpu": 36.09, "temp": 56.75}
+{"t": 300.5, "faces": 1, "score": 0.914, "w": 138, "cpu": 36.12, "temp": 57.3, "owner_sim": 0.836}
+{"t": 301.0, "faces": 1, "score": 0.917, "w": 138, "cpu": 36.26, "temp": 57.3}
+{"t": 301.5, "faces": 1, "score": 0.919, "w": 140, "cpu": 36.29, "temp": 57.3}
+{"t": 302.0, "faces": 1, "score": 0.919, "w": 137, "cpu": 36.32, "temp": 57.3}
+{"t": 302.5, "faces": 1, "score": 0.918, "w": 137, "cpu": 36.36, "temp": 57.3, "owner_sim": 0.851}
+{"t": 303.0, "faces": 1, "score": 0.917, "w": 136, "cpu": 36.49, "temp": 57.3}
+{"t": 303.5, "faces": 1, "score": 0.918, "w": 139, "cpu": 36.52, "temp": 56.75}
+{"t": 304.0, "faces": 1, "score": 0.914, "w": 136, "cpu": 36.56, "temp": 57.3}
+{"t": 304.5, "faces": 1, "score": 0.915, "w": 136, "cpu": 36.59, "temp": 57.3, "owner_sim": 0.815}
+{"t": 305.0, "faces": 1, "score": 0.915, "w": 137, "cpu": 36.72, "temp": 57.3}
+{"t": 305.5, "faces": 1, "score": 0.914, "w": 118, "cpu": 36.75, "temp": 56.75}
+{"t": 306.0, "faces": 1, "score": 0.928, "w": 94, "cpu": 36.78, "temp": 56.75}
+{"t": 306.5, "faces": 1, "score": 0.943, "w": 78, "cpu": 36.82, "temp": 57.3, "owner_sim": 0.672}
+{"t": 307.0, "faces": 1, "score": 0.927, "w": 75, "cpu": 36.95, "temp": 57.3}
+{"t": 307.5, "faces": 1, "score": 0.922, "w": 96, "cpu": 36.99, "temp": 57.85}
+{"t": 308.0, "faces": 1, "score": 0.935, "w": 125, "cpu": 37.02, "temp": 57.3}
+{"t": 308.5, "faces": 1, "score": 0.927, "w": 131, "cpu": 37.05, "temp": 56.75, "owner_sim": 0.732}
+{"t": 309.0, "faces": 1, "score": 0.927, "w": 123, "cpu": 37.19, "temp": 57.3}
+{"t": 309.5, "faces": 1, "score": 0.929, "w": 131, "cpu": 37.22, "temp": 57.3}
+{"t": 310.0, "faces": 1, "score": 0.929, "w": 129, "cpu": 37.25, "temp": 57.3}
+{"t": 310.5, "faces": 1, "score": 0.936, "w": 122, "cpu": 37.28, "temp": 57.85, "owner_sim": 0.706}
+{"t": 311.0, "faces": 1, "score": 0.934, "w": 125, "cpu": 37.41, "temp": 57.3}
+{"t": 311.5, "faces": 1, "score": 0.926, "w": 124, "cpu": 37.45, "temp": 58.4}
+{"t": 312.0, "faces": 1, "score": 0.934, "w": 121, "cpu": 37.48, "temp": 57.3}
+{"t": 312.5, "faces": 1, "score": 0.933, "w": 120, "cpu": 37.51, "temp": 56.75, "owner_sim": 0.74}
+{"t": 313.0, "faces": 1, "score": 0.936, "w": 116, "cpu": 37.64, "temp": 57.85}
+{"t": 313.5, "faces": 1, "score": 0.931, "w": 123, "cpu": 37.68, "temp": 57.3}
+{"t": 314.0, "faces": 1, "score": 0.931, "w": 118, "cpu": 37.71, "temp": 57.3}
+{"t": 314.5, "faces": 1, "score": 0.929, "w": 124, "cpu": 37.74, "temp": 57.3, "owner_sim": 0.754}
+{"t": 315.0, "faces": 1, "score": 0.93, "w": 121, "cpu": 37.88, "temp": 57.85}
+{"t": 315.5, "faces": 1, "score": 0.931, "w": 119, "cpu": 37.91, "temp": 56.75}
+{"t": 316.0, "faces": 1, "score": 0.932, "w": 118, "cpu": 37.94, "temp": 57.85}
+{"t": 316.5, "faces": 1, "score": 0.932, "w": 118, "cpu": 37.97, "temp": 56.75, "owner_sim": 0.734}
+{"t": 317.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 38.11, "temp": 57.85}
+{"t": 317.5, "faces": 1, "score": 0.932, "w": 122, "cpu": 38.14, "temp": 56.75}
+{"t": 318.0, "faces": 1, "score": 0.929, "w": 121, "cpu": 38.17, "temp": 56.75}
+{"t": 318.5, "faces": 1, "score": 0.929, "w": 123, "cpu": 38.21, "temp": 56.75, "owner_sim": 0.699}
+{"t": 319.0, "faces": 1, "score": 0.932, "w": 123, "cpu": 38.34, "temp": 57.85}
+{"t": 319.5, "faces": 1, "score": 0.933, "w": 119, "cpu": 38.37, "temp": 56.75}
+{"t": 320.0, "faces": 1, "score": 0.933, "w": 120, "cpu": 38.4, "temp": 57.85}
+{"t": 320.5, "faces": 1, "score": 0.93, "w": 121, "cpu": 38.44, "temp": 57.3, "owner_sim": 0.731}
+{"t": 321.0, "faces": 1, "score": 0.929, "w": 121, "cpu": 38.57, "temp": 57.3}
+{"t": 321.5, "faces": 1, "score": 0.928, "w": 125, "cpu": 38.61, "temp": 57.85}
+{"t": 322.0, "faces": 1, "score": 0.927, "w": 126, "cpu": 38.64, "temp": 57.85}
+{"t": 322.5, "faces": 1, "score": 0.931, "w": 118, "cpu": 38.67, "temp": 57.85, "owner_sim": 0.69}
+{"t": 323.0, "faces": 1, "score": 0.93, "w": 125, "cpu": 38.81, "temp": 57.3}
+{"t": 323.5, "faces": 1, "score": 0.929, "w": 117, "cpu": 38.84, "temp": 57.85}
+{"t": 324.0, "faces": 1, "score": 0.928, "w": 122, "cpu": 38.87, "temp": 57.3}
+{"t": 324.5, "faces": 1, "score": 0.927, "w": 124, "cpu": 38.9, "temp": 58.4, "owner_sim": 0.725}
+{"t": 325.0, "faces": 1, "score": 0.928, "w": 123, "cpu": 39.03, "temp": 57.85}
+{"t": 325.5, "faces": 1, "score": 0.926, "w": 122, "cpu": 39.07, "temp": 58.95}
+{"t": 326.0, "faces": 1, "score": 0.928, "w": 124, "cpu": 39.1, "temp": 58.95}
+{"t": 326.5, "faces": 1, "score": 0.928, "w": 123, "cpu": 39.13, "temp": 57.85, "owner_sim": 0.725}
+{"t": 327.0, "faces": 1, "score": 0.926, "w": 123, "cpu": 39.27, "temp": 57.85}
+{"t": 327.5, "faces": 1, "score": 0.925, "w": 128, "cpu": 39.3, "temp": 57.3}
+{"t": 328.0, "faces": 1, "score": 0.923, "w": 129, "cpu": 39.34, "temp": 57.3}
+{"t": 328.5, "faces": 1, "score": 0.926, "w": 121, "cpu": 39.37, "temp": 58.4, "owner_sim": 0.706}
+{"t": 329.0, "faces": 1, "score": 0.93, "w": 117, "cpu": 39.5, "temp": 57.3}
+{"t": 329.5, "faces": 1, "score": 0.935, "w": 121, "cpu": 39.54, "temp": 58.4}
+{"t": 330.0, "faces": 1, "score": 0.927, "w": 122, "cpu": 39.57, "temp": 58.4}
+{"t": 330.5, "faces": 1, "score": 0.931, "w": 128, "cpu": 39.6, "temp": 57.3, "owner_sim": 0.724}
+{"t": 331.0, "faces": 1, "score": 0.929, "w": 125, "cpu": 39.74, "temp": 58.4}
+{"t": 331.5, "faces": 1, "score": 0.924, "w": 124, "cpu": 39.77, "temp": 57.85}
+{"t": 332.0, "faces": 1, "score": 0.936, "w": 125, "cpu": 39.8, "temp": 57.85}
+{"t": 332.5, "faces": 1, "score": 0.933, "w": 125, "cpu": 39.84, "temp": 57.85, "owner_sim": 0.733}
+{"t": 333.0, "faces": 1, "score": 0.927, "w": 125, "cpu": 39.97, "temp": 58.95}
+{"t": 333.5, "faces": 1, "score": 0.932, "w": 125, "cpu": 40.01, "temp": 57.3}
+{"t": 334.0, "faces": 1, "score": 0.931, "w": 125, "cpu": 40.04, "temp": 57.85}
+{"t": 334.5, "faces": 1, "score": 0.929, "w": 125, "cpu": 40.07, "temp": 57.3, "owner_sim": 0.723}
+{"t": 335.0, "faces": 1, "score": 0.929, "w": 124, "cpu": 40.2, "temp": 58.4}
+{"t": 335.5, "faces": 1, "score": 0.929, "w": 124, "cpu": 40.24, "temp": 57.85}
+{"t": 336.0, "faces": 1, "score": 0.93, "w": 124, "cpu": 40.27, "temp": 58.95}
+{"t": 336.5, "faces": 1, "score": 0.93, "w": 124, "cpu": 40.3, "temp": 60.05, "owner_sim": 0.69}
+{"t": 337.0, "faces": 1, "score": 0.929, "w": 124, "cpu": 40.43, "temp": 58.4}
+{"t": 337.5, "faces": 1, "score": 0.929, "w": 125, "cpu": 40.46, "temp": 58.95}
+{"t": 338.0, "faces": 1, "score": 0.93, "w": 124, "cpu": 40.49, "temp": 57.85}
+{"t": 338.5, "faces": 1, "score": 0.928, "w": 124, "cpu": 40.53, "temp": 56.2, "owner_sim": 0.703}
+{"t": 339.0, "faces": 1, "score": 0.927, "w": 126, "cpu": 40.66, "temp": 57.85}
+{"t": 339.5, "faces": 1, "score": 0.926, "w": 123, "cpu": 40.69, "temp": 57.85}
+{"t": 340.0, "faces": 1, "score": 0.924, "w": 123, "cpu": 40.73, "temp": 58.4}
+{"t": 340.5, "faces": 1, "score": 0.923, "w": 122, "cpu": 40.76, "temp": 57.85, "owner_sim": 0.688}
+{"t": 341.0, "faces": 1, "score": 0.921, "w": 123, "cpu": 40.89, "temp": 57.3}
+{"t": 341.5, "faces": 1, "score": 0.923, "w": 124, "cpu": 40.93, "temp": 57.3}
+{"t": 342.0, "faces": 1, "score": 0.931, "w": 125, "cpu": 40.96, "temp": 57.3}
+{"t": 342.5, "faces": 1, "score": 0.926, "w": 125, "cpu": 40.99, "temp": 58.4, "owner_sim": 0.709}
+{"t": 343.0, "faces": 1, "score": 0.929, "w": 125, "cpu": 41.13, "temp": 58.4}
+{"t": 343.5, "faces": 1, "score": 0.922, "w": 121, "cpu": 41.16, "temp": 57.85}
+{"t": 344.0, "faces": 1, "score": 0.931, "w": 125, "cpu": 41.19, "temp": 58.4}
+{"t": 344.5, "faces": 1, "score": 0.929, "w": 126, "cpu": 41.23, "temp": 57.85, "owner_sim": 0.712}
+{"t": 345.0, "faces": 1, "score": 0.928, "w": 128, "cpu": 41.36, "temp": 58.4}
+{"t": 345.5, "faces": 1, "score": 0.93, "w": 115, "cpu": 41.4, "temp": 57.85}
+{"t": 346.0, "faces": 1, "score": 0.928, "w": 111, "cpu": 41.43, "temp": 57.85}
+{"t": 346.5, "faces": 1, "score": 0.926, "w": 113, "cpu": 41.46, "temp": 57.3, "owner_sim": 0.678}
+{"t": 347.0, "faces": 1, "score": 0.932, "w": 110, "cpu": 41.6, "temp": 58.4}
+{"t": 347.5, "faces": 1, "score": 0.925, "w": 110, "cpu": 41.63, "temp": 58.4}
+{"t": 348.0, "faces": 1, "score": 0.925, "w": 112, "cpu": 41.66, "temp": 58.4}
+{"t": 348.5, "faces": 1, "score": 0.927, "w": 112, "cpu": 41.7, "temp": 58.4, "owner_sim": 0.712}
+{"t": 349.0, "faces": 1, "score": 0.925, "w": 111, "cpu": 41.83, "temp": 58.4}
+{"t": 349.5, "faces": 1, "score": 0.929, "w": 111, "cpu": 41.86, "temp": 58.4}
+{"t": 350.0, "faces": 1, "score": 0.929, "w": 111, "cpu": 41.9, "temp": 57.85}
+{"t": 350.5, "faces": 1, "score": 0.931, "w": 115, "cpu": 41.93, "temp": 57.85, "owner_sim": 0.699}
+{"t": 351.0, "faces": 1, "score": 0.932, "w": 112, "cpu": 42.07, "temp": 58.95}
+{"t": 351.5, "faces": 1, "score": 0.93, "w": 112, "cpu": 42.1, "temp": 58.4}
+{"t": 352.0, "faces": 1, "score": 0.932, "w": 112, "cpu": 42.13, "temp": 58.4}
+{"t": 352.5, "faces": 1, "score": 0.932, "w": 111, "cpu": 42.16, "temp": 57.3, "owner_sim": 0.712}
+{"t": 353.0, "faces": 1, "score": 0.933, "w": 113, "cpu": 42.3, "temp": 58.95}
+{"t": 353.5, "faces": 1, "score": 0.929, "w": 114, "cpu": 42.33, "temp": 58.95}
+{"t": 354.0, "faces": 1, "score": 0.926, "w": 111, "cpu": 42.36, "temp": 58.4}
+{"t": 354.5, "faces": 1, "score": 0.926, "w": 111, "cpu": 42.4, "temp": 58.4, "owner_sim": 0.7}
+{"t": 355.0, "faces": 1, "score": 0.926, "w": 111, "cpu": 42.52, "temp": 58.4}
+{"t": 355.5, "faces": 1, "score": 0.93, "w": 110, "cpu": 42.56, "temp": 57.85}
+{"t": 356.0, "faces": 1, "score": 0.928, "w": 111, "cpu": 42.59, "temp": 58.95}
+{"t": 356.5, "faces": 1, "score": 0.931, "w": 112, "cpu": 42.62, "temp": 58.4, "owner_sim": 0.693}
+{"t": 357.0, "faces": 1, "score": 0.923, "w": 113, "cpu": 42.76, "temp": 58.4}
+{"t": 357.5, "faces": 1, "score": 0.933, "w": 112, "cpu": 42.79, "temp": 57.3}
+{"t": 358.0, "faces": 1, "score": 0.933, "w": 112, "cpu": 42.82, "temp": 64.45}
+{"t": 358.5, "faces": 1, "score": 0.928, "w": 111, "cpu": 42.84, "temp": 65.55, "owner_sim": 0.732}
+{"t": 359.0, "faces": 1, "score": 0.928, "w": 123, "cpu": 42.93, "temp": 66.1}
+{"t": 359.5, "faces": 1, "score": 0.92, "w": 124, "cpu": 42.97, "temp": 68.3}
+{"t": 360.0, "faces": 1, "score": 0.928, "w": 131, "cpu": 43.01, "temp": 67.75}
+{"t": 360.5, "faces": 1, "score": 0.911, "w": 132, "cpu": 43.04, "temp": 69.95, "owner_sim": 0.705}
+{"t": 361.0, "faces": 1, "score": 0.922, "w": 129, "cpu": 43.18, "temp": 71.6}
+{"t": 361.5, "faces": 1, "score": 0.925, "w": 130, "cpu": 43.22, "temp": 71.6}
+{"t": 362.0, "faces": 1, "score": 0.937, "w": 128, "cpu": 43.25, "temp": 71.6}
+{"t": 362.5, "faces": 1, "score": 0.928, "w": 124, "cpu": 43.29, "temp": 72.7, "owner_sim": 0.718}
+{"t": 363.0, "faces": 1, "score": 0.93, "w": 125, "cpu": 43.42, "temp": 74.35}
+{"t": 363.5, "faces": 1, "score": 0.932, "w": 123, "cpu": 43.46, "temp": 73.8}
+{"t": 364.0, "faces": 1, "score": 0.932, "w": 126, "cpu": 43.49, "temp": 74.9}
+{"t": 364.5, "faces": 1, "score": 0.93, "w": 122, "cpu": 43.53, "temp": 75.45, "owner_sim": 0.722}
+{"t": 365.0, "faces": 1, "score": 0.931, "w": 122, "cpu": 43.64, "temp": 76.0}
+{"t": 365.5, "faces": 1, "score": 0.928, "w": 122, "cpu": 43.66, "temp": 77.65}
+{"t": 366.0, "faces": 1, "score": 0.929, "w": 115, "cpu": 43.69, "temp": 77.1}
+{"t": 366.5, "faces": 1, "score": 0.924, "w": 117, "cpu": 43.72, "temp": 73.25, "owner_sim": 0.724}
+{"t": 367.0, "faces": 1, "score": 0.931, "w": 111, "cpu": 43.81, "temp": 71.05}
+{"t": 367.5, "faces": 1, "score": 0.927, "w": 117, "cpu": 43.84, "temp": 70.5}
+{"t": 368.0, "faces": 1, "score": 0.931, "w": 112, "cpu": 43.86, "temp": 68.85}
+{"t": 368.5, "faces": 1, "score": 0.931, "w": 116, "cpu": 43.89, "temp": 68.85, "owner_sim": 0.689}
+{"t": 369.0, "faces": 1, "score": 0.93, "w": 116, "cpu": 43.98, "temp": 68.3}
+{"t": 369.5, "faces": 1, "score": 0.93, "w": 116, "cpu": 44.01, "temp": 68.3}
+{"t": 370.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 44.03, "temp": 66.65}
+{"t": 370.5, "faces": 1, "score": 0.932, "w": 114, "cpu": 44.05, "temp": 67.75, "owner_sim": 0.724}
+{"t": 371.0, "faces": 1, "score": 0.932, "w": 117, "cpu": 44.15, "temp": 66.65}
+{"t": 371.5, "faces": 1, "score": 0.931, "w": 116, "cpu": 44.17, "temp": 66.65}
+{"t": 372.0, "faces": 1, "score": 0.932, "w": 114, "cpu": 44.2, "temp": 65.55}
+{"t": 372.5, "faces": 1, "score": 0.933, "w": 112, "cpu": 44.22, "temp": 65.55, "owner_sim": 0.714}
+{"t": 373.0, "faces": 1, "score": 0.934, "w": 112, "cpu": 44.33, "temp": 65.55}
+{"t": 373.5, "faces": 1, "score": 0.929, "w": 115, "cpu": 44.36, "temp": 64.45}
+{"t": 374.0, "faces": 1, "score": 0.93, "w": 111, "cpu": 44.39, "temp": 64.45}
+{"t": 374.5, "faces": 1, "score": 0.93, "w": 111, "cpu": 44.43, "temp": 64.45, "owner_sim": 0.716}
+{"t": 375.0, "faces": 1, "score": 0.93, "w": 115, "cpu": 44.55, "temp": 65.0}
+{"t": 375.5, "faces": 1, "score": 0.928, "w": 112, "cpu": 44.58, "temp": 63.35}
+{"t": 376.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 44.6, "temp": 64.45}
+{"t": 376.5, "faces": 1, "score": 0.93, "w": 114, "cpu": 44.63, "temp": 63.35, "owner_sim": 0.692}
+{"t": 377.0, "faces": 1, "score": 0.928, "w": 117, "cpu": 44.72, "temp": 63.9}
+{"t": 377.5, "faces": 1, "score": 0.931, "w": 117, "cpu": 44.75, "temp": 63.9}
+{"t": 378.0, "faces": 1, "score": 0.93, "w": 118, "cpu": 44.77, "temp": 63.35}
+{"t": 378.5, "faces": 1, "score": 0.931, "w": 114, "cpu": 44.8, "temp": 62.8, "owner_sim": 0.726}
+{"t": 379.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 44.89, "temp": 63.35}
+{"t": 379.5, "faces": 1, "score": 0.931, "w": 118, "cpu": 44.92, "temp": 63.35}
+{"t": 380.0, "faces": 1, "score": 0.929, "w": 116, "cpu": 44.95, "temp": 63.35}
+{"t": 380.5, "faces": 1, "score": 0.93, "w": 118, "cpu": 44.98, "temp": 61.7, "owner_sim": 0.713}
+{"t": 381.0, "faces": 1, "score": 0.929, "w": 118, "cpu": 45.11, "temp": 62.8}
+{"t": 381.5, "faces": 1, "score": 0.93, "w": 116, "cpu": 45.14, "temp": 63.35}
+{"t": 382.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 45.16, "temp": 62.8}
+{"t": 382.5, "faces": 1, "score": 0.932, "w": 117, "cpu": 45.18, "temp": 62.8, "owner_sim": 0.687}
+{"t": 383.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 45.28, "temp": 62.25}
+{"t": 383.5, "faces": 1, "score": 0.93, "w": 117, "cpu": 45.3, "temp": 62.8}
+{"t": 384.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 45.33, "temp": 63.35}
+{"t": 384.5, "faces": 1, "score": 0.93, "w": 117, "cpu": 45.35, "temp": 63.35, "owner_sim": 0.672}
+{"t": 385.0, "faces": 1, "score": 0.932, "w": 117, "cpu": 45.45, "temp": 63.35}
+{"t": 385.5, "faces": 1, "score": 0.93, "w": 112, "cpu": 45.47, "temp": 62.8}
+{"t": 386.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 45.5, "temp": 62.25}
+{"t": 386.5, "faces": 1, "score": 0.93, "w": 114, "cpu": 45.54, "temp": 62.25, "owner_sim": 0.668}
+{"t": 387.0, "faces": 1, "score": 0.931, "w": 113, "cpu": 45.67, "temp": 61.7}
+{"t": 387.5, "faces": 1, "score": 0.932, "w": 113, "cpu": 45.71, "temp": 61.15}
+{"t": 388.0, "faces": 1, "score": 0.926, "w": 112, "cpu": 45.74, "temp": 61.7}
+{"t": 388.5, "faces": 1, "score": 0.93, "w": 110, "cpu": 45.77, "temp": 62.8, "owner_sim": 0.722}
+{"t": 389.0, "faces": 1, "score": 0.93, "w": 111, "cpu": 45.91, "temp": 61.15}
+{"t": 389.5, "faces": 1, "score": 0.928, "w": 111, "cpu": 45.94, "temp": 61.7}
+{"t": 390.0, "faces": 1, "score": 0.933, "w": 111, "cpu": 45.97, "temp": 60.6}
+{"t": 390.5, "faces": 1, "score": 0.929, "w": 111, "cpu": 46.01, "temp": 61.15, "owner_sim": 0.7}
+{"t": 391.0, "faces": 1, "score": 0.929, "w": 116, "cpu": 46.14, "temp": 61.7}
+{"t": 391.5, "faces": 1, "score": 0.926, "w": 114, "cpu": 46.17, "temp": 60.6}
+{"t": 392.0, "faces": 1, "score": 0.928, "w": 112, "cpu": 46.21, "temp": 60.6}
+{"t": 392.5, "faces": 1, "score": 0.928, "w": 115, "cpu": 46.24, "temp": 60.6, "owner_sim": 0.767}
+{"t": 393.0, "faces": 1, "score": 0.92, "w": 115, "cpu": 46.37, "temp": 60.05}
+{"t": 393.5, "faces": 1, "score": 0.925, "w": 115, "cpu": 46.41, "temp": 60.6}
+{"t": 394.0, "faces": 1, "score": 0.93, "w": 112, "cpu": 46.44, "temp": 60.05}
+{"t": 394.5, "faces": 1, "score": 0.925, "w": 114, "cpu": 46.47, "temp": 58.95, "owner_sim": 0.753}
+{"t": 395.0, "faces": 1, "score": 0.925, "w": 114, "cpu": 46.61, "temp": 60.05}
+{"t": 395.5, "faces": 1, "score": 0.924, "w": 115, "cpu": 46.64, "temp": 60.05}
+{"t": 396.0, "faces": 1, "score": 0.923, "w": 114, "cpu": 46.67, "temp": 59.5}
+{"t": 396.5, "faces": 1, "score": 0.929, "w": 114, "cpu": 46.7, "temp": 59.5, "owner_sim": 0.732}
+{"t": 397.0, "faces": 1, "score": 0.929, "w": 115, "cpu": 46.84, "temp": 61.15}
+{"t": 397.5, "faces": 1, "score": 0.928, "w": 117, "cpu": 46.87, "temp": 60.05}
+{"t": 398.0, "faces": 1, "score": 0.93, "w": 117, "cpu": 46.9, "temp": 59.5}
+{"t": 398.5, "faces": 1, "score": 0.928, "w": 116, "cpu": 46.94, "temp": 59.5, "owner_sim": 0.716}
+{"t": 399.0, "faces": 1, "score": 0.928, "w": 114, "cpu": 47.07, "temp": 59.5}
+{"t": 399.5, "faces": 1, "score": 0.93, "w": 118, "cpu": 47.1, "temp": 60.05}
+{"t": 400.0, "faces": 1, "score": 0.93, "w": 117, "cpu": 47.14, "temp": 60.05}
+{"t": 400.5, "faces": 1, "score": 0.93, "w": 117, "cpu": 47.17, "temp": 60.05, "owner_sim": 0.735}
+{"t": 401.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 47.31, "temp": 60.05}
+{"t": 401.5, "faces": 1, "score": 0.932, "w": 114, "cpu": 47.34, "temp": 59.5}
+{"t": 402.0, "faces": 1, "score": 0.931, "w": 113, "cpu": 47.37, "temp": 60.05}
+{"t": 402.5, "faces": 1, "score": 0.932, "w": 117, "cpu": 47.4, "temp": 60.05, "owner_sim": 0.705}
+{"t": 403.0, "faces": 1, "score": 0.932, "w": 117, "cpu": 47.54, "temp": 60.05}
+{"t": 403.5, "faces": 1, "score": 0.933, "w": 117, "cpu": 47.57, "temp": 58.4}
+{"t": 404.0, "faces": 1, "score": 0.932, "w": 117, "cpu": 47.6, "temp": 59.5}
+{"t": 404.5, "faces": 1, "score": 0.93, "w": 117, "cpu": 47.64, "temp": 60.05, "owner_sim": 0.7}
+{"t": 405.0, "faces": 1, "score": 0.93, "w": 118, "cpu": 47.77, "temp": 60.05}
+{"t": 405.5, "faces": 1, "score": 0.931, "w": 113, "cpu": 47.81, "temp": 58.95}
+{"t": 406.0, "faces": 1, "score": 0.93, "w": 118, "cpu": 47.84, "temp": 60.05}
+{"t": 406.5, "faces": 1, "score": 0.929, "w": 113, "cpu": 47.87, "temp": 59.5, "owner_sim": 0.697}
+{"t": 407.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 48.01, "temp": 59.5}
+{"t": 407.5, "faces": 1, "score": 0.929, "w": 118, "cpu": 48.04, "temp": 58.95}
+{"t": 408.0, "faces": 1, "score": 0.93, "w": 117, "cpu": 48.07, "temp": 60.05}
+{"t": 408.5, "faces": 1, "score": 0.932, "w": 112, "cpu": 48.11, "temp": 59.5, "owner_sim": 0.71}
+{"t": 409.0, "faces": 1, "score": 0.932, "w": 111, "cpu": 48.24, "temp": 60.05}
+{"t": 409.5, "faces": 1, "score": 0.931, "w": 111, "cpu": 48.27, "temp": 58.95}
+{"t": 410.0, "faces": 1, "score": 0.931, "w": 117, "cpu": 48.3, "temp": 58.95}
+{"t": 410.5, "faces": 1, "score": 0.933, "w": 117, "cpu": 48.33, "temp": 62.8, "owner_sim": 0.697}
+{"t": 411.0, "faces": 1, "score": 0.931, "w": 113, "cpu": 48.43, "temp": 67.75}
+{"t": 411.5, "faces": 1, "score": 0.929, "w": 111, "cpu": 48.46, "temp": 68.3}
+{"t": 412.0, "faces": 1, "score": 0.925, "w": 112, "cpu": 48.5, "temp": 68.85}
+{"t": 412.5, "faces": 1, "score": 0.926, "w": 110, "cpu": 48.54, "temp": 69.95, "owner_sim": 0.693}
+{"t": 413.0, "faces": 1, "score": 0.927, "w": 111, "cpu": 48.65, "temp": 72.15}
+{"t": 413.5, "faces": 1, "score": 0.928, "w": 111, "cpu": 48.68, "temp": 72.7}
+{"t": 414.0, "faces": 1, "score": 0.928, "w": 111, "cpu": 48.72, "temp": 73.25}
+{"t": 414.5, "faces": 1, "score": 0.929, "w": 113, "cpu": 48.75, "temp": 73.8, "owner_sim": 0.684}
+{"t": 415.0, "faces": 1, "score": 0.929, "w": 117, "cpu": 48.87, "temp": 74.35}
+{"t": 415.5, "faces": 1, "score": 0.931, "w": 112, "cpu": 48.9, "temp": 75.45}
+{"t": 416.0, "faces": 1, "score": 0.928, "w": 111, "cpu": 48.94, "temp": 76.0}
+{"t": 416.5, "faces": 1, "score": 0.928, "w": 116, "cpu": 48.97, "temp": 76.55, "owner_sim": 0.683}
+{"t": 417.0, "faces": 1, "score": 0.92, "w": 113, "cpu": 49.08, "temp": 76.55}
+{"t": 417.5, "faces": 1, "score": 0.927, "w": 116, "cpu": 49.11, "temp": 76.55}
+{"t": 418.0, "faces": 1, "score": 0.929, "w": 117, "cpu": 49.15, "temp": 77.65}
+{"t": 418.5, "faces": 1, "score": 0.928, "w": 116, "cpu": 49.18, "temp": 77.65, "owner_sim": 0.713}
+{"t": 419.0, "faces": 1, "score": 0.927, "w": 112, "cpu": 49.28, "temp": 78.75}
+{"t": 419.5, "faces": 1, "score": 0.926, "w": 110, "cpu": 49.32, "temp": 78.75}
+{"t": 420.0, "faces": 1, "score": 0.928, "w": 112, "cpu": 49.36, "temp": 79.3}
+{"t": 420.5, "faces": 1, "score": 0.927, "w": 115, "cpu": 49.38, "temp": 79.85, "owner_sim": 0.715}
+{"t": 421.0, "faces": 1, "score": 0.924, "w": 112, "cpu": 49.47, "temp": 78.75}
+{"t": 421.5, "faces": 1, "score": 0.925, "w": 112, "cpu": 49.5, "temp": 79.85}
+{"t": 422.0, "faces": 1, "score": 0.929, "w": 109, "cpu": 49.53, "temp": 80.4}
+{"t": 422.5, "faces": 1, "score": 0.928, "w": 115, "cpu": 49.56, "temp": 80.4, "owner_sim": 0.681}
+{"t": 423.0, "faces": 1, "score": 0.931, "w": 109, "cpu": 49.66, "temp": 78.75}
+{"t": 423.5, "faces": 1, "score": 0.931, "w": 110, "cpu": 49.69, "temp": 81.5}
+{"t": 424.0, "faces": 1, "score": 0.928, "w": 110, "cpu": 49.73, "temp": 81.5}
+{"t": 424.5, "faces": 1, "score": 0.93, "w": 110, "cpu": 49.77, "temp": 81.5, "owner_sim": 0.69}
+{"t": 425.0, "faces": 1, "score": 0.927, "w": 113, "cpu": 49.87, "temp": 81.5}
+{"t": 425.5, "faces": 1, "score": 0.929, "w": 113, "cpu": 49.89, "temp": 82.05}
+{"t": 426.0, "faces": 1, "score": 0.93, "w": 108, "cpu": 49.92, "temp": 82.05}
+{"t": 426.5, "faces": 1, "score": 0.931, "w": 115, "cpu": 49.95, "temp": 81.5, "owner_sim": 0.704}
+{"t": 427.0, "faces": 1, "score": 0.93, "w": 112, "cpu": 50.05, "temp": 81.5}
+{"t": 427.5, "faces": 1, "score": 0.924, "w": 116, "cpu": 50.09, "temp": 81.5}
+{"t": 428.0, "faces": 1, "score": 0.925, "w": 113, "cpu": 50.12, "temp": 82.6}
+{"t": 428.5, "faces": 1, "score": 0.932, "w": 112, "cpu": 50.16, "temp": 82.6, "owner_sim": 0.686}
+{"t": 429.0, "faces": 1, "score": 0.933, "w": 111, "cpu": 50.3, "temp": 82.05}
+{"t": 429.5, "faces": 1, "score": 0.932, "w": 111, "cpu": 50.32, "temp": 83.15}
+{"t": 430.0, "faces": 1, "score": 0.93, "w": 111, "cpu": 50.35, "temp": 81.5}
+{"t": 430.5, "faces": 1, "score": 0.927, "w": 109, "cpu": 50.37, "temp": 81.5, "owner_sim": 0.7}
+{"t": 431.01, "faces": 1, "score": 0.928, "w": 110, "cpu": 50.48, "temp": 82.05}
+{"t": 431.5, "faces": 1, "score": 0.926, "w": 117, "cpu": 50.5, "temp": 83.15}
+{"t": 432.0, "faces": 1, "score": 0.926, "w": 110, "cpu": 50.54, "temp": 83.15}
+{"t": 432.5, "faces": 1, "score": 0.927, "w": 111, "cpu": 50.56, "temp": 82.05, "owner_sim": 0.702}
+{"t": 433.0, "faces": 1, "score": 0.929, "w": 111, "cpu": 50.67, "temp": 82.05}
+{"t": 433.5, "faces": 1, "score": 0.93, "w": 112, "cpu": 50.7, "temp": 83.7}
+{"t": 434.0, "faces": 1, "score": 0.927, "w": 114, "cpu": 50.72, "temp": 82.6}
+{"t": 434.5, "faces": 1, "score": 0.933, "w": 113, "cpu": 50.76, "temp": 83.7, "owner_sim": 0.699}
+{"t": 435.0, "faces": 1, "score": 0.931, "w": 114, "cpu": 50.88, "temp": 83.15}
+{"t": 435.5, "faces": 1, "score": 0.932, "w": 114, "cpu": 50.9, "temp": 82.6}
+{"t": 436.0, "faces": 1, "score": 0.933, "w": 114, "cpu": 50.93, "temp": 83.15}
+{"t": 436.5, "faces": 1, "score": 0.932, "w": 114, "cpu": 50.95, "temp": 83.15, "owner_sim": 0.703}
+{"t": 437.0, "faces": 1, "score": 0.931, "w": 116, "cpu": 51.06, "temp": 83.15}
+{"t": 437.5, "faces": 1, "score": 0.933, "w": 115, "cpu": 51.09, "temp": 83.15}
+{"t": 438.01, "faces": 1, "score": 0.933, "w": 116, "cpu": 51.13, "temp": 83.7}
+{"t": 438.5, "faces": 1, "score": 0.934, "w": 116, "cpu": 51.15, "temp": 80.4, "owner_sim": 0.741}
+{"t": 439.0, "faces": 1, "score": 0.933, "w": 115, "cpu": 51.25, "temp": 79.85}
+{"t": 439.5, "faces": 1, "score": 0.933, "w": 116, "cpu": 51.28, "temp": 77.1}
+{"t": 440.0, "faces": 1, "score": 0.933, "w": 115, "cpu": 51.3, "temp": 76.55}
+{"t": 440.5, "faces": 1, "score": 0.929, "w": 113, "cpu": 51.32, "temp": 74.35, "owner_sim": 0.749}
+{"t": 441.0, "faces": 1, "score": 0.932, "w": 114, "cpu": 51.42, "temp": 74.9}
+{"t": 441.5, "faces": 1, "score": 0.928, "w": 113, "cpu": 51.44, "temp": 73.25}
+{"t": 442.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 51.47, "temp": 73.8}
+{"t": 442.5, "faces": 1, "score": 0.93, "w": 113, "cpu": 51.49, "temp": 71.6, "owner_sim": 0.71}
+{"t": 443.0, "faces": 1, "score": 0.927, "w": 113, "cpu": 51.59, "temp": 71.6}
+{"t": 443.5, "faces": 1, "score": 0.929, "w": 114, "cpu": 51.61, "temp": 70.5}
+{"t": 444.0, "faces": 1, "score": 0.932, "w": 115, "cpu": 51.64, "temp": 71.05}
+{"t": 444.5, "faces": 1, "score": 0.93, "w": 111, "cpu": 51.66, "temp": 69.95, "owner_sim": 0.674}
+{"t": 445.0, "faces": 1, "score": 0.932, "w": 114, "cpu": 51.75, "temp": 68.85}
+{"t": 445.5, "faces": 1, "score": 0.927, "w": 118, "cpu": 51.79, "temp": 68.85}
+{"t": 446.0, "faces": 1, "score": 0.931, "w": 113, "cpu": 51.82, "temp": 68.3}
+{"t": 446.5, "faces": 1, "score": 0.933, "w": 117, "cpu": 51.85, "temp": 67.75, "owner_sim": 0.712}
+{"t": 447.0, "faces": 1, "score": 0.932, "w": 116, "cpu": 51.99, "temp": 67.2}
+{"t": 447.5, "faces": 1, "score": 0.93, "w": 114, "cpu": 52.02, "temp": 67.2}
+{"t": 448.0, "faces": 1, "score": 0.929, "w": 114, "cpu": 52.05, "temp": 67.2}
+{"t": 448.5, "faces": 1, "score": 0.931, "w": 114, "cpu": 52.08, "temp": 66.1, "owner_sim": 0.736}
+{"t": 449.0, "faces": 1, "score": 0.93, "w": 115, "cpu": 52.22, "temp": 66.1}
+{"t": 449.5, "faces": 1, "score": 0.932, "w": 114, "cpu": 52.25, "temp": 65.55}
+{"t": 450.0, "faces": 1, "score": 0.931, "w": 112, "cpu": 52.28, "temp": 65.0}
+{"t": 450.5, "faces": 1, "score": 0.931, "w": 115, "cpu": 52.32, "temp": 65.55, "owner_sim": 0.749}
+{"t": 451.0, "faces": 1, "score": 0.931, "w": 112, "cpu": 52.45, "temp": 65.0}
+{"t": 451.5, "faces": 1, "score": 0.931, "w": 116, "cpu": 52.48, "temp": 64.45}
+{"t": 452.0, "faces": 1, "score": 0.931, "w": 111, "cpu": 52.52, "temp": 64.45}
+{"t": 452.5, "faces": 1, "score": 0.931, "w": 111, "cpu": 52.55, "temp": 64.45, "owner_sim": 0.709}
+{"t": 453.0, "faces": 1, "score": 0.928, "w": 111, "cpu": 52.68, "temp": 63.9}
+{"t": 453.5, "faces": 1, "score": 0.932, "w": 112, "cpu": 52.71, "temp": 63.9}
+{"t": 454.0, "faces": 1, "score": 0.93, "w": 111, "cpu": 52.75, "temp": 63.35}
+{"t": 454.5, "faces": 1, "score": 0.925, "w": 111, "cpu": 52.78, "temp": 63.9, "owner_sim": 0.71}
+{"t": 455.0, "faces": 1, "score": 0.93, "w": 109, "cpu": 52.91, "temp": 63.35}
+{"t": 455.5, "faces": 1, "score": 0.931, "w": 115, "cpu": 52.94, "temp": 63.35}
+{"t": 456.0, "faces": 1, "score": 0.93, "w": 116, "cpu": 52.97, "temp": 63.35}
+{"t": 456.5, "faces": 1, "score": 0.929, "w": 112, "cpu": 53.0, "temp": 62.25, "owner_sim": 0.709}
+{"t": 457.0, "faces": 1, "score": 0.928, "w": 113, "cpu": 53.13, "temp": 62.8}
+{"t": 457.5, "faces": 1, "score": 0.927, "w": 112, "cpu": 53.16, "temp": 62.25}
+{"t": 458.0, "faces": 1, "score": 0.931, "w": 111, "cpu": 53.2, "temp": 62.8}
+{"t": 458.5, "faces": 1, "score": 0.928, "w": 111, "cpu": 53.23, "temp": 62.25, "owner_sim": 0.722}
+{"t": 459.0, "faces": 1, "score": 0.926, "w": 110, "cpu": 53.36, "temp": 62.25}
+{"t": 459.5, "faces": 1, "score": 0.928, "w": 109, "cpu": 53.39, "temp": 62.25}
+{"t": 460.0, "faces": 1, "score": 0.929, "w": 114, "cpu": 53.42, "temp": 62.8}
+{"t": 460.5, "faces": 1, "score": 0.931, "w": 117, "cpu": 53.46, "temp": 62.25, "owner_sim": 0.726}
+{"t": 461.0, "faces": 1, "score": 0.928, "w": 112, "cpu": 53.59, "temp": 62.8}
+{"t": 461.5, "faces": 1, "score": 0.931, "w": 111, "cpu": 53.62, "temp": 62.8}
+{"t": 462.0, "faces": 1, "score": 0.928, "w": 109, "cpu": 53.65, "temp": 62.8}
+{"t": 462.5, "faces": 1, "score": 0.929, "w": 115, "cpu": 53.69, "temp": 62.25, "owner_sim": 0.71}
+{"t": 463.0, "faces": 1, "score": 0.927, "w": 110, "cpu": 53.82, "temp": 62.25}
+{"t": 463.5, "faces": 1, "score": 0.925, "w": 109, "cpu": 53.85, "temp": 61.15}
+{"t": 464.0, "faces": 1, "score": 0.926, "w": 108, "cpu": 53.89, "temp": 62.25}
+{"t": 464.5, "faces": 1, "score": 0.927, "w": 114, "cpu": 53.92, "temp": 61.7, "owner_sim": 0.705}
+{"t": 465.0, "faces": 1, "score": 0.927, "w": 110, "cpu": 54.05, "temp": 61.7}
+{"t": 465.5, "faces": 1, "score": 0.929, "w": 110, "cpu": 54.08, "temp": 62.8}
+{"t": 466.0, "faces": 1, "score": 0.928, "w": 109, "cpu": 54.11, "temp": 62.8}
+{"t": 466.5, "faces": 1, "score": 0.926, "w": 110, "cpu": 54.14, "temp": 62.25, "owner_sim": 0.709}
+{"t": 467.0, "faces": 1, "score": 0.926, "w": 109, "cpu": 54.27, "temp": 62.25}
+{"t": 467.5, "faces": 1, "score": 0.928, "w": 109, "cpu": 54.3, "temp": 61.7}
+{"t": 468.0, "faces": 1, "score": 0.929, "w": 109, "cpu": 54.33, "temp": 63.35}
+{"t": 468.5, "faces": 1, "score": 0.927, "w": 109, "cpu": 54.36, "temp": 61.15, "owner_sim": 0.698}
+{"t": 469.0, "faces": 1, "score": 0.925, "w": 110, "cpu": 54.5, "temp": 62.25}
+{"t": 469.5, "faces": 1, "score": 0.925, "w": 111, "cpu": 54.53, "temp": 62.25}
+{"t": 470.0, "faces": 1, "score": 0.923, "w": 110, "cpu": 54.56, "temp": 62.25}
+{"t": 470.5, "faces": 1, "score": 0.922, "w": 111, "cpu": 54.6, "temp": 61.15, "owner_sim": 0.695}
+{"t": 471.0, "faces": 1, "score": 0.924, "w": 110, "cpu": 54.72, "temp": 61.7}
+{"t": 471.5, "faces": 1, "score": 0.924, "w": 109, "cpu": 54.76, "temp": 61.15}
+{"t": 472.0, "faces": 1, "score": 0.925, "w": 110, "cpu": 54.79, "temp": 61.15}
+{"t": 472.5, "faces": 1, "score": 0.923, "w": 110, "cpu": 54.82, "temp": 60.6, "owner_sim": 0.691}
+{"t": 473.0, "faces": 1, "score": 0.925, "w": 110, "cpu": 54.96, "temp": 61.7}
+{"t": 473.5, "faces": 1, "score": 0.924, "w": 110, "cpu": 54.99, "temp": 60.05}
+{"t": 474.0, "faces": 1, "score": 0.922, "w": 110, "cpu": 55.02, "temp": 61.15}
+{"t": 474.5, "faces": 1, "score": 0.923, "w": 110, "cpu": 55.06, "temp": 61.15, "owner_sim": 0.672}
+{"t": 475.0, "faces": 1, "score": 0.923, "w": 110, "cpu": 55.2, "temp": 62.25}
+{"t": 475.5, "faces": 1, "score": 0.924, "w": 110, "cpu": 55.23, "temp": 60.6}
+{"t": 476.0, "faces": 1, "score": 0.923, "w": 111, "cpu": 55.26, "temp": 60.6}
+{"t": 476.5, "faces": 1, "score": 0.923, "w": 110, "cpu": 55.3, "temp": 60.6, "owner_sim": 0.697}
+{"t": 477.0, "faces": 1, "score": 0.926, "w": 110, "cpu": 55.43, "temp": 60.6}
+{"t": 477.5, "faces": 1, "score": 0.926, "w": 108, "cpu": 55.46, "temp": 60.6}
+{"t": 478.0, "faces": 1, "score": 0.925, "w": 110, "cpu": 55.5, "temp": 61.15}
+{"t": 478.5, "faces": 1, "score": 0.924, "w": 110, "cpu": 55.53, "temp": 60.6, "owner_sim": 0.704}
+{"t": 479.0, "faces": 1, "score": 0.924, "w": 111, "cpu": 55.66, "temp": 61.15}
+{"t": 479.5, "faces": 1, "score": 0.928, "w": 109, "cpu": 55.7, "temp": 61.15}
+{"t": 480.0, "faces": 1, "score": 0.925, "w": 112, "cpu": 55.73, "temp": 62.25}
+{"t": 480.5, "faces": 1, "score": 0.925, "w": 111, "cpu": 55.76, "temp": 61.7, "owner_sim": 0.705}
+{"t": 481.0, "faces": 1, "score": 0.929, "w": 110, "cpu": 55.9, "temp": 60.6}
+{"t": 481.5, "faces": 1, "score": 0.926, "w": 110, "cpu": 55.93, "temp": 61.15}
+{"t": 482.0, "faces": 1, "score": 0.924, "w": 111, "cpu": 55.96, "temp": 60.6}
+{"t": 482.5, "faces": 1, "score": 0.926, "w": 112, "cpu": 56.0, "temp": 60.6, "owner_sim": 0.716}
+{"t": 483.0, "faces": 1, "score": 0.927, "w": 114, "cpu": 56.13, "temp": 61.15}
+{"t": 483.5, "faces": 1, "score": 0.924, "w": 110, "cpu": 56.16, "temp": 61.15}
+{"t": 484.0, "faces": 1, "score": 0.924, "w": 111, "cpu": 56.2, "temp": 60.6}
+{"t": 484.5, "faces": 1, "score": 0.927, "w": 111, "cpu": 56.23, "temp": 60.6, "owner_sim": 0.675}
+{"t": 485.0, "faces": 1, "score": 0.927, "w": 110, "cpu": 56.36, "temp": 61.15}
+{"t": 485.5, "faces": 1, "score": 0.927, "w": 110, "cpu": 56.39, "temp": 65.0}
+{"t": 486.0, "faces": 1, "score": 0.927, "w": 111, "cpu": 56.41, "temp": 67.2}
+{"t": 486.5, "faces": 1, "score": 0.924, "w": 113, "cpu": 56.44, "temp": 69.95, "owner_sim": 0.692}
+{"t": 487.0, "faces": 1, "score": 0.924, "w": 110, "cpu": 56.57, "temp": 71.6}
+{"t": 487.5, "faces": 1, "score": 0.926, "w": 112, "cpu": 56.61, "temp": 73.25}
+{"t": 488.0, "faces": 1, "score": 0.933, "w": 112, "cpu": 56.63, "temp": 73.8}
+{"t": 488.5, "faces": 1, "score": 0.928, "w": 113, "cpu": 56.65, "temp": 73.8, "owner_sim": 0.744}
+{"t": 489.0, "faces": 1, "score": 0.937, "w": 114, "cpu": 56.76, "temp": 74.35}
+{"t": 489.5, "faces": 1, "score": 0.937, "w": 113, "cpu": 56.78, "temp": 76.0}
+{"t": 490.0, "faces": 1, "score": 0.931, "w": 113, "cpu": 56.8, "temp": 76.55}
+{"t": 490.5, "faces": 1, "score": 0.929, "w": 113, "cpu": 56.84, "temp": 77.1, "owner_sim": 0.72}
+{"t": 491.0, "faces": 1, "score": 0.925, "w": 114, "cpu": 56.95, "temp": 77.1}
+{"t": 491.5, "faces": 1, "score": 0.926, "w": 112, "cpu": 56.98, "temp": 77.65}
+{"t": 492.0, "faces": 1, "score": 0.928, "w": 112, "cpu": 57.01, "temp": 77.65}
+{"t": 492.5, "faces": 1, "score": 0.928, "w": 108, "cpu": 57.03, "temp": 78.2, "owner_sim": 0.7}
+{"t": 493.0, "faces": 1, "score": 0.923, "w": 114, "cpu": 57.14, "temp": 77.65}
+{"t": 493.5, "faces": 1, "score": 0.928, "w": 126, "cpu": 57.17, "temp": 78.75}
+{"t": 494.0, "faces": 1, "score": 0.915, "w": 122, "cpu": 57.21, "temp": 79.85}
+{"t": 494.5, "faces": 1, "score": 0.916, "w": 119, "cpu": 57.24, "temp": 78.75, "owner_sim": 0.686}
+{"t": 495.0, "faces": 1, "score": 0.915, "w": 119, "cpu": 57.34, "temp": 79.85}
+{"t": 495.5, "faces": 1, "score": 0.914, "w": 120, "cpu": 57.37, "temp": 80.95}
+{"t": 496.0, "faces": 1, "score": 0.933, "w": 115, "cpu": 57.41, "temp": 79.85}
+{"t": 496.5, "faces": 1, "score": 0.926, "w": 123, "cpu": 57.44, "temp": 80.4, "owner_sim": 0.682}
+{"t": 497.0, "faces": 1, "score": 0.921, "w": 123, "cpu": 57.57, "temp": 81.5}
+{"t": 497.5, "faces": 1, "score": 0.924, "w": 118, "cpu": 57.61, "temp": 80.95}
+{"t": 498.0, "faces": 1, "score": 0.924, "w": 121, "cpu": 57.64, "temp": 81.5}
+{"t": 498.5, "faces": 1, "score": 0.923, "w": 121, "cpu": 57.68, "temp": 82.05, "owner_sim": 0.675}
+{"t": 499.0, "faces": 1, "score": 0.929, "w": 122, "cpu": 57.79, "temp": 80.4}
+{"t": 499.5, "faces": 1, "score": 0.928, "w": 120, "cpu": 57.82, "temp": 82.05}
+{"t": 500.0, "faces": 1, "score": 0.928, "w": 120, "cpu": 57.87, "temp": 82.05}
+{"t": 500.5, "faces": 1, "score": 0.922, "w": 115, "cpu": 57.9, "temp": 82.6, "owner_sim": 0.727}
+{"t": 501.0, "faces": 1, "score": 0.931, "w": 119, "cpu": 58.02, "temp": 82.6}
+{"t": 501.5, "faces": 1, "score": 0.928, "w": 108, "cpu": 58.05, "temp": 82.05}
+{"t": 502.01, "faces": 1, "score": 0.932, "w": 108, "cpu": 58.1, "temp": 83.15}
+{"t": 502.5, "faces": 1, "score": 0.932, "w": 110, "cpu": 58.13, "temp": 82.6, "owner_sim": 0.723}
+{"t": 503.01, "faces": 1, "score": 0.924, "w": 112, "cpu": 58.24, "temp": 83.15}
+{"t": 503.5, "faces": 1, "score": 0.925, "w": 110, "cpu": 58.27, "temp": 81.5}
+{"t": 504.0, "faces": 1, "score": 0.926, "w": 111, "cpu": 58.3, "temp": 78.2}
+{"t": 504.5, "faces": 1, "score": 0.93, "w": 106, "cpu": 58.32, "temp": 77.1, "owner_sim": 0.671}
+{"t": 505.0, "faces": 1, "score": 0.929, "w": 112, "cpu": 58.42, "temp": 75.45}
+{"t": 505.5, "faces": 1, "score": 0.929, "w": 117, "cpu": 58.44, "temp": 75.45}
+{"t": 506.0, "faces": 1, "score": 0.929, "w": 119, "cpu": 58.47, "temp": 74.9}
+{"t": 506.5, "faces": 1, "score": 0.93, "w": 109, "cpu": 58.49, "temp": 73.8, "owner_sim": 0.692}
+{"t": 507.0, "faces": 1, "score": 0.928, "w": 110, "cpu": 58.59, "temp": 72.15}
+{"t": 507.5, "faces": 1, "score": 0.923, "w": 113, "cpu": 58.61, "temp": 71.6}
+{"t": 508.0, "faces": 1, "score": 0.926, "w": 111, "cpu": 58.64, "temp": 69.4}
+{"t": 508.5, "faces": 1, "score": 0.925, "w": 111, "cpu": 58.66, "temp": 71.05, "owner_sim": 0.678}
+{"t": 509.0, "faces": 1, "score": 0.929, "w": 112, "cpu": 58.76, "temp": 69.95}
+{"t": 509.5, "faces": 1, "score": 0.924, "w": 111, "cpu": 58.78, "temp": 69.95}
+{"t": 510.0, "faces": 1, "score": 0.93, "w": 116, "cpu": 58.81, "temp": 69.4}
+{"t": 510.5, "faces": 1, "score": 0.933, "w": 109, "cpu": 58.84, "temp": 68.85, "owner_sim": 0.684}
+{"t": 511.0, "faces": 1, "score": 0.928, "w": 114, "cpu": 58.97, "temp": 68.3}
+{"t": 511.5, "faces": 1, "score": 0.929, "w": 114, "cpu": 59.01, "temp": 67.75}
+{"t": 512.0, "faces": 1, "score": 0.929, "w": 115, "cpu": 59.04, "temp": 67.75}
+{"t": 512.5, "faces": 1, "score": 0.93, "w": 116, "cpu": 59.07, "temp": 66.65, "owner_sim": 0.691}
+{"t": 513.0, "faces": 1, "score": 0.93, "w": 115, "cpu": 59.21, "temp": 66.65}
+{"t": 513.5, "faces": 1, "score": 0.929, "w": 110, "cpu": 59.24, "temp": 66.65}
+{"t": 514.0, "faces": 1, "score": 0.927, "w": 107, "cpu": 59.27, "temp": 66.1}
+{"t": 514.5, "faces": 1, "score": 0.93, "w": 109, "cpu": 59.3, "temp": 66.1, "owner_sim": 0.677}
+{"t": 515.0, "faces": 1, "score": 0.931, "w": 110, "cpu": 59.43, "temp": 65.55}
+{"t": 515.5, "faces": 1, "score": 0.928, "w": 113, "cpu": 59.47, "temp": 64.45}
+{"t": 516.0, "faces": 1, "score": 0.93, "w": 109, "cpu": 59.5, "temp": 64.45}
+{"t": 516.5, "faces": 1, "score": 0.929, "w": 109, "cpu": 59.53, "temp": 65.0, "owner_sim": 0.655}
+{"t": 517.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 59.66, "temp": 64.45}
+{"t": 517.5, "faces": 1, "score": 0.924, "w": 113, "cpu": 59.7, "temp": 64.45}
+{"t": 518.0, "faces": 1, "score": 0.928, "w": 113, "cpu": 59.73, "temp": 63.9}
+{"t": 518.5, "faces": 1, "score": 0.93, "w": 109, "cpu": 59.76, "temp": 64.45, "owner_sim": 0.694}
+{"t": 519.0, "faces": 1, "score": 0.932, "w": 117, "cpu": 59.9, "temp": 63.35}
+{"t": 519.5, "faces": 1, "score": 0.93, "w": 117, "cpu": 59.93, "temp": 63.9}
+{"t": 520.0, "faces": 1, "score": 0.929, "w": 115, "cpu": 59.96, "temp": 62.8}
+{"t": 520.5, "faces": 1, "score": 0.93, "w": 116, "cpu": 60.0, "temp": 62.8, "owner_sim": 0.714}
+{"t": 521.0, "faces": 1, "score": 0.931, "w": 116, "cpu": 60.13, "temp": 62.25}
+{"t": 521.5, "faces": 1, "score": 0.933, "w": 109, "cpu": 60.16, "temp": 63.35}
+{"t": 522.0, "faces": 1, "score": 0.925, "w": 110, "cpu": 60.19, "temp": 62.8}
+{"t": 522.5, "faces": 1, "score": 0.924, "w": 109, "cpu": 60.23, "temp": 62.8, "owner_sim": 0.677}
+{"t": 523.0, "faces": 1, "score": 0.93, "w": 114, "cpu": 60.35, "temp": 62.25}
+{"t": 523.5, "faces": 1, "score": 0.929, "w": 109, "cpu": 60.39, "temp": 62.8}
+{"t": 524.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 60.42, "temp": 62.25}
+{"t": 524.5, "faces": 1, "score": 0.926, "w": 110, "cpu": 60.45, "temp": 61.7, "owner_sim": 0.71}
+{"t": 525.0, "faces": 1, "score": 0.926, "w": 110, "cpu": 60.59, "temp": 61.7}
+{"t": 525.5, "faces": 1, "score": 0.924, "w": 112, "cpu": 60.61, "temp": 61.7}
+{"t": 526.0, "faces": 1, "score": 0.927, "w": 110, "cpu": 60.64, "temp": 68.85}
+{"t": 526.5, "faces": 1, "score": 0.929, "w": 110, "cpu": 60.66, "temp": 72.15, "owner_sim": 0.711}
+{"t": 527.0, "faces": 1, "score": 0.923, "w": 111, "cpu": 60.79, "temp": 72.15}
+{"t": 527.5, "faces": 1, "score": 0.931, "w": 111, "cpu": 60.83, "temp": 71.6}
+{"t": 528.0, "faces": 1, "score": 0.931, "w": 108, "cpu": 60.87, "temp": 73.8}
+{"t": 528.5, "faces": 1, "score": 0.927, "w": 110, "cpu": 60.9, "temp": 74.35, "owner_sim": 0.738}
+{"t": 529.0, "faces": 1, "score": 0.921, "w": 112, "cpu": 61.0, "temp": 75.45}
+{"t": 529.51, "faces": 1, "score": 0.929, "w": 110, "cpu": 61.03, "temp": 76.55}
+{"t": 530.0, "faces": 1, "score": 0.929, "w": 111, "cpu": 61.06, "temp": 76.55}
+{"t": 530.5, "faces": 1, "score": 0.925, "w": 111, "cpu": 61.09, "temp": 77.1, "owner_sim": 0.75}
+{"t": 531.0, "faces": 1, "score": 0.926, "w": 112, "cpu": 61.2, "temp": 77.65}
+{"t": 531.5, "faces": 1, "score": 0.924, "w": 111, "cpu": 61.22, "temp": 79.3}
+{"t": 532.0, "faces": 1, "score": 0.925, "w": 111, "cpu": 61.24, "temp": 79.3}
+{"t": 532.5, "faces": 1, "score": 0.928, "w": 110, "cpu": 61.27, "temp": 78.75, "owner_sim": 0.698}
+{"t": 533.0, "faces": 1, "score": 0.923, "w": 109, "cpu": 61.37, "temp": 79.85}
+{"t": 533.5, "faces": 1, "score": 0.931, "w": 117, "cpu": 61.4, "temp": 79.3}
+{"t": 534.0, "faces": 1, "score": 0.923, "w": 114, "cpu": 61.43, "temp": 79.85}
+{"t": 534.5, "faces": 1, "score": 0.928, "w": 112, "cpu": 61.47, "temp": 79.85, "owner_sim": 0.727}
+{"t": 535.0, "faces": 1, "score": 0.927, "w": 112, "cpu": 61.6, "temp": 81.5}
+{"t": 535.5, "faces": 1, "score": 0.92, "w": 109, "cpu": 61.63, "temp": 81.5}
+{"t": 536.0, "faces": 1, "score": 0.921, "w": 110, "cpu": 61.66, "temp": 81.5}
+{"t": 536.5, "faces": 1, "score": 0.928, "w": 113, "cpu": 61.69, "temp": 81.5, "owner_sim": 0.691}
+{"t": 537.0, "faces": 1, "score": 0.926, "w": 114, "cpu": 61.83, "temp": 81.5}
+{"t": 537.5, "faces": 1, "score": 0.931, "w": 114, "cpu": 61.85, "temp": 82.6}
+{"t": 538.0, "faces": 1, "score": 0.93, "w": 113, "cpu": 61.88, "temp": 82.6}
+{"t": 538.5, "faces": 1, "score": 0.928, "w": 114, "cpu": 61.9, "temp": 83.15, "owner_sim": 0.711}
+{"t": 539.0, "faces": 1, "score": 0.925, "w": 113, "cpu": 62.0, "temp": 82.6}
+{"t": 539.5, "faces": 1, "score": 0.924, "w": 114, "cpu": 62.04, "temp": 82.05}
+{"t": 540.0, "faces": 1, "score": 0.921, "w": 114, "cpu": 62.07, "temp": 82.6}
+{"t": 540.5, "faces": 1, "score": 0.921, "w": 114, "cpu": 62.11, "temp": 83.15, "owner_sim": 0.767}
+{"t": 541.0, "faces": 1, "score": 0.933, "w": 110, "cpu": 62.24, "temp": 82.6}
+{"t": 541.5, "faces": 1, "score": 0.915, "w": 101, "cpu": 62.27, "temp": 82.6}
+{"t": 542.0, "faces": 1, "score": 0.913, "w": 73, "cpu": 62.31, "temp": 83.15}
+{"t": 542.5, "faces": 1, "score": 0.918, "w": 68, "cpu": 62.35, "temp": 83.15, "owner_sim": 0.577}
+{"t": 543.0, "faces": 1, "score": 0.926, "w": 65, "cpu": 62.49, "temp": 82.6}
+{"t": 543.5, "faces": 1, "score": 0.862, "w": 71, "cpu": 62.52, "temp": 84.25}
+{"t": 544.0, "faces": 0, "score": null, "w": null, "cpu": 62.55, "temp": 83.7}
+{"t": 544.5, "faces": 0, "score": null, "w": null, "cpu": 62.57, "temp": 83.7}
+{"t": 545.0, "faces": 0, "score": null, "w": null, "cpu": 62.6, "temp": 84.25}
+{"t": 545.5, "faces": 0, "score": null, "w": null, "cpu": 62.62, "temp": 84.25}
+{"t": 546.01, "faces": 0, "score": null, "w": null, "cpu": 62.65, "temp": 84.8}
+{"t": 546.5, "faces": 0, "score": null, "w": null, "cpu": 62.67, "temp": 83.7}
+{"t": 547.0, "faces": 0, "score": null, "w": null, "cpu": 62.69, "temp": 84.25}
+{"t": 547.51, "faces": 0, "score": null, "w": null, "cpu": 62.72, "temp": 84.25}
+{"t": 548.0, "faces": 0, "score": null, "w": null, "cpu": 62.74, "temp": 83.15}
+{"t": 548.51, "faces": 0, "score": null, "w": null, "cpu": 62.77, "temp": 83.15}
+{"t": 549.0, "faces": 0, "score": null, "w": null, "cpu": 62.81, "temp": 83.7}
+{"t": 549.5, "faces": 0, "score": null, "w": null, "cpu": 62.84, "temp": 84.25}
+{"t": 550.0, "faces": 0, "score": null, "w": null, "cpu": 62.88, "temp": 83.7}
+{"t": 550.5, "faces": 0, "score": null, "w": null, "cpu": 62.91, "temp": 84.25}
+{"t": 551.0, "faces": 0, "score": null, "w": null, "cpu": 62.95, "temp": 84.8}
+{"t": 551.5, "faces": 0, "score": null, "w": null, "cpu": 62.98, "temp": 83.7}
+{"t": 552.0, "faces": 0, "score": null, "w": null, "cpu": 63.02, "temp": 84.8}
+{"t": 552.5, "faces": 0, "score": null, "w": null, "cpu": 63.05, "temp": 84.8}
+{"t": 553.0, "faces": 0, "score": null, "w": null, "cpu": 63.08, "temp": 84.8}
+{"t": 553.5, "faces": 0, "score": null, "w": null, "cpu": 63.12, "temp": 84.8}
+{"t": 554.0, "faces": 0, "score": null, "w": null, "cpu": 63.15, "temp": 82.6}
+{"t": 554.5, "faces": 0, "score": null, "w": null, "cpu": 63.17, "temp": 79.3}
+{"t": 555.0, "faces": 0, "score": null, "w": null, "cpu": 63.2, "temp": 76.55}
+{"t": 555.5, "faces": 0, "score": null, "w": null, "cpu": 63.22, "temp": 76.55}
+{"t": 556.0, "faces": 0, "score": null, "w": null, "cpu": 63.25, "temp": 74.9}
+{"t": 556.5, "faces": 0, "score": null, "w": null, "cpu": 63.27, "temp": 74.35}
+{"t": 557.0, "faces": 0, "score": null, "w": null, "cpu": 63.3, "temp": 74.35}
+{"t": 557.5, "faces": 0, "score": null, "w": null, "cpu": 63.32, "temp": 73.25}
+{"t": 558.0, "faces": 0, "score": null, "w": null, "cpu": 63.35, "temp": 72.7}
+{"t": 558.5, "faces": 0, "score": null, "w": null, "cpu": 63.37, "temp": 72.15}
+{"t": 559.0, "faces": 0, "score": null, "w": null, "cpu": 63.4, "temp": 71.6}
+{"t": 559.5, "faces": 0, "score": null, "w": null, "cpu": 63.42, "temp": 72.15}
+{"t": 560.0, "faces": 0, "score": null, "w": null, "cpu": 63.44, "temp": 71.6}
+{"t": 560.5, "faces": 0, "score": null, "w": null, "cpu": 63.47, "temp": 69.4}
+{"t": 561.0, "faces": 0, "score": null, "w": null, "cpu": 63.5, "temp": 69.95}
+{"t": 561.5, "faces": 0, "score": null, "w": null, "cpu": 63.53, "temp": 69.4}
+{"t": 562.0, "faces": 0, "score": null, "w": null, "cpu": 63.57, "temp": 68.3}
+{"t": 562.5, "faces": 0, "score": null, "w": null, "cpu": 63.6, "temp": 67.75}
+{"t": 563.0, "faces": 0, "score": null, "w": null, "cpu": 63.63, "temp": 65.55}
+{"t": 563.5, "faces": 0, "score": null, "w": null, "cpu": 63.66, "temp": 66.65}
+{"t": 564.0, "faces": 0, "score": null, "w": null, "cpu": 63.7, "temp": 66.65}
+{"t": 564.5, "faces": 0, "score": null, "w": null, "cpu": 63.73, "temp": 66.1}
+{"t": 565.0, "faces": 0, "score": null, "w": null, "cpu": 63.76, "temp": 66.1}
+{"t": 565.5, "faces": 0, "score": null, "w": null, "cpu": 63.79, "temp": 65.55}
+{"t": 566.0, "faces": 0, "score": null, "w": null, "cpu": 63.82, "temp": 65.0}
+{"t": 566.5, "faces": 0, "score": null, "w": null, "cpu": 63.86, "temp": 65.0}
+{"t": 567.0, "faces": 0, "score": null, "w": null, "cpu": 63.89, "temp": 64.45}
+{"t": 567.5, "faces": 0, "score": null, "w": null, "cpu": 63.92, "temp": 65.0}
+{"t": 568.0, "faces": 0, "score": null, "w": null, "cpu": 63.96, "temp": 64.45}
+{"t": 568.5, "faces": 0, "score": null, "w": null, "cpu": 63.99, "temp": 64.45}
+{"t": 569.0, "faces": 0, "score": null, "w": null, "cpu": 64.02, "temp": 63.9}
+{"t": 569.5, "faces": 0, "score": null, "w": null, "cpu": 64.05, "temp": 63.9}
+{"t": 570.0, "faces": 0, "score": null, "w": null, "cpu": 64.09, "temp": 63.9}
+{"t": 570.5, "faces": 0, "score": null, "w": null, "cpu": 64.12, "temp": 63.35}
+{"t": 571.0, "faces": 0, "score": null, "w": null, "cpu": 64.15, "temp": 63.9}
+{"t": 571.5, "faces": 0, "score": null, "w": null, "cpu": 64.19, "temp": 63.35}
+{"t": 572.0, "faces": 0, "score": null, "w": null, "cpu": 64.22, "temp": 63.9}
+{"t": 572.5, "faces": 0, "score": null, "w": null, "cpu": 64.25, "temp": 62.8}
+{"t": 573.0, "faces": 0, "score": null, "w": null, "cpu": 64.28, "temp": 63.35}
+{"t": 573.5, "faces": 0, "score": null, "w": null, "cpu": 64.32, "temp": 62.25}
+{"t": 574.0, "faces": 0, "score": null, "w": null, "cpu": 64.35, "temp": 62.8}
+{"t": 574.5, "faces": 0, "score": null, "w": null, "cpu": 64.38, "temp": 62.25}
+{"t": 575.0, "faces": 0, "score": null, "w": null, "cpu": 64.41, "temp": 62.8}
+{"t": 575.5, "faces": 0, "score": null, "w": null, "cpu": 64.45, "temp": 62.25}
+{"t": 576.0, "faces": 0, "score": null, "w": null, "cpu": 64.48, "temp": 61.7}
+{"t": 576.5, "faces": 0, "score": null, "w": null, "cpu": 64.51, "temp": 61.7}
+{"t": 577.0, "faces": 0, "score": null, "w": null, "cpu": 64.54, "temp": 62.25}
+{"t": 577.5, "faces": 0, "score": null, "w": null, "cpu": 64.58, "temp": 61.7}
+{"t": 578.0, "faces": 0, "score": null, "w": null, "cpu": 64.61, "temp": 62.8}
+{"t": 578.5, "faces": 0, "score": null, "w": null, "cpu": 64.64, "temp": 61.7}
+{"t": 579.0, "faces": 0, "score": null, "w": null, "cpu": 64.67, "temp": 62.25}
+{"t": 579.5, "faces": 0, "score": null, "w": null, "cpu": 64.71, "temp": 61.7}
+{"t": 580.0, "faces": 0, "score": null, "w": null, "cpu": 64.74, "temp": 62.8}
+{"t": 580.5, "faces": 0, "score": null, "w": null, "cpu": 64.77, "temp": 61.7}
+{"t": 581.0, "faces": 0, "score": null, "w": null, "cpu": 64.8, "temp": 60.6}
+{"t": 581.5, "faces": 0, "score": null, "w": null, "cpu": 64.84, "temp": 61.15}
+{"t": 582.0, "faces": 0, "score": null, "w": null, "cpu": 64.87, "temp": 61.15}
+{"t": 582.5, "faces": 0, "score": null, "w": null, "cpu": 64.9, "temp": 61.7}
+{"t": 583.0, "faces": 0, "score": null, "w": null, "cpu": 64.93, "temp": 61.15}
+{"t": 583.5, "faces": 0, "score": null, "w": null, "cpu": 64.97, "temp": 61.15}
+{"t": 584.0, "faces": 0, "score": null, "w": null, "cpu": 65.0, "temp": 60.6}
+{"t": 584.5, "faces": 0, "score": null, "w": null, "cpu": 65.03, "temp": 61.15}
+{"t": 585.0, "faces": 0, "score": null, "w": null, "cpu": 65.07, "temp": 61.15}
+{"t": 585.5, "faces": 0, "score": null, "w": null, "cpu": 65.1, "temp": 61.15}
+{"t": 586.0, "faces": 0, "score": null, "w": null, "cpu": 65.13, "temp": 60.6}
+{"t": 586.5, "faces": 0, "score": null, "w": null, "cpu": 65.16, "temp": 60.6}
+{"t": 587.0, "faces": 0, "score": null, "w": null, "cpu": 65.19, "temp": 60.6}
+{"t": 587.5, "faces": 0, "score": null, "w": null, "cpu": 65.23, "temp": 60.05}
+{"t": 588.0, "faces": 0, "score": null, "w": null, "cpu": 65.26, "temp": 60.05}
+{"t": 588.5, "faces": 0, "score": null, "w": null, "cpu": 65.29, "temp": 61.15}
+{"t": 589.0, "faces": 0, "score": null, "w": null, "cpu": 65.32, "temp": 60.6}
+{"t": 589.5, "faces": 0, "score": null, "w": null, "cpu": 65.36, "temp": 61.15}
+{"t": 590.0, "faces": 0, "score": null, "w": null, "cpu": 65.39, "temp": 61.15}
+{"t": 590.5, "faces": 0, "score": null, "w": null, "cpu": 65.42, "temp": 60.6}
+{"t": 591.0, "faces": 0, "score": null, "w": null, "cpu": 65.45, "temp": 60.6}
+{"t": 591.5, "faces": 0, "score": null, "w": null, "cpu": 65.49, "temp": 61.15}
+{"t": 592.0, "faces": 0, "score": null, "w": null, "cpu": 65.52, "temp": 60.6}
+{"t": 592.5, "faces": 0, "score": null, "w": null, "cpu": 65.55, "temp": 60.05}
+{"t": 593.0, "faces": 0, "score": null, "w": null, "cpu": 65.58, "temp": 60.6}
+{"t": 593.5, "faces": 0, "score": null, "w": null, "cpu": 65.62, "temp": 60.05}
+{"t": 594.0, "faces": 0, "score": null, "w": null, "cpu": 65.65, "temp": 60.6}
+{"t": 594.5, "faces": 0, "score": null, "w": null, "cpu": 65.68, "temp": 60.05}
+{"t": 595.0, "faces": 0, "score": null, "w": null, "cpu": 65.71, "temp": 60.6}
+{"t": 595.5, "faces": 0, "score": null, "w": null, "cpu": 65.75, "temp": 60.05}
+{"t": 596.0, "faces": 0, "score": null, "w": null, "cpu": 65.78, "temp": 58.95}
+{"t": 596.5, "faces": 0, "score": null, "w": null, "cpu": 65.82, "temp": 60.6}
+{"t": 597.0, "faces": 0, "score": null, "w": null, "cpu": 65.85, "temp": 60.05}
+{"t": 597.5, "faces": 0, "score": null, "w": null, "cpu": 65.88, "temp": 60.05}
+{"t": 598.0, "faces": 0, "score": null, "w": null, "cpu": 65.92, "temp": 61.15}
+{"t": 598.5, "faces": 0, "score": null, "w": null, "cpu": 65.95, "temp": 60.6}
+{"t": 599.0, "faces": 0, "score": null, "w": null, "cpu": 65.98, "temp": 60.05}
+{"t": 599.5, "faces": 0, "score": null, "w": null, "cpu": 66.01, "temp": 60.6}
+{"t": 600.0, "faces": 0, "score": null, "w": null, "cpu": 66.05, "temp": 61.15}
+{"t": 600.5, "faces": 0, "score": null, "w": null, "cpu": 66.08, "temp": 60.05}
+{"t": 601.0, "faces": 0, "score": null, "w": null, "cpu": 66.11, "temp": 60.05}
+{"t": 601.5, "faces": 0, "score": null, "w": null, "cpu": 66.14, "temp": 60.05}
+{"t": 602.0, "faces": 0, "score": null, "w": null, "cpu": 66.18, "temp": 60.05}
+{"t": 602.5, "faces": 0, "score": null, "w": null, "cpu": 66.21, "temp": 60.6}
+{"t": 603.0, "faces": 0, "score": null, "w": null, "cpu": 66.24, "temp": 59.5}
+{"t": 603.5, "faces": 0, "score": null, "w": null, "cpu": 66.27, "temp": 60.6}
+{"t": 604.0, "faces": 0, "score": null, "w": null, "cpu": 66.31, "temp": 60.05}
+{"t": 604.5, "faces": 0, "score": null, "w": null, "cpu": 66.34, "temp": 60.6}
+{"t": 605.0, "faces": 0, "score": null, "w": null, "cpu": 66.37, "temp": 59.5}
+{"t": 605.5, "faces": 0, "score": null, "w": null, "cpu": 66.4, "temp": 60.05}
+{"t": 606.0, "faces": 0, "score": null, "w": null, "cpu": 66.44, "temp": 60.6}
+{"t": 606.5, "faces": 0, "score": null, "w": null, "cpu": 66.47, "temp": 59.5}
+{"t": 607.0, "faces": 0, "score": null, "w": null, "cpu": 66.5, "temp": 60.6}
+{"t": 607.5, "faces": 0, "score": null, "w": null, "cpu": 66.54, "temp": 60.05}
+{"t": 608.0, "faces": 0, "score": null, "w": null, "cpu": 66.57, "temp": 59.5}
+{"t": 608.5, "faces": 0, "score": null, "w": null, "cpu": 66.6, "temp": 60.05}
+{"t": 609.0, "faces": 0, "score": null, "w": null, "cpu": 66.63, "temp": 60.05}
+{"t": 609.5, "faces": 0, "score": null, "w": null, "cpu": 66.67, "temp": 59.5}
+{"t": 610.0, "faces": 0, "score": null, "w": null, "cpu": 66.7, "temp": 60.05}
+{"t": 610.5, "faces": 0, "score": null, "w": null, "cpu": 66.73, "temp": 59.5}
+{"t": 611.0, "faces": 0, "score": null, "w": null, "cpu": 66.76, "temp": 60.05}
+{"t": 611.5, "faces": 0, "score": null, "w": null, "cpu": 66.8, "temp": 59.5}
+{"t": 612.0, "faces": 0, "score": null, "w": null, "cpu": 66.83, "temp": 58.4}
+{"t": 612.5, "faces": 0, "score": null, "w": null, "cpu": 66.86, "temp": 59.5}
+{"t": 613.0, "faces": 0, "score": null, "w": null, "cpu": 66.89, "temp": 60.05}
+{"t": 613.5, "faces": 0, "score": null, "w": null, "cpu": 66.93, "temp": 60.05}
+{"t": 614.0, "faces": 0, "score": null, "w": null, "cpu": 66.96, "temp": 60.05}
+{"t": 614.5, "faces": 0, "score": null, "w": null, "cpu": 66.99, "temp": 60.6}
+{"t": 615.0, "faces": 0, "score": null, "w": null, "cpu": 67.03, "temp": 60.05}
+{"t": 615.5, "faces": 0, "score": null, "w": null, "cpu": 67.06, "temp": 58.95}
+{"t": 616.0, "faces": 0, "score": null, "w": null, "cpu": 67.09, "temp": 59.5}
+{"t": 616.5, "faces": 0, "score": null, "w": null, "cpu": 67.12, "temp": 59.5}
+{"t": 617.0, "faces": 0, "score": null, "w": null, "cpu": 67.16, "temp": 60.05}
+{"t": 617.5, "faces": 0, "score": null, "w": null, "cpu": 67.19, "temp": 60.05}
+{"t": 618.0, "faces": 0, "score": null, "w": null, "cpu": 67.22, "temp": 60.05}
+{"t": 618.5, "faces": 0, "score": null, "w": null, "cpu": 67.25, "temp": 60.05}
+{"t": 619.0, "faces": 0, "score": null, "w": null, "cpu": 67.29, "temp": 59.5}
+{"t": 619.5, "faces": 0, "score": null, "w": null, "cpu": 67.32, "temp": 60.05}
+{"t": 620.0, "faces": 0, "score": null, "w": null, "cpu": 67.35, "temp": 59.5}
+{"t": 620.5, "faces": 0, "score": null, "w": null, "cpu": 67.38, "temp": 60.05}
+{"t": 621.0, "faces": 0, "score": null, "w": null, "cpu": 67.42, "temp": 58.95}
+{"t": 621.5, "faces": 0, "score": null, "w": null, "cpu": 67.45, "temp": 60.05}
+{"t": 622.0, "faces": 0, "score": null, "w": null, "cpu": 67.48, "temp": 58.95}
+{"t": 622.5, "faces": 0, "score": null, "w": null, "cpu": 67.51, "temp": 60.05}
+{"t": 623.0, "faces": 0, "score": null, "w": null, "cpu": 67.55, "temp": 59.5}
+{"t": 623.5, "faces": 0, "score": null, "w": null, "cpu": 67.58, "temp": 60.05}
+{"t": 624.0, "faces": 0, "score": null, "w": null, "cpu": 67.61, "temp": 58.95}
+{"t": 624.5, "faces": 0, "score": null, "w": null, "cpu": 67.64, "temp": 58.95}
+{"t": 625.0, "faces": 0, "score": null, "w": null, "cpu": 67.68, "temp": 58.95}
+{"t": 625.5, "faces": 0, "score": null, "w": null, "cpu": 67.71, "temp": 59.5}
+{"t": 626.0, "faces": 0, "score": null, "w": null, "cpu": 67.74, "temp": 59.5}
+{"t": 626.5, "faces": 0, "score": null, "w": null, "cpu": 67.77, "temp": 59.5}
+{"t": 627.0, "faces": 0, "score": null, "w": null, "cpu": 67.8, "temp": 59.5}
+{"t": 627.5, "faces": 0, "score": null, "w": null, "cpu": 67.84, "temp": 60.05}
+{"t": 628.0, "faces": 0, "score": null, "w": null, "cpu": 67.87, "temp": 60.6}
+{"t": 628.5, "faces": 1, "score": 0.833, "w": 118, "cpu": 67.9, "temp": 58.95, "owner_sim": 0.238}
+{"t": 629.0, "faces": 1, "score": 0.907, "w": 109, "cpu": 68.04, "temp": 59.5}
+{"t": 629.5, "faces": 1, "score": 0.905, "w": 72, "cpu": 68.07, "temp": 60.6}
+{"t": 630.0, "faces": 1, "score": 0.924, "w": 77, "cpu": 68.1, "temp": 59.5}
+{"t": 630.5, "faces": 1, "score": 0.92, "w": 99, "cpu": 68.13, "temp": 58.95, "owner_sim": 0.507}
+{"t": 631.0, "faces": 1, "score": 0.924, "w": 102, "cpu": 68.27, "temp": 60.05}
+{"t": 631.5, "faces": 1, "score": 0.92, "w": 108, "cpu": 68.3, "temp": 59.5}
+{"t": 632.0, "faces": 1, "score": 0.921, "w": 118, "cpu": 68.33, "temp": 60.05}
+{"t": 632.5, "faces": 1, "score": 0.917, "w": 127, "cpu": 68.37, "temp": 58.95, "owner_sim": 0.552}
+{"t": 633.0, "faces": 1, "score": 0.916, "w": 130, "cpu": 68.5, "temp": 60.05}
+{"t": 633.5, "faces": 1, "score": 0.924, "w": 125, "cpu": 68.53, "temp": 59.5}
+{"t": 634.0, "faces": 1, "score": 0.922, "w": 135, "cpu": 68.57, "temp": 60.6}
+{"t": 634.5, "faces": 1, "score": 0.92, "w": 126, "cpu": 68.6, "temp": 59.5, "owner_sim": 0.623}
+{"t": 635.0, "faces": 1, "score": 0.916, "w": 121, "cpu": 68.73, "temp": 60.05}
+{"t": 635.5, "faces": 1, "score": 0.883, "w": 94, "cpu": 68.77, "temp": 59.5}
+{"t": 636.0, "faces": 1, "score": 0.93, "w": 118, "cpu": 68.79, "temp": 60.05}
+{"t": 636.5, "faces": 1, "score": 0.928, "w": 114, "cpu": 68.83, "temp": 60.05, "owner_sim": 0.614}
+{"t": 637.0, "faces": 1, "score": 0.937, "w": 109, "cpu": 68.96, "temp": 59.5}
+{"t": 637.5, "faces": 1, "score": 0.931, "w": 109, "cpu": 68.99, "temp": 60.6}
+{"t": 638.0, "faces": 1, "score": 0.928, "w": 112, "cpu": 69.03, "temp": 59.5}
+{"t": 638.5, "faces": 1, "score": 0.899, "w": 95, "cpu": 69.06, "temp": 59.5, "owner_sim": 0.477}
+{"t": 639.0, "faces": 1, "score": 0.893, "w": 97, "cpu": 69.19, "temp": 59.5}
+{"t": 639.5, "faces": 1, "score": 0.893, "w": 97, "cpu": 69.23, "temp": 60.05}
+{"t": 640.0, "faces": 1, "score": 0.88, "w": 96, "cpu": 69.26, "temp": 59.5}
+{"t": 640.5, "faces": 1, "score": 0.878, "w": 99, "cpu": 69.29, "temp": 59.5, "owner_sim": 0.181}
+{"t": 641.0, "faces": 1, "score": 0.873, "w": 103, "cpu": 69.43, "temp": 60.6}
+{"t": 641.5, "faces": 1, "score": 0.864, "w": 111, "cpu": 69.46, "temp": 59.5}
+{"t": 642.0, "faces": 1, "score": 0.849, "w": 104, "cpu": 69.49, "temp": 59.5}
+{"t": 642.5, "faces": 1, "score": 0.861, "w": 109, "cpu": 69.52, "temp": 60.05, "owner_sim": 0.115}
+{"t": 643.0, "faces": 1, "score": 0.856, "w": 106, "cpu": 69.66, "temp": 58.95}
+{"t": 643.5, "faces": 1, "score": 0.871, "w": 110, "cpu": 69.69, "temp": 59.5}
+{"t": 644.0, "faces": 1, "score": 0.857, "w": 100, "cpu": 69.72, "temp": 60.6}
+{"t": 644.5, "faces": 1, "score": 0.87, "w": 98, "cpu": 69.76, "temp": 59.5, "owner_sim": 0.037}
+{"t": 645.0, "faces": 1, "score": 0.872, "w": 97, "cpu": 69.89, "temp": 60.05}
+{"t": 645.5, "faces": 1, "score": 0.862, "w": 104, "cpu": 69.92, "temp": 60.05}
+{"t": 646.0, "faces": 1, "score": 0.862, "w": 104, "cpu": 69.95, "temp": 58.95}
+{"t": 646.5, "faces": 1, "score": 0.848, "w": 106, "cpu": 69.99, "temp": 58.95, "owner_sim": 0.078}
+{"t": 647.0, "faces": 1, "score": 0.863, "w": 109, "cpu": 70.12, "temp": 60.05}
+{"t": 647.5, "faces": 1, "score": 0.831, "w": 111, "cpu": 70.15, "temp": 58.4}
+{"t": 648.0, "faces": 1, "score": 0.812, "w": 107, "cpu": 70.19, "temp": 59.5}
+{"t": 648.5, "faces": 1, "score": 0.833, "w": 99, "cpu": 70.22, "temp": 58.95, "owner_sim": 0.08}
+{"t": 649.0, "faces": 1, "score": 0.834, "w": 105, "cpu": 70.35, "temp": 59.5}
+{"t": 649.5, "faces": 0, "score": null, "w": null, "cpu": 70.39, "temp": 59.5}
+{"t": 650.0, "faces": 1, "score": 0.812, "w": 92, "cpu": 70.42, "temp": 60.05}
+{"t": 650.5, "faces": 0, "score": null, "w": null, "cpu": 70.44, "temp": 61.15}
+{"t": 651.0, "faces": 1, "score": 0.801, "w": 98, "cpu": 70.47, "temp": 61.15, "owner_sim": 0.21}
+{"t": 651.5, "faces": 1, "score": 0.811, "w": 92, "cpu": 70.56, "temp": 62.8}
+{"t": 652.0, "faces": 0, "score": null, "w": null, "cpu": 70.59, "temp": 62.25}
+{"t": 652.5, "faces": 0, "score": null, "w": null, "cpu": 70.61, "temp": 61.15}
+{"t": 653.0, "faces": 0, "score": null, "w": null, "cpu": 70.64, "temp": 61.7}
+{"t": 653.5, "faces": 0, "score": null, "w": null, "cpu": 70.66, "temp": 61.15}
+{"t": 654.0, "faces": 0, "score": null, "w": null, "cpu": 70.69, "temp": 61.7}
+{"t": 654.5, "faces": 0, "score": null, "w": null, "cpu": 70.71, "temp": 62.25}
+{"t": 655.0, "faces": 0, "score": null, "w": null, "cpu": 70.73, "temp": 62.8}
+{"t": 655.5, "faces": 0, "score": null, "w": null, "cpu": 70.77, "temp": 61.15}
+{"t": 656.0, "faces": 0, "score": null, "w": null, "cpu": 70.8, "temp": 60.05}
+{"t": 656.5, "faces": 0, "score": null, "w": null, "cpu": 70.83, "temp": 60.6}
+{"t": 657.0, "faces": 0, "score": null, "w": null, "cpu": 70.87, "temp": 60.05}
+{"t": 657.5, "faces": 0, "score": null, "w": null, "cpu": 70.9, "temp": 61.15}
+{"t": 658.0, "faces": 0, "score": null, "w": null, "cpu": 70.93, "temp": 60.6}
+{"t": 658.5, "faces": 0, "score": null, "w": null, "cpu": 70.96, "temp": 60.6}
+{"t": 659.0, "faces": 0, "score": null, "w": null, "cpu": 71.0, "temp": 60.05}
+{"t": 659.5, "faces": 0, "score": null, "w": null, "cpu": 71.03, "temp": 60.6}
+{"t": 660.0, "faces": 0, "score": null, "w": null, "cpu": 71.06, "temp": 60.6}
+{"t": 660.5, "faces": 0, "score": null, "w": null, "cpu": 71.09, "temp": 60.05}
+{"t": 661.0, "faces": 0, "score": null, "w": null, "cpu": 71.13, "temp": 60.05}
+{"t": 661.5, "faces": 0, "score": null, "w": null, "cpu": 71.16, "temp": 59.5}
+{"t": 662.0, "faces": 0, "score": null, "w": null, "cpu": 71.19, "temp": 60.6}
+{"t": 662.5, "faces": 1, "score": 0.806, "w": 99, "cpu": 71.22, "temp": 60.05, "owner_sim": 0.138}
+{"t": 663.0, "faces": 1, "score": 0.817, "w": 102, "cpu": 71.36, "temp": 60.6}
+{"t": 663.5, "faces": 1, "score": 0.807, "w": 94, "cpu": 71.39, "temp": 60.6}
+{"t": 664.0, "faces": 1, "score": 0.848, "w": 103, "cpu": 71.42, "temp": 60.05}
+{"t": 664.5, "faces": 1, "score": 0.915, "w": 108, "cpu": 71.46, "temp": 59.5, "owner_sim": 0.574}
+{"t": 665.0, "faces": 1, "score": 0.922, "w": 107, "cpu": 71.59, "temp": 59.5}
+{"t": 665.5, "faces": 1, "score": 0.925, "w": 111, "cpu": 71.62, "temp": 60.05}
+{"t": 666.0, "faces": 1, "score": 0.924, "w": 110, "cpu": 71.65, "temp": 60.6}
+{"t": 666.5, "faces": 1, "score": 0.927, "w": 110, "cpu": 71.69, "temp": 59.5, "owner_sim": 0.682}
+{"t": 667.0, "faces": 1, "score": 0.937, "w": 113, "cpu": 71.82, "temp": 60.05}
+{"t": 667.5, "faces": 1, "score": 0.931, "w": 115, "cpu": 71.85, "temp": 60.6}
+{"t": 668.0, "faces": 1, "score": 0.925, "w": 131, "cpu": 71.89, "temp": 59.5}
+{"t": 668.5, "faces": 1, "score": 0.924, "w": 133, "cpu": 71.92, "temp": 60.05, "owner_sim": 0.61}
+{"t": 669.0, "faces": 1, "score": 0.919, "w": 135, "cpu": 72.05, "temp": 59.5}
+{"t": 669.5, "faces": 1, "score": 0.918, "w": 131, "cpu": 72.09, "temp": 60.05}
+{"t": 670.0, "faces": 1, "score": 0.931, "w": 122, "cpu": 72.12, "temp": 59.5}
+{"t": 670.5, "faces": 1, "score": 0.932, "w": 122, "cpu": 72.15, "temp": 59.5, "owner_sim": 0.711}
+{"t": 671.0, "faces": 1, "score": 0.927, "w": 116, "cpu": 72.29, "temp": 59.5}
+{"t": 671.5, "faces": 1, "score": 0.93, "w": 119, "cpu": 72.32, "temp": 60.05}
+{"t": 672.0, "faces": 1, "score": 0.928, "w": 119, "cpu": 72.35, "temp": 59.5}
+{"t": 672.5, "faces": 1, "score": 0.935, "w": 115, "cpu": 72.38, "temp": 60.05, "owner_sim": 0.71}
+{"t": 673.0, "faces": 1, "score": 0.883, "w": 115, "cpu": 72.52, "temp": 59.5}
+{"t": 673.5, "faces": 1, "score": 0.863, "w": 124, "cpu": 72.55, "temp": 60.05}
+{"t": 674.0, "faces": 1, "score": 0.872, "w": 125, "cpu": 72.58, "temp": 60.05}
+{"t": 674.5, "faces": 1, "score": 0.893, "w": 125, "cpu": 72.62, "temp": 58.95, "owner_sim": 0.053}
+{"t": 675.0, "faces": 1, "score": 0.891, "w": 127, "cpu": 72.75, "temp": 59.5}
+{"t": 675.5, "faces": 1, "score": 0.906, "w": 135, "cpu": 72.78, "temp": 58.4}
+{"t": 676.0, "faces": 2, "score": 0.89, "w": 159, "cpu": 72.82, "temp": 58.95}
+{"t": 676.5, "faces": 1, "score": 0.903, "w": 153, "cpu": 72.85, "temp": 60.05, "owner_sim": 0.081}
+{"t": 677.0, "faces": 1, "score": 0.89, "w": 146, "cpu": 72.98, "temp": 59.5}
+{"t": 677.5, "faces": 1, "score": 0.899, "w": 137, "cpu": 73.02, "temp": 59.5}
+{"t": 678.0, "faces": 1, "score": 0.894, "w": 133, "cpu": 73.05, "temp": 60.05}
+{"t": 678.5, "faces": 1, "score": 0.887, "w": 132, "cpu": 73.08, "temp": 58.95, "owner_sim": 0.083}
+{"t": 679.0, "faces": 1, "score": 0.892, "w": 130, "cpu": 73.22, "temp": 60.6}
+{"t": 679.5, "faces": 1, "score": 0.87, "w": 124, "cpu": 73.25, "temp": 59.5}
+{"t": 680.0, "faces": 1, "score": 0.81, "w": 109, "cpu": 73.28, "temp": 60.05}
+{"t": 680.5, "faces": 1, "score": 0.864, "w": 116, "cpu": 73.32, "temp": 59.5, "owner_sim": 0.082}
+{"t": 681.0, "faces": 0, "score": null, "w": null, "cpu": 73.45, "temp": 59.5}
+{"t": 681.5, "faces": 1, "score": 0.868, "w": 130, "cpu": 73.48, "temp": 60.05}
+{"t": 682.0, "faces": 1, "score": 0.864, "w": 133, "cpu": 73.52, "temp": 60.05}
+{"t": 682.5, "faces": 1, "score": 0.881, "w": 129, "cpu": 73.55, "temp": 59.5, "owner_sim": 0.094}
+{"t": 683.0, "faces": 1, "score": 0.871, "w": 135, "cpu": 73.68, "temp": 58.95}
+{"t": 683.5, "faces": 1, "score": 0.891, "w": 129, "cpu": 73.72, "temp": 59.5}
+{"t": 684.0, "faces": 1, "score": 0.886, "w": 130, "cpu": 73.75, "temp": 58.95}
+{"t": 684.5, "faces": 1, "score": 0.892, "w": 128, "cpu": 73.78, "temp": 58.95, "owner_sim": 0.148}
+{"t": 685.0, "faces": 1, "score": 0.899, "w": 127, "cpu": 73.92, "temp": 60.05}
+{"t": 685.5, "faces": 1, "score": 0.901, "w": 128, "cpu": 73.95, "temp": 60.05}
+{"t": 686.0, "faces": 1, "score": 0.891, "w": 129, "cpu": 73.98, "temp": 58.95}
+{"t": 686.5, "faces": 1, "score": 0.897, "w": 131, "cpu": 74.02, "temp": 60.05, "owner_sim": 0.095}
+{"t": 687.0, "faces": 1, "score": 0.89, "w": 130, "cpu": 74.15, "temp": 60.05}
+{"t": 687.5, "faces": 1, "score": 0.891, "w": 131, "cpu": 74.18, "temp": 60.05}
+{"t": 688.0, "faces": 1, "score": 0.894, "w": 131, "cpu": 74.22, "temp": 59.5}
+{"t": 688.5, "faces": 1, "score": 0.889, "w": 129, "cpu": 74.25, "temp": 59.5, "owner_sim": 0.091}
