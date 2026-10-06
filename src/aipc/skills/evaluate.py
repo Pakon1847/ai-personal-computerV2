@@ -37,7 +37,8 @@ def safe_args() -> set[str]:
     allowed = {"xdg-open", "gtk-launch", "wpctl", "set-volume", "set-mute", actions.SINK, "0", "1"}
     allowed |= {url for _, url in actions.SITES.values()}
     allowed |= {desktop for _, desktop in actions.APPS.values()}
-    # เครื่องที่ไม่มี gtk-launch (Pi 5) ใช้ gio launch <path .desktop> · path มาจากโฟลเดอร์ระบบ ไม่ใช่ข้อความผู้ใช้
+    # เครื่องที่ไม่มี gtk-launch (Pi 5) ใช้ gio launch <path .desktop> ·
+    # path มาจากโฟลเดอร์ระบบ ไม่ใช่ข้อความผู้ใช้
     for _, desktop in actions.APPS.values():
         allowed |= set(actions._app_command(desktop))
     allowed |= {f"{n}%" for n in range(101)}

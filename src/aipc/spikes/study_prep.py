@@ -1,7 +1,8 @@
 """เตรียมบัญชีสำหรับทดสอบกับผู้ใช้ (docs/eval/user-study/README.md) · รันเช้าวันทดสอบ.
 
-    sudo /opt/aipc-v2/.venv/bin/python -m aipc.spikes.study_prep p1 p2 p3 p4 p5            # ดูก่อน (ไม่เปลี่ยนอะไร)
-    sudo /opt/aipc-v2/.venv/bin/python -m aipc.spikes.study_prep p1 p2 p3 p4 p5 --apply    # สร้าง + ใส่ข้อมูล
+    # ดูก่อน (ไม่เปลี่ยนอะไร) แล้วจึงสร้าง + ใส่ข้อมูล (--apply)
+    sudo /opt/aipc-v2/.venv/bin/python -m aipc.spikes.study_prep p1 p2 p3 p4 p5
+    sudo /opt/aipc-v2/.venv/bin/python -m aipc.spikes.study_prep p1 p2 p3 p4 p5 --apply
 
 ต่อบัญชี: สร้างผ่านตัวช่วยเดียวกับหน้าสมัคร (sudo -u _greetd sudo -n /usr/local/sbin/aipc-accounts) ·
 ใส่ไฟล์ใบเสร็จสำหรับโจทย์ T5 · ใส่นัดของวันนี้ 1 นัด (โจทย์ T3 "วันนี้ต้องทำอะไรบ้าง" ต้องมีคำตอบ) ·
@@ -80,8 +81,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--apply", action="store_true")
     a = p.parse_args(argv)
     now = datetime.now().astimezone()
-    print(f"วันนี้ {now:%Y-%m-%d} · นัด T3: {TODAY_REMINDER[0]} {TODAY_REMINDER[1]:%H:%M} · ไฟล์ T5: ~/Documents/{RECEIPT_NAME}"
-          f" (คำตอบที่ถูก {TASK_T5_ANSWER})")  # fmt: skip
+    print(
+        f"วันนี้ {now:%Y-%m-%d} · นัด T3: {TODAY_REMINDER[0]} {TODAY_REMINDER[1]:%H:%M} · "
+        f"ไฟล์ T5: ~/Documents/{RECEIPT_NAME}"
+        f" (คำตอบที่ถูก {TASK_T5_ANSWER})"
+    )
     if not a.apply:
         for u in a.users:
             print(f"[จะทำ] สร้างบัญชี {u} (ชื่อที่แสดง: ผู้ร่วมทดสอบ {u.upper()}) → ใส่ไฟล์ใบเสร็จ + นัดวันนี้")
@@ -106,7 +110,9 @@ def main(argv: list[str] | None = None) -> int:
         written = seed(home, now)
         chown_tree(written, home, pw.pw_uid, pw.pw_gid)
         print(f"✓ {u}: สร้างแล้ว · {', '.join(str(x.relative_to(home)) for x in written)}")
-    print("ต่อไป: เข้าบัญชีละครั้งที่หน้าจอ รอ 1 นาทีให้ AI อุ่นแคช แล้วออก (ข้อความแรกของผู้ร่วมทดสอบจะไม่ต้องรอ ~40 วิ)")
+    print(
+        "ต่อไป: เข้าบัญชีละครั้งที่หน้าจอ รอ 1 นาทีให้ AI อุ่นแคช แล้วออก (ข้อความแรกของผู้ร่วมทดสอบจะไม่ต้องรอ ~40 วิ)"
+    )
     return 1 if bad else 0
 
 

@@ -2,10 +2,12 @@
 
 เกณฑ์ประกาศก่อนวัด: docs/benchmarks/2026-10-06-presence-b/README.md
 
-    python -m aipc.spikes.presence record --seconds 1800 --out presence.jsonl     # ทาง SSH · กล้องของเครื่อง
+    # ทาง SSH · กล้องของเครื่อง
+    python -m aipc.spikes.presence record --seconds 1800 --out presence.jsonl
     python -m aipc.spikes.presence analyze presence.jsonl --phases phases.json
 
-record: เปิดกล้อง 640×480 · 2 ภาพ/วิ · YuNet ทุกภาพ · 15 วิแรกเก็บหน้าเจ้าของเป็นเวกเตอร์ในหน่วยความจำ (ไม่เขียนลงดิสก์) ·
+record: เปิดกล้อง 640×480 · 2 ภาพ/วิ · YuNet ทุกภาพ ·
+  15 วิแรกเก็บหน้าเจ้าของเป็นเวกเตอร์ในหน่วยความจำ (ไม่เขียนลงดิสก์) ·
   ทุก 2 วิที่เห็นหน้า: SFace เทียบกับเจ้าของ · เขียนแค่ตัวเลข (จำนวนหน้า คะแนน ความคล้าย CPU อุณหภูมิ) **ไม่มีภาพ**
 analyze: แบ่งตามช่วงจริง (เจ้าของนั่ง · ลุกไป · คนอื่นมานั่ง · เจ้าของกลับ) แล้วคิดตัวชี้วัด M1–M4
 """
@@ -48,9 +50,17 @@ def record(seconds: float, out: Path, clock=time.monotonic, cpu=time.process_tim
     det, emb = models.Detector(max_side=DETECT_SIDE), models.Embedder()
     t0, owner, enroll = clock(), None, []
     last_id, n = -1e9, 0
-    meta = {"capture": [int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))],
-            "fps": FPS, "id_every_s": ID_EVERY_S, "detect_side": DETECT_SIDE, "threshold": OWNER_THRESHOLD,
-            "start": time.strftime("%Y-%m-%dT%H:%M:%S")}  # fmt: skip
+    meta = {
+        "capture": [
+            int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+            int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+        ],
+        "fps": FPS,
+        "id_every_s": ID_EVERY_S,
+        "detect_side": DETECT_SIDE,
+        "threshold": OWNER_THRESHOLD,
+        "start": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
     with out.open("w", encoding="utf-8") as f:
         f.write(json.dumps({"meta": meta}) + "\n")
         nxt = t0
@@ -62,10 +72,18 @@ def record(seconds: float, out: Path, clock=time.monotonic, cpu=time.process_tim
                 time.sleep(0.5)
                 continue
             faces = det.detect(frame)
-            row = {"t": t, "faces": len(faces), "score": round(float(faces[0][14]), 3) if faces else None,
-                   "w": int(faces[0][2]) if faces else None, "cpu": round(cpu(), 2), "temp": _temp_c()}  # fmt: skip
+            row = {
+                "t": t,
+                "faces": len(faces),
+                "score": round(float(faces[0][14]), 3) if faces else None,
+                "w": int(faces[0][2]) if faces else None,
+                "cpu": round(cpu(), 2),
+                "temp": _temp_c(),
+            }
             if faces and (t < ENROLL_S or t - last_id >= ID_EVERY_S):
-                vec = matching.l2_normalize(emb.embed(align.crop(frame, faces[0][4:14].reshape(5, 2))))
+                vec = matching.l2_normalize(
+                    emb.embed(align.crop(frame, faces[0][4:14].reshape(5, 2)))
+                )
                 if t < ENROLL_S:
                     if len(faces) == 1 and faces[0][14] >= 0.9:
                         enroll.append(vec)

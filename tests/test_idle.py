@@ -32,7 +32,9 @@ class IdleArgsTest(unittest.TestCase):
         self.assertIsNone(idle.swayidle_args(0, 600, ["swaylock"]))
 
     def test_lock_then_logout_counted_from_last_use(self):
-        args = idle.swayidle_args(300, 600, idle.lock_command(PurePosixPath("/run/user/1/aipc/lock.png")))
+        args = idle.swayidle_args(
+            300, 600, idle.lock_command(PurePosixPath("/run/user/1/aipc/lock.png"))
+        )
         self.assertEqual(args[:2], ["swayidle", "-w"])
         self.assertEqual(args[2:4], ["timeout", "300"])
         self.assertIn("swaylock -f -e -k -l", args[4])
@@ -62,7 +64,9 @@ class IdleLockTest(unittest.TestCase):
             path.write_text("png", encoding="utf-8")
             return path
 
-        return idle.IdleLock(spawn=spawn, which=which, image_dir=Path(d.name), render=render or fake_render)
+        return idle.IdleLock(
+            spawn=spawn, which=which, image_dir=Path(d.name), render=render or fake_render
+        )
 
     def test_start_once_restart_on_change_stop_when_off(self):
         lock = self.make()
@@ -115,7 +119,9 @@ class LockImageTest(unittest.TestCase):
 
         uiapp.load_fonts()
         with tempfile.TemporaryDirectory() as d:
-            out = idle.render_lock_image(Path(d) / "lock.png", idle.lock_lines("ทดสอบ", 5, 10), (1280, 720))
+            out = idle.render_lock_image(
+                Path(d) / "lock.png", idle.lock_lines("ทดสอบ", 5, 10), (1280, 720)
+            )
             img = QImage(str(out))
             self.assertEqual((img.width(), img.height()), (1280, 720))
         self.assertIsNotNone(app)

@@ -37,7 +37,8 @@ def chat(server: str, system: str, question: str, timeout: float = 600) -> dict:
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": question}],
         "stream": False,
         **SAMPLING,
-        # Gemma 4 / Qwen3: ไม่ปิดโหมดคิด = คิดจนหมด max_tokens แล้วคำตอบว่าง (พบ 2026-09-30) · แอปส่งค่านี้ทุกครั้ง
+        # Gemma 4 / Qwen3: ไม่ปิดโหมดคิด = คิดจนหมด max_tokens แล้วคำตอบว่าง (พบ 2026-09-30) ·
+        # แอปส่งค่านี้ทุกครั้ง
         "chat_template_kwargs": {"enable_thinking": False},
     }
     req = urllib.request.Request(
@@ -107,15 +108,16 @@ def sheet(answer_files: list[Path], questions: Path, out_dir: Path, seed: int = 
 
 
 def rating_page(lines: list[dict], rubric: dict) -> str:
-    """หน้าให้คะแนนแบบออฟไลน์ (เปิดในเบราว์เซอร์) · ไม่มีชื่อโมเดล · ส่งออก CSV รูปแบบเดียวกับ rate-me.csv ให้ score อ่าน.
+    """หน้าให้คะแนนแบบออฟไลน์ (เปิดในเบราว์เซอร์) · ไม่มีชื่อโมเดล ·
+    ส่งออก CSV รูปแบบเดียวกับ rate-me.csv ให้ score อ่าน.
 
     คะแนนที่กดเก็บใน localStorage ของเบราว์เซอร์นั้น (ปิดแล้วเปิดใหม่ทำต่อได้) · ไม่ส่งอะไรออกนอกเครื่อง
     """
-    data = json.dumps({"rows": lines, "rubric": rubric}, ensure_ascii=False).replace("</", "<" + chr(92) + "/")
+    data = json.dumps({"rows": lines, "rubric": rubric}, ensure_ascii=False).replace(
+        "</", "<" + chr(92) + "/"
+    )
     page = (Path(__file__).with_name("rating_page.html")).read_text(encoding="utf-8")
     return page.replace("__DATA__", data)
-
-
 
 
 def score(key_file: Path, rating_files: list[Path], minimum: float = 3.5) -> dict:

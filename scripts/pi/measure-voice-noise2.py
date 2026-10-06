@@ -1,6 +1,7 @@
-"""รอบ 2: เสียงคนพูดแทรก (ห้องสอบ) · rnnoise · VAD (docs/benchmarks/2026-10-01-voice-noise) · รันบน Pi ด้วย venv ของ ~/voice-bench.
+"""รอบ 2: เสียงคนพูดแทรก (ห้องสอบ) · rnnoise · VAD (docs/benchmarks/2026-10-01-voice-noise) ·
+รันบน Pi ด้วย venv ของ ~/voice-bench.
 
-    ~/voice-bench/venv/bin/python scripts/pi/measure-voice-noise2.py sentences.json /tmp/noise2.json
+~/voice-bench/venv/bin/python scripts/pi/measure-voice-noise2.py sentences.json /tmp/noise2.json
 """
 
 import importlib.util
@@ -14,7 +15,9 @@ import wave
 
 import numpy as np
 
-spec = importlib.util.spec_from_file_location("r1", os.path.join(os.path.dirname(__file__), "measure-voice-noise.py"))
+spec = importlib.util.spec_from_file_location(
+    "r1", os.path.join(os.path.dirname(__file__), "measure-voice-noise.py")
+)
 r1 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(r1)
 
@@ -22,12 +25,28 @@ D = r1.D
 RNN = f"{D}/rnnoise-sh.rnnn"
 VAD = f"{D}/ggml-silero-v6.2.0.bin"
 CONDS = (("clean", None), ("babble", 5.0), ("room", 5.0), ("babble", 20.0), ("room", 20.0))
-METHODS = {"none": (None, False), "hp100": ("highpass=f=100", False), "rnnoise": (f"arnndn=m={RNN}", False),
-           "vad": (None, True), "hp100+rnnoise+vad": (f"highpass=f=100,arnndn=m={RNN}", True)}  # fmt: skip
+METHODS = {
+    "none": (None, False),
+    "hp100": ("highpass=f=100", False),
+    "rnnoise": (f"arnndn=m={RNN}", False),
+    "vad": (None, True),
+    "hp100+rnnoise+vad": (f"highpass=f=100,arnndn=m={RNN}", True),
+}
 
 
 def transcribe(path: str, vad: bool) -> tuple[str, float]:
-    args = [f"{D}/whisper.cpp/build/bin/whisper-cli", "-m", r1.MODEL, "-l", "th", "-t", "4", "-nt", "-ac", "512"]
+    args = [
+        f"{D}/whisper.cpp/build/bin/whisper-cli",
+        "-m",
+        r1.MODEL,
+        "-l",
+        "th",
+        "-t",
+        "4",
+        "-nt",
+        "-ac",
+        "512",
+    ]
     if vad:
         args += ["--vad", "-vm", VAD]
     t0 = time.monotonic()
@@ -48,7 +67,10 @@ def main() -> int:
         with wave.open(raw, "wb") as w:
             voice.synthesize_wav(text, w)
         out = f"{tmp}/{name}.wav"
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-ar", str(r1.SR), "-ac", "1", out], check=True)
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-ar", str(r1.SR), "-ac", "1", out],
+            check=True,
+        )
         return r1.read16(out)
 
     rows = []
@@ -67,7 +89,11 @@ def main() -> int:
         for cond, snr in CONDS:
             x = speech.copy()
             if cond != "clean":
-                n = babble if cond == "babble" else (babble + r1.noise("brown", len(x), rng)) / np.sqrt(2)
+                n = (
+                    babble
+                    if cond == "babble"
+                    else (babble + r1.noise("brown", len(x), rng)) / np.sqrt(2)
+                )
                 x = x + n * np.sqrt(p_speech / 10 ** (snr / 10))
             tag = cond if snr is None else f"{cond}{int(snr)}"
             mixed = f"{tmp}/{i}-{tag}.wav"
@@ -76,13 +102,28 @@ def main() -> int:
                 path = mixed
                 if flt:
                     path = f"{tmp}/{i}-{tag}-{name}.wav"
-                    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", mixed, "-af", flt, path], check=True)
+                    subprocess.run(
+                        ["ffmpeg", "-y", "-loglevel", "error", "-i", mixed, "-af", flt, path],
+                        check=True,
+                    )
                 heard, secs = transcribe(path, vad)
-                rows.append({"i": i, "text": s["text"], "noise": tag, "filter": name, "heard": heard,
-                             "seconds": secs})  # fmt: skip
+                rows.append(
+                    {
+                        "i": i,
+                        "text": s["text"],
+                        "noise": tag,
+                        "filter": name,
+                        "heard": heard,
+                        "seconds": secs,
+                    }
+                )
         print(f"{i + 1}/{len(sents)} {s['text']}", flush=True)
-    json.dump({"model": os.path.basename(r1.MODEL), "rows": rows}, open(sys.argv[2], "w", encoding="utf-8"),
-              ensure_ascii=False, indent=1)  # fmt: skip
+    json.dump(
+        {"model": os.path.basename(r1.MODEL), "rows": rows},
+        open(sys.argv[2], "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=1,
+    )
     return 0
 
 

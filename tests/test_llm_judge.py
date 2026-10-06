@@ -8,8 +8,12 @@ from pathlib import Path
 from aipc.skills.forge import Reply
 from aipc.spikes import llm_judge as j
 
-ROWS = [("q01", "ถามหนึ่ง", "A", "ตอบ ก"), ("q01", "ถามหนึ่ง", "B", "ตอบ ข"),
-        ("q02", "ถามสอง", "A", "ตอบ ค"), ("q02", "ถามสอง", "B", "ตอบ ง")]
+ROWS = [
+    ("q01", "ถามหนึ่ง", "A", "ตอบ ก"),
+    ("q01", "ถามหนึ่ง", "B", "ตอบ ข"),
+    ("q02", "ถามสอง", "A", "ตอบ ค"),
+    ("q02", "ถามสอง", "B", "ตอบ ง"),
+]
 
 
 def write(path, rows, scores=None):
@@ -36,8 +40,13 @@ class JudgeTest(unittest.TestCase):
         self.assertIsNone(j.parse_scores("ไม่ใช่ JSON", ["A", "B"]))
 
     def test_rate_retries_once_and_writes_sheet(self):
-        replies = iter([Reply(True, "ผิดรูปแบบ"), Reply(True, '{"A": 3, "B": 5}', cost_usd=0.01),
-                        Reply(True, '{"A": 2, "B": 4}', cost_usd=0.01)])
+        replies = iter(
+            [
+                Reply(True, "ผิดรูปแบบ"),
+                Reply(True, '{"A": 3, "B": 5}', cost_usd=0.01),
+                Reply(True, '{"A": 2, "B": 4}', cost_usd=0.01),
+            ]
+        )
         with tempfile.TemporaryDirectory() as d:
             sheet, out = Path(d) / "s.csv", Path(d) / "judge.csv"
             write(sheet, ROWS)

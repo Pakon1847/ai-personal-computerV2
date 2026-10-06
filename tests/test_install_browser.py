@@ -1,4 +1,5 @@
-"""scripts/pi/install-browser.sh (Pakon เลือกทาง ข 2026-10-06): Chromium ไม่ใช้ keyring · ดูก่อนเป็นค่าเริ่มต้น."""
+"""scripts/pi/install-browser.sh (Pakon เลือกทาง ข 2026-10-06): Chromium ไม่ใช้ keyring ·
+ดูก่อนเป็นค่าเริ่มต้น."""
 
 import os
 import shutil
@@ -15,7 +16,9 @@ BASH = shutil.which("bash")
 class InstallBrowserTest(unittest.TestCase):
     def run_script(self, d, *args):
         env = dict(os.environ, AIPC_CHROMIUM_D=str(d))
-        return subprocess.run([BASH, str(SCRIPT), *args], env=env, capture_output=True, text=True, check=False)
+        return subprocess.run(
+            [BASH, str(SCRIPT), *args], env=env, capture_output=True, text=True, check=False
+        )
 
     def test_dry_run_then_apply_then_rollback(self):
         with tempfile.TemporaryDirectory() as d:
@@ -27,8 +30,12 @@ class InstallBrowserTest(unittest.TestCase):
             self.assertEqual(self.run_script(d, "--apply").returncode, 0)
             self.assertIn("--password-store=basic", f.read_text(encoding="utf-8"))
             # ตัวเปิด chromium source ไฟล์นี้ใน sh → ต้องต่อท้ายค่าเดิม ไม่ทับแฟล็กอื่น
-            out = subprocess.run(["sh", "-c", f'CHROMIUM_FLAGS="--a"; . "{f}"; echo "$CHROMIUM_FLAGS"'],
-                                 capture_output=True, text=True, check=True).stdout.strip()  # fmt: skip
+            out = subprocess.run(
+                ["sh", "-c", f'CHROMIUM_FLAGS="--a"; . "{f}"; echo "$CHROMIUM_FLAGS"'],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
             self.assertEqual(out, "--a --password-store=basic")
             self.assertEqual(self.run_script(d, "--rollback").returncode, 0)
             self.assertFalse(f.exists())

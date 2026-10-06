@@ -1,4 +1,5 @@
-"""T6 แบบใหม่ (ร่างข้ออ้างรอบ 4 หัวข้อ 4): ตัวบันทึก/ตรวจการเชื่อมต่อขาออก · ใช้ผล ss ปลอมรูปแบบเดียวกับ Pi 5 จริง (2026-10-05)."""
+"""T6 แบบใหม่ (ร่างข้ออ้างรอบ 4 หัวข้อ 4): ตัวบันทึก/ตรวจการเชื่อมต่อขาออก ·
+ใช้ผล ss ปลอมรูปแบบเดียวกับ Pi 5 จริง (2026-10-05)."""
 
 import json
 import tempfile
@@ -27,7 +28,11 @@ class OutboundWatchTest(unittest.TestCase):
         rows = [r for r in ow.parse_ss(SS) if ow.external(r)]
         ledger = [{"kind": "ask", "sent": "คำถาม: ข่าววันนี้"}, {"kind": "weather", "sent": "เชียงใหม่"}]
         res = ow.check(rows, META, ledger, canary="CANARY-7Q4X")
-        self.assertTrue(res["1_ours_only_to_declared"] and res["2_claude_has_ledger"] and res["3_canary_not_sent"])
+        self.assertTrue(
+            res["1_ours_only_to_declared"]
+            and res["2_claude_has_ledger"]
+            and res["3_canary_not_sent"]
+        )
         self.assertIn("160.79.104.10:443", res["destinations"]["claude"])
 
     def test_our_process_to_unknown_host_fails(self):
@@ -55,5 +60,9 @@ class OutboundWatchTest(unittest.TestCase):
             led = Ledger(Path(d) / "outbound.json")
             led.record("ask", "คำถาม: ข่าววันนี้")
             code = ow.main(["check", str(out), "--ledger", str(led.path), "--canary", "CANARY"])
-            self.assertIn(code, (0, 1))  # IP ของ Open-Meteo จริงไม่ตรงกับค่าปลอม · ตรวจแค่ว่าอ่านไฟล์ของแอปได้
-            self.assertEqual(json.loads(out.read_text(encoding="utf-8").splitlines()[1])["proto"], "udp")
+            self.assertIn(
+                code, (0, 1)
+            )  # IP ของ Open-Meteo จริงไม่ตรงกับค่าปลอม · ตรวจแค่ว่าอ่านไฟล์ของแอปได้
+            self.assertEqual(
+                json.loads(out.read_text(encoding="utf-8").splitlines()[1])["proto"], "udp"
+            )

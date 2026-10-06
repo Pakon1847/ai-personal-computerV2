@@ -50,7 +50,8 @@ class SettingsTest(unittest.TestCase):
             voice = settings.UiPrefs("light", 1.0, speak_answers=False, speak_reminders=True)
             settings.save(voice, p)
             self.assertEqual(settings.load(p), voice)
-            # สวิตช์ Claude (2026-10-05): ค่าเริ่มต้นเปิด · ปิดแล้วจำไว้ · ค่าแปลก ๆ ในไฟล์ = เปิด (ค่าเริ่มต้นที่ Pakon เลือก)
+            # สวิตช์ Claude (2026-10-05): ค่าเริ่มต้นเปิด · ปิดแล้วจำไว้ ·
+            # ค่าแปลก ๆ ในไฟล์ = เปิด (ค่าเริ่มต้นที่ Pakon เลือก)
             self.assertTrue(settings.UiPrefs().use_claude)
             settings.save(settings.UiPrefs(use_claude=False), p)
             self.assertFalse(settings.load(p).use_claude)

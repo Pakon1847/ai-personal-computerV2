@@ -294,14 +294,27 @@ def recover(request: dict, system: System) -> dict:
 def _reset_keyring(system: System, user: str) -> None:
     """ที่เก็บรหัส "login" ของ gnome-keyring เข้ารหัสด้วยรหัสผ่านเก่า → หลังกู้คืนจะถามรหัสเก่าที่ผู้ใช้ลืมไปแล้วทุกครั้ง.
 
-    ลบให้ระบบสร้างใหม่ด้วยรหัสใหม่ตอน login ครั้งถัดไป (Pakon 2026-10-06) · ข้อมูลในนั้นเปิดไม่ได้อยู่แล้วเมื่อไม่มีรหัสเก่า ·
-    ลบ**ในนามผู้ใช้** (runuser) → ถ้าใน home มี symlink ก็พาไปลบไฟล์นอกสิทธิ์ของผู้ใช้ไม่ได้ · ลบไม่ได้ = จดไว้ ไม่ทำให้กู้คืนล้ม
+    ลบให้ระบบสร้างใหม่ด้วยรหัสใหม่ตอน login ครั้งถัดไป (Pakon 2026-10-06) ·
+    ข้อมูลในนั้นเปิดไม่ได้อยู่แล้วเมื่อไม่มีรหัสเก่า ·
+    ลบ**ในนามผู้ใช้** (runuser) → ถ้าใน home มี symlink ก็พาไปลบไฟล์นอกสิทธิ์ของผู้ใช้ไม่ได้ ·
+    ลบไม่ได้ = จดไว้ ไม่ทำให้กู้คืนล้ม
     """
     home = system.user_home(user)
     if home is None:
         return
     kr = home / ".local" / "share" / "keyrings"
-    code = system.run(["runuser", "-u", user, "--", "rm", "-f", str(kr / "login.keyring"), str(kr / "user.keystore")])
+    code = system.run(
+        [
+            "runuser",
+            "-u",
+            user,
+            "--",
+            "rm",
+            "-f",
+            str(kr / "login.keyring"),
+            str(kr / "user.keystore"),
+        ]
+    )
     if code != 0:
         system.log(f"ล้าง keyring ของ {user} ไม่สำเร็จ (รหัส {code})")
 

@@ -69,8 +69,10 @@ class QmlLoadTest(unittest.TestCase):
         from unittest import mock
 
         # ไม่ต่อ visiond ของเครื่องจริง (พบ 2026-10-05 บน Pi 5: เทสต์สั่งสแกนหน้าจริง → scanState "unknown")
-        with tempfile.TemporaryDirectory() as tmp, \
-                mock.patch.object(uiapp, "_face_client", lambda short=False: None):
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            mock.patch.object(uiapp, "_face_client", lambda short=False: None),
+        ):
             for case in CASES:
                 with self.subTest(**case):
                     opts = uiapp.Options(software=True, settings_path=Path(tmp) / "ui.json", **case)

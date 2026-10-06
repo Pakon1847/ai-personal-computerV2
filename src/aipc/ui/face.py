@@ -69,9 +69,9 @@ def release_memory() -> None:
         pass
 
 
-
 def _camera_claim():
-    """ธง "กล้องไม่ว่าง" ให้ตัวตรวจด้วยกล้อง (ขั้น C) · รอเฉพาะเมื่อตัวตรวจเปิดกล้องอยู่จริง · ไม่ใช่ Linux = ไม่ทำอะไร."""
+    """ธง "กล้องไม่ว่าง" ให้ตัวตรวจด้วยกล้อง (ขั้น C) · รอเฉพาะเมื่อตัวตรวจเปิดกล้องอยู่จริง ·
+    ไม่ใช่ Linux = ไม่ทำอะไร."""
     import contextlib
     import json
     import sys
@@ -85,6 +85,7 @@ def _camera_claim():
     except (OSError, ValueError):
         state = ""
     return presence.camera_claim(wait_s=1.5 if state in ("watching", "locked") else 0.0)
+
 
 class FaceController(QObject):
     changed = Signal()

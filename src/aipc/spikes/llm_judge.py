@@ -3,10 +3,12 @@
     python -m aipc.spikes.llm_judge rate <rate-me.csv> --out <rate-claude-judge.csv>
     python -m aipc.spikes.llm_judge agree <คนให้คะแนน.csv> <AI.csv>
 
-- ตัวให้คะแนน = `claude -p` (sonnet · ไม่มีเครื่องมือ · โฟลเดอร์ว่าง · ไม่เก็บบทสนทนา) **เห็นแค่แบบให้คะแนน** (คำถาม + คำตอบ A/B/C ที่สลับลำดับแล้ว)
+- ตัวให้คะแนน = `claude -p` (sonnet · ไม่มีเครื่องมือ · โฟลเดอร์ว่าง · ไม่เก็บบทสนทนา)
+  **เห็นแค่แบบให้คะแนน** (คำถาม + คำตอบ A/B/C ที่สลับลำดับแล้ว)
   ไม่เห็นไฟล์เฉลย ไม่เห็นชื่อโมเดล · ถามทีละคำถาม
 - **ไม่ใช่ผู้ให้คะแนนคนที่สอง** ตามที่ ADR-007 ประกาศ → รายงานเป็นหลักฐานเสริม + ความตรงกับคะแนนของคน
-- ความลำเอียงที่รู้: ชอบคำตอบยาว · ชอบตำแหน่ง (Zheng et al. 2023 · arXiv:2306.05685) → สั่งไม่ให้ดูความยาว · ลำดับสลับอยู่แล้ว
+- ความลำเอียงที่รู้: ชอบคำตอบยาว · ชอบตำแหน่ง (Zheng et al. 2023 · arXiv:2306.05685) →
+  สั่งไม่ให้ดูความยาว · ลำดับสลับอยู่แล้ว
 ข้อความสั่ง (JUDGE_PROMPT) commit ก่อนรัน · ห้ามแก้หลังเห็นผล
 """
 
@@ -20,12 +22,13 @@ from pathlib import Path
 
 from aipc.skills import forge
 
+
 def load_rubric() -> dict[str, str]:
-    """เกณฑ์ 1–5 ชุดเดียวกับที่คนใช้ (tests/data/llm_thai_questions.json · commit 2026-09-28) · ไม่พิมพ์ซ้ำในโค้ด."""
+    """เกณฑ์ 1–5 ชุดเดียวกับที่คนใช้ (tests/data/llm_thai_questions.json · commit 2026-09-28) ·
+    ไม่พิมพ์ซ้ำในโค้ด."""
     from aipc.spikes import llm_quality
 
     return json.loads(llm_quality.QUESTIONS.read_text(encoding="utf-8"))["rubric"]
-
 
 
 JUDGE_PROMPT = """คุณเป็นผู้ให้คะแนนคำตอบภาษาไทยของผู้ช่วย AI ในงานวิจัย · ให้คะแนนแต่ละคำตอบแยกกัน 1–5 ตามเกณฑ์นี้เท่านั้น:
@@ -42,7 +45,7 @@ JUDGE_PROMPT = """คุณเป็นผู้ให้คะแนนคำ�
 
 {answers}
 
-ตอบเป็น JSON อย่างเดียว เช่น {{"A": 4, "B": 2, "C": 5}} ไม่ต้องอธิบาย"""
+ตอบเป็น JSON อย่างเดียว เช่น {{"A": 4, "B": 2, "C": 5}} ไม่ต้องอธิบาย"""  # noqa: E501
 
 
 def load_sheet(path: Path) -> dict[str, list[dict]]:
@@ -78,7 +81,11 @@ def parse_scores(text: str, choices: list[str]) -> dict[str, str] | None:
 def rate(sheet: Path, out: Path, ask=None, claude: str = "claude", model: str = "sonnet") -> dict:
     if out.exists():
         raise FileExistsError(f"{out} มีอยู่แล้ว · ห้ามเขียนทับ")
-    ask = ask or (lambda prompt: forge.ask_claude(prompt, claude=claude, model=model, runner=forge.run_process))
+    ask = ask or (
+        lambda prompt: forge.ask_claude(
+            prompt, claude=claude, model=model, runner=forge.run_process
+        )
+    )
     qs = load_sheet(sheet)
     log, lines = {"model": model, "cost_usd": 0.0, "failed": [], "replies": {}}, []
     for qid, rows in qs.items():
@@ -102,13 +109,17 @@ def rate(sheet: Path, out: Path, ask=None, claude: str = "claude", model: str = 
         w.writeheader()
         w.writerows(lines)
     log["cost_usd"] = round(log["cost_usd"], 4)
-    out.with_suffix(".log.json").write_text(json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8")
+    out.with_suffix(".log.json").write_text(
+        json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
     return log
 
 
 def _scores(path: Path) -> dict[tuple[str, str], int]:
     with path.open(encoding="utf-8-sig", newline="") as f:
-        return {(r["id"], r["choice"]): int(r["score"]) for r in csv.DictReader(f) if r["score"].strip()}
+        return {
+            (r["id"], r["choice"]): int(r["score"]) for r in csv.DictReader(f) if r["score"].strip()
+        }
 
 
 def _rank(xs: list[float]) -> list[float]:
@@ -142,11 +153,14 @@ def agree(human: Path, judge: Path) -> dict:
     if not keys:
         return {"n": 0}
     a, b = [h[k] for k in keys], [j[k] for k in keys]
-    return {"n": len(keys),
-            "exact": round(sum(x == y for x, y in zip(a, b, strict=True)) / len(keys), 3),
-            "within_1": round(sum(abs(x - y) <= 1 for x, y in zip(a, b, strict=True)) / len(keys), 3),
-            "spearman": spearman(a, b),
-            "mean_human": round(sum(a) / len(a), 2), "mean_judge": round(sum(b) / len(b), 2)}  # fmt: skip
+    return {
+        "n": len(keys),
+        "exact": round(sum(x == y for x, y in zip(a, b, strict=True)) / len(keys), 3),
+        "within_1": round(sum(abs(x - y) <= 1 for x, y in zip(a, b, strict=True)) / len(keys), 3),
+        "spearman": spearman(a, b),
+        "mean_human": round(sum(a) / len(a), 2),
+        "mean_judge": round(sum(b) / len(b), 2),
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -165,8 +179,16 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("judge", type=Path)
     x = p.parse_args(argv)
     if x.cmd == "rate":
-        print(json.dumps({k: v for k, v in rate(x.sheet, x.out, claude=x.claude, model=x.model).items()
-                          if k != "replies"}, ensure_ascii=False))  # fmt: skip
+        print(
+            json.dumps(
+                {
+                    k: v
+                    for k, v in rate(x.sheet, x.out, claude=x.claude, model=x.model).items()
+                    if k != "replies"
+                },
+                ensure_ascii=False,
+            )
+        )
     else:
         print(json.dumps(agree(x.human, x.judge), ensure_ascii=False))
     return 0

@@ -2,13 +2,15 @@
 
 ออกแบบตามผลขั้น B (docs/benchmarks/2026-10-06-presence-b · ผ่าน 3/5) และกฎที่ประกาศก่อนวัด:
 - เปิดกล้องเฉพาะตอน**ไม่ได้แตะคีย์บอร์ด/เมาส์** (swayidle แจ้งผ่านไฟล์ธง) → ไฟกล้องดับเมื่อใช้งาน · ภาระเฉลี่ยต่ำ (M4)
-- ไม่เห็นหน้าเจ้าของ lock_after วิ → ล็อก (swaylock) · ล็อกแล้วไม่เห็นหน้าใครเลยอีก logout_after วิ → ออกจากระบบ (M1/M2 ผ่าน)
+- ไม่เห็นหน้าเจ้าของ lock_after วิ → ล็อก (swaylock) ·
+  ล็อกแล้วไม่เห็นหน้าใครเลยอีก logout_after วิ → ออกจากระบบ (M1/M2 ผ่าน)
 - เห็น "คนอื่น" 3 ครั้งติดและไม่มีเจ้าของ → **ล็อกทันที แต่ไม่ออกจากระบบ** (M3 ไม่ผ่าน → ห้าม logout จากการจำหน้า)
 - เทียบ**ทุกหน้า** ในภาพ: มีเจ้าของอยู่หน้าหนึ่ง = เจ้าของอยู่ (B: เจ้าของนั่งแต่หน้าคนอื่นใหญ่กว่า → ตัววัดเดิมนับผิด)
 - ไม่บันทึกภาพ · แม่แบบเจ้าของมาจาก "ใบหน้าของฉัน" (ยินยอมแล้ว · ~/.local/share/aipc/face-template.json)
 ปลดล็อกด้วยรหัสผ่านเสมอ (การ์ด 0015: หน้าจอล็อกใช้รหัสผ่าน)
 
-    python -m aipc.ui.presence run --flag <ไฟล์ธง> --lock-after 30 --logout-after 30 [--image lock.png]
+    python -m aipc.ui.presence run --flag <ไฟล์ธง> --lock-after 30 --logout-after 30
+        [--image lock.png]
 """
 
 from __future__ import annotations
@@ -31,7 +33,9 @@ STRANGER_RUN = 3
 THRESHOLD = 0.363  # cosine · ค่าเดียวกับสแกนหน้าเข้าเครื่องและขั้น B
 IDLE_AFTER_S = 10  # ไม่แตะคีย์บอร์ด/เมาส์กี่วิ ถึงเปิดกล้อง (swayidle timeout ของไฟล์ธง)
 LOCK_GRACE_S = 3.0  # หลังสั่งล็อก รอ swaylock ขึ้นก่อนเชื่อว่า "ไม่ได้ล็อก"
-STRANGER_GAP_S = 6.0  # "คนอื่น" ห่างกันเกินนี้ = เริ่มนับใหม่ (ภาพที่หาหน้าไม่เจอคั่นได้ · ทดสอบ 23:47 รูปบนมือถือหาเจอบ้างไม่เจอบ้าง)
+STRANGER_GAP_S = (
+    6.0  # "คนอื่น" ห่างกันเกินนี้ = เริ่มนับใหม่ (ภาพที่หาหน้าไม่เจอคั่นได้ · ทดสอบ 23:47 รูปบนมือถือหาเจอบ้างไม่เจอบ้าง)
+)
 
 
 def runtime_dir() -> Path:
@@ -157,7 +161,8 @@ class Eyes:
         self.cap = None
         self.det = self.emb = None
         self.last_id = -1e9
-        self.recent: list = []  # [เวลา, จำนวนหน้า, ความคล้ายสูงสุด] 12 รอบล่าสุด · ตัวเลขเท่านั้น ใช้ดูว่าทำไมล็อก
+        # [เวลา, จำนวนหน้า, ความคล้ายสูงสุด] 12 รอบล่าสุด · ตัวเลขเท่านั้น ใช้ดูว่าทำไมล็อก
+        self.recent: list = []
 
     def on(self) -> bool:
         if self.cap is not None:
@@ -192,8 +197,12 @@ class Eyes:
                 self._note(now, 0, None)
             return Seen(len(faces))
         self.last_id = now
-        sims = [matching.cosine(matching.l2_normalize(self.emb.embed(align.crop(frame, f[4:14]))), self.owner)
-                for f in faces]  # fmt: skip
+        sims = [
+            matching.cosine(
+                matching.l2_normalize(self.emb.embed(align.crop(frame, f[4:14]))), self.owner
+            )
+            for f in faces
+        ]
         owner = max(sims) >= THRESHOLD
         self._note(now, len(faces), round(float(max(sims)), 3))
         return Seen(len(faces), owner=owner, stranger=not owner)
@@ -208,7 +217,9 @@ def lock_now(image: str | None) -> subprocess.Popen:
     from aipc.ui import idle
 
     cmd = [a for a in idle.lock_command(Path(image) if image else None) if a != "-f"]
-    return subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return subprocess.Popen(
+        cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
 
 
 def any_lock(run=subprocess.run) -> bool:
@@ -217,7 +228,9 @@ def any_lock(run=subprocess.run) -> bool:
     return r.returncode == 0
 
 
-def write_status(state: str, detail: str = "", path: Path | None = None, recent: list | None = None) -> None:
+def write_status(
+    state: str, detail: str = "", path: Path | None = None, recent: list | None = None
+) -> None:
     path = path or status_path()
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -236,7 +249,7 @@ def run(flag: Path, lock_after: float, logout_after: float, image: str | None) -
 
     stored = store.FaceStore().load()
     if stored is None:
-        write_status("no-template", "ลงทะเบียน \"ใบหน้าของฉัน\" ในหน้าตั้งค่าก่อน")
+        write_status("no-template", 'ลงทะเบียน "ใบหน้าของฉัน" ในหน้าตั้งค่าก่อน')
         return 3
     eyes, d = Eyes(stored.vector), Decider(lock_after, logout_after)
     write_status("active")
@@ -265,11 +278,21 @@ def run(flag: Path, lock_after: float, logout_after: float, image: str | None) -
             write_status("logout", d.reason)
             subprocess.run(["labwc", "--exit"], check=False)
             return 0
-        cur = (d.state, d.reason if d.state == "locked" else "", eyes.cap is not None, len(eyes.recent),
-               eyes.recent[-1][0] if eyes.recent else 0)  # fmt: skip
+        cur = (
+            d.state,
+            d.reason if d.state == "locked" else "",
+            eyes.cap is not None,
+            len(eyes.recent),
+            eyes.recent[-1][0] if eyes.recent else 0,
+        )
         if cur != last:
-            write_status(d.state, ("ไม่เห็นเจ้าของ" if d.reason == "absent" else "เห็นคนอื่น") if d.state == "locked"
-                         else ("กล้องเปิด" if eyes.cap is not None else "กล้องปิด"), recent=eyes.recent)  # fmt: skip
+            write_status(
+                d.state,
+                ("ไม่เห็นเจ้าของ" if d.reason == "absent" else "เห็นคนอื่น")
+                if d.state == "locked"
+                else ("กล้องเปิด" if eyes.cap is not None else "กล้องปิด"),
+                recent=eyes.recent,
+            )
             last = cur
         time.sleep(max(0.0, 1 / FPS - (time.monotonic() - now)))
 

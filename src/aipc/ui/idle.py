@@ -2,9 +2,11 @@
 
 ทำไม: ลืมกด "ออก" แล้วลุกไป = คนต่อไปเห็นงาน แชท และบัญชีเว็บ (Gmail/YouTube) ที่ login ค้างไว้
 วิธี: swayidle (ตรวจว่าไม่มีคีย์บอร์ด/เมาส์ · labwc รองรับ ext-idle-notify) →
-  ครบ lock_min นาที  → swaylock (ext-session-lock: บังทุกหน้าต่างรวม Chromium · ปลดด้วยรหัสผ่านผ่าน PAM ของระบบ)
+  ครบ lock_min นาที  → swaylock (ext-session-lock: บังทุกหน้าต่างรวม Chromium ·
+                       ปลดด้วยรหัสผ่านผ่าน PAM ของระบบ)
   ครบอีก logout_min → labwc --exit (คำสั่งเดียวกับปุ่ม "ออก" · KillUserProcesses ปิดทุกโปรเซสของผู้ใช้)
-ทั้งสองโปรแกรมมากับ Raspberry Pi OS อยู่แล้ว (ตรวจบน Pi 5 2026-10-06: swaylock 1.8.2 · swayidle 1.8.0 · labwc 0.20.1)
+ทั้งสองโปรแกรมมากับ Raspberry Pi OS อยู่แล้ว
+(ตรวจบน Pi 5 2026-10-06: swaylock 1.8.2 · swayidle 1.8.0 · labwc 0.20.1)
 ใช้กล้องตรวจว่ามีคนอยู่ (ขั้น C) ทำหลังผลวัดขั้น B ผ่านเกณฑ์เท่านั้น
 """
 
@@ -27,8 +29,13 @@ def lock_command(image: Path | None) -> list[str]:
     return cmd
 
 
-def swayidle_args(lock_s: int, logout_s: int, lock_cmd: list[str],
-                  idle_flag: Path | None = None, flag_after_s: int = 10) -> list[str] | None:  # fmt: skip
+def swayidle_args(
+    lock_s: int,
+    logout_s: int,
+    lock_cmd: list[str],
+    idle_flag: Path | None = None,
+    flag_after_s: int = 10,
+) -> list[str] | None:
     """ไม่ใช้เครื่อง lock_s วินาที → ล็อก · ไม่ใช้ต่ออีก logout_s วินาที (นับจากครั้งสุดท้ายที่ใช้) → ออกจากระบบ.
 
     lock_s ≤ 0 = ไม่ล็อกด้วยเวลา · idle_flag (ขั้น C) = ไม่แตะ flag_after_s วิ → สร้างไฟล์ธง · แตะ → ลบ
@@ -52,7 +59,10 @@ def lock_lines(name: str, lock_min: int, logout_min: int, presence_logout_s: int
     who = f"{name} · " if name else ""
     if presence_logout_s:
         why = f"{who}ไม่ได้ใช้เครื่อง หรือกล้องไม่เห็นเจ้าของบัญชี"
-        out = f"ถ้าไม่มีใครอยู่หน้าเครื่อง ระบบจะออกจากระบบให้เองใน {presence_logout_s} วินาที · งานที่ยังไม่บันทึกจะหาย"
+        out = (
+            f"ถ้าไม่มีใครอยู่หน้าเครื่อง ระบบจะออกจากระบบให้เองใน {presence_logout_s} วินาที · "
+            "งานที่ยังไม่บันทึกจะหาย"
+        )
     else:
         why = f"{who}ไม่ได้ใช้เครื่องเกิน {lock_min} นาที"
         out = f"ถ้าไม่ปลดล็อกภายใน {logout_min} นาที ระบบจะออกจากระบบให้เอง · งานที่ยังไม่บันทึกจะหาย"
@@ -66,7 +76,8 @@ def lock_lines(name: str, lock_min: int, logout_min: int, presence_logout_s: int
 
 def render_lock_image(path: Path, lines: list[str], size: tuple[int, int] = (1920, 1080),
                       family: str = "IBM Plex Sans Thai") -> Path:  # fmt: skip
-    """วาดข้อความลงภาพ PNG ให้ swaylock ใช้เป็นพื้นหลัง (swaylock แสดงข้อความเองไม่ได้) · ใช้ฟอนต์ไทยที่มากับแอป."""
+    """วาดข้อความลงภาพ PNG ให้ swaylock ใช้เป็นพื้นหลัง (swaylock แสดงข้อความเองไม่ได้) ·
+    ใช้ฟอนต์ไทยที่มากับแอป."""
     from PySide6.QtCore import QRect, Qt
     from PySide6.QtGui import QColor, QFont, QImage, QPainter
 
@@ -84,8 +95,11 @@ def render_lock_image(path: Path, lines: list[str], size: tuple[int, int] = (192
     # กลางจอเป็นวงแหวนของ swaylock → ข้อความอยู่บนกับล่าง
     p.drawText(QRect(0, int(h * 0.22), w, int(h * 0.08)), Qt.AlignmentFlag.AlignCenter, rest[0])
     box = QRect(int(w * 0.08), int(h * 0.66), int(w * 0.84), int(h * 0.26))
-    p.drawText(box, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap,
-               "\n\n".join(rest[1:]))  # fmt: skip
+    p.drawText(
+        box,
+        Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap,
+        "\n\n".join(rest[1:]),
+    )
     p.end()
     path.parent.mkdir(parents=True, exist_ok=True)
     if not img.save(str(path), "PNG"):
@@ -99,11 +113,21 @@ def runtime_dir() -> Path:
 
 
 class IdleLock:
-    """ดูแล swayidle ของเซสชันนี้ 1 ตัว · เริ่มใหม่เมื่อค่าเปลี่ยน · ไม่มี swayidle/swaylock = ไม่ทำ (บอกผ่าน status)."""
+    """ดูแล swayidle ของเซสชันนี้ 1 ตัว · เริ่มใหม่เมื่อค่าเปลี่ยน ·
+    ไม่มี swayidle/swaylock = ไม่ทำ (บอกผ่าน status)."""
 
-    def __init__(self, spawn=None, which=shutil.which, image_dir: Path | None = None, render=render_lock_image):
-        self._spawn = spawn or (lambda args: subprocess.Popen(  # noqa: S603 · list args ไม่ผ่าน shell
-            args, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+    def __init__(
+        self,
+        spawn=None,
+        which=shutil.which,
+        image_dir: Path | None = None,
+        render=render_lock_image,
+    ):
+        self._spawn = spawn or (
+            lambda args: subprocess.Popen(  # noqa: S603 · list args ไม่ผ่าน shell
+                args, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+        )
         self._which = which
         self._dir = image_dir
         self._render = render
@@ -116,7 +140,8 @@ class IdleLock:
               presence: tuple[int, int] | None = None) -> list[str] | None:  # fmt: skip
         """ใช้ค่าใหม่ · ค่าเดิม = ไม่ทำอะไร · คืนคำสั่ง swayidle ที่เริ่ม (None = ปิด/ทำไม่ได้).
 
-        presence = (วินาทีไม่เห็นเจ้าของก่อนล็อก, วินาทีหลังล็อกก่อนออก) → เริ่มตัวตรวจด้วยกล้อง (ขั้น C) · None = ไม่ใช้กล้อง
+        presence = (วินาทีไม่เห็นเจ้าของก่อนล็อก, วินาทีหลังล็อกก่อนออก) →
+        เริ่มตัวตรวจด้วยกล้อง (ขั้น C) · None = ไม่ใช้กล้อง
         """
         key = (lock_min, logout_min, name, presence)
         if key == self._applied:
@@ -143,8 +168,18 @@ class IdleLock:
         if presence:
             import sys
 
-            mon = [sys.executable, "-m", "aipc.ui.presence", "run", "--flag", str(flag),
-                   "--lock-after", str(presence[0]), "--logout-after", str(presence[1])]  # fmt: skip
+            mon = [
+                sys.executable,
+                "-m",
+                "aipc.ui.presence",
+                "run",
+                "--flag",
+                str(flag),
+                "--lock-after",
+                str(presence[0]),
+                "--logout-after",
+                str(presence[1]),
+            ]
             if image is not None:
                 mon += ["--image", str(image)]
             self._monitor = self._spawn(mon)
@@ -166,8 +201,17 @@ class IdleLock:
 def clear_orphans(run=subprocess.run) -> None:
     """หน้าจอ V2 ล่มแล้วเปิดใหม่ (aipc-shell-loop) = swayidle ตัวเก่ายังรันอยู่ → ปิดของผู้ใช้คนนี้ก่อนเริ่มตัวใหม่."""
     try:
-        run(["pkill", "-u", str(os.getuid()), "-x", "swayidle"], check=False, capture_output=True, timeout=5)
-        run(["pkill", "-u", str(os.getuid()), "-f", "aipc.ui.presence run"], check=False, capture_output=True,
-            timeout=5)  # fmt: skip
+        run(
+            ["pkill", "-u", str(os.getuid()), "-x", "swayidle"],
+            check=False,
+            capture_output=True,
+            timeout=5,
+        )
+        run(
+            ["pkill", "-u", str(os.getuid()), "-f", "aipc.ui.presence run"],
+            check=False,
+            capture_output=True,
+            timeout=5,
+        )
     except (OSError, subprocess.TimeoutExpired):
         pass

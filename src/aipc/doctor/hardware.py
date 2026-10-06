@@ -106,7 +106,8 @@ def check_power(root: Path, run: Runner) -> Check:
     return Check("power", "ไฟเลี้ยง", PASS, detail)
 
 
-# พัดลมหมุนแล้วยังร้อนเกินนี้ = ระบายความร้อนไม่พอ · บนเครื่องเรา firmware ตั้งบิต soft temp limit ที่ 82.9 °C (soak 2026-10-01)
+# พัดลมหมุนแล้วยังร้อนเกินนี้ = ระบายความร้อนไม่พอ ·
+# บนเครื่องเรา firmware ตั้งบิต soft temp limit ที่ 82.9 °C (soak 2026-10-01)
 HOT_C = 80.0
 
 
@@ -128,10 +129,15 @@ def check_cooling(root: Path) -> Check:
             rpm = _read(entry, "fan1_input")
             if rpm and rpm.isdigit() and int(rpm) > 0:
                 if temp is not None and temp >= HOT_C:
-                    # Pi 5 ของเรา 2026-10-05: พัดลม 9,711 rpm แต่ 84.8 °C และถูกลดความเร็ว (0xe0008) ขณะ AI ตอบ
+                    # Pi 5 ของเรา 2026-10-05: พัดลม 9,711 rpm แต่ 84.8 °C
+                    # และถูกลดความเร็ว (0xe0008) ขณะ AI ตอบ
                     return Check(
-                        "cooling", "ระบายความร้อน", WARN, f"พัดลม {rpm} rpm แต่ {temp_txt} (≥ {HOT_C:.0f} °C)",
-                        "ตรวจแผ่นระบายความร้อนของ Active Cooler (ลอกฟิล์มแล้วหรือยัง · กดแนบชิป) · ขาสปริงล็อกครบ · เคส/ช่องลม",
+                        "cooling",
+                        "ระบายความร้อน",
+                        WARN,
+                        f"พัดลม {rpm} rpm แต่ {temp_txt} (≥ {HOT_C:.0f} °C)",
+                        "ตรวจแผ่นระบายความร้อนของ Active Cooler "
+                        "(ลอกฟิล์มแล้วหรือยัง · กดแนบชิป) · ขาสปริงล็อกครบ · เคส/ช่องลม",
                     )
                 return Check("cooling", "ระบายความร้อน", PASS, f"พัดลม {rpm} rpm · {temp_txt}")
             return Check(
@@ -296,16 +302,22 @@ def check_audio(root: Path) -> Check:
 
 
 def check_memory_cgroup(root: Path) -> Check:
-    """MemoryMax ของ aipc-llm.service มีผลเมื่อ cgroup v2 เปิด controller memory (audit 2026-09-30 hw-os-1)."""
+    """MemoryMax ของ aipc-llm.service มีผลเมื่อ cgroup v2 เปิด controller memory
+    (audit 2026-09-30 hw-os-1)."""
     ctl = _read(root, "/sys/fs/cgroup/cgroup.controllers")
     if ctl is None:
-        return Check("memcg", "memory cgroup", UNKNOWN, "อ่าน /sys/fs/cgroup/cgroup.controllers ไม่ได้")
+        return Check(
+            "memcg", "memory cgroup", UNKNOWN, "อ่าน /sys/fs/cgroup/cgroup.controllers ไม่ได้"
+        )
     if "memory" in ctl.split():
         return Check("memcg", "memory cgroup", PASS, "เปิดอยู่ · MemoryMax ของ AI มีผล")
     cmd = _read(root, "/proc/cmdline") or ""
     why = " (cmdline มี cgroup_disable=memory)" if "cgroup_disable=memory" in cmd else ""
     return Check(
-        "memcg", "memory cgroup", WARN, f"ปิดอยู่{why} · MemoryMax ของ aipc-llm.service ไม่มีผล",
+        "memcg",
+        "memory cgroup",
+        WARN,
+        f"ปิดอยู่{why} · MemoryMax ของ aipc-llm.service ไม่มีผล",
         "สำรอง /boot/firmware/cmdline.txt แล้วเติม cgroup_enable=memory ท้ายบรรทัดเดียวกัน · รีบูต",
     )
 

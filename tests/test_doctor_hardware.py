@@ -100,9 +100,12 @@ class HardwareTest(unittest.TestCase):
         self.assertEqual(hw.check_cooling(self.m.root).status, hw.PASS)
 
     def test_memory_cgroup(self):
-        """audit 2026-09-30 hw-os-1 · Pi 5 จริง: cmdline มี cgroup_disable=memory → MemoryMax ของ aipc-llm ไม่มีผล."""
+        """audit 2026-09-30 hw-os-1 · Pi 5 จริง: cmdline มี cgroup_disable=memory →
+        MemoryMax ของ aipc-llm ไม่มีผล."""
         self.m.write("/sys/fs/cgroup/cgroup.controllers", "cpuset cpu io pids\n")
-        self.m.write("/proc/cmdline", "console=tty1 root=PARTUUID=x cgroup_disable=memory rootwait\n")
+        self.m.write(
+            "/proc/cmdline", "console=tty1 root=PARTUUID=x cgroup_disable=memory rootwait\n"
+        )
         c = hw.check_memory_cgroup(self.m.root)
         self.assertEqual(c.status, hw.WARN)
         self.assertIn("cgroup_enable=memory", c.fix)

@@ -433,7 +433,8 @@ class ControllerTest(ServerCase):
         self.assertEqual(done[0][0], "ไม่รู้")
 
     def test_claude_switch_off_keeps_everything_local(self):
-        """สวิตช์ Claude ในหน้าตั้งค่า (2026-10-05): ปิด = ไม่ส่งคำถามออก · ไม่มี ask-cloud ในเครื่องมือ · ไม่มีใน prompt."""
+        """สวิตช์ Claude ในหน้าตั้งค่า (2026-10-05): ปิด = ไม่ส่งคำถามออก ·
+        ไม่มี ask-cloud ในเครื่องมือ · ไม่มีใน prompt."""
         from aipc.cloud.ask import CloudReply
 
         asked = []

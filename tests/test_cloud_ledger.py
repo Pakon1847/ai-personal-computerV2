@@ -85,8 +85,12 @@ class FileNeverLeavesTest(unittest.TestCase):
         history = [
             {"role": "user", "content": "สวัสดี"},
             {"role": "assistant", "content": "สวัสดีครับ"},
-            {"role": "user", "content": "[ใบเสร็จ.pdf] ค่าซ่อมแอร์ 3,500 บาท เลขบัตร 1234\nคำถาม: จ่ายเท่าไร",
-             "shown": "จ่ายเท่าไร", "file": "ใบเสร็จ.pdf"},
+            {
+                "role": "user",
+                "content": "[ใบเสร็จ.pdf] ค่าซ่อมแอร์ 3,500 บาท เลขบัตร 1234\nคำถาม: จ่ายเท่าไร",
+                "shown": "จ่ายเท่าไร",
+                "file": "ใบเสร็จ.pdf",
+            },
             {"role": "assistant", "content": "จ่ายไป 3,500 บาท"},
         ]
         sent = ask.build_input("ข่าววันนี้", history)

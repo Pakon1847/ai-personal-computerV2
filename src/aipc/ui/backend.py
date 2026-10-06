@@ -81,7 +81,8 @@ class UiSettings(QObject):
 
     @Slot(bool)
     def setUseClaude(self, on: bool) -> None:  # noqa: N802
-        """สวิตช์ส่งต่อ Claude (การ์ด 0016 หัวข้อ 1) · ปิด = ไม่ถาม Claude และไม่สร้างสกิล ข้อมูลไม่ออกไป Anthropic."""
+        """สวิตช์ส่งต่อ Claude (การ์ด 0016 หัวข้อ 1) · ปิด = ไม่ถาม Claude และไม่สร้างสกิล ·
+        ข้อมูลไม่ออกไป Anthropic."""
         if bool(on) != self._prefs.use_claude:
             self._prefs.use_claude = bool(on)
             settings.save(self._prefs, self._path)
@@ -1102,7 +1103,11 @@ class PresenceStatus(QObject):
             d = json.loads((self._path or presence.status_path()).read_text(encoding="utf-8"))
             base = self.TEXT.get(d.get("state", ""), "")
             detail = str(d.get("detail", ""))
-            text = f"{base} · {detail}" if base and detail and d.get("state") in ("locked", "camera-error") else base
+            text = (
+                f"{base} · {detail}"
+                if base and detail and d.get("state") in ("locked", "camera-error")
+                else base
+            )
         except (OSError, ValueError):
             text = ""
         if text != self._text:
@@ -1661,8 +1666,11 @@ class SkillsController(QObject):
         from aipc.skills import userskills
 
         if self._forge is not None and self._user is not None and not self._claude_on():
-            return self._plain("needs", "สร้างสกิลใหม่ไม่ได้: ปิดการใช้ Claude ไว้",
-                               ["เปิดได้ที่หน้าตั้งค่า › Claude · ระหว่างปิด ไม่มีข้อมูลออกไป Anthropic"])  # fmt: skip
+            return self._plain(
+                "needs",
+                "สร้างสกิลใหม่ไม่ได้: ปิดการใช้ Claude ไว้",
+                ["เปิดได้ที่หน้าตั้งค่า › Claude · ระหว่างปิด ไม่มีข้อมูลออกไป Anthropic"],
+            )
         if not self.canForge:
             return self._plain("needs", "สร้างสกิลใหม่ไม่ได้: เครื่องนี้ยังไม่มี Claude",
                                ["ติดตั้งและเข้าสู่ระบบ Claude Code ก่อน (การ์ด 0016)"])  # fmt: skip
@@ -2279,8 +2287,12 @@ class ChatController(QObject):
 
         from aipc.skills import catalog
 
-        base = catalog.system_prompt(date.today(), cloud=self._cloud_ok(),
-                                     model=self._model_name, forge=self._forge and self._cloud_ok())  # fmt: skip
+        base = catalog.system_prompt(
+            date.today(),
+            cloud=self._cloud_ok(),
+            model=self._model_name,
+            forge=self._forge and self._cloud_ok(),
+        )
         return base + (self.TOOLS_HINT if tools else "")
 
     def _all_tools(self, text: str = "") -> list:

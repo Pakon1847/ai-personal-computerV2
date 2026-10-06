@@ -16,7 +16,8 @@ from pathlib import Path
 
 THEMES = ("light", "dark")
 FONT_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0)  # BRIEF 5.7: 100–200%
-# ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด) และนาทีหลังล็อกก่อนออกจากระบบเอง
+# ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด)
+# และนาทีหลังล็อกก่อนออกจากระบบเอง
 LOCK_CHOICES = (0, 1, 5, 10, 15)
 LOGOUT_CHOICES = (5, 10, 30)
 # ขั้น C (aipc.ui.presence): กล้องตรวจว่าเจ้าของยังอยู่ · วินาทีที่ไม่เห็นเจ้าของก่อนล็อก และหลังล็อกก่อนออก
@@ -59,13 +60,19 @@ class UiPrefs:
             speak_answers=self.speak_answers is not False,
             speak_reminders=self.speak_reminders is True,
             use_claude=self.use_claude is not False,
-            lock_min=self.lock_min if self.lock_min in LOCK_CHOICES and type(self.lock_min) is int else 5,
-            logout_min=self.logout_min if self.logout_min in LOGOUT_CHOICES and type(self.logout_min) is int else 10,
+            lock_min=self.lock_min
+            if self.lock_min in LOCK_CHOICES and type(self.lock_min) is int
+            else 5,
+            logout_min=self.logout_min
+            if self.logout_min in LOGOUT_CHOICES and type(self.logout_min) is int
+            else 10,
             presence=self.presence is True,
-            presence_lock_s=self.presence_lock_s if self.presence_lock_s in PRESENCE_CHOICES
-            and type(self.presence_lock_s) is int else 30,
-            presence_logout_s=self.presence_logout_s if self.presence_logout_s in PRESENCE_CHOICES
-            and type(self.presence_logout_s) is int else 30,
+            presence_lock_s=self.presence_lock_s
+            if self.presence_lock_s in PRESENCE_CHOICES and type(self.presence_lock_s) is int
+            else 30,
+            presence_logout_s=self.presence_logout_s
+            if self.presence_logout_s in PRESENCE_CHOICES and type(self.presence_logout_s) is int
+            else 30,
         )
 
 

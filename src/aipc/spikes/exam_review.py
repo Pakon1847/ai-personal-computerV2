@@ -1,14 +1,17 @@
 """ให้คนตรวจคำตอบที่ Claude ตอบในชุดสอบไฮบริด (ตัวตรวจอัตโนมัติไม่ตรวจข้อมูลจากเว็บ · exam.py).
 
-    python -m aipc.spikes.exam_review sheet <ผลไฮบริด.json> --out <โฟลเดอร์>     → review.html (เปิดในเบราว์เซอร์)
-    python -m aipc.spikes.exam_review score <ผลไฮบริด.json> review-*.csv          → คะแนนไฮบริดหลังคนตรวจ
+    python -m aipc.spikes.exam_review sheet <ผลไฮบริด.json> --out <โฟลเดอร์>
+        → review.html (เปิดในเบราว์เซอร์)
+    python -m aipc.spikes.exam_review score <ผลไฮบริด.json> review-*.csv
+        → คะแนนไฮบริดหลังคนตรวจ
 
 ผลตัดสินต่อข้อ (ประกาศก่อนตรวจ · docs/benchmarks/2026-10-06-exam-hybrid-gemma/README.md):
   correct  ตอบถูกตามข้อเท็จจริง ณ เวลาที่ถาม
   partial  ถูกบางส่วน / มีส่วนผิด
   wrong    ผิด หรือแต่งข้อมูล
   honest   ไม่ได้ตอบ แต่บอกตรง ๆ ว่าไม่รู้/หาไม่ได้
-ผ่าน = correct · หรือ honest ในข้อที่เฉลยคือ "บอกตรง ๆ" (เหมือนที่ AI ในเครื่องได้คะแนน) · partial/wrong = ไม่ผ่าน ·
+ผ่าน = correct · หรือ honest ในข้อที่เฉลยคือ "บอกตรง ๆ" (เหมือนที่ AI ในเครื่องได้คะแนน) ·
+partial/wrong = ไม่ผ่าน ·
 ผู้ตรวจ 2 คนเห็นไม่ตรงกัน = ไม่ผ่าน (ระวังไว้ก่อน) และขึ้นรายการให้คุยกัน
 """
 
@@ -29,8 +32,17 @@ def cloud_rows(result: dict) -> list[dict]:
 
 def sheet(result_file: Path, out_dir: Path) -> Path:
     res = json.loads(result_file.read_text(encoding="utf-8"))
-    rows = [{"id": r["id"], "q": r["q"], "expect": r["expect"], "why": r.get("escalated_by", ""),
-             "local": r.get("local_text", ""), "claude": r.get("text", "")} for r in cloud_rows(res)]  # fmt: skip
+    rows = [
+        {
+            "id": r["id"],
+            "q": r["q"],
+            "expect": r["expect"],
+            "why": r.get("escalated_by", ""),
+            "local": r.get("local_text", ""),
+            "claude": r.get("text", ""),
+        }
+        for r in cloud_rows(res)
+    ]
     data = json.dumps({"asked": res.get("date", ""), "rows": rows}, ensure_ascii=False)
     data = data.replace("</", "<" + chr(92) + "/")
     page = Path(__file__).with_name("exam_review_page.html").read_text(encoding="utf-8")

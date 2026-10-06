@@ -16,7 +16,8 @@ NOT_CHECKED = Seen(1)  # มีหน้า แต่รอบนี้ไม่
 
 
 def drive(d, steps, start=0.0, step=0.5, idle=True):
-    """ส่ง Seen ทีละ 0.5 วิ · จำลอง swaylock ขึ้นหลังสั่ง "lock" (และค้างจนกว่าเทสต์จะปลดเอง) · คืน [(เวลา, คำสั่ง)]."""
+    """ส่ง Seen ทีละ 0.5 วิ · จำลอง swaylock ขึ้นหลังสั่ง "lock" (และค้างจนกว่าเทสต์จะปลดเอง) ·
+    คืน [(เวลา, คำสั่ง)]."""
     out, t = [], start
     for seen in steps:
         a = d.tick(t, idle, d.state == "locked", seen)
@@ -64,7 +65,9 @@ class DeciderTest(unittest.TestCase):
         d = Decider(60, 30)
         acts = drive(d, [STRANGER, NOT_CHECKED, NOT_CHECKED, NOT_CHECKED] * 2 + [NOBODY] * 16
                      + [STRANGER, NOT_CHECKED, NOT_CHECKED, NOT_CHECKED] * 3)  # fmt: skip
-        self.assertEqual(acts[0], (16.0, "lock"))  # ไม่นับใหม่จะล็อกที่ 12 วิ (ครั้งที่ 3) · นับใหม่ = 12, 14, 16
+        self.assertEqual(
+            acts[0], (16.0, "lock")
+        )  # ไม่นับใหม่จะล็อกที่ 12 วิ (ครั้งที่ 3) · นับใหม่ = 12, 14, 16
 
     def test_owner_among_several_faces_counts_as_present(self):
         both = Seen(2, owner=True, stranger=False)  # เจ้าของ + คนชะโงกมาดู
@@ -109,10 +112,14 @@ class WiringTest(unittest.TestCase):
     def test_swayidle_flag_only_when_presence(self):
         flag = PurePosixPath("/run/user/1/aipc/input-idle")
         args = idle.swayidle_args(0, 600, ["swaylock"], idle_flag=flag)
-        self.assertEqual(args, ["swayidle", "-w", "timeout", "10", f"touch {flag}", "resume", f"rm -f {flag}"])
+        self.assertEqual(
+            args, ["swayidle", "-w", "timeout", "10", f"touch {flag}", "resume", f"rm -f {flag}"]
+        )
         self.assertIsNone(idle.swayidle_args(0, 600, ["swaylock"]))
         both = idle.swayidle_args(300, 600, ["swaylock"], idle_flag=flag)
-        self.assertEqual(both[-6:], ["timeout", "300", "swaylock", "timeout", "900", "labwc --exit"])
+        self.assertEqual(
+            both[-6:], ["timeout", "300", "swaylock", "timeout", "900", "labwc --exit"]
+        )
 
     def test_idlelock_starts_monitor_only_when_enabled(self):
         spawned = []

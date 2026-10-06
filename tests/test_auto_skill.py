@@ -243,7 +243,8 @@ class ControllerTest(unittest.TestCase):
         return s, done
 
     def test_claude_switch_off_blocks_forge(self):
-        """สวิตช์ Claude ปิด (2026-10-05): ไม่มี create-skill ให้ AI · สั่งสร้างแล้วบอกตรง ๆ · ไม่เรียก Claude."""
+        """สวิตช์ Claude ปิด (2026-10-05): ไม่มี create-skill ให้ AI · สั่งสร้างแล้วบอกตรง ๆ ·
+        ไม่เรียก Claude."""
         s, done = self.make(GOOD)
         on = [False]
         s._claude_on = lambda: on[0]

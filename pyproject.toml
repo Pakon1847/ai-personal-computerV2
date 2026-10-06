@@ -29,6 +29,8 @@ aipc = ["ui/qml/AipcUi/*", "ui/fonts/*", "skills/builtin/*.md", "skills/builtin/
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# สคริปต์ในโฟลเดอร์ผลวัดเป็นหลักฐาน: commit ก่อนวัดแล้วห้ามแก้ (H9) · ไม่จัดรูปแบบย้อนหลัง
+extend-exclude = ["docs/benchmarks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]

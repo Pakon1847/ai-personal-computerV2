@@ -27,8 +27,17 @@ PHASES = {"present": [[15, 115]], "away": [115, 175], "stranger": [175, 205], "b
 
 class PresenceAnalyzeTest(unittest.TestCase):
     def test_all_criteria_pass_on_clean_session(self):
-        data = rows([(0, 15, 1, None), (15, 60, 1, 0.7), (60, 75, 0, None), (75, 115, 1, 0.7),
-                     (115, 175, 0, None), (175, 205, 1, 0.1), (205, 235, 1, 0.7)])
+        data = rows(
+            [
+                (0, 15, 1, None),
+                (15, 60, 1, 0.7),
+                (60, 75, 0, None),
+                (75, 115, 1, 0.7),
+                (115, 175, 0, None),
+                (175, 205, 1, 0.1),
+                (205, 235, 1, 0.7),
+            ]
+        )
         res = pr.analyze(data, PHASES)
         self.assertEqual(res["max_gap_present"], 15.0)  # ก้มหน้า 15 วิ ยังไม่ถึง 30
         self.assertEqual(res["gaps_present"][">=10s"], 1)

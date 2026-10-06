@@ -8,13 +8,38 @@ from pathlib import Path
 
 from aipc.spikes import exam_review as er
 
-RESULT = {"date": "2026-10-05T20:46", "summary": {"auto_ok": 95}, "rows": [
-    {"id": "A01", "by": "local", "q": "x", "expect": "answer"},
-    {"id": "A08", "by": "cloud", "q": "แม่น้ำ", "expect": "answer", "text": "มูล", "local_text": "เจ้าพระยา",
-     "escalated_by": "fallback"},
-    {"id": "B03", "by": "cloud", "q": "ราคาทอง", "expect": "honest", "text": "ยืนยันไม่ได้", "escalated_by": "tool"},
-    {"id": "B10", "by": "cloud", "q": "หุ้น", "expect": "honest", "text": "</script> ขึ้น", "escalated_by": "tool"},
-]}
+RESULT = {
+    "date": "2026-10-05T20:46",
+    "summary": {"auto_ok": 95},
+    "rows": [
+        {"id": "A01", "by": "local", "q": "x", "expect": "answer"},
+        {
+            "id": "A08",
+            "by": "cloud",
+            "q": "แม่น้ำ",
+            "expect": "answer",
+            "text": "มูล",
+            "local_text": "เจ้าพระยา",
+            "escalated_by": "fallback",
+        },
+        {
+            "id": "B03",
+            "by": "cloud",
+            "q": "ราคาทอง",
+            "expect": "honest",
+            "text": "ยืนยันไม่ได้",
+            "escalated_by": "tool",
+        },
+        {
+            "id": "B10",
+            "by": "cloud",
+            "q": "หุ้น",
+            "expect": "honest",
+            "text": "</script> ขึ้น",
+            "escalated_by": "tool",
+        },
+    ],
+}
 
 
 def write_review(path: Path, verdicts: dict) -> None:

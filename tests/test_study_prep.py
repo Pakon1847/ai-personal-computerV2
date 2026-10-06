@@ -20,8 +20,10 @@ class StudyPrepTest(unittest.TestCase):
             self.assertIn(receipt, written)
             self.assertIn("รวมทั้งสิ้น 1,600 บาท", receipt.read_text(encoding="utf-8"))
             items = ReminderStore(home / ".local/share/aipc/reminders.json").items
-            self.assertEqual([(r.what, r.when.date(), r.when.hour) for r in items],
-                             [("รับยาที่โรงพยาบาล", now.date(), 18)])
+            self.assertEqual(
+                [(r.what, r.when.date(), r.when.hour) for r in items],
+                [("รับยาที่โรงพยาบาล", now.date(), 18)],
+            )
 
     def test_create_sends_helper_request_like_signup_screen(self):
         seen = {}
@@ -32,6 +34,7 @@ class StudyPrepTest(unittest.TestCase):
             class R:
                 stdout = '{"ok": true}'
                 stderr = ""
+
             return R()
 
         self.assertTrue(sp.create("p1", "ผู้ร่วมทดสอบ P1", "pw-Long-123", "4821", run=run)["ok"])

@@ -130,7 +130,8 @@ def _weather(ledger=None):
 
 
 def _start_idle_lock(ui_settings, app):
-    """ล็อกจอเมื่อไม่ได้ใช้เครื่อง แล้วออกเอง (aipc.ui.idle · ขั้น A) · เฉพาะเซสชันจริง · ค่าเปลี่ยน = เริ่ม swayidle ใหม่."""
+    """ล็อกจอเมื่อไม่ได้ใช้เครื่อง แล้วออกเอง (aipc.ui.idle · ขั้น A) · เฉพาะเซสชันจริง ·
+    ค่าเปลี่ยน = เริ่ม swayidle ใหม่."""
     import getpass
     import pwd
 
@@ -149,7 +150,11 @@ def _start_idle_lock(ui_settings, app):
     idle.clear_orphans()
 
     def apply() -> None:
-        presence = (ui_settings.presenceLockS, ui_settings.presenceLogoutS) if ui_settings.presence else None
+        presence = (
+            (ui_settings.presenceLockS, ui_settings.presenceLogoutS)
+            if ui_settings.presence
+            else None
+        )
         lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size, presence=presence)
 
     apply()

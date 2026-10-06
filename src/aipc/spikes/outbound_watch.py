@@ -3,10 +3,12 @@
 เกณฑ์: docs/reviews/2026-10-05-claims-hybrid.md หัวข้อ 4 (ประกาศก่อนวัด) · audit 2026-09-30 gaps-1
 
     sudo python -m aipc.spikes.outbound_watch record --seconds 1800 --out watch.jsonl
-    python -m aipc.spikes.outbound_watch check watch.jsonl --ledger outbound.json --canary CANARY-7Q4X
+    python -m aipc.spikes.outbound_watch check watch.jsonl --ledger outbound.json
+        --canary CANARY-7Q4X
 
 record ต้องรันด้วย root (ss เห็นชื่อโปรเซสของทุกผู้ใช้) · อ่านอย่างเดียว ไม่แตะอะไรในเครื่อง
-ตัดสินจากชื่อโปรเซส: โปรแกรมของเรา (python / llama-server) ออกได้เฉพาะ Open-Meteo · claude = Anthropic (รายงานทุกปลายทาง)
+ตัดสินจากชื่อโปรเซส: โปรแกรมของเรา (python / llama-server) ออกได้เฉพาะ Open-Meteo ·
+claude = Anthropic (รายงานทุกปลายทาง)
 """
 
 from __future__ import annotations
@@ -46,7 +48,9 @@ def parse_ss(text: str) -> list[dict]:
 
 def external(row: dict) -> bool:
     peer = _host(row["peer"])
-    return not (peer.startswith("127.") or peer in ("::1", "localhost") or peer.startswith("::ffff:127."))
+    return not (
+        peer.startswith("127.") or peer in ("::1", "localhost") or peer.startswith("::ffff:127.")
+    )
 
 
 def resolve(hosts=OPEN_METEO, lookup=socket.getaddrinfo) -> dict[str, list[str]]:
@@ -59,15 +63,30 @@ def resolve(hosts=OPEN_METEO, lookup=socket.getaddrinfo) -> dict[str, list[str]]
     return out
 
 
-def record(seconds: float, interval: float, out: Path, run=None, clock=time.time, sleep=time.sleep) -> int:
+def record(
+    seconds: float, interval: float, out: Path, run=None, clock=time.time, sleep=time.sleep
+) -> int:
     """สุ่ม ss ทุก interval วิ นาน seconds วิ → JSONL (บรรทัดแรก = ข้อมูลการวัด) · คืนจำนวนแถวที่ออกนอกเครื่อง."""
-    run = run or (lambda: subprocess.run(["ss", "-tunpH", "state", "established"], capture_output=True,
-                                         text=True, check=False).stdout)  # fmt: skip
+    run = run or (
+        lambda: (
+            subprocess.run(
+                ["ss", "-tunpH", "state", "established"],
+                capture_output=True,
+                text=True,
+                check=False,
+            ).stdout
+        )
+    )
     n = 0
     end = clock() + seconds
     with out.open("w", encoding="utf-8") as f:
-        head = {"meta": {"start": datetime.now().isoformat(timespec="seconds"), "interval_s": interval,
-                         "open_meteo_ips": resolve()}}  # fmt: skip
+        head = {
+            "meta": {
+                "start": datetime.now().isoformat(timespec="seconds"),
+                "interval_s": interval,
+                "open_meteo_ips": resolve(),
+            }
+        }
         f.write(json.dumps(head, ensure_ascii=False) + "\n")
         while clock() < end:
             t = clock()

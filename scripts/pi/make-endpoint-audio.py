@@ -2,7 +2,8 @@
 
     ~/voice-bench/venv/bin/python make-endpoint-audio.py sentences.json outdir/
 
-เขียน single-NN.wav (ประโยคเดียว) และ pair-NN.wav (สองประโยค เว้นกลาง 0.5 วิ) · 16 kHz mono · meta.json บอกจุดเริ่ม/จบเสียงพูด
+เขียน single-NN.wav (ประโยคเดียว) และ pair-NN.wav (สองประโยค เว้นกลาง 0.5 วิ) · 16 kHz mono ·
+meta.json บอกจุดเริ่ม/จบเสียงพูด
 ทุกไฟล์มีเงียบนำ 0.5 วิ และเงียบท้าย 3 วิ (ให้ตัวจับจุดจบมีที่หยุด)
 """
 
@@ -31,7 +32,10 @@ def main() -> int:
         raw, w16 = f"{tmp}/a.wav", f"{tmp}/b.wav"
         with wave.open(raw, "wb") as w:
             voice.synthesize_wav(text, w)
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-ar", str(SR), "-ac", "1", w16], check=True)
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-ar", str(SR), "-ac", "1", w16],
+            check=True,
+        )
         with wave.open(w16) as w:
             x = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16)
         # ตัดเงียบหัวท้ายที่ Piper ใส่มา ให้รู้จุดจบเสียงพูดแม่น
@@ -39,7 +43,11 @@ def main() -> int:
         return x[idx[0] : idx[-1] + 1] if len(idx) else x
 
     meta = []
-    lead, tail, gap = np.zeros(SR // 2, np.int16), np.zeros(3 * SR, np.int16), np.zeros(SR // 2, np.int16)
+    lead, tail, gap = (
+        np.zeros(SR // 2, np.int16),
+        np.zeros(3 * SR, np.int16),
+        np.zeros(SR // 2, np.int16),
+    )
     for i, text in enumerate(sents):
         a = synth(text)
         b = synth(sents[(i + 1) % len(sents)])
@@ -53,7 +61,12 @@ def main() -> int:
                 w.writeframes(x.tobytes())
             meta.append({"file": name, "kind": kind, "speech_start": len(lead) / SR,
                          "speech_end": (len(lead) + len(body)) / SR})  # fmt: skip
-    json.dump(meta, open(os.path.join(out, "meta.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    json.dump(
+        meta,
+        open(os.path.join(out, "meta.json"), "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=1,
+    )
     print(len(meta), "files")
     return 0
 
