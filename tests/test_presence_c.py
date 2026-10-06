@@ -53,6 +53,19 @@ class DeciderTest(unittest.TestCase):
         self.assertEqual([a for _, a in acts], ["lock", "logout"])
         self.assertEqual(acts[1][0], 5.5 + 30)  # หน้าสุดท้ายที่ 5.5 วิ + ไม่มีใครต่อเนื่อง 30 วิ
 
+    def test_stranger_flickering_detection_still_locks_on_third_check(self):
+        # ทดสอบที่หน้าจอ 23:47: รูปบนมือถือหาหน้าเจอบ้างไม่เจอบ้าง → เดิมนับใหม่ทุกภาพที่ไม่เจอ
+        d = Decider(30, 30)
+        acts = drive(d, ([STRANGER, NOBODY, NOT_CHECKED, NOBODY]) * 10)
+        self.assertEqual(acts[0], (4.0, "lock"))
+        self.assertEqual(d.reason, "stranger")
+
+    def test_stranger_count_restarts_after_long_gap(self):
+        d = Decider(60, 30)
+        acts = drive(d, [STRANGER, NOT_CHECKED, NOT_CHECKED, NOT_CHECKED] * 2 + [NOBODY] * 16
+                     + [STRANGER, NOT_CHECKED, NOT_CHECKED, NOT_CHECKED] * 3)  # fmt: skip
+        self.assertEqual(acts[0], (16.0, "lock"))  # ไม่นับใหม่จะล็อกที่ 12 วิ (ครั้งที่ 3) · นับใหม่ = 12, 14, 16
+
     def test_owner_among_several_faces_counts_as_present(self):
         both = Seen(2, owner=True, stranger=False)  # เจ้าของ + คนชะโงกมาดู
         self.assertEqual(drive(Decider(), ([both] + [NOT_CHECKED] * 3) * 50), [])

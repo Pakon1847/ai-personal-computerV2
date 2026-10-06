@@ -30,7 +30,8 @@ MAX_FACES = 3
 STRANGER_RUN = 3
 THRESHOLD = 0.363  # cosine · ค่าเดียวกับสแกนหน้าเข้าเครื่องและขั้น B
 IDLE_AFTER_S = 10
-LOCK_GRACE_S = 3.0  # หลังสั่งล็อก รอ swaylock ขึ้นก่อนเชื่อว่า "ไม่ได้ล็อก"  # ไม่แตะคีย์บอร์ด/เมาส์กี่วิ ถึงเปิดกล้อง (swayidle timeout ของไฟล์ธง)
+LOCK_GRACE_S = 3.0
+STRANGER_GAP_S = 6.0  # "คนอื่น" ห่างกันเกินนี้ = เริ่มนับใหม่ (ภาพที่หาหน้าไม่เจอคั่นได้ · ทดสอบ 23:47 รูปบนมือถือหาเจอบ้างไม่เจอบ้าง)  # หลังสั่งล็อก รอ swaylock ขึ้นก่อนเชื่อว่า "ไม่ได้ล็อก"  # ไม่แตะคีย์บอร์ด/เมาส์กี่วิ ถึงเปิดกล้อง (swayidle timeout ของไฟล์ธง)
 
 
 def runtime_dir() -> Path:
@@ -91,6 +92,7 @@ class Decider:
     last_face: float = 0.0  # ครั้งล่าสุดที่เห็นหน้าใครก็ได้หลังล็อก
     locked_at: float = 0.0
     run: int = 0
+    last_stranger: float = -1e9
     log: list = field(default_factory=list)
 
     def tick(self, now: float, idle: bool, locked: bool, seen: Seen | None) -> str | None:
@@ -115,9 +117,10 @@ class Decider:
             if seen.owner:
                 self.owner_seen, self.run = now, 0
             elif seen.stranger:
-                self.run += 1
-            elif seen.owner is not None or seen.faces == 0:
-                self.run = 0
+                if now - self.last_stranger > STRANGER_GAP_S:
+                    self.run = 0
+                self.run, self.last_stranger = self.run + 1, now
+            # ไม่เห็นหน้า/ไม่ได้เทียบรอบนี้ = ไม่นับใหม่ (เดิมภาพที่หาหน้าไม่เจอ 1 ภาพทำให้นับใหม่ → ล็อกช้า)
             if self.run >= STRANGER_RUN:
                 return self._lock(now, "stranger")
             if now - self.owner_seen >= self.lock_after:
