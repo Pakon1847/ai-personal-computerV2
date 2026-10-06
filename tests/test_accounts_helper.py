@@ -171,6 +171,21 @@ class HelperTest(unittest.TestCase):
         self.assertTrue(self.recover(PIN, pw="third-password-3")["ok"], "PIN เดิมใช้ต่อได้")
         self.assertEqual(self.sys.passwords["namfon"], "third-password-3")
 
+    def test_recover_resets_login_keyring_as_the_user(self):
+        """2026-10-06: keyring เข้ารหัสด้วยรหัสเก่า → Chromium/ระบบถามรหัสเก่าที่ลืมไปแล้ว · ลบในนามผู้ใช้ (กัน symlink)."""
+        helper.handle(create_req(), self.sys)
+        self.sys.calls.clear()
+        self.assertEqual(self.recover("000001")["message"], helper.RECOVER_FAIL)
+        self.assertFalse([c for c in self.sys.calls if c[0] == "runuser"], "PIN ผิด = ไม่แตะ keyring")
+        self.assertTrue(self.recover(PIN)["ok"])
+        rm = [c for c in self.sys.calls if c[0] == "runuser"]
+        self.assertEqual(len(rm), 1)
+        self.assertEqual(rm[0][:6], ["runuser", "-u", "namfon", "--", "rm", "-f"])
+        self.assertTrue(rm[0][6].replace("\\", "/").endswith(".local/share/keyrings/login.keyring"))
+        self.sys.fail.add("runuser")
+        self.assertTrue(self.recover(PIN)["ok"], "ล้าง keyring ไม่ได้ ไม่ทำให้กู้คืนล้ม")
+        self.assertTrue(any("keyring" in x for x in self.sys.logs))
+
     def test_wrong_pins_make_you_wait(self):
         helper.handle(create_req(), self.sys)
         for _ in range(helper.FAIL_FREE):
