@@ -253,6 +253,57 @@ ColumnLayout {
                     }
                 }
             }
+            // ขั้น C: กล้องช่วยดูว่าเจ้าของยังอยู่ · ต้องลงทะเบียน "ใบหน้าของฉัน" ก่อน · เปิดเอง
+            AppCheck {
+                objectName: "presenceCheck"
+                enabled: face.state === "enrolled" || uiSettings.presence
+                text: "ใช้กล้องช่วยดูว่าฉันยังนั่งอยู่"
+                detail: face.state !== "enrolled" && !uiSettings.presence
+                        ? "ต้องลงทะเบียน \"ใบหน้าของฉัน\" ด้านบนก่อน"
+                        : "ไม่ได้แตะเครื่อง 10 วินาที → กล้องเปิด · ไม่เห็นหน้าคุณ " + uiSettings.presenceLockS
+                          + " วินาที หรือเห็นคนอื่นแทน → ล็อก · ล็อกแล้วไม่มีใครอยู่อีก " + uiSettings.presenceLogoutS
+                          + " วินาที → ออกจากระบบ · ไม่บันทึกภาพ · ไฟกล้องติดเฉพาะตอนกล้องเปิด"
+                checked: uiSettings.presence
+                onClicked: uiSettings.setPresence(checked)
+            }
+            Flow {
+                Layout.fillWidth: true
+                visible: uiSettings.presence
+                spacing: 8
+                AppText { text: "ล็อกเมื่อไม่เห็นหน้า"; size: Theme.fontSmall; color: Theme.inkMuted; height: 44; verticalAlignment: Text.AlignVCenter }
+                Repeater {
+                    model: uiSettings.presenceChoices
+                    AppButton {
+                        required property int modelData
+                        objectName: "presenceLock" + modelData
+                        text: modelData + " วินาที"
+                        kind: uiSettings.presenceLockS === modelData ? "primary" : "secondary"
+                        onClicked: uiSettings.setPresenceLockS(modelData)
+                    }
+                }
+            }
+            Flow {
+                Layout.fillWidth: true
+                visible: uiSettings.presence
+                spacing: 8
+                AppText { text: "ออกหลังล็อกถ้าไม่มีใคร"; size: Theme.fontSmall; color: Theme.inkMuted; height: 44; verticalAlignment: Text.AlignVCenter }
+                Repeater {
+                    model: uiSettings.presenceChoices
+                    AppButton {
+                        required property int modelData
+                        objectName: "presenceLogout" + modelData
+                        text: modelData + " วินาที"
+                        kind: uiSettings.presenceLogoutS === modelData ? "primary" : "secondary"
+                        onClicked: uiSettings.setPresenceLogoutS(modelData)
+                    }
+                }
+            }
+            AppText {
+                objectName: "presenceStatusText"
+                visible: uiSettings.presence && presenceStatus.text !== ""
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                text: "สถานะ: " + presenceStatus.text
+            }
         }
     }
 

@@ -18,6 +18,7 @@ from aipc.ui.backend import (
     CloudUsage,
     FilesBrowser,
     LoginController,
+    PresenceStatus,
     SessionController,
     SignupController,
     SkillsController,
@@ -148,7 +149,8 @@ def _start_idle_lock(ui_settings, app):
     idle.clear_orphans()
 
     def apply() -> None:
-        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size)
+        presence = (ui_settings.presenceLockS, ui_settings.presenceLogoutS) if ui_settings.presence else None
+        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size, presence=presence)
 
     apply()
     ui_settings.changed.connect(apply)  # ค่าเดิม = IdleLock ไม่ทำอะไร (ธีม/ตัวอักษรเปลี่ยนไม่กระทบ)
@@ -263,6 +265,8 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
+        # ขั้น C: สถานะตัวตรวจด้วยกล้อง (อ่านไฟล์ทุก 2 วิ เฉพาะเซสชันจริง)
+        "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session),
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง

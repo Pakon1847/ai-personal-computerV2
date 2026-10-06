@@ -118,6 +118,44 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
+    # ขั้น C: กล้องช่วยดูว่าเจ้าของยังอยู่ (aipc.ui.presence)
+    @Property(bool, notify=changed)
+    def presence(self) -> bool:
+        return self._prefs.presence
+
+    @Property(int, notify=changed)
+    def presenceLockS(self) -> int:  # noqa: N802
+        return self._prefs.presence_lock_s
+
+    @Property(int, notify=changed)
+    def presenceLogoutS(self) -> int:  # noqa: N802
+        return self._prefs.presence_logout_s
+
+    @Property("QVariantList", constant=True)
+    def presenceChoices(self) -> list:  # noqa: N802
+        return list(settings.PRESENCE_CHOICES)
+
+    @Slot(bool)
+    def setPresence(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.presence:
+            self._prefs.presence = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Slot(int)
+    def setPresenceLockS(self, s: int) -> None:  # noqa: N802
+        if s in settings.PRESENCE_CHOICES and s != self._prefs.presence_lock_s:
+            self._prefs.presence_lock_s = int(s)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Slot(int)
+    def setPresenceLogoutS(self, s: int) -> None:  # noqa: N802
+        if s in settings.PRESENCE_CHOICES and s != self._prefs.presence_logout_s:
+            self._prefs.presence_logout_s = int(s)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     @Slot()
     def finishOnboarding(self) -> None:  # noqa: N802
         """ปิดหน้าแนะนำการใช้งานครั้งแรก · จำไว้ในไฟล์ตั้งค่าของผู้ใช้ (ไม่ขึ้นอีก)."""
@@ -1029,6 +1067,47 @@ class SessionController(QObject):
             self.changed.emit()
             return False
         return True
+
+
+class PresenceStatus(QObject):
+    """สถานะของตัวตรวจด้วยกล้อง (ขั้น C) จากไฟล์ที่ตัวตรวจเขียน · อ่านทุก 2 วิ เฉพาะในเซสชันจริง."""
+
+    changed = Signal()
+    TEXT = {"active": "พร้อม · กล้องเปิดเมื่อไม่ได้แตะเครื่อง 10 วินาที",
+            "watching": "กล้องกำลังดูว่าเจ้าของยังอยู่ (ไม่บันทึกภาพ)",
+            "locked": "ล็อกแล้ว", "logout": "กำลังออกจากระบบ",
+            "no-template": "ยังไม่ได้ลงทะเบียน \"ใบหน้าของฉัน\" · ลงทะเบียนในหน้านี้ก่อน",
+            "camera-error": "ใช้กล้องไม่ได้ตอนนี้ · จะลองใหม่เอง"}  # fmt: skip
+
+    def __init__(self, path: Path | None = None, poll_ms: int = 2000, active: bool = True):
+        super().__init__()
+        self._path = path
+        self._text = ""
+        if active:
+            self._timer = QTimer(self)
+            self._timer.timeout.connect(self.refresh)
+            self._timer.start(poll_ms)
+
+    @Property(str, notify=changed)
+    def text(self) -> str:
+        return self._text
+
+    @Slot()
+    def refresh(self) -> None:
+        import json
+
+        from aipc.ui import presence
+
+        try:
+            d = json.loads((self._path or presence.status_path()).read_text(encoding="utf-8"))
+            base = self.TEXT.get(d.get("state", ""), "")
+            detail = str(d.get("detail", ""))
+            text = f"{base} · {detail}" if base and detail and d.get("state") in ("locked", "camera-error") else base
+        except (OSError, ValueError):
+            text = ""
+        if text != self._text:
+            self._text = text
+            self.changed.emit()
 
 
 def _run_quiet(args: list[str]) -> int:

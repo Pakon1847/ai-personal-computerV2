@@ -27,26 +27,40 @@ def lock_command(image: Path | None) -> list[str]:
     return cmd
 
 
-def swayidle_args(lock_s: int, logout_s: int, lock_cmd: list[str]) -> list[str] | None:
+def swayidle_args(lock_s: int, logout_s: int, lock_cmd: list[str],
+                  idle_flag: Path | None = None, flag_after_s: int = 10) -> list[str] | None:  # fmt: skip
     """ไม่ใช้เครื่อง lock_s วินาที → ล็อก · ไม่ใช้ต่ออีก logout_s วินาที (นับจากครั้งสุดท้ายที่ใช้) → ออกจากระบบ.
 
-    lock_s ≤ 0 = ปิด (คืน None) · -w = รอคำสั่งจบก่อนรับเหตุการณ์ถัดไป
+    lock_s ≤ 0 = ไม่ล็อกด้วยเวลา · idle_flag (ขั้น C) = ไม่แตะ flag_after_s วิ → สร้างไฟล์ธง · แตะ → ลบ
+    (ตัวตรวจด้วยกล้องเปิดกล้องเฉพาะตอนมีธง) · ไม่มีทั้งสองอย่าง = คืน None · -w = รอคำสั่งจบก่อนรับเหตุการณ์ถัดไป
     """
-    if lock_s <= 0:
-        return None
-    return ["swayidle", "-w",
-            "timeout", str(lock_s), shlex.join(lock_cmd),
-            "timeout", str(lock_s + max(logout_s, 1)), EXIT_CMD]  # fmt: skip
+    args = ["swayidle", "-w"]
+    if idle_flag is not None:
+        f = shlex.quote(str(idle_flag))
+        args += ["timeout", str(flag_after_s), f"touch {f}", "resume", f"rm -f {f}"]
+    if lock_s > 0:
+        args += ["timeout", str(lock_s), shlex.join(lock_cmd),
+                 "timeout", str(lock_s + max(logout_s, 1)), EXIT_CMD]  # fmt: skip
+    return args if len(args) > 2 else None
 
 
-def lock_lines(name: str, lock_min: int, logout_min: int) -> list[str]:
-    """ข้อความบนจอล็อก (ผู้ใช้ทั่วไป/ผู้สูงอายุต้องรู้ว่าต้องทำอะไร ไม่ใช่เห็นจอสีดำเฉย ๆ)."""
+def lock_lines(name: str, lock_min: int, logout_min: int, presence_logout_s: int = 0) -> list[str]:
+    """ข้อความบนจอล็อก (ผู้ใช้ทั่วไป/ผู้สูงอายุต้องรู้ว่าต้องทำอะไร ไม่ใช่เห็นจอสีดำเฉย ๆ).
+
+    presence_logout_s > 0 = เปิดขั้น C (ล็อกได้ทั้งเพราะไม่ได้ใช้ และเพราะกล้องไม่เห็นเจ้าของ)
+    """
     who = f"{name} · " if name else ""
+    if presence_logout_s:
+        why = f"{who}ไม่ได้ใช้เครื่อง หรือกล้องไม่เห็นเจ้าของบัญชี"
+        out = f"ถ้าไม่มีใครอยู่หน้าเครื่อง ระบบจะออกจากระบบให้เองใน {presence_logout_s} วินาที · งานที่ยังไม่บันทึกจะหาย"
+    else:
+        why = f"{who}ไม่ได้ใช้เครื่องเกิน {lock_min} นาที"
+        out = f"ถ้าไม่ปลดล็อกภายใน {logout_min} นาที ระบบจะออกจากระบบให้เอง · งานที่ยังไม่บันทึกจะหาย"
     return [
         "หน้าจอล็อกอยู่",
-        f"{who}ไม่ได้ใช้เครื่องเกิน {lock_min} นาที",
+        why,
         "เจ้าของบัญชี: พิมพ์รหัสผ่านแล้วกด Enter เพื่อกลับเข้าใช้ (ถ้าเป็นแป้นไทย กดปุ่ม ~ เพื่อสลับเป็นอังกฤษ)",
-        f"ถ้าไม่ปลดล็อกภายใน {logout_min} นาที ระบบจะออกจากระบบให้เอง · งานที่ยังไม่บันทึกจะหาย",
+        out,
     ]
 
 
@@ -94,42 +108,58 @@ class IdleLock:
         self._dir = image_dir
         self._render = render
         self._proc = None
+        self._monitor = None  # ตัวตรวจด้วยกล้อง (ขั้น C)
         self._applied: tuple | None = None
         self.status = ""  # "" = ทำงานตามค่า · ข้อความ = เหตุที่ไม่ได้ทำ
 
-    def apply(self, lock_min: int, logout_min: int, name: str = "", size=(1920, 1080)) -> list[str] | None:
-        """ใช้ค่าใหม่ · ค่าเดิม = ไม่ทำอะไร · คืนคำสั่ง swayidle ที่เริ่ม (None = ปิด/ทำไม่ได้)."""
-        key = (lock_min, logout_min, name)
+    def apply(self, lock_min: int, logout_min: int, name: str = "", size=(1920, 1080),
+              presence: tuple[int, int] | None = None) -> list[str] | None:  # fmt: skip
+        """ใช้ค่าใหม่ · ค่าเดิม = ไม่ทำอะไร · คืนคำสั่ง swayidle ที่เริ่ม (None = ปิด/ทำไม่ได้).
+
+        presence = (วินาทีไม่เห็นเจ้าของก่อนล็อก, วินาทีหลังล็อกก่อนออก) → เริ่มตัวตรวจด้วยกล้อง (ขั้น C) · None = ไม่ใช้กล้อง
+        """
+        key = (lock_min, logout_min, name, presence)
         if key == self._applied:
             return None
         self.stop()
         self._applied = key
-        if lock_min <= 0:
+        if lock_min <= 0 and presence is None:
             self.status = "ปิดอยู่"
             return None
         missing = [t for t in ("swayidle", "swaylock") if self._which(t) is None]
         if missing:
             self.status = "เครื่องนี้ไม่มี " + " ".join(missing)
             return None
+        rdir = self._dir or runtime_dir()
         image = None
         try:
-            image = self._render((self._dir or runtime_dir()) / "lock.png",
-                                 lock_lines(name, lock_min, logout_min), size)  # fmt: skip
+            lines = lock_lines(name, lock_min, logout_min, presence[1] if presence else 0)
+            image = self._render(rdir / "lock.png", lines, size)
         except Exception:  # noqa: BLE001 · วาดภาพไม่ได้ ยังล็อกได้ (จอสีพื้น) · ความปลอดภัยสำคัญกว่าหน้าตา
             image = None
-        args = swayidle_args(lock_min * 60, logout_min * 60, lock_command(image))
+        flag = rdir / "input-idle" if presence else None
+        args = swayidle_args(lock_min * 60, logout_min * 60, lock_command(image), idle_flag=flag)
         self._proc = self._spawn(args)
+        if presence:
+            import sys
+
+            mon = [sys.executable, "-m", "aipc.ui.presence", "run", "--flag", str(flag),
+                   "--lock-after", str(presence[0]), "--logout-after", str(presence[1])]  # fmt: skip
+            if image is not None:
+                mon += ["--image", str(image)]
+            self._monitor = self._spawn(mon)
         self.status = ""
         return args
 
     def stop(self) -> None:
-        if self._proc is not None and self._proc.poll() is None:
-            self._proc.terminate()
-            try:
-                self._proc.wait(timeout=3)
-            except Exception:  # noqa: BLE001
-                self._proc.kill()
-        self._proc = None
+        for proc in (self._proc, self._monitor):
+            if proc is not None and proc.poll() is None:
+                proc.terminate()
+                try:
+                    proc.wait(timeout=3)
+                except Exception:  # noqa: BLE001
+                    proc.kill()
+        self._proc = self._monitor = None
         self._applied = None
 
 
@@ -137,5 +167,7 @@ def clear_orphans(run=subprocess.run) -> None:
     """หน้าจอ V2 ล่มแล้วเปิดใหม่ (aipc-shell-loop) = swayidle ตัวเก่ายังรันอยู่ → ปิดของผู้ใช้คนนี้ก่อนเริ่มตัวใหม่."""
     try:
         run(["pkill", "-u", str(os.getuid()), "-x", "swayidle"], check=False, capture_output=True, timeout=5)
+        run(["pkill", "-u", str(os.getuid()), "-f", "aipc.ui.presence run"], check=False, capture_output=True,
+            timeout=5)  # fmt: skip
     except (OSError, subprocess.TimeoutExpired):
         pass

@@ -69,6 +69,23 @@ def release_memory() -> None:
         pass
 
 
+
+def _camera_claim():
+    """ธง "กล้องไม่ว่าง" ให้ตัวตรวจด้วยกล้อง (ขั้น C) · รอเฉพาะเมื่อตัวตรวจเปิดกล้องอยู่จริง · ไม่ใช่ Linux = ไม่ทำอะไร."""
+    import contextlib
+    import json
+    import sys
+
+    if not sys.platform.startswith("linux"):
+        return contextlib.nullcontext()
+    from aipc.ui import presence
+
+    try:
+        state = json.loads(presence.status_path().read_text(encoding="utf-8")).get("state")
+    except (OSError, ValueError):
+        state = ""
+    return presence.camera_claim(wait_s=1.5 if state in ("watching", "locked") else 0.0)
+
 class FaceController(QObject):
     changed = Signal()
     finished = Signal(bool, str)
@@ -258,7 +275,9 @@ class FaceController(QObject):
 
     def _run(self, job, arg) -> None:
         cap = scanner = None
+        claim = _camera_claim()
         try:
+            claim.__enter__()  # ขั้น C: ตัวตรวจด้วยกล้องปล่อยกล้องก่อนหน้านี้ใช้ (ถ้ากำลังเปิดอยู่)
             scanner = self._build_scanner()
             cap = self._open_camera()
             ok, msg = job(scanner, cap, arg)
@@ -267,6 +286,7 @@ class FaceController(QObject):
         finally:
             if cap is not None:
                 cap.release()
+            claim.__exit__(None, None, None)
             self._last_frame = None  # ไม่ถือภาพจากกล้องค้างไว้หลังงานจบ
             del scanner  # ปล่อยโมเดล
             release_memory()  # แล้วคืนหน่วยความจำให้ระบบจริง (H4)

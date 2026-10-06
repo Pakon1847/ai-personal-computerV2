@@ -19,6 +19,8 @@ FONT_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0)  # BRIEF 5.7: 100–200%
 # ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด) และนาทีหลังล็อกก่อนออกจากระบบเอง
 LOCK_CHOICES = (0, 1, 5, 10, 15)
 LOGOUT_CHOICES = (5, 10, 30)
+# ขั้น C (aipc.ui.presence): กล้องตรวจว่าเจ้าของยังอยู่ · วินาทีที่ไม่เห็นเจ้าของก่อนล็อก และหลังล็อกก่อนออก
+PRESENCE_CHOICES = (30, 60, 120)
 
 
 def default_path() -> Path:
@@ -41,6 +43,10 @@ class UiPrefs:
     # ลืมออกจากระบบแล้วลุกไป = คนต่อไปเห็นงาน แชท และ Gmail ที่ login ค้าง → ล็อกแล้วออกเอง · ค่าเริ่มต้นเปิด
     lock_min: int = 5
     logout_min: int = 10
+    # กล้องช่วยดูว่าเจ้าของยังอยู่ (ขั้น C) · ต้องเปิดเอง (กล้องเปิดตอนไม่ได้แตะเครื่อง) · ค่า 30/30 ตามที่ Pakon เสนอ
+    presence: bool = False
+    presence_lock_s: int = 30
+    presence_logout_s: int = 30
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
@@ -55,6 +61,11 @@ class UiPrefs:
             use_claude=self.use_claude is not False,
             lock_min=self.lock_min if self.lock_min in LOCK_CHOICES and type(self.lock_min) is int else 5,
             logout_min=self.logout_min if self.logout_min in LOGOUT_CHOICES and type(self.logout_min) is int else 10,
+            presence=self.presence is True,
+            presence_lock_s=self.presence_lock_s if self.presence_lock_s in PRESENCE_CHOICES
+            and type(self.presence_lock_s) is int else 30,
+            presence_logout_s=self.presence_logout_s if self.presence_logout_s in PRESENCE_CHOICES
+            and type(self.presence_logout_s) is int else 30,
         )
 
 
@@ -71,6 +82,9 @@ def load(path: Path | None = None) -> UiPrefs:
             use_claude=data.get("use_claude", True) is not False,
             lock_min=data.get("lock_min", 5),
             logout_min=data.get("logout_min", 10),
+            presence=data.get("presence") is True,
+            presence_lock_s=data.get("presence_lock_s", 30),
+            presence_logout_s=data.get("presence_logout_s", 30),
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()
