@@ -153,6 +153,7 @@ class Eyes:
         self.cap = None
         self.det = self.emb = None
         self.last_id = -1e9
+        self.recent: list = []  # [เวลา, จำนวนหน้า, ความคล้ายสูงสุด] 12 รอบล่าสุด · ตัวเลขเท่านั้น ใช้ดูว่าทำไมล็อก
 
     def on(self) -> bool:
         if self.cap is not None:
@@ -183,12 +184,19 @@ class Eyes:
             raise RuntimeError("กล้องส่งภาพไม่ได้")
         faces = self.det.detect(frame)[:MAX_FACES]
         if not faces or now - self.last_id < ID_EVERY_S:
+            if not faces and now - self.last_id >= ID_EVERY_S:
+                self._note(now, 0, None)
             return Seen(len(faces))
         self.last_id = now
         sims = [matching.cosine(matching.l2_normalize(self.emb.embed(align.crop(frame, f[4:14]))), self.owner)
                 for f in faces]  # fmt: skip
         owner = max(sims) >= THRESHOLD
+        self._note(now, len(faces), round(float(max(sims)), 3))
         return Seen(len(faces), owner=owner, stranger=not owner)
+
+    def _note(self, now: float, faces: int, sim) -> None:
+        self.last_id = now if sim is None else self.last_id
+        self.recent = (self.recent + [[round(now, 1), faces, sim]])[-12:]
 
 
 def lock_now(image: str | None) -> subprocess.Popen:
@@ -205,12 +213,13 @@ def any_lock(run=subprocess.run) -> bool:
     return r.returncode == 0
 
 
-def write_status(state: str, detail: str = "", path: Path | None = None) -> None:
+def write_status(state: str, detail: str = "", path: Path | None = None, recent: list | None = None) -> None:
     path = path or status_path()
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(".tmp")
-        tmp.write_text(json.dumps({"state": state, "detail": detail,
+        tmp.write_text(json.dumps({"state": state, "detail": detail, "threshold": THRESHOLD,
+                                   "recent": recent or [],
                                    "at": datetime.now().isoformat(timespec="seconds")},
                                   ensure_ascii=False), encoding="utf-8")  # fmt: skip
         os.replace(tmp, path)
@@ -252,10 +261,11 @@ def run(flag: Path, lock_after: float, logout_after: float, image: str | None) -
             write_status("logout", d.reason)
             subprocess.run(["labwc", "--exit"], check=False)
             return 0
-        cur = (d.state, d.reason if d.state == "locked" else "", eyes.cap is not None)
+        cur = (d.state, d.reason if d.state == "locked" else "", eyes.cap is not None, len(eyes.recent),
+               eyes.recent[-1][0] if eyes.recent else 0)  # fmt: skip
         if cur != last:
             write_status(d.state, ("ไม่เห็นเจ้าของ" if d.reason == "absent" else "เห็นคนอื่น") if d.state == "locked"
-                         else ("กล้องเปิด" if eyes.cap is not None else "กล้องปิด"))  # fmt: skip
+                         else ("กล้องเปิด" if eyes.cap is not None else "กล้องปิด"), recent=eyes.recent)  # fmt: skip
             last = cur
         time.sleep(max(0.0, 1 / FPS - (time.monotonic() - now)))
 
