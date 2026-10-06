@@ -58,7 +58,7 @@ flash attention ทำให้ generation ช้าลง ([ผล](benchmarks/
 - คำตอบไทย 30 ข้อ × 3 โมเดลพร้อมให้คะแนน ([แบบให้คะแนน](benchmarks/2026-10-05-llm-thai/README.md)) · รอคน 2 คน
 - ไฮบริด Gemma + Claude ชุดสอบ 100 ข้อ ([ผล](benchmarks/2026-10-06-exam-hybrid-gemma/README.md)): ในเครื่อง 93 · ไฮบริด 95 (ชั่วคราว) · ส่งต่อ 16% · $0.56
 
-**ยังเปิดอยู่:** memory cgroup ปิด (MemoryMax ไม่มีผล) · ความร้อน 78–83°C ขณะโหลด · โค้ด 65 ข้อใน [audit หัวข้อ 4](reviews/2026-09-30-pi5-audit.md) · ทดสอบกับผู้ใช้ 5 คน ([ชุดทดสอบ](eval/user-study/README.md) · ยังไม่ได้นัด) · เล่ม ([โครง](thesis/outline.md))
+**ยังเปิดอยู่:** memory cgroup ปิด (MemoryMax ไม่มีผล) · ความร้อน 78–83°C ขณะโหลด · โค้ด 65 ข้อใน [audit หัวข้อ 4](reviews/2026-09-30-pi5-audit.md) · ทดสอบกับผู้ใช้ 5 คน: **ไม่ทำในรุ่นนี้** (Pakon 2026-10-07 · ย้ายเป็นงานต่อยอดบทที่ 5 · ชุดทดสอบเก็บไว้ที่ [eval/user-study](eval/user-study/README.md)) · เล่ม ([โครง](thesis/outline.md))
 
 ## ฮาร์ดแวร์
 
