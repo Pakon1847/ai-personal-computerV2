@@ -50,7 +50,7 @@ flash attention ทำให้ generation ช้าลง ([ผล](benchmarks/
   เทสต์ที่แดงเฉพาะบน Pi 2 ชุด (`5890d6d` · ตัวให้คะแนน injection นับ path ของ `gio launch` · เทสต์ QML ต่อ visiond จริง)
 - เครื่องมือวัด: บิต throttle ค้างก่อนวัด = ไม่นับระดับ 4 · `aipc.doctor` เพิ่ม memory cgroup และเตือนเมื่อพัดลมหมุนแต่ ≥ 80°C ·
   `aipc.spikes.outbound_watch` (T6 แบบใหม่) · `aipc.spikes.study_prep` (เตรียมบัญชีทดสอบกับผู้ใช้) · หน้าให้คะแนนไทยแบบออฟไลน์
-- เอกสาร: [ร่างข้ออ้างรอบ 4](reviews/2026-10-05-claims-hybrid.md) (รออาจารย์) · [results-summary หัวข้อ 0](evaluation/results-summary.md) ·
+- เอกสาร: [ร่างข้ออ้างรอบ 4](reviews/2026-10-05-claims-hybrid.md) (รอ Pakon ตัดสินถ้อยคำ · ไม่ส่งอาจารย์) · [results-summary หัวข้อ 0](evaluation/results-summary.md) ·
   [image การ์ด](runbooks/pi5-image-and-restore.md) · [ข้อเสนอสิ่งที่ควรเพิ่ม](reviews/2026-10-05-ideas-night.md)
 - **ความร้อน** ([ผล](benchmarks/2026-10-05-thermal/README.md)): ถึง 80°C ใน 10–20 วิของการตอบต่อเนื่อง · ถอดโครงพัดลมของเคสทางการแล้วไม่ช่วย → สงสัยแผ่นนำความร้อน ·
   **Pakon ตัดสิน: ไม่แก้ฮาร์ดแวร์ก่อนสอบ เขียนเป็นเงื่อนไขของผล** · ทางเลือกต่อ: สั่ง Active Cooler ตัวสำรอง แล้วค่อยถอดดูแผ่นและวัดซ้ำด้วย `scripts/pi/thermal-test.sh`
