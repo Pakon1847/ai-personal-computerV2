@@ -40,21 +40,34 @@ class DeciderTest(unittest.TestCase):
         # ขั้น B: ระหว่างนั่งใช้ ไม่เห็นหน้านานสุด 14.5 วิ
         self.assertEqual(drive(Decider(), ([OWNER] + [NOBODY] * 29) * 20), [])
 
-    def test_stranger_locks_fast_but_never_logs_out(self):
+    def test_stranger_locks_fast_but_never_logs_out_while_present(self):
         d = Decider(30, 30)
-        acts = drive(d, ([STRANGER] + [NOT_CHECKED] * 3) * 60)  # เทียบทุก 2 วิ
+        acts = drive(d, ([STRANGER] + [NOT_CHECKED] * 3) * 60)  # เทียบทุก 2 วิ · คนอื่นนั่งอยู่ตลอด
         self.assertEqual(acts[0], (4.0, "lock"))  # 3 ครั้งติด = 0, 2, 4 วิ
         self.assertEqual([a for _, a in acts], ["lock"])  # ห้ามออกจากระบบจากการจำหน้า (M3 ไม่ผ่าน)
         self.assertEqual(d.reason, "stranger")
+
+    def test_stranger_walks_away_then_nobody_logs_out(self):
+        d = Decider(30, 30)
+        acts = drive(d, ([STRANGER] + [NOT_CHECKED] * 3) * 3 + [NOBODY] * 80)
+        self.assertEqual([a for _, a in acts], ["lock", "logout"])
+        self.assertEqual(acts[1][0], 5.5 + 30)  # หน้าสุดท้ายที่ 5.5 วิ + ไม่มีใครต่อเนื่อง 30 วิ
 
     def test_owner_among_several_faces_counts_as_present(self):
         both = Seen(2, owner=True, stranger=False)  # เจ้าของ + คนชะโงกมาดู
         self.assertEqual(drive(Decider(), ([both] + [NOT_CHECKED] * 3) * 50), [])
 
-    def test_face_during_lock_cancels_auto_logout(self):
+    def test_owner_getting_up_does_not_cancel_logout(self):
+        # ทดสอบที่หน้าจอ 23:38: เห็นหน้าตอนกำลังลุกหลังล็อก → เดิมไม่ออกเลย · ต้องนับ 30 วิจากหน้าสุดท้าย
         d = Decider(30, 30)
-        acts = drive(d, [NOBODY] * 70 + [NOT_CHECKED] + [NOBODY] * 200)
-        self.assertEqual([a for _, a in acts], ["lock"])  # มีคนกลับมาหน้าจอ → ไม่ออก (ปลดด้วยรหัสผ่านเอง)
+        acts = drive(d, [NOBODY] * 61 + [NOT_CHECKED] * 6 + [NOBODY] * 100)
+        self.assertEqual([a for _, a in acts], ["lock", "logout"])
+        self.assertEqual(acts[1][0], 33.0 + 30)  # หน้าสุดท้ายที่ 33.0 วิ
+
+    def test_someone_stays_in_front_while_locked_no_logout(self):
+        d = Decider(30, 30)
+        acts = drive(d, [NOBODY] * 61 + [NOT_CHECKED] * 300)
+        self.assertEqual([a for _, a in acts], ["lock"])  # มีคนอยู่หน้าจอ → ไม่ออก (ปลดด้วยรหัสผ่านเอง)
 
     def test_touching_input_resets_and_camera_off(self):
         d = Decider(30, 30)

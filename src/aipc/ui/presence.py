@@ -88,7 +88,7 @@ class Decider:
     state: str = "active"  # active · watching · locked
     reason: str = ""  # absent · stranger
     owner_seen: float = 0.0
-    face_since_lock: bool = False
+    last_face: float = 0.0  # ครั้งล่าสุดที่เห็นหน้าใครก็ได้หลังล็อก
     locked_at: float = 0.0
     run: int = 0
     log: list = field(default_factory=list)
@@ -123,17 +123,18 @@ class Decider:
             if now - self.owner_seen >= self.lock_after:
                 return self._lock(now, "absent")
             return None
-        # locked โดยตัวนี้
+        # locked โดยตัวนี้ · ออกเมื่อ "ไม่เห็นหน้าใครเลยต่อเนื่อง" logout_after วิ (เหตุผลคือไม่มีคน ไม่ใช่การจำหน้า)
+        # ทดสอบที่หน้าจอ 2026-10-06 23:38: เดิมเห็นหน้าครั้งเดียวหลังล็อก (ตอนกำลังลุก) = ไม่ออกเลย
+        # เห็นคนอื่นแล้วยังอยู่หน้าจอ = ไม่ออก (ขั้น B M3 ไม่ผ่าน) · คนอื่นเดินไปแล้วไม่มีใครอีก 30 วิ = ออก (M1/M2 ผ่าน)
         if seen.faces > 0:
-            self.face_since_lock = True  # มีคนอยู่หน้าจอ → เจ้าของปลดเองได้ · ไม่ออกจากระบบจากกล้อง
-        if (self.reason == "absent" and not self.face_since_lock and idle
-                and now - self.locked_at >= self.logout_after):  # fmt: skip
+            self.last_face = now
+        if idle and now - max(self.locked_at, self.last_face) >= self.logout_after:
             self._to("logout", now)
             return "logout"
         return None
 
     def _lock(self, now: float, reason: str) -> str:
-        self.reason, self.locked_at, self.face_since_lock, self.run = reason, now, False, 0
+        self.reason, self.locked_at, self.last_face, self.run = reason, now, now, 0
         self._to("locked", now)
         return "lock"
 
