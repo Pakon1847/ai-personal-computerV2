@@ -12,6 +12,12 @@ RestartSec=3
 # กัน LLM ดึง RAM จนหน้าจอและระบบค้าง · ให้ความสำคัญ CPU ต่ำกว่าหน้าจอเล็กน้อย
 MemoryMax=4G
 Nice=5
+# AI ในเครื่องต่อเน็ตไม่ได้ด้วยกลไกของ OS (2026-10-07 · docs/benchmarks/2026-10-07-llm-netsandbox-pi5)
+# ชั้นหลัก: เคอร์เนล (seccomp) ห้ามสร้าง socket อื่นนอกจาก Unix socket · llama-server ใช้แค่ $XDG_RUNTIME_DIR/aipc/llm.sock
+RestrictAddressFamilies=AF_UNIX
+# ชั้นที่สอง: network namespace ที่มีแค่ loopback · socket แบบไฟล์ยังใช้ข้าม namespace ได้
+# (IPAddressDeny= ไม่มีผลใน user service ของ systemd 257 บน Pi 5 · ลอง 2026-10-07)
+PrivateNetwork=yes
 
 [Install]
 WantedBy=default.target

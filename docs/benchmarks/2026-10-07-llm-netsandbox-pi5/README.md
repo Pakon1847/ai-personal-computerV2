@@ -42,6 +42,62 @@
 - Piper · whisper · ตัวตรวจด้วยกล้อง ยังไม่ถูกจำกัด (เป็นโปรเซสลูกของหน้าจอ ไม่ใช่ service)
 - ผู้ที่ได้สิทธิ์ root แก้ unit ได้ (นอกขอบเขตตาม THREAT_MODEL)
 
-## ผล
+## ผล (2026-10-07 07:35–07:37 · Pi 5 · บัญชี aipc2030 ทาง SSH · ไม่มีใครเข้าระบบที่หน้าจอ · ตัววัด `netsandbox_test.sh` · log ทั้งหมดด้านล่าง)
 
-(เติมหลังวัด)
+unit ใหม่ติดตั้งที่ `/etc/systemd/user/aipc-llm.service` (ไฟล์เดิมสำรองไว้ที่ `aipc-llm.service.bak-2026-10-07`) · โมเดลและค่าเดียวกับแอป (`/etc/aipc/llm.conf`)
+
+| # | เกณฑ์ | ผล |
+|---|---|---|
+| 1 | ค่าอยู่ในโปรเซสจริง · ลองเปิด socket | ✓ `systemctl --user show`: `RestrictAddressFamilies=AF_UNIX` · `PrivateNetwork=yes` · llama-server PID 229779 `Seccomp: 2` · network namespace ต่างจากเชลล์ (`4026532601` กับ `4026531833`) · unit ชั่วคราวค่าเดียวกัน: AF_INET · AF_INET6 · UDP · AF_NETLINK = `EAFNOSUPPORT` · ต่อ 1.1.1.1:443 ไม่ได้ · ชุดเดียวกันที่ไม่จำกัดเปิดได้ทุกชนิดและต่อออกได้ |
+| 2 | llama-server ทำงาน | ✓ `/health` ok หลังเริ่ม 6.7 วิ · ตอบ 3 คำถาม (ไม่ว่าง · 6.85–7.27 token/วิ) · บันทึกแคช slot 1.7 ms · โหลดคืน 1.9 ms |
+| 3 | T7 | ✓ `kill -9` → ตอบได้อีกครั้งหลัง **9.9 วิ** (PID ใหม่ยัง `Seccomp: 2`) |
+| 4 | ความเร็ว (รายงานอย่างเดียว) | คำถามเดียวกัน 3 รอบ (temperature 0 · 64 token · คำตอบเหมือนกันทุกตัวอักษร): มีค่าใหม่ 6.72 · 6.64 · 6.68 (มัธยฐาน **6.68**) ที่ 81.2°C · ไม่จำกัด 7.05 · 6.88 · 6.68 (มัธยฐาน **6.88**) ที่ 71.4°C · ต่างราว 3% แต่**อุณหภูมิต่างกัน 10°C** และบิต throttle ค้างตั้งแต่บูต (`0xe0000`) → ไม่ใช่ระดับ 4 · บอกได้แค่ว่าไม่ช้าลงจนสังเกตได้ |
+| 5 | ที่หน้าจอ | **รอ Pakon** (เข้าระบบใหม่ → แชทในเครื่อง · ถาม Claude) |
+
+**ตัดสิน:** ชั้นที่สอง (`PrivateNetwork=yes`) ผ่านข้อ 2–3 → ใช้ทั้งสองชั้นตามที่ประกาศ · ถอนกลับ: `sudo cp -p /etc/systemd/user/aipc-llm.service.bak-2026-10-07 /etc/systemd/user/aipc-llm.service`
+
+<details><summary>log</summary>
+
+```text
+== เริ่ม 2026-10-07 07:35:54 · 6.18.50+rpt-rpi-2712
+temp=58.7'C
+throttled=0xe0000
+== ข้อ 1: ค่าใน unit
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+FragmentPath=/etc/systemd/user/aipc-llm.service
+== ข้อ 1: unit ชั่วคราวค่าเดียวกัน (RestrictAddressFamilies=AF_UNIX + PrivateNetwork=yes) vs ไม่จำกัด
+{'AF_UNIX': 'ok', 'AF_INET': 'EAFNOSUPPORT', 'AF_INET6': 'EAFNOSUPPORT', 'AF_INET_UDP': 'EAFNOSUPPORT', 'AF_NETLINK': 'EAFNOSUPPORT', 'connect_1.1.1.1': 'OSError:EAFNOSUPPORT'}
+{'AF_UNIX': 'ok', 'AF_INET': 'ok', 'AF_INET6': 'ok', 'AF_INET_UDP': 'ok', 'AF_NETLINK': 'ok', 'connect_1.1.1.1': 'ok'}
+== ข้อ 2: เริ่ม aipc-llm
+health ok หลัง 6.7 วิ
+PID 229779 · Seccomp: 2
+netns llama-server: net:[4026532601] · netns เชลล์นี้: net:[4026531833]
+'สวัสดีค่ะ ฉันชื่อ Gemma 4 เป็นแบบจำลองภาษาขนาดใหญ่ที่พัฒนาโดย Google D' tok/s=7.20 n=23
+'หนึ่งปีมีจำนวนวันแตกต่างกันไป ขึ้นอยู่กับว่าเป็นปีปกติหรือปีอธิกสุรทิน' tok/s=7.27 n=64
+'"Good morning" แปลเป็นภาษาไทยได้หลายแบบ ขึ้นอยู่กับบริบทและความเป็นทาง' tok/s=6.85 n=64
+== ข้อ 2: บันทึก/โหลดแคช slot
+{"id_slot":0,"filename":"netsandbox-test.bin","n_saved":78,"n_written":1440300,"timings":{"save_ms":1.689}}
+{"id_slot":0,"filename":"netsandbox-test.bin","n_restored":78,"n_read":1440300,"timings":{"restore_ms":1.934}}
+== ข้อ 3: T7 kill -9
+กลับมาหลัง 9.9 วิ · PID ใหม่ 230105 · Seccomp: 2
+'หนึ่งปีมีจำนวนวันแตกต่างกันไป ขึ้นอยู่กับว่าเป็นปีปกติหรือปีอธิกสุรทิน' tok/s=7.10 n=64
+== ข้อ 4 (รายงานอย่างเดียว): ค่าใหม่ 3 รอบ
+temp=81.2'C
+throttled=0xe0000
+'## ดวงจันทร์: เพื่อนเงียบแห่งราตรี\n\nณ ห้วงอวกาศอันกว้างใหญ่ไพศาล มีดวง' tok/s=6.72 n=64
+'## ดวงจันทร์: เพื่อนเงียบแห่งราตรี\n\nณ ห้วงอวกาศอันกว้างใหญ่ไพศาล มีดวง' tok/s=6.64 n=64
+'## ดวงจันทร์: เพื่อนเงียบแห่งราตรี\n\nณ ห้วงอวกาศอันกว้างใหญ่ไพศาล มีดวง' tok/s=6.68 n=64
+== ข้อ 4: ไม่จำกัด 3 รอบ (unit ชั่วคราว สคริปต์เดียวกัน)
+PID 230540 · Seccomp: 0
+temp=71.4'C
+throttled=0xe0000
+'## ดวงจันทร์: เพื่อนเงียบแห่งราตรี\n\nณ ห้วงอวกาศอันกว้างใหญ่ไพศาล มีดวง' tok/s=7.05 n=64
+'## ดวงจันทร์: เพื่อนเงียบแห่งราตรี\n\nณ ห้วงอวกาศอันกว้างใหญ่ไพศาล มีดวง' tok/s=6.88 n=64
+'## ดวงจันทร์: เพื่อนเงียบแห่งราตรี\n\nณ ห้วงอวกาศอันกว้างใหญ่ไพศาล มีดวง' tok/s=6.68 n=64
+== จบ 2026-10-07 07:37:52
+temp=80.7'C
+throttled=0xe0000
+```
+
+</details>

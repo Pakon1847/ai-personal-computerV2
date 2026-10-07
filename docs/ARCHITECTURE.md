@@ -50,6 +50,7 @@ aipc-session ── systemctl --user start aipc-llm ── llama-server -m /opt/
 
 ติดตั้ง: `scripts/pi/install-llm.sh --model <ไฟล์.gguf> [--apply] | --rollback` · ค่าที่ใช้อยู่ใน `/etc/aipc/llm.conf` ·
 service: `Restart=on-failure`, `MemoryMax=4G` (**ไม่มีผลจนกว่าจะเปิด memory cgroup** · `aipc.doctor` ข้อ memcg) ·
+**ต่อเน็ตไม่ได้ด้วยกลไกของ OS:** `RestrictAddressFamilies=AF_UNIX` (seccomp) + `PrivateNetwork=yes` (network namespace ของตัวเอง) ([ผล](benchmarks/2026-10-07-llm-netsandbox-pi5/README.md)) ·
 `KillUserProcesses=yes` อยู่ใน `install-accounts.sh` (ออกจากระบบแล้วปิดทุกโปรเซสของผู้ใช้)
 
 ## เส้นทางของข้อความ (`aipc.skills.router` · `aipc.ui.backend`)
