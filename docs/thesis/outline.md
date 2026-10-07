@@ -51,7 +51,7 @@
 | 3.5.4 Skill | [ADR-011](../adr/0011-skill-format.md) · [SKILLS](../SKILLS.md) · การ์ด [0001](../design/0001-reminder.md), [0008](../design/0008-skill-command.md), [0009](../design/0009-skill-machine.md), [0017](../design/0017-auto-skill.md) (Claude สร้างสกิล), [0018](../design/0018-skill-retrieval.md) |
 | 3.5.5 ใบหน้า | การ์ด 0005, [0006](../design/0006-face-in-session.md), [0010](../design/0010-face-enroll-preview.md), [0011](../design/0011-camera-test.md) |
 | 3.5.6 ไฮบริด (ใหม่) | [การ์ด 0016](../design/0016-hybrid-cloud.md) · [ร่างข้ออ้างรอบ 4](../reviews/2026-10-05-claims-hybrid.md) · บันทึกส่งออก · "ทำไมได้คำตอบนี้" |
-| 3.5.7 ล็อกและกล้องดูเจ้าของ (ใหม่) | [ARCHITECTURE](../ARCHITECTURE.md) · ผลขั้น [A](../benchmarks/2026-10-06-idle-lock-pi5/README.md) [B](../benchmarks/2026-10-06-presence-b/README.md) [C](../benchmarks/2026-10-06-presence-c-pi5/README.md) |
+| 3.5.7 ล็อกและกล้องดูเจ้าของ (ใหม่) | [การ์ด 0020](../design/0020-idle-lock-presence.md) (เขียนย้อนหลัง) · [ARCHITECTURE](../ARCHITECTURE.md) · ผลขั้น [A](../benchmarks/2026-10-06-idle-lock-pi5/README.md) [B](../benchmarks/2026-10-06-presence-b/README.md) [C](../benchmarks/2026-10-06-presence-c-pi5/README.md) |
 | 3.5.8 เสียง (ใหม่) | [การ์ด 0019](../design/0019-thai-voice.md) |
 | 3.5.9 ไฟล์และสำรองข้อมูล (ใหม่) | `files_search.py` · `files_qa.py` · `backup.py` · [ผลค้นไฟล์](../benchmarks/2026-10-01-file-search/README.md) |
 | 3.5.10 ติดตั้ง อัปเดต ย้อนรุ่น (ใหม่) | [ADR-009](../adr/0009-app-update-rollback.md) · `scripts/pi/` · [image การ์ด](../runbooks/pi5-image-and-restore.md) |
