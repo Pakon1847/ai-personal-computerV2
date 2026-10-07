@@ -21,7 +21,7 @@ from aipc.accounts import validation
 from aipc.bench import machine
 from aipc.doctor import hardware
 from aipc.skills import machine as skill_machine
-from aipc.ui import files, settings, thaidate
+from aipc.ui import files, privacy, settings, thaidate
 
 
 class UiSettings(QObject):
@@ -85,6 +85,18 @@ class UiSettings(QObject):
         ข้อมูลไม่ออกไป Anthropic."""
         if bool(on) != self._prefs.use_claude:
             self._prefs.use_claude = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Property(bool, notify=changed)
+    def useWeather(self) -> bool:  # noqa: N802
+        return self._prefs.use_weather
+
+    @Slot(bool)
+    def setUseWeather(self, on: bool) -> None:  # noqa: N802
+        """สวิตช์อากาศ (แผงความเป็นส่วนตัว 2026-10-07) · ปิด = ไม่ส่งชื่อเมืองไป Open-Meteo."""
+        if bool(on) != self._prefs.use_weather:
+            self._prefs.use_weather = bool(on)
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
@@ -1115,6 +1127,103 @@ class PresenceStatus(QObject):
             self.changed.emit()
 
 
+class PrivacyStatus(QObject):
+    """แผงความเป็นส่วนตัวแบบสดในแถบบน (Pakon เลือกข้อ ข 2026-10-07 · aipc.ui.privacy).
+
+    บันทึกส่งออก: ดูเวลาแก้ไฟล์ทุก 2 วิ อ่านทั้งไฟล์เมื่อเปลี่ยน · มีรายการใหม่ = ป้ายเปลี่ยนสี FLASH_S วิ ·
+    AI ในเครื่อง: อ่านจาก OS ทุก 15 วิ · หน้า Login ไม่มีเจ้าของข้อมูล (active False) = ไม่แสดง
+    """
+
+    changed = Signal()
+    FLASH_S = 3.0
+
+    def __init__(self, ledger=None, claude_on=None, weather_on=None, active: bool = True,
+                 poll_ms: int = 2000, llm_poll_ms: int = 15000, clock=time.monotonic,
+                 today=None, llm_state=None):  # fmt: skip
+        super().__init__()
+        self._active = active
+        self._ledger = ledger
+        self._claude_on = claude_on or (lambda: True)
+        self._weather_on = weather_on or (lambda: True)
+        self._clock = clock
+        self._today = today or (lambda: datetime.now().date())
+        self._llm_state = llm_state or (lambda: privacy.sandbox_state(privacy.llm_pid()))
+        self._llm, self._sent, self._flash_until = "unknown", 0, 0.0
+        self._mtime = self._day = None
+        self._newest: object = ()  # () = ยังไม่เคยอ่าน · ไม่เปลี่ยนสีตอนเปิดแอป
+        self._state: tuple = ()
+        if active:
+            self.refreshLlm()
+            self.refresh()
+            self._timer = QTimer(self, interval=poll_ms, timeout=self.refresh)
+            self._timer.start()
+            self._llm_timer = QTimer(self, interval=llm_poll_ms, timeout=self.refreshLlm)
+            self._llm_timer.start()
+
+    @Slot()
+    def refreshLlm(self) -> None:  # noqa: N802
+        self._llm = self._llm_state()
+        self._publish()
+
+    @Slot()
+    def refresh(self) -> None:
+        if self._ledger is not None:
+            try:
+                mtime = self._ledger.path.stat().st_mtime_ns
+            except OSError:
+                mtime = None
+            day = self._today()
+            if mtime != self._mtime or day != self._day:
+                self._mtime, self._day = mtime, day
+                entries = self._ledger.entries()  # ใหม่สุดก่อน
+                newest = entries[0] if entries else None
+                sig = (
+                    (newest.get("time"), newest.get("kind"), newest.get("chars"))
+                    if newest
+                    else None
+                )
+                if self._newest != () and sig is not None and sig != self._newest:
+                    self._flash_until = self._clock() + self.FLASH_S
+                self._newest = sig
+                self._sent = sum(privacy.today_counts(entries, day).values())
+        self._publish()
+
+    def _publish(self) -> None:
+        all_off = not self._claude_on() and not self._weather_on()
+        state = (self._llm, self._sent, all_off, self._clock() < self._flash_until)
+        if state != self._state:
+            self._state = state
+            self.changed.emit()
+
+    @Property(bool, constant=True)
+    def visible(self) -> bool:
+        return self._active
+
+    @Property(str, notify=changed)
+    def llmState(self) -> str:  # noqa: N802
+        return self._state[0] if self._state else "unknown"
+
+    @Property(int, notify=changed)
+    def sentToday(self) -> int:  # noqa: N802
+        return self._state[1] if self._state else 0
+
+    @Property(bool, notify=changed)
+    def allOff(self) -> bool:  # noqa: N802
+        return bool(self._state and self._state[2])
+
+    @Property(bool, notify=changed)
+    def flash(self) -> bool:
+        return bool(self._state and self._state[3])
+
+    @Property(str, notify=changed)
+    def text(self) -> str:
+        return privacy.panel_text(self.llmState, self.sentToday, self.allOff)
+
+    @Property(str, notify=changed)
+    def kind(self) -> str:
+        return privacy.panel_kind(self.llmState, self.allOff, self.flash)
+
+
 def _run_quiet(args: list[str]) -> int:
     import subprocess
 
@@ -1337,7 +1446,7 @@ class SkillsController(QObject):
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
-                 weather=None, claude_on=None):  # fmt: skip
+                 weather=None, claude_on=None, weather_on=None):  # fmt: skip
         super().__init__()
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
@@ -1358,6 +1467,7 @@ class SkillsController(QObject):
         # สกิลอากาศ (aipc.skills.weather.Weather · Open-Meteo) · None = ไม่มี (หน้า Login)
         self._weather = weather
         self._weather_day: str | None = None  # ถามเมืองกลับแล้ว รอผู้ใช้ตอบชื่อเมือง
+        self._weather_on = weather_on or (lambda: True)  # สวิตช์อากาศในหน้าตั้งค่า (2026-10-07)
         self._file_search = None
         self._pending: dict[str, object] = {}
         self._counter = 0
@@ -1871,10 +1981,12 @@ class SkillsController(QObject):
 
     # ---------- ทำไมได้คำตอบนี้ (ข้อเสนอ 2026-10-03) ----------
     WHO = {"weather": "สกิลอากาศ · โค้ดในเครื่อง + บริการ Open-Meteo", "files": "ค้นไฟล์ · โค้ดในเครื่อง",
+           "weather-off": "สกิลอากาศ · โค้ดในเครื่อง (ไม่ได้ติดต่อ Open-Meteo)",
            "forging": "Claude (cloud) กำลังสร้างสกิล", "forge-failed": "Claude (cloud)"}  # fmt: skip
     WHY = {"weather": "ตรงรูปประโยคถามอากาศ (กฎ) · ไม่ผ่าน AI จึงไม่เดาตัวเลข",
            "files": "ตรงรูปประโยคหาไฟล์ (กฎ) · AI ในเครื่องเปิดไฟล์เองไม่ได้",
-           "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล"}  # fmt: skip
+           "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล",
+           "weather-off": "ถามอากาศ แต่ปิดสวิตช์อากาศในหน้าตั้งค่า"}  # fmt: skip
 
     def _why(self, card: dict, t0: float) -> dict:
         """เติม card["why"] = [{k, v}] จากสิ่งที่เกิดจริง.
@@ -1924,6 +2036,8 @@ class SkillsController(QObject):
                 if city:
                     return self._weather_card(day, city)
             if ask := weather_intent(text):  # อากาศจริง = Open-Meteo โดยตรง ไม่ผ่าน Claude
+                if not self._weather_on():
+                    return self._weather_off_card()
                 if not ask.city:
                     self._weather_day = ask.day
                     return {"kind": "weather", "badge": {}, "chips": [], "confirmToken": "",
@@ -1946,9 +2060,18 @@ class SkillsController(QObject):
             return self._card(r, text)
         return self._card(router.route(text, self._skills, self.available()), text)
 
+    def _weather_off_card(self) -> dict:
+        return {"kind": "weather-off", "badge": {}, "chips": [], "confirmToken": "", "page": "",
+                "title": "ปิดการถามพยากรณ์อากาศอยู่",
+                "lines": ["ตอนนี้ไม่ส่งชื่อเมืองไป Open-Meteo ตามที่ตั้งไว้",
+                          "เปิดได้ที่หน้าตั้งค่า › ส่งออกนอกเครื่อง"],
+                "_outbound": "ไม่มี · ปิดสวิตช์อากาศอยู่"}  # fmt: skip
+
     def _weather_card(self, day: str, city: str) -> dict:
         from aipc.skills.weather import Ask, answer
 
+        if not self._weather_on():  # ปิดสวิตช์ระหว่างรอผู้ใช้ตอบชื่อเมือง
+            return self._weather_off_card()
         card = {"kind": "weather", "badge": {}, "chips": [], "confirmToken": "", "page": ""}
         try:
             place, fc = self._weather.lookup(city)
@@ -2148,7 +2271,7 @@ class ChatController(QObject):
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
-                 claude_on=None):  # fmt: skip
+                 claude_on=None, meter=None):  # fmt: skip
         super().__init__()
         # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
@@ -2172,6 +2295,13 @@ class ChatController(QObject):
         self._busy, self._stream_text, self._stream = False, "", None
         self._trimmed, self._save_error = False, ""
         self._trace: dict = {}  # ระหว่างตอบ: เริ่มเมื่อไหร่ ทำไมทางนี้ (ทำไมได้คำตอบนี้ · ข้อเสนอ 2026-10-03)
+        # มิเตอร์พลังงานต่อคำตอบ (ข้อ ค 2026-10-07): factory() → Meter หรือ None ·
+        # อ่าน PMIC ไม่ได้ = ไม่แสดง (H5)
+        if meter is None:
+            from aipc.bench import energy
+
+            meter = energy.meter_factory() if active else (lambda: None)
+        self._meter_factory, self._meter = meter, None
         self._last_trace: list = []
         self._token.connect(self._on_token)
         self._done.connect(self._on_done)
@@ -2353,6 +2483,9 @@ class ChatController(QObject):
                 f" · เลือกใช้สกิลเองได้ {len(tools)} ตัว แต่เลือกตอบเอง" if tools else ""
             )
         self._trace = {"t0": time.monotonic(), "why": why}
+        self._meter = self._meter_factory()
+        if self._meter is not None:
+            self._meter.start()
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
@@ -2390,6 +2523,9 @@ class ChatController(QObject):
     @Slot(object)
     def _on_done(self, reply) -> None:
         self._busy, self._stream = False, None
+        if self._meter is not None:  # ไฟที่บอร์ดใช้ระหว่าง AI ในเครื่องตอบ (รอบที่ส่งต่อ Claude ไม่แสดง)
+            self._trace["energy"] = self._meter.stop()
+            self._meter = None
         from aipc.skills import catalog
 
         with_file = bool(self._conv["messages"] and self._conv["messages"][-1].get("file"))
@@ -2472,6 +2608,10 @@ class ChatController(QObject):
             if not cloud and n and tps:
                 took += f" · {n} โทเคน ({tps:.1f} โทเคน/วิ)"
             rows.append({"k": "ใช้เวลา", "v": took})
+        e = t.get("energy")
+        if e and not cloud:
+            used = f"≈ {e['joules']:.0f} J ({e['seconds']:.1f} วิ · เฉลี่ย {e['mean_w']:.1f} W · "
+            rows.append({"k": "ไฟที่บอร์ดใช้ระหว่างตอบ", "v": used + "ทั้งบอร์ด ไม่รวมอะแดปเตอร์)"})
         if self._trimmed:
             rows.append({"k": "หมายเหตุ", "v": "บทสนทนายาวเกิน จึงตัดข้อความเก่าออกก่อนส่งให้ AI"})
         return rows
@@ -2568,3 +2708,6 @@ class ChatController(QObject):
     def shutdown(self) -> None:
         self._timer.stop()
         self.stop()
+        if self._meter is not None:
+            self._meter.stop()
+            self._meter = None

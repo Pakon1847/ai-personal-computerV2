@@ -19,6 +19,7 @@ from aipc.ui.backend import (
     FilesBrowser,
     LoginController,
     PresenceStatus,
+    PrivacyStatus,
     SessionController,
     SignupController,
     SkillsController,
@@ -267,9 +268,17 @@ def build(opts: Options, argv: list[str] | None = None):
             user_skills=user_skills,
             weather=_weather(ledger) if in_session else None,
             claude_on=claude_on,
+            weather_on=lambda: ui_settings.useWeather,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
+        # แผงความเป็นส่วนตัวแบบสด (2026-10-07) · หน้า Login ไม่มีเจ้าของข้อมูล → ไม่แสดง
+        "privacyStatus": PrivacyStatus(
+            ledger=ledger,
+            claude_on=claude_on,
+            weather_on=lambda: ui_settings.useWeather,
+            active=in_session,
+        ),
         # ขั้น C: สถานะตัวตรวจด้วยกล้อง (อ่านไฟล์ทุก 2 วิ เฉพาะเซสชันจริง)
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม

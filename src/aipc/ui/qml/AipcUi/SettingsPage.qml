@@ -159,7 +159,7 @@ ColumnLayout {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 2
-                    AppText { text: "Claude (ถามข้อมูลสด · สร้างสกิล)"; strong: true }
+                    AppText { text: "ส่งข้อมูลออกนอกเครื่อง: Claude (ถามข้อมูลสด · สร้างสกิล) และอากาศ"; strong: true }
                     AppText {
                         objectName: "cloudUsageText"
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
@@ -185,6 +185,16 @@ ColumnLayout {
                         : "ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีข้อมูลออกไป Anthropic"
                 checked: uiSettings.useClaude
                 onClicked: uiSettings.setUseClaude(checked)
+            }
+            // สวิตช์อากาศ (แผงความเป็นส่วนตัว 2026-10-07): ทุกทางที่ข้อมูลออกนอกเครื่อง ผู้ใช้ปิดได้เอง
+            AppCheck {
+                objectName: "useWeatherCheck"
+                text: "ถามพยากรณ์อากาศ: ส่งชื่อเมืองไป Open-Meteo"
+                detail: uiSettings.useWeather
+                        ? "ส่งแค่ชื่อเมืองหรือพิกัด · ไม่ส่งชื่อบัญชีหรือแชท"
+                        : "ปิดอยู่: ถามอากาศแล้วไม่ส่งอะไรออกไป"
+                checked: uiSettings.useWeather
+                onClicked: uiSettings.setUseWeather(checked)
             }
             RowLayout {
                 visible: cloudUsage.available && uiSettings.useClaude

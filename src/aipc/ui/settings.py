@@ -41,6 +41,8 @@ class UiPrefs:
     speak_reminders: bool = False
     # ส่งคำถามที่ยาก/ต้องใช้ข้อมูลสด และคำขอสร้างสกิลให้ Claude (การ์ด 0016/0017) · Pakon: ค่าเริ่มต้นเปิด
     use_claude: bool = True
+    # ถามอากาศ = ส่งชื่อเมือง/พิกัดไป Open-Meteo · ปิดได้ (แผงความเป็นส่วนตัว 2026-10-07) · ค่าเริ่มต้นเปิดเหมือนเดิม
+    use_weather: bool = True
     # ลืมออกจากระบบแล้วลุกไป = คนต่อไปเห็นงาน แชท และ Gmail ที่ login ค้าง → ล็อกแล้วออกเอง · ค่าเริ่มต้นเปิด
     lock_min: int = 5
     logout_min: int = 10
@@ -60,6 +62,7 @@ class UiPrefs:
             speak_answers=self.speak_answers is not False,
             speak_reminders=self.speak_reminders is True,
             use_claude=self.use_claude is not False,
+            use_weather=self.use_weather is not False,
             lock_min=self.lock_min
             if self.lock_min in LOCK_CHOICES and type(self.lock_min) is int
             else 5,
@@ -87,6 +90,7 @@ def load(path: Path | None = None) -> UiPrefs:
             speak_answers=data.get("speak_answers", True) is not False,
             speak_reminders=data.get("speak_reminders") is True,
             use_claude=data.get("use_claude", True) is not False,
+            use_weather=data.get("use_weather", True) is not False,
             lock_min=data.get("lock_min", 5),
             logout_min=data.get("logout_min", 10),
             presence=data.get("presence") is True,

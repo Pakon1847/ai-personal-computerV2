@@ -39,6 +39,18 @@ Item {
         // สถานะจริงจาก /health ของ llama-server (การ์ด 0013 · H5)
         Chip { objectName: "modelIndicator"; text: chat.statusText; iconPath: Icons.cpu; compact: bar.tight
                kind: chat.ready ? "ok" : (chat.status === "loading" || chat.status === "restarting") ? "accent" : "warn" }
+        // แผงความเป็นส่วนตัวแบบสด (2026-10-07): AI ในเครื่องถูก OS ล็อกเน็ตไหม · ส่งออกวันนี้กี่ครั้ง (เปลี่ยนสีเมื่อมีข้อมูลออก)
+        // ค่าจาก OS และบันทึกส่งออกจริง (aipc.ui.privacy) · แตะ = หน้าตั้งค่า (ดูข้อความที่ส่งจริง · ปิดสวิตช์)
+        Chip {
+            objectName: "privacyIndicator"
+            visible: privacyStatus.visible
+            text: privacyStatus.text
+            kind: privacyStatus.kind
+            iconPath: privacyStatus.llmState === "locked" ? Icons.lock : Icons.shield
+            compact: bar.tight
+            Accessible.name: privacyStatus.text
+            TapHandler { onTapped: AppState.open("settings") }
+        }
         Chip { text: system.storageText; iconPath: Icons.hdd; compact: bar.tight }
         Chip { text: system.tempText; iconPath: Icons.thermo; compact: bar.tight; Accessible.name: "อุณหภูมิ " + system.tempText }
     }
