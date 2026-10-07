@@ -26,7 +26,21 @@
 | ส่วนประกอบ | ไลเซนส์ | ใช้เชิงพาณิชย์ได้ | แหล่งที่ตรวจ | วันที่ตรวจ |
 |---|---|---|---|---|
 | IBM Plex Sans Thai, IBM Plex Mono (ฟอนต์ใน `src/aipc/ui/fonts/`) | SIL Open Font License 1.1 | ได้ (ห้ามขายตัวฟอนต์แยก) | `src/aipc/ui/fonts/OFL.txt` ดาวน์โหลดจาก github.com/google/fonts | 2026-09-23 |
-| PySide6-Essentials 6.11.2 (Qt for Python) | LGPL-3.0 (หรือเชิงพาณิชย์) | ได้ ถ้าลิงก์แบบ dynamic และให้ผู้ใช้เปลี่ยนไลบรารีได้ — เราติดตั้งผ่าน pip จึงเข้าเงื่อนไข | ยังไม่ได้เปิดอ่านไฟล์ไลเซนส์ใน wheel ด้วยตัวเอง ต้องตรวจซ้ำ | 2026-09-23 |
+| PySide6-Essentials 6.11.2 + shiboken6 6.11.2 (Qt for Python) | `LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only` (หรือเชิงพาณิชย์จาก Qt) | ได้ ถ้าใช้ตาม LGPL: ลิงก์แบบ dynamic และให้ผู้ใช้เปลี่ยนไลบรารีได้ — เราติดตั้งผ่าน pip จึงเข้าเงื่อนไข | metadata ของ wheel ที่ติดตั้ง (`importlib.metadata`) | 2026-10-07 |
+| opencv-python-headless 5.0.0.93 | Apache-2.0 | ได้ | metadata ของ wheel ที่ติดตั้ง | 2026-10-07 |
+| numpy 2.5.3 | `BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0` | ได้ | metadata ของ wheel ที่ติดตั้ง | 2026-10-07 |
+| YuNet (`opencv_zoo/models/face_detection_yunet`) | MIT | ได้ | README ในโฟลเดอร์โมเดล | 2026-10-07 |
+| SFace (`opencv_zoo/models/face_recognition_sface`) | Apache-2.0 | ได้ | README ในโฟลเดอร์โมเดล | 2026-10-07 |
+| MiniFASNet (Silent-Face-Anti-Spoofing · Minivision) | Apache-2.0 | ได้ | github.com/minivision-ai/Silent-Face-Anti-Spoofing | 2026-10-07 |
+| whisper.cpp (ตัวถอดเสียง การ์ด 0019) | MIT | ได้ | github.com/ggml-org/whisper.cpp | 2026-10-07 |
+| Thonburian distill-small (`biodatlab/distill-whisper-th-small` · แปลงเป็น ggml เอง 2026-10-01) | MIT | ได้ | model card บน Hugging Face | 2026-10-07 |
+| greetd (ตัวจัดการ Login) | GPL-3.0 | ได้แต่ต้องเปิดซอร์สตาม GPL ถ้าแจกจ่าย · เราใช้แพ็กเกจของ OS ไม่ได้แก้ | github.com/kennylevinsen/greetd | 2026-10-07 |
+| labwc (compositor) | GPL-2.0 | เหมือน greetd | github.com/labwc/labwc | 2026-10-07 |
+| swaylock · swayidle (ล็อก/ไม่ได้ใช้เครื่อง) | MIT | ได้ | github.com/swaywm/swaylock · swayidle | 2026-10-07 |
+| ข้อมูลอากาศ Open-Meteo (บริการภายนอก) | ข้อมูล CC BY 4.0 (ต้องให้เครดิต) · API แบบฟรีไม่เกิน 10,000 ครั้ง/วัน | ข้อมูลได้ (ให้เครดิต) · **ไม่ได้ตรวจเงื่อนไข API เชิงพาณิชย์** | open-meteo.com/en/terms | 2026-10-07 |
+
+**ยังไม่ได้ตรวจ (ห้ามระบุไลเซนส์ในเล่มจนกว่าจะตรวจ):** Claude Code / บริการของ Anthropic (เป็นบริการตามข้อตกลงของบัญชี ไม่ใช่ไลเซนส์ซอฟต์แวร์เปิด) · Chromium (แพ็กเกจของ OS) ·
+ฟอนต์อื่นนอกจาก IBM Plex · โปรแกรมของ OS ที่เรียกใช้ (pw-record, pdftotext, wpctl, gio)
 | Typhoon2.5-Qwen3-4B GGUF (`typhoon-ai/typhoon2.5-qwen3-4b-gguf` · ฐาน `scb10x/typhoon2.5-qwen3-4b`) | Apache-2.0 | ได้ | Hugging Face API (`cardData.license`) | 2026-09-29 |
 | chat template ของ Typhoon2.5 (`scripts/pi/chat-templates/typhoon2.5-qwen3-4b-q4_k_m.jinja` · จาก `typhoon-ai/typhoon2.5-qwen3-4b` revision `ce0a741`) | Apache-2.0 (ไฟล์ใน repo ของโมเดล) | ได้ | Hugging Face API (`cardData.license`) | 2026-09-29 |
 | Qwen3-4B-Instruct-2507 GGUF (`unsloth/Qwen3-4B-Instruct-2507-GGUF` · ฐาน `Qwen/Qwen3-4B-Instruct-2507`) | Apache-2.0 | ได้ | Hugging Face API | 2026-09-29 |
