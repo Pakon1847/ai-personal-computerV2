@@ -1,14 +1,14 @@
 # T6 แบบใหม่: ข้อมูลออกนอกเครื่องเฉพาะทางที่ประกาศ (Pi 5 · ~45 นาที)
 
 เกณฑ์ประกาศไว้แล้วใน [ร่างข้ออ้างรอบ 4 หัวข้อ 4](../reviews/2026-10-05-claims-hybrid.md) · เครื่องมือ `aipc.spikes.outbound_watch` ·
-ต้องใช้รุ่นแอปที่มีการแก้ไฟล์หลุด (`8237d35` ขึ้นไป · ตอนนี้ติดตั้ง `2ae642bd`) → **ออกจากระบบแล้วเข้าใหม่ก่อนเริ่ม**
+ต้องใช้รุ่นแอปที่มีการแก้ไฟล์หลุด (`8237d35` ขึ้นไป · ตอนนี้ติดตั้ง `dd4436ff`) → **ออกจากระบบแล้วเข้าใหม่ก่อนเริ่ม** · บัญชีหลักตอนนี้คือ `pakon` (pakon1 ถูกลบ 2026-10-07)
 
 ## เตรียม (ผู้ช่วยทาง SSH)
 
-1. ใส่ไฟล์ canary ใน `~/Documents` ของ pakon1: `ใบแจ้งหนี้-ทดสอบ.txt` มีข้อความ `CANARY-T6-<วันที่>` (ผู้ช่วยทำด้วย sudo · chown pakon1)
+1. ใส่ไฟล์ canary ใน `~/Documents` ของ pakon: `ใบแจ้งหนี้-ทดสอบ.txt` มีข้อความ `CANARY-T6-<วันที่>` (ผู้ช่วยทำด้วย sudo · chown pakon)
 2. เริ่มบันทึก: `sudo /opt/aipc-v2/.venv/bin/python -m aipc.spikes.outbound_watch record --seconds 2400 --interval 2 --out /tmp/t6-watch.jsonl`
 
-## Pakon ทำที่หน้าจอ (บัญชี pakon1 · สวิตช์ Claude เปิด) · จดเวลาแต่ละข้อ
+## Pakon ทำที่หน้าจอ (บัญชี pakon · สวิตช์ Claude เปิด · ต้องเข้าสู่ระบบ Claude Code ในบัญชีนี้ก่อน) · จดเวลาแต่ละข้อ
 
 | # | ทำ | ทางที่ควรเกิด |
 |---|---|---|
@@ -23,7 +23,7 @@
 
 ## ตรวจ (ผู้ช่วย)
 
-1. หยุดบันทึก · คัดลอก `~/.local/share/aipc/outbound.json` ของ pakon1 (sudo) ไปโฟลเดอร์ผล
+1. หยุดบันทึก · คัดลอก `~/.local/share/aipc/outbound.json` ของ pakon (sudo) ไปโฟลเดอร์ผล
 2. `python -m aipc.spikes.outbound_watch check t6-watch.jsonl --ledger outbound.json --canary CANARY-T6-<วันที่>`
 3. เกณฑ์เพิ่มจากตาราง: ช่วงข้อ 7 ต้องไม่มีการเชื่อมต่อของ `claude` · ข้อ 3 รายการใน outbound.json ต้องไม่มี canary
 4. เขียนผลที่ `docs/benchmarks/<วันที่>-t6-new-pi5/README.md` พร้อมไฟล์ดิบ · ปลายทางของ `claude` ทั้งหมดรายงานเป็นข้อจำกัด
