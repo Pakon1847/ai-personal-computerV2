@@ -556,6 +556,40 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(find_items(win, "claudeGuide")[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_claude_connect_card_on_assistant_page(self):
+        """การ์ด 0021 เกณฑ์ข้อ 3ข: หน้าผู้ช่วยมีแถบเชื่อมต่อใต้คำทักทาย · กดแล้วขั้นตอนขึ้นกลางจอ ·
+        "ไว้ทีหลัง" ซ่อน · มี claude แล้วไม่แสดง."""
+        engine, win, warnings = self.open_shell("workspace")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._user, usage._addresses, usage._available = "pakon", lambda: ["172.20.10.2"], False
+        usage.changed.emit()
+        settle(50)
+        card = find_items(win, "claudeConnectCard")[0]
+        self.assertTrue(card.isVisible())
+        greeting = find_items(win, "greeting")[0]
+        below = card.mapToScene(card.position()).y()
+        self.assertGreater(below, greeting.mapToScene(greeting.position()).y())
+        find_items(win, "claudeConnectOpen")[0].clicked.emit()
+        settle(100)
+        popup = find_all(win, "claudeGuidePopup")[0]
+        self.assertTrue(popup.property("opened"))
+        # หน้าตั้งค่าก็มีคู่มือ (ซ่อนอยู่) → นับเฉพาะที่เห็น
+        shown = [s for s in find_items(win, "claudeGuideStep") if s.isVisible()]
+        self.assertEqual(len(shown), len(usage.guideSteps))
+        self.assertIn("ssh pakon@172.20.10.2", [s["command"] for s in usage.guideSteps])
+        find_items(win, "claudeGuideClose")[0].clicked.emit()
+        settle(300)
+        self.assertFalse(popup.property("opened"))
+        find_items(win, "claudeConnectLater")[0].clicked.emit()
+        settle(30)
+        self.assertFalse(card.isVisible())
+        card.setProperty("later", False)
+        usage._available = True
+        usage.changed.emit()
+        settle(30)
+        self.assertFalse(card.isVisible())
+        self.assertEqual(warnings, [])
+
     def test_file_search_box_finds_by_content(self):
         """ค้นไฟล์ด้วยเนื้อหาในหน้าไฟล์ของฉัน · ค้นในเธรดแยก แล้วผลขึ้นพร้อมปุ่มถาม AI."""
         engine, win, warnings = self.open_shell("files")

@@ -242,6 +242,42 @@ Item {
         }
     }
 
+    // ---------- ขั้นตอนเชื่อมต่อ Claude (การ์ด 0021) · หน้าต่างกลางจอ เลื่อนได้เมื่อตัวอักษรใหญ่ ----------
+    Popup {
+        id: guidePopup
+        objectName: "claudeGuidePopup"
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(720, root.width - 48)
+        height: Math.min(guideCol.implicitHeight + 2 * padding, root.height - 48)
+        padding: 24
+        onClosed: Qt.callLater(root.focusInput)
+        background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
+        contentItem: Flickable {
+            contentWidth: width
+            contentHeight: guideCol.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            clip: true
+            ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+            ColumnLayout {
+                id: guideCol
+                width: parent.width
+                spacing: 16
+                RowLayout {
+                    Layout.fillWidth: true
+                    AppText { text: "เชื่อมต่อ Claude"; size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
+                    AppButton { objectName: "claudeGuideClose"; kind: "secondary"; text: "ปิด"; onClicked: guidePopup.close() }
+                }
+                AppText {
+                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                    text: "เครื่องนี้ไม่มีหน้าต่างพิมพ์คำสั่ง จึงต้องตั้งจากคอมพิวเตอร์อีกเครื่อง · ทำครั้งเดียวต่อบัญชี · "
+                          + "การเข้าสู่ระบบ Claude เป็นของบัญชีนี้คนเดียว คนอื่นในเครื่องใช้ไม่ได้"
+                }
+                ClaudeGuide { Layout.fillWidth: true }
+            }
+        }
+    }
+
     // ---------- นัดที่พลาดขณะปิดเครื่อง/ไม่ได้เข้าใช้ และคำเตือนเรื่องไฟล์/นาฬิกา (การ์ด 0001, H2) ----------
     Rectangle {
         id: notice
@@ -315,6 +351,52 @@ Item {
                 iconPath: Icons.chat
                 text: voice.speakingKey === -2 ? "หยุดอ่าน" : "อ่านสรุปวันนี้ให้ฟัง"
                 onClicked: voice.speakingKey === -2 ? voice.stop() : voice.speak(-2, root.briefingText())
+            }
+        }
+
+        // ยังไม่ได้เชื่อมต่อ Claude (การ์ด 0021) · แถบสั้นใต้คำทักทาย · กดแล้วขั้นตอนขึ้นเป็นหน้าต่างกลางจอ ·
+        // "ไว้ทีหลัง" ซ่อนแค่ในเซสชันนี้ (เข้าใหม่ขึ้นอีกจนกว่าจะเชื่อมต่อ) · มี claude แล้ว = ไม่แสดง (H5)
+        Card {
+            id: connectCard
+            objectName: "claudeConnectCard"
+            property bool later: false
+            visible: !cloudUsage.available && !later
+            Layout.fillWidth: true
+            implicitHeight: visible ? connectRow.implicitHeight + 28 : 0
+            RowLayout {
+                id: connectRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 16
+                anchors.rightMargin: 12
+                spacing: 12
+                Rectangle {
+                    Layout.alignment: Qt.AlignVCenter
+                    implicitWidth: 40; implicitHeight: 40; radius: 20
+                    color: Theme.accentSoft
+                    Icon { anchors.centerIn: parent; path: Icons.globe; color: Theme.accentInk; width: 20; height: 20 }
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+                    AppText { text: "เชื่อมต่อ Claude เพื่อถามข่าวและข้อมูลสด"; strong: true; Layout.fillWidth: true }
+                    AppText {
+                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        text: "ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย"
+                    }
+                }
+                AppButton {
+                    objectName: "claudeConnectLater"
+                    kind: "ghost"
+                    text: "ไว้ทีหลัง"
+                    onClicked: connectCard.later = true
+                }
+                AppButton {
+                    objectName: "claudeConnectOpen"
+                    text: "ดูวิธีเชื่อมต่อ"
+                    onClicked: { cloudUsage.refreshGuide(); guidePopup.open() }
+                }
             }
         }
 

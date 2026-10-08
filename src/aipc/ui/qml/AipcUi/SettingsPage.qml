@@ -190,43 +190,10 @@ ColumnLayout {
                     open = !open
                 }
             }
-            ColumnLayout {
+            ClaudeGuide {
                 objectName: "claudeGuide"
                 visible: guideButton.visible && guideButton.open
                 Layout.fillWidth: true
-                spacing: 12
-                Repeater {
-                    model: cloudUsage.guideSteps
-                    ColumnLayout {
-                        id: guideStep
-                        objectName: "claudeGuideStep"
-                        required property var modelData
-                        Layout.fillWidth: true
-                        spacing: 4
-                        AppText { text: guideStep.modelData.title; strong: true; Layout.fillWidth: true }
-                        AppText {
-                            text: guideStep.modelData.detail
-                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                        }
-                        // ไม่มีปุ่มคัดลอก: คำสั่งพิมพ์บนคอมพิวเตอร์อีกเครื่อง คลิปบอร์ดของเครื่องนี้ไม่ช่วย
-                        Rectangle {
-                            objectName: "claudeGuideCommand"
-                            visible: guideStep.modelData.command !== ""
-                            Layout.fillWidth: true
-                            implicitHeight: cmdText.implicitHeight + 20
-                            radius: Theme.radiusControl
-                            color: Theme.surface2
-                            border.color: Theme.line
-                            AppText {
-                                id: cmdText
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                font.family: Theme.mono
-                                text: guideStep.modelData.command
-                            }
-                        }
-                    }
-                }
             }
             AppCheck {
                 objectName: "useClaudeCheck"
