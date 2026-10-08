@@ -57,5 +57,44 @@ class StepsTest(unittest.TestCase):
             self.assertEqual(set(s), {"title", "detail", "command"})
 
 
+class ConnectTest(unittest.TestCase):
+    """เกณฑ์ข้อ 8: python -m aipc.cloud.connect (คำสั่งปลอมทั้งหมด)."""
+
+    def go(self, finds, install_rc=0):
+        from aipc.cloud import connect
+
+        finds, calls, lines = list(finds), [], []
+
+        def run(cmd, **k):
+            calls.append(cmd)
+            return SimpleNamespace(returncode=install_rc if cmd[0] == "bash" else 0)
+
+        rc = connect.main(find=lambda: finds.pop(0) if len(finds) > 1 else finds[0],
+                          run=run, out=lines.append, ask=lambda p: "")  # fmt: skip
+        return rc, calls, "\n".join(lines)
+
+    def test_already_installed_skips_installer(self):
+        rc, calls, text = self.go(["/home/p/.local/bin/claude"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(calls, [["/home/p/.local/bin/claude"]])
+        self.assertIn("ออกจากระบบแล้วเข้าใหม่", text)
+
+    def test_installs_then_logs_in(self):
+        rc, calls, _ = self.go([None, "/home/p/.local/bin/claude"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(calls[0][:2], ["bash", "-c"])
+        self.assertIn("pipefail", calls[0][2])
+        self.assertIn(setup_guide.INSTALL, calls[0][2])
+        self.assertEqual(calls[1], ["/home/p/.local/bin/claude"])
+
+    def test_failed_install_never_runs_claude(self):
+        rc, calls, text = self.go([None, None], install_rc=1)
+        self.assertEqual(rc, 1)
+        self.assertEqual(len(calls), 1)
+        self.assertIn("ไม่สำเร็จ", text)
+        rc, calls, _ = self.go([None, None], install_rc=0)  # รหัส 0 แต่ไม่มีไฟล์ = ไม่สำเร็จ
+        self.assertEqual((rc, len(calls)), (1, 1))
+
+
 if __name__ == "__main__":
     unittest.main()

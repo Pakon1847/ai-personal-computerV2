@@ -590,6 +590,58 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(card.isVisible())
         self.assertEqual(warnings, [])
 
+    def test_connect_here_opens_one_fixed_terminal(self):
+        """การ์ด 0021 เกณฑ์ข้อ 7 และ 9: ปุ่มเปิด lxterminal ที่รัน aipc.cloud.connect เท่านั้น · กดซ้ำไม่เปิดเพิ่ม ·
+        ปิดหน้าต่างแล้วมี claude = บอกให้ออกแล้วเข้าใหม่ · ไม่มีเทอร์มินัล = ไม่มีปุ่ม."""
+        import sys
+
+        engine, win, warnings = self.open_shell("workspace")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        spawned = []
+
+        class Proc:
+            done = False
+
+            def poll(self):
+                return 0 if self.done else None
+
+        def spawn(cmd):
+            spawned.append(cmd)
+            return proc
+
+        proc = Proc()
+        usage._addresses, usage._available = (lambda: []), False
+        usage._terminal, usage._spawn, usage._find = "/usr/bin/lxterminal", spawn, lambda: None
+        usage.changed.emit()
+        usage.refreshGuide()
+        find_items(win, "claudeConnectOpen")[0].clicked.emit()
+        settle(100)
+        btn = [b for b in find_items(win, "claudeConnectHere") if b.isVisible()][0]
+        btn.clicked.emit()
+        settle(30)
+        btn.clicked.emit()  # หน้าต่างเดิมยังเปิด = ไม่เปิดเพิ่ม
+        settle(30)
+        self.assertEqual(len(spawned), 1)
+        cmd = spawned[0]
+        self.assertEqual(cmd[0], "/usr/bin/lxterminal")
+        self.assertIn("--no-remote", cmd)
+        inner = cmd[-1].removeprefix("--command=")
+        self.assertTrue(inner.endswith("-m aipc.cloud.connect"))
+        self.assertIn(Path(sys.executable).name, inner)
+        self.assertFalse(btn.property("enabled"))
+        usage._find = lambda: "/home/pakon/.local/bin/claude"
+        proc.done = True
+        usage._check_connect()
+        settle(30)
+        self.assertTrue(usage.connectedNow)
+        self.assertTrue(find_items(win, "claudeConnectedNow")[0].isVisible())
+        self.assertTrue(btn.property("enabled"))
+        usage._terminal = ""  # ไม่มีเทอร์มินัล = เหลือทาง SSH
+        usage.guideChanged.emit()
+        settle(30)
+        self.assertFalse(btn.isVisible())
+        self.assertEqual(warnings, [])
+
     def test_file_search_box_finds_by_content(self):
         """ค้นไฟล์ด้วยเนื้อหาในหน้าไฟล์ของฉัน · ค้นในเธรดแยก แล้วผลขึ้นพร้อมปุ่มถาม AI."""
         engine, win, warnings = self.open_shell("files")

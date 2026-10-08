@@ -270,8 +270,47 @@ Item {
                 }
                 AppText {
                     Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                    text: "เครื่องนี้ไม่มีหน้าต่างพิมพ์คำสั่ง จึงต้องตั้งจากคอมพิวเตอร์อีกเครื่อง · ทำครั้งเดียวต่อบัญชี · "
-                          + "การเข้าสู่ระบบ Claude เป็นของบัญชีนี้คนเดียว คนอื่นในเครื่องใช้ไม่ได้"
+                    text: "ทำครั้งเดียวต่อบัญชี · การเข้าสู่ระบบ Claude เป็นของบัญชีนี้คนเดียว คนอื่นในเครื่องใช้ไม่ได้"
+                }
+                // ทางที่ 2 (การ์ด 0021 หัวข้อ 10): เปิดหน้าต่างคำสั่งบนจอนี้ · ไม่ต้องใช้คอมพิวเตอร์อีกเครื่อง
+                Rectangle {
+                    objectName: "claudeConnectHereBox"
+                    visible: cloudUsage.canConnectHere
+                    Layout.fillWidth: true
+                    implicitHeight: hereCol.implicitHeight + 32
+                    radius: Theme.radiusCard
+                    color: Theme.accentSoft
+                    ColumnLayout {
+                        id: hereCol
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: 16
+                        spacing: 8
+                        AppText { text: "เชื่อมต่อที่เครื่องนี้ (ง่ายที่สุด)"; strong: true; color: Theme.accentInk; Layout.fillWidth: true }
+                        AppText {
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.accentInk
+                            text: "กดปุ่มแล้วหน้าต่างเชื่อมต่อจะเปิดขึ้น ติดตั้งให้เอง แล้วหน้าเข้าสู่ระบบ Claude จะเปิดใน Chromium · "
+                                  + "เข้าสู่ระบบเสร็จ กลับมาที่หน้าต่างเชื่อมต่อ พิมพ์ /exit แล้วกด Enter"
+                        }
+                        AppButton {
+                            objectName: "claudeConnectHere"
+                            enabled: !cloudUsage.connecting
+                            iconPath: Icons.terminal
+                            text: cloudUsage.connecting ? "หน้าต่างเชื่อมต่อเปิดอยู่…" : "เชื่อมต่อที่เครื่องนี้"
+                            onClicked: cloudUsage.connectHere()
+                        }
+                        AppText {
+                            objectName: "claudeConnectedNow"
+                            visible: cloudUsage.connectedNow
+                            Layout.fillWidth: true; strong: true; color: Theme.okInk
+                            text: "เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude"
+                        }
+                    }
+                }
+                AppText {
+                    visible: cloudUsage.canConnectHere
+                    text: "หรือใช้คอมพิวเตอร์อีกเครื่อง"; strong: true; Layout.fillWidth: true; Layout.topMargin: 4
                 }
                 ClaudeGuide { Layout.fillWidth: true }
             }
@@ -383,7 +422,9 @@ Item {
                     AppText { text: "เชื่อมต่อ Claude เพื่อถามข่าวและข้อมูลสด"; strong: true; Layout.fillWidth: true }
                     AppText {
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                        text: "ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย"
+                        text: cloudUsage.connectedNow
+                              ? "เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude"
+                              : "ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย"
                     }
                 }
                 AppButton {

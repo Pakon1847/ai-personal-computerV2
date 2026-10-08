@@ -451,11 +451,20 @@ class CloudUsage(QObject):
     guideChanged = Signal()  # noqa: N815
 
     def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None,
-                 user: str | None = None, addresses=None):  # fmt: skip
+                 user: str | None = None, addresses=None, terminal=None, spawn=None,
+                 find=None):  # fmt: skip
         super().__init__()
         self._user = user or getpass.getuser()
         self._addresses = addresses  # ฟังก์ชันอ่าน IP (เทสต์ใส่ของปลอม) · None = setup_guide.addresses
         self._guide: list = []
+        # เชื่อมต่อที่เครื่องนี้ (การ์ด 0021 หัวข้อ 10)
+        # terminal = path ของ lxterminal (None = หาเอง · "" = ไม่มี)
+        self._terminal = (shutil.which("lxterminal") or "") if terminal is None else terminal
+        self._spawn = spawn  # เทสต์ใส่ตัวเปิดโปรเซสปลอม · None = subprocess.Popen
+        self._find = find  # None = aipc.cloud.ask.find_claude
+        self._proc = None
+        self._connected_now = False
+        self._watch = QTimer(self, interval=1000, timeout=self._check_connect)
         self._b = budget
         self._ledger = ledger  # aipc.cloud.ledger.Ledger · ไม่มี = ไม่แสดงรายการ
         self._available = available and budget is not None
@@ -481,6 +490,54 @@ class CloudUsage(QObject):
 
         read = self._addresses or setup_guide.addresses
         self._guide = setup_guide.steps(self._user, read())
+        self.guideChanged.emit()
+
+    @Property(bool, notify=guideChanged)
+    def canConnectHere(self) -> bool:  # noqa: N802
+        """มีหน้าต่างคำสั่งในเครื่อง (lxterminal) = เชื่อมต่อจากจอนี้ได้ · ไม่มี = เหลือทาง SSH."""
+        return bool(self._terminal)
+
+    @Property(bool, notify=guideChanged)
+    def connecting(self) -> bool:
+        return self._proc is not None
+
+    @Property(bool, notify=guideChanged)
+    def connectedNow(self) -> bool:  # noqa: N802
+        """หน้าต่างเชื่อมต่อปิดแล้วและตอนนี้มี claude · แอปยังใช้ไม่ได้จนกว่าจะออกแล้วเข้าใหม่."""
+        return self._connected_now
+
+    @Slot()
+    def connectHere(self) -> None:  # noqa: N802
+        """เปิด lxterminal ที่รัน `python -m aipc.cloud.connect` ของรุ่นแอปนี้เท่านั้น.
+
+        คำสั่งตายตัว ไม่ใช่ shell ทั่วไป
+        """
+        import shlex
+        import subprocess
+        import sys
+
+        if not self._terminal or self._proc is not None:
+            return  # ไม่มีเทอร์มินัล หรือหน้าต่างเดิมยังเปิดอยู่ = ไม่เปิดเพิ่ม
+        inner = shlex.join([sys.executable, "-m", "aipc.cloud.connect"])
+        # --no-remote: โปรเซสแยกต่อหน้าต่าง (ปิดหน้าต่าง = โปรเซสจบ · แอปจึงรู้ว่าเสร็จ) และได้ env ของแอป
+        cmd = [self._terminal, "--no-remote", "--title=เชื่อมต่อ Claude", "--geometry=100x32",
+               "--command=" + inner]  # fmt: skip
+        try:
+            self._proc = (self._spawn or subprocess.Popen)(cmd)
+        except OSError:
+            self._proc = None
+            return
+        self._watch.start()
+        self.guideChanged.emit()
+
+    def _check_connect(self) -> None:
+        if self._proc is None or self._proc.poll() is None:
+            return
+        from aipc.cloud.ask import find_claude
+
+        self._proc = None
+        self._watch.stop()
+        self._connected_now = (self._find or find_claude)() is not None
         self.guideChanged.emit()
 
     @Property(float, notify=changed)
