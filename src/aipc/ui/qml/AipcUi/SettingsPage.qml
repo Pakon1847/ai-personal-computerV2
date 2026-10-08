@@ -164,7 +164,7 @@ ColumnLayout {
                         objectName: "cloudUsageText"
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                         text: !cloudUsage.available
-                              ? "บัญชีนี้ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude Code · ใช้ได้แค่ AI ในเครื่อง"
+                              ? "บัญชีนี้ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude Code · ใช้ได้แค่ AI ในเครื่อง · กดดูวิธีเชื่อมต่อข้างล่าง"
                               : "วันนี้ใช้ไป $" + cloudUsage.spentToday.toFixed(2) + " จากเพดาน $" + cloudUsage.limit.toFixed(2)
                                 + " · " + cloudUsage.callsToday + " ครั้ง · ราคาอ้างอิงที่ Claude รายงาน"
                     }
@@ -174,6 +174,58 @@ ColumnLayout {
                     text: cloudUsage.spentToday >= cloudUsage.limit ? "ครบเพดานวันนี้" : "ใช้ได้"
                     kind: cloudUsage.spentToday >= cloudUsage.limit ? "warn" : "ok"
                     dot: true
+                }
+            }
+            // คู่มือเชื่อมต่อ Claude (การ์ด 0021): ติดตั้งและเข้าสู่ระบบแยกต่อบัญชีผ่าน SSH · มี claude แล้ว = ไม่แสดง (H5)
+            AppButton {
+                id: guideButton
+                objectName: "claudeGuideButton"
+                property bool open: false
+                visible: !cloudUsage.available
+                kind: "secondary"
+                text: open ? "ซ่อนวิธีเชื่อมต่อ" : "วิธีเชื่อมต่อ Claude"
+                onClicked: {
+                    if (!open)
+                        cloudUsage.refreshGuide()
+                    open = !open
+                }
+            }
+            ColumnLayout {
+                objectName: "claudeGuide"
+                visible: guideButton.visible && guideButton.open
+                Layout.fillWidth: true
+                spacing: 12
+                Repeater {
+                    model: cloudUsage.guideSteps
+                    ColumnLayout {
+                        id: guideStep
+                        objectName: "claudeGuideStep"
+                        required property var modelData
+                        Layout.fillWidth: true
+                        spacing: 4
+                        AppText { text: guideStep.modelData.title; strong: true; Layout.fillWidth: true }
+                        AppText {
+                            text: guideStep.modelData.detail
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        }
+                        // ไม่มีปุ่มคัดลอก: คำสั่งพิมพ์บนคอมพิวเตอร์อีกเครื่อง คลิปบอร์ดของเครื่องนี้ไม่ช่วย
+                        Rectangle {
+                            objectName: "claudeGuideCommand"
+                            visible: guideStep.modelData.command !== ""
+                            Layout.fillWidth: true
+                            implicitHeight: cmdText.implicitHeight + 20
+                            radius: Theme.radiusControl
+                            color: Theme.surface2
+                            border.color: Theme.line
+                            AppText {
+                                id: cmdText
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                font.family: Theme.mono
+                                text: guideStep.modelData.command
+                            }
+                        }
+                    }
                 }
             }
             AppCheck {

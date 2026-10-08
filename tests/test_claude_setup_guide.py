@@ -1,0 +1,61 @@
+"""คู่มือเชื่อมต่อ Claude ในแอป (การ์ด 0021 · เกณฑ์ข้อ 1–2)."""
+
+import unittest
+from types import SimpleNamespace
+
+from aipc.cloud import setup_guide
+
+
+def run(out, rc=0):
+    return lambda *a, **k: SimpleNamespace(stdout=out, returncode=rc)
+
+
+class AddressesTest(unittest.TestCase):
+    def test_ipv4_without_loopback(self):
+        out = "172.20.10.3 127.0.1.1 fe80::1 192.168.1.35 \n"
+        self.assertEqual(setup_guide.addresses(run(out)), ["172.20.10.3", "192.168.1.35"])
+
+    def test_unreadable_is_empty(self):
+        self.assertEqual(setup_guide.addresses(run("", 1)), [])
+
+        def missing(*a, **k):
+            raise OSError("no hostname")  # วินโดวส์
+
+        self.assertEqual(setup_guide.addresses(missing), [])
+
+
+class StepsTest(unittest.TestCase):
+    def ssh_step(self, steps):
+        return next(s for s in steps if "SSH" in s["title"] or "ssh" in s["command"])
+
+    def test_ssh_command_has_account_and_every_address(self):
+        steps = setup_guide.steps("pakon", ["172.20.10.3", "192.168.1.35"])
+        ssh = self.ssh_step(steps)
+        self.assertIn("ssh pakon@172.20.10.3", ssh["command"])
+        self.assertIn("192.168.1.35", ssh["command"] + ssh["detail"])
+
+    def test_no_address_says_connect_first_and_shows_no_broken_command(self):
+        steps = setup_guide.steps("pakon", [])
+        for s in steps:
+            self.assertNotIn("@\n", s["command"] + "\n")
+            self.assertFalse(s["command"].rstrip().endswith("@"))
+        self.assertTrue(any("ต่อเน็ต" in s["detail"] for s in steps))
+
+    def test_install_and_login_match_find_claude(self):
+        commands = [s["command"] for s in setup_guide.steps("pakon", ["10.0.0.2"])]
+        self.assertIn("curl -fsSL https://claude.ai/install.sh | bash", commands)
+        self.assertIn("~/.local/bin/claude", commands)  # ที่ find_claude หาเมื่อ PATH ไม่มี
+
+    def test_last_step_is_log_out_and_back_in(self):
+        last = setup_guide.steps("pakon", ["10.0.0.2"])[-1]
+        self.assertIn("ออกจากระบบ", last["title"] + last["detail"])
+        self.assertEqual(last["command"], "")
+
+    def test_every_step_has_text(self):
+        for s in setup_guide.steps("pakon", ["10.0.0.2"]):
+            self.assertTrue(s["title"] and s["detail"])
+            self.assertEqual(set(s), {"title", "detail", "command"})
+
+
+if __name__ == "__main__":
+    unittest.main()

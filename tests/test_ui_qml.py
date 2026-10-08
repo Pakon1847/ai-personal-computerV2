@@ -532,6 +532,30 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(usage.outboundTotal, 0)
         self.assertEqual(warnings, [])
 
+    def test_claude_guide_only_without_claude(self):
+        """การ์ด 0021 เกณฑ์ข้อ 3: ไม่มี claude = ปุ่มคู่มือ กดแล้วเห็นทุกขั้นพร้อมกรอบคำสั่ง · มี claude = ไม่มีคู่มือ."""
+        engine, win, warnings = self.open_shell("settings")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._user, usage._addresses, usage._available = "pakon", lambda: ["172.20.10.3"], False
+        usage.changed.emit()
+        settle(50)
+        btn = find_items(win, "claudeGuideButton")[0]
+        self.assertTrue(btn.property("visible"))
+        self.assertFalse(find_items(win, "claudeGuideStep"))  # ยังไม่กด = ยังไม่สร้างขั้นตอน
+        btn.clicked.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "claudeGuide")[0].property("visible"))
+        self.assertEqual(len(find_items(win, "claudeGuideStep")), len(usage.guideSteps))
+        boxes = [c for c in find_items(win, "claudeGuideCommand") if c.isVisible()]
+        self.assertEqual(len(boxes), 3)  # ssh · ติดตั้ง · เข้าสู่ระบบ
+        self.assertIn("ssh pakon@172.20.10.3", [s["command"] for s in usage.guideSteps])
+        usage._available = True
+        usage.changed.emit()
+        settle(50)
+        self.assertFalse(btn.property("visible"))
+        self.assertFalse(find_items(win, "claudeGuide")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
     def test_file_search_box_finds_by_content(self):
         """ค้นไฟล์ด้วยเนื้อหาในหน้าไฟล์ของฉัน · ค้นในเธรดแยก แล้วผลขึ้นพร้อมปุ่มถาม AI."""
         engine, win, warnings = self.open_shell("files")

@@ -448,9 +448,14 @@ class CloudUsage(QObject):
     · ไม่มี Claude = available False."""
 
     changed = Signal()
+    guideChanged = Signal()  # noqa: N815
 
-    def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None):
+    def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None,
+                 user: str | None = None, addresses=None):  # fmt: skip
         super().__init__()
+        self._user = user or getpass.getuser()
+        self._addresses = addresses  # ฟังก์ชันอ่าน IP (เทสต์ใส่ของปลอม) · None = setup_guide.addresses
+        self._guide: list = []
         self._b = budget
         self._ledger = ledger  # aipc.cloud.ledger.Ledger · ไม่มี = ไม่แสดงรายการ
         self._available = available and budget is not None
@@ -463,6 +468,20 @@ class CloudUsage(QObject):
     @Property(bool, notify=changed)
     def available(self) -> bool:
         return self._available
+
+    # ---------- คู่มือเชื่อมต่อ Claude (การ์ด 0021) ----------
+    @Property("QVariantList", notify=guideChanged)
+    def guideSteps(self) -> list:  # noqa: N802
+        return self._guide
+
+    @Slot()
+    def refreshGuide(self) -> None:  # noqa: N802
+        """อ่าน IP ใหม่ตอนผู้ใช้กดเปิดคู่มือ (เพิ่งต่อเน็ตก็ได้ที่อยู่ล่าสุด)."""
+        from aipc.cloud import setup_guide
+
+        read = self._addresses or setup_guide.addresses
+        self._guide = setup_guide.steps(self._user, read())
+        self.guideChanged.emit()
 
     @Property(float, notify=changed)
     def spentToday(self) -> float:  # noqa: N802
