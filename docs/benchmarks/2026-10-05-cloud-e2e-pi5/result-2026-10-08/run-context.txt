@@ -1,0 +1,4 @@
+/opt/aipc-releases/22606ba1
+#!/bin/sh
+# การ์ด cloud-e2e 2026-10-05 · Pakon รันเองในบัญชี pakon
+cd /opt/aipc-v2/docs/benchmarks/2026-10-05-cloud-e2e-pi5 && /opt/aipc-v2/.venv/bin/python run.py "$HOME/cloud-e2e"
