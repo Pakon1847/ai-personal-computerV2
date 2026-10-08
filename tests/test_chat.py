@@ -14,6 +14,11 @@ from aipc.chat import client, store
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
+# คำตอบจริงของ AI ในเครื่องบน Pi 5 (T6 แบบใหม่ 2026-10-08): ลอกป้ายที่มาของ Claude จากประวัติมาใส่เอง
+LABELED = ["[ข้อความนี้ Claude (cloud) ตอบโดยค้นเว็บ ", "ไม่ใช่ความรู้ของ AI ในเครื่อง]\n",
+           "ฉันไม่สามารถให้ \"ข่าวเด่นวันนี้\" ที่เป็นข้อมูลสดได้ เนื่องจากฉันไม่มีข้อมูลสด ณ ขณะนี้"]  # fmt: skip
+
+
 class FakeLlama(BaseHTTPRequestHandler):
     mode = "ok"  # ok | slow | crash | loading | tool (AI เลือกสกิล tool_name)
     tool_name = "machine-status"
@@ -71,7 +76,9 @@ class FakeLlama(BaseHTTPRequestHandler):
                 )
             self.wfile.write(b"data: [DONE]\n\n")
             return
-        tokens = {"slow": ["ช้า"] * 40, "dunno": ["ไม่", "รู้"]}.get(self.mode, ["สวัส", "ดี", "ครับ"])
+        tokens = {"slow": ["ช้า"] * 40, "dunno": ["ไม่", "รู้"], "label": LABELED}.get(
+            self.mode, ["สวัส", "ดี", "ครับ"]
+        )
         for i, tok in enumerate(tokens):
             chunk = {"choices": [{"delta": {"content": tok}}]}
             self.wfile.write(b"data: " + json.dumps(chunk, ensure_ascii=False).encode() + b"\n\n")
@@ -472,6 +479,21 @@ class ControllerTest(ServerCase):
         self.assertIn(c.CLAUDE_LABEL + "จาก Claude", sent)
         self.assertIn("ไม่รู้", sent)  # คำตอบของ AI ในเครื่องเองไม่มีป้าย
         self.assertEqual(c._conv["messages"][-3]["content"], "จาก Claude")  # ไฟล์แชทเก็บข้อความเดิม
+
+    def test_local_answer_never_carries_claude_label(self):
+        """T6 แบบใหม่ 2026-10-08: AI ในเครื่องลอกป้าย "Claude ตอบ" มาใส่คำตอบตัวเอง.
+
+        ตัดออกก่อนแสดงและบันทึก
+        """
+        FakeLlama.mode = "label"
+        c, done, _ = self.make()
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: done)
+        self.assertNotIn("ข้อความนี้ Claude", done[0][0])
+        self.assertTrue(done[0][0].startswith("ฉันไม่สามารถให้"))
+        last = c._conv["messages"][-1]
+        self.assertNotIn("ข้อความนี้ Claude", last["content"])
+        self.assertNotIn("by", last)  # ไม่ได้มาจาก Claude
 
     def test_hybrid_offline_is_told(self):
         from aipc.cloud.ask import CloudReply

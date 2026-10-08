@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import getpass
+import re
 import shutil
 import time
 from datetime import datetime, timedelta
@@ -2596,8 +2597,14 @@ class ChatController(QObject):
         self._stream_text += token
         self.streamChanged.emit()
 
+    # AI ในเครื่องลอกป้ายที่มาของ Claude (CLAUDE_LABEL ในประวัติ) มาใส่คำตอบตัวเอง
+    # (T6 แบบใหม่ Pi 5 2026-10-08)
+    _FAKE_LABEL = re.compile(r"\[ข้อความนี้ Claude[^\]\n]*\]\s*")
+
     @Slot(object)
     def _on_done(self, reply) -> None:
+        if not getattr(reply, "cloud", False) and reply.text:
+            reply.text = self._FAKE_LABEL.sub("", reply.text)  # ป้ายที่มาจริงอยู่ใน "ทำไมได้คำตอบนี้"
         self._busy, self._stream = False, None
         if self._meter is not None:  # ไฟที่บอร์ดใช้ระหว่าง AI ในเครื่องตอบ (รอบที่ส่งต่อ Claude ไม่แสดง)
             self._trace["energy"] = self._meter.stop()
