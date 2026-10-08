@@ -12,7 +12,7 @@ import unittest
 from pathlib import Path
 
 from aipc.voice.speech_text import number_words, sentences, to_speech
-from aipc.voice.tts import Speaker
+from aipc.voice.tts import Speaker, sandboxed
 
 DATA = Path(__file__).parent / "data" / "tts_normalize.json"
 
@@ -140,6 +140,30 @@ class SpeakerTest(unittest.TestCase):
         sp = Speaker(play_cmd=None)
         sp._play_cmd = None
         self.assertFalse(sp.available)
+
+
+class SandboxTest(unittest.TestCase):
+    """onnxruntime ใน Piper ส่ง telemetry ไป Microsoft (T6 แบบใหม่ 2026-10-08).
+
+    ตัวสังเคราะห์ต้องต่อเน็ตไม่ได้
+    """
+
+    def test_wrapped_with_network_locks(self):
+        env = {"XDG_RUNTIME_DIR": "/run/user/1005", "OMP_NUM_THREADS": "2"}
+        found = lambda n: "/usr/bin/" + n  # noqa: E731
+        cmd = sandboxed(["/opt/v/python", "worker.py", "m.onnx"], env, which=found)
+        self.assertEqual(cmd[:2], ["/usr/bin/systemd-run", "--user"])
+        self.assertIn("--pipe", cmd)
+        self.assertIn("--property=RestrictAddressFamilies=AF_UNIX", cmd)
+        self.assertIn("--property=PrivateNetwork=yes", cmd)
+        self.assertIn("--setenv=OMP_NUM_THREADS=2", cmd)  # service ไม่ได้ env ของแอป
+        self.assertEqual(cmd[-3:], ["/opt/v/python", "worker.py", "m.onnx"])
+
+    def test_plain_without_systemd(self):
+        base = ["python", "worker.py"]
+        runtime = {"XDG_RUNTIME_DIR": "/run/user/1"}
+        self.assertEqual(sandboxed(base, runtime, which=lambda n: None), base)
+        self.assertEqual(sandboxed(base, {}, which=lambda n: "/usr/bin/" + n), base)
 
 
 if __name__ == "__main__":

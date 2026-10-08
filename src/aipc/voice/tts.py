@@ -2,7 +2,8 @@
 
 - เปิดตัวสังเคราะห์เมื่อกดอ่านครั้งแรก (ไม่โหลดตอนเข้าเครื่อง: ขณะทำงานใช้ RAM ~670 MB · วัดบน Pi 5)
 - ไม่ได้ใช้ IDLE_S วินาที → ปิดตัวสังเคราะห์คืน RAM
-- ไฟล์เสียงอยู่ใน $XDG_RUNTIME_DIR (tmpfs ของผู้ใช้ 0700) · เล่นจบลบทันที · ไม่มีอะไรออกนอกเครื่อง
+- ไฟล์เสียงอยู่ใน $XDG_RUNTIME_DIR (tmpfs ของผู้ใช้ 0700) · เล่นจบลบทันที
+- ตัวสังเคราะห์ต่อเน็ตไม่ได้ด้วยกลไกของ OS (sandboxed · onnxruntime ส่ง telemetry เอง · พบ 2026-10-08)
 """
 
 from __future__ import annotations
@@ -32,6 +33,24 @@ def player() -> list[str] | None:
         if path:
             return [path]
     return None
+
+
+def sandboxed(cmd: list[str], env: dict[str, str], which=shutil.which) -> list[str]:
+    """รันตัวสังเคราะห์เป็น user service ที่ต่อเน็ตไม่ได้ (กลไกเดียวกับ aipc-llm.service).
+
+    พบใน T6 แบบใหม่บน Pi 5 (2026-10-08): onnxruntime 1.30.0 ที่ Piper ใช้ ต่อ *.events.data.microsoft.com
+    เองแค่โหลดโมเดล · disable_telemetry_events() ไม่ช่วย · ตัวสังเคราะห์ไม่ต้องใช้เน็ตเลย →
+    ปิดที่ OS: สร้าง socket ได้แค่ AF_UNIX + network namespace ของตัวเอง ·
+    ไม่มี systemd-run (วินโดวส์/เครื่องทดสอบ) = รันตรงเหมือนเดิม
+    """
+    runner = which("systemd-run")
+    if runner is None or not env.get("XDG_RUNTIME_DIR"):
+        return cmd
+    keep = [f"--setenv={k}={env[k]}" for k in ("OMP_NUM_THREADS", "PYTHONIOENCODING", "LANG")
+            if k in env]  # fmt: skip # service ไม่ได้ env ของแอป
+    return [runner, "--user", "--pipe", "--quiet", "--collect",
+            "--property=RestrictAddressFamilies=AF_UNIX", "--property=PrivateNetwork=yes",
+            *keep, *cmd]  # fmt: skip
 
 
 def installed(voice_dir: Path = VOICE_DIR) -> bool:
@@ -134,7 +153,8 @@ class Speaker:
         }  # เหลือ CPU ให้ AI ในเครื่อง
         pipe = subprocess.PIPE
         quiet = subprocess.DEVNULL
-        self._proc = subprocess.Popen(self._worker_cmd, stdin=pipe, stdout=pipe, stderr=quiet,
+        cmd = self._worker_cmd if self._custom_worker else sandboxed(self._worker_cmd, env)
+        self._proc = subprocess.Popen(cmd, stdin=pipe, stdout=pipe, stderr=quiet,
                                       text=True, encoding="utf-8", env=env)  # fmt: skip
         threading.Thread(target=self._read, args=(self._proc,), daemon=True).start()
 
