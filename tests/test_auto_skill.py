@@ -332,3 +332,35 @@ class ControllerTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class ForgeLedgerTest(unittest.TestCase):
+    """การ์ด 0022 ข้อ ข: บันทึกส่งออกเขียน ok: false ทั้งที่สกิลติดตั้งได้ (T6 Pi 5 2026-10-08)."""
+
+    def _run(self, proposal):
+        from unittest import mock
+
+        from aipc.cloud.ledger import Ledger
+        from aipc.ui import app
+
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        ledger = Ledger(Path(d.name) / "outbound.json")
+        with mock.patch("aipc.cloud.ask.find_claude", return_value="claude"), \
+             mock.patch.object(forge, "run_process", return_value=(0, "2.1 (Claude Code)", "")), \
+             mock.patch.object(forge, "forge", return_value=proposal):  # fmt: skip
+            run = app._skill_forge(None, ledger)
+            run("ทำโหมดประชุม", skills=[])
+        return ledger.entries()[0]
+
+    def test_installable_skill_is_ok_even_if_rule_trial_misses(self):
+        p = forge.Proposal(False, "ทำโหมดประชุม", skill_md=GOOD, skill_id="meeting-mode", attempts=1,
+                           trial={"trigger_fail": ["meeting mode"]})  # fmt: skip
+        e = self._run(p)
+        self.assertTrue(e["ok"])
+        self.assertIn("ไม่กระทบการติดตั้ง", e["note"])
+
+    def test_no_skill_is_not_ok(self):
+        e = self._run(forge.Proposal(False, "ทำโหมดประชุม", errors=["Claude ตอบไม่สำเร็จ"]))
+        self.assertFalse(e["ok"])

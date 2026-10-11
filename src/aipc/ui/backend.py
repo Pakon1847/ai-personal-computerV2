@@ -2465,17 +2465,24 @@ class ChatController(QObject):
             if status == "ready":
                 self._warm_up()
 
-    CLAUDE_LABEL = "[ข้อความนี้ Claude (cloud) ตอบโดยค้นเว็บ ไม่ใช่ความรู้ของ AI ในเครื่อง]\n"
+    CLAUDE_HIDDEN = ("[ข้อความนี้ Claude (cloud) ตอบโดยค้นเว็บ · เนื้อหาไม่แสดงให้ AI ในเครื่อง · "
+                     "ถ้าผู้ใช้ถามข้อมูลสด หรือถามต่อจากข้อความนี้ {how}]")  # fmt: skip
 
-    @classmethod
-    def _for_local(cls, m: dict) -> dict:
-        """คำตอบของ Claude ในประวัติ → กำกับที่มาก่อนส่งให้ AI ในเครื่อง.
+    def _for_local(self, m: dict) -> dict:
+        """คำตอบของ Claude ในประวัติ → ส่งให้ AI ในเครื่องแค่ป้ายที่มา ไม่ส่งเนื้อหา.
 
         พบ 2026-10-05 บน Pi: ปิดสวิตช์ Claude แล้วถามข่าวซ้ำ · AI ในเครื่องอ้างว่าข่าวที่ Claude ค้นมา
-        "เป็นความรู้ ณ เวลาที่ฉันถูกฝึก" (H5) · เก็บในไฟล์แชทตามเดิม เปลี่ยนแค่สิ่งที่ส่ง
+        "เป็นความรู้ ณ เวลาที่ฉันถูกฝึก" (H5) → เดิมใส่ป้ายนำหน้าเนื้อหา · การ์ด 0022 (ชุดพัฒนา D1 Pi 5
+        2026-10-12): แม้มีป้าย ยังลอกคำตอบเก่าของ Claude มาตอบเอง หรือแต่งข้อมูลสดใหม่ในรูปเดียวกัน
+        ("แก๊สโซฮอล์ 95 … 36.50 บาท") → ไม่ส่งเนื้อหา · คำถามต่อเรื่องนั้นไปที่ Claude ซึ่งเห็นบทสนทนาเต็ม
+        (aipc.cloud.ask.build_input) · เก็บในไฟล์แชทตามเดิม เปลี่ยนแค่สิ่งที่ส่ง
         """
         if m.get("by") == "claude":
-            return {**m, "content": cls.CLAUDE_LABEL + m["content"]}
+            from aipc.skills.catalog import ASK_CLOUD
+
+            how = (f"ให้เรียกเครื่องมือ {ASK_CLOUD}" if self._cloud_ok()
+                   else "ให้บอกว่าต้องเปิด Claude ในหน้าตั้งค่าก่อน ห้ามเดา")  # fmt: skip
+            return {**m, "content": self.CLAUDE_HIDDEN.format(how=how)}
         return m
 
     def _cloud_ok(self) -> bool:
@@ -2601,10 +2608,15 @@ class ChatController(QObject):
     # (T6 แบบใหม่ Pi 5 2026-10-08)
     _FAKE_LABEL = re.compile(r"\[ข้อความนี้ Claude[^\]\n]*\]\s*")
 
+    NEEDS_CLAUDE = "ข้อนี้ต้องใช้ข้อมูลที่ Claude ค้นจากเว็บ · AI ในเครื่องตอบเองไม่ได้ · เปิด Claude ได้ที่หน้าตั้งค่า"
+
     @Slot(object)
     def _on_done(self, reply) -> None:
+        parroted = False  # ตอบมาแค่ป้ายที่มาของ Claude ที่ลอกจากประวัติ (การ์ด 0022 ชุดพัฒนา D1)
         if not getattr(reply, "cloud", False) and reply.text:
-            reply.text = self._FAKE_LABEL.sub("", reply.text)  # ป้ายที่มาจริงอยู่ใน "ทำไมได้คำตอบนี้"
+            text = self._FAKE_LABEL.sub("", reply.text)  # ป้ายที่มาจริงอยู่ใน "ทำไมได้คำตอบนี้"
+            parroted = not text.strip() and not reply.tool_call and not reply.reason
+            reply.text = text
         self._busy, self._stream = False, None
         if self._meter is not None:  # ไฟที่บอร์ดใช้ระหว่าง AI ในเครื่องตอบ (รอบที่ส่งต่อ Claude ไม่แสดง)
             self._trace["energy"] = self._meter.stop()
@@ -2624,9 +2636,11 @@ class ChatController(QObject):
             if reply.tool_call == catalog.ASK_CLOUD:
                 self._ask_cloud("AI ในเครื่องเลือกส่งต่อ: ต้องใช้ข้อมูลสด หรือยากเกินกว่า AI ในเครื่อง")
                 return
-            if not reply.tool_call and local_gave_up(reply.text):
+            if not reply.tool_call and (parroted or local_gave_up(reply.text)):
                 self._ask_cloud("AI ในเครื่องตอบว่าไม่รู้ จึงถาม Claude แทน")
                 return
+        if parroted:  # ส่งต่อไม่ได้ (ปิด Claude / ถามเกี่ยวกับไฟล์) · ไม่แสดงคำตอบว่าง
+            reply.text = self.NEEDS_CLAUDE
         if reply.tool_call and not reply.reason:
             # AI เลือกสกิล: เอาข้อความของผู้ใช้ออกจากบทสนทนา (ทางของสกิลจะส่งข้อความนี้เองอีกครั้ง) · ไม่บันทึก
             text = self._conv["messages"].pop()["content"]

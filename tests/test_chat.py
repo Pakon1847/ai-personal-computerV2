@@ -76,7 +76,10 @@ class FakeLlama(BaseHTTPRequestHandler):
                 )
             self.wfile.write(b"data: [DONE]\n\n")
             return
-        tokens = {"slow": ["ช้า"] * 40, "dunno": ["ไม่", "รู้"], "label": LABELED}.get(
+        parrot = ["[ข้อความนี้ Claude (cloud) ตอบโดยค้นเว็บ · เนื้อหาไม่แสดงให้ AI ในเครื่อง · ",
+                  "ถ้าผู้ใช้ถามข้อมูลสด หรือถามต่อจากข้อความนี้ ให้เรียกเครื่องมือ ask-cloud]"]  # fmt: skip
+        canned = {"slow": ["ช้า"] * 40, "dunno": ["ไม่", "รู้"], "label": LABELED, "parrot": parrot}
+        tokens = canned.get(
             self.mode, ["สวัส", "ดี", "ครับ"]
         )
         for i, tok in enumerate(tokens):
@@ -469,15 +472,19 @@ class ControllerTest(ServerCase):
         c.send("ข่าวเด่นวันนี้มีอะไร", "")
         pump(lambda: len(done) > 1)
         self.assertEqual((done[1], asked), ("จาก Claude", ["ข่าวเด่นวันนี้มีอะไร"]))
-        # ปิดอีกครั้งแล้วถามต่อ: คำตอบของ Claude ในประวัติต้องมีป้ายที่มาเมื่อส่งให้ AI ในเครื่อง (พบ 2026-10-05)
+        # ปิดอีกครั้งแล้วถามต่อ: AI ในเครื่องเห็นแค่ป้ายที่มา ไม่เห็นเนื้อหาของ Claude
+        # (พบ 2026-10-05: อ้างว่าเป็นความรู้ตัวเอง · การ์ด 0022: ลอก/แต่งข้อมูลสดตาม)
         on[0] = False
         FakeLlama.seen.clear()
         c.send("ข่าวเด่นวันนี้มีอะไร", "")
         pump(lambda: len(done) > 2)
         real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1][-1]
         sent = [m["content"] for m in real["messages"] if m["role"] == "assistant"]
-        self.assertIn(c.CLAUDE_LABEL + "จาก Claude", sent)
-        self.assertIn("ไม่รู้", sent)  # คำตอบของ AI ในเครื่องเองไม่มีป้าย
+        hidden = [s for s in sent if s.startswith("[ข้อความนี้ Claude")]
+        self.assertEqual(len(hidden), 1)
+        self.assertNotIn("จาก Claude", hidden[0])
+        self.assertIn("ต้องเปิด Claude", hidden[0])  # ปิดสวิตช์ = ไม่มี ask-cloud ให้เรียก
+        self.assertIn("ไม่รู้", sent)  # คำตอบของ AI ในเครื่องเองส่งตามเดิม
         self.assertEqual(c._conv["messages"][-3]["content"], "จาก Claude")  # ไฟล์แชทเก็บข้อความเดิม
 
     def test_local_answer_never_carries_claude_label(self):
@@ -494,6 +501,42 @@ class ControllerTest(ServerCase):
         last = c._conv["messages"][-1]
         self.assertNotIn("ข้อความนี้ Claude", last["content"])
         self.assertNotIn("by", last)  # ไม่ได้มาจาก Claude
+
+    def _parrot_case(self, cloud_on: bool):
+        """การ์ด 0022 (ชุดพัฒนา D1 Pi 5 2026-10-12): คำตอบของ Claude ในประวัติเหลือแค่ป้ายที่มา ·
+        AI ในเครื่องตอบกลับมาเป็นป้ายนั้นอย่างเดียว → ตัดป้ายแล้วเหลือข้อความว่าง."""
+        from aipc.cloud.ask import CloudReply
+
+        FakeLlama.mode = "parrot"
+        asked = []
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           cloud=lambda q, h: asked.append((q, h)) or CloudReply(True, "95 ราคา …"),
+                           claude_on=lambda: cloud_on)  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        c._conv["messages"] = [
+            {"role": "user", "content": "ดีเซลวันนี้เท่าไหร่"},
+            {"role": "assistant", "by": "claude", "content": "ดีเซล 32.94 บาท"},
+        ]
+        done = []
+        c.finished.connect(lambda text, note: done.append((text, note)))
+        c.send("แล้วแก๊สโซฮอล์ 95 ล่ะ", "")
+        pump(lambda: done)
+        return c, done[0], asked
+
+    def test_parroted_label_goes_to_claude(self):
+        c, (text, note), asked = self._parrot_case(True)
+        self.assertEqual((text, note), ("95 ราคา …", c.CLOUD_NOTE))
+        q, history = asked[0]
+        self.assertEqual(q, "แล้วแก๊สโซฮอล์ 95 ล่ะ")
+        self.assertEqual(history[-1]["content"], "ดีเซล 32.94 บาท")  # Claude เห็นบทสนทนาเต็ม
+
+    def test_parroted_label_never_shows_empty_answer(self):
+        c, (text, _), asked = self._parrot_case(False)
+        self.assertEqual((text, asked), (c.NEEDS_CLAUDE, []))
+        self.assertEqual(c._conv["messages"][-1]["content"], c.NEEDS_CLAUDE)
 
     def test_hybrid_offline_is_told(self):
         from aipc.cloud.ask import CloudReply

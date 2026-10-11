@@ -115,7 +115,12 @@ def _skill_forge(budget=None, ledger=None):
             note = "พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง · ไม่มีแชท นัด หรือไฟล์"
             if p.attempts > 1:
                 note += f" · ส่ง {p.attempts} ครั้ง (แก้ตามที่ประตูตรวจตีกลับ)"
-            ledger.record("skill", sent, p.cost_usd, ok=p.ok, note=note)
+            # ok = Claude ได้ไฟล์สกิลที่ผ่านประตูตรวจ (แอปติดตั้งจากเงื่อนไขนี้) · ไม่ใช่ p.ok ที่รวมผลทดลองกับตัวคัด
+            # สกิลแบบกฎ (เดิมบันทึก ok: false ทั้งที่ติดตั้งได้ · T6 2026-10-08 · การ์ด 0022 ข้อ ข)
+            made = bool(p.skill_md)
+            if made and not p.ok:
+                note += " · ทดลองกับตัวคัดสกิลแบบกฎไม่ครบทุกประโยค (ไม่กระทบการติดตั้ง)"
+            ledger.record("skill", sent, p.cost_usd, ok=made, note=note)
         return p
 
     return run
