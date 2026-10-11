@@ -1,0 +1,11 @@
+r01 ติดตั้ง=True music-mode               ทำตามที่ขอ=True ซ้ำ=rule:steps:โหมดฟังเพลง แก้=True 11วิ
+r02 ติดตั้ง=True sleep-mode               ทำตามที่ขอ=True ซ้ำ=rule:steps:โหมดนอน แก้=- 11วิ
+r03 ติดตั้ง=True online-class-mode        ทำตามที่ขอ=True ซ้ำ=rule:steps:โหมดเรียนออนไลน์ แก้=- 13วิ
+r04 ติดตั้ง=True research-mode            ทำตามที่ขอ=True ซ้ำ=rule:steps:โหมดหาข้อมูล แก้=True 14วิ
+r05 ติดตั้ง=True health-check-mode        ทำตามที่ขอ=True ซ้ำ=rule:steps:โหมดเช็กสุขภาพ แก้=- 28วิ
+r06 ติดตั้ง=True series-mode              ทำตามที่ขอ=True ซ้ำ=rule:steps:โหมดดูซีรีส์ แก้=- 22วิ
+r07 ติดตั้ง=True kids-english-nickname    ทำตามที่ขอ=True ซ้ำ=rule:chat:ชื่อเล่นอังกฤษให้เด็ก แก้=- 46วิ
+r08 ติดตั้ง=True daily-expense-sum        ทำตามที่ขอ=True ซ้ำ=rule:chat:รวมค่าใช้จ่ายรายวัน แก้=- 30วิ
+r09 ติดตั้ง=True sale-caption             ทำตามที่ขอ=True ซ้ำ=rule:chat:แคปชันขายของ แก้=False 32วิ
+r10 ติดตั้ง=True formal-report-style      ทำตามที่ขอ=True ซ้ำ=rule:chat:ภาษาเขียนทางการ แก้=- 51วิ
+{"installed": [10, 10], "intent_ok": [10, 10], "again_ok": [10, 10], "revise_ok": [2, 3], "ledger_matches_install": true, "cost_usd": 0.7394, "pass": {"2.1": true, "2.2": true, "2.3": true, "2.4": true, "2.5": true}}
