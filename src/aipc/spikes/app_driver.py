@@ -102,6 +102,9 @@ class AppDriver(QObject):
         """ข้อความเดียวในแชทใหม่ที่มี history ก่อนหน้า (แบบเดียวกับเปิดแชทเก่าแล้วพิมพ์ต่อ)."""
         from aipc.chat import store
 
+        # tunnel หลุดระหว่างข้อ (2026-10-12: IP วินโดวส์เปลี่ยน) = รอต่อใหม่ · ไม่กลับ = ข้อนี้เป็นความผิดของตัววัด
+        if not self.wait_ready(300):
+            return Turn(route="infra", note="AI ในเครื่องไม่พร้อมก่อนเริ่มข้อ (ตัววัด)")
         self.chat.newChat(True)  # แชทชั่วคราว: ไม่เขียนประวัติ
         conv = store.new_conversation()
         conv["messages"] = copy.deepcopy(history or [])

@@ -167,6 +167,13 @@ def main(argv: list[str] | None = None) -> int:
                     row.update(cloud_cost=e["cost_usd"], ledger_ok=e["ok"], ledger_match=match)
                 else:
                     row["ledger_match"] = False
+        if t.route == "infra" or t.note == drv.chat.NOTE["crashed"]:
+            # การเชื่อมต่อไป llama-server หลุด (tunnel) ไม่ใช่ผลของระบบ → ทั้งรอบใช้ไม่ได้ ต้องรันใหม่ทั้งชุด
+            res["void"] = f"{it['id']}: {t.note}"
+            _save(a.out, res)
+            print("รอบนี้ใช้ไม่ได้:", res["void"])
+            drv.close()
+            return 2
         rows.append(row)
         print(f"{row['id']} {row['group']}{'m' if row['multi'] else ' '} → {row['route']:24} "
               f"tool={row['local_tool'] or '-':10} เดิม={int(row['old_rule'])} "
