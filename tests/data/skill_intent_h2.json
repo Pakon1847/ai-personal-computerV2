@@ -1,0 +1,35 @@
+{
+  "about": "ชุดทดสอบ H2 ของการ์ด 0022 ส่วน 2 (สกิลที่ Claude สร้างทำตามที่ผู้ใช้ขอ) · ผู้ช่วยเขียน 2026-10-12 และ commit ก่อนวัด (H9) · ห้ามแก้หลังเห็นผล · คนละประโยคกับ tests/data/create_skill_*.json · kind code: expect = ชุดคำสั่งเครื่องที่ต้องได้ (ไม่สนลำดับ · ไม่นับ 'บอก:' · ห้ามขาด ห้ามเกิน) · kind llm: รันคำสั่งให้ AI ของสกิลใหม่บน AI ในเครื่องกับ test แล้วตรวจด้วย check · revise = คำติของผู้ใช้ + ผลที่ต้องได้หลัง Claude แก้ (2.4)",
+  "criteria": {"installed_min": 9, "intent_min": 8, "again_min": 8, "revise_min": 2},
+  "checks": {
+    "names5": "ชื่อภาษาอังกฤษ (คำอักษรละติน ขึ้นต้นตัวใหญ่ ยาว ≥ 3) ต่างกัน ≥ 5 ชื่อ และมีภาษาไทย",
+    "has": "มีทุกข้อความใน words",
+    "has_not": "ไม่มีข้อความใดใน words และมีภาษาไทย",
+    "emoji": "มีอีโมจิอย่างน้อย 1 ตัว และมีทุกข้อความใน words"
+  },
+  "items": [
+    {"id": "r01", "kind": "code", "request": "อยากได้สกิลโหมดฟังเพลง เปิดยูทูบแล้วปรับเสียงเป็น 60",
+     "expect": [["open_url", {"site": "youtube"}], ["set_volume", {"percent": 60}]],
+     "revise": {"feedback": "ขอเปิด Gmail ด้วย", "expect": [["open_url", {"site": "youtube"}], ["set_volume", {"percent": 60}], ["open_url", {"site": "gmail"}]]}},
+    {"id": "r02", "kind": "code", "request": "ทำคำสั่งโหมดนอนให้หน่อย แค่ปิดเสียงเครื่องอย่างเดียว",
+     "expect": [["mute", {}]]},
+    {"id": "r03", "kind": "code", "request": "อยากได้คำสั่งเริ่มเรียนออนไลน์ เปิด Gmail กับ YouTube แล้วเพิ่มเสียงอีก 20",
+     "expect": [["open_url", {"site": "gmail"}], ["open_url", {"site": "youtube"}], ["change_volume", {"step": 20}]]},
+    {"id": "r04", "kind": "code", "request": "สร้างสกิลโหมดหาข้อมูล เปิดวิกิพีเดีย Google และ Google Maps พร้อมกัน",
+     "expect": [["open_url", {"site": "wikipedia"}], ["open_url", {"site": "google"}], ["open_url", {"site": "maps"}]],
+     "revise": {"feedback": "ไม่ต้องเปิดแผนที่", "expect": [["open_url", {"site": "wikipedia"}], ["open_url", {"site": "google"}]]}},
+    {"id": "r05", "kind": "code", "request": "อยากได้โหมดเช็กเครื่อง เปิดหน้าสุขภาพเครื่องแล้วเปิดหน้าไฟล์ของฉันให้ด้วย",
+     "expect": [["open_page", {"page": "health"}], ["open_page", {"page": "files"}]]},
+    {"id": "r06", "kind": "code", "request": "ทำโหมดดูซีรีส์ เปิดยูทูบ เปิดเสียง แล้วปรับเสียงเป็น 70",
+     "expect": [["open_url", {"site": "youtube"}], ["unmute", {}], ["set_volume", {"percent": 70}]]},
+    {"id": "r07", "kind": "llm", "request": "อยากได้สกิลตั้งชื่อเล่นภาษาอังกฤษให้เด็ก ขอทีละ 5 ชื่อพร้อมความหมายสั้น ๆ",
+     "test": "ตั้งชื่อเล่นภาษาอังกฤษให้ลูกสาวหน่อย ชอบดอกไม้", "check": "names5"},
+    {"id": "r08", "kind": "llm", "request": "ทำสกิลรวมค่าใช้จ่ายรายวัน พิมพ์รายการกับราคาแล้วบอกยอดรวม",
+     "test": "ค่าใช้จ่ายวันนี้ กาแฟ 45 ข้าวมันไก่ 60 ค่ารถ 30", "check": "has", "words": ["135"]},
+    {"id": "r09", "kind": "llm", "request": "อยากได้สกิลเขียนแคปชันขายของสั้น ๆ พร้อมแฮชแท็ก",
+     "test": "เขียนแคปชันขายเสื้อยืดลายแมว ราคา 199 บาท", "check": "has", "words": ["#", "199"],
+     "revise": {"feedback": "ขอแบบมีอีโมจิด้วย", "check": "emoji", "words": ["#", "199"]}},
+    {"id": "r10", "kind": "llm", "request": "อยากได้สกิลเปลี่ยนภาษาพูดให้เป็นภาษาเขียนทางการสำหรับรายงาน",
+     "test": "ทำให้เป็นภาษาทางการ: งานนี้มันยากมากเลยอะ ทำไม่ทันแน่ๆ", "check": "has_not", "words": ["มากเลยอะ", "แน่ๆ", "มันยาก"]}
+  ]
+}
