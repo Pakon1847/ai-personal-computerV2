@@ -126,6 +126,22 @@ class AppDriver(QObject):
         self._turn = None
         return t
 
+    def run_card(self, make_card, text: str, timeout: float = 900) -> Turn:
+        """เริ่มจากการ์ดที่ได้จาก make_card() (เช่น skills._start_forge / reviseSkill) แล้วทำต่อแบบหน้าจอ."""
+        self.chat.newChat(True)
+        self.exec.plans = []
+        self._turn = Turn()
+        self._waiting = 0
+        t0 = time.monotonic()
+        self._dispatch(make_card(), text)
+        ok = self._spin(lambda: self._waiting == 0, timeout)
+        t = self._turn
+        t.seconds, t.plans = round(time.monotonic() - t0, 2), list(self.exec.plans)
+        if not ok:
+            t.route, t.note = "error", f"หมดเวลา {timeout} วิ"
+        self._turn = None
+        return t
+
     def _dispatch(self, card: dict, text: str) -> None:
         t = self._turn
         card = dict(card)
