@@ -160,7 +160,7 @@ class ExecutorTest(unittest.TestCase):
         self.assertTrue(all(isinstance(a, list) for a in calls))
         self.assertIn(["xdg-open", "https://www.youtube.com"], calls)
         self.assertIn(["wpctl", "set-volume", actions.SINK, "40%"], calls)
-        self.assertIn(["wpctl", "set-volume", actions.SINK, "10%-"], calls)
+        self.assertIn(["wpctl", "set-volume", "-l", "1.0", actions.SINK, "10%-"], calls)
 
     def test_dry_run_says_so(self):
         out = actions.Executor(dry_run=True).execute(command.parse("เปิดยูทูบ").plan)

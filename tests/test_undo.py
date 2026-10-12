@@ -30,11 +30,13 @@ class FakeSink:
     def run(self, args):
         self.ran.append(args)
         if args[:2] == ["wpctl", "set-volume"]:
-            v = args[3]
+            v = args[-1]
             n = int(v.rstrip("%+-"))
             self.percent = (
                 self.percent + n if v.endswith("+") else self.percent - n if v.endswith("-") else n
             )
+            if "-l" in args:  # wpctl -l 1.0 = ไม่เกิน 100%
+                self.percent = min(self.percent, 100)
         elif args[:2] == ["wpctl", "set-mute"]:
             self.muted = args[3] == "1"
         return 0
@@ -56,6 +58,13 @@ class ExecutorUndoTest(unittest.TestCase):
         for p in out2.undo + out.undo:
             ex.execute(p)
         self.assertEqual((sink.percent, sink.muted), (35, True))
+
+    def test_volume_up_stops_at_100(self):
+        # พบบน Pi 5 2026-10-12: 100% + "เพิ่มเสียง" = 110% (เกินระดับปกติ เสียงแตกได้)
+        sink = FakeSink(percent=100)
+        ex = Executor(runner=sink.run, reader=sink.read, dry_run=False)
+        ex.execute(Plan("change_volume", {"step": 10}, "เพิ่มเสียง"))
+        self.assertEqual(sink.percent, 100)
 
     def test_no_undo_when_state_unknown_or_irreversible(self):
         sink = FakeSink(readable=False)

@@ -209,7 +209,8 @@ def command_for(plan: Plan) -> list[str] | None:
         return ["wpctl", "set-volume", SINK, f"{int(p['percent'])}%"]
     if plan.action == "change_volume":
         step = int(p["step"])
-        return ["wpctl", "set-volume", SINK, f"{abs(step)}%{'+' if step > 0 else '-'}"]
+        # -l 1.0: เพิ่มได้ไม่เกิน 100% (พบบน Pi 5 2026-10-12: 100% + "เพิ่มเสียง" = 110% เสียงแตกได้)
+        return ["wpctl", "set-volume", "-l", "1.0", SINK, f"{abs(step)}%{'+' if step > 0 else '-'}"]
     if plan.action in ("mute", "unmute"):
         return ["wpctl", "set-mute", SINK, "1" if plan.action == "mute" else "0"]
     return None
