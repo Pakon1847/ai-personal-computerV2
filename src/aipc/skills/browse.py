@@ -21,10 +21,8 @@ class BrowseCommand:
     site: str = ""
 
     def as_dict(self) -> dict:
-        d = {"kind": self.kind}
-        d.update({k: v for k, v in (("query", self.query), ("n", self.n),
-                                    ("direction", self.direction), ("site", self.site)) if v})  # fmt: skip
-        return d
+        extra = {"query": self.query, "n": self.n, "direction": self.direction, "site": self.site}
+        return {"kind": self.kind, **{k: v for k, v in extra.items() if v}}
 
 
 NUMBERS = {"แรก": 1, "หนึ่ง": 1, "สอง": 2, "สาม": 3, "สี่": 4, "ห้า": 5,
@@ -61,8 +59,8 @@ _SEARCH = re.compile(
     r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|เสิร์[ชด]|เซิร์ช|search|(?:กูเกิ้?ล|google)\s*(?:หา|ดู)?(?=\s*(?:ว่า|คำว่า)|(?<=หา)|(?<=ดู)))\s*"
     r"(?:ใน\s*(?:กูเกิ้?ล|google|เน็ต|อินเทอร์เน็ต|เว็บ)\s*)?(?:ว่า|คำว่า)?\s*(.+)"
 )
-# "หา" ที่เป็นต้นคำอื่น (หาก หาด หาย หาว หาม หาร=หารเลข · หาร้าน ไม่นับ)
-_FIND = re.compile(r"(?:ช่วย\s*)?หา(?![กดยวม]|ร(?!้))\s*(.+)")
+# "หา" ที่เป็นต้นคำอื่น (หาก หาด หาย หาว หาม หาร=หารเลข · หาร้าน หาวิธี ไม่นับ)
+_FIND = re.compile(r"(?:ช่วย\s*)?หา(?![กดยม]|ว(?!ิ)|ร(?!้))\s*(.+)")
 # "หา/ค้นหา X" ที่เป็นงานในเครื่อง (สกิลค้นไฟล์) หรือโจทย์เลข ไม่ใช่ค้นเว็บ
 _NOT_WEB = re.compile(r"(?:ไฟล์|เอกสาร|โฟลเดอร์|รูป(?:ในเครื่อง)?|ค่า|ผลรวม|ผลบวก|ผลคูณ|ผลต่าง|คำตอบ)")
 
@@ -94,7 +92,8 @@ def _single(t: str) -> BrowseCommand | None:
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
     m = _SEARCH.fullmatch(t) or _FIND.fullmatch(t)
-    if m and not (fileintent.file_intent(t) or fileintent.file_time(t)):  # หาไฟล์/โน้ตในเครื่อง = สกิลค้นไฟล์
+    # หาไฟล์/โน้ตในเครื่อง = สกิลค้นไฟล์ ไม่ใช่ค้นเว็บ
+    if m and not (fileintent.file_intent(t) or fileintent.file_time(t)):
         query = _POLITE.sub("", m.group(1)).strip()
         if query and not _NOT_WEB.match(query):
             return BrowseCommand("search", query=query)

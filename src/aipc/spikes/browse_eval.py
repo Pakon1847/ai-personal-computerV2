@@ -1,4 +1,7 @@
-"""วัดตัวแปลคำสั่งเว็บ (การ์ด 0024 เกณฑ์ข้อ 1) · python -m aipc.spikes.browse_eval tests/data/browse_v2.json [ผล.json]."""
+"""วัดตัวแปลคำสั่งเว็บ (การ์ด 0024 เกณฑ์ข้อ 1).
+
+python -m aipc.spikes.browse_eval tests/data/browse_v2.json [ผล.json]
+"""
 
 from __future__ import annotations
 
@@ -14,7 +17,9 @@ def run(path: Path) -> dict:
     rows = []
     for it in items:
         got = [c.as_dict() for c in browse.parse(it["text"])]
-        rows.append({"text": it["text"], "expect": it["expect"], "got": got, "ok": got == it["expect"]})
+        rows.append(
+            {"text": it["text"], "expect": it["expect"], "got": got, "ok": got == it["expect"]}
+        )
     cmd = [r for r in rows if r["expect"]]
     neg = [r for r in rows if not r["expect"]]
     return {
