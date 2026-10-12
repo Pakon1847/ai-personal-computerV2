@@ -2882,6 +2882,11 @@ class ChatController(QObject):
         try:
             text = files_qa.extract(Path(path))
         except files_qa.Unsupported as e:
+            # แนบไม่สำเร็จ = เลิกแนบไฟล์เดิมด้วย (พบบน Pi 5 2026-10-12: กดถามไฟล์ใหม่ที่อ่านไม่ได้
+            # แล้วถาม "ไฟล์นี้มีอะไร" ได้คำตอบของไฟล์ก่อนหน้า)
+            if self._file is not None:
+                self._file = None
+                self.changed.emit()
             return str(e)
         self._file = (Path(path).name, text)
         self.changed.emit()

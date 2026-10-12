@@ -131,6 +131,12 @@ class ChatFileTest(ServerCase or unittest.TestCase):
         c.attachFile(str(f))
         c.newChat(False)
         self.assertEqual(c.attachedFile, "")
+        # แนบไฟล์ใหม่ไม่สำเร็จ = ไม่ค้างไฟล์เดิม (พบ 2026-10-12: ถามต่อแล้วได้คำตอบของไฟล์ก่อนหน้า)
+        c.attachFile(str(f))
+        img = Path(d.name) / "รูป.jpg"
+        img.write_bytes(b"\xff\xd8\xff")
+        self.assertNotEqual(c.attachFile(str(img)), "")
+        self.assertEqual(c.attachedFile, "")
 
 
 if __name__ == "__main__":
