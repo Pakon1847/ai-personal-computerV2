@@ -64,6 +64,14 @@ class SkillsControllerTest(unittest.TestCase):
         self.assertTrue(any("ประชุม" in line for line in card["lines"][1:]))
         self.assertEqual(len(self.s._store.items), before)
 
+    def test_days_until_counted_by_code(self):
+        # สำรวจบน Pi 5 2026-10-12: "อีกกี่วันจะถึงปีใหม่" AI ในเครื่องตอบ 109 วัน (ที่ถูก 81) · ชุดสอบข้อ C06
+        card = self.s.handle("อีกกี่วันจะถึงวันปีใหม่")  # self.now = 23 ก.ย. 2026
+        self.assertEqual((card["kind"], card["title"]), ("clock", "อีก 100 วันถึงปีใหม่"))
+        self.assertEqual(self.s.handle("อีกกี่วันถึงวันที่ 25 กันยา")["title"], "อีก 2 วันถึงวันที่ 25/9")
+        for text in ("อีกกี่วันจะสอบ", "ปีใหม่ไปเที่ยวไหนดี", "อีกกี่วันจะถึงวันเด็ก"):
+            self.assertNotEqual(self.s.handle(text)["kind"], "clock", text)
+
     def test_time_question_answered_by_clock_not_ai(self):
         # สำรวจบน Pi 5 2026-10-12: "ตอนนี้กี่โมง" AI ในเครื่องตอบว่าไม่รู้ → ส่งต่อ Claude
         for text in ("ตอนนี้กี่โมง", "กี่โมงแล้วครับ", "ตอนนี้เวลาเท่าไหร่", "what time is it"):

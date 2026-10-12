@@ -130,3 +130,37 @@ def move_target(text: str) -> str | None:
     """None = ไม่ใช่คำขอเลื่อนนัด · คืนข้อความที่เหลือ (ใช้หานัด)."""
     m = _MOVE.fullmatch(re.sub(r"\s+", "", text))
     return None if m is None else m.group(1)
+
+
+# "อีกกี่วันจะถึงปีใหม่" (สำรวจบน Pi 5 2026-10-12: AI ในเครื่องตอบ 109 วัน ที่ถูกคือ 81 · ชุดสอบข้อ C06)
+# → นับด้วยโค้ดจากวันที่ของเครื่อง · รู้เฉพาะวันที่ตายตัว (ลอยกระทง/วันพระ ฯลฯ ตามจันทรคติ = ไม่ตอบเอง)
+_UNTIL = re.compile(r"(?:อีก|เหลือ)กี่วัน|กี่วันจะถึง|กี่วันถึง")
+HOLIDAYS = {
+    "ปีใหม่": (1, 1), "สงกรานต์": (4, 13), "คริสต์มาส": (12, 25), "คริสมาส": (12, 25),
+    "วาเลนไทน์": (2, 14), "วันแม่": (8, 12), "วันพ่อ": (12, 5), "วันเด็ก": None,
+}  # fmt: skip
+
+
+def days_until(text: str, today: date) -> tuple[str, date] | None:
+    """(ชื่อวัน, วันที่) ของคำถาม "อีกกี่วันจะถึง …" · None = ไม่ใช่คำถามนี้ หรือไม่รู้วันที่แน่นอน."""
+    from aipc.skills.when import MONTHS
+
+    t = re.sub(r"\s+", "", text)
+    if not _UNTIL.search(t):
+        return None
+    for name, md in HOLIDAYS.items():
+        if name in t:
+            if md is None:
+                return None
+            d = date(today.year, *md)
+            return (name, d if d > today else date(today.year + 1, *md))
+    months = "|".join(sorted((re.escape(m) for m in MONTHS), key=len, reverse=True))
+    if m := re.search(rf"(?:วันที่)?(\d{{1,2}})\.?({months})\.?", t):
+        try:
+            d = date(today.year, MONTHS[m[2]], int(m[1]))
+        except ValueError:
+            return None
+        if d <= today:
+            d = date(today.year + 1, d.month, d.day)
+        return (f"วันที่ {d.day}/{d.month}", d)
+    return None

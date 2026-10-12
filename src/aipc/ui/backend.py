@@ -1719,6 +1719,22 @@ class SkillsController(QObject):
         card = self._plain("reminder", "ยังเลื่อนนัดให้ไม่ได้", lines)
         return self._with_reminder_badge(card, "ขอเลื่อนนัด · ยังไม่รองรับ จึงไม่จดนัดใหม่")
 
+    def _until_card(self, text: str) -> dict | None:
+        """ "อีกกี่วันจะถึงปีใหม่" → นับจากวันที่ของเครื่อง · None = ไม่ใช่คำถามนี้."""
+        from aipc.skills import agenda
+
+        now = self._now()
+        hit = agenda.days_until(text, now.date())
+        if hit is None:
+            return None
+        name, d = hit
+        n = (d - now.date()).days
+        title = f"อีก {n} วันถึง{name}" if n else f"วันนี้คือ{name}"
+        when = f"{thaidate.short_date(d)} {d.year + thaidate.BE_OFFSET}"
+        return self._plain(
+            "clock", title, [f"{when} · นับจากวันที่ของเครื่องนี้ ({thaidate.short_date(now)})"]
+        )
+
     def _agenda_card(self, text: str) -> dict | None:
         """ "วันนี้ต้องทำอะไร" (ฟีเจอร์ข้อ 5) · None = ไม่ใช่คำถามเรื่องตารางนัด."""
         from aipc.skills import agenda
@@ -2180,7 +2196,7 @@ class SkillsController(QObject):
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
             return card
-        if card := self._clock_card(text):  # ถามเวลาตอนนี้ = นาฬิกาเครื่อง (ไม่ส่งต่อ Claude)
+        if card := self._clock_card(text) or self._until_card(text):  # เวลา · อีกกี่วัน = นาฬิกาเครื่อง
             return card
         if card := self._cancel_card(text):  # ยกเลิก/ลบนัด = การ์ดยืนยัน แล้วลบด้วยโค้ด
             return card
