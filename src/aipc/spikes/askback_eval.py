@@ -24,20 +24,32 @@ ASK_WORDS = ("กรุณา", "รบกวน", "โปรด", "ช่วย
 MISSING = ("ข้อความ", "ประโยค", "โค้ด", "ไฟล์", "อีเมล", "บทความ", "ย่อหน้า", "วาง", "ส่ง", "แนบ")
 
 
-def work_lines(text: str) -> list[str]:
-    """บรรทัดที่เป็นเนื้องาน (ไม่ใช่คำถามกลับ)."""
+# ตัวตัดสิน v2 (2026-10-12 · แก้หลังดูผลชุดพัฒนา D3 · ก่อนรัน H4): v1 นับบรรทัดที่ถามกลับเป็นงาน
+# ("1. **ลูกค้าคือใคร?**" · "เมื่อได้ข้อมูลแล้วจะร่างให้") → v2 ตัดบรรทัดที่มี ? หรือคำขอข้อมูล
+ASK_BACK = (
+    "รบกวน", "ขอข้อมูล", "ขอรายละเอียด", "บอกข้อมูล", "ข้อมูลเพิ่มเติม", "ต้องการให้", "อยากให้",
+    "แบบไหน", "แนวไหน", "ประเภทไหน", "ประเภทใด", "เพื่อให้", "เมื่อได้ข้อมูล", "ระหว่างรอ", "สนใจ",
+)  # fmt: skip
+
+
+def work_lines(text: str, questions_ok: bool = False) -> list[str]:
+    """บรรทัดที่เป็นเนื้องาน · ตัดบรรทัดถามกลับ (มี ? หรือคำขอข้อมูล) ·
+    questions_ok = งานที่ขอคือคำถาม (เช่น คิดคำถามสัมภาษณ์) → ? ไม่นับเป็นถามกลับ."""
     out = []
     for line in text.splitlines():
         s = line.strip().strip("*#-• ").strip()
-        if s and not s.rstrip(" )").endswith(("?", "？")):
-            out.append(s)
+        if not s or any(w in s for w in ASK_BACK):
+            continue
+        if not questions_ok and ("?" in s or "？" in s):
+            continue
+        out.append(s)
     return out
 
 
 def judge(item: dict, text: str) -> bool:
     if item["group"] == "O":
         c = item["check"]
-        lines = work_lines(text)
+        lines = work_lines(text, questions_ok="คำถาม" in item["q"])
         if "min_lines" in c:
             return len(lines) >= c["min_lines"]
         return sum(len(s) for s in lines) >= c["min_chars"]
@@ -51,7 +63,22 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--server", default="http://127.0.0.1:18080")
     p.add_argument("--rule", default="")
     p.add_argument("--out", required=True)
+    p.add_argument("--rejudge", action="store_true", help="ตัดสินไฟล์ผล --out ที่มีอยู่ใหม่ (ไม่ถาม AI)")
     a = p.parse_args(argv)
+    if a.rejudge:
+        data = json.loads(Path(a.data).read_text(encoding="utf-8"))
+        res = json.loads(Path(a.out).read_text(encoding="utf-8"))
+        by_id = {it["id"]: it for it in data["items"]}
+        for r in res["rows"]:
+            r["pass_v1"] = r.get("pass_v1", r["pass"])
+            r["pass"] = judge(by_id[r["id"]], r["text"])
+            print(r["id"], "✓" if r["pass"] else "✗", "(v1 ✓)" if r["pass_v1"] else "(v1 ✗)")
+        for g in ("O", "N"):
+            rs = [r for r in res["rows"] if r["group"] == g]
+            res["summary"][g] = [sum(r["pass"] for r in rs), len(rs)]
+        Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(json.dumps(res["summary"], ensure_ascii=False))
+        return 0
 
     from aipc.cloud.ask import CloudReply
     from aipc.skills import catalog
