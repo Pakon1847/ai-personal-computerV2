@@ -29,7 +29,8 @@ LINKS_JS = r"""(() => {
   const host = location.hostname, seen = new Set(), out = [];
   let sel = null;
   if (/(^|\.)google\./.test(host) && location.pathname === '/search')
-    sel = '#search a h3, #rso a h3, #tads a [role=heading], #tvcap a [role=heading], #bottomads a [role=heading]';
+    sel = '#search a h3, #rso a h3, #tads a [role=heading], #tvcap a [role=heading], ' +
+          '#bottomads a [role=heading]';
   else if (/(^|\.)bing\.com$/.test(host) && location.pathname === '/search')
     sel = 'li.b_algo h2 a, li.b_ad h2 a, .b_adTop h2 a';
   else if (/duckduckgo\.com$/.test(host))
@@ -39,7 +40,8 @@ LINKS_JS = r"""(() => {
     const r = a.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) return;
     seen.add(a.href);
-    out.push({href: a.href, text: (a.innerText || '').trim().slice(0, 80), y: r.top + scrollY, x: r.left});
+    const text = (a.innerText || '').trim().slice(0, 80);
+    out.push({href: a.href, text, y: r.top + scrollY, x: r.left});
   };
   if (sel) {
     for (const el of document.querySelectorAll(sel)) push(el.closest('a') || el);
@@ -68,14 +70,21 @@ def default_profile() -> Path:
 
 
 class BrowserControl:
-    def __init__(self, profile: Path | None = None, chromium: str = "chromium",
-                 extra_args: list[str] | None = None, launcher=cdp.launch, load_timeout=12.0):  # fmt: skip
+    def __init__(
+        self,
+        profile: Path | None = None,
+        chromium: str = "chromium",
+        extra_args: list[str] | None = None,
+        launcher=cdp.launch,
+        load_timeout=12.0,
+    ):
         self._profile = profile or default_profile()
         self._chromium, self._extra = chromium, list(extra_args or [])
         self._launch, self._load_timeout = launcher, load_timeout
         self._proc = self._cdp = None
         self._session = self._target = ""
         self._lock = threading.Lock()  # ทีละคำสั่ง
+        self._mark = 0
 
     # ---------- เปิด / ต่อ ----------
     @property
@@ -84,16 +93,28 @@ class BrowserControl:
 
     def _start(self, url: str) -> None:
         self._profile.mkdir(parents=True, exist_ok=True)
-        argv = [self._chromium, f"--user-data-dir={self._profile}", "--remote-debugging-pipe",
-                "--no-first-run", "--no-default-browser-check", "--start-maximized",
-                *self._extra, url]  # fmt: skip
+        argv = [
+            self._chromium,
+            f"--user-data-dir={self._profile}",
+            "--remote-debugging-pipe",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--start-maximized",
+            *self._extra,
+            url,
+        ]
+        if os.environ.get("WAYLAND_DISPLAY"):
+            # Chromium บน Pi เลือก X11 เอง (hint=auto ก็ X11) · ไม่มี $DISPLAY = ปิดตัวทันที (พบ 2026-10-13)
+            argv.insert(1, "--ozone-platform=wayland")
         self._proc, self._cdp = self._launch(argv)
         self._session = self._target = ""
         self._cdp.call("Browser.getVersion", timeout=30)  # รอจนพร้อม (เปิดครั้งแรกบน Pi ~1–3 วิ)
 
     def _page(self) -> str:
         """session ของแท็บที่ใช้อยู่ (แท็บล่าสุด) · แท็บเดิมปิดไปแล้ว = ต่อแท็บใหม่."""
-        pages = [t for t in self._cdp.call("Target.getTargets")["targetInfos"] if t["type"] == "page"]
+        pages = [
+            t for t in self._cdp.call("Target.getTargets")["targetInfos"] if t["type"] == "page"
+        ]
         if not pages:
             created = self._cdp.call("Target.createTarget", {"url": "about:blank"})
             pages = [{"targetId": created["targetId"]}]
@@ -106,36 +127,61 @@ class BrowserControl:
         return self._session
 
     def _eval(self, js: str):
-        r = self._cdp.call("Runtime.evaluate", {"expression": js, "returnByValue": True},
-                           session=self._page())  # fmt: skip
-        return r.get("result", {}).get("value")
+        for _ in range(20):  # ระหว่างเปลี่ยนหน้า หน้าใหม่ยังไม่มี context ให้รันสคริปต์ (~0.1–1 วิ)
+            try:
+                r = self._cdp.call(
+                    "Runtime.evaluate",
+                    {"expression": js, "returnByValue": True},
+                    session=self._page(),
+                )
+                return r.get("result", {}).get("value")
+            except cdp.CdpError as e:
+                if "context" not in str(e) or self._cdp.closed:
+                    raise
+                time.sleep(0.15)
+        raise cdp.CdpError("หน้าเว็บยังไม่พร้อม")
 
     def _url(self) -> str:
         return self._eval("location.href") or ""
 
     def _go(self, url: str) -> str:
-        self._cdp.call("Page.navigate", {"url": url}, session=self._page())
-        return self._wait_load()
+        return self._navigate("Page.navigate", {"url": url})
 
-    def _wait_load(self, before: str = "") -> str:
+    def _navigate(self, method: str, params: dict | None = None) -> str:
+        """เปลี่ยนหน้าแล้วรอจนหน้าใหม่โหลดเสร็จและ URL นิ่ง (หน้าเด้งต่อ เช่น Google → /sorry/).
+
+        ทำเครื่องหมายเลขใหม่ไว้ในหน้าเดิมก่อน · ไม่เจอเลขนี้ = เป็นเอกสารใหม่แล้ว (ใช้ได้กับโหลดใหม่ที่ URL เดิม ·
+        หน้าที่ย้อนกลับมาจากแคชของ Chromium มีเลขเก่า ไม่ใช่เลขนี้ · เดิมใช้ค่าเดียว ย้อนกลับรอจนหมดเวลา 12 วิ)
+        """
+        self._mark += 1
+        token = self._mark
+        self._eval(f"window.__aipcOld = {token}")
+        self._cdp.call(method, params or {}, session=self._page())
         end = time.monotonic() + self._load_timeout
+        last, since = None, time.monotonic()
         time.sleep(0.3)
         while time.monotonic() < end:
             try:
-                state, url = self._eval("[document.readyState, location.href]") or ("", "")
-            except cdp.CdpError:  # ระหว่างเปลี่ยนหน้า context เดิมหายชั่วคราว
-                state, url = "", ""
-            if state in ("interactive", "complete") and url and url != before:
+                state, url, old = self._eval(
+                    f"[document.readyState, location.href, window.__aipcOld === {token}]"
+                ) or ("", "", True)
+            except cdp.CdpError:
+                state, url, old = "", "", True
+            if url != last:
+                last, since = url, time.monotonic()
+            if state == "complete" and not old and time.monotonic() - since >= 0.6:
                 return url
-            time.sleep(0.25)
-        return self._url()
+            time.sleep(0.2)
+        return last or ""
 
     def _front(self) -> None:
         """เบราว์เซอร์มาอยู่หน้าสุด (เคยย่อไว้ด้วย "กลับไปแอป")."""
         try:
             win = self._cdp.call("Browser.getWindowForTarget", {"targetId": self._target})
-            self._cdp.call("Browser.setWindowBounds",
-                           {"windowId": win["windowId"], "bounds": {"windowState": "maximized"}})  # fmt: skip
+            self._cdp.call(
+                "Browser.setWindowBounds",
+                {"windowId": win["windowId"], "bounds": {"windowState": "maximized"}},
+            )
         except cdp.CdpError:
             pass
         self._cdp.call("Page.bringToFront", session=self._page())
@@ -154,16 +200,15 @@ class BrowserControl:
         if not self.running:
             if cmd.kind in NEEDS_PAGE:
                 return Result(False, "", handled=False)
-            first = self._search_url(cmd.query) if cmd.kind == "search" else SITES[cmd.site][1]
-            self._start(first)
+            self._start("about:blank")
             self._page()
-            url = self._wait_load()
-            return self._after_open(cmd, url)
         self._page()
         if cmd.kind != "app":
             self._front()
         if cmd.kind in ("search", "site"):
-            url = self._go(self._search_url(cmd.query) if cmd.kind == "search" else SITES[cmd.site][1])
+            url = self._go(
+                self._search_url(cmd.query) if cmd.kind == "search" else SITES[cmd.site][1]
+            )
             return self._after_open(cmd, url)
         return getattr(self, "_do_" + cmd.kind)(cmd)
 
@@ -197,11 +242,10 @@ class BrowserControl:
         h = self._cdp.call("Page.getNavigationHistory", session=self._page())
         i = h["currentIndex"] + step
         if not 0 <= i < len(h["entries"]):
-            return Result(False, "ย้อนกลับไม่ได้ นี่คือหน้าแรกแล้ว" if step < 0 else "ไปข้างหน้าไม่ได้ ไม่มีหน้าถัดไป")
-        before = self._url()
-        self._cdp.call("Page.navigateToHistoryEntry", {"entryId": h["entries"][i]["id"]},
-                       session=self._page())  # fmt: skip
-        url = self._wait_load(before)
+            return Result(
+                False, "ย้อนกลับไม่ได้ นี่คือหน้าแรกแล้ว" if step < 0 else "ไปข้างหน้าไม่ได้ ไม่มีหน้าถัดไป"
+            )
+        url = self._navigate("Page.navigateToHistoryEntry", {"entryId": h["entries"][i]["id"]})
         return Result(True, "ย้อนกลับแล้ว" if step < 0 else "ไปข้างหน้าแล้ว", url=url)
 
     def _do_back(self, cmd: BrowseCommand) -> Result:
@@ -211,8 +255,7 @@ class BrowserControl:
         return self._history(+1)
 
     def _do_reload(self, cmd: BrowseCommand) -> Result:
-        self._cdp.call("Page.reload", session=self._page())
-        return Result(True, "โหลดหน้านี้ใหม่แล้ว", url=self._wait_load())
+        return Result(True, "โหลดหน้านี้ใหม่แล้ว", url=self._navigate("Page.reload"))
 
     def _do_scroll(self, cmd: BrowseCommand) -> Result:
         sign = 1 if cmd.direction == "down" else -1
@@ -225,7 +268,9 @@ class BrowserControl:
         return Result(True, "เลื่อนลงแล้ว" if sign > 0 else "เลื่อนขึ้นแล้ว")
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
-        pages = [t for t in self._cdp.call("Target.getTargets")["targetInfos"] if t["type"] == "page"]
+        pages = [
+            t for t in self._cdp.call("Target.getTargets")["targetInfos"] if t["type"] == "page"
+        ]
         self._cdp.call("Target.closeTarget", {"targetId": self._target})
         self._session = self._target = ""
         if len(pages) <= 1:  # แท็บสุดท้าย = Chromium ปิดตัวเอง
@@ -234,8 +279,10 @@ class BrowserControl:
 
     def _do_app(self, cmd: BrowseCommand) -> Result:
         win = self._cdp.call("Browser.getWindowForTarget", {"targetId": self._target})
-        self._cdp.call("Browser.setWindowBounds",
-                       {"windowId": win["windowId"], "bounds": {"windowState": "minimized"}})  # fmt: skip
+        self._cdp.call(
+            "Browser.setWindowBounds",
+            {"windowId": win["windowId"], "bounds": {"windowState": "minimized"}},
+        )
         return Result(True, "ย่อเบราว์เซอร์แล้ว กลับมาที่แอป")
 
     def close(self) -> None:

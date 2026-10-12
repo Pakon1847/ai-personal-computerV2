@@ -1,7 +1,8 @@
 """Chrome DevTools Protocol ทาง pipe (การ์ด 0024).
 
-Chromium ที่เปิดด้วย `--remote-debugging-pipe` อ่านคำสั่งจาก fd 3 และตอบทาง fd 4 · ข้อความเป็น JSON คั่นด้วย \\0 ·
-ไม่เปิดพอร์ตเครือข่าย: เฉพาะโปรเซสที่เปิด Chromium (แอปของผู้ใช้คนนี้) คุมได้ (พอร์ต 9222 = ทุกโปรแกรม/ทุกบัญชีในเครื่องต่อได้)
+Chromium ที่เปิดด้วย `--remote-debugging-pipe` อ่านคำสั่งจาก fd 3 และตอบทาง fd 4 ·
+ข้อความเป็น JSON คั่นด้วย \\0 · ไม่เปิดพอร์ตเครือข่าย: เฉพาะโปรเซสที่เปิด Chromium
+(แอปของผู้ใช้คนนี้) คุมได้ (พอร์ต 9222 = ทุกโปรแกรม/ทุกบัญชีในเครื่องต่อได้)
 """
 
 from __future__ import annotations
@@ -43,7 +44,7 @@ class PipeClient:
                     if slot is not None:  # เหตุการณ์ (ไม่มี id) ไม่ได้ใช้
                         slot[1] = msg
                         slot[0].set()
-        except OSError:
+        except (OSError, ValueError):  # ValueError = เราปิดไฟล์เองระหว่างอ่าน (close())
             pass
         self.closed = True
         for slot in list(self._waiting.values()):  # Chromium ปิด = ปลุกทุกคนที่รออยู่
@@ -86,10 +87,14 @@ class PipeClient:
 
 
 def launch(argv: list[str], env: dict | None = None) -> tuple[subprocess.Popen, PipeClient]:
-    """เปิด Chromium ให้ fd 3 = คำสั่งจากเรา · fd 4 = คำตอบถึงเรา (sh ย้าย fd ให้ · ไม่ใช้ preexec_fn ในแอป Qt)."""
+    """เปิด Chromium ให้ fd 3 = คำสั่งจากเรา · fd 4 = คำตอบถึงเรา.
+
+    sh ย้าย fd ให้ (ไม่ใช้ preexec_fn ในแอป Qt)
+    """
     to_r, to_w = os.pipe()
     from_r, from_w = os.pipe()
-    script = f'exec "$@" 3<&{to_r} 4>&{from_w} {to_r}<&- {from_w}>&-'
+    # ไม่ปิด fd ต้นทางหลังย้าย: os.pipe() อาจได้เลข 3/4 เอง (ปิดแล้ว Chromium ไม่มี pipe · พบ 2026-10-13)
+    script = f'exec "$@" 3<&{to_r} 4>&{from_w}'
     proc = subprocess.Popen(
         ["sh", "-c", script, "sh", *argv],
         pass_fds=(to_r, from_w),

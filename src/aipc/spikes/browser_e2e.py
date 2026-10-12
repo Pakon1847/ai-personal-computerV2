@@ -42,21 +42,29 @@ def one_round(b: BrowserControl) -> list[dict]:
         rows.append({"step": name, "text": text, "cmds": [c.as_dict() for c in cmds],
                      "say": r.say if r else "", "url": r.url if r else "", "ok": ok,
                      "detail": detail, "seconds": took})  # fmt: skip
-        print(f"{'✓' if ok else '✗'} {name:10} {took:5.1f}s · {r.say if r else '-'} · {detail}", flush=True)
+        print(
+            f"{'✓' if ok else '✗'} {name:10} {took:5.1f}s · {r.say if r else '-'} · {detail}",
+            flush=True,
+        )
 
     def searched(r):
         state["search"] = b._url()
         links = b.links()
         state["links"] = [x["href"] for x in links]
-        is_search = host(state["search"]) in ("google.com", "bing.com") and "/search" in state["search"]
+        is_search = (
+            host(state["search"]) in ("google.com", "bing.com") and "/search" in state["search"]
+        )
         return is_search and len(links) >= 3, f"{host(state['search'])} · ลิงก์ {len(links)}"
 
     def opened(i):
         def check(r):
+            # ลิงก์ของ Bing ผ่านตัวพาไป (bing.com/ck/a) · ตรวจว่าออกจากหน้าค้นหาไปเว็บอื่นจริง
+            # และลิงก์ที่ 2 ไม่ใช่หน้าเดียวกับลิงก์ที่ 1
             url = b._url()
             state[f"open{i}"] = url
-            want = host(state["links"][i - 1])
-            return host(url) == want and url != state["search"], f"{host(url)} (ต้องเป็น {want})"
+            left = host(url) not in ("google.com", "bing.com", "duckduckgo.com")
+            new = i == 1 or url != state.get("open1")
+            return left and new, f"{host(url)} · {url[:60]}"
 
         return check
 
