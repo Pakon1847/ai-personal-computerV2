@@ -79,9 +79,7 @@ class FakeLlama(BaseHTTPRequestHandler):
         parrot = ["[ข้อความนี้ Claude (cloud) ตอบโดยค้นเว็บ · เนื้อหาไม่แสดงให้ AI ในเครื่อง · ",
                   "ถ้าผู้ใช้ถามข้อมูลสด หรือถามต่อจากข้อความนี้ ให้เรียกเครื่องมือ ask-cloud]"]  # fmt: skip
         canned = {"slow": ["ช้า"] * 40, "dunno": ["ไม่", "รู้"], "label": LABELED, "parrot": parrot}
-        tokens = canned.get(
-            self.mode, ["สวัส", "ดี", "ครับ"]
-        )
+        tokens = canned.get(self.mode, ["สวัส", "ดี", "ครับ"])
         for i, tok in enumerate(tokens):
             chunk = {"choices": [{"delta": {"content": tok}}]}
             self.wfile.write(b"data: " + json.dumps(chunk, ensure_ascii=False).encode() + b"\n\n")
@@ -457,12 +455,13 @@ class ControllerTest(ServerCase):
                            claude_on=lambda: on[0])  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
-        done = []
-        c.finished.connect(lambda text, note: done.append(text))
+        done, notes = [], []
+        c.finished.connect(lambda text, note: done.append(text) or notes.append(note))
         FakeLlama.seen.clear()
         c.send("ข่าวเด่นวันนี้มีอะไร", "")
         pump(lambda: done)
         self.assertEqual((done[0], asked), ("ไม่รู้", []))
+        self.assertIn("เปิดได้ที่หน้าตั้งค่า", notes[0])  # พบ 2026-10-12: เดิมไม่บอกว่าเปิด Claude ได้
         real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1][-1]
         names = [t["function"]["name"] for t in real.get("tools", [])]
         self.assertNotIn("ask-cloud", names)

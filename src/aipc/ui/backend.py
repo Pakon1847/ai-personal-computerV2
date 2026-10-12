@@ -2753,6 +2753,8 @@ class ChatController(QObject):
         note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
         if getattr(reply, "cloud", False):
             note = self.CLOUD_NOTE
+        elif self._switched_off_gave_up(reply, with_file):
+            note = self.CLAUDE_OFF_NOTE
         if reply.text:
             msg = {"role": "assistant", "content": reply.text}
             if getattr(reply, "cloud", False):
@@ -2774,6 +2776,15 @@ class ChatController(QObject):
         self.refresh()
 
     CLOUD_NOTE = "ตอบโดย Claude (cloud) · ค้นเว็บได้ · คำถามนี้ถูกส่งออกนอกเครื่อง"
+    # มี Claude แต่ผู้ใช้ปิดสวิตช์ แล้ว AI ในเครื่องตอบว่าไม่รู้ (พบบน Pi 5 2026-10-12: "ไม่มีข้อมูลสด" เฉย ๆ
+    # ผู้ใช้ไม่รู้ว่าเปิด Claude ได้) · บอกเท่านั้น ไม่ส่งอะไรออก
+    CLAUDE_OFF_NOTE = "ปิด Claude ไว้ · ข้อนี้ Claude ช่วยค้นจากเว็บได้ เปิดได้ที่หน้าตั้งค่า"
+
+    def _switched_off_gave_up(self, reply, with_file: bool) -> bool:
+        from aipc.cloud.ask import local_gave_up
+
+        off = self._cloud is not None and not self._claude_on() and not with_file
+        return off and not reply.reason and not reply.tool_call and local_gave_up(reply.text)
 
     @Property("QVariantList", notify=changed)
     def lastTrace(self) -> list:  # noqa: N802
