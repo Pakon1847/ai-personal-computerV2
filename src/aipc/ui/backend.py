@@ -1654,6 +1654,32 @@ class SkillsController(QObject):
         return self._plain("clock", f"ตอนนี้ {thaidate.clock(now)} น.",
                            [f"{thaidate.long_date(now)} · ตามนาฬิกาของเครื่องนี้"])  # fmt: skip
 
+    def _cancel_card(self, text: str) -> dict | None:
+        """ "ยกเลิกนัดส่งรายงาน" · "ลบนัดทั้งหมด" → แสดงนัดที่จะลบ แล้วรอยืนยัน · None = ไม่ใช่คำขอลบนัด."""
+        from aipc.skills import agenda
+
+        key = agenda.cancel_target(text)
+        if key is None:
+            return None
+        if self._store.broken:
+            return self._plain("reminder", "ลบนัดไม่ได้ตอนนี้", [self.reminderWarning])
+        live = [r for r in self._store.items if not r.fired]
+        hits = [r for r in live if not key or key in (w := r.what.replace(" ", "")) or w in key]
+
+        def line(r):
+            return f"{self._when_text(r.when)} · {r.what}{self._repeat_text(r)}"
+
+        if not hits:
+            names = [line(r) for r in live[:5]]
+            title = f"ไม่พบนัด “{key}”" if key and live else "ยังไม่มีนัดให้ลบ"
+            return self._plain("reminder", title, names and ["นัดที่มีอยู่:", *names])
+        self._counter += 1
+        token = f"r{self._counter}"
+        self._pending[token] = ("cancel", [r.id for r in hits])
+        card = self._plain("reminder", f"ลบนัด {len(hits)} รายการ ใช่ไหม", [line(r) for r in hits])
+        card["confirmToken"] = token
+        return card
+
     def _agenda_card(self, text: str) -> dict | None:
         """ "วันนี้ต้องทำอะไร" (ฟีเจอร์ข้อ 5) · None = ไม่ใช่คำถามเรื่องตารางนัด."""
         from aipc.skills import agenda
@@ -1715,7 +1741,7 @@ class SkillsController(QObject):
         card["lines"] = [f"ตีความเอง: {a}" for a in w.assumptions]
         if w.repeat:
             card["lines"].insert(
-                0, f"เตือนครั้งแรก {self._when_text(w.at)} แล้วตั้งครั้งถัดไปเอง · ลบได้ในรายการนัด"
+                0, f"เตือนครั้งแรก {self._when_text(w.at)} แล้วตั้งครั้งถัดไปเอง · เลิกเตือน: พิมพ์ “ยกเลิกนัด…”"
             )
         card["lines"].append("วันที่คำนวณด้วยโค้ด ไม่ใช่ให้ AI เดา · ไม่ถูกให้กด “ไม่ใช่” แล้วพิมพ์ใหม่")
         card["confirmToken"] = token
@@ -2117,6 +2143,8 @@ class SkillsController(QObject):
             return card
         if card := self._clock_card(text):  # ถามเวลาตอนนี้ = นาฬิกาเครื่อง (ไม่ส่งต่อ Claude)
             return card
+        if card := self._cancel_card(text):  # ยกเลิก/ลบนัด = การ์ดยืนยัน แล้วลบด้วยโค้ด
+            return card
         from aipc.skills.fileintent import file_intent, file_time
         from aipc.skills.weather import place_in, weather_intent
 
@@ -2314,6 +2342,15 @@ class SkillsController(QObject):
             if card.get("llm"):
                 card["llmText"] = text  # หน้าจอส่งข้อความเดิมให้ AI พร้อม prompt ของสกิลที่ผู้ใช้ยืนยัน
             return card
+        elif isinstance(plan, tuple) and plan[0] == "cancel":
+            card["kind"] = "reminder"
+            try:
+                n = sum(self._store.delete(rid, self._now()) for rid in plan[1])
+            except (OSError, reminders.Unreadable) as e:
+                card["title"] = f"ลบไม่สำเร็จ: {e}"
+                return card
+            self.remindersChanged.emit()
+            card["title"] = f"ลบนัดแล้ว {n} รายการ"
         elif isinstance(plan, tuple) and plan[0] == "steps":
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))

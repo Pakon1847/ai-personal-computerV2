@@ -86,3 +86,23 @@ def asks_time(text: str) -> bool:
     if m and m.group(3) in ("เท่าไหร่", "เท่าไร") and not m.group(2):
         return False
     return bool(m) or bool(_TIME_EN.fullmatch(t))
+
+
+# ยกเลิก/ลบนัดด้วยการพิมพ์ (สำรวจบน Pi 5 2026-10-12: แอปไม่มีทางลบนัดเลย ทั้งที่การ์ดนัดซ้ำบอกว่า "ลบได้"
+# · "ลบนัดทั้งหมด" ถูกส่งต่อ Claude) · ต้องขึ้นต้นด้วย ยกเลิก/ลบ + นัด/เตือน · คืนคำที่ใช้หานัด ("" = ทุกนัด)
+_CANCEL = re.compile(
+    r"(?:ช่วย|ขอ)?(?:ยกเลิก|ลบ)(?:การ)?(?:นัดหมาย|นัด|การเตือน|เตือน)(?:ที่ชื่อ|เรื่อง|ชื่อ)?(.*)"
+)
+_CANCEL_END = ("ให้หน่อย", "หน่อย", "ครับ", "ค่ะ", "คะ", "นะ", "ด้วย", "เลย", "ให้")
+ALL_WORDS = ("ทั้งหมด", "หมดเลย", "ทุกนัด", "ทุกอัน", "หมด")
+
+
+def cancel_target(text: str) -> str | None:
+    """None = ไม่ใช่คำขอลบนัด · "" = ลบทุกนัด · อื่น ๆ = คำที่ใช้หานัดที่จะลบ."""
+    m = _CANCEL.fullmatch(re.sub(r"\s+", "", text))
+    if m is None:
+        return None
+    rest = m.group(1)
+    while rest.endswith(_CANCEL_END):
+        rest = rest[: -len(next(e for e in _CANCEL_END if rest.endswith(e)))]
+    return "" if rest in ALL_WORDS else rest

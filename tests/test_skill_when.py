@@ -136,6 +136,17 @@ class FoundOn20260928Test(unittest.TestCase):
         self.assertEqual(r.at, datetime(2026, 9, 25, 9, 0))
         self.assertTrue(any("เที่ยงคืน" in n for n in r.assumptions), "ต้องบอกว่า “พรุ่งนี้” คือวันไหน")
 
+    def test_title_drops_leftover_part_of_day_words(self):
+        # สำรวจบน Pi 5 2026-10-12: "พรุ่งนี้เช้า 9 โมงมีประชุม" ได้ชื่อนัด "เช้า มีประชุม"
+        cases = {
+            "พรุ่งนี้เช้า 9 โมงมีประชุม": "มีประชุม",
+            "เย็นนี้ 6 โมงรดน้ำต้นไม้": "รดน้ำต้นไม้",
+            "เตือนกินข้าวเย็นตอน 6 โมงเย็น": "กินข้าวเย็น",
+            "คืนนี้ 4 ทุ่มโทรหาแม่": "โทรหาแม่",
+        }
+        for text, what in cases.items():
+            self.assertEqual(when.parse(text, NOW).what, what, text)
+
 
 if __name__ == "__main__":
     unittest.main()

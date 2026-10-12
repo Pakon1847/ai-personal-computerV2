@@ -23,6 +23,30 @@ class SkillsControllerTest(unittest.TestCase):
         self.now = datetime(2026, 9, 23, 10, 0).astimezone()
         self.s = SkillsController(executor=ex, reminders_path=self.path, clock=lambda: self.now)
 
+    def test_cancel_reminder_by_typing_asks_then_deletes(self):
+        # สำรวจบน Pi 5 2026-10-12: แอปไม่มีทางลบนัด (นัดซ้ำเลิกเตือนไม่ได้) · "ลบนัดทั้งหมด" ถูกส่งต่อ Claude
+        for text in ("เตือนส่งรายงานพรุ่งนี้บ่ายสาม", "เตือนกินยาทุกวันตอน 8 โมงเช้า"):
+            self.s.confirm(self.s.handle(text)["confirmToken"], True)
+        card = self.s.handle("ยกเลิกนัดกินยาด้วยครับ")
+        self.assertEqual(card["title"], "ลบนัด 1 รายการ ใช่ไหม")
+        self.assertIn("กินยา", card["lines"][0])
+        self.assertIn("ซ้ำ", card["lines"][0])
+        self.assertEqual(len(self.s._store.items), 2)  # ยังไม่ลบจนกว่าจะยืนยัน
+        no = self.s.confirm(card["confirmToken"], False)
+        self.assertEqual(no["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
+        self.assertEqual(len(self.s._store.items), 2)
+        card = self.s.handle("ยกเลิกนัดกินยา")
+        self.assertEqual(self.s.confirm(card["confirmToken"], True)["title"], "ลบนัดแล้ว 1 รายการ")
+        self.assertEqual([r.what for r in self.s._store.items], ["ส่งรายงาน"])
+        self.assertIn("ไม่พบนัด", self.s.handle("ลบนัดหมอฟัน")["title"])
+        card = self.s.handle("ลบนัดทั้งหมด")
+        self.s.confirm(card["confirmToken"], True)
+        self.assertEqual(self.s._store.items, [])
+        self.assertEqual(self.s.handle("ลบนัดทั้งหมด")["title"], "ยังไม่มีนัดให้ลบ")
+        # ไม่ใช่คำขอลบนัด
+        self.assertIsNone(self.s._cancel_card("ลบไฟล์รายงาน"))
+        self.assertIsNone(self.s._cancel_card("ยกเลิกการประชุม"))
+
     def test_time_question_answered_by_clock_not_ai(self):
         # สำรวจบน Pi 5 2026-10-12: "ตอนนี้กี่โมง" AI ในเครื่องตอบว่าไม่รู้ → ส่งต่อ Claude
         for text in ("ตอนนี้กี่โมง", "กี่โมงแล้วครับ", "ตอนนี้เวลาเท่าไหร่", "what time is it"):
