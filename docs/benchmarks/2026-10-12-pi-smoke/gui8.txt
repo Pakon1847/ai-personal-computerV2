@@ -1,0 +1,5 @@
+!attach /usr/share/doc/shared-mime-info/shared-mime-info-spec.pdf
+เอกสารนี้เกี่ยวกับอะไร สรุปเป็นภาษาไทยสั้นๆ
+ในเอกสารนี้ไฟล์ mime cache เก็บไว้ที่ไหน
+!attach /usr/share/cups/data/default.pdf
+ไฟล์นี้มีอะไรเขียนไว้

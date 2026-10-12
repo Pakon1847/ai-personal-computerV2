@@ -37,7 +37,8 @@ for n, step in enumerate(steps, 1):
         tok = next((it["card"]["confirmToken"] for it in reversed(items) if it.get("card") and it["card"].get("confirmToken")), "")
         page.answer(tok, step.startswith("!yes")) if tok else print("  ไม่มีปุ่มให้กด")
     elif step.startswith("!attach "):
-        print("  attach:", repr(chat.attachFile(str(home / step[8:]))))
+        f = step[8:]
+        print("  attach:", repr(chat.attachFile(f if f.startswith("/") else str(home / f))))
     elif step.startswith("!undo"):
         items = items_of(page)
         tok = next((it["card"]["undoToken"] for it in reversed(items) if it.get("card") and it["card"].get("undoToken")), "")
@@ -50,6 +51,12 @@ for n, step in enumerate(steps, 1):
         t2 = time.time()
         while not due and time.time() - t2 < float(step[6:]): settle(500)
         print("  due:", due, f"{time.time()-t2:.0f}s")
+    elif step.startswith("!open "):
+        h = chat.history
+        h = h.toVariant() if hasattr(h, "toVariant") else h
+        print("  history:", [(x.get("title"), x.get("id")) for x in h][:5])
+        idx = int(step[6:])
+        page.loadChat(chat.openChat(h[idx]["id"]))
     elif step.startswith("!new"):
         chat.newChat(False); page.setProperty("items", [])
     else:
