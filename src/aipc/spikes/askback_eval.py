@@ -82,8 +82,8 @@ def main(argv: list[str] | None = None) -> int:
                "cloud": asked[n:], "seconds": t.seconds, "pass": judge(it, text)}  # fmt: skip
         rows.append(row)
         first = re.sub(r"\s+", " ", text)[:70]
-        print(f"{it['id']} {it['group']} {'✓' if row['pass'] else '✗'} {t.route:<24} {t.seconds:5.1f}วิ · {first}",
-              flush=True)  # fmt: skip
+        mark = "✓" if row["pass"] else "✗"
+        print(f"{it['id']} {it['group']} {mark} {t.route:<24} {t.seconds:5.1f}วิ · {first}", flush=True)
     d.close()
     summary = {g: [sum(r["pass"] for r in rows if r["group"] == g),
                    sum(1 for r in rows if r["group"] == g)] for g in ("O", "N")}  # fmt: skip
