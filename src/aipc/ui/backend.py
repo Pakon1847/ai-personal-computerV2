@@ -1644,6 +1644,16 @@ class SkillsController(QObject):
         if t.due or t.save_failed:
             self.remindersChanged.emit()
 
+    def _clock_card(self, text: str) -> dict | None:
+        """ "ตอนนี้กี่โมง" · None = ไม่ใช่คำถามเวลา (agenda.asks_time)."""
+        from aipc.skills import agenda
+
+        if not agenda.asks_time(text):
+            return None
+        now = self._now()
+        return self._plain("clock", f"ตอนนี้ {thaidate.clock(now)} น.",
+                           [f"{thaidate.long_date(now)} · ตามนาฬิกาของเครื่องนี้"])  # fmt: skip
+
     def _agenda_card(self, text: str) -> dict | None:
         """ "วันนี้ต้องทำอะไร" (ฟีเจอร์ข้อ 5) · None = ไม่ใช่คำถามเรื่องตารางนัด."""
         from aipc.skills import agenda
@@ -2059,11 +2069,13 @@ class SkillsController(QObject):
     # ---------- ทำไมได้คำตอบนี้ (ข้อเสนอ 2026-10-03) ----------
     WHO = {"weather": "สกิลอากาศ · โค้ดในเครื่อง + บริการ Open-Meteo", "files": "ค้นไฟล์ · โค้ดในเครื่อง",
            "weather-off": "สกิลอากาศ · โค้ดในเครื่อง (ไม่ได้ติดต่อ Open-Meteo)",
-           "forging": "Claude (cloud) กำลังสร้างสกิล", "forge-failed": "Claude (cloud)"}  # fmt: skip
+           "forging": "Claude (cloud) กำลังสร้างสกิล", "forge-failed": "Claude (cloud)",
+           "clock": "นาฬิกาเครื่อง · โค้ดในเครื่อง"}  # fmt: skip
     WHY = {"weather": "ตรงรูปประโยคถามอากาศ (กฎ) · ไม่ผ่าน AI จึงไม่เดาตัวเลข",
            "files": "ตรงรูปประโยคหาไฟล์ (กฎ) · AI ในเครื่องเปิดไฟล์เองไม่ได้",
            "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล",
-           "weather-off": "ถามอากาศ แต่ปิดสวิตช์อากาศในหน้าตั้งค่า"}  # fmt: skip
+           "weather-off": "ถามอากาศ แต่ปิดสวิตช์อากาศในหน้าตั้งค่า",
+           "clock": "ตรงรูปประโยคถามเวลา (กฎ) · AI ในเครื่องไม่รู้เวลาตอนนี้"}  # fmt: skip
 
     def _why(self, card: dict, t0: float) -> dict:
         """เติม card["why"] = [{k, v}] จากสิ่งที่เกิดจริง.
@@ -2102,6 +2114,8 @@ class SkillsController(QObject):
         from aipc.skills import router
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
+            return card
+        if card := self._clock_card(text):  # ถามเวลาตอนนี้ = นาฬิกาเครื่อง (ไม่ส่งต่อ Claude)
             return card
         from aipc.skills.fileintent import file_intent, file_time
         from aipc.skills.weather import place_in, weather_intent

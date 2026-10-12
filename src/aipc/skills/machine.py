@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -117,7 +118,10 @@ def diagnose(checks: list[hw.Check], temp_c: float | None, avail_mb: int | None)
         d.advice.append("ลบไฟล์ที่ไม่ใช้ หรือย้ายไปไดรฟ์อื่น (เกิน 90% ระบบจะหยุดงานเสริม)")
         problems.append("พื้นที่ใกล้เต็ม")
     elif storage and storage.status == hw.PASS:
-        d.findings.append(Finding("ok", "พื้นที่เก็บข้อมูลพอ"))
+        # บอกตัวเลขด้วย (สำรวจบน Pi 5 2026-10-12: ถาม "พื้นที่เหลือเท่าไหร่" ได้แค่ "พอ")
+        free = re.search(r"ว่าง [0-9.]+ GB", storage.detail)
+        text = f"พื้นที่เก็บข้อมูลพอ · {free.group(0)}" if free else "พื้นที่เก็บข้อมูลพอ"
+        d.findings.append(Finding("ok", text))
     else:
         d.unknown.append("พื้นที่เก็บข้อมูล")
 

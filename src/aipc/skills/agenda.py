@@ -66,3 +66,23 @@ def items_for(store, q: Query) -> list:
         if q.start <= d < q.start + timedelta(days=q.days):
             out.append(r)
     return sorted(out, key=lambda r: r.when)
+
+
+# ถามเวลาตอนนี้ (สำรวจบน Pi 5 2026-10-12: "ตอนนี้กี่โมง" AI ในเครื่องตอบว่าไม่รู้
+# → ส่งต่อ Claude ทั้งที่นาฬิกาอยู่ในเครื่อง)
+# system prompt มีแค่วันที่ (ไม่ใส่เวลา เพื่อให้แคชใช้ได้ทั้งวัน) → ตอบจากนาฬิกาเครื่องด้วยโค้ด
+# ต้องเป็นประโยคถามเวลาทั้งประโยค · "นัดพรุ่งนี้กี่โมง" "ร้านเปิดกี่โมง" "ญี่ปุ่นตอนนี้กี่โมง" ไม่เข้าข่าย
+_TIME_TH = re.compile(
+    r"(ตอนนี้|เดี๋ยวนี้|ขณะนี้)?(เวลา)?(กี่โมง|กี่ทุ่ม|กี่นาฬิกา|เท่าไหร่|เท่าไร)(แล้ว)?"
+    r"(ครับ|คับ|คะ|ค่ะ|จ้ะ|จ้า|นะ|อะ|เหรอ)*[?？]*"
+)
+_TIME_EN = re.compile(r"(what('s|is)?(the)?timeisit(now)?|what('s|is)thetime(now)?|timenow)[?]*")
+
+
+def asks_time(text: str) -> bool:
+    t = re.sub(r"\s+", "", text).lower()
+    m = _TIME_TH.fullmatch(t)
+    # "เท่าไหร่" เฉย ๆ ไม่ใช่ถามเวลา
+    if m and m.group(3) in ("เท่าไหร่", "เท่าไร") and not m.group(2):
+        return False
+    return bool(m) or bool(_TIME_EN.fullmatch(t))

@@ -23,6 +23,18 @@ class SkillsControllerTest(unittest.TestCase):
         self.now = datetime(2026, 9, 23, 10, 0).astimezone()
         self.s = SkillsController(executor=ex, reminders_path=self.path, clock=lambda: self.now)
 
+    def test_time_question_answered_by_clock_not_ai(self):
+        # สำรวจบน Pi 5 2026-10-12: "ตอนนี้กี่โมง" AI ในเครื่องตอบว่าไม่รู้ → ส่งต่อ Claude
+        for text in ("ตอนนี้กี่โมง", "กี่โมงแล้วครับ", "ตอนนี้เวลาเท่าไหร่", "what time is it"):
+            card = self.s.handle(text)
+            self.assertEqual(card["kind"], "clock", text)
+            self.assertEqual(card["title"], "ตอนนี้ 10:00 น.")
+            self.assertFalse(card.get("llm"))
+            self.assertIn("โค้ดในเครื่อง", card["why"][0]["v"])
+        # ถามเวลาของสิ่งอื่น = ไม่ใช่นาฬิกา
+        for text in ("นัดพรุ่งนี้กี่โมง", "ร้านเปิดกี่โมง", "ตอนนี้ที่ญี่ปุ่นกี่โมง", "ราคาทองตอนนี้เท่าไหร่", "เท่าไหร่"):
+            self.assertNotEqual(self.s.handle(text)["kind"], "clock", text)
+
     def test_agenda_question_lists_reminders_and_creates_nothing(self):
         # พบ 2026-10-01: "วันนี้มีนัดอะไร" เคยถูกตีเป็นคำขอจดนัดใหม่ชื่อ "มีนัดอะไร"
         for text in ("เตือนส่งรายงานวันนี้บ่ายสาม", "เตือนโทรหาแม่พรุ่งนี้หกโมงเย็น"):

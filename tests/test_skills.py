@@ -248,6 +248,13 @@ class MachineTest(unittest.TestCase):
         self.assertEqual(d.headline, "ไม่พบปัญหาจากค่าที่อ่านได้")
         self.assertEqual(d.advice, [])
 
+    def test_storage_says_free_amount(self):
+        # สำรวจบน Pi 5 2026-10-12: ถาม "พื้นที่เหลือเท่าไหร่" ได้แค่ "พอ" ไม่มีตัวเลข
+        detail = "/dev/mmcblk0p2 · ทั้งหมด 60.9 GB · ใช้แล้ว 55% · ว่าง 24.6 GB"
+        c = [hw.Check("storage", "s", hw.PASS, detail)]
+        d = machine.diagnose(c, 55.0, 4000)
+        self.assertIn("พื้นที่เก็บข้อมูลพอ · ว่าง 24.6 GB", [f.text for f in d.findings])
+
     def test_hot_and_low_memory(self):
         d = machine.diagnose(checks(), 83.0, 700)
         self.assertIn("ร้อนเกิน", d.headline)
