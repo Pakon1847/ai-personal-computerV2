@@ -1682,6 +1682,43 @@ class SkillsController(QObject):
             card["badge"] = self._badge(reminder, "ขอลบนัด · ลบด้วยโค้ดหลังกดยืนยัน")
         return card
 
+    def _reminder_line(self, r) -> str:
+        return f"{self._when_text(r.when)} · {r.what}{self._repeat_text(r)}"
+
+    def _with_reminder_badge(self, card: dict, why: str) -> dict:
+        if reminder := next((s for s in self._skills if s.id == "reminder"), None):
+            card["badge"] = self._badge(reminder, why)
+        return card
+
+    def _next_card(self, text: str) -> dict | None:
+        """ "นัดถัดไปของฉันคืออะไร" → นัดที่ยังไม่ถึงเวลา (ไม่เกิน 10) · None = ไม่ใช่คำถามนี้."""
+        from aipc.skills import agenda
+
+        if not agenda.asks_next(text):
+            return None
+        up = self._store.upcoming(self._now())
+        title = f"นัดที่ยังไม่ถึงเวลา {len(up)} นัด" if up else "ยังไม่มีนัดที่รออยู่"
+        lines = [self._reminder_line(r) for r in up[:10]] or [
+            "จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"
+        ]
+        return self._with_reminder_badge(
+            self._plain("reminder", title, lines), "ถามนัด · อ่านจากนัดที่บันทึกไว้"
+        )
+
+    def _move_card(self, text: str) -> dict | None:
+        """ "เลื่อนนัดประชุมไปบ่ายสาม" → ยังเลื่อนเองไม่ได้ บอกวิธีทำด้วยสองคำสั่ง (ไม่จดนัดใหม่ผิด ๆ)."""
+        from aipc.skills import agenda
+
+        rest = agenda.move_target(text)
+        if rest is None:
+            return None
+        hits = [r for r in self._store.items
+                if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
+        lines = ["ทำได้ 2 ขั้น: พิมพ์ “ยกเลิกนัด…” แล้วจดนัดใหม่ เช่น “พรุ่งนี้บ่ายสามประชุม”"]
+        lines += [self._reminder_line(r) for r in hits[:5]]
+        card = self._plain("reminder", "ยังเลื่อนนัดให้ไม่ได้", lines)
+        return self._with_reminder_badge(card, "ขอเลื่อนนัด · ยังไม่รองรับ จึงไม่จดนัดใหม่")
+
     def _agenda_card(self, text: str) -> dict | None:
         """ "วันนี้ต้องทำอะไร" (ฟีเจอร์ข้อ 5) · None = ไม่ใช่คำถามเรื่องตารางนัด."""
         from aipc.skills import agenda
@@ -2146,6 +2183,8 @@ class SkillsController(QObject):
         if card := self._clock_card(text):  # ถามเวลาตอนนี้ = นาฬิกาเครื่อง (ไม่ส่งต่อ Claude)
             return card
         if card := self._cancel_card(text):  # ยกเลิก/ลบนัด = การ์ดยืนยัน แล้วลบด้วยโค้ด
+            return card
+        if card := self._next_card(text) or self._move_card(text):  # นัดถัดไป · ขอเลื่อนนัด
             return card
         from aipc.skills.fileintent import file_intent, file_time
         from aipc.skills.weather import place_in, weather_intent

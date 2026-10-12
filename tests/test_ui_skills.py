@@ -47,6 +47,23 @@ class SkillsControllerTest(unittest.TestCase):
         self.assertIsNone(self.s._cancel_card("ลบไฟล์รายงาน"))
         self.assertIsNone(self.s._cancel_card("ยกเลิกการประชุม"))
 
+    def test_next_reminders_and_move_request_stay_local(self):
+        # สำรวจบน Pi 5 2026-10-12: "นัดล่าสุดของฉันคืออะไร" → ส่งต่อ Claude ·
+        # "เลื่อนนัดประชุมไปบ่ายสาม" → จดนัดใหม่ชื่อ "เลื่อนนัดประชุมไป"
+        self.assertEqual(self.s.handle("นัดถัดไปของฉันคืออะไร")["title"], "ยังไม่มีนัดที่รออยู่")
+        for text in ("เตือนประชุมพรุ่งนี้บ่ายสอง", "เตือนกินยาทุกวันตอน 8 โมงเช้า"):
+            self.s.confirm(self.s.handle(text)["confirmToken"], True)
+        card = self.s.handle("นัดล่าสุดของฉันคืออะไร")
+        self.assertEqual(card["title"], "นัดที่ยังไม่ถึงเวลา 2 นัด")
+        self.assertIn("กินยา", card["lines"][0])
+        self.assertFalse(card.get("llm"))
+        before = len(self.s._store.items)
+        card = self.s.handle("เลื่อนนัดประชุมไปบ่ายสาม")
+        self.assertEqual(card["title"], "ยังเลื่อนนัดให้ไม่ได้")
+        self.assertEqual(card["confirmToken"], "")
+        self.assertTrue(any("ประชุม" in line for line in card["lines"][1:]))
+        self.assertEqual(len(self.s._store.items), before)
+
     def test_time_question_answered_by_clock_not_ai(self):
         # สำรวจบน Pi 5 2026-10-12: "ตอนนี้กี่โมง" AI ในเครื่องตอบว่าไม่รู้ → ส่งต่อ Claude
         for text in ("ตอนนี้กี่โมง", "กี่โมงแล้วครับ", "ตอนนี้เวลาเท่าไหร่", "what time is it"):

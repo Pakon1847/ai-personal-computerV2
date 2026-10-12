@@ -143,9 +143,18 @@ class FoundOn20260928Test(unittest.TestCase):
             "เย็นนี้ 6 โมงรดน้ำต้นไม้": "รดน้ำต้นไม้",
             "เตือนกินข้าวเย็นตอน 6 โมงเย็น": "กินข้าวเย็น",
             "คืนนี้ 4 ทุ่มโทรหาแม่": "โทรหาแม่",
+            "จดไว้ว่าพรุ่งนี้ต้องซื้อนม": "ต้องซื้อนม",
         }
         for text, what in cases.items():
             self.assertEqual(when.parse(text, NOW).what, what, text)
+
+    def test_monthly_is_not_turned_into_daily(self):
+        # สำรวจบน Pi 5 2026-10-12: "เตือนจ่ายค่าไฟทุกวันที่ 5" เคยได้ "ทุกวัน 09:00" (จะเตือนทุกวัน)
+        for text in ("เตือนจ่ายค่าไฟทุกวันที่ 5", "ทุกวันที่ห้าเตือนจ่ายค่าเน็ต", "เตือนจ่ายค่าห้องทุกสิ้นเดือน"):
+            r = when.parse(text, NOW)
+            self.assertIsNone(r.at, text)
+            self.assertIn("รองรับนัดซ้ำแค่", r.problem)
+        self.assertEqual(when.parse("ทุกวันเตือนกินยา 8 โมงเช้า", NOW).at.hour, 8)
 
 
 if __name__ == "__main__":
