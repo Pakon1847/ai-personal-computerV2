@@ -52,6 +52,25 @@ class ReadyTest(unittest.TestCase):
 
         self.assertEqual(ready.check_network(down).status, WARN)
 
+    def test_camera_ignores_the_pi_chips_own_video_nodes(self):
+        # พบบน Pi 5 2026-10-12: ถอดกล้องแล้วยังขึ้น "พบกล้อง" (นับ /dev/video* ของชิปด้วย)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "dev").mkdir()
+
+            def node(n, name):
+                (root / "dev" / f"video{n}").touch()
+                sysfs = root / "sys/class/video4linux" / f"video{n}"
+                sysfs.mkdir(parents=True)
+                (sysfs / "name").write_text(name, encoding="utf-8")
+
+            node(19, "rpi-hevc-dec")
+            node(20, "pispbe-input")
+            cam = ready.check_devices(root, True, True, "claude")[0]
+            self.assertEqual((cam.id, cam.status), ("camera", WARN))
+            node(0, "USB Camera: USB Camera")
+            self.assertEqual(ready.check_devices(root, True, True, "claude")[0].status, PASS)
+
     def test_run_all_lists_everything(self):
         with tempfile.TemporaryDirectory() as d:
             checks = ready.run_all(

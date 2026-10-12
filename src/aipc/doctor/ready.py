@@ -133,7 +133,11 @@ def check_disk(home: Path) -> Check:
 def check_devices(
     root: Path, voice_available: bool, mic_available: bool, claude: str | None
 ) -> list[Check]:
-    cams = list((root / "dev").glob("video*")) if (root / "dev").exists() else []
+    # ใช้ตัวตรวจเดียวกับการ์ดฮาร์ดแวร์ · พบบน Pi 5 2026-10-12: ถอดกล้องแล้วยังขึ้น "พบกล้อง"
+    # เพราะนับ /dev/video* ทุกตัว (ชิปของ Pi มีโหนดวิดีโอของตัวเอง 17 ตัว)
+    from aipc.doctor.hardware import check_camera
+
+    cams = check_camera(root).status == PASS
     return [
         Check(
             "camera",
