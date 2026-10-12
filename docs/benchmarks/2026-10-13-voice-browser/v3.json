@@ -1,0 +1,683 @@
+{
+ "commands": "16/35",
+ "commands_pct": 45.7,
+ "non_commands_caught": 3,
+ "non_commands": 17,
+ "stt_median_s": 2.36,
+ "stt_max_s": 5.75,
+ "rows": [
+  {
+   "text": "ค้นหาราคาน้ำมันวันนี้",
+   "heard": "คนหาราคาน้ำบันวันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาน้ำมันวันนี้"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 5.75
+  },
+  {
+   "text": "ค้นหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "heard": "คนหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "โรงหนังแถวนี้"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.36
+  },
+  {
+   "text": "ช่วยเสิร์ชตารางรถไฟไปเชียงใหม่",
+   "heard": "ช่วยเสิร์ฟตารางรถไฟไปเชียงใหม่",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ตารางรถไฟไปเชียงใหม่"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.54
+  },
+  {
+   "text": "ค้นในกูเกิลว่าวันหยุดเดือนหน้ามีวันไหน",
+   "heard": "คนในกูเกินว่าวันหยุดเดือนน่ามีวันไหน",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วันหยุดเดือนหน้ามีวันไหน"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.84
+  },
+  {
+   "text": "หาวิธีปลูกมะนาวในกระถาง",
+   "heard": "หาวิธีปลูกมะนาวในกระถาง",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.54
+  },
+  {
+   "text": "ค้นหาคำว่าปัญญาประดิษฐ์",
+   "heard": "ค้นหาคำว่า ปัญญาประดิษฐ์",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ปัญญาประดิษฐ์"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ปัญญาประดิษฐ์"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.64
+  },
+  {
+   "text": "ค้นหา raspberry pi 5 ครับ",
+   "heard": "คนหาสิบห้าครับ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "raspberry pi 5"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.37
+  },
+  {
+   "text": "ค้นหาผลบอลเมื่อคืนแล้วเข้าลิงก์แรก",
+   "heard": "คนหาผลบอลเมื่อคืนแล้วเข้าลิงแรก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ผลบอลเมื่อคืน"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.7
+  },
+  {
+   "text": "เข้าลิงค์แรกเลย",
+   "heard": "เข้าลิงแรกเลย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.16
+  },
+  {
+   "text": "เข้าลิงก์อันแรกครับ",
+   "heard": "เข้าลิงอันแรกครับ",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.42
+  },
+  {
+   "text": "กดเข้าลิงก์ที่หนึ่ง",
+   "heard": "กด เข้า ลิง ที่ หนึ่ง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.42
+  },
+  {
+   "text": "เปิดลิ้งที่สอง",
+   "heard": "เปิด ลิง ที่ สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.28
+  },
+  {
+   "text": "เข้าลิงก์ที่ 2",
+   "heard": "เข้าลิงที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.26
+  },
+  {
+   "text": "คลิกลิงก์ที่สามให้หน่อย",
+   "heard": "ขลิกกลิงที่สามให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.4
+  },
+  {
+   "text": "เข้าผลลัพธ์ที่ห้า",
+   "heard": "เข้าผลลับที่ห้า",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 5
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.38
+  },
+  {
+   "text": "เปิดเว็บที่สองครับ",
+   "heard": "เปิด เว็บ ที่ สอง ครับ",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.36
+  },
+  {
+   "text": "ย้อนกลับครับ",
+   "heard": "ย้อนกลับครับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.26
+  },
+  {
+   "text": "ถอยกลับไปหน้าเดิม",
+   "heard": "ถอยกลับไปหน้าเดิม",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.4
+  },
+  {
+   "text": "กลับหน้าที่แล้ว",
+   "heard": "กลับหน้าที่แล้ว",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.39
+  },
+  {
+   "text": "ย้อนกลับไปหน้าที่แล้วหน่อย",
+   "heard": "ยอน กลับ ไป หน้า ที่ แล้ว หน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.54
+  },
+  {
+   "text": "ไปหน้าข้างหน้า",
+   "heard": "ไปหน้าค้างนะฮะ",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.31
+  },
+  {
+   "text": "เดินหน้า",
+   "heard": "เดินหน้า",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.13
+  },
+  {
+   "text": "รีโหลด",
+   "heard": "ตีโหลด",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.09
+  },
+  {
+   "text": "โหลดหน้านี้ใหม่",
+   "heard": "โหลดหน้ามีใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "เลื่อนลงหน่อย",
+   "heard": "เลื่อนลงหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.23
+  },
+  {
+   "text": "เลื่อนหน้าลง",
+   "heard": "เลื่อด น่า ลง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.2
+  },
+  {
+   "text": "เลื่อนขึ้นไปหน่อย",
+   "heard": "เลื่อนขึ้นไปหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.32
+  },
+  {
+   "text": "เลื่อนกลับขึ้นไป",
+   "heard": "เลื่อน กลับ ขึ้น ไป",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "ปิดแท็บนี้",
+   "heard": "ปิงมี",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.09
+  },
+  {
+   "text": "ปิดเว็บนี้",
+   "heard": "ปิด เว็บ นี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [
+    {
+     "kind": "close"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.22
+  },
+  {
+   "text": "กลับไปที่แอป",
+   "heard": "กลับ ไป ที่ แอ๊ก",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.29
+  },
+  {
+   "text": "กลับไปหน้าแชท",
+   "heard": "กลับ ไป หน้า แฉด",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.27
+  },
+  {
+   "text": "เปิดกูเกิ้ลหน่อย",
+   "heard": "เปิด กู เกิ้ล หน่อย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.31
+  },
+  {
+   "text": "เปิดเว็บยูทูป",
+   "heard": "เปิดเวฟยูทูก",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.32
+  },
+  {
+   "text": "เปิดวิกิพีเดีย",
+   "heard": "เปิด วิกฤติพีเดีย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "wikipedia"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.4
+  },
+  {
+   "text": "ค้นหาไฟล์ pdf ที่ทำเมื่อวาน",
+   "heard": "ค้นหาใส่ที่ทำเมื่อวาน",
+   "expect": [],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ใส่ที่ทำเมื่อวาน"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.45
+  },
+  {
+   "text": "หาไฟล์ใบเสร็จ",
+   "heard": "หาไฟใบเสร็จ",
+   "expect": [],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ไฟใบเสร็จ"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "หาเอกสารรายงานประจำเดือน",
+   "heard": "ถ้าเอกสารรายงานประจำเดือน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.46
+  },
+  {
+   "text": "เลื่อนนัดหมอฟันเป็นวันศุกร์",
+   "heard": "เลื่อนัดหมอฟันเป็นวันศุกร์",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.71
+  },
+  {
+   "text": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "heard": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.53
+  },
+  {
+   "text": "ปิดเสียงหน่อย",
+   "heard": "ปิด เสียง หน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.29
+  },
+  {
+   "text": "เพิ่มเสียง",
+   "heard": "เพิ่ม เสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.34
+  },
+  {
+   "text": "ลดเสียงลงหน่อย",
+   "heard": "รถเสียงลงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.28
+  },
+  {
+   "text": "วันนี้วันที่เท่าไหร่",
+   "heard": "วันนี้วันที่เท่าไหร่",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.48
+  },
+  {
+   "text": "ลบนัดประชุมพรุ่งนี้",
+   "heard": "ลบนัดประชุมพรุ่งนี้",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.5
+  },
+  {
+   "text": "หาผลรวมของ 12 กับ 30",
+   "heard": "หา ผล รวม ของ สิบ สอง กับ สาม สิบ",
+   "expect": [],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ผล รวม ของ สิบ สอง กับ สาม สิบ"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.74
+  },
+  {
+   "text": "ข่าววันนี้มีอะไรบ้าง",
+   "heard": "เขา วันนี้ มี อะไร บ้าง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "เครื่องช้าเพราะอะไร",
+   "heard": "เครื่องช้าเพราะอะไร",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.31
+  },
+  {
+   "text": "เปิดโหมดประชุม",
+   "heard": "เปิดโหมดประชุม",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "ย้อนกลับเมื่อกี้ที่ปรับเสียง",
+   "heard": "ย้อนกลับเมื่อกี้ทีปรับเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.64
+  },
+  {
+   "text": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "heard": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.54
+  },
+  {
+   "text": "เขียนกลอนสั้นๆเรื่องฝน",
+   "heard": "เขียน กลอน สั้น เขียน กลอน สั้น เรื่อง ฝน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.77
+  }
+ ]
+}
