@@ -1,0 +1,6 @@
+#!/bin/sh
+# คีย์ลัด F9 ของ labwc (การ์ด 0024): บอกแอปของผู้ใช้คนนี้ให้เริ่ม/หยุดฟังเสียง
+# แอปเปิด FIFO ไว้ที่ $XDG_RUNTIME_DIR/aipc/voice-key (0600) · แอปไม่ได้เปิดอยู่ = ไม่ทำอะไร (timeout กันค้าง)
+f="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/aipc/voice-key"
+[ -p "$f" ] || exit 0
+exec timeout 1 sh -c 'printf k > "$1"' sh "$f"

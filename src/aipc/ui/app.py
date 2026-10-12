@@ -28,6 +28,7 @@ from aipc.ui.backend import (
     VoiceController,
 )
 from aipc.ui.face import FaceController
+from aipc.ui.handsfree import BrowserController, HotkeyListener
 from aipc.ui.loginface import LoginFaceController
 
 HERE = Path(__file__).resolve().parent
@@ -288,6 +289,8 @@ def build(opts: Options, argv: list[str] | None = None):
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session),
+        # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก
+        "browser": BrowserController(active=in_session, ledger=ledger),
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),
@@ -312,6 +315,10 @@ def build(opts: Options, argv: list[str] | None = None):
     if opts.session and not opts.greeter_session and app.platformName() == "wayland":
         engine._idle = _start_idle_lock(ui_settings, app)
     voice = engine._backends["voice"]
+    # คีย์ลัด F9 ทั้งเครื่อง (labwc → FIFO · การ์ด 0024) · เฉพาะเซสชันจริงของผู้ใช้
+    engine._hotkey = HotkeyListener(active=opts.session and not opts.greeter_session)
+    engine._hotkey.pressed.connect(voice.toggleHandsFree)
+    app.aboutToQuit.connect(engine._backends["browser"].close)  # ออกจากระบบ = ปิดเบราว์เซอร์ของผู้ช่วย
 
     def ready_inputs() -> dict:
         from aipc.cloud.ask import find_claude

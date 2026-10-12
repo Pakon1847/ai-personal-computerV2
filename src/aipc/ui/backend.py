@@ -299,6 +299,8 @@ class VoiceController(QObject):
     changed = Signal()
     micChanged = Signal()  # noqa: N815
     transcribed = Signal(str)  # ข้อความที่ถอดได้ · หน้าจอใส่ช่องพิมพ์ (ไม่ส่งเอง · การ์ด 0019 ข้อ 9)
+    # กดคีย์ลัด F9 (การ์ด 0024) · Pakon เลือก 2026-10-13: ถอดเสร็จทำทันที ไม่ต้องกดส่ง
+    heardHandsFree = Signal(str)  # noqa: N815
     _state = Signal(int, bool, str)
     _heard = Signal(str, str, float)
 
@@ -315,6 +317,7 @@ class VoiceController(QObject):
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
         # ตัวอัดหยุดเองเมื่อพูดจบ (การ์ด 0019 ข้อ 10) จากเธรดของมัน → ดูสถานะทุก 0.15 วิระหว่างฟัง
         self._awaiting = False
+        self._hands_free = False
         self._mic_poll = QTimer(self, interval=150, timeout=self._poll_mic)
         self._state.connect(self._on_state)
         self._heard.connect(self._on_heard)
@@ -427,15 +430,40 @@ class VoiceController(QObject):
         self.micChanged.emit()
         self._listener.stop()
 
+    @Slot()
+    def toggleHandsFree(self) -> None:  # noqa: N802
+        """คีย์ลัด F9: เริ่มฟัง (เสียงติ๊ก) · กดอีกครั้งระหว่างฟัง = หยุดแล้วถอดเลย."""
+        if self._listener is None:
+            return
+        if self._listener.listening:
+            self.stopListening()
+            return
+        from aipc.ui.handsfree import beep
+
+        self._hands_free = True
+        self.startListening()
+        if self._awaiting:
+            beep(high=True)
+        else:
+            self._hands_free = False
+
     @Slot(str, str, float)
     def _on_heard(self, text: str, err: str, secs: float) -> None:
+        hands_free, self._hands_free = self._hands_free, False
         self._awaiting = False
         self._mic_poll.stop()
         self._transcribing, self._last_stt_s = False, secs
-        self._mic_message = err or f"ถอดเสียงใน {secs:.1f} วิ · ตรวจข้อความแล้วกดส่ง"
+        done = "ทำตามที่สั่งแล้ว" if hands_free else "ตรวจข้อความแล้วกดส่ง"
+        self._mic_message = err or f"ถอดเสียงใน {secs:.1f} วิ · {done}"
         self.micChanged.emit()
+        if hands_free:
+            from aipc.ui.handsfree import beep
+
+            beep(high=False)
         if text:
-            self.transcribed.emit(text)
+            (self.heardHandsFree if hands_free else self.transcribed).emit(text)
+        elif hands_free and self.available:  # ไม่ได้มองจอ (เบราว์เซอร์เต็มจอ) = พูดบอกว่าทำไมไม่ได้ทำ
+            self.speak(-3, err or "ไม่ได้ยินเสียงพูด")
 
     def close(self) -> None:
         if self._speaker is not None:

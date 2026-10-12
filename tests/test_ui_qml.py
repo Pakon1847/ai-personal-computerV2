@@ -135,6 +135,11 @@ class ChatInputTest(unittest.TestCase):
             uiapp.shutdown(engine)
 
 
+def items_of(page):
+    v = page.property("items")
+    return v.toVariant() if hasattr(v, "toVariant") else v
+
+
 def find_all(root, name):
     return [o for o in root.findChildren(QObject) if o.objectName() == name]
 
@@ -391,6 +396,28 @@ class ShellCardTest(unittest.TestCase):
         ])  # fmt: skip
         settle(100)
         self.assertEqual(find_all(win, "chatList")[0].property("count"), 4)
+        self.assertEqual(warnings, [])
+
+    def test_hands_free_voice_answers_pending_card_and_sends_the_rest(self):
+        """การ์ด 0024: พูด "ใช่" ตอบการ์ดที่รอยืนยัน (ไม่ต้องกดปุ่ม) · ประโยคอื่นส่งเข้าแชทเอง (ไม่ต้องกดส่ง)."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        base = {"chips": [], "lines": [], "page": "", "badge": {}, "kind": "command"}
+        page.setProperty("items", [{"user": True, "text": "ยกเลิกนัดกินยา"},
+                                   {"user": False, "card": {**base, "title": "ลบนัด 1 รายการ ใช่ไหม",
+                                                            "confirmToken": "tok-1"}}])  # fmt: skip
+        settle(50)
+        page.voiceCommand("ใช่ครับ")
+        settle(50)
+        answered = page.property("answered")
+        answered = answered.toVariant() if hasattr(answered, "toVariant") else answered
+        self.assertTrue(answered.get("tok-1"))
+        n = len(items_of(page))
+        page.voiceCommand("ตอนนี้กี่โมง")  # ไม่ใช่คำสั่งเว็บ → ทางเดิม (การ์ดเวลา) เหมือนพิมพ์แล้วกดส่ง
+        settle(100)
+        rows = items_of(page)
+        self.assertEqual(rows[n]["text"], "ตอนนี้กี่โมง")
+        self.assertIn("ตอนนี้", rows[-1]["card"]["title"])
         self.assertEqual(warnings, [])
 
     def test_claude_made_skill_cards_draw_with_undo_and_wrong_buttons(self):

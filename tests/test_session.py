@@ -192,8 +192,18 @@ class SessionConfigTest(unittest.TestCase):
     def test_no_default_keybinds_or_terminal(self):
         rc = self.code_only(self.DIR / "rc.xml")
         self.assertIn('key="A-Tab"', rc)
+        # คีย์ลัดเรียกโปรแกรมได้ตัวเดียว: F9 สั่งด้วยเสียง (การ์ด 0024) · ไม่มี terminal/โปรแกรมอื่น
+        runs = re.findall(r'<action name="Execute" command="([^"]*)"', rc)
+        self.assertEqual(runs, ["/opt/aipc-v2/scripts/pi/session/aipc-voice-key"])
+        rc = re.sub(r'<action name="Execute" command="[^"]*aipc-voice-key" />', "", rc)
         for bad in ("<default", "terminal", "Execute", "Exit", "wfpanelctl", "pishutdown"):
             self.assertNotIn(bad, rc, bad)
+
+    def test_voice_key_script_only_pokes_own_fifo(self):
+        text = self.code_only(self.DIR.parent / "aipc-voice-key")
+        self.assertIn("${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/aipc/voice-key", text)
+        self.assertIn('[ -p "$f" ] || exit 0', text)
+        self.assertIn("timeout 1", text)
 
     def test_menu_is_empty(self):
         menu = self.code_only(self.DIR / "menu.xml")
