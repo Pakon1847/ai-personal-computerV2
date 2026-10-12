@@ -2071,6 +2071,8 @@ class SkillsController(QObject):
             md = Path(path).read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError) as e:
             return f"อ่านไฟล์ไม่ได้: {e}"
+        if not md.lstrip("\ufeff \r\n").startswith("---"):  # โน้ต .md ทั่วไป (ปุ่มขึ้นทุกไฟล์ .md)
+            return "ไฟล์นี้เป็นโน้ตธรรมดา ไม่ใช่ไฟล์สกิล · ติดตั้งได้เฉพาะไฟล์ที่ส่งออกจากหน้า Skill"
         m, errors = userskills.gate(md, self._skills)
         if m is None:
             return "ติดตั้งไม่ได้: " + "; ".join(errors[:2])

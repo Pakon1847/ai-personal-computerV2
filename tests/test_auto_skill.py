@@ -325,6 +325,10 @@ class ControllerTest(unittest.TestCase):
         bad = Path(home.name) / "bad.md"
         bad.write_text(BAD["items"][2]["skill_md"], encoding="utf-8")  # เปิดลิงก์เอง
         self.assertIn("ติดตั้งไม่ได้", other.importSkill(str(bad), True))
+        # โน้ต .md ธรรมดา (พบ 2026-10-12: เดิมได้ข้อความเทคนิคเรื่องส่วนหัว ---)
+        note = Path(home.name) / "บันทึกประชุม.md"
+        note.write_text("# บันทึกประชุม\n- ส่งงานวันศุกร์\n", encoding="utf-8")
+        self.assertIn("โน้ตธรรมดา", other.importSkill(str(note), False))
         self.assertEqual(len(other.userSkills), 1)
         self.assertTrue(os.path.exists(exported))
 
