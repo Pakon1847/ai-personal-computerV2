@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 
-from aipc.skills.fileintent import file_intent, file_time, time_range
+from aipc.skills.fileintent import file_intent, file_time, time_range, topic
 
 DATA = Path(__file__).parent / "data"
 
@@ -38,6 +38,11 @@ class FileIntentTest(unittest.TestCase):
         for t, want in cases.items():
             with self.subTest(t=t):
                 self.assertEqual(file_time(t), want)
+
+    def test_topic_drops_want_word(self):
+        # พบ 2026-10-12: "อยากดูไฟล์ที่ทำสัปดาห์นี้ทั้งหมด" ได้หัวข้อ "อยาก" → กรองจนไม่พบไฟล์
+        self.assertEqual(topic("อยากดูไฟล์ที่ทำสัปดาห์นี้ทั้งหมด"), "")
+        self.assertEqual(topic("อยากดูไฟล์รายงานที่แก้เมื่อวาน"), "รายงาน")
 
     def test_time_range(self):
         now = datetime(2026, 10, 1, 15, 0)  # วันพฤหัส

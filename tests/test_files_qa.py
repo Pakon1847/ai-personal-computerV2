@@ -33,6 +33,20 @@ class ExtractTest(unittest.TestCase):
             files_qa.extract(self.dir / "scan.pdf", runner=runner)
         self.assertIn("ภาพสแกน", str(e.exception))
 
+    def test_unreadable_file_is_unsupported_not_a_crash(self):
+        # พบ 2026-10-12: ไฟล์ที่เปิดอ่านไม่ได้ทำให้ "ไฟล์ที่ทำสัปดาห์นี้" ล่มทั้งการ์ด (PermissionError)
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "ล็อก.txt"
+            f.write_text("x", encoding="utf-8")
+            with mock.patch.object(
+                Path, "read_bytes", side_effect=PermissionError(13, "Permission denied")
+            ):
+                with self.assertRaises(files_qa.Unsupported) as e:
+                    files_qa.extract(f)
+            self.assertIn("เปิดไฟล์ไม่ได้", str(e.exception))
+
     def test_pdf_text_via_pdftotext(self):
         (self.dir / "r.pdf").write_bytes(b"%PDF-1.4")
         seen = []

@@ -43,7 +43,10 @@ def extract(path: Path, runner=subprocess.run) -> str:
     if size > MAX_FILE_BYTES:
         raise Unsupported("ไฟล์ใหญ่เกิน 5 MB")
     if ext in TEXT_TYPES:
-        raw = path.read_bytes()
+        try:
+            raw = path.read_bytes()
+        except OSError as e:  # ไม่มีสิทธิ์อ่าน/ไฟล์ถูกล็อก (พบ 2026-10-12: ค้นไฟล์ตามเวลาล่มทั้งการ์ด)
+            raise Unsupported(f"เปิดไฟล์ไม่ได้: {e.strerror or e}") from e
         # utf-16 ถอดได้แทบทุกไบต์ (ได้ขยะ) → ใช้เฉพาะไฟล์ที่มี BOM
         # ไม่มี BOM = utf-8 แล้วค่อย cp874 (ไฟล์ไทยจาก Windows เก่า)
         bom16 = raw[:2] in (codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)
