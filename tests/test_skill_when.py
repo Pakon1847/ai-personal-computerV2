@@ -7,7 +7,7 @@
 
 import json
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from aipc.skills import when
@@ -155,6 +155,14 @@ class FoundOn20260928Test(unittest.TestCase):
             self.assertIsNone(r.at, text)
             self.assertIn("รองรับนัดซ้ำแค่", r.problem)
         self.assertEqual(when.parse("ทุกวันเตือนกินยา 8 โมงเช้า", NOW).at.hour, 8)
+
+    def test_chat_abbreviation_for_tomorrow(self):
+        # สำรวจบน Pi 5 2026-10-12: "พน 10 โมงนัดหมอ" ได้ชื่อนัด "พน นัดหมอ"
+        r = when.parse("พน 10 โมงนัดหมอ", NOW)
+        self.assertEqual(
+            (r.at.date(), r.at.hour, r.what), ((NOW + timedelta(days=1)).date(), 10, "นัดหมอ")
+        )
+        self.assertEqual(when.parse("เตือนประชุมพนักงาน 10 โมง", NOW).what, "ประชุมพนักงาน")
 
 
 if __name__ == "__main__":

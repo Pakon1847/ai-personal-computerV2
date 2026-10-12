@@ -239,7 +239,8 @@ def _date(t: _Text, now: datetime, notes: list[str]) -> tuple[date | None, str, 
     today = now.date()
     if t.take(r"วันนี้|คืนนี้"):
         return today, "", False
-    if t.take(r"พรุ่งนี้"):
+    # "พน" = คำย่อพรุ่งนี้ที่พิมพ์ในแชท (สำรวจบน Pi 5 2026-10-12) · ติดอักษรไทยไม่นับ (พนักงาน · พนม)
+    if t.take(r"พรุ่งนี้|(?<![ก-๙])พน\.?(?![ก-๙])"):
         d = today + timedelta(days=1)
         if now.hour < 4:  # ยังไม่นอนแต่เลยเที่ยงคืนแล้ว — คนมักหมายถึง "วันนี้" ตามปฏิทิน · บอกให้ชัด
             notes.append(f"ตอนนี้เลยเที่ยงคืนแล้ว “พรุ่งนี้” จึงเป็นวันที่ {d.day}/{d.month}")
