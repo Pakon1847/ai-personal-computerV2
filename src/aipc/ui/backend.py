@@ -1678,6 +1678,8 @@ class SkillsController(QObject):
         self._pending[token] = ("cancel", [r.id for r in hits])
         card = self._plain("reminder", f"ลบนัด {len(hits)} รายการ ใช่ไหม", [line(r) for r in hits])
         card["confirmToken"] = token
+        if reminder := next((s for s in self._skills if s.id == "reminder"), None):
+            card["badge"] = self._badge(reminder, "ขอลบนัด · ลบด้วยโค้ดหลังกดยืนยัน")
         return card
 
     def _agenda_card(self, text: str) -> dict | None:
@@ -2831,6 +2833,8 @@ class ChatController(QObject):
 
         self.stop()
         self._conv, self._temporary, self._trimmed = chat_store.new_conversation(), temporary, False
+        # ไฟล์ที่แนบเป็นของแชทเดิม (สำรวจบน Pi 5 2026-10-12: แชทใหม่ยังแนบอยู่ → "ปรับเสียงเป็น 40" ถูกถามไฟล์แทน)
+        self._file = None
         self.changed.emit()
 
     @Slot(str, result="QVariantList")
@@ -2839,6 +2843,7 @@ class ChatController(QObject):
         if conv is None or self._busy:
             return []
         self._conv, self._temporary, self._trimmed = conv, False, False
+        self._file = None
         self.changed.emit()
         return conv["messages"]
 

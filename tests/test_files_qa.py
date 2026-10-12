@@ -113,6 +113,10 @@ class ChatFileTest(ServerCase or unittest.TestCase):
         self.assertEqual(c._conv["messages"][0]["shown"], "รหัสตู้เซฟคืออะไร")
         c.detachFile()
         self.assertEqual(c.attachedFile, "")
+        # สำรวจบน Pi 5 2026-10-12: แชทใหม่ยังแนบไฟล์เดิม → คำสั่งในแชทใหม่ถูกถามไฟล์แทน
+        c.attachFile(str(f))
+        c.newChat(False)
+        self.assertEqual(c.attachedFile, "")
 
 
 if __name__ == "__main__":
