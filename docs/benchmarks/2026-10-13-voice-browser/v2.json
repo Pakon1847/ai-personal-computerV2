@@ -1,0 +1,655 @@
+{
+ "file": "tests\\data\\browse_v2.json",
+ "commands": "35/35",
+ "commands_pct": 100.0,
+ "non_commands_caught": 0,
+ "non_commands": 17,
+ "rows": [
+  {
+   "text": "ค้นหาราคาน้ำมันวันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาน้ำมันวันนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาน้ำมันวันนี้"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ค้นหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "โรงหนังแถวนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "โรงหนังแถวนี้"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ช่วยเสิร์ชตารางรถไฟไปเชียงใหม่",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ตารางรถไฟไปเชียงใหม่"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ตารางรถไฟไปเชียงใหม่"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ค้นในกูเกิลว่าวันหยุดเดือนหน้ามีวันไหน",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วันหยุดเดือนหน้ามีวันไหน"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วันหยุดเดือนหน้ามีวันไหน"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "หาวิธีปลูกมะนาวในกระถาง",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ค้นหาคำว่าปัญญาประดิษฐ์",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ปัญญาประดิษฐ์"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ปัญญาประดิษฐ์"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ค้นหา raspberry pi 5 ครับ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "raspberry pi 5"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "raspberry pi 5"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ค้นหาผลบอลเมื่อคืนแล้วเข้าลิงก์แรก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ผลบอลเมื่อคืน"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ผลบอลเมื่อคืน"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เข้าลิงค์แรกเลย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เข้าลิงก์อันแรกครับ",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "กดเข้าลิงก์ที่หนึ่ง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เปิดลิ้งที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เข้าลิงก์ที่ 2",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "คลิกลิงก์ที่สามให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เข้าผลลัพธ์ที่ห้า",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 5
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 5
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เปิดเว็บที่สองครับ",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ย้อนกลับครับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ถอยกลับไปหน้าเดิม",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "กลับหน้าที่แล้ว",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ย้อนกลับไปหน้าที่แล้วหน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ไปหน้าข้างหน้า",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เดินหน้า",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "รีโหลด",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "โหลดหน้านี้ใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เลื่อนลงหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เลื่อนหน้าลง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เลื่อนขึ้นไปหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เลื่อนกลับขึ้นไป",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ปิดแท็บนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [
+    {
+     "kind": "close"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ปิดเว็บนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [
+    {
+     "kind": "close"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "กลับไปที่แอป",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [
+    {
+     "kind": "app"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "กลับไปหน้าแชท",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [
+    {
+     "kind": "app"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เปิดกูเกิ้ลหน่อย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เปิดเว็บยูทูป",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "เปิดวิกิพีเดีย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "wikipedia"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "wikipedia"
+    }
+   ],
+   "ok": true
+  },
+  {
+   "text": "ค้นหาไฟล์ pdf ที่ทำเมื่อวาน",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "หาไฟล์ใบเสร็จ",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "หาเอกสารรายงานประจำเดือน",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "เลื่อนนัดหมอฟันเป็นวันศุกร์",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "ปิดเสียงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "เพิ่มเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "ลดเสียงลงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "วันนี้วันที่เท่าไหร่",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "ลบนัดประชุมพรุ่งนี้",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "หาผลรวมของ 12 กับ 30",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "ข่าววันนี้มีอะไรบ้าง",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "เครื่องช้าเพราะอะไร",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "เปิดโหมดประชุม",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "ย้อนกลับเมื่อกี้ที่ปรับเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "expect": [],
+   "got": [],
+   "ok": true
+  },
+  {
+   "text": "เขียนกลอนสั้นๆเรื่องฝน",
+   "expect": [],
+   "got": [],
+   "ok": true
+  }
+ ]
+}
