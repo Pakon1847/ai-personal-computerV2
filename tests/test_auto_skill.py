@@ -253,6 +253,10 @@ class ControllerTest(unittest.TestCase):
         card = s.handleAs("create-skill", "เข้าโหมดประชุมให้หน่อย")
         self.assertEqual(card["kind"], "needs")
         self.assertIn("ปิดการใช้ Claude", card["title"])
+        # พิมพ์เอง (ไม่ผ่าน AI): เดิมส่งให้ AI ในเครื่องตอบว่าสร้างไม่ได้ โดยไม่บอกว่าต้องเปิดสวิตช์
+        card = s.handle("อยากได้สกิลโหมดฟังเพลง เปิดยูทูบแล้วปรับเสียงเป็น 60")
+        self.assertEqual(card["kind"], "needs")
+        self.assertIn("หน้าตั้งค่า", card["lines"][0])
         self.assertEqual(self.seen, [])
         on[0] = True
         self.assertTrue(s.canForge)

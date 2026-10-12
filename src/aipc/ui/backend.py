@@ -2186,6 +2186,11 @@ class SkillsController(QObject):
             return card
         if card := self._next_card(text) or self._move_card(text):  # นัดถัดไป · ขอเลื่อนนัด
             return card
+        # ขอสกิลใหม่ระหว่างปิดสวิตช์ Claude (AI ไม่มีเครื่องมือ create-skill) = บอกให้เปิดที่หน้าตั้งค่า
+        # · พบบน Pi 5 2026-10-12: เดิม AI ในเครื่องตอบ "ไม่รู้ครับ สร้างสกิลไม่ได้"
+        claude_off = self._forge is not None and self._user is not None and not self._claude_on()
+        if claude_off and re.search(r"(สร้าง|อยากได้|ขอ|ทำ|เพิ่ม)(ให้)?สกิล", text.replace(" ", "")):
+            return self._start_forge(text)
         from aipc.skills.fileintent import file_intent, file_time
         from aipc.skills.weather import place_in, weather_intent
 
@@ -2212,9 +2217,12 @@ class SkillsController(QObject):
         if self._llm_ready():
             r = router.route_ai_first(text, self._skills)
             if r.kind == "create":  # ตั้งโหมด/งานประจำที่ยังไม่มีสกิล (การ์ด 0017)
+                # มี Claude แต่ปิดสวิตช์ = บอกให้เปิดที่หน้าตั้งค่า (_start_forge) · พบบน Pi 5 2026-10-12:
+                # เดิมส่งให้ AI ในเครื่อง → "ไม่รู้ครับ สร้างสกิลไม่ได้" ผู้ใช้ไม่รู้ว่าต้องเปิดสวิตช์
+                has_claude = self._forge is not None and self._user is not None
                 return (
                     self._start_forge(text)
-                    if self.canForge
+                    if has_claude
                     else self._card(router.Route("chat"), text)
                 )
             return self._card(r, text)
