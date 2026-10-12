@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from aipc.skills import fileintent
+
 
 @dataclass(frozen=True)
 class BrowseCommand:
@@ -56,10 +58,11 @@ _SITE = re.compile(
     r"เปิด\s*(?:เว็บ\s*)?(" + "|".join(f"(?P<{k}>{v})" for k, v in SITE_NAMES.items()) + r")"
 )
 _SEARCH = re.compile(
-    r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|เสิร์[ชด]|เซิร์ช|search|กูเกิ้?ล)\s*"
+    r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|เสิร์[ชด]|เซิร์ช|search|(?:กูเกิ้?ล|google)\s*(?:หา|ดู)?(?=\s*(?:ว่า|คำว่า)|(?<=หา)|(?<=ดู)))\s*"
     r"(?:ใน\s*(?:กูเกิ้?ล|google|เน็ต|อินเทอร์เน็ต|เว็บ)\s*)?(?:ว่า|คำว่า)?\s*(.+)"
 )
-_FIND = re.compile(r"(?:ช่วย\s*)?หา\s*(.+)")
+# "หา" ที่เป็นต้นคำอื่น (หาก หาด หาย หาว หาม หาร=หารเลข · หาร้าน ไม่นับ)
+_FIND = re.compile(r"(?:ช่วย\s*)?หา(?![กดยวม]|ร(?!้))\s*(.+)")
 # "หา/ค้นหา X" ที่เป็นงานในเครื่อง (สกิลค้นไฟล์) หรือโจทย์เลข ไม่ใช่ค้นเว็บ
 _NOT_WEB = re.compile(r"(?:ไฟล์|เอกสาร|โฟลเดอร์|รูป(?:ในเครื่อง)?|ค่า|ผลรวม|ผลบวก|ผลคูณ|ผลต่าง|คำตอบ)")
 
@@ -91,7 +94,7 @@ def _single(t: str) -> BrowseCommand | None:
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
     m = _SEARCH.fullmatch(t) or _FIND.fullmatch(t)
-    if m:
+    if m and not (fileintent.file_intent(t) or fileintent.file_time(t)):  # หาไฟล์/โน้ตในเครื่อง = สกิลค้นไฟล์
         query = _POLITE.sub("", m.group(1)).strip()
         if query and not _NOT_WEB.match(query):
             return BrowseCommand("search", query=query)
