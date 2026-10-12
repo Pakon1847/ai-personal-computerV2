@@ -1,0 +1,525 @@
+{
+ "commands": "9/29",
+ "commands_pct": 31.0,
+ "non_commands_caught": 2,
+ "non_commands": 11,
+ "stt_median_s": 2.275,
+ "stt_max_s": 2.89,
+ "rows": [
+  {
+   "text": "ค้นหาราคาทองหน่อย",
+   "heard": "คนหาราคาทองหน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาทอง"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.04
+  },
+  {
+   "text": "ค้นหาราคาทองหน่อยเข้าลิงก์แรก",
+   "heard": "ค้นหาราคาทองหน่อยเข้าลิงแร่",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาทอง"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาทองหน่อยเข้าลิงแร่"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.56
+  },
+  {
+   "text": "ค้นหา ร้านอาหารใกล้ฉัน",
+   "heard": "คนหารานอาหารใกล้ฉัน",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ร้านอาหารใกล้ฉัน"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.34
+  },
+  {
+   "text": "เสิร์ชข่าวฟุตบอลวันนี้",
+   "heard": "เสิร์จ ข่าว ฟุตบอล วันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ข่าวฟุตบอลวันนี้"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.47
+  },
+  {
+   "text": "กูเกิลวิธีทำไข่เจียว",
+   "heard": "กูเกินวิธีทำไข่เจียว",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีทำไข่เจียว"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.48
+  },
+  {
+   "text": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "heard": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "เพลงใหม่"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "เพลงใหม่"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.89
+  },
+  {
+   "text": "หาสูตรแกงเขียวหวานหน่อย",
+   "heard": "ขาสุดแกงเขียวหวานหน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "สูตรแกงเขียวหวาน"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.5
+  },
+  {
+   "text": "เข้าลิงก์แรก",
+   "heard": "ข้าวลิงแรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.21
+  },
+  {
+   "text": "เข้าลิ้งค์แรกให้หน่อย",
+   "heard": "เข้าลิงแรกให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.51
+  },
+  {
+   "text": "กดลิงก์ที่สอง",
+   "heard": "กดลิง ที่ สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.24
+  },
+  {
+   "text": "เปิดลิงก์ที่ 3",
+   "heard": "เปิด ลิง ที่ สาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.36
+  },
+  {
+   "text": "เข้าเว็บแรก",
+   "heard": "เท่า เวทย์แรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.22
+  },
+  {
+   "text": "คลิกอันที่สี่",
+   "heard": "คลึกอันที่สี่",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.27
+  },
+  {
+   "text": "ย้อนกลับ",
+   "heard": "ย้อนกลับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.16
+  },
+  {
+   "text": "ย้อนกลับหน่อย",
+   "heard": "ย้อน กลับ หน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.34
+  },
+  {
+   "text": "กลับไปหน้าก่อนหน้า",
+   "heard": "กลับไปหน้าก่อนหน้า",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.36
+  },
+  {
+   "text": "ไปข้างหน้า",
+   "heard": "ไปข้างมาฮะ",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.18
+  },
+  {
+   "text": "โหลดใหม่",
+   "heard": "โหลดใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.12
+  },
+  {
+   "text": "รีเฟรชหน้านี้",
+   "heard": "รีเฟลดหน้านี้",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.28
+  },
+  {
+   "text": "เลื่อนลง",
+   "heard": "เลื่อน ลง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.13
+  },
+  {
+   "text": "เลื่อนลงอีก",
+   "heard": "เลื่อน ลง อี",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.16
+  },
+  {
+   "text": "เลื่อนขึ้น",
+   "heard": "เลื่อน คืน",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.13
+  },
+  {
+   "text": "ปิดแท็บ",
+   "heard": "เปก",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.06
+  },
+  {
+   "text": "ปิดหน้านี้",
+   "heard": "ปิด หน้า หนี",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.2
+  },
+  {
+   "text": "กลับไปแอป",
+   "heard": "กลับ ไป แอ๊ก",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.24
+  },
+  {
+   "text": "กลับไปหน้าผู้ช่วย",
+   "heard": "ตลับไปหน้าผู้ช่วย",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.36
+  },
+  {
+   "text": "เปิดกูเกิล",
+   "heard": "ปาดกูการ",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.29
+  },
+  {
+   "text": "เปิด google",
+   "heard": "เปิด",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.04
+  },
+  {
+   "text": "เปิดยูทูบ",
+   "heard": "เปิดยูทูล",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.15
+  },
+  {
+   "text": "ค้นหาไฟล์รายงาน",
+   "heard": "ค้นหาไฟรายงาน",
+   "expect": [],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ไฟรายงาน"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.24
+  },
+  {
+   "text": "หาไฟล์ที่แก้เมื่อวาน",
+   "heard": "หาไฟที่แก้เมื่อวาน",
+   "expect": [],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ไฟที่แก้เมื่อวาน"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.53
+  },
+  {
+   "text": "เลื่อนนัดประชุมไปพรุ่งนี้",
+   "heard": "เลื่อนนักประชุมไปพรุ่งนี้",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.57
+  },
+  {
+   "text": "ปิดเสียง",
+   "heard": "ปิด เสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.15
+  },
+  {
+   "text": "เปิดเสียง",
+   "heard": "เปิดเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.12
+  },
+  {
+   "text": "ปรับเสียงเป็น 40",
+   "heard": "ปรับ เสียง เป็น สี่ สิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.85
+  },
+  {
+   "text": "ตอนนี้กี่โมง",
+   "heard": "ตอนนี้ขี่โมง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.24
+  },
+  {
+   "text": "ยกเลิกนัดกินยา",
+   "heard": "นกเลิกนัดคินยา",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.37
+  },
+  {
+   "text": "หาค่าเฉลี่ยของ 4 6 8",
+   "heard": "หาค่าเฉลี่ยของสี่หกแปด",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.5
+  },
+  {
+   "text": "ราคาทองวันนี้เท่าไหร่",
+   "heard": "ราคาทองวันนี้เท่าไหร่",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.5
+  },
+  {
+   "text": "เปิดแอปเครื่องคิดเลข",
+   "heard": "เปิดแอบเครื่องคิดเลข",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.45
+  }
+ ]
+}
