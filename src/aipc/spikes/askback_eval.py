@@ -83,7 +83,8 @@ def main(argv: list[str] | None = None) -> int:
         rows.append(row)
         first = re.sub(r"\s+", " ", text)[:70]
         mark = "✓" if row["pass"] else "✗"
-        print(f"{it['id']} {it['group']} {mark} {t.route:<24} {t.seconds:5.1f}วิ · {first}", flush=True)
+        head = f"{it['id']} {it['group']} {mark} {t.route:<24}"
+        print(f"{head} {t.seconds:5.1f}วิ · {first}", flush=True)
     d.close()
     summary = {g: [sum(r["pass"] for r in rows if r["group"] == g),
                    sum(1 for r in rows if r["group"] == g)] for g in ("O", "N")}  # fmt: skip
