@@ -361,6 +361,23 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(preview.property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_chat_scrolls_to_newest_after_a_very_long_message(self):
+        # พบบน Pi 5 2026-10-12: วางข้อความยาวมาก → แชทค้างบนสุด ไม่เห็นคำตอบใหม่อีกเลย
+        _, win, warnings = self.open_shell()
+        win.resize(1280, 800)
+        page = find_all(win, "workspace")[0]
+        chat_list = find_all(win, "chatList")[0]
+        items = [{"user": True, "text": "สรุปข้อความนี้: " + "การประชุมมีวาระสำคัญหลายเรื่อง " * 300}]
+        for i in range(4):
+            items = items + [
+                {"ai": True, "text": f"คำตอบ {i} " + "ข้อความ " * 80, "note": "", "done": True},
+                {"user": True, "text": f"ถามต่อ {i}"},
+            ]
+            page.setProperty("items", items)
+            settle(200)
+            self.assertTrue(chat_list.property("atYEnd"), f"ข้อความที่ {i}: ต้องเห็นข้อความล่าสุด")
+        self.assertEqual(warnings, [])
+
     def test_ai_answers_draw_without_warnings(self):
         """การ์ด 0013: ข้อความ AI (กำลังตอบ / จบ / หยุด) วาดได้โดยไม่มี warning
         · พบ 2026-09-28: ข้อความ AI ไม่มีช่อง user ทำให้ binding ได้ undefined."""

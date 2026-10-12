@@ -616,7 +616,9 @@ Item {
         clip: true
         model: root.items
         // ความสูงของการ์ดรู้หลังวาดเสร็จ จึงเลื่อนลงล่างสุดทุกครั้งที่เนื้อหายาวขึ้น
-        onContentHeightChanged: positionViewAtEnd()
+        // · เลื่อนหลังวาดรอบนี้เสร็จ (callLater): พบ 2026-10-12 วางข้อความยาวมาก → ค้างบนสุด ไม่เห็นคำตอบใหม่
+        onContentHeightChanged: Qt.callLater(positionViewAtEnd)
+        onCountChanged: Qt.callLater(positionViewAtEnd)
         delegate: Item {
             id: row
             required property var modelData
