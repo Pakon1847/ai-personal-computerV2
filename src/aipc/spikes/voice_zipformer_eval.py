@@ -14,11 +14,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import resource
 import time
 import wave
 from pathlib import Path
 
 from aipc.skills import browse
+from aipc.spikes.voice_cands import FIXED, SEARCH_STEMS
 from aipc.spikes.voice_score_eval import STEMS
 
 
@@ -39,6 +41,8 @@ def main() -> None:
     ap.add_argument("sets", nargs="+")
     ap.add_argument("--hotwords", action="store_true")
     ap.add_argument("--hotwords-score", type=float, default=2.0)
+    # stems = ต้นคำเดิม (voice_score_eval.STEMS) · full = ประโยคคำสั่งเต็ม + ต้นคำค้นหา (voice_cands)
+    ap.add_argument("--hotwords-list", choices=("stems", "full"), default="stems")
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--out", default="")
     a = ap.parse_args()
@@ -46,7 +50,8 @@ def main() -> None:
     kw = {}
     if a.hotwords:
         hw = m / "hotwords.txt"
-        hw.write_text("\n".join(STEMS) + "\n", encoding="utf-8")
+        words = STEMS if a.hotwords_list == "stems" else SEARCH_STEMS + FIXED
+        hw.write_text("\n".join(words) + "\n", encoding="utf-8")
         kw = dict(
             decoding_method="modified_beam_search",
             hotwords_file=str(hw),
@@ -103,11 +108,16 @@ def main() -> None:
         "median_s": secs[len(secs) // 2],
         "max_s": secs[-1],
         "hotwords": a.hotwords,
+        "hotwords_list": a.hotwords_list if a.hotwords else None,
+        "hotwords_score": a.hotwords_score if a.hotwords else None,
     }
+    rss = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)  # Linux: KB
     print(json.dumps(summary, ensure_ascii=False))
     if a.out:
         Path(a.out).write_text(
-            json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1),
+            json.dumps(
+                {"summary": summary, "peak_rss_mb": rss, "rows": rows}, ensure_ascii=False, indent=1
+            ),
             encoding="utf-8",
         )
 
