@@ -1,0 +1,3208 @@
+{
+ "set": "tests/data/agent_dev.json",
+ "summary": {
+  "chat": "43/57 = 75.4%",
+  "look": "1/5 = 20.0%",
+  "plan": "98/122 = 80.3%",
+  "plan_median_s": 1.16,
+  "look_median_s": 34.5
+ },
+ "rows": [
+  {
+   "id": "v101",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาราคาทองหน่อย",
+   "plan": {
+    "reply": "search ราคาทอง",
+    "s": 2.02,
+    "prompt_n": 25,
+    "predicted_n": 6
+   },
+   "final": [
+    "search ราคาทอง"
+   ],
+   "ok": true,
+   "s": 2.02
+  },
+  {
+   "id": "v102",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ค้นหาราคาทองหน่อยเข้าลิงก์แรก",
+   "plan": {
+    "reply": "search ราคาทอง ; result 1",
+    "s": 3.94,
+    "prompt_n": 56,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ราคาทอง",
+    "result 1"
+   ],
+   "ok": true,
+   "s": 3.94
+  },
+  {
+   "id": "v103",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหา ร้านอาหารใกล้ฉัน",
+   "plan": {
+    "reply": "search ร้านอาหารใกล้ฉัน",
+    "s": 1.98,
+    "prompt_n": 25,
+    "predicted_n": 6
+   },
+   "final": [
+    "search ร้านอาหารใกล้ฉัน"
+   ],
+   "ok": true,
+   "s": 1.98
+  },
+  {
+   "id": "v104",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เสิร์ชข่าวฟุตบอลวันนี้",
+   "plan": {
+    "reply": "search ข่าวฟุตบอลวันนี้",
+    "s": 1.8,
+    "prompt_n": 13,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ข่าวฟุตบอลวันนี้"
+   ],
+   "ok": true,
+   "s": 1.8
+  },
+  {
+   "id": "v105",
+   "cat": "plan",
+   "page": "blank",
+   "command": "กูเกิลวิธีทำไข่เจียว",
+   "plan": {
+    "reply": "search วิธีทำไข่เจียว",
+    "s": 1.81,
+    "prompt_n": 14,
+    "predicted_n": 8
+   },
+   "final": [
+    "search วิธีทำไข่เจียว"
+   ],
+   "ok": true,
+   "s": 1.81
+  },
+  {
+   "id": "v106",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "plan": {
+    "reply": "search เพลงใหม่",
+    "s": 1.34,
+    "prompt_n": 13,
+    "predicted_n": 5
+   },
+   "final": [
+    "search เพลงใหม่"
+   ],
+   "ok": true,
+   "s": 1.34
+  },
+  {
+   "id": "v107",
+   "cat": "plan",
+   "page": "blank",
+   "command": "หาสูตรแกงเขียวหวานหน่อย",
+   "plan": {
+    "reply": "search สูตรแกงเขียวหวาน",
+    "s": 1.93,
+    "prompt_n": 15,
+    "predicted_n": 8
+   },
+   "final": [
+    "search สูตรแกงเขียวหวาน"
+   ],
+   "ok": true,
+   "s": 1.93
+  },
+  {
+   "id": "v108",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงก์แรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 2.99,
+    "prompt_n": 49,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 2.99
+  },
+  {
+   "id": "v109",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิ้งค์แรกให้หน่อย",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.25,
+    "prompt_n": 11,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.25
+  },
+  {
+   "id": "v110",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กดลิงก์ที่สอง",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.25,
+    "prompt_n": 11,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.25
+  },
+  {
+   "id": "v111",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิดลิงก์ที่ 3",
+   "plan": {
+    "reply": "result 3",
+    "s": 1.21,
+    "prompt_n": 12,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 3"
+   ],
+   "ok": true,
+   "s": 1.21
+  },
+  {
+   "id": "v112",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บแรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.01,
+    "prompt_n": 8,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.01
+  },
+  {
+   "id": "v113",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "คลิกอันที่สี่",
+   "plan": {
+    "reply": "result 4",
+    "s": 1.18,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 4"
+   ],
+   "ok": true,
+   "s": 1.18
+  },
+  {
+   "id": "v114",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับ",
+   "plan": {
+    "reply": "back",
+    "s": 0.71,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.71
+  },
+  {
+   "id": "v115",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับหน่อย",
+   "plan": {
+    "reply": "back",
+    "s": 0.63,
+    "prompt_n": 6,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.63
+  },
+  {
+   "id": "v116",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าก่อนหน้า",
+   "plan": {
+    "reply": "back",
+    "s": 0.85,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.85
+  },
+  {
+   "id": "v117",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ไปข้างหน้า",
+   "plan": {
+    "reply": "down",
+    "s": 0.7,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": false,
+   "s": 0.7
+  },
+  {
+   "id": "v118",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "โหลดใหม่",
+   "plan": {
+    "reply": "reload",
+    "s": 0.69,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.69
+  },
+  {
+   "id": "v119",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "รีเฟรชหน้านี้",
+   "plan": {
+    "reply": "reload",
+    "s": 0.84,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.84
+  },
+  {
+   "id": "v120",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนลง",
+   "plan": {
+    "reply": "down",
+    "s": 0.74,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.74
+  },
+  {
+   "id": "v121",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงอีก",
+   "plan": {
+    "reply": "down",
+    "s": 0.66,
+    "prompt_n": 6,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.66
+  },
+  {
+   "id": "v122",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนขึ้น",
+   "plan": {
+    "reply": "up",
+    "s": 0.59,
+    "prompt_n": 6,
+    "predicted_n": 2
+   },
+   "final": [
+    "up"
+   ],
+   "ok": true,
+   "s": 0.59
+  },
+  {
+   "id": "v123",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ปิดแท็บ",
+   "plan": {
+    "reply": "close",
+    "s": 0.74,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "close"
+   ],
+   "ok": true,
+   "s": 0.74
+  },
+  {
+   "id": "v124",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ปิดหน้านี้",
+   "plan": {
+    "reply": "close",
+    "s": 0.68,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "close"
+   ],
+   "ok": true,
+   "s": 0.68
+  },
+  {
+   "id": "v125",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปแอป",
+   "plan": {
+    "reply": "app",
+    "s": 0.75,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "app"
+   ],
+   "ok": true,
+   "s": 0.75
+  },
+  {
+   "id": "v126",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าผู้ช่วย",
+   "plan": {
+    "reply": "app",
+    "s": 0.73,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "app"
+   ],
+   "ok": true,
+   "s": 0.73
+  },
+  {
+   "id": "v127",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดกูเกิล",
+   "plan": {
+    "reply": "open google.com",
+    "s": 1.96,
+    "prompt_n": 23,
+    "predicted_n": 5
+   },
+   "final": [
+    "open google.com"
+   ],
+   "ok": true,
+   "s": 1.96
+  },
+  {
+   "id": "v128",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิด google",
+   "plan": {
+    "reply": "open google.com",
+    "s": 1.13,
+    "prompt_n": 6,
+    "predicted_n": 5
+   },
+   "final": [
+    "open google.com"
+   ],
+   "ok": true,
+   "s": 1.13
+  },
+  {
+   "id": "v129",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดยูทูบ",
+   "plan": {
+    "reply": "open youtube.com",
+    "s": 1.26,
+    "prompt_n": 9,
+    "predicted_n": 5
+   },
+   "final": [
+    "open youtube.com"
+   ],
+   "ok": true,
+   "s": 1.26
+  },
+  {
+   "id": "v130",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ค้นหาไฟล์รายงาน",
+   "plan": {
+    "reply": "search ไฟล์รายงาน",
+    "s": 1.19,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "search ไฟล์รายงาน"
+   ],
+   "ok": false,
+   "s": 1.19
+  },
+  {
+   "id": "v131",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาไฟล์ที่แก้เมื่อวาน",
+   "plan": {
+    "reply": "chat",
+    "s": 0.91,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.91
+  },
+  {
+   "id": "v132",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนนัดประชุมไปพรุ่งนี้",
+   "plan": {
+    "reply": "chat",
+    "s": 1.05,
+    "prompt_n": 14,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.05
+  },
+  {
+   "id": "v133",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปิดเสียง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.72,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.72
+  },
+  {
+   "id": "v134",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดเสียง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.69,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.69
+  },
+  {
+   "id": "v135",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปรับเสียงเป็น 40",
+   "plan": {
+    "reply": "chat",
+    "s": 0.9,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.9
+  },
+  {
+   "id": "v136",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ตอนนี้กี่โมง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.85,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.85
+  },
+  {
+   "id": "v137",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ยกเลิกนัดกินยา",
+   "plan": {
+    "reply": "chat",
+    "s": 0.92,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.92
+  },
+  {
+   "id": "v138",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาค่าเฉลี่ยของ 4 6 8",
+   "plan": {
+    "reply": "chat",
+    "s": 1.17,
+    "prompt_n": 17,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.17
+  },
+  {
+   "id": "v139",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ราคาทองวันนี้เท่าไหร่",
+   "plan": {
+    "reply": "search ราคาทองวันนี้เท่าไหร่",
+    "s": 2.33,
+    "prompt_n": 13,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ราคาทองวันนี้เท่าไหร่"
+   ],
+   "ok": false,
+   "s": 2.33
+  },
+  {
+   "id": "v140",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดแอปเครื่องคิดเลข",
+   "plan": {
+    "reply": "chat",
+    "s": 0.95,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.95
+  },
+  {
+   "id": "v201",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาราคาน้ำมันวันนี้",
+   "plan": {
+    "reply": "search ราคาน้ำมันวันนี้",
+    "s": 1.99,
+    "prompt_n": 13,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ราคาน้ำมันวันนี้"
+   ],
+   "ok": true,
+   "s": 1.99
+  },
+  {
+   "id": "v202",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "plan": {
+    "reply": "search โรงหนังแถวนี้",
+    "s": 1.89,
+    "prompt_n": 14,
+    "predicted_n": 7
+   },
+   "final": [
+    "search โรงหนังแถวนี้"
+   ],
+   "ok": true,
+   "s": 1.89
+  },
+  {
+   "id": "v203",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ช่วยเสิร์ชตารางรถไฟไปเชียงใหม่",
+   "plan": {
+    "reply": "search ตารางรถไฟไปเชียงใหม่",
+    "s": 2.56,
+    "prompt_n": 17,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ตารางรถไฟไปเชียงใหม่"
+   ],
+   "ok": true,
+   "s": 2.56
+  },
+  {
+   "id": "v204",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นในกูเกิลว่าวันหยุดเดือนหน้ามีวันไหน",
+   "plan": {
+    "reply": "search วันหยุดเดือนหน้า",
+    "s": 1.99,
+    "prompt_n": 20,
+    "predicted_n": 6
+   },
+   "final": [
+    "search วันหยุดเดือนหน้า"
+   ],
+   "ok": false,
+   "s": 1.99
+  },
+  {
+   "id": "v205",
+   "cat": "plan",
+   "page": "blank",
+   "command": "หาวิธีปลูกมะนาวในกระถาง",
+   "plan": {
+    "reply": "search วิธีปลูกมะนาวในกระถาง",
+    "s": 2.95,
+    "prompt_n": 17,
+    "predicted_n": 12
+   },
+   "final": [
+    "search วิธีปลูกมะนาวในกระถาง"
+   ],
+   "ok": true,
+   "s": 2.95
+  },
+  {
+   "id": "v206",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาคำว่าปัญญาประดิษฐ์",
+   "plan": {
+    "reply": "search ปัญญาประดิษฐ์",
+    "s": 2.17,
+    "prompt_n": 16,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ปัญญาประดิษฐ์"
+   ],
+   "ok": true,
+   "s": 2.17
+  },
+  {
+   "id": "v207",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหา raspberry pi 5 ครับ",
+   "plan": {
+    "reply": "search raspberry pi 5",
+    "s": 1.56,
+    "prompt_n": 10,
+    "predicted_n": 6
+   },
+   "final": [
+    "search raspberry pi 5"
+   ],
+   "ok": true,
+   "s": 1.56
+  },
+  {
+   "id": "v208",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ค้นหาผลบอลเมื่อคืนแล้วเข้าลิงก์แรก",
+   "plan": {
+    "reply": "search ผลบอลเมื่อคืน ; result 1",
+    "s": 4.57,
+    "prompt_n": 57,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ผลบอลเมื่อคืน",
+    "result 1"
+   ],
+   "ok": true,
+   "s": 4.57
+  },
+  {
+   "id": "v209",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงค์แรกเลย",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.22,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.22
+  },
+  {
+   "id": "v210",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงก์อันแรกครับ",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.22,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.22
+  },
+  {
+   "id": "v211",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กดเข้าลิงก์ที่หนึ่ง",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.28,
+    "prompt_n": 12,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.28
+  },
+  {
+   "id": "v212",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิดลิ้งที่สอง",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.16,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.16
+  },
+  {
+   "id": "v213",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงก์ที่ 2",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.22,
+    "prompt_n": 12,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.22
+  },
+  {
+   "id": "v214",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "คลิกลิงก์ที่สามให้หน่อย",
+   "plan": {
+    "reply": "result 3",
+    "s": 1.39,
+    "prompt_n": 14,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 3"
+   ],
+   "ok": true,
+   "s": 1.39
+  },
+  {
+   "id": "v215",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าผลลัพธ์ที่ห้า",
+   "plan": {
+    "reply": "result 5",
+    "s": 1.32,
+    "prompt_n": 13,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 5"
+   ],
+   "ok": true,
+   "s": 1.32
+  },
+  {
+   "id": "v216",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิดเว็บที่สองครับ",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.19,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.19
+  },
+  {
+   "id": "v217",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับครับ",
+   "plan": {
+    "reply": "back",
+    "s": 0.8,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.8
+  },
+  {
+   "id": "v218",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ถอยกลับไปหน้าเดิม",
+   "plan": {
+    "reply": "back",
+    "s": 0.94,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.94
+  },
+  {
+   "id": "v219",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับหน้าที่แล้ว",
+   "plan": {
+    "reply": "back",
+    "s": 0.72,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.72
+  },
+  {
+   "id": "v220",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับไปหน้าที่แล้วหน่อย",
+   "plan": {
+    "reply": "back",
+    "s": 0.9,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.9
+  },
+  {
+   "id": "v221",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ไปหน้าข้างหน้า",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.23,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": false,
+   "s": 1.23
+  },
+  {
+   "id": "v222",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เดินหน้า",
+   "plan": {
+    "reply": "down",
+    "s": 0.74,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": false,
+   "s": 0.74
+  },
+  {
+   "id": "v223",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "รีโหลด",
+   "plan": {
+    "reply": "reload",
+    "s": 0.7,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.7
+  },
+  {
+   "id": "v225",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงหน่อย",
+   "plan": {
+    "reply": "down",
+    "s": 0.78,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.78
+  },
+  {
+   "id": "v226",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนหน้าลง",
+   "plan": {
+    "reply": "down",
+    "s": 0.72,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.72
+  },
+  {
+   "id": "v228",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนกลับขึ้นไป",
+   "plan": {
+    "reply": "up",
+    "s": 0.77,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "up"
+   ],
+   "ok": true,
+   "s": 0.77
+  },
+  {
+   "id": "v230",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ปิดเว็บนี้",
+   "plan": {
+    "reply": "close",
+    "s": 0.76,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "close"
+   ],
+   "ok": true,
+   "s": 0.76
+  },
+  {
+   "id": "v231",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปที่แอป",
+   "plan": {
+    "reply": "app",
+    "s": 0.87,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "app"
+   ],
+   "ok": true,
+   "s": 0.87
+  },
+  {
+   "id": "v232",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าแชท",
+   "plan": {
+    "reply": "chat",
+    "s": 0.76,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": false,
+   "s": 0.76
+  },
+  {
+   "id": "v233",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดกูเกิ้ลหน่อย",
+   "plan": {
+    "reply": "open google.com",
+    "s": 2.23,
+    "prompt_n": 26,
+    "predicted_n": 5
+   },
+   "final": [
+    "open google.com"
+   ],
+   "ok": true,
+   "s": 2.23
+  },
+  {
+   "id": "v234",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดเว็บยูทูป",
+   "plan": {
+    "reply": "open youtube.com",
+    "s": 1.28,
+    "prompt_n": 9,
+    "predicted_n": 5
+   },
+   "final": [
+    "open youtube.com"
+   ],
+   "ok": true,
+   "s": 1.28
+  },
+  {
+   "id": "v235",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดวิกิพีเดีย",
+   "plan": {
+    "reply": "open wikipedia.org",
+    "s": 1.5,
+    "prompt_n": 11,
+    "predicted_n": 5
+   },
+   "final": [
+    "open wikipedia.org"
+   ],
+   "ok": true,
+   "s": 1.5
+  },
+  {
+   "id": "v236",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ค้นหาไฟล์ pdf ที่ทำเมื่อวาน",
+   "plan": {
+    "reply": "search ไฟล์ pdf ที่ทำเมื่อวาน",
+    "s": 2.35,
+    "prompt_n": 15,
+    "predicted_n": 9
+   },
+   "final": [
+    "search ไฟล์ pdf ที่ทำเมื่อวาน"
+   ],
+   "ok": false,
+   "s": 2.35
+  },
+  {
+   "id": "v237",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาไฟล์ใบเสร็จ",
+   "plan": {
+    "reply": "chat",
+    "s": 0.84,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.84
+  },
+  {
+   "id": "v238",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาเอกสารรายงานประจำเดือน",
+   "plan": {
+    "reply": "search เอกสารรายงานประจำเดือน",
+    "s": 1.72,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "final": [
+    "search เอกสารรายงานประจำเดือน"
+   ],
+   "ok": false,
+   "s": 1.72
+  },
+  {
+   "id": "v239",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนนัดหมอฟันเป็นวันศุกร์",
+   "plan": {
+    "reply": "chat",
+    "s": 1.27,
+    "prompt_n": 17,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.27
+  },
+  {
+   "id": "v240",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "plan": {
+    "reply": "chat",
+    "s": 1.02,
+    "prompt_n": 13,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.02
+  },
+  {
+   "id": "v241",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปิดเสียงหน่อย",
+   "plan": {
+    "reply": "chat",
+    "s": 0.81,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.81
+  },
+  {
+   "id": "v242",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เพิ่มเสียง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.72,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.72
+  },
+  {
+   "id": "v243",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ลดเสียงลงหน่อย",
+   "plan": {
+    "reply": "chat",
+    "s": 0.83,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.83
+  },
+  {
+   "id": "v244",
+   "cat": "chat",
+   "page": "blank",
+   "command": "วันนี้วันที่เท่าไหร่",
+   "plan": {
+    "reply": "chat",
+    "s": 0.95,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.95
+  },
+  {
+   "id": "v245",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ลบนัดประชุมพรุ่งนี้",
+   "plan": {
+    "reply": "chat",
+    "s": 0.93,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.93
+  },
+  {
+   "id": "v246",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาผลรวมของ 12 กับ 30",
+   "plan": {
+    "reply": "chat",
+    "s": 1.18,
+    "prompt_n": 16,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.18
+  },
+  {
+   "id": "v247",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ข่าววันนี้มีอะไรบ้าง",
+   "plan": {
+    "reply": "search ข่าววันนี้",
+    "s": 1.46,
+    "prompt_n": 11,
+    "predicted_n": 5
+   },
+   "final": [
+    "search ข่าววันนี้"
+   ],
+   "ok": false,
+   "s": 1.46
+  },
+  {
+   "id": "v248",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เครื่องช้าเพราะอะไร",
+   "plan": {
+    "reply": "chat",
+    "s": 0.84,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.84
+  },
+  {
+   "id": "v249",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดโหมดประชุม",
+   "plan": {
+    "reply": "chat",
+    "s": 0.77,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.77
+  },
+  {
+   "id": "v250",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ย้อนกลับเมื่อกี้ที่ปรับเสียง",
+   "plan": {
+    "reply": "back",
+    "s": 1.04,
+    "prompt_n": 14,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": false,
+   "s": 1.04
+  },
+  {
+   "id": "v251",
+   "cat": "chat",
+   "page": "blank",
+   "command": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "plan": {
+    "reply": "chat",
+    "s": 1.11,
+    "prompt_n": 16,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.11
+  },
+  {
+   "id": "v252",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เขียนกลอนสั้นๆเรื่องฝน",
+   "plan": {
+    "reply": "chat",
+    "s": 1.04,
+    "prompt_n": 14,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.04
+  },
+  {
+   "id": "hd01",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาราคาทองหน่อย",
+   "plan": {
+    "reply": "search ราคาทอง",
+    "s": 1.66,
+    "prompt_n": 11,
+    "predicted_n": 6
+   },
+   "final": [
+    "search ราคาทอง"
+   ],
+   "ok": true,
+   "s": 1.66
+  },
+  {
+   "id": "hd02",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ค้นหาราคาทองหน่อยเข้าลิงแร่",
+   "plan": {
+    "reply": "search ราคาทอง ; result 1",
+    "s": 4.69,
+    "prompt_n": 55,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ราคาทอง",
+    "result 1"
+   ],
+   "ok": true,
+   "s": 4.69
+  },
+  {
+   "id": "hd03",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหารานอาหารใกล้ฉัน",
+   "plan": {
+    "reply": "search คนหาร้านอาหารใกล้ฉัน",
+    "s": 2.77,
+    "prompt_n": 24,
+    "predicted_n": 8
+   },
+   "final": [
+    "search คนหาร้านอาหารใกล้ฉัน"
+   ],
+   "ok": true,
+   "s": 2.77
+  },
+  {
+   "id": "hd04",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เสิร์จ ข่าว ฟุตบอล วันนี้",
+   "plan": {
+    "reply": "search ข่าวฟุตบอลวันนี้",
+    "s": 2.12,
+    "prompt_n": 15,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ข่าวฟุตบอลวันนี้"
+   ],
+   "ok": true,
+   "s": 2.12
+  },
+  {
+   "id": "hd05",
+   "cat": "plan",
+   "page": "blank",
+   "command": "กูเกินวิธีทำไข่เจียว",
+   "plan": {
+    "reply": "search วิธีทำไข่เจียว",
+    "s": 1.97,
+    "prompt_n": 13,
+    "predicted_n": 8
+   },
+   "final": [
+    "search วิธีทำไข่เจียว"
+   ],
+   "ok": true,
+   "s": 1.97
+  },
+  {
+   "id": "hd06",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "plan": {
+    "reply": "search เพลงใหม่",
+    "s": 1.51,
+    "prompt_n": 13,
+    "predicted_n": 5
+   },
+   "final": [
+    "search เพลงใหม่"
+   ],
+   "ok": true,
+   "s": 1.51
+  },
+  {
+   "id": "hd07",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ขาสุดแกงเขียวหวานหน่อย",
+   "plan": {
+    "reply": "search ขาสุดแกงเขียวหวาน",
+    "s": 2.41,
+    "prompt_n": 14,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ขาสุดแกงเขียวหวาน"
+   ],
+   "ok": false,
+   "s": 2.41
+  },
+  {
+   "id": "hd08",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ข้าวลิงแรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 3.26,
+    "prompt_n": 48,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 3.26
+  },
+  {
+   "id": "hd09",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงแรกให้หน่อย",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.2,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.2
+  },
+  {
+   "id": "hd10",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กดลิง ที่ สอง",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.12,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.12
+  },
+  {
+   "id": "hd11",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิด ลิง ที่ สาม",
+   "plan": {
+    "reply": "result 3",
+    "s": 1.19,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 3"
+   ],
+   "ok": true,
+   "s": 1.19
+  },
+  {
+   "id": "hd12",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เท่า เวทย์แรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.11,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.11
+  },
+  {
+   "id": "hd13",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "คลึกอันที่สี่",
+   "plan": {
+    "reply": "result 4",
+    "s": 1.28,
+    "prompt_n": 12,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 4"
+   ],
+   "ok": true,
+   "s": 1.28
+  },
+  {
+   "id": "hd14",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับ",
+   "plan": {
+    "reply": "back",
+    "s": 0.72,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.72
+  },
+  {
+   "id": "hd15",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อน กลับ หน่อย",
+   "plan": {
+    "reply": "back",
+    "s": 0.75,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.75
+  },
+  {
+   "id": "hd16",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าก่อนหน้า",
+   "plan": {
+    "reply": "back",
+    "s": 0.84,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.84
+  },
+  {
+   "id": "hd17",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ไปข้างมาฮะ",
+   "plan": {
+    "reply": "look ไปข้างมาฮะ",
+    "s": 1.75,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "ไปข้างมาฮะ",
+    "reply": "click 20",
+    "s": 123.49,
+    "prompt_n": 2177,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 20"
+   ],
+   "ok": false,
+   "s": 125.24
+  },
+  {
+   "id": "hd18",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "โหลดใหม่",
+   "plan": {
+    "reply": "reload",
+    "s": 0.74,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.74
+  },
+  {
+   "id": "hd19",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "รีเฟลดหน้านี้",
+   "plan": {
+    "reply": "reload",
+    "s": 0.99,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.99
+  },
+  {
+   "id": "hd20",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อน ลง",
+   "plan": {
+    "reply": "down",
+    "s": 0.68,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.68
+  },
+  {
+   "id": "hd21",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อน ลง อี",
+   "plan": {
+    "reply": "down",
+    "s": 0.63,
+    "prompt_n": 6,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.63
+  },
+  {
+   "id": "hd22",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อน คืน",
+   "plan": {
+    "reply": "down",
+    "s": 0.7,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": false,
+   "s": 0.7
+  },
+  {
+   "id": "hd23",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปก",
+   "plan": {
+    "reply": "look เปก",
+    "s": 1.08,
+    "prompt_n": 7,
+    "predicted_n": 4
+   },
+   "look": {
+    "task": "เปก",
+    "reply": "type 2 ราคาทองวันนี้",
+    "s": 1.99,
+    "prompt_n": 7,
+    "predicted_n": 9
+   },
+   "final": [
+    "type 2 ราคาทองวันนี้"
+   ],
+   "ok": false,
+   "s": 3.08
+  },
+  {
+   "id": "hd24",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ปิด หน้า หนี",
+   "plan": {
+    "reply": "close",
+    "s": 0.93,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "close"
+   ],
+   "ok": true,
+   "s": 0.93
+  },
+  {
+   "id": "hd25",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับ ไป แอ๊ก",
+   "plan": {
+    "reply": "back",
+    "s": 0.82,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": false,
+   "s": 0.82
+  },
+  {
+   "id": "hd26",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ตลับไปหน้าผู้ช่วย",
+   "plan": {
+    "reply": "chat",
+    "s": 0.94,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": false,
+   "s": 0.94
+  },
+  {
+   "id": "hd27",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ปาดกูการ",
+   "plan": {
+    "reply": "search ปาดกูการ",
+    "s": 2.46,
+    "prompt_n": 23,
+    "predicted_n": 7
+   },
+   "final": [
+    "search ปาดกูการ"
+   ],
+   "ok": false,
+   "s": 2.46
+  },
+  {
+   "id": "hd28",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิด",
+   "plan": {
+    "reply": "open = เปิดอะไร",
+    "s": 1.36,
+    "prompt_n": 6,
+    "predicted_n": 5
+   },
+   "final": [
+    "open = เปิดอะไร"
+   ],
+   "ok": false,
+   "s": 1.36
+  },
+  {
+   "id": "hd29",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดยูทูล",
+   "plan": {
+    "reply": "open youtube.com",
+    "s": 1.22,
+    "prompt_n": 8,
+    "predicted_n": 5
+   },
+   "final": [
+    "open youtube.com"
+   ],
+   "ok": true,
+   "s": 1.22
+  },
+  {
+   "id": "hd30",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ค้นหาไฟรายงาน",
+   "plan": {
+    "reply": "search ไฟรายงาน",
+    "s": 1.43,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "search ไฟรายงาน"
+   ],
+   "ok": false,
+   "s": 1.43
+  },
+  {
+   "id": "hd31",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาไฟที่แก้เมื่อวาน",
+   "plan": {
+    "reply": "chat",
+    "s": 0.91,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.91
+  },
+  {
+   "id": "hd32",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนนักประชุมไปพรุ่งนี้",
+   "plan": {
+    "reply": "chat",
+    "s": 1.02,
+    "prompt_n": 13,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.02
+  },
+  {
+   "id": "hd33",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปิด เสียง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.71,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.71
+  },
+  {
+   "id": "hd34",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดเสียง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.72,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.72
+  },
+  {
+   "id": "hd35",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปรับ เสียง เป็น สี่ สิบ",
+   "plan": {
+    "reply": "chat",
+    "s": 0.97,
+    "prompt_n": 13,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.97
+  },
+  {
+   "id": "hd36",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ตอนนี้ขี่โมง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.93,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.93
+  },
+  {
+   "id": "hd37",
+   "cat": "chat",
+   "page": "blank",
+   "command": "นกเลิกนัดคินยา",
+   "plan": {
+    "reply": "chat",
+    "s": 1.09,
+    "prompt_n": 14,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.09
+  },
+  {
+   "id": "hd38",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาค่าเฉลี่ยของสี่หกแปด",
+   "plan": {
+    "reply": "search ค่าเฉลี่ยของสี่หกแปด",
+    "s": 3.15,
+    "prompt_n": 17,
+    "predicted_n": 13
+   },
+   "final": [
+    "search ค่าเฉลี่ยของสี่หกแปด"
+   ],
+   "ok": false,
+   "s": 3.15
+  },
+  {
+   "id": "hd39",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ราคาทองวันนี้เท่าไหร่",
+   "plan": {
+    "reply": "search ราคาทองวันนี้เท่าไหร่",
+    "s": 2.48,
+    "prompt_n": 13,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ราคาทองวันนี้เท่าไหร่"
+   ],
+   "ok": false,
+   "s": 2.48
+  },
+  {
+   "id": "hd40",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดแอบเครื่องคิดเลข",
+   "plan": {
+    "reply": "open calculator",
+    "s": 1.18,
+    "prompt_n": 11,
+    "predicted_n": 3
+   },
+   "final": [
+    "open calculator"
+   ],
+   "ok": false,
+   "s": 1.18
+  },
+  {
+   "id": "hd41",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาราคาน้ำบันวันนี้",
+   "plan": {
+    "reply": "search ราคาน้ำวันนี้",
+    "s": 1.87,
+    "prompt_n": 12,
+    "predicted_n": 7
+   },
+   "final": [
+    "search ราคาน้ำวันนี้"
+   ],
+   "ok": false,
+   "s": 1.87
+  },
+  {
+   "id": "hd42",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "plan": {
+    "reply": "search โรงหนังแถวนี้",
+    "s": 1.96,
+    "prompt_n": 14,
+    "predicted_n": 7
+   },
+   "final": [
+    "search โรงหนังแถวนี้"
+   ],
+   "ok": true,
+   "s": 1.96
+  },
+  {
+   "id": "hd43",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ช่วยเสิร์ฟตารางรถไฟไปเชียงใหม่",
+   "plan": {
+    "reply": "search ตารางรถไฟไปเชียงใหม่",
+    "s": 2.56,
+    "prompt_n": 17,
+    "predicted_n": 10
+   },
+   "final": [
+    "search ตารางรถไฟไปเชียงใหม่"
+   ],
+   "ok": true,
+   "s": 2.56
+  },
+  {
+   "id": "hd44",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนในกูเกินว่าวันหยุดเดือนน่ามีวันไหน",
+   "plan": {
+    "reply": "chat",
+    "s": 1.3,
+    "prompt_n": 18,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": false,
+   "s": 1.3
+  },
+  {
+   "id": "hd45",
+   "cat": "plan",
+   "page": "blank",
+   "command": "หาวิธีปลูกมะนาวในกระถาง",
+   "plan": {
+    "reply": "search วิธีปลูกมะนาวในกระถาง",
+    "s": 2.96,
+    "prompt_n": 17,
+    "predicted_n": 12
+   },
+   "final": [
+    "search วิธีปลูกมะนาวในกระถาง"
+   ],
+   "ok": true,
+   "s": 2.96
+  },
+  {
+   "id": "hd46",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาคำว่า ปัญญาประดิษฐ์",
+   "plan": {
+    "reply": "search ปัญญาประดิษฐ์",
+    "s": 2.2,
+    "prompt_n": 16,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ปัญญาประดิษฐ์"
+   ],
+   "ok": true,
+   "s": 2.2
+  },
+  {
+   "id": "hd47",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาสิบห้าครับ",
+   "plan": {
+    "reply": "search คนหา",
+    "s": 1.5,
+    "prompt_n": 12,
+    "predicted_n": 4
+   },
+   "final": [
+    "search คนหา"
+   ],
+   "ok": false,
+   "s": 1.5
+  },
+  {
+   "id": "hd48",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "คนหาผลบอลเมื่อคืนแล้วเข้าลิงแรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 3.51,
+    "prompt_n": 54,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": false,
+   "s": 3.51
+  },
+  {
+   "id": "hd49",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงแรกเลย",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.14,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.14
+  },
+  {
+   "id": "hd50",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงอันแรกครับ",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.08,
+    "prompt_n": 8,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.08
+  },
+  {
+   "id": "hd51",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กด เข้า ลิง ที่ หนึ่ง",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.5,
+    "prompt_n": 11,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.5
+  },
+  {
+   "id": "hd52",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิด ลิง ที่ สอง",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.23,
+    "prompt_n": 11,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.23
+  },
+  {
+   "id": "hd53",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงที่สอง",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.13,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.13
+  },
+  {
+   "id": "hd54",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ขลิกกลิงที่สามให้หน่อย",
+   "plan": {
+    "reply": "result 3",
+    "s": 1.4,
+    "prompt_n": 14,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 3"
+   ],
+   "ok": true,
+   "s": 1.4
+  },
+  {
+   "id": "hd55",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าผลลับที่ห้า",
+   "plan": {
+    "reply": "result 5",
+    "s": 1.27,
+    "prompt_n": 11,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 5"
+   ],
+   "ok": true,
+   "s": 1.27
+  },
+  {
+   "id": "hd56",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิด เว็บ ที่ สอง ครับ",
+   "plan": {
+    "reply": "result 2",
+    "s": 1.4,
+    "prompt_n": 12,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 2"
+   ],
+   "ok": true,
+   "s": 1.4
+  },
+  {
+   "id": "hd57",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับครับ",
+   "plan": {
+    "reply": "back",
+    "s": 0.79,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.79
+  },
+  {
+   "id": "hd58",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ถอยกลับไปหน้าเดิม",
+   "plan": {
+    "reply": "back",
+    "s": 0.93,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.93
+  },
+  {
+   "id": "hd59",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับหน้าที่แล้ว",
+   "plan": {
+    "reply": "back",
+    "s": 0.71,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.71
+  },
+  {
+   "id": "hd60",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ยอน กลับ ไป หน้า ที่ แล้ว หน่อย",
+   "plan": {
+    "reply": "back",
+    "s": 0.96,
+    "prompt_n": 13,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.96
+  },
+  {
+   "id": "hd61",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ไปหน้าค้างนะฮะ",
+   "plan": {
+    "reply": "look ไปหน้าค้างนะฮะ",
+    "s": 2.1,
+    "prompt_n": 12,
+    "predicted_n": 9
+   },
+   "look": {
+    "task": "ไปหน้าค้างนะฮะ",
+    "reply": "click 18",
+    "s": 1.54,
+    "prompt_n": 12,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 18"
+   ],
+   "ok": false,
+   "s": 3.65
+  },
+  {
+   "id": "hd62",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เดินหน้า",
+   "plan": {
+    "reply": "down",
+    "s": 0.7,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": false,
+   "s": 0.7
+  },
+  {
+   "id": "hd63",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ตีโหลด",
+   "plan": {
+    "reply": "reload",
+    "s": 0.69,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.69
+  },
+  {
+   "id": "hd65",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงหน่อย",
+   "plan": {
+    "reply": "down",
+    "s": 0.81,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.81
+  },
+  {
+   "id": "hd66",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อด น่า ลง",
+   "plan": {
+    "reply": "look เลื่อด น่า ลง",
+    "s": 1.6,
+    "prompt_n": 9,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "เลื่อด น่า ลง",
+    "reply": "type 2 ราคาทองวันนี้ ; click 3",
+    "s": 2.87,
+    "prompt_n": 10,
+    "predicted_n": 13
+   },
+   "final": [
+    "type 2 ราคาทองวันนี้",
+    "click 3"
+   ],
+   "ok": false,
+   "s": 4.47
+  },
+  {
+   "id": "hd68",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อน กลับ ขึ้น ไป",
+   "plan": {
+    "reply": "down ; up",
+    "s": 1.18,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "down",
+    "up"
+   ],
+   "ok": false,
+   "s": 1.18
+  },
+  {
+   "id": "hd70",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ปิด เว็บ นี้",
+   "plan": {
+    "reply": "close",
+    "s": 0.92,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "close"
+   ],
+   "ok": true,
+   "s": 0.92
+  },
+  {
+   "id": "hd71",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับ ไป ที่ แอ๊ก",
+   "plan": {
+    "reply": "back",
+    "s": 0.89,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": false,
+   "s": 0.89
+  },
+  {
+   "id": "hd72",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับ ไป หน้า แฉด",
+   "plan": {
+    "reply": "back",
+    "s": 0.83,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": false,
+   "s": 0.83
+  },
+  {
+   "id": "hd73",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิด กู เกิ้ล หน่อย",
+   "plan": {
+    "reply": "open google.com",
+    "s": 2.16,
+    "prompt_n": 25,
+    "predicted_n": 5
+   },
+   "final": [
+    "open google.com"
+   ],
+   "ok": true,
+   "s": 2.16
+  },
+  {
+   "id": "hd74",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดเวฟยูทูก",
+   "plan": {
+    "reply": "open youtube.com",
+    "s": 1.38,
+    "prompt_n": 10,
+    "predicted_n": 5
+   },
+   "final": [
+    "open youtube.com"
+   ],
+   "ok": true,
+   "s": 1.38
+  },
+  {
+   "id": "hd75",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิด วิกฤติพีเดีย",
+   "plan": {
+    "reply": "open วิกฤติพีเดีย",
+    "s": 2.11,
+    "prompt_n": 12,
+    "predicted_n": 9
+   },
+   "final": [
+    "open วิกฤติพีเดีย"
+   ],
+   "ok": false,
+   "s": 2.11
+  },
+  {
+   "id": "hd76",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ค้นหาใส่ที่ทำเมื่อวาน",
+   "plan": {
+    "reply": "search ใส่ที่ทำเมื่อวาน",
+    "s": 2.06,
+    "prompt_n": 14,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ใส่ที่ทำเมื่อวาน"
+   ],
+   "ok": false,
+   "s": 2.06
+  },
+  {
+   "id": "hd77",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาไฟใบเสร็จ",
+   "plan": {
+    "reply": "search หาไฟใบเสร็จ",
+    "s": 1.72,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "final": [
+    "search หาไฟใบเสร็จ"
+   ],
+   "ok": false,
+   "s": 1.72
+  },
+  {
+   "id": "hd78",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ถ้าเอกสารรายงานประจำเดือน",
+   "plan": {
+    "reply": "chat",
+    "s": 0.92,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.92
+  },
+  {
+   "id": "hd79",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนัดหมอฟันเป็นวันศุกร์",
+   "plan": {
+    "reply": "chat",
+    "s": 1.08,
+    "prompt_n": 16,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.08
+  },
+  {
+   "id": "hd80",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "plan": {
+    "reply": "chat",
+    "s": 1.03,
+    "prompt_n": 13,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.03
+  },
+  {
+   "id": "hd81",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปิด เสียง หน่อย",
+   "plan": {
+    "reply": "chat",
+    "s": 0.83,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.83
+  },
+  {
+   "id": "hd82",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เพิ่ม เสียง",
+   "plan": {
+    "reply": "chat",
+    "s": 0.73,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.73
+  },
+  {
+   "id": "hd83",
+   "cat": "chat",
+   "page": "blank",
+   "command": "รถเสียงลงหน่อย",
+   "plan": {
+    "reply": "chat",
+    "s": 0.81,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.81
+  },
+  {
+   "id": "hd84",
+   "cat": "chat",
+   "page": "blank",
+   "command": "วันนี้วันที่เท่าไหร่",
+   "plan": {
+    "reply": "chat",
+    "s": 0.96,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.96
+  },
+  {
+   "id": "hd85",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ลบนัดประชุมพรุ่งนี้",
+   "plan": {
+    "reply": "chat",
+    "s": 0.95,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.95
+  },
+  {
+   "id": "hd86",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หา ผล รวม ของ สิบ สอง กับ สาม สิบ",
+   "plan": {
+    "reply": "chat",
+    "s": 1.21,
+    "prompt_n": 17,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.21
+  },
+  {
+   "id": "hd87",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เขา วันนี้ มี อะไร บ้าง",
+   "plan": {
+    "reply": "search เขา วันนี้ มี อะไร บ้าง",
+    "s": 2.22,
+    "prompt_n": 11,
+    "predicted_n": 8
+   },
+   "final": [
+    "search เขา วันนี้ มี อะไร บ้าง"
+   ],
+   "ok": false,
+   "s": 2.22
+  },
+  {
+   "id": "hd88",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เครื่องช้าเพราะอะไร",
+   "plan": {
+    "reply": "chat",
+    "s": 0.87,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.87
+  },
+  {
+   "id": "hd89",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดโหมดประชุม",
+   "plan": {
+    "reply": "chat",
+    "s": 0.82,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.82
+  },
+  {
+   "id": "hd90",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ย้อนกลับเมื่อกี้ทีปรับเสียง",
+   "plan": {
+    "reply": "back",
+    "s": 1.06,
+    "prompt_n": 14,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": false,
+   "s": 1.06
+  },
+  {
+   "id": "hd91",
+   "cat": "chat",
+   "page": "blank",
+   "command": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "plan": {
+    "reply": "chat",
+    "s": 1.16,
+    "prompt_n": 16,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.16
+  },
+  {
+   "id": "hd92",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เขียน กลอน สั้น เขียน กลอน สั้น เรื่อง ฝน",
+   "plan": {
+    "reply": "chat",
+    "s": 1.31,
+    "prompt_n": 18,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.31
+  },
+  {
+   "id": "d07",
+   "cat": "look",
+   "page": "form",
+   "command": "ใส่หัวหอมด้วย",
+   "plan": {
+    "reply": "look ใส่หัวหอมด้วย",
+    "s": 2.55,
+    "prompt_n": 26,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "ใส่หัวหอมด้วย",
+    "reply": "type 1 หัวหอม",
+    "s": 89.27,
+    "prompt_n": 1610,
+    "predicted_n": 7
+   },
+   "final": [
+    "type 1 หัวหอม"
+   ],
+   "ok": false,
+   "s": 91.82
+  },
+  {
+   "id": "d08",
+   "cat": "look",
+   "page": "form",
+   "command": "พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+   "plan": {
+    "reply": "look พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+    "s": 3.05,
+    "prompt_n": 16,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+    "reply": "type 1 ไม่ใส่ผัก",
+    "s": 2.21,
+    "prompt_n": 16,
+    "predicted_n": 8
+   },
+   "final": [
+    "type 1 ไม่ใส่ผัก"
+   ],
+   "ok": false,
+   "s": 5.26
+  },
+  {
+   "id": "d21",
+   "cat": "look",
+   "page": "ddg-weather",
+   "command": "วันศุกร์โอกาสฝนตกเท่าไหร่",
+   "plan": {
+    "reply": "look วันศุกร์โอกาสฝนตกเท่าไหร่",
+    "s": 5.38,
+    "prompt_n": 61,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "วันศุกร์โอกาสฝนตกเท่าไหร่",
+    "reply": "answer 50 %",
+    "s": 34.5,
+    "prompt_n": 587,
+    "predicted_n": 6
+   },
+   "final": [
+    "answer 50 %"
+   ],
+   "ok": true,
+   "s": 39.87
+  },
+  {
+   "id": "d26",
+   "cat": "look",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บ investing",
+   "plan": {
+    "reply": "open investing.com",
+    "s": 3.41,
+    "prompt_n": 47,
+    "predicted_n": 5
+   },
+   "final": [
+    "open investing.com"
+   ],
+   "ok": false,
+   "s": 3.41
+  },
+  {
+   "id": "d34",
+   "cat": "chat",
+   "page": "youtube",
+   "command": "มีนัดอะไรบ้างวันนี้",
+   "plan": {
+    "reply": "look มีนัดอะไรบ้างวันนี้",
+    "s": 2.63,
+    "prompt_n": 25,
+    "predicted_n": 8
+   },
+   "look": {
+    "task": "มีนัดอะไรบ้างวันนี้",
+    "reply": "chat",
+    "s": 88.32,
+    "prompt_n": 1604,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 90.95
+  },
+  {
+   "id": "d36",
+   "cat": "look",
+   "page": "wiki-th",
+   "command": "สรุปบทความนี้ให้หน่อย",
+   "plan": {
+    "reply": "look สรุปบทความนี้ให้หน่อย",
+    "s": 4.14,
+    "prompt_n": 45,
+    "predicted_n": 10
+   },
+   "look": {
+    "task": "สรุปบทความนี้ให้หน่อย",
+    "reply": "chat",
+    "s": 48.48,
+    "prompt_n": 841,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": false,
+   "s": 52.63
+  }
+ ]
+}
