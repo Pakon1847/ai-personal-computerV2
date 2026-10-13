@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>อัดเสียงทดสอบ</title>
+<style>
+  :root { --bg:#f7f7f5; --fg:#1d1d1b; --muted:#6b6b66; --card:#fff; --line:#e3e3de; --accent:#2f6fde; --ok:#1f8a4c; --warn:#b26a00; --bad:#c23b2b; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#161615; --fg:#ecece8; --muted:#a3a39c; --card:#20201e; --line:#34342f; --accent:#7aa7ff; --ok:#5cc489; --warn:#e3a23b; --bad:#ff7b6b; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font: 17px/1.55 "Sarabun","Noto Sans Thai",system-ui,sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .muted { color: var(--muted); font-size: 15px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin:14px 0; }
+  label { display:block; margin:10px 0 4px; font-weight:600; }
+  select, input { font: inherit; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--fg); width:100%; }
+  button { font: inherit; padding:9px 16px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--fg); cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button:disabled { opacity:.45; cursor:default; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  #prompt { font-size: 34px; line-height:1.35; font-weight:700; margin: 8px 0 4px; word-break: break-word; }
+  #mode { font-size: 15px; font-weight:600; }
+  .say { color: var(--accent); } .task { color: var(--warn); }
+  #meter { height: 12px; border-radius: 6px; background: var(--line); overflow:hidden; margin: 14px 0 6px; }
+  #meter > div { height:100%; width:0; background: var(--ok); transition: width .05s linear; }
+  #state { font-weight:700; min-height: 1.6em; }
+  .rec { color: var(--bad); } .done { color: var(--ok); } .warnc { color: var(--warn); }
+  #bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden; }
+  #bar > div { height:100%; background:var(--accent); width:0; }
+  kbd { border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 6px; font-size: 14px; }
+  .hidden { display:none; }
+  table { border-collapse: collapse; width:100%; font-size: 15px; }
+  td { border-top:1px solid var(--line); padding:4px 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>อัดเสียงทดสอบสั่งเว็บด้วยเสียง</h1>
+  <div class="muted">การ์ด 0026 · เสียงอยู่ในเครื่องนี้เท่านั้นจนกว่าจะกด "ส่งออก" · ไฟล์ที่ส่งออกมีเสียงของคุณ ใช้ทดสอบระบบเท่านั้น และลบหลังส่งเล่ม</div>
+
+  <section id="setup" class="card">
+    <label for="speaker">ชื่อย่อผู้พูด</label>
+    <input id="speaker" value="pakon" maxlength="20">
+    <label for="mic">ไมค์ (เลือกตัวที่จะใช้กับเครื่องจริง)</label>
+    <select id="mic"><option>กด "ขอใช้ไมค์" ก่อน</option></select>
+    <div class="row" style="margin-top:12px">
+      <button id="perm">ขอใช้ไมค์</button>
+      <button id="start" class="primary" disabled>เริ่มอัด</button>
+    </div>
+    <p class="muted">วิธีใช้: กด <kbd>Space</kbd> แล้วพูด · พูดจบแล้วเงียบ ระบบหยุดอัดและไปข้อถัดไปเอง · พูดผิดกด <kbd>←</kbd> กลับไปอัดใหม่ ·
+      ข้อที่เขียนว่า <b class="say">พูดตามนี้</b> ให้อ่านตามตัวอักษร · ข้อที่เขียนว่า <b class="task">พูดด้วยคำของคุณเอง</b> ให้สั่งแบบที่คุณจะพูดจริง ·
+      พูดเสียงปกติ ระยะเท่าตอนใช้เครื่องจริง · ปิดหน้านี้แล้วเปิดใหม่ทำต่อได้</p>
+  </section>
+
+  <section id="work" class="card hidden">
+    <div class="row" style="justify-content:space-between">
+      <div id="pos" class="muted"></div>
+      <div class="muted" id="setname"></div>
+    </div>
+    <div id="bar"><div></div></div>
+    <div id="mode" style="margin-top:14px"></div>
+    <div id="prompt"></div>
+    <div id="meter"><div></div></div>
+    <div id="state"></div>
+    <div class="row" style="margin-top:10px">
+      <button id="prev">← ข้อก่อน</button>
+      <button id="rec" class="primary">อัด (Space)</button>
+      <button id="play" disabled>ฟังที่อัด</button>
+      <button id="next">ข้อถัดไป →</button>
+      <span style="flex:1"></span>
+      <button id="export">ส่งออก</button>
+    </div>
+  </section>
+
+  <section id="list" class="card hidden">
+    <b>สรุป</b> <span id="count" class="muted"></span>
+    <table id="tbl"></table>
+  </section>
+</main>
+<script>
+const ITEMS = [{"id": "d01", "set": "D", "mode": "say", "prompt": "ค้นหาราคาทองวันนี้", "expect": [{"kind": "search", "has": ["ราคาทอง"]}]}, {"id": "d02", "set": "D", "mode": "say", "prompt": "หาร้านกาแฟใกล้ฉัน", "expect": [{"kind": "search", "has": ["กาแฟ"]}]}, {"id": "d03", "set": "D", "mode": "say", "prompt": "เสิร์ชผลบอลเมื่อคืน", "expect": [{"kind": "search", "has": ["บอล"]}]}, {"id": "d04", "set": "D", "mode": "say", "prompt": "ค้นหาวิธีทำแกงเขียวหวานแล้วเข้าลิงก์แรก", "expect": [{"kind": "search", "has": ["แกงเขียวหวาน"]}, {"kind": "open", "n": 1}]}, {"id": "d05", "set": "D", "mode": "say", "prompt": "เข้าลิงก์แรก", "expect": [{"kind": "open", "n": 1}]}, {"id": "d06", "set": "D", "mode": "say", "prompt": "เปิดลิงก์ที่สอง", "expect": [{"kind": "open", "n": 2}]}, {"id": "d07", "set": "D", "mode": "say", "prompt": "กดลิงก์ที่สาม", "expect": [{"kind": "open", "n": 3}]}, {"id": "d08", "set": "D", "mode": "say", "prompt": "เข้าเว็บที่สี่", "expect": [{"kind": "open", "n": 4}]}, {"id": "d09", "set": "D", "mode": "say", "prompt": "ย้อนกลับ", "expect": [{"kind": "back"}]}, {"id": "d10", "set": "D", "mode": "say", "prompt": "กลับไปหน้าก่อน", "expect": [{"kind": "back"}]}, {"id": "d11", "set": "D", "mode": "say", "prompt": "ไปข้างหน้า", "expect": [{"kind": "forward"}]}, {"id": "d12", "set": "D", "mode": "say", "prompt": "โหลดใหม่", "expect": [{"kind": "reload"}]}, {"id": "d13", "set": "D", "mode": "say", "prompt": "รีเฟรชหน้านี้", "expect": [{"kind": "reload"}]}, {"id": "d14", "set": "D", "mode": "say", "prompt": "เลื่อนลง", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "d15", "set": "D", "mode": "say", "prompt": "เลื่อนขึ้น", "expect": [{"kind": "scroll", "direction": "up"}]}, {"id": "d16", "set": "D", "mode": "say", "prompt": "ปิดแท็บ", "expect": [{"kind": "close"}]}, {"id": "d17", "set": "D", "mode": "say", "prompt": "ปิดหน้านี้", "expect": [{"kind": "close"}]}, {"id": "d18", "set": "D", "mode": "say", "prompt": "กลับไปแอป", "expect": [{"kind": "app"}]}, {"id": "d19", "set": "D", "mode": "say", "prompt": "เปิดยูทูบ", "expect": [{"kind": "site", "site": "youtube"}]}, {"id": "d20", "set": "D", "mode": "say", "prompt": "เปิดกูเกิล", "expect": [{"kind": "site", "site": "google"}]}, {"id": "d21", "set": "D", "mode": "say", "prompt": "เปิดวิกิพีเดีย", "expect": [{"kind": "site", "site": "wikipedia"}]}, {"id": "d22", "set": "D", "mode": "say", "prompt": "เลื่อนลงอีกหน่อย", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "d23", "set": "D", "mode": "say", "prompt": "ย้อนกลับไปหน้าที่แล้ว", "expect": [{"kind": "back"}]}, {"id": "d24", "set": "D", "mode": "say", "prompt": "ค้นหาหนังใหม่เดือนนี้", "expect": [{"kind": "search", "has": ["หนัง"]}]}, {"id": "d25", "set": "D", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: สูตรต้มยำกุ้ง", "expect": [{"kind": "search", "has": ["ต้มยำ"]}]}, {"id": "d26", "set": "D", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันแรก", "expect": [{"kind": "open", "n": 1}]}, {"id": "d27", "set": "D", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่ห้า", "expect": [{"kind": "open", "n": 5}]}, {"id": "d28", "set": "D", "mode": "task", "prompt": "ให้ถอยกลับไปหน้าก่อนหน้า", "expect": [{"kind": "back"}]}, {"id": "d29", "set": "D", "mode": "task", "prompt": "ให้โหลดหน้าเว็บนี้ใหม่", "expect": [{"kind": "reload"}]}, {"id": "d30", "set": "D", "mode": "task", "prompt": "ให้เลื่อนหน้าเว็บลงไปดูต่อ", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "d31", "set": "D", "mode": "task", "prompt": "ให้เลื่อนกลับขึ้นไปข้างบน", "expect": [{"kind": "scroll", "direction": "up"}]}, {"id": "d32", "set": "D", "mode": "task", "prompt": "ให้ปิดแท็บที่เปิดอยู่", "expect": [{"kind": "close"}]}, {"id": "d33", "set": "D", "mode": "task", "prompt": "ให้กลับไปที่หน้าผู้ช่วย", "expect": [{"kind": "app"}]}, {"id": "d34", "set": "D", "mode": "task", "prompt": "ให้เปิดเว็บยูทูบ", "expect": [{"kind": "site", "site": "youtube"}]}, {"id": "d35", "set": "D", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ข่าวน้ำท่วมเชียงใหม่ แล้วเข้าผลแรก", "expect": [{"kind": "search", "has": ["น้ำท่วม"]}, {"kind": "open", "n": 1}]}, {"id": "d36", "set": "D", "mode": "task", "prompt": "ให้ไปหน้าถัดไป (หลังจากย้อนกลับมาแล้ว)", "expect": [{"kind": "forward"}]}, {"id": "d37", "set": "D", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ราคาน้ำมันพรุ่งนี้", "expect": [{"kind": "search", "has": ["น้ำมัน"]}]}, {"id": "d38", "set": "D", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่สอง", "expect": [{"kind": "open", "n": 2}]}, {"id": "d39", "set": "D", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: เพลงคาราบาว", "expect": [{"kind": "search", "has": ["คาราบาว"]}]}, {"id": "d40", "set": "D", "mode": "task", "prompt": "ให้เปิดเว็บกูเกิล", "expect": [{"kind": "site", "site": "google"}]}, {"id": "d41", "set": "D", "mode": "say", "prompt": "ตอนนี้กี่โมงแล้ว", "expect": []}, {"id": "d42", "set": "D", "mode": "say", "prompt": "พรุ่งนี้มีนัดอะไรบ้าง", "expect": []}, {"id": "d43", "set": "D", "mode": "say", "prompt": "ปิดเสียงหน่อย", "expect": []}, {"id": "d44", "set": "D", "mode": "say", "prompt": "เปิดเสียงดังขึ้นอีกนิด", "expect": []}, {"id": "d45", "set": "D", "mode": "say", "prompt": "ช่วยสรุปข่าวนี้ให้หน่อย", "expect": []}, {"id": "d46", "set": "D", "mode": "say", "prompt": "ค้นหาไฟล์รายงานเมื่อวาน", "expect": []}, {"id": "d47", "set": "D", "mode": "say", "prompt": "ย้อนกลับไปดูนัดเมื่อวาน", "expect": []}, {"id": "d48", "set": "D", "mode": "say", "prompt": "เปิดโหมดทำงาน", "expect": []}, {"id": "d49", "set": "D", "mode": "say", "prompt": "ตั้งเตือนตอนห้าโมงเย็น", "expect": []}, {"id": "d50", "set": "D", "mode": "say", "prompt": "อากาศวันนี้เป็นยังไง", "expect": []}, {"id": "d51", "set": "D", "mode": "say", "prompt": "ขอบคุณมากครับ", "expect": []}, {"id": "d52", "set": "D", "mode": "say", "prompt": "เลื่อนนัดหมอไปวันศุกร์", "expect": []}, {"id": "d53", "set": "D", "mode": "say", "prompt": "ปิดเครื่อง", "expect": []}, {"id": "d54", "set": "D", "mode": "say", "prompt": "กลับบ้านกี่โมงดี", "expect": []}, {"id": "d55", "set": "D", "mode": "say", "prompt": "เปิดไฟล์สไลด์ที่ทำเมื่อวาน", "expect": []}, {"id": "d56", "set": "D", "mode": "say", "prompt": "ลิงก์นี้ปลอดภัยไหม", "expect": []}, {"id": "d57", "set": "D", "mode": "say", "prompt": "หาค่าเฉลี่ยของสิบกับยี่สิบ", "expect": []}, {"id": "d58", "set": "D", "mode": "say", "prompt": "แปลคำว่าขอบคุณเป็นภาษาอังกฤษ", "expect": []}, {"id": "d59", "set": "D", "mode": "say", "prompt": "เขียนอีเมลขอลางานให้หน่อย", "expect": []}, {"id": "d60", "set": "D", "mode": "say", "prompt": "วันนี้วันอะไร", "expect": []}, {"id": "h001", "set": "H", "mode": "say", "prompt": "ค้นหาตารางรถไฟไปเชียงใหม่", "expect": [{"kind": "search", "has": ["รถไฟ"]}]}, {"id": "h002", "set": "H", "mode": "say", "prompt": "หาที่เที่ยวใกล้กรุงเทพ", "expect": [{"kind": "search", "has": ["เที่ยว"]}]}, {"id": "h003", "set": "H", "mode": "say", "prompt": "ค้นหาโปรโมชั่นมือถือเดือนนี้", "expect": [{"kind": "search", "has": ["มือถือ"]}]}, {"id": "h004", "set": "H", "mode": "say", "prompt": "เข้าลิงก์ที่สอง", "expect": [{"kind": "open", "n": 2}]}, {"id": "h005", "set": "H", "mode": "say", "prompt": "เปิดลิงก์แรกให้หน่อย", "expect": [{"kind": "open", "n": 1}]}, {"id": "h006", "set": "H", "mode": "say", "prompt": "คลิกลิงก์ที่สี่", "expect": [{"kind": "open", "n": 4}]}, {"id": "h007", "set": "H", "mode": "say", "prompt": "ย้อนกลับหน่อย", "expect": [{"kind": "back"}]}, {"id": "h008", "set": "H", "mode": "say", "prompt": "ไปข้างหน้าอีกที", "expect": [{"kind": "forward"}]}, {"id": "h009", "set": "H", "mode": "say", "prompt": "โหลดหน้านี้ใหม่", "expect": [{"kind": "reload"}]}, {"id": "h010", "set": "H", "mode": "say", "prompt": "เลื่อนลงไปอีก", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "h011", "set": "H", "mode": "say", "prompt": "เลื่อนขึ้นหน่อย", "expect": [{"kind": "scroll", "direction": "up"}]}, {"id": "h012", "set": "H", "mode": "say", "prompt": "ปิดแท็บนี้", "expect": [{"kind": "close"}]}, {"id": "h013", "set": "H", "mode": "say", "prompt": "กลับไปที่แอป", "expect": [{"kind": "app"}]}, {"id": "h014", "set": "H", "mode": "say", "prompt": "เปิดเว็บยูทูบ", "expect": [{"kind": "site", "site": "youtube"}]}, {"id": "h015", "set": "H", "mode": "say", "prompt": "เปิดกูเกิลให้หน่อย", "expect": [{"kind": "site", "site": "google"}]}, {"id": "h016", "set": "H", "mode": "say", "prompt": "ค้นหาสูตรขนมปังแล้วเข้าลิงก์ที่สอง", "expect": [{"kind": "search", "has": ["ขนมปัง"]}, {"kind": "open", "n": 2}]}, {"id": "h017", "set": "H", "mode": "say", "prompt": "รีเฟรช", "expect": [{"kind": "reload"}]}, {"id": "h018", "set": "H", "mode": "say", "prompt": "ถอยกลับ", "expect": [{"kind": "back"}]}, {"id": "h019", "set": "H", "mode": "say", "prompt": "ปิดหน้าเว็บนี้", "expect": [{"kind": "close"}]}, {"id": "h020", "set": "H", "mode": "say", "prompt": "เปิดจีเมล", "expect": [{"kind": "site", "site": "gmail"}]}, {"id": "h021", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ราคาไอโฟนรุ่นล่าสุด", "expect": [{"kind": "search", "has": ["ไอโฟน"]}]}, {"id": "h022", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: วิธีปลูกมะนาว", "expect": [{"kind": "search", "has": ["มะนาว"]}]}, {"id": "h023", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ร้านส้มตำแถวนี้", "expect": [{"kind": "search", "has": ["ส้มตำ"]}]}, {"id": "h024", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ผลหวยงวดล่าสุด", "expect": [{"kind": "search", "has": ["หวย"]}]}, {"id": "h025", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ตารางฟุตบอลคืนนี้", "expect": [{"kind": "search", "has": ["ฟุตบอล"]}]}, {"id": "h026", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: อาการไข้หวัดใหญ่", "expect": [{"kind": "search", "has": ["ไข้หวัด"]}]}, {"id": "h027", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ที่พักหัวหิน", "expect": [{"kind": "search", "has": ["หัวหิน"]}]}, {"id": "h028", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: วิธีทำไข่ตุ๋น", "expect": [{"kind": "search", "has": ["ไข่ตุ๋น"]}]}, {"id": "h029", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ข่าวการเมืองวันนี้", "expect": [{"kind": "search", "has": ["การเมือง"]}]}, {"id": "h030", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ราคาน้ำมันดีเซล", "expect": [{"kind": "search", "has": ["ดีเซล"]}]}, {"id": "h031", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: เพลงลูกทุ่งใหม่", "expect": [{"kind": "search", "has": ["ลูกทุ่ง"]}]}, {"id": "h032", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ร้านซ่อมคอมพิวเตอร์", "expect": [{"kind": "search", "has": ["ซ่อม"]}]}, {"id": "h033", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: สภาพอากาศเชียงราย", "expect": [{"kind": "search", "has": ["เชียงราย"]}]}, {"id": "h034", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: หนังการ์ตูนเข้าใหม่", "expect": [{"kind": "search", "has": ["การ์ตูน"]}]}, {"id": "h035", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: วิธีลดความอ้วน", "expect": [{"kind": "search", "has": ["อ้วน"]}]}, {"id": "h036", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ราคาทองคำ แล้วเปิดผลแรก (พูดรวดเดียว)", "expect": [{"kind": "search", "has": ["ทอง"]}, {"kind": "open", "n": 1}]}, {"id": "h037", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: สูตรผัดกะเพรา แล้วเปิดผลที่สาม (พูดรวดเดียว)", "expect": [{"kind": "search", "has": ["กะเพรา"]}, {"kind": "open", "n": 3}]}, {"id": "h038", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันแรก", "expect": [{"kind": "open", "n": 1}]}, {"id": "h039", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่สอง", "expect": [{"kind": "open", "n": 2}]}, {"id": "h040", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่สาม", "expect": [{"kind": "open", "n": 3}]}, {"id": "h041", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่หก", "expect": [{"kind": "open", "n": 6}]}, {"id": "h042", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่สี่", "expect": [{"kind": "open", "n": 4}]}, {"id": "h043", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่ห้า", "expect": [{"kind": "open", "n": 5}]}, {"id": "h044", "set": "H", "mode": "task", "prompt": "ให้กลับไปหน้าก่อนหน้า", "expect": [{"kind": "back"}]}, {"id": "h045", "set": "H", "mode": "task", "prompt": "ให้กลับไปหน้าก่อนหน้า (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "back"}]}, {"id": "h046", "set": "H", "mode": "task", "prompt": "ให้ไปหน้าถัดไป (หลังจากย้อนกลับมาแล้ว)", "expect": [{"kind": "forward"}]}, {"id": "h047", "set": "H", "mode": "task", "prompt": "ให้โหลดหน้าเว็บใหม่", "expect": [{"kind": "reload"}]}, {"id": "h048", "set": "H", "mode": "task", "prompt": "ให้โหลดหน้าเว็บใหม่ (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "reload"}]}, {"id": "h049", "set": "H", "mode": "task", "prompt": "ให้เลื่อนหน้าเว็บลง", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "h050", "set": "H", "mode": "task", "prompt": "ให้เลื่อนหน้าเว็บลง (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "h051", "set": "H", "mode": "task", "prompt": "ให้เลื่อนหน้าเว็บขึ้น", "expect": [{"kind": "scroll", "direction": "up"}]}, {"id": "h052", "set": "H", "mode": "task", "prompt": "ให้เลื่อนหน้าเว็บขึ้น (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "scroll", "direction": "up"}]}, {"id": "h053", "set": "H", "mode": "task", "prompt": "ให้ปิดแท็บที่เปิดอยู่", "expect": [{"kind": "close"}]}, {"id": "h054", "set": "H", "mode": "task", "prompt": "ให้ปิดแท็บที่เปิดอยู่ (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "close"}]}, {"id": "h055", "set": "H", "mode": "task", "prompt": "ให้กลับไปหน้าผู้ช่วย", "expect": [{"kind": "app"}]}, {"id": "h056", "set": "H", "mode": "task", "prompt": "ให้กลับไปหน้าผู้ช่วย (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "app"}]}, {"id": "h057", "set": "H", "mode": "task", "prompt": "ให้เปิดเว็บยูทูบ", "expect": [{"kind": "site", "site": "youtube"}]}, {"id": "h058", "set": "H", "mode": "task", "prompt": "ให้เปิดเว็บกูเกิล", "expect": [{"kind": "site", "site": "google"}]}, {"id": "h059", "set": "H", "mode": "task", "prompt": "ให้เปิดเว็บวิกิพีเดีย", "expect": [{"kind": "site", "site": "wikipedia"}]}, {"id": "h060", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ค่าเงินดอลลาร์วันนี้", "expect": [{"kind": "search", "has": ["ดอลลาร์"]}]}, {"id": "h061", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: วิธีเปลี่ยนยางรถยนต์", "expect": [{"kind": "search", "has": ["ยาง"]}]}, {"id": "h062", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: โรงพยาบาลใกล้ที่สุด", "expect": [{"kind": "search", "has": ["โรงพยาบาล"]}]}, {"id": "h063", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: คอร์สเรียนภาษาอังกฤษฟรี", "expect": [{"kind": "search", "has": ["อังกฤษ"]}]}, {"id": "h064", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: รีวิวหูฟังไร้สาย", "expect": [{"kind": "search", "has": ["หูฟัง"]}]}, {"id": "h065", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: เลขเด็ดงวดนี้", "expect": [{"kind": "search", "has": ["เลขเด็ด"]}]}, {"id": "h066", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ร้านอาหารญี่ปุ่น", "expect": [{"kind": "search", "has": ["ญี่ปุ่น"]}]}, {"id": "h067", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: วิธีล้างแอร์เอง", "expect": [{"kind": "search", "has": ["แอร์"]}]}, {"id": "h068", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ตั๋วเครื่องบินไปภูเก็ต", "expect": [{"kind": "search", "has": ["ภูเก็ต"]}]}, {"id": "h069", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ข่าวกีฬาล่าสุด", "expect": [{"kind": "search", "has": ["กีฬา"]}]}, {"id": "h070", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: เพลงฟังสบายตอนทำงาน", "expect": [{"kind": "search", "has": ["เพลง"]}]}, {"id": "h071", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันแรก (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "open", "n": 1}]}, {"id": "h072", "set": "H", "mode": "task", "prompt": "ให้เปิดผลค้นหาอันที่สอง (ใช้คำต่างจากครั้งก่อน)", "expect": [{"kind": "open", "n": 2}]}, {"id": "h073", "set": "H", "mode": "task", "prompt": "ให้ย้อนกลับ (พูดให้สั้นที่สุด)", "expect": [{"kind": "back"}]}, {"id": "h074", "set": "H", "mode": "task", "prompt": "ให้ปิดแท็บ (พูดให้สั้นที่สุด)", "expect": [{"kind": "close"}]}, {"id": "h075", "set": "H", "mode": "task", "prompt": "ให้เลื่อนลง (พูดให้สั้นที่สุด)", "expect": [{"kind": "scroll", "direction": "down"}]}, {"id": "h076", "set": "H", "mode": "task", "prompt": "ให้กลับไปแอป (พูดให้สั้นที่สุด)", "expect": [{"kind": "app"}]}, {"id": "h077", "set": "H", "mode": "task", "prompt": "ให้โหลดใหม่ (พูดให้สั้นที่สุด)", "expect": [{"kind": "reload"}]}, {"id": "h078", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: วิธีชงกาแฟเย็น", "expect": [{"kind": "search", "has": ["กาแฟ"]}]}, {"id": "h079", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: ราคารถมือสอง", "expect": [{"kind": "search", "has": ["มือสอง"]}]}, {"id": "h080", "set": "H", "mode": "task", "prompt": "ให้ค้นหาเรื่อง: งานพาร์ทไทม์", "expect": [{"kind": "search", "has": ["ไทม์"]}]}, {"id": "h081", "set": "H", "mode": "say", "prompt": "ตอนนี้กี่โมง", "expect": []}, {"id": "h082", "set": "H", "mode": "say", "prompt": "วันนี้วันที่เท่าไหร่", "expect": []}, {"id": "h083", "set": "H", "mode": "say", "prompt": "พรุ่งนี้มีนัดอะไรไหม", "expect": []}, {"id": "h084", "set": "H", "mode": "say", "prompt": "ตั้งนัดไปหาหมอวันจันทร์บ่ายสองโมง", "expect": []}, {"id": "h085", "set": "H", "mode": "say", "prompt": "ยกเลิกนัดประชุมพรุ่งนี้", "expect": []}, {"id": "h086", "set": "H", "mode": "say", "prompt": "เลื่อนนัดกินข้าวไปวันเสาร์", "expect": []}, {"id": "h087", "set": "H", "mode": "say", "prompt": "ปิดเสียง", "expect": []}, {"id": "h088", "set": "H", "mode": "say", "prompt": "เปิดเสียงดังขึ้น", "expect": []}, {"id": "h089", "set": "H", "mode": "say", "prompt": "ลดเสียงลงหน่อย", "expect": []}, {"id": "h090", "set": "H", "mode": "say", "prompt": "ปรับเสียงเจ็ดสิบ", "expect": []}, {"id": "h091", "set": "H", "mode": "say", "prompt": "เปิดโหมดโฟกัส", "expect": []}, {"id": "h092", "set": "H", "mode": "say", "prompt": "ปิดเครื่องได้เลย", "expect": []}, {"id": "h093", "set": "H", "mode": "say", "prompt": "ค้นหาไฟล์รูปเมื่อวาน", "expect": []}, {"id": "h094", "set": "H", "mode": "say", "prompt": "หาไฟล์งานนำเสนอ", "expect": []}, {"id": "h095", "set": "H", "mode": "say", "prompt": "กลับบ้านกี่โมงดี", "expect": []}, {"id": "h096", "set": "H", "mode": "say", "prompt": "เปิดแอปเครื่องคิดเลข", "expect": []}, {"id": "h097", "set": "H", "mode": "say", "prompt": "เปิดโปรแกรมเขียนโน้ต", "expect": []}, {"id": "h098", "set": "H", "mode": "say", "prompt": "ลิงก์นี้ส่งให้ใครดี", "expect": []}, {"id": "h099", "set": "H", "mode": "say", "prompt": "อากาศพรุ่งนี้จะร้อนไหม", "expect": []}, {"id": "h100", "set": "H", "mode": "say", "prompt": "ข่าวเด่นวันนี้มีอะไรบ้าง", "expect": []}, {"id": "h101", "set": "H", "mode": "say", "prompt": "ช่วยแปลประโยคนี้เป็นภาษาอังกฤษ", "expect": []}, {"id": "h102", "set": "H", "mode": "say", "prompt": "เขียนจดหมายขอบคุณให้หน่อย", "expect": []}, {"id": "h103", "set": "H", "mode": "say", "prompt": "สรุปเนื้อหาในหน้านี้ให้หน่อย", "expect": []}, {"id": "h104", "set": "H", "mode": "say", "prompt": "ขอบคุณครับ", "expect": []}, {"id": "h105", "set": "H", "mode": "say", "prompt": "สวัสดีครับ", "expect": []}, {"id": "h106", "set": "H", "mode": "say", "prompt": "เครื่องร้อนไหม", "expect": []}, {"id": "h107", "set": "H", "mode": "say", "prompt": "พื้นที่ดิสก์เหลือเท่าไหร่", "expect": []}, {"id": "h108", "set": "H", "mode": "say", "prompt": "หาค่าเฉลี่ยของสามสิบกับห้าสิบ", "expect": []}, {"id": "h109", "set": "H", "mode": "say", "prompt": "ห้าคูณเจ็ดเท่ากับเท่าไหร่", "expect": []}, {"id": "h110", "set": "H", "mode": "say", "prompt": "เตือนให้กินยาตอนสองทุ่ม", "expect": []}, {"id": "h111", "set": "H", "mode": "say", "prompt": "เลื่อนเวลาเตือนออกไปสิบนาที", "expect": []}, {"id": "h112", "set": "H", "mode": "say", "prompt": "โหลดไฟล์นี้เก็บไว้ในเครื่อง", "expect": []}, {"id": "h113", "set": "H", "mode": "say", "prompt": "รีสตาร์ทเครื่อง", "expect": []}, {"id": "h114", "set": "H", "mode": "say", "prompt": "ปิดไฟห้องนอน", "expect": []}, {"id": "h115", "set": "H", "mode": "say", "prompt": "ไปกินข้าวกันไหม", "expect": []}, {"id": "h116", "set": "H", "mode": "say", "prompt": "กดไลก์ให้หน่อย", "expect": []}, {"id": "h117", "set": "H", "mode": "say", "prompt": "เข้านอนกี่โมงดี", "expect": []}, {"id": "h118", "set": "H", "mode": "say", "prompt": "ย้อนกลับไปเรื่องที่คุยกันเมื่อเช้า", "expect": []}, {"id": "h119", "set": "H", "mode": "say", "prompt": "เปิดรูปที่ถ่ายเมื่อวาน", "expect": []}, {"id": "h120", "set": "H", "mode": "say", "prompt": "ปิดการแจ้งเตือนวันนี้", "expect": []}];
+const SEED = 20261014;
+
+// สลับลำดับในแต่ละชุด (คงที่ทุกครั้ง) · ชุด D ก่อน H
+function shuffled(arr, seed) {
+  const a = arr.slice(); let s = seed;
+  for (let i = a.length - 1; i > 0; i--) { s = (s * 1103515245 + 12345) % 2147483648; const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const ORDER = [...shuffled(ITEMS.filter(x => x.set === "D"), SEED), ...shuffled(ITEMS.filter(x => x.set === "H"), SEED + 1)];
+
+// ---- IndexedDB (เก็บเสียงที่อัดแล้ว ปิดหน้าแล้วไม่หาย) ----
+let db;
+function openDb() {
+  return new Promise((ok, bad) => {
+    const r = indexedDB.open("aipc-voice-record", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("rec");
+    r.onsuccess = () => { db = r.result; ok(); };
+    r.onerror = () => bad(r.error);
+  });
+}
+const dbPut = (k, v) => new Promise((ok, bad) => { const t = db.transaction("rec", "readwrite"); t.objectStore("rec").put(v, k); t.oncomplete = ok; t.onerror = () => bad(t.error); });
+const dbGet = k => new Promise((ok, bad) => { const r = db.transaction("rec").objectStore("rec").get(k); r.onsuccess = () => ok(r.result); r.onerror = () => bad(r.error); });
+const dbAll = () => new Promise((ok, bad) => { const out = {}; const r = db.transaction("rec").objectStore("rec").openCursor(); r.onsuccess = () => { const c = r.result; if (c) { out[c.key] = c.value; c.continue(); } else ok(out); }; r.onerror = () => bad(r.error); });
+
+// ---- ไมค์ ----
+const $ = id => document.getElementById(id);
+let stream, ctx, node, srcNode, idx = 0, recording = false, chunks = [], rate = 48000, saved = {};
+
+async function listMics() {
+  const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "audioinput");
+  $("mic").innerHTML = devs.map(d => `<option value="${d.deviceId}">${d.label || "ไมค์ " + d.deviceId.slice(0, 6)}</option>`).join("");
+  try { const last = localStorage.getItem("aipc-mic"); if (last) $("mic").value = last; } catch (e) {}
+}
+$("perm").onclick = async () => {
+  try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach(t => t.stop()); await listMics(); $("start").disabled = false; }
+  catch (e) { alert("ใช้ไมค์ไม่ได้: " + e.message); }
+};
+
+const WORKLET = `class Tap extends AudioWorkletProcessor { process(inputs) { const ch = inputs[0][0]; if (ch) this.port.postMessage(ch.slice(0)); return true; } } registerProcessor("tap", Tap);`;
+
+$("start").onclick = async () => {
+  try { localStorage.setItem("aipc-mic", $("mic").value); } catch (e) {}
+  // ปิดตัวช่วยของเบราว์เซอร์ทั้งหมด = เสียงดิบเหมือนที่ Pi อัด (pw-record)
+  stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: $("mic").value }, channelCount: 1,
+    echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  ctx = new AudioContext();
+  rate = ctx.sampleRate;
+  await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" })));
+  srcNode = ctx.createMediaStreamSource(stream);
+  node = new AudioWorkletNode(ctx, "tap");
+  node.port.onmessage = e => onAudio(e.data);
+  srcNode.connect(node);
+  saved = await dbAll();
+  idx = ORDER.findIndex(x => !saved[x.id]); if (idx < 0) idx = 0;
+  $("setup").classList.add("hidden"); $("work").classList.remove("hidden"); $("list").classList.remove("hidden");
+  show();
+};
+
+// ---- จับจุดจบเสียงพูด (ความดัง · เหมือนตัวจับของแอป แต่เงียบ 0.8 วิ) ----
+let noise = null, levels = [], speaking = false, loud = 0, quiet = 0, frames = 0, autoTimer = null;
+function onAudio(buf) {
+  let s = 0; for (const v of buf) s += v * v; const rms = Math.sqrt(s / buf.length);
+  $("meter").firstElementChild.style.width = Math.min(100, rms * 400) + "%";
+  if (!recording) return;
+  chunks.push(buf);
+  frames += buf.length;
+  const t = frames / rate;
+  if (noise === null) { levels.push(rms); if (t >= 0.3) noise = levels.sort((a, b) => a - b)[levels.length >> 1]; return; }
+  const th = Math.max(3 * noise, 0.012);
+  if (!speaking) { loud = rms > th ? loud + buf.length : 0; if (loud / rate >= 0.09) speaking = true; else if (t > 6) stop("ไม่ได้ยินเสียงพูด ลองใหม่"); }
+  else { quiet = rms < 0.7 * th ? quiet + buf.length : 0; if (quiet / rate >= 0.8) stop(); }
+  if (t > 10) stop();
+}
+
+function startRec() {
+  if (recording) return stop();
+  chunks = []; noise = null; levels = []; speaking = false; loud = quiet = frames = 0; recording = true;
+  $("state").textContent = "● กำลังอัด… พูดได้เลย"; $("state").className = "rec"; $("rec").textContent = "หยุด (Space)";
+}
+
+async function stop(err) {
+  if (!recording) return;
+  recording = false; $("rec").textContent = "อัด (Space)";
+  if (err) { $("state").textContent = err; $("state").className = "warnc"; return; }
+  const n = chunks.reduce((a, c) => a + c.length, 0); const pcm = new Float32Array(n); let o = 0; for (const c of chunks) { pcm.set(c, o); o += c.length; }
+  // แปลงเป็น 16 kHz (ตัวแปลงของเบราว์เซอร์มีตัวกรองกันเสียงแตก)
+  const off = new OfflineAudioContext(1, Math.ceil(n * 16000 / rate), 16000);
+  const b = off.createBuffer(1, n, rate); b.copyToChannel(pcm, 0);
+  const src = off.createBufferSource(); src.buffer = b; src.connect(off.destination); src.start();
+  const out = (await off.startRendering()).getChannelData(0);
+  let peak = 0; const i16 = new Int16Array(out.length);
+  for (let i = 0; i < out.length; i++) { const v = Math.max(-1, Math.min(1, out[i])); peak = Math.max(peak, Math.abs(v)); i16[i] = v < 0 ? v * 32768 : v * 32767; }
+  const it = ORDER[idx];
+  const rec = { id: it.id, secs: +(out.length / 16000).toFixed(2), peak: +peak.toFixed(3), pcm: i16.buffer, at: new Date().toISOString(), mic: $("mic").selectedOptions[0]?.text || "" };
+  await dbPut(it.id, rec); saved[it.id] = rec;
+  const warn = peak < 0.05 ? " · เสียงเบามาก ลองพูดดังขึ้นหรือใกล้ไมค์แล้วอัดใหม่ (←)" : peak > 0.98 ? " · เสียงดังจนแตก ลองถอยห่างไมค์แล้วอัดใหม่ (←)" : "";
+  $("state").textContent = `✓ บันทึกแล้ว ${rec.secs} วิ${warn}`; $("state").className = warn ? "warnc" : "done";
+  renderList();
+  if (!warn) { clearTimeout(autoTimer); autoTimer = setTimeout(() => { if (idx < ORDER.length - 1) { idx++; show(); } }, 600); }
+  else $("play").disabled = false;
+}
+
+function show() {
+  const it = ORDER[idx];
+  $("pos").textContent = `ข้อ ${idx + 1} / ${ORDER.length}`;
+  $("setname").textContent = it.set === "D" ? "ชุดที่ 1 (60 ข้อ)" : "ชุดที่ 2 (120 ข้อ)";
+  $("bar").firstElementChild.style.width = (100 * Object.keys(saved).length / ORDER.length) + "%";
+  $("mode").innerHTML = it.mode === "say" ? '<span class="say">พูดตามนี้</span>' : '<span class="task">พูดด้วยคำของคุณเอง ให้ระบบ…</span>';
+  $("prompt").textContent = it.mode === "say" ? it.prompt : it.prompt.replace(/^ให้/, "");
+  const r = saved[it.id];
+  $("state").textContent = r ? `อัดแล้ว ${r.secs} วิ · กด Space เพื่ออัดใหม่` : "กด Space แล้วพูด"; $("state").className = r ? "done" : "";
+  $("play").disabled = !r;
+  $("prev").disabled = idx === 0; $("next").disabled = idx === ORDER.length - 1;
+}
+
+function renderList() {
+  const done = ORDER.filter(x => saved[x.id]).length;
+  $("count").textContent = `อัดแล้ว ${done} / ${ORDER.length}`;
+  $("tbl").innerHTML = ORDER.map((x, i) => `<tr><td>${i + 1}</td><td>${x.mode === "say" ? x.prompt : "(คำของคุณ) " + x.prompt.replace(/^ให้/, "")}</td><td>${saved[x.id] ? "✓ " + saved[x.id].secs + " วิ" : ""}</td></tr>`).join("");
+}
+
+$("rec").onclick = startRec;
+$("prev").onclick = () => { clearTimeout(autoTimer); if (idx > 0) { idx--; show(); } };
+$("next").onclick = () => { clearTimeout(autoTimer); if (idx < ORDER.length - 1) { idx++; show(); } };
+$("play").onclick = async () => {
+  const r = saved[ORDER[idx].id]; if (!r) return;
+  const i16 = new Int16Array(r.pcm); const b = ctx.createBuffer(1, i16.length, 16000); const ch = b.getChannelData(0);
+  for (let i = 0; i < i16.length; i++) ch[i] = i16[i] / 32768; const s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start();
+};
+document.addEventListener("keydown", e => {
+  if ($("work").classList.contains("hidden")) return;
+  if (e.code === "Space") { e.preventDefault(); clearTimeout(autoTimer); startRec(); }
+  else if (e.code === "ArrowLeft") $("prev").click();
+  else if (e.code === "ArrowRight") $("next").click();
+});
+
+function wav(i16) {
+  const buf = new ArrayBuffer(44 + i16.length * 2), v = new DataView(buf);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, "RIFF"); v.setUint32(4, 36 + i16.length * 2, true); w(8, "WAVE"); w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+  v.setUint16(22, 1, true); v.setUint32(24, 16000, true); v.setUint32(28, 32000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  w(36, "data"); v.setUint32(40, i16.length * 2, true); new Int16Array(buf, 44).set(i16); return new Uint8Array(buf);
+}
+function b64(u8) { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+
+$("export").onclick = async () => {
+  const all = await dbAll();
+  const items = ORDER.filter(x => all[x.id]).map(x => ({ ...x, secs: all[x.id].secs, peak: all[x.id].peak, at: all[x.id].at, mic: all[x.id].mic, wav: b64(wav(new Int16Array(all[x.id].pcm))) }));
+  const missing = ORDER.length - items.length;
+  if (missing && !confirm(`ยังไม่ได้อัด ${missing} ข้อ ส่งออกเท่าที่มีก่อนไหม`)) return;
+  const out = { speaker: $("speaker").value.trim() || "speaker", created: new Date().toISOString(), sample_rate: 16000, items };
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(out)], { type: "application/json" }));
+  a.download = `voice-${out.speaker}-${out.created.slice(0, 10)}.json`; a.click();
+};
+
+openDb().then(async () => { saved = await dbAll(); renderList(); });
+</script>
+</body>
+</html>
