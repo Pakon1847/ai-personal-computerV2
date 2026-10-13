@@ -1,0 +1,23 @@
+start 23:39:21 temp=62.6'C throttled=0xe0000
+✓ r1  1 ค้นหาราคาทองวันนี้แล้วเข้าลิงก์แรก        17.13s → search ราคาทองวันนี้ ; result 1 · search ราคาทองวันนี้ ; result 1 · https://xn--42cah7d0cxcvbbb9x.com/
+✓ r1  2 ย้อนกลับ                                  93.77s → back · back · https://duckduckgo.com/?kl=th-en&q=%E0%B8%A3%E0%B8%B2%E0%B8%
+✓ r1  3 เข้าลิงก์ที่สอง                           99.08s → result 2 · result 2 · https://th.investing.com/currencies/xau-usd
+✓ r1  4 เปิดยูทูบแล้วหาเพลงคาราบาว               110.76s → open youtube.com ; find เพลงคาราบาว · open youtube.com ; find เพลงคาราบาว · https://www.youtube.com/results?search_query=เพลงคาราบาว
+✓ r1  5 เปิดคลิปแรก                                98.2s → result 1 · result 1 · https://www.youtube.com/watch?v=_Q6qtILK0ho&list=RD_Q6qtILK0
+✗ r1  6 เปิดเว็บ httpbin.org/forms/post แล้วใส่ช 101.64s → open httpbin.org/forms/post ; look ใส่ชื่อว่าสมชาย · open httpbin.org/forms/post · 
+✗ r1  7 เลือกพิซซ่าไซส์ใหญ่                       128.5s → look เลือกพิซซ่าไซส์ใหญ่ ·  · None
+✗ r1  8 ใส่เบอร์โทร 0812345678                   100.23s → look ใส่เบอร์โทร 0812345678 · type 6 0812345678 · None
+✗ r1  9 เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งข 191.36s → open youtube.com ; look เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก · open youtube.com ; click 1 ; type 3 สมาคมค้าทองคำ ; click 1 · หน้า  · ตอบ เปิด www.youtube.com แล้ว · กด Search แล้ว · พิม
+✓ r1 10 กลับไปแอป                                 90.35s → app · app · minimized
+✓ r2  1 ค้นหาราคาทองวันนี้แล้วเข้าลิงก์แรก       100.06s → search ราคาทองวันนี้ ; result 1 · search ราคาทองวันนี้ ; result 1 · https://xn--42cah7d0cxcvbbb9x.com/
+✓ r2  2 ย้อนกลับ                                 108.64s → back · back · https://duckduckgo.com/?kl=th-en&q=%E0%B8%A3%E0%B8%B2%E0%B8%
+✓ r2  3 เข้าลิงก์ที่สอง                          110.56s → result 2 · result 2 · https://www.goldtraders.or.th/
+✓ r2  4 เปิดยูทูบแล้วหาเพลงคาราบาว                18.47s → open youtube.com ; find เพลงคาราบาว · open youtube.com ; find เพลงคาราบาว · https://www.youtube.com/results?search_query=เพลงคาราบาว
+✓ r2  5 เปิดคลิปแรก                                12.7s → result 1 · result 1 · https://www.youtube.com/watch?v=_Q6qtILK0ho&list=RD_Q6qtILK0
+✗ r2  6 เปิดเว็บ httpbin.org/forms/post แล้วใส่ช  19.72s → open httpbin.org/forms/post ; look ใส่ชื่อว่าสมชาย · open httpbin.org/forms/post · 
+✗ r2  7 เลือกพิซซ่าไซส์ใหญ่                       60.74s → look เลือกพิซซ่าไซส์ใหญ่ ·  · None
+✗ r2  8 ใส่เบอร์โทร 0812345678                   195.46s → look ใส่เบอร์โทร 0812345678 · type 6 0812345678 · None
+✗ r2  9 เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งข 189.55s → open youtube.com ; look เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก · open youtube.com ; type 3 สมาคมค้าทองคำ ; click 1 · หน้า  · ตอบ เปิด www.youtube.com แล้ว · พิมพ์ สมาคมค้าทองคำ 
+✓ r2 10 กลับไปแอป                                 91.74s → app · app · minimized
+รวม 12/20
+end 00:18:22 temp=82.9'C throttled=0xe0008

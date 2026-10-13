@@ -1,0 +1,630 @@
+{
+ "pause_s": 20.0,
+ "rows": [
+  {
+   "round": 1,
+   "n": 1,
+   "command": "ค้นหาราคาทองวันนี้แล้วเข้าลิงก์แรก",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://xn--42cah7d0cxcvbbb9x.com/",
+   "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย DuckDuckGo แทน: ราคาทองวันนี้ · เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+   "seconds": 17.13,
+   "plan": "search ราคาทองวันนี้ ; result 1",
+   "steps": [
+    "search ราคาทองวันนี้",
+    "result 1"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "search ราคาทองวันนี้ ; result 1",
+     "s": 2.97,
+     "prompt_n": 31,
+     "predicted_n": 11
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 2,
+   "command": "ย้อนกลับ",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://duckduckgo.com/?kl=th-en&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A7%E0%B8%B1%E0%B8%99%E0%B8%99%E0%B8%B5%E0%B9%89&ia=web",
+   "say": "ย้อนกลับแล้ว",
+   "seconds": 93.77,
+   "plan": "back",
+   "steps": [
+    "back"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "back",
+     "s": 92.85,
+     "prompt_n": 1602,
+     "predicted_n": 2
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 3,
+   "command": "เข้าลิงก์ที่สอง",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://th.investing.com/currencies/xau-usd",
+   "say": "เข้าลิงก์ที่ 2 แล้ว: th.investing.com",
+   "seconds": 99.08,
+   "plan": "result 2",
+   "steps": [
+    "result 2"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "result 2",
+     "s": 88.46,
+     "prompt_n": 1479,
+     "predicted_n": 4
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 4,
+   "command": "เปิดยูทูบแล้วหาเพลงคาราบาว",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://www.youtube.com/results?search_query=เพลงคาราบาว",
+   "say": "เปิด www.youtube.com แล้ว · ค้นหา เพลงคาราบาว ในเว็บนี้แล้ว",
+   "seconds": 110.76,
+   "plan": "open youtube.com ; find เพลงคาราบาว",
+   "steps": [
+    "open youtube.com",
+    "find เพลงคาราบาว"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "open youtube.com ; find เพลงคาราบาว",
+     "s": 105.99,
+     "prompt_n": 1687,
+     "predicted_n": 13
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 5,
+   "command": "เปิดคลิปแรก",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://www.youtube.com/watch?v=_Q6qtILK0ho&list=RD_Q6qtILK0ho&start_radio=1&pp=ygUh4LmA4Lie4Lil4LiH4LiE4Liy4Lij4Liy4Lia4Liy4LinoAcB",
+   "say": "เข้าลิงก์ที่ 1 แล้ว: www.youtube.com",
+   "seconds": 98.2,
+   "plan": "result 1",
+   "steps": [
+    "result 1"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "result 1",
+     "s": 95.37,
+     "prompt_n": 1580,
+     "predicted_n": 4
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 6,
+   "command": "เปิดเว็บ httpbin.org/forms/post แล้วใส่ชื่อว่าสมชาย",
+   "kind": "plan+look",
+   "ok": false,
+   "evidence": "",
+   "say": "สั่งเบราว์เซอร์ไม่สำเร็จ: Cannot navigate to invalid URL",
+   "seconds": 101.64,
+   "plan": "open httpbin.org/forms/post ; look ใส่ชื่อว่าสมชาย",
+   "steps": [
+    "open httpbin.org/forms/post"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "open httpbin.org/forms/post ; look ใส่ชื่อว่าสมชาย",
+     "s": 101.62,
+     "prompt_n": 1617,
+     "predicted_n": 17
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 7,
+   "command": "เลือกพิซซ่าไซส์ใหญ่",
+   "kind": "look",
+   "ok": false,
+   "evidence": "None",
+   "say": "หาไม่เจอในหน้านี้",
+   "seconds": 128.5,
+   "plan": "look เลือกพิซซ่าไซส์ใหญ่",
+   "steps": [],
+   "cloud": false,
+   "preread_used": [
+    false
+   ],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "look เลือกพิซซ่าไซส์ใหญ่",
+     "s": 92.24,
+     "prompt_n": 1499,
+     "predicted_n": 10
+    },
+    {
+     "stage": "look",
+     "reply": "none",
+     "s": 36.21,
+     "prompt_n": 644,
+     "predicted_n": 2,
+     "preread": false
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 8,
+   "command": "ใส่เบอร์โทร 0812345678",
+   "kind": "look",
+   "ok": false,
+   "evidence": "None",
+   "say": "พิมพ์ 0812345678 แล้ว",
+   "seconds": 100.23,
+   "plan": "look ใส่เบอร์โทร 0812345678",
+   "steps": [
+    "type 6 0812345678"
+   ],
+   "cloud": false,
+   "preread_used": [
+    false
+   ],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "look ใส่เบอร์โทร 0812345678",
+     "s": 96.61,
+     "prompt_n": 1616,
+     "predicted_n": 17
+    },
+    {
+     "stage": "look",
+     "reply": "type 6 0812345678",
+     "s": 3.55,
+     "prompt_n": 20,
+     "predicted_n": 15,
+     "preread": false
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 9,
+   "command": "เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก",
+   "kind": "plan+look",
+   "ok": false,
+   "evidence": "หน้า  · ตอบ เปิด www.youtube.com แล้ว · กด Search แล้ว · พิมพ์ สมาคมค้าทองคำ แล้ว · กด Search แล้ว → www.youtube.com",
+   "say": "เปิด www.youtube.com แล้ว · กด Search แล้ว · พิมพ์ สมาคมค้าทองคำ แล้ว · กด Search แล้ว → www.youtube.com",
+   "seconds": 191.36,
+   "plan": "open youtube.com ; look เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก",
+   "steps": [
+    "open youtube.com",
+    "click 1",
+    "type 3 สมาคมค้าทองคำ",
+    "click 1"
+   ],
+   "cloud": false,
+   "preread_used": [
+    false
+   ],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "open youtube.com ; look เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก",
+     "s": 97.74,
+     "prompt_n": 1619,
+     "predicted_n": 25
+    },
+    {
+     "stage": "look",
+     "reply": "click 1 ; type 3 สมาคมค้าทองคำ ; click 1",
+     "s": 87.36,
+     "prompt_n": 1583,
+     "predicted_n": 18,
+     "preread": false
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 1,
+   "n": 10,
+   "command": "กลับไปแอป",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "minimized",
+   "say": "ย่อเบราว์เซอร์แล้ว กลับมาที่แอป",
+   "seconds": 90.35,
+   "plan": "app",
+   "steps": [
+    "app"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "app",
+     "s": 90.35,
+     "prompt_n": 1581,
+     "predicted_n": 2
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 1,
+   "command": "ค้นหาราคาทองวันนี้แล้วเข้าลิงก์แรก",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://xn--42cah7d0cxcvbbb9x.com/",
+   "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย DuckDuckGo แทน: ราคาทองวันนี้ · เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+   "seconds": 100.06,
+   "plan": "search ราคาทองวันนี้ ; result 1",
+   "steps": [
+    "search ราคาทองวันนี้",
+    "result 1"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "search ราคาทองวันนี้ ; result 1",
+     "s": 88.4,
+     "prompt_n": 1460,
+     "predicted_n": 11
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 2,
+   "command": "ย้อนกลับ",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://duckduckgo.com/?kl=th-en&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A7%E0%B8%B1%E0%B8%99%E0%B8%99%E0%B8%B5%E0%B9%89&ia=web",
+   "say": "ย้อนกลับแล้ว",
+   "seconds": 108.64,
+   "plan": "back",
+   "steps": [
+    "back"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "back",
+     "s": 107.68,
+     "prompt_n": 912,
+     "predicted_n": 2
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 3,
+   "command": "เข้าลิงก์ที่สอง",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://www.goldtraders.or.th/",
+   "say": "เข้าลิงก์ที่ 2 แล้ว: www.goldtraders.or.th",
+   "seconds": 110.56,
+   "plan": "result 2",
+   "steps": [
+    "result 2"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "result 2",
+     "s": 107.29,
+     "prompt_n": 342,
+     "predicted_n": 4
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 4,
+   "command": "เปิดยูทูบแล้วหาเพลงคาราบาว",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://www.youtube.com/results?search_query=เพลงคาราบาว",
+   "say": "เปิด www.youtube.com แล้ว · ค้นหา เพลงคาราบาว ในเว็บนี้แล้ว",
+   "seconds": 18.47,
+   "plan": "open youtube.com ; find เพลงคาราบาว",
+   "steps": [
+    "open youtube.com",
+    "find เพลงคาราบาว"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "open youtube.com ; find เพลงคาราบาว",
+     "s": 11.85,
+     "prompt_n": 42,
+     "predicted_n": 13
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 5,
+   "command": "เปิดคลิปแรก",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "https://www.youtube.com/watch?v=_Q6qtILK0ho&list=RD_Q6qtILK0ho&start_radio=1&pp=ygUh4LmA4Lie4Lil4LiH4LiE4Liy4Lij4Liy4Lia4Liy4LinoAcB",
+   "say": "เข้าลิงก์ที่ 1 แล้ว: www.youtube.com",
+   "seconds": 12.7,
+   "plan": "result 1",
+   "steps": [
+    "result 1"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "result 1",
+     "s": 8.21,
+     "prompt_n": 1,
+     "predicted_n": 4
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 6,
+   "command": "เปิดเว็บ httpbin.org/forms/post แล้วใส่ชื่อว่าสมชาย",
+   "kind": "plan+look",
+   "ok": false,
+   "evidence": "",
+   "say": "สั่งเบราว์เซอร์ไม่สำเร็จ: Cannot navigate to invalid URL",
+   "seconds": 19.72,
+   "plan": "open httpbin.org/forms/post ; look ใส่ชื่อว่าสมชาย",
+   "steps": [
+    "open httpbin.org/forms/post"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "open httpbin.org/forms/post ; look ใส่ชื่อว่าสมชาย",
+     "s": 19.71,
+     "prompt_n": 1,
+     "predicted_n": 17
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 7,
+   "command": "เลือกพิซซ่าไซส์ใหญ่",
+   "kind": "look",
+   "ok": false,
+   "evidence": "None",
+   "say": "หาไม่เจอในหน้านี้",
+   "seconds": 60.74,
+   "plan": "look เลือกพิซซ่าไซส์ใหญ่",
+   "steps": [],
+   "cloud": false,
+   "preread_used": [
+    false
+   ],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "look เลือกพิซซ่าไซส์ใหญ่",
+     "s": 17.62,
+     "prompt_n": 1,
+     "predicted_n": 10
+    },
+    {
+     "stage": "look",
+     "reply": "none",
+     "s": 43.04,
+     "prompt_n": 622,
+     "predicted_n": 2,
+     "preread": false
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 8,
+   "command": "ใส่เบอร์โทร 0812345678",
+   "kind": "look",
+   "ok": false,
+   "evidence": "None",
+   "say": "พิมพ์ 0812345678 แล้ว",
+   "seconds": 195.46,
+   "plan": "look ใส่เบอร์โทร 0812345678",
+   "steps": [
+    "type 6 0812345678"
+   ],
+   "cloud": false,
+   "preread_used": [
+    false
+   ],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "look ใส่เบอร์โทร 0812345678",
+     "s": 93.91,
+     "prompt_n": 1506,
+     "predicted_n": 17
+    },
+    {
+     "stage": "look",
+     "reply": "type 6 0812345678",
+     "s": 101.48,
+     "prompt_n": 1737,
+     "predicted_n": 15,
+     "preread": false
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 9,
+   "command": "เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก",
+   "kind": "plan+look",
+   "ok": false,
+   "evidence": "หน้า  · ตอบ เปิด www.youtube.com แล้ว · พิมพ์ สมาคมค้าทองคำ แล้ว · กด Search แล้ว → www.youtube.com",
+   "say": "เปิด www.youtube.com แล้ว · พิมพ์ สมาคมค้าทองคำ แล้ว · กด Search แล้ว → www.youtube.com",
+   "seconds": 189.55,
+   "plan": "open youtube.com ; look เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก",
+   "steps": [
+    "open youtube.com",
+    "type 3 สมาคมค้าทองคำ",
+    "click 1"
+   ],
+   "cloud": false,
+   "preread_used": [
+    false
+   ],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "open youtube.com ; look เปิดเว็บสมาคมค้าทองคำแล้วบอกราคาทองแท่งขายออก",
+     "s": 98.39,
+     "prompt_n": 1619,
+     "predicted_n": 25
+    },
+    {
+     "stage": "look",
+     "reply": "type 3 สมาคมค้าทองคำ ; click 1",
+     "s": 87.4,
+     "prompt_n": 1583,
+     "predicted_n": 14,
+     "preread": false
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  },
+  {
+   "round": 2,
+   "n": 10,
+   "command": "กลับไปแอป",
+   "kind": "plan",
+   "ok": true,
+   "evidence": "minimized",
+   "say": "ย่อเบราว์เซอร์แล้ว กลับมาที่แอป",
+   "seconds": 91.74,
+   "plan": "app",
+   "steps": [
+    "app"
+   ],
+   "cloud": false,
+   "preread_used": [],
+   "trace": [
+    {
+     "stage": "plan",
+     "reply": "app",
+     "s": 91.73,
+     "prompt_n": 1581,
+     "predicted_n": 2
+    }
+   ],
+   "preread_before": {
+    "done": 0
+   }
+  }
+ ]
+}

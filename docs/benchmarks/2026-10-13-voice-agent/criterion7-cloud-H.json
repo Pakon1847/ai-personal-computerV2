@@ -1,0 +1,35 @@
+[
+ {
+  "id": "h07",
+  "command": "เปิดวิกิพีเดียเรื่องช้างไทย",
+  "reply": "search วิกิพีเดีย ช้างไทย ; result 1",
+  "ok": false,
+  "error": "",
+  "seconds": 5.28,
+  "cost_usd": 0.004182,
+  "model": "claude-sonnet-5-5",
+  "chars_sent": 149
+ },
+ {
+  "id": "h44",
+  "command": "ราคาวันนี้ขึ้นหรือลงจากเมื่อวาน",
+  "reply": "answer ราคาทองคำแท่งวันนี้ขึ้นจากเมื่อวาน 50 บาท โดยรับซื้อ 66,400 บาท ขายออก 66,600 บาท (ราคาประกาศครั้งที่ 7 เวลา 11:25 น.)",
+  "ok": true,
+  "error": "",
+  "seconds": 6.68,
+  "cost_usd": 0.010499999999999999,
+  "model": "claude-sonnet-5-5",
+  "chars_sent": 794
+ },
+ {
+  "id": "h57",
+  "command": "เครื่องร้อนไหม",
+  "reply": "app",
+  "ok": false,
+  "error": "",
+  "seconds": 4.36,
+  "cost_usd": 0.009148,
+  "model": "claude-sonnet-5-5",
+  "chars_sent": 1467
+ }
+]
