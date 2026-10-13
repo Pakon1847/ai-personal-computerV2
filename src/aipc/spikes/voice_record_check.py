@@ -2,6 +2,7 @@
 
     WAYLAND_DISPLAY=wayland-0 python -m aipc.spikes.voice_record_check
         <record.html> <เสียง.wav> <โฟลเดอร์ส่งออก>
+    (ไม่มีจอ: AIPC_HEADLESS=1 แทน WAYLAND_DISPLAY)
 
 ขั้นตอนเหมือนคน: ขอใช้ไมค์ → เริ่มอัด → กด Space → (เสียงในไฟล์ = คนพูด แล้วเงียบ) → หน้าหยุดอัดเองและไปข้อถัดไป →
 ส่งออก → ตรวจว่าได้ไฟล์ JSON ที่มี WAV 16 kHz ความยาวพอดีกับเสียงพูด
@@ -12,6 +13,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import os
 import sys
 import tempfile
 import time
@@ -35,6 +37,8 @@ def main() -> int:
             "--use-fake-device-for-media-stream",
             f"--use-file-for-fake-audio-capture={audio}%noloop",
             "--autoplay-policy=no-user-gesture-required",
+            # ไม่มีจอ/มีคนใช้จออยู่ → ตรวจแบบไม่เปิดหน้าต่าง (AIPC_HEADLESS=1)
+            *(["--headless=new"] if os.environ.get("AIPC_HEADLESS") == "1" else []),
         ],
     )
     bc._start(page.as_uri())
@@ -63,8 +67,14 @@ def main() -> int:
     js("document.getElementById('perm').click(); true")
     assert wait("!document.getElementById('start').disabled", 10), "ขอใช้ไมค์ไม่สำเร็จ"
     mics = js("[...document.getElementById('mic').options].map(o => o.text)")
+    # ปุ่มเริ่มเป็น async · พังกลางทาง = error เงียบ → เก็บไว้แสดง
+    js(
+        "window.__err = '';"
+        "addEventListener('unhandledrejection', e => window.__err = String(e.reason)); true"
+    )
     js("document.getElementById('start').click(); true")
-    assert wait("!document.getElementById('work').classList.contains('hidden')", 10), "เริ่มไม่ได้"
+    started = wait("!document.getElementById('work').classList.contains('hidden')", 10)
+    assert started, f"เริ่มไม่ได้: {js('window.__err')} · ไมค์ {mics}"
     first = js("document.getElementById('prompt').textContent")
     js("document.dispatchEvent(new KeyboardEvent('keydown', {code: 'Space'})); true")
     t0 = time.monotonic()
@@ -87,8 +97,9 @@ def main() -> int:
         "pos_after_auto_next": pos_after,
         "exported": [f.name for f in files],
     }
-    if files:
-        d = json.loads(files[-1].read_text(encoding="utf-8"))
+    d = json.loads(files[-1].read_text(encoding="utf-8")) if files else {"items": []}
+    report["items_exported"] = len(d["items"])
+    if d["items"]:
         it = d["items"][0]
         with wave.open(io.BytesIO(base64.b64decode(it["wav"]))) as w:
             report["wav"] = {
@@ -100,7 +111,7 @@ def main() -> int:
         (out_dir / "first.wav").write_bytes(base64.b64decode(it["wav"]))
     print(json.dumps(report, ensure_ascii=False, indent=1))
     bc.close()
-    return 0 if ok and files else 1
+    return 0 if ok and d["items"] else 1
 
 
 if __name__ == "__main__":

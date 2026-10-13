@@ -127,11 +127,19 @@ $("start").onclick = async () => {
     echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
   ctx = new AudioContext();
   rate = ctx.sampleRate;
-  await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" })));
   srcNode = ctx.createMediaStreamSource(stream);
-  node = new AudioWorkletNode(ctx, "tap");
-  node.port.onmessage = e => onAudio(e.data);
-  srcNode.connect(node);
+  try {
+    await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" })));
+    node = new AudioWorkletNode(ctx, "tap");
+    node.port.onmessage = e => onAudio(e.data);
+    srcNode.connect(node);
+  } catch (e) {
+    // เปิดหน้าเป็นไฟล์ (file://) Chromium ไม่ยอมโหลด worklet จาก blob (พบ 2026-10-14 ตอนตรวจด้วยไมค์ปลอม) → ใช้วิธีเก่า
+    node = ctx.createScriptProcessor(4096, 1, 1);
+    node.onaudioprocess = ev => onAudio(ev.inputBuffer.getChannelData(0).slice(0));
+    srcNode.connect(node);
+    node.connect(ctx.destination);  // ScriptProcessor ทำงานเฉพาะเมื่อต่อปลายทาง (ส่งค่าศูนย์ออก ไม่มีเสียง)
+  }
   saved = await dbAll();
   idx = ORDER.findIndex(x => !saved[x.id]); if (idx < 0) idx = 0;
   $("setup").classList.add("hidden"); $("work").classList.remove("hidden"); $("list").classList.remove("hidden");
