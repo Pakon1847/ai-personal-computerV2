@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import re
 import time
@@ -96,6 +97,17 @@ def run_item(llm: agent.Llm, item: dict, obs: dict, today: date, preread: bool) 
     return row
 
 
+def summarize(rows: list[dict]) -> dict:
+    total = Counter(r["cat"] for r in rows)
+    ok = Counter(r["cat"] for r in rows if r["ok"])
+    summary = {c: f"{ok[c]}/{total[c]} = {100 * ok[c] / total[c]:.1f}%" for c in sorted(total)}
+    plan_s = sorted(r["plan"]["s"] for r in rows)
+    summary["plan_median_s"] = plan_s[len(plan_s) // 2] if plan_s else None
+    looks = sorted(r["look"]["s"] for r in rows if "look" in r)
+    summary["look_median_s"] = looks[len(looks) // 2] if looks else None
+    return summary
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("set")
@@ -104,28 +116,39 @@ def main() -> None:
     ap.add_argument("--out", default="")
     ap.add_argument("--only", default="", help="เฉพาะ id ที่ขึ้นต้นด้วย (คั่นด้วย ,)")
     ap.add_argument("--preread", action="store_true")
+    ap.add_argument("--resume", action="store_true", help="ข้ามข้อที่มีผลใน --out แล้ว (เน็ตหลุดกลางทาง)")
     a = ap.parse_args()
     data = json.load(open(a.set, encoding="utf-8"))
     pages = json.load(open(a.pages, encoding="utf-8"))["pages"]
     today = date.fromisoformat(data.get("today", "2026-10-13"))
     llm = agent.Llm(Target(url=a.url), timeout=600)
     rows = []
+    if a.resume and a.out:
+        try:
+            rows = json.load(open(a.out, encoding="utf-8"))["rows"]
+        except (OSError, ValueError, KeyError):
+            rows = []
+    done = {r["id"] for r in rows}
     only = [x for x in a.only.split(",") if x]
     for item in data["items"]:
         if only and not any(item["id"].startswith(o) for o in only):
             continue
-        r = run_item(llm, item, pages[item["page"]], today, a.preread)
+        if item["id"] in done:
+            continue
+        try:
+            r = run_item(llm, item, pages[item["page"]], today, a.preread)
+        except (OSError, http.client.HTTPException, ConnectionError) as e:
+            # AI ไม่ตอบ (เน็ตหลุด / Pi ดับ) = หยุด เก็บผลที่ได้ไว้ · รันต่อด้วย --resume (ไม่นับเป็นข้อผิด)
+            print(f"หยุดที่ {item['id']}: ติดต่อ AI ไม่ได้ ({e}) · รันต่อด้วย --resume", flush=True)
+            break
         rows.append(r)
         mark = "✓" if r["ok"] else "✗"
         print(f"{mark} {r['id']:5} {r['cat']:5} {r['page']:15} {r['command'][:34]:34} → "
               f"{' ; '.join(r['final'])[:70]}  [{r['s']}s]", flush=True)  # fmt: skip
-    total = Counter(r["cat"] for r in rows)
-    ok = Counter(r["cat"] for r in rows if r["ok"])
-    summary = {c: f"{ok[c]}/{total[c]} = {100 * ok[c] / total[c]:.1f}%" for c in sorted(total)}
-    plan_s = sorted(r["plan"]["s"] for r in rows)
-    summary["plan_median_s"] = plan_s[len(plan_s) // 2] if plan_s else None
-    looks = sorted(r["look"]["s"] for r in rows if "look" in r)
-    summary["look_median_s"] = looks[len(looks) // 2] if looks else None
+        if a.out:  # บันทึกทุกข้อ: หยุดกลางทางไม่เสียผลที่ได้แล้ว
+            json.dump({"set": a.set, "summary": summarize(rows), "rows": rows},
+                      open(a.out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)  # fmt: skip
+    summary = summarize(rows)
     print(json.dumps(summary, ensure_ascii=False))
     if a.out:
         json.dump({"set": a.set, "summary": summary, "rows": rows},

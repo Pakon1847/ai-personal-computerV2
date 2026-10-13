@@ -156,7 +156,7 @@ find <query> = search with the website's own search box
 result <N> = open the search result at position N
 down / up = scroll to see more, when what is needed is not on the screen yet
 none = it is not on this page
-chat = the request is not about this web page at all (the user's appointments, reminders, files, the computer, general talk): the assistant's chat will answer it
+chat = the request is not about this web page at all (the user's appointments, reminders, files, the computer, general talk): the assistant's chat will answer it. Never chat for requests about this page (สรุปหน้านี้, บทความนี้, ในหน้านี้).
 
 Rules:
 1. A question (เท่าไหร่ กี่ อะไร ไหม ยังไง เมื่อไหร่ ใคร สรุป) gets answer. Never click to answer a question when the page text already has the answer.
@@ -175,6 +175,7 @@ Examples:
 ข้อความบนจอ: ร้านนี้เปิดปี 2550 ขายก๋วยเตี๋ยวเรือ มีสาขา 12 สาขาในกรุงเทพ | คำขอ: สรุปหน้านี้ให้หน่อย => answer ร้านก๋วยเตี๋ยวเรือที่เปิดตั้งแต่ปี 2550 มี 12 สาขาในกรุงเทพ
 [1] ช่อง: Name: [2] ช่อง: Phone: [3] ตัวเลือก: Rice [4] ตัวเลือก: Noodles [5] ช่อง: Notes: [6] ปุ่ม: Send | คำขอ: เอาเส้น => click 4
 [1] ช่อง: Name: [2] ช่อง: Phone: [3] ตัวเลือก: Rice [4] ตัวเลือก: Noodles [5] ช่อง: Notes: [6] ปุ่ม: Send | คำขอ: เขียนหมายเหตุว่าไม่เผ็ด => type 5 ไม่เผ็ด
+[1] ช่อง: Name: [2] ตัวเลือก: Spicy [3] ตัวเลือก: Extra egg [4] ปุ่ม: Order | คำขอ: ใส่พริกด้วย => click 2
 [1] ช่อง: Name: [2] ช่อง: Phone: [3] ตัวเลือก: Rice [4] ตัวเลือก: Noodles [5] ช่อง: Notes: [6] ปุ่ม: Send | คำขอ: ใส่เบอร์ 0891112222 แล้วส่งเลย => type 2 0891112222 ; click 6
 [14] ลิงก์: รวมเพลงคาราบาว ฮิตตลอดกาล [15] ลิงก์: Go to channel คาราบาว [16] ลิงก์: คอนเสิร์ตเสก โลโซ เต็มวง [17] ลิงก์: Go to channel Loso | คำขอ: เปิดคลิปคอนเสิร์ตเสก => click 16
 [20] ลิงก์: Search domain kapook.com [21] ลิงก์: https://kapook.com › news — ข่าววันนี้ [22] ลิงก์: Search domain sanook.com [23] ลิงก์: https://www.sanook.com › news — ข่าวล่าสุด | คำขอ: เข้าเว็บสนุก => click 23
@@ -511,6 +512,9 @@ class Agent:
             out = self._run(command)
         except (OSError, http.client.HTTPException, ValueError, ConnectionError) as e:
             out = Outcome(ok=False, say=f"AI ในเครื่องยังไม่พร้อม: {e}")
+        except Exception as e:  # noqa: BLE001 · เบราว์เซอร์ปิด/หน้าเปลี่ยนระหว่างดูหน้า (CdpError) ฯลฯ
+            # ต้องจบเสมอ: ไม่งั้นหน้าจอค้าง "กำลังทำ" และคีย์ลัดไม่รับคำสั่งใหม่ (busy ไม่คืน)
+            out = Outcome(ok=False, say=f"ทำไม่สำเร็จ: {e}")
         out.seconds["total"] = round(time.monotonic() - t0, 2)
         if self.pre is not None and (self.browser.running or not self.pre.warmed):
             self.pre.schedule()
