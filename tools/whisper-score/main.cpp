@@ -10,6 +10,7 @@
 //   FIX <ข้อความ>                   ให้คะแนนประโยคนี้ทั้งประโยค
 //   PRE <ข้อความ>                   บังคับขึ้นต้นด้วยข้อความนี้ แล้วให้ whisper ถอดต่อเอง (คำค้นหา ฯลฯ)
 //   GO                              ทำ แล้วตอบ JSON หนึ่งบรรทัด
+//   AGAIN                           ให้คะแนน FIX/PRE ชุดใหม่บนเสียงเดิม (ไม่เข้ารหัสซ้ำ · สร้างตัวเลือกจากข้อความที่ถอดอิสระได้)
 #include "whisper.h"
 
 #include <algorithm>
@@ -177,6 +178,20 @@ struct Scorer {
     }
 };
 
+// ให้คะแนนตัวเลือกทุกตัว → JSON (ไม่มีวงเล็บเหลี่ยม) · FIX ถอดรวดเดียว · PRE ถอดต่อเองทีละคำ (ช้ากว่ามาก)
+static std::string score_all(Scorer & sc, const std::vector<std::pair<char, std::string>> & cands) {
+    std::string out;
+    for (size_t c = 0; c < cands.size(); c++) {
+        float lp;
+        std::vector<whisper_token> got;
+        const bool ok = sc.score(sc.tokenize(cands[c].second), cands[c].first == 'P' ? 32 : 0, lp, got);
+        if (c) out += ",";
+        out += "{\"lp\":" + (ok ? std::to_string(lp) : std::string("null")) + ",\"n\":" +
+               std::to_string(got.size()) + (cands[c].first == 'P' ? ",\"text\":" + jstr(sc.text(got)) : "") + "}";
+    }
+    return out;
+}
+
 int main(int argc, char ** argv) {
     if (argc < 2) {
         fprintf(stderr, "ใช้: %s <โมเดล ggml> [เธรด]\n", argv[0]);
@@ -198,13 +213,29 @@ int main(int argc, char ** argv) {
 
     std::string line, wav, prompt;
     std::vector<std::pair<char, std::string>> cands;  // 'F' = FIX · 'P' = PRE
+    bool have_audio = false;  // AGAIN ใช้ได้หลัง GO ที่สำเร็จเท่านั้น
     while (std::getline(std::cin, line)) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
         if (line.rfind("WAV ", 0) == 0) wav = line.substr(4);
         else if (line.rfind("PROMPT ", 0) == 0) prompt = line.substr(7);
         else if (line.rfind("FIX ", 0) == 0) cands.push_back({'F', line.substr(4)});
         else if (line.rfind("PRE ", 0) == 0) cands.push_back({'P', line.substr(4)});
+        else if (line == "AGAIN") {
+            // state ล่าสุดยังเก็บผลเข้ารหัสเสียงไว้ (cross-attention) และ prefix_logits ยังเป็นของเสียงนี้
+            if (!have_audio) {
+                printf("{\"error\":\"ยังไม่มีเสียง\"}\n");
+            } else {
+                auto t1 = clk::now();
+                sc.n_decode = 0;
+                std::string out = "{\"cands\":[" + score_all(sc, cands) + "],\"score_ms\":" +
+                                  std::to_string((int) ms_since(t1)) + ",\"n_decode\":" + std::to_string(sc.n_decode) + "}";
+                printf("%s\n", out.c_str());
+            }
+            fflush(stdout);
+            cands.clear();
+        }
         else if (line == "GO") {
+            have_audio = false;
             auto t0 = clk::now();
             std::vector<float> pcm;
             if (!read_wav(wav, pcm)) {
@@ -262,16 +293,9 @@ int main(int argc, char ** argv) {
                     out += ",\"text\":" + jstr(free_text) + ",\"free\":" + std::to_string(lp_free) +
                            ",\"free_retok\":" + std::to_string(lp_retok) + ",\"free_n\":" + std::to_string(free_toks.size()) +
                            ",\"cands\":[";
-                    for (size_t c = 0; c < cands.size(); c++) {
-                        float lp;
-                        std::vector<whisper_token> got;
-                        const bool ok = sc.score(sc.tokenize(cands[c].second), cands[c].first == 'P' ? 32 : 0, lp, got);
-                        if (c) out += ",";
-                        out += "{\"lp\":" + (ok ? std::to_string(lp) : std::string("null")) + ",\"n\":" +
-                               std::to_string(got.size()) + (cands[c].first == 'P' ? ",\"text\":" + jstr(sc.text(got)) : "") + "}";
-                    }
-                    out += "],\"score_ms\":" + std::to_string((int) ms_since(t1)) +
+                    out += score_all(sc, cands) + "],\"score_ms\":" + std::to_string((int) ms_since(t1)) +
                            ",\"n_decode\":" + std::to_string(sc.n_decode) + "}";
+                    have_audio = true;
                 }
                 printf("%s\n", out.c_str());
             }
