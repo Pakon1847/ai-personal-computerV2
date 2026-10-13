@@ -177,6 +177,13 @@ Item {
         // งานที่ลบ/แตะเครื่องยังต้องยืนยัน · พูด "ใช่" / "ไม่" แทนการกดปุ่ม
         if (tok !== "" && /^(ใช่|ตกลง|ยืนยัน|โอเค|ok|เอาเลย)/i.test(t)) { push({ user: true, text: t }); answer(tok, true); speakLastCard(); return }
         if (tok !== "" && /^(ไม่|ยกเลิก|ไม่เอา)/.test(t)) { push({ user: true, text: t }); answer(tok, false); speakLastCard(); return }
+        // ผู้ช่วยเว็บยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป)
+        if (browser.busy) {
+            push({ user: true, text: t })
+            push({ ai: true, text: "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่", note: "", done: true, skill: "ผู้ช่วยเว็บ" })
+            if (voice.available) voice.speak(items.length - 1, "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")
+            return
+        }
         // AI คิดเองว่าเป็นงานเว็บไหม (การ์ด 0025) · ไม่ใช่ → passToChat → chatCommand
         if (browser.handle(t)) {
             push({ user: true, text: t })
