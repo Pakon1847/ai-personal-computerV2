@@ -35,9 +35,10 @@ def count(rows: list[dict], pick) -> dict:
         if r["expect"]:
             c["n_cmd"] += 1
             if what == "do":
-                c["ok" if got == r["expect"] else "wrong"] += 1
+                ok = matches(got, r["expect"])
+                c["ok" if ok else "wrong"] += 1
                 # ชนิดคำสั่งถูกหมดแต่คำค้นเพี้ยน (ยังนับเป็นผิด · แสดงแยกเพราะเว็บค้นหาแก้คำผิดได้)
-                c["qdiff"] += got != r["expect"] and only_query_differs(got, r["expect"])
+                c["qdiff"] += not ok and only_query_differs(got, r["expect"])
             else:
                 c["ask" if what == "ask" else "miss"] += 1
         else:
@@ -47,15 +48,30 @@ def count(rows: list[dict], pick) -> dict:
     return c
 
 
+def _no_query(cmds: list[dict]) -> list[dict]:
+    return [{k: v for k, v in x.items() if not (x["kind"] == "search" and k in ("query", "has"))}
+            for x in cmds]  # fmt: skip
+
+
+def matches(got: list[dict], expect: list[dict]) -> bool:
+    """ตรงกับคำตอบ.
+
+    ชุดเสียงคน: ค้นหาใช้ has = คำค้นต้องมีทุกคำนี้ (ไม่สนวรรค) · ชุดสังเคราะห์: query ต้องตรงทุกตัว."""
+    if _no_query(got) != _no_query(expect):
+        return False
+    for g, e in zip(got, expect, strict=True):
+        if "has" in e:
+            q = g.get("query", "").replace(" ", "")
+            if not all(w.replace(" ", "") in q for w in e["has"]):
+                return False
+        elif g != e:
+            return False
+    return True
+
+
 def only_query_differs(got: list[dict], expect: list[dict]) -> bool:
     """ต่างกันแค่คำค้น (ลิงก์ที่ N ผิด = ผิดจริง ไม่ใช่คำค้นเพี้ยน)."""
-    strip = [
-        {k: v for k, v in x.items() if not (x["kind"] == "search" and k == "query")} for x in got
-    ]
-    want = [
-        {k: v for k, v in x.items() if not (x["kind"] == "search" and k == "query")} for x in expect
-    ]
-    return strip == want
+    return _no_query(got) == _no_query(expect)
 
 
 def free_pick(r: dict) -> tuple[str, list[dict]]:
