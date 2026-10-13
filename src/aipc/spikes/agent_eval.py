@@ -80,7 +80,11 @@ def run_item(llm: agent.Llm, item: dict, obs: dict, today: date, preread: bool) 
             row["look"] = {"task": st.text, "reply": reply, "s": round(time.monotonic() - t1, 2),
                            "prompt_n": tm.get("prompt_n"),
                            "predicted_n": tm.get("predicted_n")}  # fmt: skip
-            got = agent.parse_steps(reply, (*agent.LOOK_STEPS, "none")) or [agent.Step("none")]
+            got = agent.parse_steps(reply, (*agent.LOOK_STEPS, "none", "chat")) or [
+                agent.Step("none")
+            ]
+            if got[0].action == "chat" and len(steps) == 1:  # แผนมีแค่ look = ส่งเข้าแชท (agent._run)
+                got = [agent.Step("chat")]
             final += got
             moved = moved or any(s.action in CHANGES_PAGE for s in got)
             continue

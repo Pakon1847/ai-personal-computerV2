@@ -157,6 +157,16 @@ class AgentTest(unittest.TestCase):
         self.assertIn("ทำไปแล้ว: ทำ down แล้ว", llm.asked[2][1])
         self.assertTrue(out.ok)
 
+    def test_look_can_hand_over_to_chat(self):
+        b = FakeBrowser()
+        out = make(FakeLlm(plan=["look วันนี้มีนัดอะไร"], look=["chat"]), b).run("วันนี้มีนัดอะไร")
+        self.assertFalse(out.handled)
+        self.assertEqual(b.acts, [])
+        out = make(FakeLlm(plan=["search ข่าว ; look วันนี้มีนัดอะไร"], look=["chat"]),
+                   FakeBrowser()).run("ค้นข่าวแล้วบอกว่าวันนี้มีนัดอะไร")  # fmt: skip
+        self.assertTrue(out.handled)
+        self.assertFalse(out.ok, "แผนหลายขั้น = ทำไม่สำเร็จ ไม่ย้อนไปแชท (ค้นไปแล้ว)")
+
     def test_not_found_without_claude_says_so(self):
         out = make(FakeLlm(plan=["look หาปุ่มสมัคร"], look=["none"])).run("กดสมัคร")
         self.assertFalse(out.ok)

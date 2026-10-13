@@ -128,6 +128,7 @@ KNOWN_SITES = {
     "เฟสบุ๊ค": "https://www.facebook.com", "pantip": "https://pantip.com",
     "พันทิป": "https://pantip.com", "wikipedia": "https://th.wikipedia.org",
     "วิกิพีเดีย": "https://th.wikipedia.org", "วิกิ": "https://th.wikipedia.org",
+    "พีเดีย": "https://th.wikipedia.org",  # ถอดเสียงเพี้ยน "วิกฤติพีเดีย" (ชุดพัฒนา 0025)
     "google": "https://www.google.com", "กูเกิล": "https://www.google.com",
     "gmail": "https://mail.google.com", "จีเมล": "https://mail.google.com",
     "shopee": "https://shopee.co.th", "ช้อปปี้": "https://shopee.co.th",
