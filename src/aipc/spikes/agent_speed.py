@@ -15,17 +15,25 @@ from urllib.parse import quote_plus, urlparse
 
 from aipc.browser import agent
 
+DDG = "https://duckduckgo.com/?kl=th-th&q="
 PAGES = [
-    ("bing-gold", "https://www.bing.com/search?setlang=th&q=" + quote_plus("ราคาทองวันนี้")),
-    ("bing-egg", "https://www.bing.com/search?setlang=th&q=" + quote_plus("วิธีทำไข่เจียว")),
+    ("ddg-gold", DDG + quote_plus("ราคาทองวันนี้")),
+    ("ddg-egg", DDG + quote_plus("วิธีทำไข่เจียว")),
+    ("ddg-weather", DDG + quote_plus("พยากรณ์อากาศเชียงใหม่")),
     ("wiki-th", "https://th.wikipedia.org/wiki/กรุงเทพมหานคร"),
+    ("wiki-th-mid", "https://th.wikipedia.org/wiki/กรุงเทพมหานคร#scroll"),
     ("youtube", "https://www.youtube.com/"),
+    ("youtube-results", "https://www.youtube.com/results?search_query=" + quote_plus("เพลงลูกทุ่ง")),
+    ("goldtraders", "https://www.goldtraders.or.th/"),
+    ("news", "https://www.thairath.co.th/news/local"),
+    ("form", "https://httpbin.org/forms/post"),
+    ("pantip", "https://pantip.com/"),
 ]
 
 COMMANDS = {
     "blank": ["ค้นหาราคาทองหน่อย", "เปิดยูทูบ", "พรุ่งนี้มีนัดอะไรบ้าง"],
-    "bing-gold": ["เข้าลิงก์แรก", "ราคาทองวันนี้เท่าไหร่", "ย้อนกลับ", "เลื่อนลง"],
-    "bing-egg": ["เข้าลิงก์ที่สอง", "ค้นหาวิธีทำต้มยำแทน"],
+    "ddg-gold": ["เข้าลิงก์แรก", "ราคาทองวันนี้เท่าไหร่", "ย้อนกลับ", "เลื่อนลง"],
+    "ddg-egg": ["เข้าลิงก์ที่สอง", "ค้นหาวิธีทำต้มยำแทน"],
     "wiki-th": ["กรุงเทพมีประชากรเท่าไหร่", "เลื่อนลงอีก"],
     "youtube": ["ค้นหาเพลงลูกทุ่งในยูทูบ", "กลับไปแอป"],
 }
@@ -39,9 +47,15 @@ def capture(out: str) -> None:
     obs = {"blank": {}}
     for name, url in PAGES:
         t0 = time.monotonic()
-        bc._go(url)
-        time.sleep(1.0)
+        bc._go(url.replace("#scroll", ""))
+        time.sleep(1.5)
+        if url.endswith("#scroll"):
+            bc._eval("window.scrollBy(0, innerHeight * 2.4)")
+            time.sleep(0.8)
         o = bc._eval(agent.OBSERVE_JS)
+        if o is None:
+            print(name, "OBSERVE_JS ล้ม", flush=True)
+            continue
         o["_load_s"] = round(time.monotonic() - t0, 2)
         obs[name] = o
         print(name, o["url"][:80], len(o["items"]), "items", len(o["text"]), "chars", flush=True)
