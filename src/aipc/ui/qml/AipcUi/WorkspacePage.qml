@@ -144,6 +144,24 @@ Item {
             root.items = i
             if (voice.available) voice.speak(i.length - 1, say)
         }
+        // ระหว่าง AI ทำ (การ์ด 0025): ฟองคำตอบที่รออยู่บอกว่ากำลังทำอะไร
+        function onProgress(text) {
+            const i = root.items.slice()
+            if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done && i[i.length - 1].web) {
+                i[i.length - 1] = Object.assign({}, i[i.length - 1], { live: text })
+                root.items = i
+            }
+        }
+        // AI บอกว่าไม่ใช่งานเว็บ → เอาฟองที่รับไว้ออก แล้วส่งเข้าแชทเหมือนพิมพ์ (ทางเดิม)
+        function onPassToChat(text) {
+            const i = root.items.slice()
+            if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done && i[i.length - 1].web)
+                i.pop()
+            if (i.length > 0 && i[i.length - 1].user && i[i.length - 1].text === text)
+                i.pop()
+            root.items = i
+            root.chatCommand(text)
+        }
     }
     function pendingConfirm() {
         for (let k = items.length - 1; k >= 0; k--) {
@@ -159,11 +177,15 @@ Item {
         // งานที่ลบ/แตะเครื่องยังต้องยืนยัน · พูด "ใช่" / "ไม่" แทนการกดปุ่ม
         if (tok !== "" && /^(ใช่|ตกลง|ยืนยัน|โอเค|ok|เอาเลย)/i.test(t)) { push({ user: true, text: t }); answer(tok, true); speakLastCard(); return }
         if (tok !== "" && /^(ไม่|ยกเลิก|ไม่เอา)/.test(t)) { push({ user: true, text: t }); answer(tok, false); speakLastCard(); return }
+        // AI คิดเองว่าเป็นงานเว็บไหม (การ์ด 0025) · ไม่ใช่ → passToChat → chatCommand
         if (browser.handle(t)) {
             push({ user: true, text: t })
-            push({ ai: true, text: "", note: "", done: false, skill: "เบราว์เซอร์ของผู้ช่วย" })
+            push({ ai: true, text: "", note: "", done: false, skill: "ผู้ช่วยเว็บ", web: true, live: "กำลังคิด…" })
             return
         }
+        chatCommand(t)
+    }
+    function chatCommand(t) {
         const before = items.length
         sendText(t)
         if (items.length > before && items[items.length - 1].ai)
@@ -717,7 +739,9 @@ Item {
                         objectName: "aiText"
                         Layout.fillWidth: true
                         textFormat: Text.PlainText  // ค่าเริ่มต้น AutoText เดาเป็น HTML ได้ถ้าคำตอบหน้าตาเหมือนแท็ก
-                        text: root.tidy(row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : "กำลังอ่านข้อความ…"))
+                        text: root.tidy(row.modelData.done ? row.modelData.text
+                                        : row.modelData.web ? (row.modelData.live || "กำลังคิด…")
+                                        : (chat.streamText !== "" ? chat.streamText : "กำลังอ่านข้อความ…"))
                     }
                     AppText {
                         visible: !!row.modelData.note

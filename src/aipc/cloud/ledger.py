@@ -17,7 +17,8 @@ from pathlib import Path
 
 KEEP = 200
 KINDS = {"ask": "ถาม Claude", "skill": "ให้ Claude สร้างสกิล", "weather": "ขอพยากรณ์อากาศ (Open-Meteo)",
-         "web": "ค้นเว็บด้วยเสียง (Google/Bing)"}  # fmt: skip
+         "web": "ค้นเว็บด้วยเสียง (Google/DuckDuckGo)",
+         "web-agent": "ผู้ช่วยเว็บส่งหน้าเว็บให้ Claude ช่วย"}  # fmt: skip
 
 
 def default_path() -> Path:

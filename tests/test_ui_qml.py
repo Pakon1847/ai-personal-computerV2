@@ -413,8 +413,14 @@ class ShellCardTest(unittest.TestCase):
         answered = answered.toVariant() if hasattr(answered, "toVariant") else answered
         self.assertTrue(answered.get("tok-1"))
         n = len(items_of(page))
-        page.voiceCommand("ตอนนี้กี่โมง")  # ไม่ใช่คำสั่งเว็บ → ทางเดิม (การ์ดเวลา) เหมือนพิมพ์แล้วกดส่ง
-        settle(100)
+        # ไม่ใช่งานเว็บ → ทางเดิม (การ์ดเวลา) เหมือนพิมพ์แล้วกดส่ง · การ์ด 0025: AI ในเครื่องตัดสินก่อน
+        # (เทสต์ไม่มี AI = ส่งเข้าแชทเอง) → ฟอง "ผู้ช่วยเว็บ" ที่รับไว้หายไป
+        page.voiceCommand("ตอนนี้กี่โมง")
+        for _ in range(40):
+            settle(50)
+            rows = items_of(page)
+            if rows and rows[-1].get("card"):
+                break
         rows = items_of(page)
         self.assertEqual(rows[n]["text"], "ตอนนี้กี่โมง")
         self.assertIn("ตอนนี้", rows[-1]["card"]["title"])

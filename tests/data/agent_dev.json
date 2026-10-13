@@ -1,0 +1,2373 @@
+{
+ "about": "ชุดพัฒนา D ของผู้ช่วยเว็บ (การ์ด 0025) · ใช้ปรับ prompt/ตัวอย่างได้ · v1/v2/hd = ประโยคชุด V1 V2 และข้อความที่ whisper ถอดจากเสียงสังเคราะห์ของ V1+V2 (การ์ด 0024) แปลงเป็นขั้นของ 0025 · ตัดประโยคที่ซ้ำกับชุดทดสอบ H ออก: โหลดหน้านี้ใหม่ · เลื่อนขึ้นไปหน่อย · ปิดแท็บนี้ · โหลดหน้ามีใหม่ · เลื่อนขึ้นไปหน่อย · ปิงมี · d = งานดูหน้า/ตอบจากหน้า/หลายขั้น ที่ผู้ช่วยเขียนเพิ่ม (คนละถ้อยคำกับ H)",
+ "today": "2026-10-13",
+ "items": [
+  {
+   "id": "v101",
+   "page": "blank",
+   "command": "ค้นหาราคาทองหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาทอง"
+    ]
+   ]
+  },
+  {
+   "id": "v102",
+   "page": "ddg-gold",
+   "command": "ค้นหาราคาทองหน่อยเข้าลิงก์แรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาทอง",
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v103",
+   "page": "blank",
+   "command": "ค้นหา ร้านอาหารใกล้ฉัน",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ร้านอาหารใกล้ฉัน"
+    ]
+   ]
+  },
+  {
+   "id": "v104",
+   "page": "blank",
+   "command": "เสิร์ชข่าวฟุตบอลวันนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ข่าวฟุตบอลวันนี้"
+    ]
+   ]
+  },
+  {
+   "id": "v105",
+   "page": "blank",
+   "command": "กูเกิลวิธีทำไข่เจียว",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~วิธีทำไข่เจียว"
+    ]
+   ]
+  },
+  {
+   "id": "v106",
+   "page": "blank",
+   "command": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~เพลงใหม่"
+    ]
+   ]
+  },
+  {
+   "id": "v107",
+   "page": "blank",
+   "command": "หาสูตรแกงเขียวหวานหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~สูตรแกงเขียวหวาน"
+    ]
+   ]
+  },
+  {
+   "id": "v108",
+   "page": "ddg-gold",
+   "command": "เข้าลิงก์แรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v109",
+   "page": "ddg-gold",
+   "command": "เข้าลิ้งค์แรกให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v110",
+   "page": "ddg-gold",
+   "command": "กดลิงก์ที่สอง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "v111",
+   "page": "ddg-gold",
+   "command": "เปิดลิงก์ที่ 3",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "v112",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บแรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v113",
+   "page": "ddg-gold",
+   "command": "คลิกอันที่สี่",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 4"
+    ]
+   ]
+  },
+  {
+   "id": "v114",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v115",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v116",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าก่อนหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v117",
+   "page": "ddg-gold",
+   "command": "ไปข้างหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "v118",
+   "page": "ddg-gold",
+   "command": "โหลดใหม่",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "v119",
+   "page": "ddg-gold",
+   "command": "รีเฟรชหน้านี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "v120",
+   "page": "ddg-gold",
+   "command": "เลื่อนลง",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "v121",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงอีก",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "v122",
+   "page": "ddg-gold",
+   "command": "เลื่อนขึ้น",
+   "cat": "plan",
+   "expect": [
+    [
+     "up"
+    ]
+   ]
+  },
+  {
+   "id": "v123",
+   "page": "ddg-gold",
+   "command": "ปิดแท็บ",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "v124",
+   "page": "ddg-gold",
+   "command": "ปิดหน้านี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "v125",
+   "page": "ddg-gold",
+   "command": "กลับไปแอป",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "v126",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าผู้ช่วย",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "v127",
+   "page": "blank",
+   "command": "เปิดกูเกิล",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "v128",
+   "page": "blank",
+   "command": "เปิด google",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "v129",
+   "page": "blank",
+   "command": "เปิดยูทูบ",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube"
+    ]
+   ]
+  },
+  {
+   "id": "v130",
+   "page": "blank",
+   "command": "ค้นหาไฟล์รายงาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v131",
+   "page": "blank",
+   "command": "หาไฟล์ที่แก้เมื่อวาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v132",
+   "page": "blank",
+   "command": "เลื่อนนัดประชุมไปพรุ่งนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v133",
+   "page": "blank",
+   "command": "ปิดเสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v134",
+   "page": "blank",
+   "command": "เปิดเสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v135",
+   "page": "blank",
+   "command": "ปรับเสียงเป็น 40",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v136",
+   "page": "blank",
+   "command": "ตอนนี้กี่โมง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v137",
+   "page": "blank",
+   "command": "ยกเลิกนัดกินยา",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v138",
+   "page": "blank",
+   "command": "หาค่าเฉลี่ยของ 4 6 8",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v139",
+   "page": "blank",
+   "command": "ราคาทองวันนี้เท่าไหร่",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v140",
+   "page": "blank",
+   "command": "เปิดแอปเครื่องคิดเลข",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v201",
+   "page": "blank",
+   "command": "ค้นหาราคาน้ำมันวันนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาน้ำมันวันนี้"
+    ]
+   ]
+  },
+  {
+   "id": "v202",
+   "page": "blank",
+   "command": "ค้นหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~โรงหนังแถวนี้"
+    ]
+   ]
+  },
+  {
+   "id": "v203",
+   "page": "blank",
+   "command": "ช่วยเสิร์ชตารางรถไฟไปเชียงใหม่",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ตารางรถไฟไปเชียงใหม่"
+    ]
+   ]
+  },
+  {
+   "id": "v204",
+   "page": "blank",
+   "command": "ค้นในกูเกิลว่าวันหยุดเดือนหน้ามีวันไหน",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~วันหยุดเดือนหน้ามีวันไหน"
+    ]
+   ]
+  },
+  {
+   "id": "v205",
+   "page": "blank",
+   "command": "หาวิธีปลูกมะนาวในกระถาง",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~วิธีปลูกมะนาวในกระถาง"
+    ]
+   ]
+  },
+  {
+   "id": "v206",
+   "page": "blank",
+   "command": "ค้นหาคำว่าปัญญาประดิษฐ์",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ปัญญาประดิษฐ์"
+    ]
+   ]
+  },
+  {
+   "id": "v207",
+   "page": "blank",
+   "command": "ค้นหา raspberry pi 5 ครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~raspberrypi5"
+    ]
+   ]
+  },
+  {
+   "id": "v208",
+   "page": "ddg-gold",
+   "command": "ค้นหาผลบอลเมื่อคืนแล้วเข้าลิงก์แรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ผลบอลเมื่อคืน",
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v209",
+   "page": "ddg-gold",
+   "command": "เข้าลิงค์แรกเลย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v210",
+   "page": "ddg-gold",
+   "command": "เข้าลิงก์อันแรกครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v211",
+   "page": "ddg-gold",
+   "command": "กดเข้าลิงก์ที่หนึ่ง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v212",
+   "page": "ddg-gold",
+   "command": "เปิดลิ้งที่สอง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "v213",
+   "page": "ddg-gold",
+   "command": "เข้าลิงก์ที่ 2",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "v214",
+   "page": "ddg-gold",
+   "command": "คลิกลิงก์ที่สามให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "v215",
+   "page": "ddg-gold",
+   "command": "เข้าผลลัพธ์ที่ห้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 5"
+    ]
+   ]
+  },
+  {
+   "id": "v216",
+   "page": "ddg-gold",
+   "command": "เปิดเว็บที่สองครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "v217",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v218",
+   "page": "ddg-gold",
+   "command": "ถอยกลับไปหน้าเดิม",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v219",
+   "page": "ddg-gold",
+   "command": "กลับหน้าที่แล้ว",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v220",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับไปหน้าที่แล้วหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v221",
+   "page": "ddg-gold",
+   "command": "ไปหน้าข้างหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "v222",
+   "page": "ddg-gold",
+   "command": "เดินหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "v223",
+   "page": "ddg-gold",
+   "command": "รีโหลด",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "v225",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "v226",
+   "page": "ddg-gold",
+   "command": "เลื่อนหน้าลง",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "v228",
+   "page": "ddg-gold",
+   "command": "เลื่อนกลับขึ้นไป",
+   "cat": "plan",
+   "expect": [
+    [
+     "up"
+    ]
+   ]
+  },
+  {
+   "id": "v230",
+   "page": "ddg-gold",
+   "command": "ปิดเว็บนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "v231",
+   "page": "ddg-gold",
+   "command": "กลับไปที่แอป",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "v232",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าแชท",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "v233",
+   "page": "blank",
+   "command": "เปิดกูเกิ้ลหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "v234",
+   "page": "blank",
+   "command": "เปิดเว็บยูทูป",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube"
+    ]
+   ]
+  },
+  {
+   "id": "v235",
+   "page": "blank",
+   "command": "เปิดวิกิพีเดีย",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~wikipedia"
+    ]
+   ]
+  },
+  {
+   "id": "v236",
+   "page": "blank",
+   "command": "ค้นหาไฟล์ pdf ที่ทำเมื่อวาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v237",
+   "page": "blank",
+   "command": "หาไฟล์ใบเสร็จ",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v238",
+   "page": "blank",
+   "command": "หาเอกสารรายงานประจำเดือน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v239",
+   "page": "blank",
+   "command": "เลื่อนนัดหมอฟันเป็นวันศุกร์",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v240",
+   "page": "blank",
+   "command": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v241",
+   "page": "blank",
+   "command": "ปิดเสียงหน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v242",
+   "page": "blank",
+   "command": "เพิ่มเสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v243",
+   "page": "blank",
+   "command": "ลดเสียงลงหน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v244",
+   "page": "blank",
+   "command": "วันนี้วันที่เท่าไหร่",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v245",
+   "page": "blank",
+   "command": "ลบนัดประชุมพรุ่งนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v246",
+   "page": "blank",
+   "command": "หาผลรวมของ 12 กับ 30",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v247",
+   "page": "blank",
+   "command": "ข่าววันนี้มีอะไรบ้าง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v248",
+   "page": "blank",
+   "command": "เครื่องช้าเพราะอะไร",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v249",
+   "page": "blank",
+   "command": "เปิดโหมดประชุม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v250",
+   "page": "blank",
+   "command": "ย้อนกลับเมื่อกี้ที่ปรับเสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v251",
+   "page": "blank",
+   "command": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v252",
+   "page": "blank",
+   "command": "เขียนกลอนสั้นๆเรื่องฝน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd01",
+   "page": "blank",
+   "command": "คนหาราคาทองหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาทอง"
+    ]
+   ]
+  },
+  {
+   "id": "hd02",
+   "page": "ddg-gold",
+   "command": "ค้นหาราคาทองหน่อยเข้าลิงแร่",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาทอง",
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd03",
+   "page": "blank",
+   "command": "คนหารานอาหารใกล้ฉัน",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ร้านอาหารใกล้ฉัน"
+    ]
+   ]
+  },
+  {
+   "id": "hd04",
+   "page": "blank",
+   "command": "เสิร์จ ข่าว ฟุตบอล วันนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ข่าวฟุตบอลวันนี้"
+    ]
+   ]
+  },
+  {
+   "id": "hd05",
+   "page": "blank",
+   "command": "กูเกินวิธีทำไข่เจียว",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~วิธีทำไข่เจียว"
+    ]
+   ]
+  },
+  {
+   "id": "hd06",
+   "page": "blank",
+   "command": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~เพลงใหม่"
+    ]
+   ]
+  },
+  {
+   "id": "hd07",
+   "page": "blank",
+   "command": "ขาสุดแกงเขียวหวานหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~สูตรแกงเขียวหวาน"
+    ]
+   ]
+  },
+  {
+   "id": "hd08",
+   "page": "ddg-gold",
+   "command": "ข้าวลิงแรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd09",
+   "page": "ddg-gold",
+   "command": "เข้าลิงแรกให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd10",
+   "page": "ddg-gold",
+   "command": "กดลิง ที่ สอง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "hd11",
+   "page": "ddg-gold",
+   "command": "เปิด ลิง ที่ สาม",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "hd12",
+   "page": "ddg-gold",
+   "command": "เท่า เวทย์แรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd13",
+   "page": "ddg-gold",
+   "command": "คลึกอันที่สี่",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 4"
+    ]
+   ]
+  },
+  {
+   "id": "hd14",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd15",
+   "page": "ddg-gold",
+   "command": "ย้อน กลับ หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd16",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าก่อนหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd17",
+   "page": "ddg-gold",
+   "command": "ไปข้างมาฮะ",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "hd18",
+   "page": "ddg-gold",
+   "command": "โหลดใหม่",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "hd19",
+   "page": "ddg-gold",
+   "command": "รีเฟลดหน้านี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "hd20",
+   "page": "ddg-gold",
+   "command": "เลื่อน ลง",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "hd21",
+   "page": "ddg-gold",
+   "command": "เลื่อน ลง อี",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "hd22",
+   "page": "ddg-gold",
+   "command": "เลื่อน คืน",
+   "cat": "plan",
+   "expect": [
+    [
+     "up"
+    ]
+   ]
+  },
+  {
+   "id": "hd23",
+   "page": "ddg-gold",
+   "command": "เปก",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "hd24",
+   "page": "ddg-gold",
+   "command": "ปิด หน้า หนี",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "hd25",
+   "page": "ddg-gold",
+   "command": "กลับ ไป แอ๊ก",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "hd26",
+   "page": "ddg-gold",
+   "command": "ตลับไปหน้าผู้ช่วย",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "hd27",
+   "page": "blank",
+   "command": "ปาดกูการ",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "hd28",
+   "page": "blank",
+   "command": "เปิด",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "hd29",
+   "page": "blank",
+   "command": "เปิดยูทูล",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube"
+    ]
+   ]
+  },
+  {
+   "id": "hd30",
+   "page": "blank",
+   "command": "ค้นหาไฟรายงาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd31",
+   "page": "blank",
+   "command": "หาไฟที่แก้เมื่อวาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd32",
+   "page": "blank",
+   "command": "เลื่อนนักประชุมไปพรุ่งนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd33",
+   "page": "blank",
+   "command": "ปิด เสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd34",
+   "page": "blank",
+   "command": "เปิดเสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd35",
+   "page": "blank",
+   "command": "ปรับ เสียง เป็น สี่ สิบ",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd36",
+   "page": "blank",
+   "command": "ตอนนี้ขี่โมง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd37",
+   "page": "blank",
+   "command": "นกเลิกนัดคินยา",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd38",
+   "page": "blank",
+   "command": "หาค่าเฉลี่ยของสี่หกแปด",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd39",
+   "page": "blank",
+   "command": "ราคาทองวันนี้เท่าไหร่",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd40",
+   "page": "blank",
+   "command": "เปิดแอบเครื่องคิดเลข",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd41",
+   "page": "blank",
+   "command": "คนหาราคาน้ำบันวันนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาน้ำมันวันนี้"
+    ]
+   ]
+  },
+  {
+   "id": "hd42",
+   "page": "blank",
+   "command": "คนหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~โรงหนังแถวนี้"
+    ]
+   ]
+  },
+  {
+   "id": "hd43",
+   "page": "blank",
+   "command": "ช่วยเสิร์ฟตารางรถไฟไปเชียงใหม่",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ตารางรถไฟไปเชียงใหม่"
+    ]
+   ]
+  },
+  {
+   "id": "hd44",
+   "page": "blank",
+   "command": "คนในกูเกินว่าวันหยุดเดือนน่ามีวันไหน",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~วันหยุดเดือนหน้ามีวันไหน"
+    ]
+   ]
+  },
+  {
+   "id": "hd45",
+   "page": "blank",
+   "command": "หาวิธีปลูกมะนาวในกระถาง",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~วิธีปลูกมะนาวในกระถาง"
+    ]
+   ]
+  },
+  {
+   "id": "hd46",
+   "page": "blank",
+   "command": "ค้นหาคำว่า ปัญญาประดิษฐ์",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ปัญญาประดิษฐ์"
+    ]
+   ]
+  },
+  {
+   "id": "hd47",
+   "page": "blank",
+   "command": "คนหาสิบห้าครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~raspberrypi5"
+    ]
+   ]
+  },
+  {
+   "id": "hd48",
+   "page": "ddg-gold",
+   "command": "คนหาผลบอลเมื่อคืนแล้วเข้าลิงแรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ผลบอลเมื่อคืน",
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd49",
+   "page": "ddg-gold",
+   "command": "เข้าลิงแรกเลย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd50",
+   "page": "ddg-gold",
+   "command": "เข้าลิงอันแรกครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd51",
+   "page": "ddg-gold",
+   "command": "กด เข้า ลิง ที่ หนึ่ง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "hd52",
+   "page": "ddg-gold",
+   "command": "เปิด ลิง ที่ สอง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "hd53",
+   "page": "ddg-gold",
+   "command": "เข้าลิงที่สอง",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "hd54",
+   "page": "ddg-gold",
+   "command": "ขลิกกลิงที่สามให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "hd55",
+   "page": "ddg-gold",
+   "command": "เข้าผลลับที่ห้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 5"
+    ]
+   ]
+  },
+  {
+   "id": "hd56",
+   "page": "ddg-gold",
+   "command": "เปิด เว็บ ที่ สอง ครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "hd57",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับครับ",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd58",
+   "page": "ddg-gold",
+   "command": "ถอยกลับไปหน้าเดิม",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd59",
+   "page": "ddg-gold",
+   "command": "กลับหน้าที่แล้ว",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd60",
+   "page": "ddg-gold",
+   "command": "ยอน กลับ ไป หน้า ที่ แล้ว หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "hd61",
+   "page": "ddg-gold",
+   "command": "ไปหน้าค้างนะฮะ",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "hd62",
+   "page": "ddg-gold",
+   "command": "เดินหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "hd63",
+   "page": "ddg-gold",
+   "command": "ตีโหลด",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "hd65",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "hd66",
+   "page": "ddg-gold",
+   "command": "เลื่อด น่า ลง",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "hd68",
+   "page": "ddg-gold",
+   "command": "เลื่อน กลับ ขึ้น ไป",
+   "cat": "plan",
+   "expect": [
+    [
+     "up"
+    ]
+   ]
+  },
+  {
+   "id": "hd70",
+   "page": "ddg-gold",
+   "command": "ปิด เว็บ นี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "hd71",
+   "page": "ddg-gold",
+   "command": "กลับ ไป ที่ แอ๊ก",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "hd72",
+   "page": "ddg-gold",
+   "command": "กลับ ไป หน้า แฉด",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "hd73",
+   "page": "blank",
+   "command": "เปิด กู เกิ้ล หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "hd74",
+   "page": "blank",
+   "command": "เปิดเวฟยูทูก",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube"
+    ]
+   ]
+  },
+  {
+   "id": "hd75",
+   "page": "blank",
+   "command": "เปิด วิกฤติพีเดีย",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~wikipedia"
+    ]
+   ]
+  },
+  {
+   "id": "hd76",
+   "page": "blank",
+   "command": "ค้นหาใส่ที่ทำเมื่อวาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd77",
+   "page": "blank",
+   "command": "หาไฟใบเสร็จ",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd78",
+   "page": "blank",
+   "command": "ถ้าเอกสารรายงานประจำเดือน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd79",
+   "page": "blank",
+   "command": "เลื่อนัดหมอฟันเป็นวันศุกร์",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd80",
+   "page": "blank",
+   "command": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd81",
+   "page": "blank",
+   "command": "ปิด เสียง หน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd82",
+   "page": "blank",
+   "command": "เพิ่ม เสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd83",
+   "page": "blank",
+   "command": "รถเสียงลงหน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd84",
+   "page": "blank",
+   "command": "วันนี้วันที่เท่าไหร่",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd85",
+   "page": "blank",
+   "command": "ลบนัดประชุมพรุ่งนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd86",
+   "page": "blank",
+   "command": "หา ผล รวม ของ สิบ สอง กับ สาม สิบ",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd87",
+   "page": "blank",
+   "command": "เขา วันนี้ มี อะไร บ้าง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd88",
+   "page": "blank",
+   "command": "เครื่องช้าเพราะอะไร",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd89",
+   "page": "blank",
+   "command": "เปิดโหมดประชุม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd90",
+   "page": "blank",
+   "command": "ย้อนกลับเมื่อกี้ทีปรับเสียง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd91",
+   "page": "blank",
+   "command": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "hd92",
+   "page": "blank",
+   "command": "เขียน กลอน สั้น เขียน กลอน สั้น เรื่อง ฝน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "d01",
+   "page": "goldtraders",
+   "command": "ราคารับซื้อทองแท่งเท่าไหร่",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~66,400|66400"
+    ]
+   ]
+  },
+  {
+   "id": "d02",
+   "page": "goldtraders",
+   "command": "ราคาทองโลกตอนนี้เท่าไหร่",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~4,191|4191"
+    ]
+   ]
+  },
+  {
+   "id": "d03",
+   "page": "goldtraders",
+   "command": "กดเมนูบทความ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 4"
+    ]
+   ]
+  },
+  {
+   "id": "d04",
+   "page": "goldtraders",
+   "command": "เข้าเกี่ยวกับเรา",
+   "cat": "look",
+   "expect": [
+    [
+     "click 3"
+    ]
+   ]
+  },
+  {
+   "id": "d05",
+   "page": "form",
+   "command": "ใส่อีเมล somsak@gmail.com",
+   "cat": "look",
+   "expect": [
+    [
+     "type 3 ~somsak@gmail.com"
+    ]
+   ]
+  },
+  {
+   "id": "d06",
+   "page": "form",
+   "command": "เลือกไซส์กลาง",
+   "cat": "look",
+   "expect": [
+    [
+     "click 5"
+    ]
+   ]
+  },
+  {
+   "id": "d07",
+   "page": "form",
+   "command": "ใส่หัวหอมด้วย",
+   "cat": "look",
+   "expect": [
+    [
+     "click 9"
+    ]
+   ]
+  },
+  {
+   "id": "d08",
+   "page": "form",
+   "command": "พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+   "cat": "look",
+   "expect": [
+    [
+     "type 12 ~ไม่ใส่ผัก"
+    ]
+   ]
+  },
+  {
+   "id": "d09",
+   "page": "news",
+   "command": "เข้าข่าวการเมือง",
+   "cat": "look",
+   "expect": [
+    [
+     "click 28"
+    ]
+   ]
+  },
+  {
+   "id": "d10",
+   "page": "news",
+   "command": "ดูหมวดหวย",
+   "cat": "look",
+   "expect": [
+    [
+     "click 9"
+    ]
+   ]
+  },
+  {
+   "id": "d11",
+   "page": "news",
+   "command": "เปิดข่าว กทม.",
+   "cat": "look",
+   "expect": [
+    [
+     "click 36"
+    ]
+   ]
+  },
+  {
+   "id": "d12",
+   "page": "pantip",
+   "command": "เข้าพันทิปพิค",
+   "cat": "look",
+   "expect": [
+    [
+     "click 9"
+    ]
+   ]
+  },
+  {
+   "id": "d13",
+   "page": "pantip",
+   "command": "ดูกฎกติกา",
+   "cat": "look",
+   "expect": [
+    [
+     "click 14"
+    ]
+   ]
+  },
+  {
+   "id": "d14",
+   "page": "youtube",
+   "command": "กดปุ่มตั้งค่า",
+   "cat": "look",
+   "expect": [
+    [
+     "click 7"
+    ]
+   ]
+  },
+  {
+   "id": "d15",
+   "page": "youtube",
+   "command": "ดูช็อตส์",
+   "cat": "look",
+   "expect": [
+    [
+     "click 8"
+    ]
+   ]
+  },
+  {
+   "id": "d16",
+   "page": "youtube",
+   "command": "ค้นหาคลิปตลก",
+   "cat": "plan",
+   "expect": [
+    [
+     "find ~คลิปตลก"
+    ]
+   ]
+  },
+  {
+   "id": "d17",
+   "page": "youtube-results",
+   "command": "กดดูวิดีโอรวมเพลงฮิตลูกทุ่งยามเช้า",
+   "cat": "look",
+   "expect": [
+    [
+     "click 21"
+    ]
+   ]
+  },
+  {
+   "id": "d18",
+   "page": "youtube-results",
+   "command": "ดูเฉพาะไลฟ์",
+   "cat": "look",
+   "expect": [
+    [
+     "click 13"
+    ]
+   ]
+  },
+  {
+   "id": "d19",
+   "page": "ddg-weather",
+   "command": "เข้าเว็บกรมอุตุ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 21"
+    ],
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "d20",
+   "page": "ddg-weather",
+   "command": "วันพฤหัสร้อนสุดกี่องศา",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~31"
+    ]
+   ]
+  },
+  {
+   "id": "d21",
+   "page": "ddg-weather",
+   "command": "วันศุกร์โอกาสฝนตกเท่าไหร่",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~50"
+    ]
+   ]
+  },
+  {
+   "id": "d22",
+   "page": "wiki-th",
+   "command": "กดเข้าสู่ระบบวิกิ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 5"
+    ]
+   ]
+  },
+  {
+   "id": "d23",
+   "page": "wiki-th",
+   "command": "กรุงเทพเป็นเมืองหลวงของประเทศอะไร",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~ไทย"
+    ]
+   ]
+  },
+  {
+   "id": "d24",
+   "page": "wiki-th",
+   "command": "เข้าหัวข้อภูมิศาสตร์",
+   "cat": "look",
+   "expect": [
+    [
+     "click 19"
+    ]
+   ]
+  },
+  {
+   "id": "d25",
+   "page": "wiki-th-mid",
+   "command": "เข้าหัวข้อการคมนาคม",
+   "cat": "look",
+   "expect": [
+    [
+     "click 34"
+    ]
+   ]
+  },
+  {
+   "id": "d26",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บ investing",
+   "cat": "look",
+   "expect": [
+    [
+     "click 24"
+    ],
+    [
+     "result 4"
+    ]
+   ]
+  },
+  {
+   "id": "d27",
+   "page": "ddg-egg",
+   "command": "เปิดคลิปไข่เจียวหมูสับ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 21"
+    ]
+   ]
+  },
+  {
+   "id": "d28",
+   "page": "blank",
+   "command": "ค้นหาร้านอาหารญี่ปุ่นแล้วกดอันที่สาม",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ร้านอาหารญี่ปุ่น",
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "d29",
+   "page": "blank",
+   "command": "เปิดพันทิปแล้วค้นหาเรื่องคอนโด",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~pantip",
+     "find ~คอนโด"
+    ]
+   ]
+  },
+  {
+   "id": "d30",
+   "page": "blank",
+   "command": "ค้นหาราคาน้ำมันแล้วบอกราคาดีเซล",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ราคาน้ำมัน",
+     "look"
+    ]
+   ]
+  },
+  {
+   "id": "d31",
+   "page": "ddg-gold",
+   "command": "เปิดเว็บไทยรัฐ",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~thairath|ไทยรัฐ"
+    ]
+   ]
+  },
+  {
+   "id": "d32",
+   "page": "pantip",
+   "command": "ค้นหาร้านกาแฟในกูเกิล",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ร้านกาแฟ"
+    ]
+   ]
+  },
+  {
+   "id": "d33",
+   "page": "news",
+   "command": "กลับไปที่แอปผู้ช่วย",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "d34",
+   "page": "youtube",
+   "command": "มีนัดอะไรบ้างวันนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "d35",
+   "page": "goldtraders",
+   "command": "ตั้งปลุกตีห้า",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "d36",
+   "page": "wiki-th",
+   "command": "สรุปบทความนี้ให้หน่อย",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~กรุงเทพ"
+    ]
+   ]
+  }
+ ]
+}

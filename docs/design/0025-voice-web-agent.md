@@ -31,6 +31,8 @@
 | คำสั่งสั้นไม่มีหน้าเว็บ | อ่าน 35–39 token = ~2 วิ |
 | แคชใน RAM (`-cram` ที่แอปเปิดอยู่แล้ว) · แชท → งานเว็บ → แชท | แชทอ่านใหม่แค่ 10 token (0.7 วิ) = **ไม่ต้องแก้ llama-server ของแอป** แชทไม่ช้าลง |
 | อ่านหน้าไว้ก่อน → คำสั่งสั้นคั่น → งานที่ต้องดูหน้า | system prompt เดียวกัน: แคชหน้าหาย อ่านใหม่ 536 token 27 วิ · **system prompt คนละข้อความ: อ่านแค่ 19 token 1.1 วิ** |
+| Bing (ตัวสำรองของ 0024) กับคำค้นไทย 4 คำ × 2 รอบ บน Pi | Bing ไม่ตรงคำค้น 3/4 ทั้ง 2 รอบ (ไข่เจียว → หน้าช่วยเหลือ Windows · อากาศเชียงใหม่ → แบบทดสอบ Harry Potter) · **DuckDuckGo ตรง 8/8** → เปลี่ยนตัวสำรองเป็น DuckDuckGo (ผล 0024 ข้อ 3 ตรวจแค่ "ออกจากหน้าค้นหา" จึงไม่เห็นปัญหานี้) |
+| system prompt ของผู้ช่วย (A ~1,700 · B ~1,300 token) ครั้งแรกหลัง login | ข้อแรกของชุดพัฒนารอบ 2 = 171 วิ → อุ่นไว้ก่อนเบื้องหลังตอนแชทว่าง (หัวข้อ 4) |
 
 ## 4. ออกแบบ
 
@@ -44,20 +46,30 @@ F9 → ฟัง → whisper ถอด → (มีการ์ดรอยืน
   → ทำไม่สำเร็จ / หาไม่เจอ และเปิด Claude ไว้ → Claude ได้คำสั่ง + สิ่งที่ทำไปแล้ว + หน้าเว็บ → ตอบแผนแบบเดียวกัน (สูงสุด 2 รอบ)
   → พูดผลสั้น ๆ (piper) · ข้อความผลประกอบจากสิ่งที่ทำจริง (ไม่ใช่ AI แต่งว่าทำแล้ว) + คำตอบจากหน้าเว็บ
 หน้าเว็บเปลี่ยน (โหลดเสร็จ/เลื่อน) และว่าง → อ่านหน้าไว้ก่อนเบื้องหลัง (ขั้น B ส่วนหน้า · max_tokens 0) → ถามเรื่องในหน้าตอบไว
+AI พร้อมหลัง login + 45 วิ และแชทว่าง → อุ่น system prompt A และ B ไว้ก่อน (ครั้งเดียวต่อ login)
 ```
 
 - **รูปแบบคำตอบของ AI:** ภาษาคำสั่งสั้น ๆ (ไม่ใช่ JSON) บังคับด้วย grammar ของ llama-server → ตอบผิดรูปแบบไม่ได้ และสั้น (search ราคาทอง ≈ 5 token)
-- **ขั้น A ทำได้:** `search <คำค้น>` (Google → Bing เมื่อโดนถามบอต) · `find <คำค้น>` (ช่องค้นหาของเว็บที่เปิดอยู่ เช่น YouTube) · `open <เว็บ>` ·
+- **ขั้น A ทำได้:** `search <คำค้น>` (Google → DuckDuckGo เมื่อโดนถามบอต · ครั้งต่อไปไป DuckDuckGo ตรงจนปิดเบราว์เซอร์) · `find <คำค้น>` (ช่องค้นหาของเว็บที่เปิดอยู่ เช่น YouTube) · `open <เว็บ>` ·
   `result <N>` (ลิงก์ที่ N ที่เห็นบนจอ · หน้าผลค้นหา = หัวข้อผลค้นหา ตาม 0024) · `back` `forward` `reload` `down` `up` `close` `app` · `look <งาน>` · `chat`
-- **ขั้น B ทำได้:** `click <เลข>` · `type <เลข> <ข้อความ>` · `answer <คำตอบ>` · `down` `up` (ดูต่อ ≤ 2 ครั้ง) · `result <N>` · `none`
+- **ขั้น B ทำได้:** `click <เลข>` · `type <เลข> <ข้อความ>` · `find <คำค้น>` · `answer <คำตอบ>` · `down` `up` (ดูต่อ ≤ 2 ครั้ง) · `result <N>` · `none` ·
+  **grammar สร้างจากหน้าที่เห็นทุกครั้ง:** `click` ได้แค่เลขของลิงก์/ปุ่ม/ตัวเลือก · `type` ได้แค่เลขของช่อง · เลขที่ไม่มีในหน้าเลือกไม่ได้
+  (ชุดพัฒนา: AI สั่ง "type" ลงช่องติ๊ก) · AI ยังเลือกเองว่าจะทำอะไร
 - **หน้าเว็บที่ AI เห็น:** สิ่งที่อยู่ในจอเท่านั้น ≤ 40 รายการ เรียงบน→ล่าง ซ้าย→ขวา · ช่องใช้ข้อความป้ายกำกับ (label) · ลิงก์ที่ชี้ที่เดียวกันรวมเป็นรายการเดียว ·
   ข้อความบนจอไม่ซ้ำกับรายการ ≤ 700 ตัวอักษร · **ช่องรหัสผ่านไม่ส่ง** · ที่อยู่เว็บถอด %E0… เป็นตัวไทย (token น้อยลงหลายเท่า)
-- **ไม่แก้ llama-server ของแอป** (`-np 1 -cram 512` เดิม · วัดแล้วหัวข้อ 3) · ทุกคำขอ `cache_prompt` · system prompt A/B คงที่ = อยู่ในแคช
+- **ไม่แก้ llama-server ของแอป** (`-np 1 -cram 512` เดิม · วัดแล้วหัวข้อ 3) · ทุกคำขอ `cache_prompt` · system prompt A/B คงที่ = อยู่ในแคช ·
+  temperature 0 (ผลซ้ำได้)
+- **อ่านไว้ก่อน (system prompt และหน้าเว็บ):** เป็นช่วง ๆ ละ ~450 ตัวอักษร (~7 วิบน Pi) ตัดตรงขึ้นบรรทัด · ผู้ใช้สั่งงานหรือแชทกำลังใช้ AI = หยุด ·
+  ผู้ใช้พูดระหว่างอ่าน = รอไม่เกินช่วงเดียว
+- **AI ในเครื่องยังไม่พร้อม (ขั้นวางแผนต่อไม่ได้):** ส่งประโยคเข้าแชททางเดิม (งานแบบกฎ เช่น บอกเวลา เปิดแอป ยังทำได้)
 
 ## 5. รอยต่อ
 
-- `aipc.browser.agent`: `plan_prompt()` `look_prompt()` · `parse_plan(text) -> list[Step]` · `Agent(control, llm, cloud).run(command) -> Outcome(handled, ok, say, steps)`
-- `aipc.browser.control.BrowserControl`: เพิ่ม `observe()` `click(n)` `type(n, text)` `find(query)` `open_site()` (ของเดิม 0024 ใช้ต่อ)
+- `aipc.browser.page`: `OBSERVE_JS` · `page_text(obs)` · `header(obs)`
+- `aipc.browser.agent`: `plan_messages()` `look_messages()` `look_grammar(obs)` · `parse_steps(text, allowed) -> list[Step]` ·
+  `Agent(browser, llm, cloud, cloud_ready, idle).run(command) -> Outcome(handled, ok, say, plan, steps, cloud, trace)` · `PreReader` (warm · schedule · take)
+- `aipc.browser.control.BrowserControl`: เพิ่ม `current()` `observe()` `where()` `tagged()` `act(step)` (click/type/find/open ใหม่ · ที่เหลือใช้ของ 0024)
+- `aipc.cloud.ask.ask_plain(system, text)`: `claude -p --tools ""` (ไม่มีเครื่องมือ) · สมุดบัญชีชนิด `web-agent`
 - `aipc.ui.handsfree.BrowserController.handle(text)`: รับทุกประโยคจากคีย์ลัด (ทำในเธรด) → `finished(say, ok)` หรือ `passToChat(text)` (AI ตอบ `chat`)
 - QML `WorkspacePage.voiceCommand`: `passToChat` → ส่งเข้าแชทเหมือนพิมพ์ (ทางเดิม)
 
