@@ -37,8 +37,7 @@ def count(rows: list[dict], pick) -> dict:
             if what == "do":
                 c["ok" if got == r["expect"] else "wrong"] += 1
                 # ชนิดคำสั่งถูกหมดแต่คำค้นเพี้ยน (ยังนับเป็นผิด · แสดงแยกเพราะเว็บค้นหาแก้คำผิดได้)
-                kinds = [x["kind"] for x in got] == [x["kind"] for x in r["expect"]]
-                c["qdiff"] += got != r["expect"] and kinds
+                c["qdiff"] += got != r["expect"] and only_query_differs(got, r["expect"])
             else:
                 c["ask" if what == "ask" else "miss"] += 1
         else:
@@ -46,6 +45,17 @@ def count(rows: list[dict], pick) -> dict:
             c["neg_do"] += what == "do"
             c["neg_ask"] += what == "ask"
     return c
+
+
+def only_query_differs(got: list[dict], expect: list[dict]) -> bool:
+    """ต่างกันแค่คำค้น (ลิงก์ที่ N ผิด = ผิดจริง ไม่ใช่คำค้นเพี้ยน)."""
+    strip = [
+        {k: v for k, v in x.items() if not (x["kind"] == "search" and k == "query")} for x in got
+    ]
+    want = [
+        {k: v for k, v in x.items() if not (x["kind"] == "search" and k == "query")} for x in expect
+    ]
+    return strip == want
 
 
 def free_pick(r: dict) -> tuple[str, list[dict]]:
