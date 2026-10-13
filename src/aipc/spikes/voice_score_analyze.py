@@ -34,20 +34,26 @@ def similarity(stem: str, heard: str) -> float:
     return best
 
 
-def choose(row: dict, stems: list[str], t: float, keep: set[int] | None) -> list[dict]:
+def choose(row: dict, t: float, m: float, keep: set[int] | None) -> tuple[str, list[dict]]:
+    """("do", คำสั่ง) ทำเลย · ("ask", คำสั่ง) ถามกลับ (สองอันดับแรกความหมายต่างกันแต่คะแนนห่างไม่ถึง m) ·
+    ("chat", []) ไม่ใช่คำสั่ง (คำสั่งที่ดีที่สุดห่างจากถอดอิสระเกิน t)."""
     res = row["res"]
-    best = None
+    by_meaning: dict[str, tuple[float, list[dict]]] = {}
     for k, c in enumerate(res["cands"]):
-        if keep is not None and k not in keep:
+        if (keep is not None and k not in keep) or c["lp"] is None:
             continue
-        if c["lp"] is None:
+        mean = meaning(c["text"])
+        if not mean:
             continue
-        m = meaning(c["text"])
-        if m and (best is None or c["lp"] > best[0]):
-            best = (c["lp"], m)
-    if best is None or res["free"] - best[0] > t:
-        return []
-    return best[1]
+        key = json.dumps(mean, ensure_ascii=False, sort_keys=True)
+        if key not in by_meaning or c["lp"] > by_meaning[key][0]:
+            by_meaning[key] = (c["lp"], mean)
+    ranked = sorted(by_meaning.values(), key=lambda x: -x[0])
+    if not ranked or res["free"] - ranked[0][0] > t:
+        return "chat", []
+    if len(ranked) > 1 and ranked[0][0] - ranked[1][0] < m:
+        return "ask", ranked[0][1]
+    return "do", ranked[0][1]
 
 
 def main() -> None:
@@ -61,30 +67,36 @@ def main() -> None:
     cmd = [r for r in rows if r["expect"]]
     neg = [r for r in rows if not r["expect"]]
     free_ok = sum(meaning(r["res"]["text"]) == r["expect"] for r in cmd)
+    free_bad = sum(bool(g := meaning(r["res"]["text"])) and g != r["expect"] for r in cmd)
     free_caught = sum(bool(meaning(r["res"]["text"])) for r in neg)
     print(f"ประโยค {len(rows)} (คำสั่ง {len(cmd)} · ไม่ใช่คำสั่ง {len(neg)})")
-    print(f"ถอดอิสระ + กฎ: คำสั่งถูก {free_ok}/{len(cmd)} · ไม่ใช่คำสั่งแต่ถูกจับ {free_caught}/{len(neg)}")
-    for k in (None, 12, 8, 5, 3):
-        for t in (10, 15, 20, 25, 30):
-            ok = caught = 0
-            wrong_action = 0
+    print(
+        f"ถอดอิสระ + กฎ: ทำถูก {free_ok}/{len(cmd)} · ทำผิดคำสั่ง {free_bad} · "
+        f"ไม่ใช่คำสั่งแต่ถูกทำ {free_caught}/{len(neg)}"
+    )
+    for k in (None, 8, 5, 3):
+        for t, m in ((15, 0), (20, 0), (25, 0), (20, 2), (20, 4), (25, 4), (30, 4)):
+            ok = ask_ok = ask_bad = bad = caught = neg_ask = 0
             for r in rows:
                 keep = None
                 if k is not None:
-                    sims = sorted(
-                        range(len(stems)), key=lambda i: -similarity(stems[i], r["res"]["text"])
-                    )
+                    text = r["res"]["text"]
+                    sims = sorted(range(len(stems)), key=lambda i: -similarity(stems[i], text))
                     keep = set(sims[:k])
-                got = choose(r, stems, t, keep)
+                what, got = choose(r, t, m, keep)
                 if r["expect"]:
-                    ok += got == r["expect"]
-                    wrong_action += bool(got) and got != r["expect"]
+                    ok += what == "do" and got == r["expect"]
+                    bad += what == "do" and got != r["expect"]
+                    ask_ok += what == "ask" and got == r["expect"]
+                    ask_bad += what == "ask" and got != r["expect"]
                 else:
-                    caught += bool(got)
+                    caught += what == "do"
+                    neg_ask += what == "ask"
             label = "ทุกต้นคำ" if k is None else f"K={k}"
             print(
-                f"{label:8} T={t:2}: คำสั่งถูก {ok}/{len(cmd)} · ทำผิดคำสั่ง {wrong_action} · "
-                f"ไม่ใช่คำสั่งแต่ถูกจับ {caught}/{len(neg)}"
+                f"{label:8} T={t:2} M={m}: ทำถูก {ok}/{len(cmd)} · ทำผิด {bad} · "
+                f"ถามกลับ {ask_ok}+{ask_bad} (ถูก+ผิด) · ไม่ใช่คำสั่งแต่ถูกทำ {caught}/{len(neg)} "
+                f"ถาม {neg_ask}"
             )
 
 
