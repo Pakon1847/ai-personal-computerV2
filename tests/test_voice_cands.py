@@ -42,6 +42,16 @@ class DecideTest(unittest.TestCase):
         d = decide("เป๊ก", -7.0, [("ปิดแท็บ", -10.0), ("รีเฟรช", -11.0)], ts=6, tc=12, m=2)
         self.assertEqual((d.what, d.commands), ("ask", [{"kind": "close"}]))
 
+    def test_dropping_spoken_words_not_counted(self):
+        heard = "ยอนกลับเมื่อกี้ที่ปรับเสียง"
+        self.assertNotIn("ย้อนกลับ", candidates(heard))
+        self.assertEqual(decide(heard, -1.7, [("ย้อนกลับ", -13.2)], 6, 14, 2).what, "chat")
+
+    def test_loop_acts_only_when_command_beats_loop(self):
+        heard = "กดลิงที่สอง สิ่งสิ่งสิ่งสิ่งสิ่ง"
+        d = decide(heard, -23.7, [("กดลิงก์ที่สอง", -8.8), ("กดลิงก์ที่สาม", -21.7)], 6, 14, 2)
+        self.assertEqual((d.what, d.commands), ("do", [{"kind": "open", "n": 2}]))
+
     def test_loop_never_acts(self):
         self.assertTrue(looped("ปิดเสียง ปิดเสียง ปิดเสียง"))
         d = decide("ย้อน ย้อน ย้อน ย้อน", -3.0, [("ย้อนกลับ", -5.0)], ts=6, tc=12, m=2)

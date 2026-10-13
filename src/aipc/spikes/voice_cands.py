@@ -14,6 +14,7 @@ import json
 import re
 from dataclasses import dataclass
 from difflib import SequenceMatcher
+from functools import lru_cache
 
 from aipc.skills import browse
 from aipc.voice import stt
@@ -43,8 +44,12 @@ FIXED = [
     "เปิดวิกิพีเดีย",
     "เปิดจีเมล",
     "เปิดกูเกิลแมพ",
-    *(f"{v}ลิงก์{n}" for v in ("เข้า", "เปิด", "กด", "คลิก") for n in ("แรก", "ที่สอง", "ที่สาม")),
-    *(f"เข้าลิงก์ที่{n}" for n in ("สี่", "ห้า")),
+    "รีโหลด",
+    "กลับไปหน้าแชท",
+    "กลับไปหน้าผู้ช่วย",
+    *(f"{v}ลิงก์{n}" for v in ("เข้า", "เปิด", "กด", "คลิก", "กดเข้า") for n in ("แรก", "ที่สอง", "ที่สาม")),
+    *(f"เข้าลิงก์ที่{n}" for n in ("หนึ่ง", "สี่", "ห้า")),
+    *(f"เข้า{w}{n}" for w in ("เว็บ", "ผลลัพธ์") for n in ("แรก", "ที่สอง", "ที่สาม", "ที่สี่", "ที่ห้า")),
 ]
 OPEN_TAILS = ["แล้วเข้าลิงก์แรก", "แล้วเข้าลิงก์ที่สอง", "แล้วเข้าลิงก์ที่สาม"]
 
@@ -56,12 +61,24 @@ def skeleton(s: str) -> str:
     return _MARKS.sub("", re.sub(r"\s+", "", s))
 
 
+@lru_cache(maxsize=65536)
+def _meaning(text: str) -> str:
+    return json.dumps([c.as_dict() for c in browse.parse(stt.clean(text))], ensure_ascii=False)
+
+
 def meaning(text: str) -> list[dict]:
-    return [c.as_dict() for c in browse.parse(stt.clean(text))]
+    """ความหมายตามกฎเดิม (aipc.skills.browse) · จำผลไว้ (ตัววิเคราะห์ลองเกณฑ์หลายร้อยชุดบนข้อความเดิม)."""
+    return json.loads(_meaning(text))
 
 
 def looped(text: str) -> bool:
     return bool(_LOOP.search(text))
+
+
+def drops_words(heard: str, cand: str) -> bool:
+    """ตัวเลือกสั้นกว่าสิ่งที่ได้ยินมาก = ตัดคำที่พูดทิ้ง ("ย้อนกลับเมื่อกี้ที่ปรับเสียง" ≠ "ย้อนกลับ") ·
+    ยกเว้น whisper วนซ้ำ (ข้อความที่ได้ยินยาวเพราะซ้ำ ไม่ใช่เพราะพูดยาว)."""
+    return not looped(heard) and len(skeleton(heard)) - len(skeleton(cand)) > 4
 
 
 def stem_fit(stem: str, heard: str) -> tuple[float, list[int]]:
@@ -94,7 +111,7 @@ def candidates(heard: str, keep: int = 8) -> list[str]:
     def add(s: str) -> None:
         s = s.strip()
         # กฎแปลไม่ได้ = ต่อให้คะแนนดีก็ทำอะไรไม่ได้ → ไม่เสียเวลาให้คะแนน
-        if s and s != heard and s not in out and meaning(s):
+        if s and s != heard and s not in out and meaning(s) and not drops_words(heard, s):
             out.append(s)
 
     for (_, cuts), stem in fits:
@@ -126,11 +143,12 @@ def decide(
     - คำสั่งที่ดีที่สุดห่างจากข้อความที่ถอดอิสระเกินเกณฑ์ = ไม่ใช่คำสั่ง · เกณฑ์แยก:
       ค้นหา ts (เติมต้นคำ "ค้นหา" ให้ประโยคไหนก็ได้ จึงต้องเข้มกว่า) · อื่น ๆ tc
     - คำสั่งอันดับ 2 ที่ความหมายต่างกัน ห่างไม่ถึง m = ไม่แน่ใจ → ถามกลับ
-    - whisper วนซ้ำ = ข้อความที่ถอดอิสระเชื่อไม่ได้ → ถามกลับถ้ามีคำสั่งผ่านเกณฑ์ (ไม่ทำเลย)
+    - whisper วนซ้ำ = ข้อความที่ถอดอิสระเชื่อไม่ได้ → ทำเลยเฉพาะเมื่อคำสั่งได้คะแนนดีกว่าข้อความที่วนซ้ำ · ไม่งั้นถามกลับ
+    - ตัวเลือกที่ตัดคำที่พูดทิ้ง (drops_words) ไม่นับ
     """
     best: dict[str, tuple[float, list[dict]]] = {}
     for text, lp in [(heard, free_lp), *scored]:
-        if lp is None:
+        if lp is None or drops_words(heard, text):
             continue
         mean = meaning(text)
         if not mean:
@@ -146,6 +164,6 @@ def decide(
     limit = ts if any(c["kind"] == "search" for c in mean) else tc
     if gap > limit:
         return Decision("chat", [], gap)
-    if looped(heard) or (len(ranked) > 1 and lp - ranked[1][0] < m):
+    if (looped(heard) and gap >= 0) or (len(ranked) > 1 and lp - ranked[1][0] < m):
         return Decision("ask", mean, gap)
     return Decision("do", mean, gap)
