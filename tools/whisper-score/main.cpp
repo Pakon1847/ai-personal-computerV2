@@ -67,7 +67,21 @@ static bool read_wav(const std::string & path, std::vector<float> & pcm) {
     return true;
 }
 
-static std::string jstr(const std::string & s) {
+// ตัดไบต์ที่ไม่ครบตัวอักษร (ตัวไทย = 3 ไบต์ · whisper ตัดกลางตัวได้ตอนหยุดถอด) → JSON อ่านได้เสมอ
+static std::string utf8_valid(const std::string & s) {
+    std::string o;
+    for (size_t i = 0; i < s.size();) {
+        const unsigned char c = s[i];
+        const size_t n = c < 0x80 ? 1 : (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 0;
+        bool ok = n > 0 && i + n <= s.size();
+        for (size_t k = 1; ok && k < n; k++) ok = ((unsigned char) s[i + k] >> 6) == 0x2;
+        if (ok) { o.append(s, i, n); i += n; } else { i++; }
+    }
+    return o;
+}
+
+static std::string jstr(const std::string & raw) {
+    const std::string s = utf8_valid(raw);
     std::string o = "\"";
     for (unsigned char c : s) {
         if (c == '"' || c == '\\') { o += '\\'; o += (char) c; }
