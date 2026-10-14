@@ -48,16 +48,23 @@ def main() -> None:
               "reaches_skill": {route(t, r, skill) for r in (False, True)} == {SKILL}}
              for sid, t in phrases if t not in skipped]  # fmt: skip
     print(f"ประโยค {len(items)} · ข้าม (ไม่มีตัวอักษรไทย) {len(skipped)}: {skipped}", flush=True)
-    (work / "texts.json").write_text(json.dumps([i["text"] for i in items], ensure_ascii=False),
-                                     encoding="utf-8")  # fmt: skip
-    py = tts.VOICE_DIR / "venv" / "bin" / "python"
-    subprocess.run([str(py), "-c", SYNTH, str(tts.VOICE_DIR / tts.MODEL), str(work / "texts.json"),
-                    str(work)], check=True)  # fmt: skip
-    for i in range(len(items)):
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(work / f"{i:03d}.wav"),
-                        "-ar", "16000", "-ac", "1", str(work / f"{i:03d}-16k.wav")],
+    texts = json.dumps([i["text"] for i in items], ensure_ascii=False)
+    old = work / "texts.json"
+    # Piper สุ่มทุกครั้ง (พบ 2026-10-15: โค้ดเดิม ไม่มี hotwords ได้ 4/15 แล้ว 7/15) → สังเคราะห์ครั้งเดียว
+    # แล้วใช้ไฟล์เสียงชุดเดียวกันเทียบ มี/ไม่มี hotwords
+    if not (old.exists() and old.read_text(encoding="utf-8") == texts
+            and (work / f"{len(items) - 1:03d}-16k.wav").exists()):  # fmt: skip
+        old.write_text(texts, encoding="utf-8")
+        py = tts.VOICE_DIR / "venv" / "bin" / "python"
+        subprocess.run([str(py), "-c", SYNTH, str(tts.VOICE_DIR / tts.MODEL), str(old), str(work)],
                        check=True)  # fmt: skip
-    print(f"เสียงพร้อม {len(items)} ไฟล์ · {temp()}", flush=True)
+        for i in range(len(items)):
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(work / f"{i:03d}.wav"),
+                            "-ar", "16000", "-ac", "1", str(work / f"{i:03d}-16k.wav")],
+                           check=True)  # fmt: skip
+        print(f"สังเคราะห์ใหม่ {len(items)} ไฟล์ · {temp()}", flush=True)
+    else:
+        print(f"ใช้ไฟล์เสียงเดิม {len(items)} ไฟล์ · {temp()}", flush=True)
     extra = [t for m in voice for t in m.examples] if a.skill_hotwords else []
     z = Transcriber(base=Path(a.zip_base), extra_hotwords=lambda: extra)
     assert z.available, "ไม่มี venv/ หรือ model/ ใต้ --zip-base"
