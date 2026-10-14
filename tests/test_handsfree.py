@@ -1,4 +1,4 @@
-"""สั่งด้วยเสียงไม่ใช้เมาส์ (การ์ด 0024 · 0025): โหมดคีย์ลัด · ผู้ช่วยเว็บในแอป · FIFO ของคีย์ลัด."""
+"""สั่งด้วยเสียงไม่ใช้เมาส์ (การ์ด 0024): โหมดคีย์ลัด · ตัวคุมเบราว์เซอร์ในแอป · FIFO ของคีย์ลัด."""
 
 import os
 import tempfile
@@ -105,45 +105,22 @@ class HandsFreeTest(unittest.TestCase):
         v._on_heard("", "ไม่ได้ยินเสียงพูด", 0.0)
         self.assertEqual(spk.said, ["ไม่ได้ยินเสียงพูด"])
 
-    def test_ai_decides_web_or_chat(self):
-        """การ์ด 0025: ทุกประโยคจากคีย์ลัดไปให้ AI ตัดสิน · ไม่ใช่งานเว็บ → passToChat (แชทตามเดิม)."""
-        from aipc.browser.agent import Outcome
-
-        class FakeAgent:
-            pre = None
-
-            def run(self, text):
-                if "นัด" in text:
-                    return Outcome(handled=False)
-                return Outcome(ok=True, say="ค้นหา ราคาทอง แล้ว · เข้าลิงก์ที่ 1 แล้ว",
-                               steps=["search ราคาทอง", "result 1"])  # fmt: skip
-
-        ledger = FakeLedger()
-        b = BrowserController(control=FakeControl(), ledger=ledger, agent=FakeAgent())
-        done, chat = [], []
+    def test_browser_takes_web_commands_only(self):
+        ctl, ledger = FakeControl(), FakeLedger()
+        b = BrowserController(control=ctl, ledger=ledger)
+        done = []
         b.finished.connect(lambda say, ok: done.append((say, ok)))
-        b.passToChat.connect(chat.append)
-        self.assertTrue(b.handle("พรุ่งนี้มีนัดอะไร"))
-        self.assertTrue(pump(lambda: chat))
-        self.assertEqual((chat, done), (["พรุ่งนี้มีนัดอะไร"], []))
+        self.assertFalse(b.handle("ปรับเสียงเป็น 40"))  # ไม่ใช่คำสั่งเว็บ = แชทตามเดิม
+        self.assertFalse(b.handle("ย้อนกลับ"))  # ยังไม่เปิดเบราว์เซอร์ = ไม่ใช่งานของเรา
         self.assertTrue(b.handle("ค้นหาราคาทองแล้วเข้าลิงก์แรก"))
-        self.assertTrue(b.busy)
-        self.assertFalse(b.handle("ย้อนกลับ"), "กำลังทำคำสั่งก่อน = ไม่รับซ้อน")
         self.assertTrue(pump(lambda: done))
-        self.assertEqual(done, [("ค้นหา ราคาทอง แล้ว · เข้าลิงก์ที่ 1 แล้ว", True)])
+        self.assertEqual(
+            ctl.ran, [{"kind": "search", "query": "ราคาทอง"}, {"kind": "open", "n": 1}]
+        )
+        self.assertEqual(done, [("ทำ search แล้ว · ทำ open แล้ว", True)])
         # คำค้นออกนอกเครื่อง = จดในบันทึกสิ่งที่ส่งออก
         self.assertEqual(ledger.rows, [("web", "ค้นเว็บ: ราคาทอง", True)])
-        self.assertFalse(b.busy)
-
-    def test_claude_switch_reaches_the_agent(self):
-        on = {"v": False}
-        b = BrowserController(control=FakeControl(), cloud=lambda s, p: None,
-                              claude_on=lambda: on["v"])  # fmt: skip
-        a = b._get_agent()
-        self.assertFalse(a.cloud_ready())
-        on["v"] = True
-        self.assertTrue(a.cloud_ready())
-        self.assertIsNone(BrowserController(control=FakeControl())._get_agent().cloud)
+        self.assertTrue(b.handle("ย้อนกลับ"))  # เปิดเบราว์เซอร์แล้ว = งานของเรา
 
     def test_login_screen_has_no_browser(self):
         b = BrowserController(active=False, control=FakeControl())

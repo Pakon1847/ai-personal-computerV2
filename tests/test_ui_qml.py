@@ -413,17 +413,26 @@ class ShellCardTest(unittest.TestCase):
         answered = answered.toVariant() if hasattr(answered, "toVariant") else answered
         self.assertTrue(answered.get("tok-1"))
         n = len(items_of(page))
-        # ไม่ใช่งานเว็บ → ทางเดิม (การ์ดเวลา) เหมือนพิมพ์แล้วกดส่ง · การ์ด 0025: AI ในเครื่องตัดสินก่อน
-        # (เทสต์ไม่มี AI = ส่งเข้าแชทเอง) → ฟอง "ผู้ช่วยเว็บ" ที่รับไว้หายไป
-        page.voiceCommand("ตอนนี้กี่โมง")
-        for _ in range(40):
-            settle(50)
-            rows = items_of(page)
-            if rows and rows[-1].get("card"):
-                break
+        page.voiceCommand("ตอนนี้กี่โมง")  # ไม่ใช่คำสั่งเว็บ → ทางเดิม (การ์ดเวลา) เหมือนพิมพ์แล้วกดส่ง
+        settle(100)
         rows = items_of(page)
         self.assertEqual(rows[n]["text"], "ตอนนี้กี่โมง")
         self.assertIn("ตอนนี้", rows[-1]["card"]["title"])
+        self.assertEqual(warnings, [])
+
+    def test_hands_free_while_browser_busy_says_wait(self):
+        """เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ ไม่หลุดไปเป็นคำสั่งของแอป ("ย้อนกลับ" · พบใน 0025)."""
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        browser = engine._backends["browser"]
+        browser._busy = True
+        browser.busyChanged.emit()
+        settle(50)
+        page.voiceCommand("ย้อนกลับ")
+        settle(50)
+        rows = items_of(page)
+        self.assertEqual(rows[-2]["text"], "ย้อนกลับ")
+        self.assertIn("รอสักครู่", rows[-1]["text"])
         self.assertEqual(warnings, [])
 
     def test_claude_made_skill_cards_draw_with_undo_and_wrong_buttons(self):

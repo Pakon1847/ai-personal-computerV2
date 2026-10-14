@@ -89,30 +89,6 @@ def _cloud_client(budget=None, ledger=None):
     return run
 
 
-def _web_cloud(budget=None, ledger=None):
-    """ผู้ช่วยเว็บ (การ์ด 0025): Gemma ทำไม่สำเร็จ → Claude ช่วยวางแผนจากคำสั่ง + หน้าเว็บที่เห็น ·
-    บันทึกข้อความที่ส่งจริงลงสมุดบัญชี · ปิดได้ด้วย AIPC_CLOUD=0 · สวิตช์ในหน้าตั้งค่าตรวจที่ BrowserController."""
-    import os
-
-    from aipc.cloud import ask
-
-    if os.environ.get("AIPC_CLOUD", "1") == "0" or ask.find_claude() is None:
-        return None
-
-    def run(system, prompt):
-        if budget is not None and not budget.allow():
-            return ask.CloudReply(False, error=budget.blocked_message())
-        r = ask.ask_plain(system, prompt)
-        if budget is not None:
-            budget.record(r.cost_usd, "web")
-        if ledger is not None:
-            ledger.record("web-agent", prompt, r.cost_usd, ok=r.ok,
-                          note="ผู้ช่วยเว็บ: AI ในเครื่องทำไม่สำเร็จ")  # fmt: skip
-        return r
-
-    return run
-
-
 def _skill_forge(budget=None, ledger=None):
     """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้.
 
@@ -313,15 +289,8 @@ def build(opts: Options, argv: list[str] | None = None):
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session),
-        # สั่งเว็บด้วยเสียง (การ์ด 0024) · AI คิดเองว่าจะทำอะไร (การ์ด 0025)
-        # · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก
-        "browser": BrowserController(
-            active=in_session,
-            ledger=ledger,
-            cloud=_web_cloud(budget, ledger) if in_session else None,
-            claude_on=claude_on,
-            chat_busy=lambda: chat.busy,
-        ),  # fmt: skip
+        # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก
+        "browser": BrowserController(active=in_session, ledger=ledger),
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),
@@ -350,8 +319,6 @@ def build(opts: Options, argv: list[str] | None = None):
     engine._hotkey = HotkeyListener(active=opts.session and not opts.greeter_session)
     engine._hotkey.pressed.connect(voice.toggleHandsFree)
     app.aboutToQuit.connect(engine._backends["browser"].close)  # ออกจากระบบ = ปิดเบราว์เซอร์ของผู้ช่วย
-    if opts.session and not opts.greeter_session:  # AI พร้อม → อุ่น prompt ของผู้ช่วยเว็บไว้ก่อน (การ์ด 0025)
-        chat.statusChanged.connect(lambda: chat.ready and engine._backends["browser"].warmSoon())
 
     def ready_inputs() -> dict:
         from aipc.cloud.ask import find_claude

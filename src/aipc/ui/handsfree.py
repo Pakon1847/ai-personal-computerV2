@@ -3,8 +3,7 @@
 - labwc กด F9 → `scripts/pi/session/aipc-voice-key` เขียนหนึ่งไบต์ลง FIFO
   `$XDG_RUNTIME_DIR/aipc/voice-key` → HotkeyListener ส่ง pressed()
   (FIFO ของผู้ใช้คนนี้ 0600 · บัญชีอื่นกดแทนไม่ได้)
-- BrowserController ให้ AI คิดเองว่าจะทำอะไรกับเบราว์เซอร์ (การ์ด 0025 · aipc.browser.agent) ในเธรดแยก
-  แล้วส่ง finished(ประโยคสั้น, สำเร็จไหม) หรือ passToChat(ประโยค) เมื่อไม่ใช่งานเว็บ
+- BrowserController ทำคำสั่งเว็บในเธรดแยก (หน้าเว็บโหลดหลายวินาที) แล้วส่ง finished(ประโยคสั้น, สำเร็จไหม)
 """
 
 from __future__ import annotations
@@ -105,29 +104,17 @@ def beep(high: bool = True) -> None:
 
 
 class BrowserController(QObject):
-    """ผู้ช่วยเว็บที่ AI คิดเอง (การ์ด 0025 · เดิม 0024 ใช้กฎ) · ทุกประโยคจากคีย์ลัด F9 มาที่นี่ (ยกเว้นตอบการ์ดยืนยัน)
-    → AI วางแผน/ดูหน้า/ทำ ในเธรดแยก (aipc.browser.agent) → finished(ประโยคสั้น, สำเร็จไหม) ·
-    AI บอกว่าไม่ใช่งานเว็บ → passToChat(ประโยค) ให้หน้าจอส่งเข้าแชทตามเดิม · progress(ข้อความ) ระหว่างทำ."""
+    """คำสั่งเว็บจากเสียง · ประโยคที่ไม่ใช่คำสั่งเว็บ handle() คืน False ให้หน้าจอส่งเข้าแชทตามเดิม."""
 
     finished = Signal(str, bool)
-    passToChat = Signal(str)  # noqa: N815
-    progress = Signal(str)
     busyChanged = Signal()  # noqa: N815
-    _done = Signal(object, str)
+    _done = Signal(str, bool)
 
-    WARM_DELAY_MS = 45_000  # หลัง AI พร้อม: ให้แชทอุ่นของตัวเองก่อน แล้วจึงอุ่นของผู้ช่วยเว็บ
-
-    def __init__(self, active: bool = True, control=None, ledger=None, agent=None, cloud=None,
-                 claude_on=None, chat_busy=None):  # fmt: skip
+    def __init__(self, active: bool = True, control=None, ledger=None):
         super().__init__()
-        self._chat_busy = chat_busy or (lambda: False)  # แชทกำลังใช้ AI = ไม่อ่านไว้ก่อน (ไม่แย่งคิว)
-        self._warm_pending = False
         self._active = active
         self._control = control
         self._ledger = ledger
-        self._agent = agent
-        self._cloud = cloud  # (system, prompt) → CloudReply · None = ไม่มี Claude ในบัญชีนี้
-        self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
         self._busy = False
         self._done.connect(self._on_done)
 
@@ -138,71 +125,50 @@ class BrowserController(QObject):
             self._control = BrowserControl()
         return self._control
 
-    def _get_agent(self):
-        if self._agent is None:
-            from aipc.browser.agent import Agent, Llm
-            from aipc.chat.client import Target
-
-            # Claude สำรอง · ไม่มี/ปิดสวิตช์ = ไม่ส่งอะไรออกเลย (การ์ด 0025 เกณฑ์ข้อ 7)
-            self._agent = Agent(self._ctl(), Llm(Target.from_env()), cloud=self._cloud,
-                                cloud_ready=self._claude_on, progress=self.progress.emit,
-                                idle=lambda: not self._chat_busy() and not self._busy)  # fmt: skip
-        return self._agent
-
     @Property(bool, notify=busyChanged)
     def busy(self) -> bool:
         return self._busy
 
-    @Slot()
-    def warmSoon(self) -> None:  # noqa: N802
-        """AI ในเครื่องเพิ่งพร้อม (login) → อีกสักพักอ่าน system prompt ของผู้ช่วยเว็บไว้ในแคชเบื้องหลัง
-        · ไม่อุ่น = คำสั่งเสียงแรกรอเกือบ 3 นาที (Pi 5 2026-10-13) · อ่านเป็นช่วง ๆ เฉพาะตอนแชทว่าง."""
-        if not self._active or self._warm_pending:
-            return
-        from PySide6.QtCore import QTimer
-
-        self._warm_pending = True
-
-        def go():
-            self._warm_pending = False
-            agent = self._get_agent()
-            if agent.pre is not None and not agent.pre.warmed and not self._busy:
-                agent.pre.warm()
-
-        QTimer.singleShot(self.WARM_DELAY_MS, go)
-
     @Slot(str, result=bool)
     def handle(self, text: str) -> bool:
-        """รับประโยคไปให้ AI ตัดสิน · False = ไม่รับ (ปิดอยู่ / กำลังทำคำสั่งก่อน) → หน้าจอส่งเข้าแชทเอง."""
-        if not self._active or self._busy or not text.strip():
+        from aipc.browser.control import NEEDS_PAGE
+        from aipc.skills import browse
+
+        if not self._active or self._busy:
             return False
+        cmds = browse.parse(text)
+        if not cmds:
+            return False
+        ctl = self._ctl()
+        if not ctl.running and all(c.kind in NEEDS_PAGE for c in cmds):
+            return False  # ยังไม่เปิดเบราว์เซอร์ เช่น "กลับไปหน้าแชท" = คำสั่งเดิมของแอป
         self._busy = True
         self.busyChanged.emit()
-        threading.Thread(target=self._work, args=(text,), daemon=True).start()
+        threading.Thread(target=self._work, args=(cmds,), daemon=True).start()
         return True
 
-    def _work(self, text: str) -> None:
-        out = self._get_agent().run(text)
-        self._done.emit(out, text)
+    def _work(self, cmds) -> None:
+        says, ok = [], True
+        for c in cmds:
+            r = self._ctl().run(c)
+            if c.kind == "search" and self._ledger is not None:
+                # คำค้นออกไป Google/Bing = ส่งออกนอกเครื่อง (แผงความเป็นส่วนตัวนับด้วย)
+                self._ledger.record("web", f"ค้นเว็บ: {c.query}", ok=r.ok,
+                                    note="เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง")  # fmt: skip
+            if r.say:
+                says.append(r.say)
+            if not r.ok:
+                ok = False
+                break
+        self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok)
 
-    @Slot(object, str)
-    def _on_done(self, out, text: str) -> None:
+    @Slot(str, bool)
+    def _on_done(self, say: str, ok: bool) -> None:
         self._busy = False
         self.busyChanged.emit()
-        if self._ledger is not None:
-            for st in out.steps:
-                act, _, arg = st.partition(" ")
-                if act in ("search", "find"):  # คำค้นออกไปเว็บค้นหา/เว็บที่เปิด = ส่งออกนอกเครื่อง
-                    self._ledger.record("web", f"ค้นเว็บ: {arg}", ok=out.ok,
-                                        note="ผู้ช่วยเว็บ · สั่งด้วยเสียง")  # fmt: skip
-        if not out.handled:
-            self.passToChat.emit(text)
-            return
-        self.finished.emit(out.say or ("ทำแล้ว" if out.ok else "ทำไม่สำเร็จ"), out.ok)
+        self.finished.emit(say, ok)
 
     @Slot()
     def close(self) -> None:
-        if self._agent is not None and self._agent.pre is not None:
-            self._agent.pre.pause()
         if self._control is not None:
             self._control.close()
