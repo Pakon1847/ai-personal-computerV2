@@ -319,6 +319,8 @@ def build(opts: Options, argv: list[str] | None = None):
     engine._hotkey = HotkeyListener(active=opts.session and not opts.greeter_session)
     engine._hotkey.pressed.connect(voice.toggleHandsFree)
     app.aboutToQuit.connect(engine._backends["browser"].close)  # ออกจากระบบ = ปิดเบราว์เซอร์ของผู้ช่วย
+    # การ์ด 0028: คำพูดจากคีย์ลัดที่ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด (เช่น ที่ Claude สร้าง) = ทำสกิลนั้น
+    engine._backends["browser"]._skill_match = engine._backends["skills"].voiceSkill
 
     def ready_inputs() -> dict:
         from aipc.cloud.ask import find_claude

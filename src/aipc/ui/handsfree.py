@@ -16,6 +16,7 @@ import struct
 import subprocess
 import threading
 import wave
+from collections.abc import Callable
 from pathlib import Path
 
 from PySide6.QtCore import Property, QObject, QSocketNotifier, Signal, Slot
@@ -110,16 +111,21 @@ OPEN_BROWSER = "open_browser"  # "เปิดเบราว์เซอร์"
 COMMAND = "command"  # คำสั่งเครื่อง (เปิดแอป ปรับเสียง หน้าในระบบ) → ทางเดิมของแชท ซึ่งทำคำสั่งก่อนถึง AI
 NEEDS_BROWSER = "needs_browser"  # คำสั่งที่ต้องมีหน้าเว็บ แต่ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย
 UNKNOWN = "unknown"  # ไม่ใช่คำสั่ง → บอกตรง ๆ ไม่ส่งให้ AI
+SKILL = "skill"  # การ์ด 0028: ตรงเป๊ะกับประโยคของสกิลที่ทำด้วยโค้ด (เช่น สกิลที่ Claude สร้าง) → ทำสกิลนั้น
 
 
-def route(text: str, browser_running: bool) -> str:
+def route(text: str, browser_running: bool, skill: Callable[[str], str] | None = None) -> str:
     """ใช้ตัวแปลแบบกฎล้วน ไม่มี LLM (H6).
 
-    ลำดับ: เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก
+    ลำดับ: สกิลของผู้ใช้ (ตรงเป๊ะ) → เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก ·
+    skill(text) คืน id ของสกิล ("" = ไม่ตรง) · ประโยคที่ผู้ใช้สร้างเองชนะการแปลแบบทั่วไป
+    (ตัวตรวจของการ์ด 0017 กันประโยคสกิลชนคำสั่งเครื่องและสกิลเดิมอยู่แล้ว)
     """
     from aipc.browser.control import NEEDS_PAGE
     from aipc.skills import browse, command
 
+    if skill is not None and skill(text):
+        return SKILL
     cmds = browse.parse(text)
     if cmds and (browser_running or not all(c.kind in NEEDS_PAGE for c in cmds)):
         return BROWSER
@@ -139,11 +145,12 @@ class BrowserController(QObject):
     busyChanged = Signal()  # noqa: N815
     _done = Signal(str, bool)
 
-    def __init__(self, active: bool = True, control=None, ledger=None):
+    def __init__(self, active: bool = True, control=None, ledger=None, skill_match=None):
         super().__init__()
         self._active = active
         self._control = control
         self._ledger = ledger
+        self._skill_match = skill_match  # การ์ด 0028: SkillsController.voiceSkill (app.py ต่อให้)
         self._busy = False
         self._done.connect(self._on_done)
 
@@ -177,7 +184,7 @@ class BrowserController(QObject):
     def route(self, text: str) -> str:
         if not self._active:  # หน้าเข้าสู่ระบบไม่มีเบราว์เซอร์และไม่มีแชท
             return UNKNOWN
-        return route(text, self._ctl().running)
+        return route(text, self._ctl().running, self._skill_match)
 
     @Slot(result=bool)
     def openHome(self) -> bool:  # noqa: N802

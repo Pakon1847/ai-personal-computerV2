@@ -459,6 +459,27 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง ไม่ใช่คำตอบของ AI
         self.assertEqual(warnings, [])
 
+    def test_hands_free_runs_claude_made_skill_by_exact_phrase(self):
+        """การ์ด 0028: พูดประโยคของสกิลที่ Claude สร้าง = การ์ดสกิลเดียวกับตอนพิมพ์ · ได้ยินเพี้ยน = คำใบ้ ไม่ทำ."""
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        skills = engine._backends["skills"]
+        md = (Path(__file__).resolve().parent.parent / "docs/benchmarks/2026-09-30-skill-author"
+              / "claude/s2.md").read_text(encoding="utf-8")  # fmt: skip
+        skills._user.install(md, skills._skills, request="อยากได้สกิลโหมดประชุม")
+        skills._reload()
+        n = len(items_of(page))
+        page.voiceCommand("เข้าโหมดประชุม")
+        settle(100)
+        rows = items_of(page)
+        self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + การ์ดสกิล · ไม่มีคำตอบของ AI
+        self.assertEqual(rows[n]["text"], "เข้าโหมดประชุม")
+        self.assertEqual(rows[-1]["card"]["badge"]["name"], "โหมดประชุม")
+        page.voiceCommand("เข้าโหมดประชม")
+        settle(50)
+        self.assertIn("ใกล้กับ", items_of(page)[-1]["text"])
+        self.assertEqual(warnings, [])
+
     def test_hands_free_while_browser_busy_says_wait(self):
         """เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ ไม่หลุดไปเป็นคำสั่งของแอป ("ย้อนกลับ" · พบใน 0025)."""
         engine, win, warnings = self.open_shell()

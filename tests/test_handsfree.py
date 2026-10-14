@@ -151,6 +151,23 @@ class HandsFreeTest(unittest.TestCase):
         # สะกดใกล้เคียง (ต้องยืนยัน) = การ์ดยืนยันเดิม ไม่เดาเปิดเอง
         self.assertEqual(route("เปิดเบราวเซอ", False), "command")
 
+    def test_route_runs_exact_skill_phrase_first(self):
+        """การ์ด 0028: ตรงเป๊ะกับสกิลที่ผู้ใช้มี = ทำสกิลนั้น (มาก่อนการแปลทั่วไป) ·
+        ไม่ตรง = ทางเดิมของ 0027."""
+        mine = {"เปิดโหมดประชุม": "meeting-mode", "ค้นหาสูตรอาหาร": "cook"}
+
+        def skill(text):
+            return mine.get(text, "")
+
+        for running in (False, True):
+            self.assertEqual(route("เปิดโหมดประชุม", running, skill=skill), "skill")
+            self.assertEqual(route("ค้นหาสูตรอาหาร", running, skill=skill), "skill")  # ชนะคำสั่งเว็บ
+            self.assertEqual(route("ค้นหาราคาทอง", running, skill=skill), "browser")
+            self.assertEqual(route("เปิดโหมดประชม", running, skill=skill), "unknown")
+        b = BrowserController(control=FakeControl(), skill_match=skill)
+        self.assertEqual(b.route("เปิดโหมดประชุม"), "skill")
+        self.assertEqual(BrowserController(control=FakeControl()).route("เปิดโหมดประชุม"), "unknown")
+
     def test_open_home_opens_assistant_browser_at_google(self):
         ctl = FakeControl()
         b = BrowserController(control=ctl)

@@ -168,6 +168,12 @@ Item {
         }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
         const way = browser.route(t)
+        if (way === "skill") {          // การ์ด 0028: ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด = การ์ดสกิลเดียวกับตอนพิมพ์ (ยืนยันตามกติกาเดิม)
+            push({ user: true, text: t })
+            dispatch(skills.handleAs(skills.voiceSkill(t), t), t)
+            speakLastCard()
+            return
+        }
         if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
             push({ user: true, text: t })
             push({ ai: true, text: "", note: "", done: false, skill: "เบราว์เซอร์ของผู้ช่วย" })
@@ -182,8 +188,11 @@ Item {
                 speakLastCard()
             return
         }
+        const hint = way === "unknown" ? skills.voiceHint(t) : ""   // ได้ยินใกล้เคียงสกิล = บอก ไม่ทำเอง (การ์ด 0028)
         const say = way === "needs_browser"
             ? "ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า \"เปิดเบราว์เซอร์\" ก่อน"
+            : hint !== ""
+            ? "ไม่รู้จักคำสั่ง \"" + t + "\" · ใกล้กับ \"" + hint + "\" ลองพูดอีกครั้ง"
             : "ไม่รู้จักคำสั่ง \"" + t + "\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท"
         push({ user: true, text: t })
         push({ ai: true, text: say, note: "", done: true, skill: "สั่งงานด้วยเสียง" })

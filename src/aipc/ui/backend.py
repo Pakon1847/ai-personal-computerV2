@@ -2042,7 +2042,11 @@ class SkillsController(QObject):
         v = self._user.info(new.id)["version"]
         note = (f"แก้สกิล “{new.name}” แล้ว (รุ่น {v})" if revise_id
                 else f"สร้างสกิลใหม่ “{new.name}” แล้ว (Claude สร้าง) · ครั้งหน้าสั่งแบบนี้ได้เลย")  # fmt: skip
-        card["lines"] = [note, *card.get("lines", [])]
+        # การ์ด 0028: บอกประโยคที่พูดผ่านคีย์ลัดได้จริง (ตรงเป๊ะ) · เฉพาะสกิลที่ทำด้วยโค้ด
+        spoken = [f"กด Alt+Space แล้วพูดได้: “{new.examples[0]}”"] if self.voiceSkill(
+            new.examples[0]
+        ) else []  # fmt: skip
+        card["lines"] = [note, *spoken, *card.get("lines", [])]
         self.forgeDone.emit(card, text)
 
     def _reload(self) -> None:
@@ -2164,6 +2168,37 @@ class SkillsController(QObject):
                                [{"text": "ปิดแล้ว", "kind": "warn"}])  # fmt: skip
         request = text or self._user.info(skill_id).get("request", "")
         return self._start_forge(request, skill_id, feedback)
+
+    # ---------- สั่งสกิลด้วยเสียง (การ์ด 0028) ----------
+    def _voice_skills(self) -> list:
+        """สกิลที่สั่งด้วยคีย์ลัดได้: มีขั้นตอนและทำด้วยโค้ดทั้งหมด · สกิลที่ถาม AI ไม่เข้า (สัญญาของการ์ด 0027)."""
+        return [s for s in self._skills if s.steps and s.worker == "code"]
+
+    @Slot(str, result=str)
+    def voiceSkill(self, text: str) -> str:  # noqa: N802
+        """id ของสกิลที่ประโยคตรงเป๊ะกับตัวอย่าง/คำขอที่ใช้สร้าง · "" = ไม่ตรง.
+
+        ใช้ router.repeat_of ตัวเดียวกับแชท (ไม่สนช่องว่างและคำสุภาพหัวท้าย)
+        """
+        from aipc.skills import router
+
+        m = router.repeat_of(text, self._voice_skills())
+        return m.id if m else ""
+
+    @Slot(str, result=str)
+    def voiceHint(self, text: str) -> str:  # noqa: N802
+        """ได้ยินใกล้เคียงแต่ไม่ตรง → ประโยคตัวอย่างที่ใกล้ที่สุด (ใช้บอกให้พูดใหม่ · ไม่ทำเอง · BRIEF 5.6 ข้อ 2)."""
+        import difflib
+
+        from aipc.skills import command
+
+        key, best, score = command.normalize(text), "", 0.0
+        for s in self._voice_skills():
+            for example in s.examples:
+                r = difflib.SequenceMatcher(None, key, command.normalize(example)).ratio()
+                if r > score:
+                    best, score = example, r
+        return best if key and score >= command.FUZZY_CUTOFF else ""
 
     @Slot(str, str, result="QVariantMap")
     def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802
