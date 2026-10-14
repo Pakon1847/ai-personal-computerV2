@@ -109,13 +109,16 @@ class Listener:
 
     auto_stop=True (แตะครั้งเดียว · การ์ด 0019 ข้อ 10): อ่านไฟล์ที่กำลังอัดทุก 0.1 วิ ป้อน Endpointer ·
     พูดจบแล้วเงียบ 1 วิ = หยุดและถอดเอง · ไม่ได้ยินเสียงพูด 5 วิ = ทิ้งแล้วบอกผู้ใช้
+    fast = ตัวถอดของคีย์ลัด (Zipformer · การ์ด 0026) ใช้เมื่อ start(fast=True) · ไม่มี/ล่ม = ถอยไปใช้ whisper
     """
 
     def __init__(self, on_done: Callable[[str, str, float], None] = lambda *a: None,
                  voice_dir: Path = VOICE_DIR, record_cmd: list[str] | None = None,
                  transcribe_cmd: list[str] | None = None, max_s: float = MAX_S,
-                 auto_stop: bool = True, endpointer=None):  # fmt: skip
+                 auto_stop: bool = True, endpointer=None, fast=None):  # fmt: skip
         self._on_done = on_done
+        self._fast = fast
+        self._use_fast = False
         self._voice_dir = voice_dir
         rec = shutil.which("pw-record")
         auto = [rec, "--rate", "16000", "--channels", "1", "--format", "s16"] if rec else None
@@ -147,13 +150,16 @@ class Listener:
     def listening(self) -> bool:
         return self._proc is not None
 
-    def start(self) -> str:
-        """เริ่มอัด · คืนข้อผิดพลาด ("" = เริ่มได้)."""
+    def start(self, fast: bool = False) -> str:
+        """เริ่มอัด · คืนข้อผิดพลาด ("" = เริ่มได้) · fast = ถอดด้วยตัวถอดของคีย์ลัด (เปิดรอระหว่างพูด)."""
         with self._lock:
             if self._proc is not None:
                 return ""
             if not self.available:
                 return "ยังไม่ได้ติดตั้งตัวถอดเสียง หรือไม่มีไมค์"
+            self._use_fast = fast and self._fast is not None and self._fast.available
+            if self._use_fast:
+                self._fast.warm()  # โหลดโมเดล 3.7 วิ ระหว่างผู้ใช้พูด
             self._dir.mkdir(mode=0o700, exist_ok=True)
             self._path = self._dir / f"rec-{os.getpid()}-{int(time.time() * 1000)}.wav"
             try:
@@ -237,6 +243,14 @@ class Listener:
 
     def _transcribe(self, path: Path) -> None:
         t0 = time.monotonic()
+        if self._use_fast:
+            text, err = self._fast.transcribe(path)
+            if not err:  # ล่ม/ค้าง = ถอยไปใช้ whisper ข้างล่าง (ไม่ทิ้งสิ่งที่ผู้ใช้พูด · H2)
+                _remove(path)
+                if not text:
+                    err = "ไม่ได้ยินเสียงพูด ลองพูดใกล้ไมค์อีกครั้ง"
+                self._on_done(text, err, round(time.monotonic() - t0, 2))
+                return
         try:
             r = subprocess.run([*self._transcribe_cmd, str(path)], capture_output=True, text=True,
                                encoding="utf-8", timeout=60)  # fmt: skip

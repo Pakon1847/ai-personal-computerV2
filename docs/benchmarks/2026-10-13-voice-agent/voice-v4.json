@@ -1,0 +1,623 @@
+{
+ "set": "tests/data/agent_voice_v4.json",
+ "summary": {
+  "chat": "10/10 = 100.0%",
+  "plan": "20/26 = 76.9%",
+  "plan_median_s": 0.89,
+  "look_median_s": null
+ },
+ "rows": [
+  {
+   "id": "v01",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาราง ซ่อม รส ใกล้ ค้น หาราง ซ่อม รส ใกล้",
+   "plan": {
+    "reply": "search หาราง ซ่อม รส ใกล้",
+    "s": 2.46,
+    "prompt_n": 24,
+    "predicted_n": 10
+   },
+   "final": [
+    "search หาราง ซ่อม รส ใกล้"
+   ],
+   "ok": false,
+   "s": 2.46
+  },
+  {
+   "id": "v02",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาตารางบอลคืนนี้",
+   "plan": {
+    "reply": "search ตารางบอลคืนนี้",
+    "s": 1.49,
+    "prompt_n": 11,
+    "predicted_n": 7
+   },
+   "final": [
+    "search ตารางบอลคืนนี้"
+   ],
+   "ok": true,
+   "s": 1.49
+  },
+  {
+   "id": "v03",
+   "cat": "plan",
+   "page": "blank",
+   "command": "คนหาวิธีรถน้ำหนักให้หน่อย",
+   "plan": {
+    "reply": "search วิธีรถน้ำหนัก",
+    "s": 1.39,
+    "prompt_n": 13,
+    "predicted_n": 6
+   },
+   "final": [
+    "search วิธีรถน้ำหนัก"
+   ],
+   "ok": false,
+   "s": 1.39
+  },
+  {
+   "id": "v04",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ช่วยค้นหาที่พักเข่าใหญ่",
+   "plan": {
+    "reply": "search ที่พักเข่าใหญ่",
+    "s": 1.6,
+    "prompt_n": 13,
+    "predicted_n": 7
+   },
+   "final": [
+    "search ที่พักเข่าใหญ่"
+   ],
+   "ok": false,
+   "s": 1.6
+  },
+  {
+   "id": "v05",
+   "cat": "plan",
+   "page": "blank",
+   "command": "หาร้านกาแฟเปิดดึก",
+   "plan": {
+    "reply": "search ร้านกาแฟเปิดดึก",
+    "s": 1.68,
+    "prompt_n": 12,
+    "predicted_n": 8
+   },
+   "final": [
+    "search ร้านกาแฟเปิดดึก"
+   ],
+   "ok": true,
+   "s": 1.68
+  },
+  {
+   "id": "v06",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ถาข่าวเศรษฐกิจล่าสุด",
+   "plan": {
+    "reply": "search ข่าวเศรษฐกิจล่าสุด",
+    "s": 1.64,
+    "prompt_n": 11,
+    "predicted_n": 7
+   },
+   "final": [
+    "search ข่าวเศรษฐกิจล่าสุด"
+   ],
+   "ok": true,
+   "s": 1.64
+  },
+  {
+   "id": "v07",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "คนหาราคาไข่ไก่แล้วข้าวลิงแรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 3.36,
+    "prompt_n": 56,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": false,
+   "s": 3.36
+  },
+  {
+   "id": "v08",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ข้าวหลิงแรก",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.05,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.05
+  },
+  {
+   "id": "v09",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้าลิงที่สาม",
+   "plan": {
+    "reply": "result 3",
+    "s": 1.0,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 3"
+   ],
+   "ok": true,
+   "s": 1.0
+  },
+  {
+   "id": "v10",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิด ลิง ที่ สี่",
+   "plan": {
+    "reply": "result 4",
+    "s": 1.17,
+    "prompt_n": 11,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 4"
+   ],
+   "ok": true,
+   "s": 1.18
+  },
+  {
+   "id": "v11",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กดลิงแรกให้หน่อย",
+   "plan": {
+    "reply": "result 1",
+    "s": 1.13,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 1"
+   ],
+   "ok": true,
+   "s": 1.13
+  },
+  {
+   "id": "v12",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เข้า เว็บ ที่ สาม",
+   "plan": {
+    "reply": "result 3",
+    "s": 1.09,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "result 3"
+   ],
+   "ok": true,
+   "s": 1.09
+  },
+  {
+   "id": "v13",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับไป",
+   "plan": {
+    "reply": "back",
+    "s": 0.7,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.7
+  },
+  {
+   "id": "v14",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ย้อน กลับ อีกที",
+   "plan": {
+    "reply": "back",
+    "s": 0.64,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.64
+  },
+  {
+   "id": "v15",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าเดิม",
+   "plan": {
+    "reply": "back",
+    "s": 0.69,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "back"
+   ],
+   "ok": true,
+   "s": 0.69
+  },
+  {
+   "id": "v16",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ไปข้างหน้าหน่อย",
+   "plan": {
+    "reply": "forward",
+    "s": 0.7,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "forward"
+   ],
+   "ok": true,
+   "s": 0.7
+  },
+  {
+   "id": "v17",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "โลดใหม่อีกที",
+   "plan": {
+    "reply": "reload",
+    "s": 0.85,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.85
+  },
+  {
+   "id": "v18",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "รีเฟลด",
+   "plan": {
+    "reply": "reload",
+    "s": 0.63,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "reload"
+   ],
+   "ok": true,
+   "s": 0.63
+  },
+  {
+   "id": "v19",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงอีกหน่อย",
+   "plan": {
+    "reply": "down",
+    "s": 0.78,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.78
+  },
+  {
+   "id": "v20",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนขึ้น",
+   "plan": {
+    "reply": "up",
+    "s": 0.58,
+    "prompt_n": 6,
+    "predicted_n": 2
+   },
+   "final": [
+    "up"
+   ],
+   "ok": true,
+   "s": 0.58
+  },
+  {
+   "id": "v21",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงไป",
+   "plan": {
+    "reply": "down",
+    "s": 0.71,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "down"
+   ],
+   "ok": true,
+   "s": 0.71
+  },
+  {
+   "id": "v22",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เป๊ก",
+   "plan": {
+    "reply": "chat",
+    "s": 0.71,
+    "prompt_n": 7,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": false,
+   "s": 0.71
+  },
+  {
+   "id": "v23",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "ปิด หน้า นี้ เลย",
+   "plan": {
+    "reply": "close",
+    "s": 0.84,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "close"
+   ],
+   "ok": true,
+   "s": 0.84
+  },
+  {
+   "id": "v24",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "กลับไปแอด",
+   "plan": {
+    "reply": "app",
+    "s": 0.75,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "app"
+   ],
+   "ok": true,
+   "s": 0.75
+  },
+  {
+   "id": "v25",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดยูทูก",
+   "plan": {
+    "reply": "open youtube.com",
+    "s": 1.95,
+    "prompt_n": 22,
+    "predicted_n": 5
+   },
+   "final": [
+    "open youtube.com"
+   ],
+   "ok": true,
+   "s": 1.95
+  },
+  {
+   "id": "v26",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดเวฟกูเกิน",
+   "plan": {
+    "reply": "chat",
+    "s": 0.81,
+    "prompt_n": 10,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": false,
+   "s": 0.81
+  },
+  {
+   "id": "v27",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาไฟไล่นามเสนอ",
+   "plan": {
+    "reply": "chat",
+    "s": 0.89,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.89
+  },
+  {
+   "id": "v28",
+   "cat": "chat",
+   "page": "blank",
+   "command": "คนหาโน้ตที่จดไว้เมื่อวาน",
+   "plan": {
+    "reply": "chat",
+    "s": 1.18,
+    "prompt_n": 17,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.18
+  },
+  {
+   "id": "v29",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลื่อนัดไปวันจันทร์",
+   "plan": {
+    "reply": "chat",
+    "s": 0.87,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.87
+  },
+  {
+   "id": "v30",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ลดเสียงหน่อย",
+   "plan": {
+    "reply": "chat",
+    "s": 0.68,
+    "prompt_n": 8,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.68
+  },
+  {
+   "id": "v31",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ปรับ เสียง หก สิบ",
+   "plan": {
+    "reply": "chat",
+    "s": 0.85,
+    "prompt_n": 12,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.85
+  },
+  {
+   "id": "v32",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เลี้ยวกเลิกนัดหมอ",
+   "plan": {
+    "reply": "chat",
+    "s": 1.01,
+    "prompt_n": 14,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.01
+  },
+  {
+   "id": "v33",
+   "cat": "chat",
+   "page": "blank",
+   "command": "ตอนนี้ขี่โมงแล้ว",
+   "plan": {
+    "reply": "chat",
+    "s": 0.89,
+    "prompt_n": 11,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.89
+  },
+  {
+   "id": "v34",
+   "cat": "chat",
+   "page": "blank",
+   "command": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "plan": {
+    "reply": "chat",
+    "s": 1.28,
+    "prompt_n": 20,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 1.28
+  },
+  {
+   "id": "v35",
+   "cat": "chat",
+   "page": "blank",
+   "command": "เปิดโหมดทำงาน",
+   "plan": {
+    "reply": "chat",
+    "s": 0.7,
+    "prompt_n": 9,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.7
+  },
+  {
+   "id": "v36",
+   "cat": "chat",
+   "page": "blank",
+   "command": "อากาศพรุ่งนี้เป็นอย่างใน",
+   "plan": {
+    "reply": "chat",
+    "s": 0.9,
+    "prompt_n": 13,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 0.9
+  }
+ ]
+}

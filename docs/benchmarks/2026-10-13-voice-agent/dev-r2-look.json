@@ -1,0 +1,817 @@
+{
+ "set": "tests/data/agent_dev.json",
+ "summary": {
+  "chat": "1/2 = 50.0%",
+  "look": "22/27 = 81.5%",
+  "plan": "7/7 = 100.0%",
+  "plan_median_s": 2.8,
+  "look_median_s": 3.24
+ },
+ "rows": [
+  {
+   "id": "d01",
+   "cat": "look",
+   "page": "goldtraders",
+   "command": "ราคารับซื้อทองแท่งเท่าไหร่",
+   "plan": {
+    "reply": "look ราคารับซื้อทองแท่งเท่าไหร่",
+    "s": 77.78,
+    "prompt_n": 1483,
+    "predicted_n": 12
+   },
+   "look": {
+    "task": "ราคารับซื้อทองแท่งเท่าไหร่",
+    "reply": "answer 66,400.00",
+    "s": 93.09,
+    "prompt_n": 1639,
+    "predicted_n": 12
+   },
+   "final": [
+    "answer 66,400.00"
+   ],
+   "ok": true,
+   "s": 170.86
+  },
+  {
+   "id": "d02",
+   "cat": "look",
+   "page": "goldtraders",
+   "command": "ราคาทองโลกตอนนี้เท่าไหร่",
+   "plan": {
+    "reply": "look ราคาทองโลกตอนนี้เท่าไหร่",
+    "s": 2.48,
+    "prompt_n": 13,
+    "predicted_n": 11
+   },
+   "look": {
+    "task": "ราคาทองโลกตอนนี้เท่าไหร่",
+    "reply": "answer Gold Spot : 4,191.00 USD/THB : 33.58",
+    "s": 4.98,
+    "prompt_n": 13,
+    "predicted_n": 25
+   },
+   "final": [
+    "answer Gold Spot : 4,191.00 USD/THB : 33.58"
+   ],
+   "ok": true,
+   "s": 7.46
+  },
+  {
+   "id": "d03",
+   "cat": "look",
+   "page": "goldtraders",
+   "command": "กดเมนูบทความ",
+   "plan": {
+    "reply": "look กดเมนูบทความ",
+    "s": 1.7,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "กดเมนูบทความ",
+    "reply": "click 4",
+    "s": 1.24,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 4"
+   ],
+   "ok": true,
+   "s": 2.94
+  },
+  {
+   "id": "d04",
+   "cat": "look",
+   "page": "goldtraders",
+   "command": "เข้าเกี่ยวกับเรา",
+   "plan": {
+    "reply": "look เข้าเกี่ยวกับเรา",
+    "s": 1.22,
+    "prompt_n": 8,
+    "predicted_n": 5
+   },
+   "look": {
+    "task": "เข้าเกี่ยวกับเรา",
+    "reply": "click 3",
+    "s": 1.06,
+    "prompt_n": 8,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 3"
+   ],
+   "ok": true,
+   "s": 2.28
+  },
+  {
+   "id": "d05",
+   "cat": "look",
+   "page": "form",
+   "command": "ใส่อีเมล somsak@gmail.com",
+   "plan": {
+    "reply": "look ใส่อีเมล somsak@gmail.com",
+    "s": 3.77,
+    "prompt_n": 32,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "ใส่อีเมล somsak@gmail.com",
+    "reply": "type 3 somsak@gmail.com",
+    "s": 11.29,
+    "prompt_n": 181,
+    "predicted_n": 10
+   },
+   "final": [
+    "type 3 somsak@gmail.com"
+   ],
+   "ok": true,
+   "s": 15.05
+  },
+  {
+   "id": "d06",
+   "cat": "look",
+   "page": "form",
+   "command": "เลือกไซส์กลาง",
+   "plan": {
+    "reply": "look เลือกไซส์กลาง",
+    "s": 1.45,
+    "prompt_n": 9,
+    "predicted_n": 6
+   },
+   "look": {
+    "task": "เลือกไซส์กลาง",
+    "reply": "click 5",
+    "s": 1.12,
+    "prompt_n": 9,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 5"
+   ],
+   "ok": true,
+   "s": 2.57
+  },
+  {
+   "id": "d07",
+   "cat": "look",
+   "page": "form",
+   "command": "ใส่หัวหอมด้วย",
+   "plan": {
+    "reply": "look ใส่หัวหอมด้วย",
+    "s": 1.72,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "ใส่หัวหอมด้วย",
+    "reply": "type 9 หัวหอมด้วย",
+    "s": 1.89,
+    "prompt_n": 10,
+    "predicted_n": 8
+   },
+   "final": [
+    "type 9 หัวหอมด้วย"
+   ],
+   "ok": false,
+   "s": 3.61
+  },
+  {
+   "id": "d08",
+   "cat": "look",
+   "page": "form",
+   "command": "พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+   "plan": {
+    "reply": "look พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+    "s": 2.99,
+    "prompt_n": 16,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "พิมพ์ในช่องหมายเหตุว่าไม่ใส่ผัก",
+    "reply": "type 1 ไม่ใส่ผัก",
+    "s": 2.13,
+    "prompt_n": 16,
+    "predicted_n": 8
+   },
+   "final": [
+    "type 1 ไม่ใส่ผัก"
+   ],
+   "ok": false,
+   "s": 5.13
+  },
+  {
+   "id": "d09",
+   "cat": "look",
+   "page": "news",
+   "command": "เข้าข่าวการเมือง",
+   "plan": {
+    "reply": "look เข้าข่าวการเมือง",
+    "s": 3.3,
+    "prompt_n": 45,
+    "predicted_n": 6
+   },
+   "look": {
+    "task": "เข้าข่าวการเมือง",
+    "reply": "click 28",
+    "s": 39.92,
+    "prompt_n": 710,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 28"
+   ],
+   "ok": true,
+   "s": 43.22
+  },
+  {
+   "id": "d10",
+   "cat": "look",
+   "page": "news",
+   "command": "ดูหมวดหวย",
+   "plan": {
+    "reply": "look ดูหมวดหวย",
+    "s": 1.68,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "ดูหมวดหวย",
+    "reply": "click 9",
+    "s": 1.27,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 9"
+   ],
+   "ok": true,
+   "s": 2.96
+  },
+  {
+   "id": "d11",
+   "cat": "look",
+   "page": "news",
+   "command": "เปิดข่าว กทม.",
+   "plan": {
+    "reply": "look เปิดข่าว กทม.",
+    "s": 2.0,
+    "prompt_n": 11,
+    "predicted_n": 8
+   },
+   "look": {
+    "task": "เปิดข่าว กทม.",
+    "reply": "click 36",
+    "s": 1.47,
+    "prompt_n": 11,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 36"
+   ],
+   "ok": true,
+   "s": 3.46
+  },
+  {
+   "id": "d12",
+   "cat": "look",
+   "page": "pantip",
+   "command": "เข้าพันทิปพิค",
+   "plan": {
+    "reply": "look เข้าพันทิปพิค",
+    "s": 3.12,
+    "prompt_n": 32,
+    "predicted_n": 9
+   },
+   "look": {
+    "task": "เข้าพันทิปพิค",
+    "reply": "click 9",
+    "s": 102.47,
+    "prompt_n": 1849,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 9"
+   ],
+   "ok": true,
+   "s": 105.59
+  },
+  {
+   "id": "d13",
+   "cat": "look",
+   "page": "pantip",
+   "command": "ดูกฎกติกา",
+   "plan": {
+    "reply": "look ดูกฎกติกา",
+    "s": 1.92,
+    "prompt_n": 11,
+    "predicted_n": 8
+   },
+   "look": {
+    "task": "ดูกฎกติกา",
+    "reply": "click 14",
+    "s": 1.6,
+    "prompt_n": 11,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 14"
+   ],
+   "ok": true,
+   "s": 3.52
+  },
+  {
+   "id": "d14",
+   "cat": "look",
+   "page": "youtube",
+   "command": "กดปุ่มตั้งค่า",
+   "plan": {
+    "reply": "look กดปุ่มตั้งค่า",
+    "s": 2.44,
+    "prompt_n": 24,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "กดปุ่มตั้งค่า",
+    "reply": "click 7",
+    "s": 79.41,
+    "prompt_n": 1459,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 7"
+   ],
+   "ok": true,
+   "s": 81.85
+  },
+  {
+   "id": "d15",
+   "cat": "look",
+   "page": "youtube",
+   "command": "ดูช็อตส์",
+   "plan": {
+    "reply": "look ดูช็อตส์",
+    "s": 1.74,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "ดูช็อตส์",
+    "reply": "click 8",
+    "s": 1.25,
+    "prompt_n": 10,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 8"
+   ],
+   "ok": true,
+   "s": 2.99
+  },
+  {
+   "id": "d16",
+   "cat": "plan",
+   "page": "youtube",
+   "command": "ค้นหาคลิปตลก",
+   "plan": {
+    "reply": "find คลิปตลก",
+    "s": 1.45,
+    "prompt_n": 12,
+    "predicted_n": 5
+   },
+   "final": [
+    "find คลิปตลก"
+   ],
+   "ok": true,
+   "s": 1.45
+  },
+  {
+   "id": "d17",
+   "cat": "look",
+   "page": "youtube-results",
+   "command": "กดดูวิดีโอรวมเพลงฮิตลูกทุ่งยามเช้า",
+   "plan": {
+    "reply": "look กดดูวิดีโอรวมเพลงฮิตลูกทุ่งยามเช้า",
+    "s": 5.99,
+    "prompt_n": 52,
+    "predicted_n": 19
+   },
+   "look": {
+    "task": "กดดูวิดีโอรวมเพลงฮิตลูกทุ่งยามเช้า",
+    "reply": "click 21",
+    "s": 39.9,
+    "prompt_n": 685,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 21"
+   ],
+   "ok": true,
+   "s": 45.9
+  },
+  {
+   "id": "d18",
+   "cat": "look",
+   "page": "youtube-results",
+   "command": "ดูเฉพาะไลฟ์",
+   "plan": {
+    "reply": "look ดูเฉพาะไลฟ์",
+    "s": 1.73,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "ดูเฉพาะไลฟ์",
+    "reply": "click 13",
+    "s": 1.41,
+    "prompt_n": 10,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 13"
+   ],
+   "ok": true,
+   "s": 3.14
+  },
+  {
+   "id": "d19",
+   "cat": "look",
+   "page": "ddg-weather",
+   "command": "เข้าเว็บกรมอุตุ",
+   "plan": {
+    "reply": "look เข้าเว็บกรมอุตุ",
+    "s": 4.11,
+    "prompt_n": 55,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "เข้าเว็บกรมอุตุ",
+    "reply": "click 21",
+    "s": 104.37,
+    "prompt_n": 1872,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 21"
+   ],
+   "ok": true,
+   "s": 108.48
+  },
+  {
+   "id": "d20",
+   "cat": "look",
+   "page": "ddg-weather",
+   "command": "วันพฤหัสร้อนสุดกี่องศา",
+   "plan": {
+    "reply": "look วันพฤหัสร้อนสุดกี่องศา",
+    "s": 3.02,
+    "prompt_n": 16,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "วันพฤหัสร้อนสุดกี่องศา",
+    "reply": "answer 40 % 31 ° 23 °",
+    "s": 3.24,
+    "prompt_n": 16,
+    "predicted_n": 14
+   },
+   "final": [
+    "answer 40 % 31 ° 23 °"
+   ],
+   "ok": true,
+   "s": 6.26
+  },
+  {
+   "id": "d21",
+   "cat": "look",
+   "page": "ddg-weather",
+   "command": "วันศุกร์โอกาสฝนตกเท่าไหร่",
+   "plan": {
+    "reply": "look วันศุกร์โอกาสฝนตกเท่าไหร่",
+    "s": 3.06,
+    "prompt_n": 15,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "วันศุกร์โอกาสฝนตกเท่าไหร่",
+    "reply": "find วันศุกร์โอกาสฝนตกเท่าไหร่",
+    "s": 3.03,
+    "prompt_n": 15,
+    "predicted_n": 13
+   },
+   "final": [
+    "find วันศุกร์โอกาสฝนตกเท่าไหร่"
+   ],
+   "ok": false,
+   "s": 6.1
+  },
+  {
+   "id": "d22",
+   "cat": "look",
+   "page": "wiki-th",
+   "command": "กดเข้าสู่ระบบวิกิ",
+   "plan": {
+    "reply": "look กดเข้าสู่ระบบวิกิ",
+    "s": 3.66,
+    "prompt_n": 44,
+    "predicted_n": 9
+   },
+   "look": {
+    "task": "กดเข้าสู่ระบบวิกิ",
+    "reply": "click 5",
+    "s": 119.68,
+    "prompt_n": 2131,
+    "predicted_n": 4
+   },
+   "final": [
+    "click 5"
+   ],
+   "ok": true,
+   "s": 123.34
+  },
+  {
+   "id": "d23",
+   "cat": "look",
+   "page": "wiki-th",
+   "command": "กรุงเทพเป็นเมืองหลวงของประเทศอะไร",
+   "plan": {
+    "reply": "look กรุงเทพเป็นเมืองหลวงของประเทศอะไร",
+    "s": 2.37,
+    "prompt_n": 13,
+    "predicted_n": 10
+   },
+   "look": {
+    "task": "กรุงเทพเป็นเมืองหลวงของประเทศอะไร",
+    "reply": "answer กรุงเทพมหานครเป็นเมืองหลวงของประเทศไทย",
+    "s": 2.76,
+    "prompt_n": 13,
+    "predicted_n": 12
+   },
+   "final": [
+    "answer กรุงเทพมหานครเป็นเมืองหลวงของประเทศไทย"
+   ],
+   "ok": true,
+   "s": 5.13
+  },
+  {
+   "id": "d24",
+   "cat": "look",
+   "page": "wiki-th",
+   "command": "เข้าหัวข้อภูมิศาสตร์",
+   "plan": {
+    "reply": "look เข้าหัวข้อภูมิศาสตร์",
+    "s": 1.76,
+    "prompt_n": 10,
+    "predicted_n": 7
+   },
+   "look": {
+    "task": "เข้าหัวข้อภูมิศาสตร์",
+    "reply": "click 19",
+    "s": 1.39,
+    "prompt_n": 10,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 19"
+   ],
+   "ok": true,
+   "s": 3.16
+  },
+  {
+   "id": "d25",
+   "cat": "look",
+   "page": "wiki-th-mid",
+   "command": "เข้าหัวข้อการคมนาคม",
+   "plan": {
+    "reply": "look เข้าหัวข้อการคมนาคม",
+    "s": 1.94,
+    "prompt_n": 9,
+    "predicted_n": 9
+   },
+   "look": {
+    "task": "เข้าหัวข้อการคมนาคม",
+    "reply": "click 34",
+    "s": 120.3,
+    "prompt_n": 2120,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 34"
+   ],
+   "ok": true,
+   "s": 122.24
+  },
+  {
+   "id": "d26",
+   "cat": "look",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บ investing",
+   "plan": {
+    "reply": "open investing.com",
+    "s": 3.34,
+    "prompt_n": 47,
+    "predicted_n": 5
+   },
+   "final": [
+    "open investing.com"
+   ],
+   "ok": false,
+   "s": 3.35
+  },
+  {
+   "id": "d27",
+   "cat": "look",
+   "page": "ddg-egg",
+   "command": "เปิดคลิปไข่เจียวหมูสับ",
+   "plan": {
+    "reply": "look เปิดคลิปไข่เจียวหมูสับ",
+    "s": 5.18,
+    "prompt_n": 57,
+    "predicted_n": 13
+   },
+   "look": {
+    "task": "เปิดคลิปไข่เจียวหมูสับ",
+    "reply": "click 21",
+    "s": 122.63,
+    "prompt_n": 2160,
+    "predicted_n": 5
+   },
+   "final": [
+    "click 21"
+   ],
+   "ok": true,
+   "s": 127.81
+  },
+  {
+   "id": "d28",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาร้านอาหารญี่ปุ่นแล้วกดอันที่สาม",
+   "plan": {
+    "reply": "search ร้านอาหารญี่ปุ่น ; result 3",
+    "s": 2.95,
+    "prompt_n": 29,
+    "predicted_n": 9
+   },
+   "final": [
+    "search ร้านอาหารญี่ปุ่น",
+    "result 3"
+   ],
+   "ok": true,
+   "s": 2.95
+  },
+  {
+   "id": "d29",
+   "cat": "plan",
+   "page": "blank",
+   "command": "เปิดพันทิปแล้วค้นหาเรื่องคอนโด",
+   "plan": {
+    "reply": "open pantip.com ; find เรื่องคอนโด",
+    "s": 2.58,
+    "prompt_n": 16,
+    "predicted_n": 11
+   },
+   "final": [
+    "open pantip.com",
+    "find เรื่องคอนโด"
+   ],
+   "ok": true,
+   "s": 2.58
+  },
+  {
+   "id": "d30",
+   "cat": "plan",
+   "page": "blank",
+   "command": "ค้นหาราคาน้ำมันแล้วบอกราคาดีเซล",
+   "plan": {
+    "reply": "search ราคาน้ำมัน ; look ราคาดีเซล",
+    "s": 2.98,
+    "prompt_n": 17,
+    "predicted_n": 12
+   },
+   "final": [
+    "search ราคาน้ำมัน",
+    "look ราคาดีเซล"
+   ],
+   "ok": true,
+   "s": 2.98
+  },
+  {
+   "id": "d31",
+   "cat": "plan",
+   "page": "ddg-gold",
+   "command": "เปิดเว็บไทยรัฐ",
+   "plan": {
+    "reply": "open thairath.co.th",
+    "s": 4.07,
+    "prompt_n": 48,
+    "predicted_n": 9
+   },
+   "final": [
+    "open thairath.co.th"
+   ],
+   "ok": true,
+   "s": 4.07
+  },
+  {
+   "id": "d32",
+   "cat": "plan",
+   "page": "pantip",
+   "command": "ค้นหาร้านกาแฟในกูเกิล",
+   "plan": {
+    "reply": "search ค้นหาร้านกาแฟในกูเกิล",
+    "s": 3.88,
+    "prompt_n": 36,
+    "predicted_n": 13
+   },
+   "final": [
+    "search ค้นหาร้านกาแฟในกูเกิล"
+   ],
+   "ok": true,
+   "s": 3.88
+  },
+  {
+   "id": "d33",
+   "cat": "plan",
+   "page": "news",
+   "command": "กลับไปที่แอปผู้ช่วย",
+   "plan": {
+    "reply": "app",
+    "s": 2.74,
+    "prompt_n": 48,
+    "predicted_n": 2
+   },
+   "final": [
+    "app"
+   ],
+   "ok": true,
+   "s": 2.74
+  },
+  {
+   "id": "d34",
+   "cat": "chat",
+   "page": "youtube",
+   "command": "มีนัดอะไรบ้างวันนี้",
+   "plan": {
+    "reply": "look มีนัดอะไรบ้างวันนี้",
+    "s": 2.8,
+    "prompt_n": 25,
+    "predicted_n": 8
+   },
+   "look": {
+    "task": "มีนัดอะไรบ้างวันนี้",
+    "reply": "none",
+    "s": 79.5,
+    "prompt_n": 1460,
+    "predicted_n": 2
+   },
+   "final": [
+    "none"
+   ],
+   "ok": false,
+   "s": 82.3
+  },
+  {
+   "id": "d35",
+   "cat": "chat",
+   "page": "goldtraders",
+   "command": "ตั้งปลุกตีห้า",
+   "plan": {
+    "reply": "chat",
+    "s": 2.22,
+    "prompt_n": 36,
+    "predicted_n": 2
+   },
+   "final": [
+    "chat"
+   ],
+   "ok": true,
+   "s": 2.22
+  },
+  {
+   "id": "d36",
+   "cat": "look",
+   "page": "wiki-th",
+   "command": "สรุปบทความนี้ให้หน่อย",
+   "plan": {
+    "reply": "look สรุปบทความนี้ให้หน่อย",
+    "s": 4.0,
+    "prompt_n": 45,
+    "predicted_n": 10
+   },
+   "look": {
+    "task": "สรุปบทความนี้ให้หน่อย",
+    "reply": "answer กรุงเทพมหานครเป็นเมืองหลวงและเมืองที่มีประชากรมากที่สุดของประเทศไทย ; click 17",
+    "s": 52.42,
+    "prompt_n": 841,
+    "predicted_n": 25
+   },
+   "final": [
+    "answer กรุงเทพมหานครเป็นเมืองหลวงและเมืองที่มีประชากรมากที่สุดของประเทศไทย",
+    "click 17"
+   ],
+   "ok": false,
+   "s": 56.42
+  }
+ ]
+}

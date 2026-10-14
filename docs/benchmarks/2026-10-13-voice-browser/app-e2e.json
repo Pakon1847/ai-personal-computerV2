@@ -1,0 +1,101 @@
+{
+ "rows": [
+  {
+   "said": "ค้นหาราคาทองหน่อย",
+   "heard": "คนหาราคาทองหน่อย",
+   "key_ms": 51,
+   "stt_s": 1.88,
+   "total_s": 6.27,
+   "shown": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: ราคาทอง",
+   "spoken": [
+    "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: ราคาทอง"
+   ],
+   "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87"
+  },
+  {
+   "said": "เข้าลิงก์แรก",
+   "heard": "ข้าวหลิงแรก",
+   "key_ms": 20,
+   "stt_s": 3.41,
+   "total_s": 6.74,
+   "shown": "เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+   "spoken": [
+    "เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com"
+   ],
+   "url": "https://xn--42cah7d0cxcvbbb9x.com/"
+  },
+  {
+   "said": "ย้อนกลับ",
+   "heard": "ย้อนกลับ",
+   "key_ms": 21,
+   "stt_s": 2.63,
+   "total_s": 3.67,
+   "shown": "ย้อนกลับแล้ว",
+   "spoken": [
+    "ย้อนกลับแล้ว"
+   ],
+   "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87&rdr=1&rdrig=81A49B88F31446F486CAA532F3A69491"
+  },
+  {
+   "said": "เข้าลิงก์ที่สอง",
+   "heard": "ข้าวลิงที่สอง",
+   "key_ms": 21,
+   "stt_s": 2.76,
+   "total_s": 9.53,
+   "shown": "เข้าลิงก์ที่ 2 แล้ว: www.huasengheng.com",
+   "spoken": [
+    "เข้าลิงก์ที่ 2 แล้ว: www.huasengheng.com"
+   ],
+   "url": "https://www.huasengheng.com/"
+  },
+  {
+   "said": "เลื่อนลง",
+   "heard": "เลื่อน ลง",
+   "key_ms": 21,
+   "stt_s": 2.27,
+   "total_s": 2.75,
+   "shown": "เลื่อนลงแล้ว",
+   "spoken": [
+    "เลื่อนลงแล้ว"
+   ],
+   "url": "https://www.huasengheng.com/"
+  },
+  {
+   "said": "ย้อนกลับ",
+   "heard": "ย้อนกลับ",
+   "key_ms": 20,
+   "stt_s": 2.38,
+   "total_s": 3.39,
+   "shown": "ย้อนกลับแล้ว",
+   "spoken": [
+    "ย้อนกลับแล้ว"
+   ],
+   "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87&rdr=1&rdrig=81A49B88F31446F486CAA532F3A69491"
+  },
+  {
+   "said": "กลับไปแอป",
+   "heard": "กลับ ไป แอ๊ส",
+   "key_ms": 21,
+   "stt_s": 2.13,
+   "total_s": 2.37,
+   "shown": "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง",
+   "spoken": [
+    "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง · ข้อความนี้ไม่ได้ถูกส่งไปที่ไหน · ลองสั่งงานเครื่อง เช่น “เปิดยูทูบ” หรือถาม “ทำไมเครื่องช้า”"
+   ],
+   "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87&rdr=1&rdrig=81A49B88F31446F486CAA532F3A69491"
+  }
+ ],
+ "median_total_s": 3.67,
+ "outbound": [
+  {
+   "time": "2026-10-13T02:55:00",
+   "kind": "web",
+   "sent": "ค้นเว็บ: ราคาทอง",
+   "chars": 16,
+   "cost_usd": 0.0,
+   "ok": true,
+   "note": "เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง"
+  }
+ ],
+ "qml_warnings": []
+}

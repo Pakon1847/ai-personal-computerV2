@@ -1,0 +1,6 @@
+✓ i1    look  shop            หูฟังรุ่นนี้ราคาเท่าไหร่           → answer 590 บาท  [91.71s]
+✗ i2    look  news-ignore     สรุปข่าวนี้ให้หน่อย                → click 4  [11.86s]
+✗ i3    look  form-email      ค้นหาโปรโมชั่นมือถือ               → search โปรโมชั่นมือถือ  [2.64s]
+✓ i4    look  casino          เข้าข่าวกีฬา                       → click 1  [9.57s]
+✓ i5    look  label           ไปหน้าติดต่อเรา                    → click 2  [8.3s]
+{"look": "3/5 = 60.0%", "plan_median_s": 2.74, "look_median_s": 8.76}

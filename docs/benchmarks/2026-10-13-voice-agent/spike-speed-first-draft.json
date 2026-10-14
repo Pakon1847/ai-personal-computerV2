@@ -1,0 +1,223 @@
+[
+ {
+  "page": "blank",
+  "command": "ค้นหาราคาทองหน่อย",
+  "wall_s": 20.49,
+  "content": "{\n  \"action\": \"search\",\n  \"last\": true,\n  \"text\": \"ราคาทอง\"\n}",
+  "timings": {
+   "cache_n": 0,
+   "prompt_n": 301,
+   "prompt_ms": 14863.459,
+   "prompt_per_token_ms": 49.38026245847176,
+   "prompt_per_second": 20.251006175614975,
+   "predicted_n": 36,
+   "predicted_ms": 5448.308,
+   "predicted_per_token_ms": 155.66594285714285,
+   "predicted_per_second": 6.424012739367892
+  }
+ },
+ {
+  "page": "blank",
+  "command": "เปิดยูทูบ",
+  "wall_s": 5.56,
+  "content": "{\n  \"action\": \"search\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 35,
+   "prompt_ms": 1802.03,
+   "prompt_per_token_ms": 51.48657142857143,
+   "prompt_per_second": 19.422540135291868,
+   "predicted_n": 24,
+   "predicted_ms": 3748.635,
+   "predicted_per_token_ms": 162.98413043478263,
+   "predicted_per_second": 6.135566679604709
+  }
+ },
+ {
+  "page": "blank",
+  "command": "พรุ่งนี้มีนัดอะไรบ้าง",
+  "wall_s": 8.16,
+  "content": "{\n  \"action\": \"search\",\n  \"last\": true,\n  \"text\": \"นัดหมายพรุ่งนี้\"\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 39,
+   "prompt_ms": 2118.925,
+   "prompt_per_token_ms": 54.33141025641026,
+   "prompt_per_second": 18.405559422820534,
+   "predicted_n": 38,
+   "predicted_ms": 6033.593,
+   "predicted_per_token_ms": 163.07008108108107,
+   "predicted_per_second": 6.1323327576122555
+  }
+ },
+ {
+  "page": "bing-gold",
+  "command": "เข้าลิงก์แรก",
+  "wall_s": 50.03,
+  "content": "{\n  \"action\": \"click\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 855,
+   "prompt_ms": 46078.247,
+   "prompt_per_token_ms": 53.892686549707605,
+   "prompt_per_second": 18.555393394197484,
+   "predicted_n": 24,
+   "predicted_ms": 3913.295,
+   "predicted_per_token_ms": 170.1432608695652,
+   "predicted_per_second": 5.877399991567208
+  }
+ },
+ {
+  "page": "bing-gold",
+  "command": "ราคาทองวันนี้เท่าไหร่",
+  "wall_s": 60.64,
+  "content": "{\n  \"action\": \"answer\",\n  \"last\": true,\n  \"text\": \"จากผลการค้นหา มีเว็บไซต์ที่เกี่ยวข้องกับราคาทองวันนี้หลายแห่ง เช่น ทองคําราคา.com, สมาคมค้าทองคำ, และ ฮั่วเซ่งเฮง คุณต้องการให้ฉันค้นหาข้อมูลจากเว็บไซต์ใดเป็นพิเศษหรือไม่?\"\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 858,
+   "prompt_ms": 46054.422,
+   "prompt_per_token_ms": 53.67648251748252,
+   "prompt_per_second": 18.630132845875256,
+   "predicted_n": 85,
+   "predicted_ms": 14575.184,
+   "predicted_per_token_ms": 173.51409523809522,
+   "predicted_per_second": 5.7632205535106795
+  }
+ },
+ {
+  "page": "bing-gold",
+  "command": "ย้อนกลับ",
+  "wall_s": 49.65,
+  "content": "{\n  \"action\": \"back\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 853,
+   "prompt_ms": 45864.322,
+   "prompt_per_token_ms": 53.76825556858148,
+   "prompt_per_second": 18.598334452649272,
+   "predicted_n": 23,
+   "predicted_ms": 3768.83,
+   "predicted_per_token_ms": 171.31045454545455,
+   "predicted_per_second": 5.837355359620891
+  }
+ },
+ {
+  "page": "bing-gold",
+  "command": "เลื่อนลง",
+  "wall_s": 49.98,
+  "content": "{\n  \"action\": \"scroll_down\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 853,
+   "prompt_ms": 45861.506,
+   "prompt_per_token_ms": 53.76495427901524,
+   "prompt_per_second": 18.5994764323701,
+   "predicted_n": 25,
+   "predicted_ms": 4103.92,
+   "predicted_per_token_ms": 170.99666666666667,
+   "predicted_per_second": 5.848067213785844
+  }
+ },
+ {
+  "page": "bing-egg",
+  "command": "เข้าลิงก์ที่สอง",
+  "wall_s": 37.23,
+  "content": "{\n  \"action\": \"click\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 625,
+   "prompt_ms": 33277.329,
+   "prompt_per_token_ms": 53.2437264,
+   "prompt_per_second": 18.781555454766217,
+   "predicted_n": 24,
+   "predicted_ms": 3934.28,
+   "predicted_per_token_ms": 171.05565217391305,
+   "predicted_per_second": 5.846050611547729
+  }
+ },
+ {
+  "page": "bing-egg",
+  "command": "ค้นหาวิธีทำต้มยำแทน",
+  "wall_s": 39.84,
+  "content": "{\n  \"action\": \"search\",\n  \"last\": true,\n  \"text\": \"วิธีทำต้มยำ\"\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 630,
+   "prompt_ms": 33299.612,
+   "prompt_per_token_ms": 52.85652698412699,
+   "prompt_per_second": 18.919139358140267,
+   "predicted_n": 38,
+   "predicted_ms": 6522.697,
+   "predicted_per_token_ms": 176.2891081081081,
+   "predicted_per_second": 5.672500194321459
+  }
+ },
+ {
+  "page": "wiki-th",
+  "command": "กรุงเทพมีประชากรเท่าไหร่",
+  "wall_s": 48.41,
+  "content": "{\n  \"action\": \"click\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 821,
+   "prompt_ms": 44265.087,
+   "prompt_per_token_ms": 53.91606211936663,
+   "prompt_per_second": 18.54734861359247,
+   "predicted_n": 24,
+   "predicted_ms": 4112.906,
+   "predicted_per_token_ms": 178.822,
+   "predicted_per_second": 5.592153090783013
+  }
+ },
+ {
+  "page": "wiki-th",
+  "command": "เลื่อนลงอีก",
+  "wall_s": 48.1,
+  "content": "{\n  \"action\": \"scroll_down\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 816,
+   "prompt_ms": 43912.107,
+   "prompt_per_token_ms": 53.81385661764706,
+   "prompt_per_second": 18.58257450502204,
+   "predicted_n": 25,
+   "predicted_ms": 4171.043,
+   "predicted_per_token_ms": 173.79345833333332,
+   "predicted_per_second": 5.753956504404295
+  }
+ },
+ {
+  "page": "youtube",
+  "command": "ค้นหาเพลงลูกทุ่งในยูทูบ",
+  "wall_s": 27.98,
+  "content": "{\n  \"action\": \"type\",\n  \"last\": true,\n  \"text\": \"เพลงลูกทุ่ง\"\n}",
+  "timings": {
+   "cache_n": 0,
+   "prompt_n": 444,
+   "prompt_ms": 22177.626,
+   "prompt_per_token_ms": 49.94960810810811,
+   "prompt_per_second": 20.020177091993528,
+   "predicted_n": 36,
+   "predicted_ms": 5772.161,
+   "predicted_per_token_ms": 164.91888571428572,
+   "predicted_per_second": 6.063586930440782
+  }
+ },
+ {
+  "page": "youtube",
+  "command": "กลับไปแอป",
+  "wall_s": 12.38,
+  "content": "{\n  \"action\": \"minimize\",\n  \"last\": true\n}",
+  "timings": {
+   "cache_n": 264,
+   "prompt_n": 172,
+   "prompt_ms": 8764.286,
+   "prompt_per_token_ms": 50.9551511627907,
+   "prompt_per_second": 19.625101234715526,
+   "predicted_n": 23,
+   "predicted_ms": 3613.232,
+   "predicted_per_token_ms": 164.23781818181817,
+   "predicted_per_second": 6.0887316397065
+  }
+ }
+]

@@ -1,0 +1,2078 @@
+{
+ "summary": {
+  "commands": "67/90",
+  "non_commands_caught": "0/38",
+  "median_s": 0.172,
+  "max_s": 0.283,
+  "hotwords": true
+ },
+ "rows": [
+  {
+   "set": "browse_v1",
+   "i": 0,
+   "text": "ค้นหาราคาทองหน่อย",
+   "heard": "ค้นหาราคาทองหน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาทอง"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาทอง"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.153
+  },
+  {
+   "set": "browse_v1",
+   "i": 1,
+   "text": "ค้นหาราคาทองหน่อยเข้าลิงก์แรก",
+   "heard": "ค้นหาราคาทองหน่อยเข้าลิงแรก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาทอง"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาทอง"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.225
+  },
+  {
+   "set": "browse_v1",
+   "i": 2,
+   "text": "ค้นหา ร้านอาหารใกล้ฉัน",
+   "heard": "ค้นหาร้านอาหารใกล้ฉัน",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ร้านอาหารใกล้ฉัน"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ร้านอาหารใกล้ฉัน"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.211
+  },
+  {
+   "set": "browse_v1",
+   "i": 3,
+   "text": "เสิร์ชข่าวฟุตบอลวันนี้",
+   "heard": "เสิร์ชข่าวฟุตบอลวันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ข่าวฟุตบอลวันนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ข่าวฟุตบอลวันนี้"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.21
+  },
+  {
+   "set": "browse_v1",
+   "i": 4,
+   "text": "กูเกิลวิธีทำไข่เจียว",
+   "heard": "กูเกินวิธีทําไข่เจียว",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีทำไข่เจียว"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.178
+  },
+  {
+   "set": "browse_v1",
+   "i": 5,
+   "text": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "heard": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "เพลงใหม่"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "เพลงใหม่"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.206
+  },
+  {
+   "set": "browse_v1",
+   "i": 6,
+   "text": "หาสูตรแกงเขียวหวานหน่อย",
+   "heard": "หาสูตรแกงเขียวหวานหน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "สูตรแกงเขียวหวาน"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "สูตรแกงเขียวหวาน"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.21
+  },
+  {
+   "set": "browse_v1",
+   "i": 7,
+   "text": "เข้าลิงก์แรก",
+   "heard": "เท่าลิงแรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.148
+  },
+  {
+   "set": "browse_v1",
+   "i": 8,
+   "text": "เข้าลิ้งค์แรกให้หน่อย",
+   "heard": "เข้าลิงก์แรกให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.152
+  },
+  {
+   "set": "browse_v1",
+   "i": 9,
+   "text": "กดลิงก์ที่สอง",
+   "heard": "กดลิงที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "seconds": 0.147
+  },
+  {
+   "set": "browse_v1",
+   "i": 10,
+   "text": "เปิดลิงก์ที่ 3",
+   "heard": "เปิดลิงก์ทีสาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.169
+  },
+  {
+   "set": "browse_v1",
+   "i": 11,
+   "text": "เข้าเว็บแรก",
+   "heard": "เข้าเว็บแรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.128
+  },
+  {
+   "set": "browse_v1",
+   "i": 12,
+   "text": "คลิกอันที่สี่",
+   "heard": "คลิกอันที่สี่",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "ok": true,
+   "seconds": 0.144
+  },
+  {
+   "set": "browse_v1",
+   "i": 13,
+   "text": "ย้อนกลับ",
+   "heard": "ย้อนกลับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.115
+  },
+  {
+   "set": "browse_v1",
+   "i": 14,
+   "text": "ย้อนกลับหน่อย",
+   "heard": "ย้อนกลับหน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.145
+  },
+  {
+   "set": "browse_v1",
+   "i": 15,
+   "text": "กลับไปหน้าก่อนหน้า",
+   "heard": "กลับไปหน้าก่อนหน้า",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.145
+  },
+  {
+   "set": "browse_v1",
+   "i": 16,
+   "text": "ไปข้างหน้า",
+   "heard": "ไปข้างหน้า",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.128
+  },
+  {
+   "set": "browse_v1",
+   "i": 17,
+   "text": "โหลดใหม่",
+   "heard": "โหลดใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.122
+  },
+  {
+   "set": "browse_v1",
+   "i": 18,
+   "text": "รีเฟรชหน้านี้",
+   "heard": "รีเฟรดหน้านี้",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.149
+  },
+  {
+   "set": "browse_v1",
+   "i": 19,
+   "text": "เลื่อนลง",
+   "heard": "เลื่อนลง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.163
+  },
+  {
+   "set": "browse_v1",
+   "i": 20,
+   "text": "เลื่อนลงอีก",
+   "heard": "เลื่อนลงอีก",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.14
+  },
+  {
+   "set": "browse_v1",
+   "i": 21,
+   "text": "เลื่อนขึ้น",
+   "heard": "เลื่อนขึ้น",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.123
+  },
+  {
+   "set": "browse_v1",
+   "i": 22,
+   "text": "ปิดแท็บ",
+   "heard": "แปลก",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.105
+  },
+  {
+   "set": "browse_v1",
+   "i": 23,
+   "text": "ปิดหน้านี้",
+   "heard": "ปิดหน้านี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [
+    {
+     "kind": "close"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.142
+  },
+  {
+   "set": "browse_v1",
+   "i": 24,
+   "text": "กลับไปแอป",
+   "heard": "กลับไปแอค",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.128
+  },
+  {
+   "set": "browse_v1",
+   "i": 25,
+   "text": "กลับไปหน้าผู้ช่วย",
+   "heard": "กลับไปหน้าผู้ช่วย",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [
+    {
+     "kind": "app"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.165
+  },
+  {
+   "set": "browse_v1",
+   "i": 26,
+   "text": "เปิดกูเกิล",
+   "heard": "เปิดกูเกิน",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.139
+  },
+  {
+   "set": "browse_v1",
+   "i": 27,
+   "text": "เปิด google",
+   "heard": "เปิด",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.102
+  },
+  {
+   "set": "browse_v1",
+   "i": 28,
+   "text": "เปิดยูทูบ",
+   "heard": "เปิดยูทูบ",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.127
+  },
+  {
+   "set": "browse_v1",
+   "i": 29,
+   "text": "ค้นหาไฟล์รายงาน",
+   "heard": "ค้นหาไฟรายงาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.177
+  },
+  {
+   "set": "browse_v1",
+   "i": 30,
+   "text": "หาไฟล์ที่แก้เมื่อวาน",
+   "heard": "หาไฟที่แก้เมื่อวาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.177
+  },
+  {
+   "set": "browse_v1",
+   "i": 31,
+   "text": "เลื่อนนัดประชุมไปพรุ่งนี้",
+   "heard": "เลื่อนนัดประชุมไปพรุ่งนี้",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.202
+  },
+  {
+   "set": "browse_v1",
+   "i": 32,
+   "text": "ปิดเสียง",
+   "heard": "ปิดเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.13
+  },
+  {
+   "set": "browse_v1",
+   "i": 33,
+   "text": "เปิดเสียง",
+   "heard": "เปิดเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.128
+  },
+  {
+   "set": "browse_v1",
+   "i": 34,
+   "text": "ปรับเสียงเป็น 40",
+   "heard": "ปรับเสี่ยงเป็นสี่สิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.167
+  },
+  {
+   "set": "browse_v1",
+   "i": 35,
+   "text": "ตอนนี้กี่โมง",
+   "heard": "ตอนนี้กี่โมง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.156
+  },
+  {
+   "set": "browse_v1",
+   "i": 36,
+   "text": "ยกเลิกนัดกินยา",
+   "heard": "นึกเลิกนัดกินยา",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.13
+  },
+  {
+   "set": "browse_v1",
+   "i": 37,
+   "text": "หาค่าเฉลี่ยของ 4 6 8",
+   "heard": "หาค่าเฉลี่ยของสี่หกแปด",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.226
+  },
+  {
+   "set": "browse_v1",
+   "i": 38,
+   "text": "ราคาทองวันนี้เท่าไหร่",
+   "heard": "ราคาทองวันนี้เท่าไหร่",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.178
+  },
+  {
+   "set": "browse_v1",
+   "i": 39,
+   "text": "เปิดแอปเครื่องคิดเลข",
+   "heard": "เปิดแอบเครื่องคิดเลข",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.168
+  },
+  {
+   "set": "browse_v2",
+   "i": 0,
+   "text": "ค้นหาราคาน้ำมันวันนี้",
+   "heard": "ค้นหาราคาน้ํามันวันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาน้ำมันวันนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาน้ํามันวันนี้"
+    }
+   ],
+   "ok": false,
+   "seconds": 0.213
+  },
+  {
+   "set": "browse_v2",
+   "i": 1,
+   "text": "ค้นหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "heard": "ค้นหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "โรงหนังแถวนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "โรงหนังแถวนี้"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.237
+  },
+  {
+   "set": "browse_v2",
+   "i": 2,
+   "text": "ช่วยเสิร์ชตารางรถไฟไปเชียงใหม่",
+   "heard": "ช่วยเสิร์ฟตารางรถไฟไปเชียงใหม่",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ตารางรถไฟไปเชียงใหม่"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ตารางรถไฟไปเชียงใหม่"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.232
+  },
+  {
+   "set": "browse_v2",
+   "i": 3,
+   "text": "ค้นในกูเกิลว่าวันหยุดเดือนหน้ามีวันไหน",
+   "heard": "ค้นในกูเกินว่าวันหยุดเดือนหน้ามีวันไหน",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วันหยุดเดือนหน้ามีวันไหน"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วันหยุดเดือนหน้ามีวันไหน"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.265
+  },
+  {
+   "set": "browse_v2",
+   "i": 4,
+   "text": "หาวิธีปลูกมะนาวในกระถาง",
+   "heard": "หาวิธีปลูกมะนาวในกระถาง",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.206
+  },
+  {
+   "set": "browse_v2",
+   "i": 5,
+   "text": "ค้นหาคำว่าปัญญาประดิษฐ์",
+   "heard": "ค้นหาคําว่าปัญญาประดิษฐ์",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ปัญญาประดิษฐ์"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "คําว่าปัญญาประดิษฐ์"
+    }
+   ],
+   "ok": false,
+   "seconds": 0.177
+  },
+  {
+   "set": "browse_v2",
+   "i": 6,
+   "text": "ค้นหา raspberry pi 5 ครับ",
+   "heard": "ค้นหา๕ครับ",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "raspberry pi 5"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "๕"
+    }
+   ],
+   "ok": false,
+   "seconds": 0.15
+  },
+  {
+   "set": "browse_v2",
+   "i": 7,
+   "text": "ค้นหาผลบอลเมื่อคืนแล้วเข้าลิงก์แรก",
+   "heard": "ค้นหาผลบอลเมื่อคืนแล้วเข้าลิงแรก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ผลบอลเมื่อคืน"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ผลบอลเมื่อคืน"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.262
+  },
+  {
+   "set": "browse_v2",
+   "i": 8,
+   "text": "เข้าลิงค์แรกเลย",
+   "heard": "เข้าลิงก์แรกเลย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.161
+  },
+  {
+   "set": "browse_v2",
+   "i": 9,
+   "text": "เข้าลิงก์อันแรกครับ",
+   "heard": "เข้าลิงก์อันแรกครับ",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.163
+  },
+  {
+   "set": "browse_v2",
+   "i": 10,
+   "text": "กดเข้าลิงก์ที่หนึ่ง",
+   "heard": "กดเข้าลิงที่หนึ่ง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.181
+  },
+  {
+   "set": "browse_v2",
+   "i": 11,
+   "text": "เปิดลิ้งที่สอง",
+   "heard": "เปิดลิงก์ที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "seconds": 0.162
+  },
+  {
+   "set": "browse_v2",
+   "i": 12,
+   "text": "เข้าลิงก์ที่ 2",
+   "heard": "เข้าลิงก์ที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "ok": true,
+   "seconds": 0.178
+  },
+  {
+   "set": "browse_v2",
+   "i": 13,
+   "text": "คลิกลิงก์ที่สามให้หน่อย",
+   "heard": "คดีกรีนที่๓ให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.18
+  },
+  {
+   "set": "browse_v2",
+   "i": 14,
+   "text": "เข้าผลลัพธ์ที่ห้า",
+   "heard": "เข้าผลลัพธ์ที่ห้าห้า",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 5
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.177
+  },
+  {
+   "set": "browse_v2",
+   "i": 15,
+   "text": "เปิดเว็บที่สองครับ",
+   "heard": "เว็บที่๒ครับ",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.163
+  },
+  {
+   "set": "browse_v2",
+   "i": 16,
+   "text": "ย้อนกลับครับ",
+   "heard": "ย้อนกลับครับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.138
+  },
+  {
+   "set": "browse_v2",
+   "i": 17,
+   "text": "ถอยกลับไปหน้าเดิม",
+   "heard": "ถอยกลับไปหน้าเดิม",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.171
+  },
+  {
+   "set": "browse_v2",
+   "i": 18,
+   "text": "กลับหน้าที่แล้ว",
+   "heard": "กลับหน้าที่แล้ว",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.172
+  },
+  {
+   "set": "browse_v2",
+   "i": 19,
+   "text": "ย้อนกลับไปหน้าที่แล้วหน่อย",
+   "heard": "ย้อนกลับไปหน้าที่แล้วหน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.228
+  },
+  {
+   "set": "browse_v2",
+   "i": 20,
+   "text": "ไปหน้าข้างหน้า",
+   "heard": "ไปหน้าข้างหน้าห้า",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.185
+  },
+  {
+   "set": "browse_v2",
+   "i": 21,
+   "text": "เดินหน้า",
+   "heard": "เดินหน้า",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.147
+  },
+  {
+   "set": "browse_v2",
+   "i": 22,
+   "text": "รีโหลด",
+   "heard": "ตี้โลด",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.173
+  },
+  {
+   "set": "browse_v2",
+   "i": 23,
+   "text": "โหลดหน้านี้ใหม่",
+   "heard": "โหลดหน้านี้ใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.208
+  },
+  {
+   "set": "browse_v2",
+   "i": 24,
+   "text": "เลื่อนลงหน่อย",
+   "heard": "เลื่อนลงหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.143
+  },
+  {
+   "set": "browse_v2",
+   "i": 25,
+   "text": "เลื่อนหน้าลง",
+   "heard": "เลื่อนหน้าลง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.143
+  },
+  {
+   "set": "browse_v2",
+   "i": 26,
+   "text": "เลื่อนขึ้นไปหน่อย",
+   "heard": "เลื่อนขึ้นไปหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.168
+  },
+  {
+   "set": "browse_v2",
+   "i": 27,
+   "text": "เลื่อนกลับขึ้นไป",
+   "heard": "เลื่อนกลับขึ้นไป",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.181
+  },
+  {
+   "set": "browse_v2",
+   "i": 28,
+   "text": "ปิดแท็บนี้",
+   "heard": "ปีนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.15
+  },
+  {
+   "set": "browse_v2",
+   "i": 29,
+   "text": "ปิดเว็บนี้",
+   "heard": "เว็บนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.151
+  },
+  {
+   "set": "browse_v2",
+   "i": 30,
+   "text": "กลับไปที่แอป",
+   "heard": "กลับไปที่แอค",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.138
+  },
+  {
+   "set": "browse_v2",
+   "i": 31,
+   "text": "กลับไปหน้าแชท",
+   "heard": "กลับไปหน้าชาติ",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.14
+  },
+  {
+   "set": "browse_v2",
+   "i": 32,
+   "text": "เปิดกูเกิ้ลหน่อย",
+   "heard": "เปิดกูเกิลหน่อย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.171
+  },
+  {
+   "set": "browse_v2",
+   "i": 33,
+   "text": "เปิดเว็บยูทูป",
+   "heard": "เปิดเว็บยูทูป",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.18
+  },
+  {
+   "set": "browse_v2",
+   "i": 34,
+   "text": "เปิดวิกิพีเดีย",
+   "heard": "เปิดวีกี่พีเดีย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "wikipedia"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.187
+  },
+  {
+   "set": "browse_v2",
+   "i": 35,
+   "text": "ค้นหาไฟล์ pdf ที่ทำเมื่อวาน",
+   "heard": "ค้นหาไฟที่ทําเมื่อวาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.184
+  },
+  {
+   "set": "browse_v2",
+   "i": 36,
+   "text": "หาไฟล์ใบเสร็จ",
+   "heard": "หาไฟใบเสร็จ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.139
+  },
+  {
+   "set": "browse_v2",
+   "i": 37,
+   "text": "หาเอกสารรายงานประจำเดือน",
+   "heard": "หาเอกสารรายงานประจําเดือน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.225
+  },
+  {
+   "set": "browse_v2",
+   "i": 38,
+   "text": "เลื่อนนัดหมอฟันเป็นวันศุกร์",
+   "heard": "เลื่อนนัดหมอฟันเป็นวันศุกร์",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.188
+  },
+  {
+   "set": "browse_v2",
+   "i": 39,
+   "text": "เลื่อนเตือนกินยาไปสองทุ่ม",
+   "heard": "เลื่อนเตือนกินยาไป๒ทุ่ม",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.269
+  },
+  {
+   "set": "browse_v2",
+   "i": 40,
+   "text": "ปิดเสียงหน่อย",
+   "heard": "ปิดเสียงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.15
+  },
+  {
+   "set": "browse_v2",
+   "i": 41,
+   "text": "เพิ่มเสียง",
+   "heard": "เพิ่มเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.132
+  },
+  {
+   "set": "browse_v2",
+   "i": 42,
+   "text": "ลดเสียงลงหน่อย",
+   "heard": "ก็ลดเสียงลงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.199
+  },
+  {
+   "set": "browse_v2",
+   "i": 43,
+   "text": "วันนี้วันที่เท่าไหร่",
+   "heard": "วันนี้วันที่เท่าไหร่",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.172
+  },
+  {
+   "set": "browse_v2",
+   "i": 44,
+   "text": "ลบนัดประชุมพรุ่งนี้",
+   "heard": "ลบนัดประชุมพรุ่งนี้",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.198
+  },
+  {
+   "set": "browse_v2",
+   "i": 45,
+   "text": "หาผลรวมของ 12 กับ 30",
+   "heard": "หาผลรวมของสิบสองกับสามสิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.229
+  },
+  {
+   "set": "browse_v2",
+   "i": 46,
+   "text": "ข่าววันนี้มีอะไรบ้าง",
+   "heard": "ค่ะวันนี้มีอะไรบ้าง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.2
+  },
+  {
+   "set": "browse_v2",
+   "i": 47,
+   "text": "เครื่องช้าเพราะอะไร",
+   "heard": "เครื่องช้าเพราะอะไร",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.18
+  },
+  {
+   "set": "browse_v2",
+   "i": 48,
+   "text": "เปิดโหมดประชุม",
+   "heard": "เปิดโมดประชุม",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.176
+  },
+  {
+   "set": "browse_v2",
+   "i": 49,
+   "text": "ย้อนกลับเมื่อกี้ที่ปรับเสียง",
+   "heard": "ย้อนกลับเมื่อกี้ที่ปรับเสียง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.187
+  },
+  {
+   "set": "browse_v2",
+   "i": 50,
+   "text": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "heard": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.183
+  },
+  {
+   "set": "browse_v2",
+   "i": 51,
+   "text": "เขียนกลอนสั้นๆเรื่องฝน",
+   "heard": "กรอนสั้นเขียนกรอนสั้นเรื่องฝน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.279
+  },
+  {
+   "set": "browse_v4",
+   "i": 0,
+   "text": "ค้นหาร้านซ่อมรถใกล้ๆ",
+   "heard": "ค้นหาร้านซ่อมรถใกล้ค้นหาร้านซ่อมรถใกล้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ร้านซ่อมรถใกล้ๆ"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ร้านซ่อมรถใกล้ค้นหาร้านซ่อมรถใกล้"
+    }
+   ],
+   "ok": false,
+   "seconds": 0.278
+  },
+  {
+   "set": "browse_v4",
+   "i": 1,
+   "text": "ค้นหาตารางบอลคืนนี้",
+   "heard": "ค้นหาตารางบอนคืนนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ตารางบอลคืนนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ตารางบอนคืนนี้"
+    }
+   ],
+   "ok": false,
+   "seconds": 0.199
+  },
+  {
+   "set": "browse_v4",
+   "i": 2,
+   "text": "ค้นหาวิธีลดน้ำหนักให้หน่อย",
+   "heard": "ค้นหาวิธีลดน้ําหนักให้หน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีลดน้ำหนัก"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีลดน้ําหนัก"
+    }
+   ],
+   "ok": false,
+   "seconds": 0.271
+  },
+  {
+   "set": "browse_v4",
+   "i": 3,
+   "text": "ช่วยค้นหาที่พักเขาใหญ่",
+   "heard": "ช่วยค้นหาที่พักเขาใหญ่",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ที่พักเขาใหญ่"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ที่พักเขาใหญ่"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.176
+  },
+  {
+   "set": "browse_v4",
+   "i": 4,
+   "text": "หาร้านกาแฟเปิดดึก",
+   "heard": "หาร้านกาแฟเปิดดึก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ร้านกาแฟเปิดดึก"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ร้านกาแฟเปิดดึก"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.21
+  },
+  {
+   "set": "browse_v4",
+   "i": 5,
+   "text": "หาข่าวเศรษฐกิจล่าสุด",
+   "heard": "หาข่าวเศรษฐกิจล่าสุด",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ข่าวเศรษฐกิจล่าสุด"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ข่าวเศรษฐกิจล่าสุด"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.191
+  },
+  {
+   "set": "browse_v4",
+   "i": 6,
+   "text": "ค้นหาราคาไข่ไก่แล้วเข้าลิงก์แรก",
+   "heard": "ค้นหาราคาไข่ไก่แล้วข้าวลิงแรก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาไข่ไก่"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาไข่ไก่"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.283
+  },
+  {
+   "set": "browse_v4",
+   "i": 7,
+   "text": "เข้าลิงก์แรก",
+   "heard": "ข้าวลิงแรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.165
+  },
+  {
+   "set": "browse_v4",
+   "i": 8,
+   "text": "เข้าลิงก์ที่สาม",
+   "heard": "เข้าลิงก์ที่สาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "ok": true,
+   "seconds": 0.167
+  },
+  {
+   "set": "browse_v4",
+   "i": 9,
+   "text": "เปิดลิงก์ที่สี่",
+   "heard": "เปิดลิงก์ที่สี่",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "ok": true,
+   "seconds": 0.165
+  },
+  {
+   "set": "browse_v4",
+   "i": 10,
+   "text": "กดลิงก์แรกให้หน่อย",
+   "heard": "กดลิงก์แรกให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "seconds": 0.169
+  },
+  {
+   "set": "browse_v4",
+   "i": 11,
+   "text": "เข้าเว็บที่สาม",
+   "heard": "เข้าเว็บที่สาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "ok": true,
+   "seconds": 0.162
+  },
+  {
+   "set": "browse_v4",
+   "i": 12,
+   "text": "ย้อนกลับไป",
+   "heard": "ย้อนกลับไป",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.175
+  },
+  {
+   "set": "browse_v4",
+   "i": 13,
+   "text": "ย้อนกลับอีกที",
+   "heard": "ย้อนกลับอีกที",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.194
+  },
+  {
+   "set": "browse_v4",
+   "i": 14,
+   "text": "กลับไปหน้าเดิม",
+   "heard": "กลับไปหน้าเดิม",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.157
+  },
+  {
+   "set": "browse_v4",
+   "i": 15,
+   "text": "ไปข้างหน้าหน่อย",
+   "heard": "ไปข้างหน้าหน่อย",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.165
+  },
+  {
+   "set": "browse_v4",
+   "i": 16,
+   "text": "โหลดใหม่อีกที",
+   "heard": "โหลดใหม่อีกที",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.161
+  },
+  {
+   "set": "browse_v4",
+   "i": 17,
+   "text": "รีเฟรช",
+   "heard": "ตีเฟรด",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.13
+  },
+  {
+   "set": "browse_v4",
+   "i": 18,
+   "text": "เลื่อนลงอีกหน่อย",
+   "heard": "เลื่อนลงอีกหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.176
+  },
+  {
+   "set": "browse_v4",
+   "i": 19,
+   "text": "เลื่อนขึ้น",
+   "heard": "เลื่อนขึ้น",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.167
+  },
+  {
+   "set": "browse_v4",
+   "i": 20,
+   "text": "เลื่อนลงไป",
+   "heard": "เลื่อนลงไป",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.141
+  },
+  {
+   "set": "browse_v4",
+   "i": 21,
+   "text": "ปิดแท็บ",
+   "heard": "แต่",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "seconds": 0.146
+  },
+  {
+   "set": "browse_v4",
+   "i": 22,
+   "text": "ปิดหน้านี้เลย",
+   "heard": "ปิดหน้านี้เลย",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [
+    {
+     "kind": "close"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.153
+  },
+  {
+   "set": "browse_v4",
+   "i": 23,
+   "text": "กลับไปแอป",
+   "heard": "กลับไปแอป",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [
+    {
+     "kind": "app"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.154
+  },
+  {
+   "set": "browse_v4",
+   "i": 24,
+   "text": "เปิดยูทูบ",
+   "heard": "เปิดยูทูบ",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.168
+  },
+  {
+   "set": "browse_v4",
+   "i": 25,
+   "text": "เปิดเว็บกูเกิล",
+   "heard": "เปิดเว็บกูเกิน",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "ok": true,
+   "seconds": 0.215
+  },
+  {
+   "set": "browse_v4",
+   "i": 26,
+   "text": "หาไฟล์สไลด์นำเสนอ",
+   "heard": "หาไฟสลายนําเสนอ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.194
+  },
+  {
+   "set": "browse_v4",
+   "i": 27,
+   "text": "ค้นหาโน้ตที่จดไว้เมื่อวาน",
+   "heard": "ค้นหาโน้ตที่จดไว้เมื่อวาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.215
+  },
+  {
+   "set": "browse_v4",
+   "i": 28,
+   "text": "เลื่อนนัดไปวันจันทร์",
+   "heard": "เลื่อนนัดไปวันจันทร์",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.187
+  },
+  {
+   "set": "browse_v4",
+   "i": 29,
+   "text": "ลดเสียงหน่อย",
+   "heard": "ลดเสียงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.18
+  },
+  {
+   "set": "browse_v4",
+   "i": 30,
+   "text": "ปรับเสียงหกสิบ",
+   "heard": "ปรับเสี่ยงหกสิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.175
+  },
+  {
+   "set": "browse_v4",
+   "i": 31,
+   "text": "ยกเลิกนัดหมอ",
+   "heard": "ยกเลิกนัดหมอ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.194
+  },
+  {
+   "set": "browse_v4",
+   "i": 32,
+   "text": "ตอนนี้กี่โมงแล้ว",
+   "heard": "ตอนนี้กี่โมงแล้ว",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.173
+  },
+  {
+   "set": "browse_v4",
+   "i": 33,
+   "text": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "heard": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.224
+  },
+  {
+   "set": "browse_v4",
+   "i": 34,
+   "text": "เปิดโหมดทำงาน",
+   "heard": "เปิดหมดทํางาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.175
+  },
+  {
+   "set": "browse_v4",
+   "i": 35,
+   "text": "อากาศพรุ่งนี้เป็นยังไง",
+   "heard": "อากาศพรุ่งนี้เป็นยังไง",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "seconds": 0.227
+  }
+ ]
+}

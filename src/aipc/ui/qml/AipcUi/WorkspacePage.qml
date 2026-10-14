@@ -21,6 +21,8 @@ Item {
     property var feedbackFor: null
     property int copiedRow: -1    // คำตอบ AI ที่เพิ่งกดคัดลอก (ปุ่มขึ้นว่า "คัดลอกแล้ว")
     property int speakRow: -1     // คำตอบที่กดอ่านออกเสียงล่าสุด (แสดงข้อความผิดพลาดของตัวอ่านใต้แถวนี้)
+    // สั่งด้วยคีย์ลัด F9 (การ์ด 0024): ผู้ใช้อาจไม่ได้มองจอ (เบราว์เซอร์เต็มจอ) → อ่านผลให้ฟังเสมอ
+    property bool speakNext: false
     readonly property bool home: items.length === 0
     readonly property int colWidth: Math.min(760, width - 48)
 
@@ -128,6 +130,71 @@ Item {
             input.cursorPosition = input.text.length
         }
     }
+    // คีย์ลัด F9 (การ์ด 0024 · Pakon เลือก: ถอดเสร็จทำทันที): ตอบการ์ดที่รอยืนยัน → คำสั่งเว็บ → แชทตามเดิม
+    Connections {
+        target: voice
+        function onHeardHandsFree(text) { root.voiceCommand(text) }
+    }
+    Connections {
+        target: browser
+        function onFinished(say, ok) {
+            const i = root.items.slice()
+            if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done)
+                i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: say, note: ok ? "" : "ทำไม่สำเร็จ", done: true })
+            root.items = i
+            if (voice.available) voice.speak(i.length - 1, say)
+        }
+    }
+    function pendingConfirm() {
+        for (let k = items.length - 1; k >= 0; k--) {
+            const c = items[k].card
+            if (c && c.confirmToken && !answered[c.confirmToken]) return c.confirmToken
+            if (items[k].user) break   // การ์ดเก่ากว่าข้อความล่าสุดของผู้ใช้ไม่นับ
+        }
+        return ""
+    }
+    function voiceCommand(text) {
+        const t = text.trim().replace(/[.!?。\s]+$/, "")
+        const tok = pendingConfirm()
+        // งานที่ลบ/แตะเครื่องยังต้องยืนยัน · พูด "ใช่" / "ไม่" แทนการกดปุ่ม
+        if (tok !== "" && /^(ใช่|ตกลง|ยืนยัน|โอเค|ok|เอาเลย)/i.test(t)) { push({ user: true, text: t }); answer(tok, true); speakLastCard(); return }
+        if (tok !== "" && /^(ไม่|ยกเลิก|ไม่เอา)/.test(t)) { push({ user: true, text: t }); answer(tok, false); speakLastCard(); return }
+        // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
+        if (browser.busy) {
+            push({ user: true, text: t })
+            push({ ai: true, text: "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่", note: "", done: true, skill: "เบราว์เซอร์ของผู้ช่วย" })
+            if (voice.available) voice.speak(items.length - 1, "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")
+            return
+        }
+        // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
+        const way = browser.route(t)
+        if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
+            push({ user: true, text: t })
+            push({ ai: true, text: "", note: "", done: false, skill: "เบราว์เซอร์ของผู้ช่วย" })
+            return
+        }
+        if (way === "command") {        // คำสั่งเครื่อง: ทางเดิมของแชททำคำสั่งก่อนถึง AI (ยืนยันตามกติกาเดิม)
+            const before = items.length
+            sendText(t)
+            if (items.length > before && items[items.length - 1].ai)
+                speakNext = true        // รอ AI ตอบ แล้วอ่านใน onFinished
+            else
+                speakLastCard()
+            return
+        }
+        const say = way === "needs_browser"
+            ? "ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า \"เปิดเบราว์เซอร์\" ก่อน"
+            : "ไม่รู้จักคำสั่ง \"" + t + "\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท"
+        push({ user: true, text: t })
+        push({ ai: true, text: say, note: "", done: true, skill: "สั่งงานด้วยเสียง" })
+        if (voice.available) voice.speak(items.length - 1, say)
+    }
+    function speakLastCard() {
+        const last = items[items.length - 1]
+        if (!voice.available || !last || !last.card) return
+        const c = last.card
+        voice.speak(items.length - 1, [c.title].concat((c.lines || []).slice(0, 2)).join(" · "))
+    }
     Connections {
         target: chat
         // AI ในเครื่องเลือกสกิล (อาจารย์ขอ · งานข้อ ④): เอาฟองคำตอบที่รออยู่ออก แล้วทำทางเดียวกับที่กฎเลือก
@@ -144,7 +211,9 @@ Item {
             i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace })
             root.items = i
             // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
-            if (uiSettings.speakAnswers && voice.available && note === "" && text !== "")
+            const spoken = root.speakNext
+            root.speakNext = false
+            if ((uiSettings.speakAnswers || spoken) && voice.available && note === "" && text !== "")
                 voice.speak(i.length - 1, root.tidy(text))
         }
     }

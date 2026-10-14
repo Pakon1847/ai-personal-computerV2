@@ -1,0 +1,547 @@
+{
+ "rounds": [
+  [
+   {
+    "step": "ค้นหา",
+    "text": "ค้นหาราคาทองหน่อย",
+    "cmds": [
+     {
+      "kind": "search",
+      "query": "ราคาทอง"
+     }
+    ],
+    "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: ราคาทอง",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "bing.com · ลิงก์ 10",
+    "seconds": 4.57
+   },
+   {
+    "step": "ลิงก์1",
+    "text": "เข้าลิงก์แรก",
+    "cmds": [
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "say": "เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/",
+    "ok": true,
+    "detail": "xn--42cah7d0cxcvbbb9x.com · https://xn--42cah7d0cxcvbbb9x.com/",
+    "seconds": 3.31
+   },
+   {
+    "step": "ย้อน",
+    "text": "ย้อนกลับ",
+    "cmds": [
+     {
+      "kind": "back"
+     }
+    ],
+    "say": "ย้อนกลับแล้ว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E",
+    "seconds": 0.94
+   },
+   {
+    "step": "ลิงก์2",
+    "text": "เข้าลิงก์ที่สอง",
+    "cmds": [
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "say": "เข้าลิงก์ที่ 2 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "xn--42cah7d0cxcvbbb9x.com · https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%8",
+    "seconds": 2.99
+   },
+   {
+    "step": "ย้อน",
+    "text": "ย้อนกลับ",
+    "cmds": [
+     {
+      "kind": "back"
+     }
+    ],
+    "say": "ย้อนกลับแล้ว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E",
+    "seconds": 1.25
+   },
+   {
+    "step": "หน้า",
+    "text": "ไปข้างหน้า",
+    "cmds": [
+     {
+      "kind": "forward"
+     }
+    ],
+    "say": "ไปข้างหน้าแล้ว",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+    "seconds": 2.42
+   },
+   {
+    "step": "โหลดใหม่",
+    "text": "โหลดใหม่",
+    "cmds": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "say": "โหลดหน้านี้ใหม่แล้ว",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+    "seconds": 2.53
+   },
+   {
+    "step": "เลื่อนลง",
+    "text": "เลื่อนลง",
+    "cmds": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "say": "เลื่อนลงแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "scrollY 0→503",
+    "seconds": 0.31
+   },
+   {
+    "step": "เลื่อนขึ้น",
+    "text": "เลื่อนขึ้น",
+    "cmds": [
+     {
+      "kind": "scroll",
+      "direction": "up"
+     }
+    ],
+    "say": "เลื่อนขึ้นแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "scrollY 503→0",
+    "seconds": 0.3
+   },
+   {
+    "step": "ปิดแท็บ",
+    "text": "ปิดแท็บ",
+    "cmds": [
+     {
+      "kind": "close"
+     }
+    ],
+    "say": "ปิดแท็บแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "running=False",
+    "seconds": 0.27
+   },
+   {
+    "step": "ค้นใหม่",
+    "text": "ค้นหาวิธีทำไข่เจียว",
+    "cmds": [
+     {
+      "kind": "search",
+      "query": "วิธีทำไข่เจียว"
+     }
+    ],
+    "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: วิธีทำไข่เจียว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%97%E0%B8%B3%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%88%E0%B8%B5%E0%B8%A2%E0%B8%A7",
+    "ok": true,
+    "detail": "bing.com · ลิงก์ 10",
+    "seconds": 3.82
+   },
+   {
+    "step": "พอร์ต",
+    "ok": true,
+    "detail": "ไม่มีพอร์ตที่ Chromium ฟัง"
+   },
+   {
+    "step": "กลับแอป",
+    "text": "กลับไปแอป",
+    "cmds": [
+     {
+      "kind": "app"
+     }
+    ],
+    "say": "ย่อเบราว์เซอร์แล้ว กลับมาที่แอป",
+    "url": "",
+    "ok": true,
+    "detail": "minimized",
+    "seconds": 0.01
+   }
+  ],
+  [
+   {
+    "step": "ค้นหา",
+    "text": "ค้นหาราคาทองหน่อย",
+    "cmds": [
+     {
+      "kind": "search",
+      "query": "ราคาทอง"
+     }
+    ],
+    "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: ราคาทอง",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "bing.com · ลิงก์ 10",
+    "seconds": 4.56
+   },
+   {
+    "step": "ลิงก์1",
+    "text": "เข้าลิงก์แรก",
+    "cmds": [
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "say": "เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/",
+    "ok": true,
+    "detail": "xn--42cah7d0cxcvbbb9x.com · https://xn--42cah7d0cxcvbbb9x.com/",
+    "seconds": 3.17
+   },
+   {
+    "step": "ย้อน",
+    "text": "ย้อนกลับ",
+    "cmds": [
+     {
+      "kind": "back"
+     }
+    ],
+    "say": "ย้อนกลับแล้ว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E",
+    "seconds": 0.94
+   },
+   {
+    "step": "ลิงก์2",
+    "text": "เข้าลิงก์ที่สอง",
+    "cmds": [
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "say": "เข้าลิงก์ที่ 2 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "xn--42cah7d0cxcvbbb9x.com · https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%8",
+    "seconds": 2.88
+   },
+   {
+    "step": "ย้อน",
+    "text": "ย้อนกลับ",
+    "cmds": [
+     {
+      "kind": "back"
+     }
+    ],
+    "say": "ย้อนกลับแล้ว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E",
+    "seconds": 1.15
+   },
+   {
+    "step": "หน้า",
+    "text": "ไปข้างหน้า",
+    "cmds": [
+     {
+      "kind": "forward"
+     }
+    ],
+    "say": "ไปข้างหน้าแล้ว",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+    "seconds": 2.69
+   },
+   {
+    "step": "โหลดใหม่",
+    "text": "โหลดใหม่",
+    "cmds": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "say": "โหลดหน้านี้ใหม่แล้ว",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+    "seconds": 2.21
+   },
+   {
+    "step": "เลื่อนลง",
+    "text": "เลื่อนลง",
+    "cmds": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "say": "เลื่อนลงแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "scrollY 0→503",
+    "seconds": 0.31
+   },
+   {
+    "step": "เลื่อนขึ้น",
+    "text": "เลื่อนขึ้น",
+    "cmds": [
+     {
+      "kind": "scroll",
+      "direction": "up"
+     }
+    ],
+    "say": "เลื่อนขึ้นแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "scrollY 503→0",
+    "seconds": 0.3
+   },
+   {
+    "step": "ปิดแท็บ",
+    "text": "ปิดแท็บ",
+    "cmds": [
+     {
+      "kind": "close"
+     }
+    ],
+    "say": "ปิดแท็บแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "running=False",
+    "seconds": 0.37
+   },
+   {
+    "step": "ค้นใหม่",
+    "text": "ค้นหาวิธีทำไข่เจียว",
+    "cmds": [
+     {
+      "kind": "search",
+      "query": "วิธีทำไข่เจียว"
+     }
+    ],
+    "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: วิธีทำไข่เจียว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%97%E0%B8%B3%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%88%E0%B8%B5%E0%B8%A2%E0%B8%A7",
+    "ok": true,
+    "detail": "bing.com · ลิงก์ 10",
+    "seconds": 3.81
+   },
+   {
+    "step": "พอร์ต",
+    "ok": true,
+    "detail": "ไม่มีพอร์ตที่ Chromium ฟัง"
+   },
+   {
+    "step": "กลับแอป",
+    "text": "กลับไปแอป",
+    "cmds": [
+     {
+      "kind": "app"
+     }
+    ],
+    "say": "ย่อเบราว์เซอร์แล้ว กลับมาที่แอป",
+    "url": "",
+    "ok": true,
+    "detail": "minimized",
+    "seconds": 0.01
+   }
+  ],
+  [
+   {
+    "step": "ค้นหา",
+    "text": "ค้นหาราคาทองหน่อย",
+    "cmds": [
+     {
+      "kind": "search",
+      "query": "ราคาทอง"
+     }
+    ],
+    "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: ราคาทอง",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "bing.com · ลิงก์ 10",
+    "seconds": 4.61
+   },
+   {
+    "step": "ลิงก์1",
+    "text": "เข้าลิงก์แรก",
+    "cmds": [
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "say": "เข้าลิงก์ที่ 1 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/",
+    "ok": true,
+    "detail": "xn--42cah7d0cxcvbbb9x.com · https://xn--42cah7d0cxcvbbb9x.com/",
+    "seconds": 3.22
+   },
+   {
+    "step": "ย้อน",
+    "text": "ย้อนกลับ",
+    "cmds": [
+     {
+      "kind": "back"
+     }
+    ],
+    "say": "ย้อนกลับแล้ว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E",
+    "seconds": 0.92
+   },
+   {
+    "step": "ลิงก์2",
+    "text": "เข้าลิงก์ที่สอง",
+    "cmds": [
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "say": "เข้าลิงก์ที่ 2 แล้ว: xn--42cah7d0cxcvbbb9x.com",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "xn--42cah7d0cxcvbbb9x.com · https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%8",
+    "seconds": 2.87
+   },
+   {
+    "step": "ย้อน",
+    "text": "ย้อนกลับ",
+    "cmds": [
+     {
+      "kind": "back"
+     }
+    ],
+    "say": "ย้อนกลับแล้ว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87",
+    "ok": true,
+    "detail": "https://www.bing.com/search?setlang=th&q=%E0%B8%A3%E0%B8%B2%E0%B8%84%E",
+    "seconds": 1.07
+   },
+   {
+    "step": "หน้า",
+    "text": "ไปข้างหน้า",
+    "cmds": [
+     {
+      "kind": "forward"
+     }
+    ],
+    "say": "ไปข้างหน้าแล้ว",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+    "seconds": 2.47
+   },
+   {
+    "step": "โหลดใหม่",
+    "text": "โหลดใหม่",
+    "cmds": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "say": "โหลดหน้านี้ใหม่แล้ว",
+    "url": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/",
+    "ok": true,
+    "detail": "https://xn--42cah7d0cxcvbbb9x.com/%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+    "seconds": 2.29
+   },
+   {
+    "step": "เลื่อนลง",
+    "text": "เลื่อนลง",
+    "cmds": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "say": "เลื่อนลงแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "scrollY 0→503",
+    "seconds": 0.32
+   },
+   {
+    "step": "เลื่อนขึ้น",
+    "text": "เลื่อนขึ้น",
+    "cmds": [
+     {
+      "kind": "scroll",
+      "direction": "up"
+     }
+    ],
+    "say": "เลื่อนขึ้นแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "scrollY 503→0",
+    "seconds": 0.3
+   },
+   {
+    "step": "ปิดแท็บ",
+    "text": "ปิดแท็บ",
+    "cmds": [
+     {
+      "kind": "close"
+     }
+    ],
+    "say": "ปิดแท็บแล้ว",
+    "url": "",
+    "ok": true,
+    "detail": "running=False",
+    "seconds": 0.32
+   },
+   {
+    "step": "ค้นใหม่",
+    "text": "ค้นหาวิธีทำไข่เจียว",
+    "cmds": [
+     {
+      "kind": "search",
+      "query": "วิธีทำไข่เจียว"
+     }
+    ],
+    "say": "Google ขอยืนยันว่าไม่ใช่บอต จึงค้นด้วย Bing แทน: วิธีทำไข่เจียว",
+    "url": "https://www.bing.com/search?setlang=th&q=%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%97%E0%B8%B3%E0%B9%84%E0%B8%82%E0%B9%88%E0%B9%80%E0%B8%88%E0%B8%B5%E0%B8%A2%E0%B8%A7",
+    "ok": true,
+    "detail": "bing.com · ลิงก์ 10",
+    "seconds": 3.54
+   },
+   {
+    "step": "พอร์ต",
+    "ok": true,
+    "detail": "ไม่มีพอร์ตที่ Chromium ฟัง"
+   },
+   {
+    "step": "กลับแอป",
+    "text": "กลับไปแอป",
+    "cmds": [
+     {
+      "kind": "app"
+     }
+    ],
+    "say": "ย่อเบราว์เซอร์แล้ว กลับมาที่แอป",
+    "url": "",
+    "ok": true,
+    "detail": "minimized",
+    "seconds": 0.01
+   }
+  ]
+ ]
+}

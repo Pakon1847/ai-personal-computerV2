@@ -1,0 +1,821 @@
+{
+ "about": "ชุดทดสอบ H ของผู้ช่วยเว็บ (การ์ด 0025 หัวข้อ 8) · ผู้ช่วยเขียน 2026-10-13 ก่อนเขียน prompt · ห้ามใช้ปรับ prompt · หน้าเว็บ = tests/data/agent_pages.json · วันที่ของหน้า = วันอังคารที่ 13 ตุลาคม 2569 · expect = ทางที่ยอมรับ (ข้อใดข้อหนึ่ง) · ขั้น: 'search ~คำ' = มีคำนี้ในคำค้น (ไม่สนวรรค) · 'click 6' · 'answer ~ก|ข' = คำตอบมี ก หรือ ข · 'look' = ขั้นดูหน้าหลังเปลี่ยนหน้า (ไม่มีหน้าให้ตรวจต่อ)",
+ "today": "2026-10-13",
+ "items": [
+  {
+   "id": "h01",
+   "page": "blank",
+   "command": "หาสูตรแกงเขียวหวานให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~แกงเขียวหวาน"
+    ]
+   ]
+  },
+  {
+   "id": "h02",
+   "page": "blank",
+   "command": "เปิดยูทูบให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube"
+    ]
+   ]
+  },
+  {
+   "id": "h03",
+   "page": "blank",
+   "command": "ช่วยค้นข่าวน้ำท่วมภาคเหนือแล้วเปิดอันแรกเลย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~น้ำท่วม",
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "h04",
+   "page": "blank",
+   "command": "อยากดูวิดีโอแมวตลกในยูทูบ",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube",
+     "find ~แมว"
+    ],
+    [
+     "search ~แมว"
+    ]
+   ]
+  },
+  {
+   "id": "h05",
+   "page": "blank",
+   "command": "เข้าเว็บพันทิป",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~pantip"
+    ]
+   ]
+  },
+  {
+   "id": "h06",
+   "page": "blank",
+   "command": "ราคาน้ำมันวันนี้เท่าไหร่ ค้นในเน็ตให้หน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~น้ำมัน"
+    ],
+    [
+     "search ~น้ำมัน",
+     "look"
+    ]
+   ]
+  },
+  {
+   "id": "h07",
+   "page": "blank",
+   "command": "เปิดวิกิพีเดียเรื่องช้างไทย",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ช้าง"
+    ],
+    [
+     "open ~wiki",
+     "find ~ช้าง"
+    ],
+    [
+     "open ~wiki~ช้าง"
+    ]
+   ]
+  },
+  {
+   "id": "h08",
+   "page": "blank",
+   "command": "ค้นหาร้านกาแฟแถวสยามแล้วเข้าลิงก์ที่สอง",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~กาแฟ~สยาม",
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "h09",
+   "page": "blank",
+   "command": "เปิดยูทูบแล้วหาเพลงบอดี้สแลม",
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube",
+     "find ~บอดี้สแลม"
+    ],
+    [
+     "search ~บอดี้สแลม"
+    ]
+   ]
+  },
+  {
+   "id": "h10",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บแรกเลย",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ],
+    [
+     "click 18"
+    ]
+   ]
+  },
+  {
+   "id": "h11",
+   "page": "ddg-gold",
+   "command": "อันที่สองล่ะ",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 2"
+    ],
+    [
+     "click 20"
+    ]
+   ]
+  },
+  {
+   "id": "h12",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงไปอีกหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "h13",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าก่อน",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "h14",
+   "page": "ddg-gold",
+   "command": "ค้นใหม่เป็นราคาทองย้อนหลังแทน",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~ทอง~ย้อนหลัง"
+    ]
+   ]
+  },
+  {
+   "id": "h15",
+   "page": "ddg-gold",
+   "command": "รีเฟรชหน้านี้ที",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "h16",
+   "page": "ddg-gold",
+   "command": "ปิดแท็บนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "h17",
+   "page": "ddg-gold",
+   "command": "กลับไปที่แอปก่อน",
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "h18",
+   "page": "youtube",
+   "command": "หาเพลงคาราบาวในนี้",
+   "cat": "plan",
+   "expect": [
+    [
+     "find ~คาราบาว"
+    ]
+   ]
+  },
+  {
+   "id": "h19",
+   "page": "youtube",
+   "command": "ไปข้างหน้าอีกหน้า",
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "h20",
+   "page": "youtube-results",
+   "command": "เปิดคลิปแรก",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ],
+    [
+     "click 21"
+    ]
+   ]
+  },
+  {
+   "id": "h21",
+   "page": "wiki-th",
+   "command": "ค้นหาคำว่าเชียงใหม่ในวิกิ",
+   "cat": "plan",
+   "expect": [
+    [
+     "find ~เชียงใหม่"
+    ]
+   ]
+  },
+  {
+   "id": "h22",
+   "page": "wiki-th-mid",
+   "command": "เลื่อนขึ้นไปหน่อย",
+   "cat": "plan",
+   "expect": [
+    [
+     "up"
+    ]
+   ]
+  },
+  {
+   "id": "h23",
+   "page": "pantip",
+   "command": "ค้นหากระทู้เรื่องรถไฟฟ้าในพันทิป",
+   "cat": "plan",
+   "expect": [
+    [
+     "find ~รถไฟฟ้า"
+    ]
+   ]
+  },
+  {
+   "id": "h24",
+   "page": "news",
+   "command": "เลื่อนลงดูข่าวอื่น",
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "h25",
+   "page": "news",
+   "command": "ค้นหาข่าวรถไฟฟ้าสายสีม่วงในเน็ต",
+   "cat": "plan",
+   "expect": [
+    [
+     "search ~สายสีม่วง"
+    ]
+   ]
+  },
+  {
+   "id": "h26",
+   "page": "form",
+   "command": "ย้อนกลับไปหน้าที่แล้ว",
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "h27",
+   "page": "goldtraders",
+   "command": "โหลดหน้านี้ใหม่",
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "h28",
+   "page": "youtube-results",
+   "command": "เข้าลิงก์ที่สาม",
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "h29",
+   "page": "news",
+   "command": "เข้าหมวดกีฬา",
+   "cat": "look",
+   "expect": [
+    [
+     "click 6"
+    ]
+   ]
+  },
+  {
+   "id": "h30",
+   "page": "news",
+   "command": "ดูข่าวภาคอีสาน",
+   "cat": "look",
+   "expect": [
+    [
+     "click 39"
+    ]
+   ]
+  },
+  {
+   "id": "h31",
+   "page": "form",
+   "command": "ใส่ชื่อว่าสมชาย ใจดี",
+   "cat": "look",
+   "expect": [
+    [
+     "type 1 ~สมชาย"
+    ]
+   ]
+  },
+  {
+   "id": "h32",
+   "page": "form",
+   "command": "เลือกพิซซ่าไซส์ใหญ่",
+   "cat": "look",
+   "expect": [
+    [
+     "click 6"
+    ]
+   ]
+  },
+  {
+   "id": "h33",
+   "page": "form",
+   "command": "กรอกเบอร์ 0812345678 แล้วกดสั่ง",
+   "cat": "look",
+   "expect": [
+    [
+     "type 2 ~0812345678",
+     "click 13"
+    ]
+   ]
+  },
+  {
+   "id": "h34",
+   "page": "form",
+   "command": "ติ๊กชีสเพิ่ม",
+   "cat": "look",
+   "expect": [
+    [
+     "click 8"
+    ]
+   ]
+  },
+  {
+   "id": "h35",
+   "page": "form",
+   "command": "กดส่งฟอร์ม",
+   "cat": "look",
+   "expect": [
+    [
+     "click 13"
+    ]
+   ]
+  },
+  {
+   "id": "h36",
+   "page": "pantip",
+   "command": "กดยอมรับคุกกี้",
+   "cat": "look",
+   "expect": [
+    [
+     "click 21"
+    ]
+   ]
+  },
+  {
+   "id": "h37",
+   "page": "pantip",
+   "command": "ตั้งกระทู้ใหม่",
+   "cat": "look",
+   "expect": [
+    [
+     "click 3"
+    ]
+   ]
+  },
+  {
+   "id": "h38",
+   "page": "pantip",
+   "command": "เข้าสู่ระบบ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 6"
+    ]
+   ]
+  },
+  {
+   "id": "h39",
+   "page": "youtube",
+   "command": "กดเข้าสู่ระบบ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 4"
+    ]
+   ]
+  },
+  {
+   "id": "h40",
+   "page": "ddg-gold",
+   "command": "เข้าเว็บสมาคมค้าทองคำ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 20"
+    ],
+    [
+     "result 2"
+    ]
+   ]
+  },
+  {
+   "id": "h41",
+   "page": "ddg-egg",
+   "command": "เปิดคลิปไข่เจียวกุหลาบ",
+   "cat": "look",
+   "expect": [
+    [
+     "click 18"
+    ]
+   ]
+  },
+  {
+   "id": "h42",
+   "page": "goldtraders",
+   "command": "ทองแท่งขายออกเท่าไหร่",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~66,600|66600|หกหมื่นหกพันหกร้อย"
+    ]
+   ]
+  },
+  {
+   "id": "h43",
+   "page": "goldtraders",
+   "command": "ทองรูปพรรณขายออกราคาเท่าไร",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~67,400|67400|หกหมื่นเจ็ดพันสี่ร้อย"
+    ]
+   ]
+  },
+  {
+   "id": "h44",
+   "page": "goldtraders",
+   "command": "ราคาวันนี้ขึ้นหรือลงจากเมื่อวาน",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~ขึ้น|เพิ่ม|150"
+    ]
+   ]
+  },
+  {
+   "id": "h45",
+   "page": "goldtraders",
+   "command": "ประกาศครั้งที่เท่าไหร่ของวัน",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~7|เจ็ด"
+    ]
+   ]
+  },
+  {
+   "id": "h46",
+   "page": "ddg-weather",
+   "command": "พรุ่งนี้เชียงใหม่ร้อนสุดกี่องศา",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~30|สามสิบ"
+    ]
+   ]
+  },
+  {
+   "id": "h47",
+   "page": "ddg-weather",
+   "command": "ตอนนี้ความชื้นเท่าไหร่",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~65|หกสิบห้า"
+    ]
+   ]
+  },
+  {
+   "id": "h48",
+   "page": "wiki-th",
+   "command": "กรุงเทพอยู่ริมแม่น้ำอะไร",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~เจ้าพระยา"
+    ]
+   ]
+  },
+  {
+   "id": "h49",
+   "page": "wiki-th-mid",
+   "command": "มีนักท่องเที่ยวต่างชาติมาเยือนกี่คน",
+   "cat": "look",
+   "expect": [
+    [
+     "answer ~32.4|32,4|สามสิบสองจุดสี่"
+    ]
+   ]
+  },
+  {
+   "id": "h50",
+   "page": "blank",
+   "command": "พรุ่งนี้มีนัดอะไรบ้าง",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h51",
+   "page": "blank",
+   "command": "ตั้งเตือนกินยาตอนสองทุ่ม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h52",
+   "page": "youtube",
+   "command": "เพิ่มเสียงหน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h53",
+   "page": "blank",
+   "command": "สรุปไฟล์รายงานประจำเดือนให้หน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h54",
+   "page": "ddg-egg",
+   "command": "แปลคำว่า good morning เป็นภาษาไทย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h55",
+   "page": "blank",
+   "command": "ช่วยเขียนจดหมายลาป่วยให้หัวหน้า",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h56",
+   "page": "blank",
+   "command": "วันนี้วันอะไร",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h57",
+   "page": "news",
+   "command": "เครื่องร้อนไหม",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h58",
+   "page": "blank",
+   "command": "ยกเลิกนัดหมอฟันพรุ่งนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h59",
+   "page": "pantip",
+   "command": "เล่าเรื่องตลกให้ฟังหน่อย",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h60",
+   "page": "blank",
+   "command": "หาไฟล์ใบเสร็จเดือนที่แล้ว",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h61",
+   "page": "blank",
+   "command": "ย้อนกลับไปดูนัดเมื่อวาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h62",
+   "page": "news",
+   "command": "ปิดเสียงที",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h63",
+   "page": "form",
+   "command": "ขอบคุณมาก",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h64",
+   "page": "blank",
+   "command": "ห้าคูณเจ็ดเท่ากับเท่าไหร่",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h65",
+   "page": "wiki-th",
+   "command": "ช่วยคิดเมนูอาหารเย็นวันนี้",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h66",
+   "page": "wiki-th",
+   "command": "คุณชื่ออะไร",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h67",
+   "page": "blank",
+   "command": "เปิดไฟล์รูปเมื่อวาน",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h68",
+   "page": "youtube-results",
+   "command": "ตอนนี้กี่โมงแล้ว",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h69",
+   "page": "blank",
+   "command": "ลบนัดประชุมวันศุกร์",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h70",
+   "page": "pantip",
+   "command": "ช่วยจำไว้ว่าผมชอบกาแฟดำ",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "h71",
+   "page": "blank",
+   "command": "เปิดหน้าตั้งค่า",
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  }
+ ]
+}

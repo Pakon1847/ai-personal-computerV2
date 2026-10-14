@@ -7,6 +7,11 @@
 #   sudo ./scripts/pi/install-voice.sh --apply --stt-model <thonburian-distill-small-f16.bin>   + กดค้างเพื่อพูด
 #     (ไฟล์ ggml แปลงจาก biodatlab/distill-whisper-th-small ด้วย whisper.cpp models/convert-h5-to-ggml.py ·
 #      docs/benchmarks/2026-10-01-voice-small · ตรวจ sha256) · build whisper.cpp v1.9.4 ลง /opt/aipc-voice/whisper
+#   ./scripts/pi/install-voice.sh --zipformer                      ดูว่าจะทำอะไร (ตัวถอดของคีย์ลัด F9 / Alt+Space · การ์ด 0026)
+#   sudo ./scripts/pi/install-voice.sh --zipformer --apply
+#     /opt/aipc-voice/zipformer/{venv,model} · sherpa-onnx ตาม scripts/pi/zipformer-requirements.txt ·
+#     โมเดล yfyeung/icefall-asr-gigaspeech2-th-zipformer-2024-06-20 (Apache-2.0 · ข้อมูลเทรนใช้ได้เฉพาะงานศึกษา) ~161 MB · ตรวจ sha256
+#     ไม่ติดตั้ง = คีย์ลัดใช้ whisper เหมือนเดิม · ถอนเฉพาะส่วนนี้: sudo rm -rf /opt/aipc-voice/zipformer
 #
 # ทำอะไร: /opt/aipc-voice (root · อ่านได้ทุกคน)
 #   venv/   piper-tts 1.8.0 + รุ่นตาม scripts/pi/voice-requirements.txt
@@ -16,10 +21,11 @@
 # แอปเปิดตัวอ่านเมื่อกดปุ่มลำโพงครั้งแรก ไม่มี service · ไม่แตะ greetd, PAM, ไฟล์บูต · ไม่รีบูต
 set -euo pipefail
 
-MODE="dry-run"; STT_MODEL=""
+MODE="dry-run"; STT_MODEL=""; ZIP=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) MODE="apply" ;;
+    --zipformer) ZIP=1 ;;
     --rollback) MODE="rollback" ;;
     --stt-model) STT_MODEL="${2:?}"; shift ;;
     *) echo "ไม่รู้จัก: $1" >&2; exit 2 ;;
@@ -34,6 +40,33 @@ V=https://huggingface.co/rhasspy/piper-voices/resolve/main/th/th_TH/tsync2/mediu
 ONNX_SHA=136669378ee72dd27012604994099ca3c833e625c7cfdff05ccdf468a1a2115f
 say() { printf '%s\n' "$*"; }
 need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย sudo" >&2; exit 1; }; }
+
+if [ "$ZIP" = 1 ]; then
+  say "จะติดตั้งตัวถอดของคีย์ลัดที่ $OPT/zipformer: venv (sherpa-onnx 1.13.8) + โมเดล Zipformer ไทย (~161 MB) · ต้องใช้อินเทอร์เน็ต"
+  [ "$MODE" = "apply" ] || { say "== โหมดดูก่อน: ยังไม่เปลี่ยนอะไร · ใส่ --apply เพื่อทำจริง =="; exit 0; }
+  need_root
+  [ -x "$OPT/venv/bin/python" ] || { say "หยุด: ติดตั้งตัวอ่านออกเสียงก่อน (--apply)" >&2; exit 1; }
+  Z="$OPT/zipformer"; HF=https://huggingface.co/yfyeung/icefall-asr-gigaspeech2-th-zipformer-2024-06-20/resolve/main
+  umask 022
+  mkdir -p "$Z/model"
+  [ -x "$Z/venv/bin/python" ] || python3 -m venv "$Z/venv"
+  "$Z/venv/bin/pip" install -q -r "$SRC/scripts/pi/zipformer-requirements.txt"
+  # ไฟล์ · sha256 (ตรงกับที่วัดบน Pi 5 2026-10-14 · ~/voice-bench/zipformer-th)
+  while read -r f sha; do
+    n=$(basename "$f")
+    [ -f "$Z/model/$n" ] || { curl -fsSL --retry 5 -o "$Z/model/$n.part" "$HF/$f" && mv "$Z/model/$n.part" "$Z/model/$n"; }
+    echo "$sha  $Z/model/$n" | sha256sum -c --quiet || { say "หยุด: sha256 ของ $n ไม่ตรง" >&2; rm -f "$Z/model/$n"; exit 1; }
+  done <<'LIST'
+exp/encoder-epoch-12-avg-5.int8.onnx 9ceb14519103b854bafb41b952ac0aaedc037825c9d5aa991a8849f93d8cfc7d
+exp/decoder-epoch-12-avg-5.onnx 21ebb9302e1c72b352a4d14a4ae2cf0364dc741d1007dded5110e720b6e17ef4
+exp/joiner-epoch-12-avg-5.int8.onnx 6ee983924b39ed7d5a57a57963daeaaeafcfc2095f0eae5bb0446fbba34842cf
+data/lang_bpe_2000/tokens.txt dd5fc99e7251a7dff28d459d812607c6dd4a3acfd248bdd8d869a5c251fc44f5
+data/lang_bpe_2000/unigram_2000.vocab bfbd50d49a7c0aa3b0d12bc4934b3488f45f724c979612635aadae69c538695d
+LIST
+  chmod -R a+rX "$Z"
+  "$Z/venv/bin/python" -c "import sherpa_onnx" && say "เสร็จ · ตัวถอดของคีย์ลัดพร้อม · ออกจากระบบแล้วเข้าใหม่ (หรือเปิดแอปใหม่) จึงใช้"     || { say "ติดตั้ง sherpa-onnx ไม่สำเร็จ" >&2; exit 1; }
+  exit 0
+fi
 
 if [ "$MODE" = "rollback" ]; then
   need_root

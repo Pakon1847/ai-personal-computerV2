@@ -1,0 +1,514 @@
+{
+ "commands": "15/26",
+ "commands_pct": 57.7,
+ "non_commands_caught": 0,
+ "non_commands": 10,
+ "stt_median_s": 2.31,
+ "stt_max_s": 2.79,
+ "rows": [
+  {
+   "text": "ค้นหาร้านซ่อมรถใกล้ๆ",
+   "heard": "คนหาราง ซ่อม รส ใกล้ ค้น หาราง ซ่อม รส ใกล้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ร้านซ่อมรถใกล้ๆ"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "รางซ่อมรสใกล้ค้นหารางซ่อมรสใกล้"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.73
+  },
+  {
+   "text": "ค้นหาตารางบอลคืนนี้",
+   "heard": "คนหาตารางบอลคืนนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ตารางบอลคืนนี้"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ตารางบอลคืนนี้"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.31
+  },
+  {
+   "text": "ค้นหาวิธีลดน้ำหนักให้หน่อย",
+   "heard": "คนหาวิธีรถน้ำหนักให้หน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "วิธีลดน้ำหนัก"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีรถน้ำหนัก"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.47
+  },
+  {
+   "text": "ช่วยค้นหาที่พักเขาใหญ่",
+   "heard": "ช่วยค้นหาที่พักเข่าใหญ่",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ที่พักเขาใหญ่"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ที่พักเข่าใหญ่"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.4
+  },
+  {
+   "text": "หาร้านกาแฟเปิดดึก",
+   "heard": "หาร้านกาแฟเปิดดึก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ร้านกาแฟเปิดดึก"
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ร้านกาแฟเปิดดึก"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.42
+  },
+  {
+   "text": "หาข่าวเศรษฐกิจล่าสุด",
+   "heard": "ถาข่าวเศรษฐกิจล่าสุด",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ข่าวเศรษฐกิจล่าสุด"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.56
+  },
+  {
+   "text": "ค้นหาราคาไข่ไก่แล้วเข้าลิงก์แรก",
+   "heard": "คนหาราคาไข่ไก่แล้วข้าวลิงแรก",
+   "expect": [
+    {
+     "kind": "search",
+     "query": "ราคาไข่ไก่"
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "search",
+     "query": "ราคาไข่ไก่แล้วข้าวลิงแรก"
+    }
+   ],
+   "ok": false,
+   "stt_seconds": 2.65
+  },
+  {
+   "text": "เข้าลิงก์แรก",
+   "heard": "ข้าวหลิงแรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.26
+  },
+  {
+   "text": "เข้าลิงก์ที่สาม",
+   "heard": "เข้าลิงที่สาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.27
+  },
+  {
+   "text": "เปิดลิงก์ที่สี่",
+   "heard": "เปิด ลิง ที่ สี่",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.34
+  },
+  {
+   "text": "กดลิงก์แรกให้หน่อย",
+   "heard": "กดลิงแรกให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.36
+  },
+  {
+   "text": "เข้าเว็บที่สาม",
+   "heard": "เข้า เว็บ ที่ สาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "got": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.3
+  },
+  {
+   "text": "ย้อนกลับไป",
+   "heard": "ย้อนกลับไป",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.19
+  },
+  {
+   "text": "ย้อนกลับอีกที",
+   "heard": "ย้อน กลับ อีกที",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.29
+  },
+  {
+   "text": "กลับไปหน้าเดิม",
+   "heard": "กลับไปหน้าเดิม",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "got": [
+    {
+     "kind": "back"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "ไปข้างหน้าหน่อย",
+   "heard": "ไปข้างหน้าหน่อย",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "got": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.28
+  },
+  {
+   "text": "โหลดใหม่อีกที",
+   "heard": "โลดใหม่อีกที",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.27
+  },
+  {
+   "text": "รีเฟรช",
+   "heard": "รีเฟลด",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "got": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.1
+  },
+  {
+   "text": "เลื่อนลงอีกหน่อย",
+   "heard": "เลื่อนลงอีกหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.31
+  },
+  {
+   "text": "เลื่อนขึ้น",
+   "heard": "เลื่อนขึ้น",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.15
+  },
+  {
+   "text": "เลื่อนลงไป",
+   "heard": "เลื่อนลงไป",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "got": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.18
+  },
+  {
+   "text": "ปิดแท็บ",
+   "heard": "เป๊ก",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.05
+  },
+  {
+   "text": "ปิดหน้านี้เลย",
+   "heard": "ปิด หน้า นี้ เลย",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "got": [
+    {
+     "kind": "close"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.21
+  },
+  {
+   "text": "กลับไปแอป",
+   "heard": "กลับไปแอด",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "got": [],
+   "ok": false,
+   "stt_seconds": 2.24
+  },
+  {
+   "text": "เปิดยูทูบ",
+   "heard": "เปิดยูทูก",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.14
+  },
+  {
+   "text": "เปิดเว็บกูเกิล",
+   "heard": "เปิดเวฟกูเกิน",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "got": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "ok": true,
+   "stt_seconds": 2.33
+  },
+  {
+   "text": "หาไฟล์สไลด์นำเสนอ",
+   "heard": "หาไฟไล่นามเสนอ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.28
+  },
+  {
+   "text": "ค้นหาโน้ตที่จดไว้เมื่อวาน",
+   "heard": "คนหาโน้ตที่จดไว้เมื่อวาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.56
+  },
+  {
+   "text": "เลื่อนนัดไปวันจันทร์",
+   "heard": "เลื่อนัดไปวันจันทร์",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.47
+  },
+  {
+   "text": "ลดเสียงหน่อย",
+   "heard": "ลดเสียงหน่อย",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.22
+  },
+  {
+   "text": "ปรับเสียงหกสิบ",
+   "heard": "ปรับ เสียง หก สิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.35
+  },
+  {
+   "text": "ยกเลิกนัดหมอ",
+   "heard": "เลี้ยวกเลิกนัดหมอ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.34
+  },
+  {
+   "text": "ตอนนี้กี่โมงแล้ว",
+   "heard": "ตอนนี้ขี่โมงแล้ว",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.32
+  },
+  {
+   "text": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "heard": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.79
+  },
+  {
+   "text": "เปิดโหมดทำงาน",
+   "heard": "เปิดโหมดทำงาน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.21
+  },
+  {
+   "text": "อากาศพรุ่งนี้เป็นยังไง",
+   "heard": "อากาศพรุ่งนี้เป็นอย่างใน",
+   "expect": [],
+   "got": [],
+   "ok": true,
+   "stt_seconds": 2.58
+  }
+ ]
+}

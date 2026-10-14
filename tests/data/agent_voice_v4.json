@@ -1,0 +1,475 @@
+{
+ "about": "เกณฑ์ข้อ 2 การ์ด 0025: ข้อความที่ whisper ถอดจากเสียงสังเคราะห์ (Piper) ของชุด V4 การ์ด 0024 (docs/benchmarks/2026-10-13-voice-browser/v4.json · ไม่ได้ใช้ปรับ prompt ของ 0025) · ตัวเทียบเดียวกับ 0024: ชนิดและค่าต้องตรง · คำค้นต้องเท่ากันทุกตัวอักษร (ไม่สนวรรค) = 'search =…' · rules_ok = ผลของกฎ 0024 บนข้อความเดียวกัน (15/26) · หน้าเว็บ: คำสั่งที่ต้องมีหน้า = ddg-gold",
+ "today": "2026-10-13",
+ "items": [
+  {
+   "id": "v01",
+   "page": "blank",
+   "command": "คนหาราง ซ่อม รส ใกล้ ค้น หาราง ซ่อม รส ใกล้",
+   "said": "ค้นหาร้านซ่อมรถใกล้ๆ",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =ร้านซ่อมรถใกล้ๆ"
+    ]
+   ]
+  },
+  {
+   "id": "v02",
+   "page": "blank",
+   "command": "คนหาตารางบอลคืนนี้",
+   "said": "ค้นหาตารางบอลคืนนี้",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =ตารางบอลคืนนี้"
+    ]
+   ]
+  },
+  {
+   "id": "v03",
+   "page": "blank",
+   "command": "คนหาวิธีรถน้ำหนักให้หน่อย",
+   "said": "ค้นหาวิธีลดน้ำหนักให้หน่อย",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =วิธีลดน้ำหนัก"
+    ]
+   ]
+  },
+  {
+   "id": "v04",
+   "page": "blank",
+   "command": "ช่วยค้นหาที่พักเข่าใหญ่",
+   "said": "ช่วยค้นหาที่พักเขาใหญ่",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =ที่พักเขาใหญ่"
+    ]
+   ]
+  },
+  {
+   "id": "v05",
+   "page": "blank",
+   "command": "หาร้านกาแฟเปิดดึก",
+   "said": "หาร้านกาแฟเปิดดึก",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =ร้านกาแฟเปิดดึก"
+    ]
+   ]
+  },
+  {
+   "id": "v06",
+   "page": "blank",
+   "command": "ถาข่าวเศรษฐกิจล่าสุด",
+   "said": "หาข่าวเศรษฐกิจล่าสุด",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =ข่าวเศรษฐกิจล่าสุด"
+    ]
+   ]
+  },
+  {
+   "id": "v07",
+   "page": "ddg-gold",
+   "command": "คนหาราคาไข่ไก่แล้วข้าวลิงแรก",
+   "said": "ค้นหาราคาไข่ไก่แล้วเข้าลิงก์แรก",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "search =ราคาไข่ไก่",
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v08",
+   "page": "ddg-gold",
+   "command": "ข้าวหลิงแรก",
+   "said": "เข้าลิงก์แรก",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v09",
+   "page": "ddg-gold",
+   "command": "เข้าลิงที่สาม",
+   "said": "เข้าลิงก์ที่สาม",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "v10",
+   "page": "ddg-gold",
+   "command": "เปิด ลิง ที่ สี่",
+   "said": "เปิดลิงก์ที่สี่",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "result 4"
+    ]
+   ]
+  },
+  {
+   "id": "v11",
+   "page": "ddg-gold",
+   "command": "กดลิงแรกให้หน่อย",
+   "said": "กดลิงก์แรกให้หน่อย",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "result 1"
+    ]
+   ]
+  },
+  {
+   "id": "v12",
+   "page": "ddg-gold",
+   "command": "เข้า เว็บ ที่ สาม",
+   "said": "เข้าเว็บที่สาม",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "result 3"
+    ]
+   ]
+  },
+  {
+   "id": "v13",
+   "page": "ddg-gold",
+   "command": "ย้อนกลับไป",
+   "said": "ย้อนกลับไป",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v14",
+   "page": "ddg-gold",
+   "command": "ย้อน กลับ อีกที",
+   "said": "ย้อนกลับอีกที",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v15",
+   "page": "ddg-gold",
+   "command": "กลับไปหน้าเดิม",
+   "said": "กลับไปหน้าเดิม",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "back"
+    ]
+   ]
+  },
+  {
+   "id": "v16",
+   "page": "ddg-gold",
+   "command": "ไปข้างหน้าหน่อย",
+   "said": "ไปข้างหน้าหน่อย",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "forward"
+    ]
+   ]
+  },
+  {
+   "id": "v17",
+   "page": "ddg-gold",
+   "command": "โลดใหม่อีกที",
+   "said": "โหลดใหม่อีกที",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "v18",
+   "page": "ddg-gold",
+   "command": "รีเฟลด",
+   "said": "รีเฟรช",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "reload"
+    ]
+   ]
+  },
+  {
+   "id": "v19",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงอีกหน่อย",
+   "said": "เลื่อนลงอีกหน่อย",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "v20",
+   "page": "ddg-gold",
+   "command": "เลื่อนขึ้น",
+   "said": "เลื่อนขึ้น",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "up"
+    ]
+   ]
+  },
+  {
+   "id": "v21",
+   "page": "ddg-gold",
+   "command": "เลื่อนลงไป",
+   "said": "เลื่อนลงไป",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "down"
+    ]
+   ]
+  },
+  {
+   "id": "v22",
+   "page": "ddg-gold",
+   "command": "เป๊ก",
+   "said": "ปิดแท็บ",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "v23",
+   "page": "ddg-gold",
+   "command": "ปิด หน้า นี้ เลย",
+   "said": "ปิดหน้านี้เลย",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "close"
+    ]
+   ]
+  },
+  {
+   "id": "v24",
+   "page": "ddg-gold",
+   "command": "กลับไปแอด",
+   "said": "กลับไปแอป",
+   "rules_ok": false,
+   "cat": "plan",
+   "expect": [
+    [
+     "app"
+    ]
+   ]
+  },
+  {
+   "id": "v25",
+   "page": "blank",
+   "command": "เปิดยูทูก",
+   "said": "เปิดยูทูบ",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~youtube"
+    ]
+   ]
+  },
+  {
+   "id": "v26",
+   "page": "blank",
+   "command": "เปิดเวฟกูเกิน",
+   "said": "เปิดเว็บกูเกิล",
+   "rules_ok": true,
+   "cat": "plan",
+   "expect": [
+    [
+     "open ~google"
+    ]
+   ]
+  },
+  {
+   "id": "v27",
+   "page": "blank",
+   "command": "หาไฟไล่นามเสนอ",
+   "said": "หาไฟล์สไลด์นำเสนอ",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v28",
+   "page": "blank",
+   "command": "คนหาโน้ตที่จดไว้เมื่อวาน",
+   "said": "ค้นหาโน้ตที่จดไว้เมื่อวาน",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v29",
+   "page": "blank",
+   "command": "เลื่อนัดไปวันจันทร์",
+   "said": "เลื่อนนัดไปวันจันทร์",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v30",
+   "page": "blank",
+   "command": "ลดเสียงหน่อย",
+   "said": "ลดเสียงหน่อย",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v31",
+   "page": "blank",
+   "command": "ปรับ เสียง หก สิบ",
+   "said": "ปรับเสียงหกสิบ",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v32",
+   "page": "blank",
+   "command": "เลี้ยวกเลิกนัดหมอ",
+   "said": "ยกเลิกนัดหมอ",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v33",
+   "page": "blank",
+   "command": "ตอนนี้ขี่โมงแล้ว",
+   "said": "ตอนนี้กี่โมงแล้ว",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v34",
+   "page": "blank",
+   "command": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "said": "หาค่าเฉลี่ยของห้าสิบกับเจ็ดสิบ",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v35",
+   "page": "blank",
+   "command": "เปิดโหมดทำงาน",
+   "said": "เปิดโหมดทำงาน",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  },
+  {
+   "id": "v36",
+   "page": "blank",
+   "command": "อากาศพรุ่งนี้เป็นอย่างใน",
+   "said": "อากาศพรุ่งนี้เป็นยังไง",
+   "rules_ok": true,
+   "cat": "chat",
+   "expect": [
+    [
+     "chat"
+    ]
+   ]
+  }
+ ]
+}

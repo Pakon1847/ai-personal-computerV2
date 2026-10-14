@@ -146,9 +146,13 @@ def ask(
         "--strict-mcp-config",
         "--disable-slash-commands",
     ]
+    return _call(args, build_input(question, history or []), runner)
+
+
+def _call(args: list[str], text: str, runner) -> CloudReply:
     t0 = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="aipc-cloud-") as cwd:
-        code, out, err = runner(args, build_input(question, history or []), cwd, TIMEOUT_S)
+        code, out, err = runner(args, text, cwd, TIMEOUT_S)
     secs = round(time.monotonic() - t0, 2)
     try:
         data = json.loads(out)
@@ -165,3 +169,25 @@ def ask(
         float(data.get("total_cost_usd") or 0),
         ",".join((data.get("modelUsage") or {}).keys()),
     )
+
+
+def ask_plain(
+    system: str,
+    text: str,
+    *,
+    claude: str | None = None,
+    model: str = MODEL,
+    runner=forge.run_process,
+) -> CloudReply:
+    """ถาม Claude แบบไม่มีเครื่องมือเลย (--tools "") ด้วย system prompt ของผู้เรียกเอง ·
+    ผู้ช่วยเว็บ (การ์ด 0025) ใช้เมื่อ AI ในเครื่องทำไม่สำเร็จ: Claude ได้แค่ข้อความ (คำสั่ง + หน้าเว็บ) ตอบแผนกลับมา
+    ไม่ได้คุมเบราว์เซอร์เอง."""
+    exe = claude or find_claude()
+    if not exe:
+        return CloudReply(False, error="ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในเครื่องนี้")
+    args = [exe, "-p", "--output-format", "json", "--tools", "",
+            "--permission-prompts", "none",
+            "--no-session-persistence", "--max-budget-usd", BUDGET_USD, "--model", model,
+            "--system-prompt", system, "--strict-mcp-config",
+            "--disable-slash-commands"]  # fmt: skip
+    return _call(args, text, runner)
