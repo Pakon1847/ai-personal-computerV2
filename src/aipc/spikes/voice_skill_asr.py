@@ -4,7 +4,7 @@
 (กล่องตัดเน็ต · hotwords ชุดเดิม) · ประโยค = ตัวอย่างของสกิลโค้ดล้วนที่ผ่านประตูตรวจ
 (สกิลที่ Claude เขียนใน docs/benchmarks/2026-09-30-skill-author/claude)
 
-    python -m aipc.spikes.voice_skill_asr <งาน> --skills <สกิล> --zip-base <ฐาน zipformer> --out ผล.json
+    python -m aipc.spikes.voice_skill_asr <งาน> --skills <สกิล> --zip-base <ฐาน> --out ผล.json
 """
 
 from __future__ import annotations
