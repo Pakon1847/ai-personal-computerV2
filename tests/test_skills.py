@@ -96,6 +96,15 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(self.plan("เปิดสุขภาพเครื่อง"), ("open_page", {"page": "health"}))
         self.assertEqual(self.plan("เปิดเบราว์เซอร์"), ("open_app", {"app": "browser"}))
 
+    def test_common_browser_spellings_open_without_asking(self):
+        # Pi 5 2026-10-14: Pakon พิมพ์ "เปิดเบาเซอร์" แล้วต้องกด "ใช่" ก่อนเปิด (เดิมตรงแบบใกล้เคียง 0.84)
+        for text in ("เปิดเบาเซอร์", "เปิดเบราเซอร์"):
+            c = command.parse(text)
+            self.assertEqual((c.plan.action, c.plan.params), ("open_app", {"app": "browser"}), text)
+            self.assertFalse(c.needs_confirmation, text)
+        # "เบา" ยังเป็นเรื่องเสียงเหมือนเดิม
+        self.assertEqual(self.plan("เสียงเบาลง"), ("change_volume", {"step": -10}))
+
     def test_volume(self):
         self.assertEqual(self.plan("ปรับเสียงสี่สิบ"), ("set_volume", {"percent": 40}))
         self.assertEqual(self.plan("เสียง 70%"), ("set_volume", {"percent": 70}))
