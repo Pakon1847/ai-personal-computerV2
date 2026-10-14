@@ -441,6 +441,12 @@ class VoiceSkillTest(unittest.TestCase):
         self.s.confirm(no["confirmToken"], False)
         self.assertEqual(len(self.ran), 2)  # "ไม่" = ไม่ทำ
 
+    def test_voice_phrases_for_hotwords_are_code_skill_examples(self):
+        """การ์ด 0028 ทาง ข: ประโยคที่ส่งให้ตัวถอดเป็น hotwords = ตัวอย่างของสกิลโค้ดล้วนเท่านั้น."""
+        phrases = self.s.voicePhrases()
+        self.assertIn("เข้าโหมดประชุมให้หน่อย", phrases)
+        self.assertNotIn("ในตู้เย็นมีไข่ หมูสับ ผักกาด ทำอะไรกินดี", phrases)  # สกิล llm
+
     def test_exact_or_far_phrases_get_no_confirm_card(self):
         self.assertEqual(self.s.voiceConfirm("เข้าโหมดประชุมให้หน่อย"), {})  # ตรงเป๊ะ = ทางสกิลปกติ
         self.assertEqual(self.s.voiceConfirm("ราคาทองวันนี้"), {})  # ไม่ใกล้ = ไม่รู้จักคำสั่ง

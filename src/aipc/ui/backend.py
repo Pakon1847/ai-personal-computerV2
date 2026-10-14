@@ -475,6 +475,12 @@ class VoiceController(QObject):
         elif hands_free and self.available:  # ไม่ได้มองจอ (เบราว์เซอร์เต็มจอ) = พูดบอกว่าทำไมไม่ได้ทำ
             self.speak(-3, err or "ไม่ได้ยินเสียงพูด")
 
+    def use_skill_phrases(self, phrases) -> None:
+        """การ์ด 0028 ทาง ข: ประโยคของสกิลผู้ใช้เป็น hotwords ของตัวถอดคีย์ลัด (app.py ต่อให้)."""
+        fast = getattr(self._listener, "_fast", None)
+        if fast is not None and hasattr(fast, "extra_hotwords"):
+            fast.extra_hotwords = phrases
+
     def close(self) -> None:
         if self._speaker is not None:
             self._speaker.close()
@@ -2183,6 +2189,13 @@ class SkillsController(QObject):
 
         m = router.repeat_of(text, self._voice_skills())
         return m.id if m else ""
+
+    def voicePhrases(self) -> list[str]:  # noqa: N802
+        """ทาง ข (การ์ด 0028 หัวข้อ 12): ประโยคตัวอย่างของสกิลโค้ดล้วน → hotwords ของตัวถอดคีย์ลัด.
+
+        เรียกจากเธรดของตัวอัดเสียง · อ่านรายการอย่างเดียว
+        """
+        return [e for s in self._voice_skills() for e in s.examples]
 
     @Slot(str, result=str)
     def voiceExample(self, skill_id: str) -> str:  # noqa: N802

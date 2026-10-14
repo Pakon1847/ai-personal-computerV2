@@ -321,6 +321,7 @@ def build(opts: Options, argv: list[str] | None = None):
     app.aboutToQuit.connect(engine._backends["browser"].close)  # ออกจากระบบ = ปิดเบราว์เซอร์ของผู้ช่วย
     # การ์ด 0028: คำพูดจากคีย์ลัดที่ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด (เช่น ที่ Claude สร้าง) = ทำสกิลนั้น
     engine._backends["browser"]._skill_match = engine._backends["skills"].voiceSkill
+    voice.use_skill_phrases(engine._backends["skills"].voicePhrases)  # ทาง ข: hotwords ของสกิล
 
     def ready_inputs() -> dict:
         from aipc.cloud.ask import find_claude

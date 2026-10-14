@@ -100,6 +100,22 @@ class TranscriberTest(unittest.TestCase):
                          ("", "ถอดเสียงนานเกินไป"))  # fmt: skip
         self.assertFalse(self.t.running)
 
+    def test_skill_phrases_join_hotwords_and_restart_when_they_change(self):
+        """การ์ด 0028 ทาง ข: ประโยคไทยของสกิลผู้ใช้เข้า hotwords ต่อท้าย (รายการคำสั่งเว็บเดิมไม่เปลี่ยน) ·
+        สกิลเปลี่ยน = เริ่มตัวถอดใหม่ครั้งถัดไป · ไม่เปลี่ยน = ใช้ตัวเดิม (ไม่โหลดโมเดลซ้ำ)."""
+        phrases = ["เปิดโหมดประชุม", "meeting mode", "  ขอโหมดประชุม\nหน่อย ", "เปิดโหมดประชุม", "ย้อนกลับ"]
+        self.t.extra_hotwords = lambda: phrases
+        self.assertEqual(self.t.hotwords(),
+                         zipformer.HOTWORDS + ["เปิดโหมดประชุม", "ขอโหมดประชุม หน่อย"])  # fmt: skip
+        self.t.transcribe(self.wav("a"))
+        first = self.t._proc.pid
+        self.t.transcribe(self.wav("b"))
+        self.assertEqual(self.t._proc.pid, first)
+        phrases.append("เปิดโหมดอ่านหนังสือ")  # สร้างสกิลใหม่
+        self.t.transcribe(self.wav("c"))
+        self.assertNotEqual(self.t._proc.pid, first)
+        self.assertEqual(Transcriber(worker_cmd=["x"]).hotwords(), zipformer.HOTWORDS)  # ไม่มีสกิล
+
     def test_idle_closes_to_free_ram(self):
         self.t.transcribe(self.wav("a"))
         self.assertFalse(self.t.idle_check())  # เพิ่งใช้
