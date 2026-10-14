@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -39,9 +40,13 @@ def main() -> None:
         m = router.repeat_of(text, voice)
         return m.id if m else ""
 
-    items = [{"skill": m.id, "text": t,
+    # Piper ไทยไม่อ่านคำอังกฤษ (ได้ไฟล์ว่าง · พบใน 0026) → ประโยคที่ไม่มีตัวอักษรไทยข้ามและนับแยก
+    phrases = [(m.id, t) for m in voice for t in m.examples]
+    skipped = [t for _, t in phrases if not re.search("[฀-๿]", t)]
+    items = [{"skill": sid, "text": t,
               "reaches_skill": {route(t, r, skill) for r in (False, True)} == {SKILL}}
-             for m in voice for t in m.examples]  # fmt: skip
+             for sid, t in phrases if t not in skipped]  # fmt: skip
+    print(f"ประโยค {len(items)} · ข้าม (ไม่มีตัวอักษรไทย) {len(skipped)}: {skipped}", flush=True)
     (work / "texts.json").write_text(json.dumps([i["text"] for i in items], ensure_ascii=False),
                                      encoding="utf-8")  # fmt: skip
     py = tts.VOICE_DIR / "venv" / "bin" / "python"
@@ -67,7 +72,8 @@ def main() -> None:
     right = sum(i["picked"] == i["skill"] for i in items)
     wrong = sum(bool(i["picked"]) and i["picked"] != i["skill"] for i in items)
     reach = [i for i in items if i["reaches_skill"]]
-    summary = {"phrases": len(items), "exact": exact, "picked_right": right, "picked_wrong": wrong,
+    summary = {"phrases": len(items), "skipped_non_thai": skipped, "exact": exact,
+               "picked_right": right, "picked_wrong": wrong,
                "reaches_skill_phrases": len(reach),
                "reaches_skill_right": sum(i["picked"] == i["skill"] for i in reach),
                "temp": temp()}  # fmt: skip
