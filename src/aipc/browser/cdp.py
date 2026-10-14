@@ -89,14 +89,16 @@ class PipeClient:
 def launch(argv: list[str], env: dict | None = None) -> tuple[subprocess.Popen, PipeClient]:
     """เปิด Chromium ให้ fd 3 = คำสั่งจากเรา · fd 4 = คำตอบถึงเรา.
 
-    sh ย้าย fd ให้ (ไม่ใช้ preexec_fn ในแอป Qt)
+    bash ย้าย fd ให้ (ไม่ใช้ preexec_fn ในแอป Qt)
     """
     to_r, to_w = os.pipe()
     from_r, from_w = os.pipe()
     # ไม่ปิด fd ต้นทางหลังย้าย: os.pipe() อาจได้เลข 3/4 เอง (ปิดแล้ว Chromium ไม่มี pipe · พบ 2026-10-13)
     script = f'exec "$@" 3<&{to_r} 4>&{from_w}'
+    # bash ไม่ใช่ sh: sh ของ Pi คือ dash รับเลข fd แค่ 0–9 ("Bad fd number") · แอปจริงเปิดไฟล์ ~28 ช่อง
+    # → pipe ได้เลข ≥ 10 → เบราว์เซอร์ไม่เคยเปิด = "เบราว์เซอร์ปิดไปแล้ว" (Pi 5 2026-10-14)
     proc = subprocess.Popen(
-        ["sh", "-c", script, "sh", *argv],
+        ["bash", "-c", script, "bash", *argv],
         pass_fds=(to_r, from_w),
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,

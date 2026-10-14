@@ -4,10 +4,13 @@
 รอหน้าโหลด · พิมพ์ด้วย Input.insertText · กด Enter · หน้าที่ไม่มีช่องค้นหา · Google ขอยืนยันว่าไม่ใช่บอต
 """
 
+import os
+import shutil
+import sys
 import unittest
 from urllib.parse import parse_qs, urlsplit
 
-from aipc.browser import control, page
+from aipc.browser import cdp, control, page
 from aipc.browser.agent import Step
 from aipc.browser.control import BrowserControl
 
@@ -214,6 +217,33 @@ class BrowserStepTest(unittest.TestCase):
         self.assertFalse(r.ok)
         self.assertFalse(r.handled)
         self.assertEqual(bc.observe(), {})
+
+
+# เบราว์เซอร์ปลอม: อ่านคำสั่งจาก fd 3 แล้วตอบทาง fd 4 แบบเดียวกับ Chromium --remote-debugging-pipe
+FAKE_BROWSER = (
+    "import json, os\n"
+    "buf = b''\n"
+    "while b'\\0' not in buf:\n"
+    "    buf += os.read(3, 4096)\n"
+    "msg = json.loads(buf.split(b'\\0')[0])\n"
+    "os.write(4, json.dumps({'id': msg['id'], 'result': {'product': 'ปลอม'}}).encode() + b'\\0')\n"
+)
+
+
+@unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "pipe แบบ fd 3/4 มีเฉพาะ Linux")
+class LaunchTest(unittest.TestCase):
+    def test_pipe_reaches_browser_when_app_has_many_open_files(self):
+        """แอปจริงเปิดไฟล์ไว้ ~28 ช่อง → os.pipe() ได้เลข ≥ 10 · dash (sh ของ Pi) รับเลข fd หลักเดียว
+        ("Bad fd number") → เบราว์เซอร์ไม่เคยเปิด = "เบราว์เซอร์ปิดไปแล้ว" (Pi 5 2026-10-14)."""
+        spare = [os.open(os.devnull, os.O_RDONLY) for _ in range(12)]
+        self.addCleanup(lambda: [os.close(fd) for fd in spare])
+        probe = os.open(os.devnull, os.O_RDONLY)
+        os.close(probe)
+        self.assertGreaterEqual(probe, 10)  # จำลองสภาพในแอปได้จริง
+        proc, client = cdp.launch([sys.executable, "-c", FAKE_BROWSER])
+        self.addCleanup(client.close)
+        self.assertEqual(client.call("Browser.getVersion", timeout=10), {"product": "ปลอม"})
+        proc.wait(timeout=10)
 
 
 if __name__ == "__main__":
