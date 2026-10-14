@@ -35,6 +35,7 @@
 | ผลวัด (ค่าดิบ + สรุป) | `docs/benchmarks/<วันที่>-<เรื่อง>/README.md` |
 | ตัวเลขสำหรับเล่ม | `docs/evaluation/` · `docs/thesis/` |
 | ขั้นตอนบน Pi | `docs/runbooks/` |
+| skill ของโปรเจกต์ (ซ้อมตอบกรรมการ · ส่งขึ้น Pi · วัดผล H9 · ช่วยทำเล่ม) · hook กัน git อันตราย | `.claude/skills/` · `.claude/hooks/` |
 
 ## โครงสร้างโค้ด
 
