@@ -117,15 +117,14 @@ SKILL = "skill"  # การ์ด 0028: ตรงเป๊ะกับประ
 def route(text: str, browser_running: bool, skill: Callable[[str], str] | None = None) -> str:
     """ใช้ตัวแปลแบบกฎล้วน ไม่มี LLM (H6).
 
-    ลำดับ: สกิลของผู้ใช้ (ตรงเป๊ะ) → เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก ·
-    skill(text) คืน id ของสกิล ("" = ไม่ตรง) · ประโยคที่ผู้ใช้สร้างเองชนะการแปลแบบทั่วไป
-    (ตัวตรวจของการ์ด 0017 กันประโยคสกิลชนคำสั่งเครื่องและสกิลเดิมอยู่แล้ว)
+    ลำดับ: เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → สกิลของผู้ใช้ (ตรงเป๊ะ) → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก ·
+    skill(text) คืน id ของสกิล ("" = ไม่ตรง) · สกิลมาหลังคำสั่งเดิม = ตรงกับตอนพิมพ์ (แชทตรวจคำสั่งเครื่องก่อน
+    router.repeat_of) และสกิลเปลี่ยนคำสั่งเดิมไม่ได้ · ประตูของการ์ด 0017 ไม่ได้กันประโยคสกิลชนคำสั่ง
+    (พบ 2026-10-15: สกิล "เปิดแผนที่" ของ Claude มีตัวอย่าง "เปิดแผนที่ให้หน่อย" = คำสั่งเปิด Google Maps)
     """
     from aipc.browser.control import NEEDS_PAGE
     from aipc.skills import browse, command
 
-    if skill is not None and skill(text):
-        return SKILL
     cmds = browse.parse(text)
     if cmds and (browser_running or not all(c.kind in NEEDS_PAGE for c in cmds)):
         return BROWSER
@@ -135,6 +134,8 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
         return OPEN_BROWSER
     if cmd:
         return COMMAND
+    if skill is not None and skill(text):
+        return SKILL
     return NEEDS_BROWSER if cmds else UNKNOWN
 
 

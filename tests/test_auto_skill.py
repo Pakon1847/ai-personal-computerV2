@@ -432,6 +432,18 @@ class VoiceSkillTest(unittest.TestCase):
         self.s._reload()
         self.assertEqual(self.s.voiceSkill("เข้าโหมดประชุมให้หน่อย"), "")
 
+    def test_spoken_example_skips_phrases_that_are_existing_commands(self):
+        """การ์ดสร้างสกิลบอกประโยคที่พูดแล้วถึงสกิลจริง ·
+        "เปิดแผนที่ให้หน่อย" = คำสั่งเปิด Google Maps เดิม (H5)."""
+        s3 = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s3.md").read_text(
+            encoding="utf-8"
+        )
+        self.store.install(s3, self.s._skills, request="อยากได้สกิลดูแผนที่")
+        self.s._reload()
+        self.assertEqual(self.s.voiceExample("map-open"), "อยากไปสยามพารากอน ไปยังไง")
+        self.assertEqual(self.s.voiceExample("meeting-mode"), "เข้าโหมดประชุมให้หน่อย")
+        self.assertEqual(self.s.voiceExample("fridge-menu"), "")  # สกิลที่ใช้ AI ไม่มีประโยคเสียง
+
     def test_voice_runs_the_same_card_as_typing(self):
         card = self.s.handleAs(self.s.voiceSkill("เข้าโหมดประชุม"), "เข้าโหมดประชุม")
         self.assertEqual(card["kind"], "steps")

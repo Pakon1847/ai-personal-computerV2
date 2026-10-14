@@ -152,18 +152,23 @@ class HandsFreeTest(unittest.TestCase):
         self.assertEqual(route("เปิดเบราวเซอ", False), "command")
 
     def test_route_runs_exact_skill_phrase_first(self):
-        """การ์ด 0028: ตรงเป๊ะกับสกิลที่ผู้ใช้มี = ทำสกิลนั้น (มาก่อนการแปลทั่วไป) ·
+        """การ์ด 0028: ตรงเป๊ะกับสกิลที่ผู้ใช้มี = ทำสกิลนั้น · มาหลังคำสั่งเดิม (เหมือนตอนพิมพ์) ·
         ไม่ตรง = ทางเดิมของ 0027."""
-        mine = {"เปิดโหมดประชุม": "meeting-mode", "ค้นหาสูตรอาหาร": "cook"}
+        mine = {"เปิดโหมดประชุม": "meeting-mode", "ค้นหาสูตรอาหาร": "cook",
+                "เปิดแผนที่ให้หน่อย": "maps", "เลื่อนลง": "scroll"}  # fmt: skip
 
         def skill(text):
             return mine.get(text, "")
 
         for running in (False, True):
             self.assertEqual(route("เปิดโหมดประชุม", running, skill=skill), "skill")
-            self.assertEqual(route("ค้นหาสูตรอาหาร", running, skill=skill), "skill")  # ชนะคำสั่งเว็บ
-            self.assertEqual(route("ค้นหาราคาทอง", running, skill=skill), "browser")
+            # ชนคำสั่งเดิม = คำสั่งเดิมชนะ (พิมพ์ก็ได้ทางเดียวกัน)
+            self.assertEqual(route("ค้นหาสูตรอาหาร", running, skill=skill), "browser")
+            self.assertEqual(route("เปิดแผนที่ให้หน่อย", running, skill=skill), "command")
             self.assertEqual(route("เปิดโหมดประชม", running, skill=skill), "unknown")
+        # เดิม "ต้องเปิดเบราว์เซอร์ก่อน" = สกิลของผู้ใช้รับได้ · เปิดเบราว์เซอร์แล้ว = คำสั่งเว็บชนะ
+        self.assertEqual(route("เลื่อนลง", False, skill=skill), "skill")
+        self.assertEqual(route("เลื่อนลง", True, skill=skill), "browser")
         b = BrowserController(control=FakeControl(), skill_match=skill)
         self.assertEqual(b.route("เปิดโหมดประชุม"), "skill")
         self.assertEqual(BrowserController(control=FakeControl()).route("เปิดโหมดประชุม"), "unknown")

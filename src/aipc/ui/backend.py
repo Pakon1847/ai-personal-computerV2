@@ -2042,10 +2042,9 @@ class SkillsController(QObject):
         v = self._user.info(new.id)["version"]
         note = (f"แก้สกิล “{new.name}” แล้ว (รุ่น {v})" if revise_id
                 else f"สร้างสกิลใหม่ “{new.name}” แล้ว (Claude สร้าง) · ครั้งหน้าสั่งแบบนี้ได้เลย")  # fmt: skip
-        # การ์ด 0028: บอกประโยคที่พูดผ่านคีย์ลัดได้จริง (ตรงเป๊ะ) · เฉพาะสกิลที่ทำด้วยโค้ด
-        spoken = [f"กด Alt+Space แล้วพูดได้: “{new.examples[0]}”"] if self.voiceSkill(
-            new.examples[0]
-        ) else []  # fmt: skip
+        # การ์ด 0028: บอกประโยคที่พูดผ่านคีย์ลัดแล้วถึงสกิลนี้จริง · เฉพาะสกิลที่ทำด้วยโค้ด
+        say = self.voiceExample(new.id)
+        spoken = [f"กด Alt+Space แล้วพูดได้: “{say}”"] if say else []
         card["lines"] = [note, *spoken, *card.get("lines", [])]
         self.forgeDone.emit(card, text)
 
@@ -2184,6 +2183,21 @@ class SkillsController(QObject):
 
         m = router.repeat_of(text, self._voice_skills())
         return m.id if m else ""
+
+    @Slot(str, result=str)
+    def voiceExample(self, skill_id: str) -> str:  # noqa: N802
+        """ประโยคตัวอย่างแรกที่พูดผ่านคีย์ลัดแล้วถึงสกิลนี้จริง · "" = ไม่มี.
+
+        ตัวอย่างที่ชนคำสั่งเว็บ/คำสั่งเครื่องเดิม (เช่น "เปิดแผนที่ให้หน่อย") ไปทางคำสั่งเดิม จึงไม่บอก (H5)
+        """
+        from aipc.ui.handsfree import SKILL, route
+
+        skill = next((s for s in self._voice_skills() if s.id == skill_id), None)
+        for example in skill.examples if skill else []:
+            ways = {route(example, running, self.voiceSkill) for running in (False, True)}
+            if ways == {SKILL} and self.voiceSkill(example) == skill_id:
+                return example
+        return ""
 
     @Slot(str, result=str)
     def voiceHint(self, text: str) -> str:  # noqa: N802
