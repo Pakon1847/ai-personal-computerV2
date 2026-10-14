@@ -82,7 +82,7 @@ def install_store(folder: Path):
     return store, rejected
 
 
-def app_answers(store):
+def app_answers(store, create: bool = False):
     """การ์ด 0029: ตัวคุมสกิลตัวจริง (ตัวสั่งเครื่องจำลอง · home ว่าง).
 
     คืน (ฟังก์ชันจัดประเภททาง unknown, รายการคำสั่งที่ถูกสั่ง, ตัวคุม)
@@ -103,6 +103,9 @@ def app_answers(store):
                          user_skills=store)  # fmt: skip
     (tmp / "home").mkdir()
     s._home = tmp / "home"
+    if create:  # การ์ด 0030: Claude ปลอมที่จดทุกครั้งที่ถูกเรียก (ต้องไม่ถูกเรียกเลย เพราะไม่มีใครตอบ "ใช่")
+        s._forge = lambda request, **kw: calls.append(("claude", request))
+        s._claude_on = lambda: True
 
     def classify(text: str) -> str:
         if card := s.voiceAnswer(text):
@@ -110,6 +113,9 @@ def app_answers(store):
             return f"answer:{card.get('kind', '')}{gate}"
         if card := s.voiceConfirm(text):
             return "confirm_skill:" + s._pending[card["confirmToken"]][1].id
+        if create and (card := s.voiceCreate(text)):
+            info = f"create_info:{card.get('kind', '')}"
+            return "create_ask" if card.get("confirmToken") else info
         return UNKNOWN
 
     return classify, calls, s
@@ -128,6 +134,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True, help="ไฟล์ค่าดิบ JSON")
     ap.add_argument("--skills", type=Path, help="การ์ด 0028: โฟลเดอร์สกิล .md ที่ติดตั้งก่อนตัดสินทาง")
     ap.add_argument("--baseline", type=Path, help="การ์ด 0028: ผล 0027 (routes.json) ไว้เทียบ")
+    ap.add_argument("--create", action="store_true", help="การ์ด 0030: ทางขอสร้างสกิล (คู่ --answers)")
     ap.add_argument("--answers", action="store_true",
                     help="การ์ด 0029: ตอบด้วยโค้ด + การ์ดยืนยันสกิล (คู่กับ --skills)")  # fmt: skip
     args = ap.parse_args()
@@ -137,7 +144,7 @@ def main() -> int:
         store, rejected = install_store(args.skills)
         installed = store.load()
         if args.answers:
-            classify, calls, _ = app_answers(store)
+            classify, calls, _ = app_answers(store, create=args.create)
         voice = [m for m in installed if m.steps and m.worker == "code"]  # เหมือน SkillsController
 
         def skill(text: str) -> str:
@@ -176,7 +183,8 @@ def main() -> int:
             was = key.get((r["set"], r["text"], r["browser_running"]))
             print(f"  ต่าง: {r['text']} ({r['browser_running']}): {was} → {r['new']}")
     if args.answers:
-        print(f"การ์ด 0029: คำสั่งเครื่องที่ถูกสั่งโดยไม่ได้ยืนยัน {len(calls)} ครั้ง")
+        print(f"การ์ด 0029: คำสั่งเครื่องที่ถูกสั่งโดยไม่ได้ยืนยัน {len(calls)} ครั้ง"
+              + (" (รวมการเรียก Claude ของการ์ด 0030)" if args.create else ""))  # fmt: skip
     to_ai = sum(r["new"] == "chat" for r in out)
     counts = {k: sum(r["judge"] == k for r in out) for k in
               ("same", "intended", "new_action", "lost", "changed")}  # fmt: skip
