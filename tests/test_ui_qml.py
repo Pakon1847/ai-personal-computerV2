@@ -465,6 +465,24 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง ไม่ใช่คำตอบของ AI
         self.assertEqual(warnings, [])
 
+    def test_hands_free_create_skill_asks_before_sending(self):
+        """การ์ด 0030: พูดขอโหมดใหม่ → การ์ดยืนยันข้อความก่อนส่ง Claude · พูด "ไม่" = ไม่ส่งอะไร."""
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        skills = engine._backends["skills"]
+        sent = []
+        skills._forge = lambda request, **kw: sent.append(request)  # Claude ปลอม: จดว่าถูกเรียกไหม
+        skills._claude_on = lambda: True
+        page.voiceCommand("ทำโหมดฟังเพลง: เปิดยูทูบแล้วปรับเสียง 60")
+        settle(50)
+        card = items_of(page)[-1]["card"]
+        self.assertEqual(card["title"], "ส่งให้ Claude สร้างสกิลนี้ ใช่ไหม")
+        page.voiceCommand("ไม่")
+        settle(100)
+        self.assertEqual(items_of(page)[-1]["card"]["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
+        self.assertEqual(sent, [])
+        self.assertEqual(warnings, [])
+
     def test_hands_free_runs_claude_made_skill_by_exact_phrase(self):
         """การ์ด 0028: พูดประโยคของสกิลที่ Claude สร้าง = การ์ดสกิลเดียวกับตอนพิมพ์ · ได้ยินเพี้ยน = คำใบ้ ไม่ทำ."""
         engine, win, warnings = self.open_shell()

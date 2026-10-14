@@ -205,6 +205,14 @@ Item {
                 speakLastCard()
                 return
             }
+            // การ์ด 0030: ขอโหมดใหม่ = การ์ดยืนยันข้อความก่อนส่ง Claude (ไม่มี Claude/ปิดสวิตช์ = การ์ดอธิบาย)
+            const create = skills.voiceCreate(t)
+            if (create.kind !== undefined) {
+                push({ user: true, text: t })
+                showCard(create)
+                speakLastCard()
+                return
+            }
         }
         const say = way === "needs_browser"
             ? "ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า \"เปิดเบราว์เซอร์\" ก่อน"
@@ -252,6 +260,8 @@ Item {
                 return
             }
             root.dispatch(card, text)
+            if (card.voice === true)    // การ์ด 0030: สร้างจากเสียง = อ่านผลออกเสียง (ไม่ได้มองจอก็รู้)
+                root.speakLastCard()
         }
     }
     function sendText(text) {

@@ -1581,6 +1581,7 @@ class SkillsController(QObject):
         self._forge = forge
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า (ผู้ใช้ปิดเองได้)
         self._forging = False
+        self._voice_forges: set[str] = set()  # การ์ด 0030: คำขอที่เริ่มจากเสียง (ไม่สำเร็จ = ไม่ส่งต่อ)
         self._user = user_skills
         self._builtin = manifest.load_builtin()
         self._skills = self._builtin + (user_skills.load() if user_skills is not None else [])
@@ -2027,6 +2028,8 @@ class SkillsController(QObject):
 
         p, text, revise_id = result
         self._forging = False
+        by_voice = text in self._voice_forges
+        self._voice_forges.discard(text)
         errors = [str(p)] if isinstance(p, Exception) else list(p.errors)
         new = None
         if not isinstance(p, Exception) and p.skill_md:
@@ -2041,6 +2044,9 @@ class SkillsController(QObject):
             title = "แก้สกิลไม่สำเร็จ" if revise_id else "สร้างสกิลไม่สำเร็จ"
             card = self._plain("forge-failed", title, [*errors[:2], "ไม่ได้ติดตั้งอะไร"])
             card["fallback"] = not revise_id  # หน้าจอให้ Claude ตอบคำขอนี้แทน (การ์ด 0016)
+            if by_voice:  # การ์ด 0030: คีย์ลัดไม่ส่งให้ AI คุย (0027) = ไม่ส่งต่อ
+                card.update(fallback=False, voice=True)
+                card["lines"].append("สั่งด้วยเสียง: ไม่ส่งต่อให้ Claude ตอบแทน · พิมพ์ในแชทถ้าต้องการ")
             self.forgeDone.emit(card, text)
             return
         self._reload()
@@ -2052,6 +2058,8 @@ class SkillsController(QObject):
         say = self.voiceExample(new.id)
         spoken = [f"กด Alt+Space แล้วพูดได้: “{say}”"] if say else []
         card["lines"] = [note, *spoken, *card.get("lines", [])]
+        if by_voice:
+            card["voice"] = True  # หน้าจออ่านผลออกเสียง (การ์ด 0030)
         self.forgeDone.emit(card, text)
 
     def _reload(self) -> None:
@@ -2262,6 +2270,32 @@ class SkillsController(QObject):
             return self._why(self._card(route, text), t0)
         return {}
 
+    # ---------- พูดสั่งให้ Claude สร้างสกิล (การ์ด 0030) ----------
+    @Slot(str, result="QVariantMap")
+    def voiceCreate(self, text: str) -> dict:  # noqa: N802
+        """ขอโหมด/งานประจำที่ยังไม่มีสกิล → การ์ดยืนยันข้อความตามตัวอักษร **ก่อนส่ง Claude** · อื่น ๆ = {}.
+
+        ไม่มี Claude / ปิดสวิตช์ / กำลังสร้างอยู่ = การ์ดอธิบายเดิมของ _start_forge (ไม่ส่ง)
+        """
+        from aipc.skills import router
+
+        t0 = time.monotonic()
+        new_mode = router.define_intent(text)
+        if not new_mode or router.route_ai_first(text, self._skills).kind != "create":
+            return {}  # ไม่ใช่คำขอสร้าง หรือมีสกิลเดิมตรงอยู่แล้ว
+        if not self.canForge or self._forging:  # _start_forge กรณีนี้แค่อธิบาย ไม่ส่งอะไร
+            return self._why(self._start_forge(text), t0)
+        self._counter += 1
+        token = f"f{self._counter}"
+        self._pending[token] = ("forge", text)
+        card = {"kind": "forge-ask", "badge": {}, "title": "ส่งให้ Claude สร้างสกิลนี้ ใช่ไหม",
+                "chips": [{"text": "ส่งออกนอกเครื่อง", "kind": "warn"}], "confirmToken": token,
+                "lines": [f"ได้ยินว่า “{text}”",
+                          "ข้อความนี้จะส่งไปให้ Claude (นอกเครื่อง) สร้างสกิล · บันทึกในสิ่งที่ส่งออก",
+                          "ไม่ตรงกับที่พูด = ตอบ “ไม่” แล้วพูดใหม่"],
+                "page": "", "_outbound": "ยังไม่มี · จะส่งข้อความนี้ไป Claude เมื่อตอบ “ใช่”"}  # fmt: skip
+        return self._why(card, t0)
+
     @Slot(str, result="QVariantMap")
     def voiceConfirm(self, text: str) -> dict:  # noqa: N802
         """ทาง ก (การ์ด 0028 หัวข้อ 12): ได้ยินใกล้เคียงสกิลแต่ไม่ตรงเป๊ะ → การ์ด "หมายถึง … ใช่ไหม" ใบเดียว.
@@ -2312,8 +2346,10 @@ class SkillsController(QObject):
     WHO = {"weather": "สกิลอากาศ · โค้ดในเครื่อง + บริการ Open-Meteo", "files": "ค้นไฟล์ · โค้ดในเครื่อง",
            "weather-off": "สกิลอากาศ · โค้ดในเครื่อง (ไม่ได้ติดต่อ Open-Meteo)",
            "forging": "Claude (cloud) กำลังสร้างสกิล", "forge-failed": "Claude (cloud)",
-           "clock": "นาฬิกาเครื่อง · โค้ดในเครื่อง"}  # fmt: skip
+           "clock": "นาฬิกาเครื่อง · โค้ดในเครื่อง",
+           "forge-ask": "โค้ดในเครื่อง · ยังไม่ได้ส่งอะไร"}  # fmt: skip
     WHY = {"weather": "ตรงรูปประโยคถามอากาศ (กฎ) · ไม่ผ่าน AI จึงไม่เดาตัวเลข",
+           "forge-ask": "ขอโหมด/งานประจำที่ยังไม่มีสกิล (กฎ) · ส่งออกต้องยืนยันก่อน (การ์ด 0030)",
            "files": "ตรงรูปประโยคหาไฟล์ (กฎ) · AI ในเครื่องเปิดไฟล์เองไม่ได้",
            "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล",
            "weather-off": "ถามอากาศ แต่ปิดสวิตช์อากาศในหน้าตั้งค่า",
@@ -2581,6 +2617,9 @@ class SkillsController(QObject):
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
             return self._run_steps(skill, text, card)
+        elif isinstance(plan, tuple) and plan[0] == "forge":  # การ์ด 0030: ยืนยันแล้วจึงส่ง Claude
+            self._voice_forges.add(plan[1])
+            return self._start_forge(plan[1])
         elif isinstance(plan, reminders.Reminder):
             try:
                 self._store.add(plan, self._now())

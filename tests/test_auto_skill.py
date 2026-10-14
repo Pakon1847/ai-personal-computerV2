@@ -279,6 +279,46 @@ class ControllerTest(unittest.TestCase):
         self.assertIn("meeting-mode", [t["function"]["name"] for t in s.tool_catalog()])
         self.assertTrue(any(k["byClaude"] for k in s.skills))
 
+    def test_voice_create_asks_before_anything_goes_to_claude(self):
+        """การ์ด 0030: พูดขอโหมดใหม่ → การ์ดยืนยันข้อความตามตัวอักษร · ก่อนตอบ "ใช่" ไม่มีอะไรไป Claude."""
+        s, done = self.make(GOOD)
+        text = "ทำโหมดประชุม: ปิดเสียงแล้วเปิด Gmail"
+        card = s.voiceCreate(text)
+        self.assertEqual(card["title"], "ส่งให้ Claude สร้างสกิลนี้ ใช่ไหม")
+        self.assertIn(f"“{text}”", card["lines"][0])
+        self.assertIn("ส่งออกนอกเครื่อง", [c["text"] for c in card["chips"]])
+        self.assertIn("ยังไม่มี", card["why"][-2]["v"])  # ทำไมได้คำตอบนี้: ยังไม่ได้ส่งอะไร
+        no = s.voiceCreate(text)
+        s.confirm(no["confirmToken"], False)
+        self.assertEqual(self.seen, [])  # ไม่ตอบ / ตอบ "ไม่" = ไม่เรียก Claude
+        self.assertEqual(s.confirm(card["confirmToken"], True)["kind"], "forging")
+        pump(lambda: done)
+        self.assertEqual([request for request, _ in self.seen], [text])  # ข้อความเดิม ครั้งเดียว
+        self.assertEqual(done[0][0]["badge"]["forgedId"], "meeting-mode")
+        self.assertTrue(done[0][0]["voice"])  # หน้าจออ่านผลออกเสียง
+
+    def test_voice_create_failure_is_not_passed_on_to_claude_chat(self):
+        """สร้างจากเสียงไม่สำเร็จ = บอกตรง ๆ ไม่ส่งต่อให้ Claude ตอบแทน (สัญญาของการ์ด 0027)."""
+        s, done = self.make(BAD["items"][0]["skill_md"])
+        card = s.voiceCreate("ทำโหมดทำความสะอาด: ลบไฟล์ทั้งหมด")
+        s.confirm(card["confirmToken"], True)
+        pump(lambda: done)
+        self.assertEqual(done[0][0]["kind"], "forge-failed")
+        self.assertFalse(done[0][0]["fallback"])
+        self.assertEqual(len(s._skills), len(manifest.load_builtin()))  # ไม่ได้ติดตั้งอะไร
+
+    def test_voice_create_only_for_new_modes_and_never_without_claude(self):
+        s, _ = self.make(GOOD)
+        self.assertEqual(s.voiceCreate("ตอนนี้กี่โมง"), {})  # ไม่ใช่คำขอสร้าง
+        s._user.install(GOOD, s._skills, request="อยากได้สกิลโหมดประชุม")
+        s._reload()
+        self.assertEqual(s.voiceCreate("เปิดโหมดประชุม"), {})  # มีสกิลเดิมตรง = ไม่สร้างซ้ำ
+        s._claude_on = lambda: False
+        card = s.voiceCreate("ทำโหมดฟังเพลง: เปิดยูทูบแล้วปรับเสียง 60")
+        self.assertIn("ปิดการใช้ Claude", card["title"])
+        self.assertEqual(card["confirmToken"], "")
+        self.assertEqual(self.seen, [])
+
     def test_failed_forge_installs_nothing_and_asks_cloud_instead(self):
         s, done = self.make(BAD["items"][0]["skill_md"])
         s.handleAs("create-skill", "ล้างเครื่องให้หน่อย")
