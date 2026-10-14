@@ -39,6 +39,28 @@ class BrowseParseTest(unittest.TestCase):
         self.assertEqual(parsed("หาร 10 ด้วย 2"), [])
         self.assertEqual(parsed("หารสองได้เท่าไหร่"), [])
 
+    def test_dev_phrasings_round2(self):
+        # การ์ด 0026 รอบ 2: ถ้อยคำจากชุดพัฒนา D (ไม่ใช่ชุดทดสอบ)
+        self.assertEqual(parsed("เลื่อนลงไปดูต่อ"), [{"kind": "scroll", "direction": "down"}])
+        self.assertEqual(parsed("เลื่อนกลับขึ้นไปข้างบนหน่อย"), [{"kind": "scroll", "direction": "up"}])
+        self.assertEqual(parsed("ปิดแท็บนี้ไปเลย"), [{"kind": "close"}])
+        self.assertEqual(parsed("ไปหน้าถัดไปหน่อย"), [{"kind": "forward"}])
+        self.assertEqual(parsed("ราคาน้ำมันพรุ่งนี้ ช่วยหาให้หน่อย"),
+                         [{"kind": "search", "query": "ราคาน้ำมันพรุ่งนี้"}])  # fmt: skip
+        # กริยาท้ายประโยคแต่เป็นงานในเครื่อง / "หา" เดี่ยวท้ายประโยค = ไม่ใช่ค้นเว็บ
+        self.assertEqual(parsed("ผลของการประชุมครั้งก่อนสรุปไว้ในไฟล์ไหน ช่วยหาให้หน่อย"), [])
+        self.assertEqual(parsed("ของที่ต้องหา"), [])
+        self.assertEqual(parsed("เลื่อนนัดไปพรุ่งนี้"), [])
+
+    def test_heard_fixes_round2(self):
+        # ตัวถอดเสียงได้ยินเพี้ยน (ชุดพัฒนา V1 V2 D เสียง Piper)
+        self.assertEqual(parsed("เปิดกู้เกิน"), [{"kind": "site", "site": "google"}])
+        self.assertEqual(parsed("กฎลิงที่สาม"), [{"kind": "open", "n": 3}])
+        self.assertEqual(parsed("ยานกลับไปหน้าที่แล้ว"), [{"kind": "back"}])
+        self.assertEqual(parsed("ถอยกลับไปนะก่อนหน้า"), [{"kind": "back"}])
+        self.assertEqual(parsed("รีโลด"), [{"kind": "reload"}])
+        self.assertEqual(parsed("ยานพาหนะกลับบ้าน"), [])
+
     def test_local_work_is_not_web(self):
         # หาไฟล์/โน้ตในเครื่อง · เลื่อนนัด · ย้อนงานเดิม · ต้นคำ "หา" อื่น ๆ = ไปทางเดิมของแอป
         for text in ["ค้นหาไฟล์รายงาน", "หาโน้ตที่จดไว้วันนี้ให้หน่อย", "หาใบเสร็จค่าซ่อมรถ",
