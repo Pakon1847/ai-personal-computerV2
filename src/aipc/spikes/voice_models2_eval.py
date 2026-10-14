@@ -161,6 +161,23 @@ def run(audio: Path, models: Path, sets: list[str], specs: list[str], threads: i
 
     res = {}
     for spec in specs:
+        if ">" in spec:  # สองขั้น "A>B": ใช้ผลของ A · A ไม่เจอคำสั่ง → ใช้ผลของ B (เวลา = A + B เมื่อใช้ B)
+            a, b = spec.split(">")
+            for one in (a, b):
+                if one not in res:
+                    res.update(run(audio, models, sets, [one], threads))
+            rows = []
+            for ra, rb in zip(res[a]["rows"], res[b]["rows"], strict=True):
+                pick = ra if ra["got"] else rb
+                secs = ra["seconds"] + (rb["seconds"] if not ra["got"] else 0)
+                got = pick["got"]
+                rows.append({**pick, "seconds": round(secs, 3), "by": a if ra["got"] else b,
+                             "verdict": judge(got, ra["expect"])})  # fmt: skip
+            res[spec] = {"summary": summary(rows), "rows": rows}
+            print(line(spec, res[spec]["summary"]), flush=True)
+            continue
+        if spec in res:
+            continue
         rec = recognizer(spec, models, threads)
         rows = []
         for name in sets:
