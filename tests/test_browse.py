@@ -32,6 +32,13 @@ class BrowseParseTest(unittest.TestCase):
         )
         self.assertEqual(parsed(" เลื่อนลงหน่อยค่ะ "), [{"kind": "scroll", "direction": "down"}])
 
+    def test_find_price_is_web_search(self):
+        # "หาราคา…" เคยถูกกันเพราะกฎ "หาร" (หารเลข) · การ์ด 0026 ชุด H
+        self.assertEqual(parsed("หาราคาทอง"), [{"kind": "search", "query": "ราคาทอง"}])
+        self.assertEqual(parsed("หาราคารถมือสอง"), [{"kind": "search", "query": "ราคารถมือสอง"}])
+        self.assertEqual(parsed("หาร 10 ด้วย 2"), [])
+        self.assertEqual(parsed("หารสองได้เท่าไหร่"), [])
+
     def test_local_work_is_not_web(self):
         # หาไฟล์/โน้ตในเครื่อง · เลื่อนนัด · ย้อนงานเดิม · ต้นคำ "หา" อื่น ๆ = ไปทางเดิมของแอป
         for text in ["ค้นหาไฟล์รายงาน", "หาโน้ตที่จดไว้วันนี้ให้หน่อย", "หาใบเสร็จค่าซ่อมรถ",
