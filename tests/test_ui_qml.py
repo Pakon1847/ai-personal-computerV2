@@ -475,9 +475,16 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + การ์ดสกิล · ไม่มีคำตอบของ AI
         self.assertEqual(rows[n]["text"], "เข้าโหมดประชุม")
         self.assertEqual(rows[-1]["card"]["badge"]["name"], "โหมดประชุม")
+        # ทาง ก: ได้ยินใกล้เคียง = การ์ด "หมายถึง … ใช่ไหม" · พูด "ไม่" = ไม่ทำ
+        # (ไม่ทดสอบ "ใช่" ที่นี่: บน Pi ตัวสั่งเครื่องทำจริง · ทดสอบใน test_auto_skill ด้วยตัวจำลอง)
         page.voiceCommand("เข้าโหมดประชม")
         settle(50)
-        self.assertIn("ใกล้กับ", items_of(page)[-1]["text"])
+        card = items_of(page)[-1]["card"]
+        self.assertEqual(card["title"], "หมายถึง “โหมดประชุม” ใช่ไหม")
+        self.assertNotEqual(card["confirmToken"], "")
+        page.voiceCommand("ไม่")
+        settle(50)
+        self.assertEqual(items_of(page)[-1]["card"]["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
         self.assertEqual(warnings, [])
 
     def test_hands_free_while_browser_busy_says_wait(self):

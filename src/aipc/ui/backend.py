@@ -2199,20 +2199,43 @@ class SkillsController(QObject):
                 return example
         return ""
 
-    @Slot(str, result=str)
-    def voiceHint(self, text: str) -> str:  # noqa: N802
-        """ได้ยินใกล้เคียงแต่ไม่ตรง → ประโยคตัวอย่างที่ใกล้ที่สุด (ใช้บอกให้พูดใหม่ · ไม่ทำเอง · BRIEF 5.6 ข้อ 2)."""
+    def _nearest_voice(self, text: str):
+        """(สกิล, ประโยคตัวอย่าง) ที่ใกล้ที่สุดเมื่อใกล้พอ · ไม่ใกล้ = (None, "").
+
+        เกณฑ์ใกล้ = FUZZY_CUTOFF ตัวเดียวกับคำสั่งเครื่อง (0.72)
+        """
         import difflib
 
         from aipc.skills import command
 
-        key, best, score = command.normalize(text), "", 0.0
+        key, best, score = command.normalize(text), (None, ""), 0.0
         for s in self._voice_skills():
             for example in s.examples:
                 r = difflib.SequenceMatcher(None, key, command.normalize(example)).ratio()
                 if r > score:
-                    best, score = example, r
-        return best if key and score >= command.FUZZY_CUTOFF else ""
+                    best, score = (s, example), r
+        return best if key and score >= command.FUZZY_CUTOFF else (None, "")
+
+    @Slot(str, result="QVariantMap")
+    def voiceConfirm(self, text: str) -> dict:  # noqa: N802
+        """ทาง ก (การ์ด 0028 หัวข้อ 12): ได้ยินใกล้เคียงสกิลแต่ไม่ตรงเป๊ะ → การ์ด "หมายถึง … ใช่ไหม" ใบเดียว.
+
+        ไม่ทำอะไรจนกว่าตอบ "ใช่" (BRIEF 5.6 ข้อ 2) · ใช่ = ทำขั้นตอนทางเดียวกับการ์ดสกิลที่ยืนยันแล้ว ·
+        ตรงเป๊ะ / ไม่ใกล้ = {} (หน้าจอใช้ทางเดิม)
+        """
+        t0 = time.monotonic()
+        skill, example = self._nearest_voice(text)
+        if skill is None or self.voiceSkill(text):
+            return {}
+        self._counter += 1
+        token = f"v{self._counter}"
+        self._pending[token] = ("steps", skill, text)
+        prefix = {"llm": "ถาม AI: ", "say": "บอก: ", "action": ""}
+        steps = [f"{i}. {prefix[s.kind]}{s.text}" for i, s in enumerate(skill.steps, 1)]
+        card = {"kind": "steps", "badge": self._badge(skill, "ได้ยินใกล้เคียง · ยืนยันก่อนทำ"),
+                "title": f"หมายถึง “{skill.name}” ใช่ไหม", "chips": [], "confirmToken": token,
+                "lines": [f"ได้ยินว่า “{text}” · ใกล้กับ “{example}”", *steps], "page": ""}  # fmt: skip
+        return self._why(card, t0)
 
     @Slot(str, str, result="QVariantMap")
     def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802

@@ -188,11 +188,17 @@ Item {
                 speakLastCard()
             return
         }
-        const hint = way === "unknown" ? skills.voiceHint(t) : ""   // ได้ยินใกล้เคียงสกิล = บอก ไม่ทำเอง (การ์ด 0028)
+        if (way === "unknown") {        // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
+            const ask = skills.voiceConfirm(t)
+            if (ask.confirmToken) {
+                push({ user: true, text: t })
+                showCard(ask)
+                speakLastCard()
+                return
+            }
+        }
         const say = way === "needs_browser"
             ? "ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า \"เปิดเบราว์เซอร์\" ก่อน"
-            : hint !== ""
-            ? "ไม่รู้จักคำสั่ง \"" + t + "\" · ใกล้กับ \"" + hint + "\" ลองพูดอีกครั้ง"
             : "ไม่รู้จักคำสั่ง \"" + t + "\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท"
         push({ user: true, text: t })
         push({ ai: true, text: say, note: "", done: true, skill: "สั่งงานด้วยเสียง" })

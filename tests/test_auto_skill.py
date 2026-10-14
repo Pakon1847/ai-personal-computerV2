@@ -6,7 +6,7 @@ import time
 import unittest
 from pathlib import Path
 
-from aipc.skills import forge, manifest, userskills
+from aipc.skills import actions, forge, manifest, userskills
 
 ROOT = Path(__file__).resolve().parent.parent
 GOOD = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(
@@ -405,8 +405,11 @@ class VoiceSkillTest(unittest.TestCase):
         builtin = manifest.load_builtin()
         self.store.install(GOOD, builtin, request="อยากได้สกิลโหมดประชุม: ปิดเสียงเครื่อง แล้วเปิด Gmail ให้")
         self.store.install(GOOD_LLM, builtin + self.store.load(), request="อยากได้สกิลคิดเมนู")
-        self.s = SkillsController(reminders_path=Path(d.name) / "r.json", run_timer=False,
-                                  llm_ready=lambda: True, user_skills=self.store)  # fmt: skip
+        self.ran = []  # ตัวสั่งเครื่องจำลอง: จดคำสั่งแทนการปิดเสียง/เปิดเว็บจริง
+        ex = actions.Executor(runner=lambda a: self.ran.append(a) or 0, dry_run=False)
+        self.s = SkillsController(executor=ex, reminders_path=Path(d.name) / "r.json",
+                                  run_timer=False, llm_ready=lambda: True,
+                                  user_skills=self.store)  # fmt: skip
         ask = Path(d.name) / "news-mode.md"
         ask.write_text(ASK_AI, encoding="utf-8")
         self.ask_ai = manifest.load(ask)
@@ -423,9 +426,25 @@ class VoiceSkillTest(unittest.TestCase):
         self.assertEqual(s.voiceSkill("เข้าโหมดประชม"), "")  # ได้ยินเพี้ยน = ไม่ทำ
         self.assertEqual(s.voiceSkill("ปิดเสียง"), "")  # คำสั่งเครื่องไม่ใช่สกิลของผู้ใช้
 
-    def test_near_miss_gives_hint_not_action(self):
-        self.assertEqual(self.s.voiceHint("เข้าโหมดประชม"), "เข้าโหมดประชุมให้หน่อย")
-        self.assertEqual(self.s.voiceHint("ราคาทองวันนี้"), "")
+    def test_near_miss_asks_once_and_does_nothing_until_yes(self):
+        """ทาง ก (การ์ด 0028 หัวข้อ 12): ได้ยินใกล้เคียง = "หมายถึง … ใช่ไหม" · ไม่สั่งเครื่องก่อนตอบ."""
+        card = self.s.voiceConfirm("โหมดประชุมให้หน่อย")  # คำแรก "เข้า" หาย (พบในข้อ 3)
+        self.assertEqual(card["title"], "หมายถึง “โหมดประชุม” ใช่ไหม")
+        self.assertIn("ใกล้กับ “เข้าโหมดประชุมให้หน่อย”", card["lines"][0])
+        self.assertEqual(card["lines"][1:], ["1. ปิดเสียง", "2. เปิด Gmail",
+                                             card["lines"][3]])  # fmt: skip
+        self.assertEqual(self.ran, [])  # ยังไม่ทำอะไร
+        done = self.s.confirm(card["confirmToken"], True)
+        self.assertEqual(len(self.ran), 2)  # ปิดเสียง + เปิด Gmail · ยืนยันครั้งเดียว
+        self.assertEqual(done["kind"], "steps")
+        no = self.s.voiceConfirm("เข้าโหมดประชม")
+        self.s.confirm(no["confirmToken"], False)
+        self.assertEqual(len(self.ran), 2)  # "ไม่" = ไม่ทำ
+
+    def test_exact_or_far_phrases_get_no_confirm_card(self):
+        self.assertEqual(self.s.voiceConfirm("เข้าโหมดประชุมให้หน่อย"), {})  # ตรงเป๊ะ = ทางสกิลปกติ
+        self.assertEqual(self.s.voiceConfirm("ราคาทองวันนี้"), {})  # ไม่ใกล้ = ไม่รู้จักคำสั่ง
+        self.assertEqual(self.s.voiceConfirm("คิดเมนูจากของในตู้เย็นหน่อย"), {})  # สกิล llm ไม่เข้า
 
     def test_disabled_skill_is_not_voice_command(self):
         self.store.set_enabled("meeting-mode", False)
