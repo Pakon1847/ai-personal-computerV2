@@ -54,8 +54,8 @@ def load_set(name: str) -> list[dict]:
             for it in prompts
             if it["set"] == "D"
         ]
-    if name == "h2":
-        items = json.loads((DATA / "voice_h2_synth.json").read_text(encoding="utf-8"))["items"]
+    if name in ("h2", "h3"):
+        items = json.loads((DATA / f"voice_{name}_synth.json").read_text(encoding="utf-8"))["items"]
         return [{"id": it["id"], "text": it["text"], "expect": it["expect"]} for it in items]
     raise ValueError(name)
 
