@@ -308,11 +308,14 @@ class VoiceController(QObject):
         self, speaker=None, active: bool = True, idle_poll_ms: int = 60_000, listener=None
     ):
         super().__init__()
-        from aipc.voice import stt, tts
+        from aipc.voice import stt, tts, zipformer
 
         self._speaker = (speaker or tts.Speaker(self._weak("_state"))) if active else None
         # กดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · None = หน้า Login
-        self._listener = (listener or stt.Listener(self._weak("_heard"))) if active else None
+        # คีย์ลัดถอดด้วย Zipformer + hotwords (การ์ด 0026) · ปุ่มไมค์ใช้ whisper เหมือนเดิม
+        if active and listener is None:
+            listener = stt.Listener(self._weak("_heard"), fast=zipformer.Transcriber())
+        self._listener = listener if active else None
         self._key, self._job, self._message = -1, -1, ""
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
         # ตัวอัดหยุดเองเมื่อพูดจบ (การ์ด 0019 ข้อ 10) จากเธรดของมัน → ดูสถานะทุก 0.15 วิระหว่างฟัง
@@ -322,7 +325,7 @@ class VoiceController(QObject):
         self._state.connect(self._on_state)
         self._heard.connect(self._on_heard)
         self._idle = QTimer(self, interval=idle_poll_ms, timeout=self._idle_check)
-        if self._speaker is not None:
+        if self._speaker is not None or self._listener is not None:
             self._idle.start()
 
     @Property(bool, notify=changed)
@@ -380,7 +383,11 @@ class VoiceController(QObject):
 
     @Slot()
     def _idle_check(self) -> None:
-        self._speaker.idle_check()
+        if self._speaker is not None:
+            self._speaker.idle_check()
+        fast = getattr(self._listener, "_fast", None)
+        if fast is not None:  # ตัวถอดของคีย์ลัดไม่ได้ใช้นาน = ปิดคืน RAM
+            fast.idle_check()
 
     # ---------- กดค้างเพื่อพูด ----------
     @Property(bool, notify=micChanged)
@@ -401,11 +408,14 @@ class VoiceController(QObject):
 
     @Slot()
     def startListening(self) -> None:  # noqa: N802
+        self._start_listening(fast=False)
+
+    def _start_listening(self, fast: bool) -> None:
         if self._listener is None or self._transcribing:
             return
         if self._key != -1:  # กำลังอ่านออกเสียงอยู่ = หยุดก่อน ไม่ให้ไมค์ได้ยินลำโพง
             self.stop()
-        err = self._listener.start()
+        err = self._listener.start(fast=fast)
         self._mic_message = err
         self._awaiting = err == ""
         if self._awaiting:
@@ -441,7 +451,7 @@ class VoiceController(QObject):
         from aipc.ui.handsfree import beep
 
         self._hands_free = True
-        self.startListening()
+        self._start_listening(fast=True)
         if self._awaiting:
             beep(high=True)
         else:
@@ -470,6 +480,9 @@ class VoiceController(QObject):
             self._speaker.close()
         if self._listener is not None:
             self._listener.cancel()
+            fast = getattr(self._listener, "_fast", None)
+            if fast is not None:
+                fast.close()
 
 
 class CloudUsage(QObject):

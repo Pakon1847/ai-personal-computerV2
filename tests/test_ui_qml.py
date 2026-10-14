@@ -922,7 +922,7 @@ class ShellCardTest(unittest.TestCase):
         class FakeListener:
             available, listening = True, False
 
-            def start(self):
+            def start(self, fast=False):
                 self.listening = True
                 return ""
 
@@ -963,7 +963,7 @@ class ShellCardTest(unittest.TestCase):
         class SelfStopping:
             available, listening = True, False
 
-            def start(self):
+            def start(self, fast=False):
                 self.listening = True
                 return ""
 

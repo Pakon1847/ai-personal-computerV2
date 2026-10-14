@@ -1,0 +1,4 @@
+# ตัวถอดเสียงของคีย์ลัด (การ์ด 0026) · /opt/aipc-voice/zipformer/venv · รุ่นที่วัดบน Pi 5 2026-10-14 · Apache-2.0
+# sherpa-onnx-core มี onnxruntime ของตัวเองข้างใน (ไม่ใช้ numpy) · แอปรันในกล่องตัดเน็ต (aipc.voice.tts.sandboxed)
+sherpa-onnx==1.13.8
+sherpa-onnx-core==1.13.8

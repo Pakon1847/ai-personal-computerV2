@@ -29,8 +29,10 @@ class FakeListener:
 
     def __init__(self):
         self.listening = False
+        self.fast = []  # start(fast=…) ทุกครั้ง
 
-    def start(self):
+    def start(self, fast=False):
+        self.fast.append(fast)
         self.listening = True
         return ""
 
@@ -97,6 +99,8 @@ class HandsFreeTest(unittest.TestCase):
         v.startListening()
         v._on_heard("สวัสดี", "", 1.0)
         self.assertEqual((typed, heard), (["สวัสดี"], ["ค้นหาราคาทอง"]))
+        # การ์ด 0026: คีย์ลัดถอดด้วยตัวถอดเร็ว (Zipformer) · ปุ่มไมค์ใช้ whisper เดิม
+        self.assertEqual(lis.fast, [True, False])
 
     def test_hotkey_with_nothing_heard_speaks_why(self):
         spk = FakeSpeaker()
