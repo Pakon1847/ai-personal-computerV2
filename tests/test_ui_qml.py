@@ -398,8 +398,9 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(find_all(win, "chatList")[0].property("count"), 4)
         self.assertEqual(warnings, [])
 
-    def test_hands_free_voice_answers_pending_card_and_sends_the_rest(self):
-        """การ์ด 0024: พูด "ใช่" ตอบการ์ดที่รอยืนยัน (ไม่ต้องกดปุ่ม) · ประโยคอื่นส่งเข้าแชทเอง (ไม่ต้องกดส่ง)."""
+    def test_hands_free_voice_answers_pending_card_and_never_chats(self):
+        """การ์ด 0024: พูด "ใช่" ตอบการ์ดที่รอยืนยัน (ไม่ต้องกดปุ่ม) ·
+        การ์ด 0027: ประโยคที่ไม่ใช่คำสั่ง = บอกว่าไม่รู้จัก ไม่ส่งเข้าแชท (เดิมได้การ์ดเวลา/คำตอบของ AI)."""
         _, win, warnings = self.open_shell()
         page = find_all(win, "workspace")[0]
         base = {"chips": [], "lines": [], "page": "", "badge": {}, "kind": "command"}
@@ -413,11 +414,49 @@ class ShellCardTest(unittest.TestCase):
         answered = answered.toVariant() if hasattr(answered, "toVariant") else answered
         self.assertTrue(answered.get("tok-1"))
         n = len(items_of(page))
-        page.voiceCommand("ตอนนี้กี่โมง")  # ไม่ใช่คำสั่งเว็บ → ทางเดิม (การ์ดเวลา) เหมือนพิมพ์แล้วกดส่ง
+        page.voiceCommand("ตอนนี้กี่โมง")
         settle(100)
         rows = items_of(page)
+        self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + คำบอก · ไม่มีการ์ดเวลาหรือคำตอบของ AI ตามมา
         self.assertEqual(rows[n]["text"], "ตอนนี้กี่โมง")
-        self.assertIn("ตอนนี้", rows[-1]["card"]["title"])
+        self.assertIn("ไม่รู้จักคำสั่ง", rows[-1]["text"])
+        self.assertNotIn("card", rows[-1])
+        self.assertEqual(warnings, [])
+
+    def test_hands_free_command_mode_routes(self):
+        """การ์ด 0027: "เลื่อนลง" ก่อนเปิดเบราว์เซอร์ = บอกให้เปิดก่อน · "เปิดเบราว์เซอร์" = เบราว์เซอร์ของผู้ช่วย ·
+        คำสั่งเครื่อง = ทางเดิมของแชท (ทำคำสั่ง ไม่ถึง AI)."""
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        browser = engine._backends["browser"]
+        ran = []
+
+        class Control:  # ไม่เปิด Chromium จริงในเทสต์
+            running = False
+
+            def run(self, cmd):
+                ran.append(cmd.as_dict())
+                self.running = True
+                from aipc.browser.control import Result
+
+                return Result(True, "เปิดแล้ว")
+
+        browser._control = Control()
+        page.voiceCommand("เลื่อนลง")
+        settle(50)
+        rows = items_of(page)
+        self.assertIn("เปิดเบราว์เซอร์", rows[-1]["text"])
+        self.assertEqual(ran, [])
+        page.voiceCommand("เปิดเบราว์เซอร์")
+        settle(200)
+        self.assertEqual(ran, [{"kind": "site", "site": "google"}])
+        self.assertEqual(items_of(page)[-2]["text"], "เปิดเบราว์เซอร์")
+        n = len(items_of(page))
+        page.voiceCommand("เปิดหน้าตั้งค่า")
+        settle(100)
+        rows = items_of(page)
+        self.assertEqual(rows[n]["text"], "เปิดหน้าตั้งค่า")
+        self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง ไม่ใช่คำตอบของ AI
         self.assertEqual(warnings, [])
 
     def test_hands_free_while_browser_busy_says_wait(self):

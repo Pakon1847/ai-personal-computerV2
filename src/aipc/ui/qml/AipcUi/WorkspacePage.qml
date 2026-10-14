@@ -166,17 +166,28 @@ Item {
             if (voice.available) voice.speak(items.length - 1, "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")
             return
         }
-        if (browser.handle(t)) {
+        // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
+        const way = browser.route(t)
+        if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
             push({ user: true, text: t })
             push({ ai: true, text: "", note: "", done: false, skill: "เบราว์เซอร์ของผู้ช่วย" })
             return
         }
-        const before = items.length
-        sendText(t)
-        if (items.length > before && items[items.length - 1].ai)
-            speakNext = true            // รอ AI ตอบ แล้วอ่านใน onFinished
-        else
-            speakLastCard()
+        if (way === "command") {        // คำสั่งเครื่อง: ทางเดิมของแชททำคำสั่งก่อนถึง AI (ยืนยันตามกติกาเดิม)
+            const before = items.length
+            sendText(t)
+            if (items.length > before && items[items.length - 1].ai)
+                speakNext = true        // รอ AI ตอบ แล้วอ่านใน onFinished
+            else
+                speakLastCard()
+            return
+        }
+        const say = way === "needs_browser"
+            ? "ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า \"เปิดเบราว์เซอร์\" ก่อน"
+            : "ไม่รู้จักคำสั่ง \"" + t + "\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท"
+        push({ user: true, text: t })
+        push({ ai: true, text: say, note: "", done: true, skill: "สั่งงานด้วยเสียง" })
+        if (voice.available) voice.speak(items.length - 1, say)
     }
     function speakLastCard() {
         const last = items[items.length - 1]

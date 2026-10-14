@@ -4,6 +4,7 @@
   `$XDG_RUNTIME_DIR/aipc/voice-key` → HotkeyListener ส่ง pressed()
   (FIFO ของผู้ใช้คนนี้ 0600 · บัญชีอื่นกดแทนไม่ได้)
 - BrowserController ทำคำสั่งเว็บในเธรดแยก (หน้าเว็บโหลดหลายวินาที) แล้วส่ง finished(ประโยคสั้น, สำเร็จไหม)
+- route() ตัดสินว่าคำพูดจากคีย์ลัดไปทางไหน (การ์ด 0027): สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย
 """
 
 from __future__ import annotations
@@ -103,8 +104,36 @@ def beep(high: bool = True) -> None:
         pass
 
 
+# ทางของคำพูดจากคีย์ลัด (การ์ด 0027 หัวข้อ 5) · ไม่มีทาง "ส่งให้ AI คุย" (BRIEF 5.6 ข้อ 1: คีย์ลัด = สั่งงาน)
+BROWSER = "browser"  # คำสั่งเว็บ → เบราว์เซอร์ของผู้ช่วย
+OPEN_BROWSER = "open_browser"  # "เปิดเบราว์เซอร์" → เบราว์เซอร์ของผู้ช่วย (ตัวที่เสียงคุมได้) แทนตัวธรรมดา
+COMMAND = "command"  # คำสั่งเครื่อง (เปิดแอป ปรับเสียง หน้าในระบบ) → ทางเดิมของแชท ซึ่งทำคำสั่งก่อนถึง AI
+NEEDS_BROWSER = "needs_browser"  # คำสั่งที่ต้องมีหน้าเว็บ แต่ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย
+UNKNOWN = "unknown"  # ไม่ใช่คำสั่ง → บอกตรง ๆ ไม่ส่งให้ AI
+
+
+def route(text: str, browser_running: bool) -> str:
+    """ใช้ตัวแปลแบบกฎล้วน ไม่มี LLM (H6).
+
+    ลำดับ: เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก
+    """
+    from aipc.browser.control import NEEDS_PAGE
+    from aipc.skills import browse, command
+
+    cmds = browse.parse(text)
+    if cmds and (browser_running or not all(c.kind in NEEDS_PAGE for c in cmds)):
+        return BROWSER
+    cmd = command.parse(text)
+    # สะกด/ได้ยินใกล้เคียง (ต้องยืนยัน) ไม่เข้าข้อนี้ → การ์ดยืนยันเดิมของคำสั่งเครื่อง (BRIEF 5.6 ข้อ 2)
+    if cmd and cmd.plan.params.get("app") == "browser" and not cmd.needs_confirmation:
+        return OPEN_BROWSER
+    if cmd:
+        return COMMAND
+    return NEEDS_BROWSER if cmds else UNKNOWN
+
+
 class BrowserController(QObject):
-    """คำสั่งเว็บจากเสียง · ประโยคที่ไม่ใช่คำสั่งเว็บ handle() คืน False ให้หน้าจอส่งเข้าแชทตามเดิม."""
+    """คำสั่งเว็บจากเสียง · route() บอกหน้าจอว่าคำพูดจากคีย์ลัดไปทางไหน (การ์ด 0027)."""
 
     finished = Signal(str, bool)
     busyChanged = Signal()  # noqa: N815
@@ -142,6 +171,24 @@ class BrowserController(QObject):
         ctl = self._ctl()
         if not ctl.running and all(c.kind in NEEDS_PAGE for c in cmds):
             return False  # ยังไม่เปิดเบราว์เซอร์ เช่น "กลับไปหน้าแชท" = คำสั่งเดิมของแอป
+        return self._start(cmds)
+
+    @Slot(str, result=str)
+    def route(self, text: str) -> str:
+        if not self._active:  # หน้าเข้าสู่ระบบไม่มีเบราว์เซอร์และไม่มีแชท
+            return UNKNOWN
+        return route(text, self._ctl().running)
+
+    @Slot(result=bool)
+    def openHome(self) -> bool:  # noqa: N802
+        """พูด "เปิดเบราว์เซอร์" → เปิดเบราว์เซอร์ของผู้ช่วยที่หน้า Google (คำสั่งเปิดเว็บตัวเดิมของ 0024)."""
+        from aipc.skills.browse import BrowseCommand
+
+        if not self._active or self._busy:
+            return False
+        return self._start([BrowseCommand(kind="site", site="google")])
+
+    def _start(self, cmds) -> bool:
         self._busy = True
         self.busyChanged.emit()
         threading.Thread(target=self._work, args=(cmds,), daemon=True).start()

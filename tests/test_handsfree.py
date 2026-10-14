@@ -10,7 +10,7 @@ try:
 
     from aipc.browser.control import Result
     from aipc.ui.backend import VoiceController
-    from aipc.ui.handsfree import BrowserController, HotkeyListener
+    from aipc.ui.handsfree import BrowserController, HotkeyListener, route
 except ImportError:  # pragma: no cover
     VoiceController = None
 
@@ -129,6 +129,38 @@ class HandsFreeTest(unittest.TestCase):
     def test_login_screen_has_no_browser(self):
         b = BrowserController(active=False, control=FakeControl())
         self.assertFalse(b.handle("ค้นหาราคาทอง"))
+        self.assertEqual(b.route("ค้นหาราคาทอง"), "unknown")
+        self.assertFalse(b.openHome())
+
+    def test_route_is_commands_only(self):
+        """การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว · ไม่มีทางไหนส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1)."""
+        for running in (False, True):
+            self.assertEqual(route("ค้นหาราคาทองวันนี้", running), "browser")
+            # เป็นทั้งคำสั่งเว็บและคำสั่งเครื่อง = เบราว์เซอร์ของผู้ช่วย
+            self.assertEqual(route("เปิดยูทูบ", running), "browser")
+            self.assertEqual(route("เปิดเบราว์เซอร์", running), "open_browser")
+            self.assertEqual(route("ปิดเสียงหน่อย", running), "command")
+            self.assertEqual(route("เปิดหน้าตั้งค่า", running), "command")
+            for text in ("ตอนนี้กี่โมงแล้ว", "เตือนกินยาพรุ่งนี้แปดโมง", "สวัสดีครับ"):
+                self.assertEqual(route(text, running), "unknown", text)
+        # คำสั่งที่ต้องมีหน้าเว็บ: ยังไม่เปิดเบราว์เซอร์ของผู้ช่วย = บอกให้เปิดก่อน (เดิมหลุดไปแชท · Pi 5 2026-10-14)
+        self.assertEqual(route("เลื่อนลง", False), "needs_browser")
+        self.assertEqual(route("เลื่อนลง", True), "browser")
+        # "กลับไปหน้าผู้ช่วย" ตอนไม่มีเบราว์เซอร์ = คำสั่งเปิดหน้าของแอปตามเดิม
+        self.assertEqual(route("กลับไปหน้าผู้ช่วย", False), "command")
+        # สะกดใกล้เคียง (ต้องยืนยัน) = การ์ดยืนยันเดิม ไม่เดาเปิดเอง
+        self.assertEqual(route("เปิดเบราวเซอ", False), "command")
+
+    def test_open_home_opens_assistant_browser_at_google(self):
+        ctl = FakeControl()
+        b = BrowserController(control=ctl)
+        done = []
+        b.finished.connect(lambda say, ok: done.append(ok))
+        self.assertEqual(b.route("เลื่อนลง"), "needs_browser")
+        self.assertTrue(b.openHome())
+        self.assertTrue(pump(lambda: done))
+        self.assertEqual(ctl.ran, [{"kind": "site", "site": "google"}])
+        self.assertEqual(b.route("เลื่อนลง"), "browser")  # เปิดแล้ว = เสียงคุมต่อได้
 
 
 @unittest.skipUnless(hasattr(os, "mkfifo") and VoiceController, "FIFO มีเฉพาะ Linux")
