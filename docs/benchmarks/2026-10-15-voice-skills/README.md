@@ -79,3 +79,21 @@ PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -m aipc.spikes.voice_route_eva
 
 ถึงสกิลถูก **11/15** (เดิม 4/15) · ข้อจำกัด: ข้อความชุดเดียวกับที่ใช้ตัดสินทำทาง ก (ชุดพัฒนา) · เสียงสังเคราะห์
 
+
+## รอบ 2 · ทาง ข (hotwords ของสกิล) · **ประกาศก่อนรัน** (เกณฑ์ ข2–ข4 อยู่ใน[การ์ด 0028 หัวข้อ 12](../../design/0028-voice-skills.md))
+
+- ข2: `voice_skill_asr` ชุดเดียวกับข้อ 3 · ไม่มี vs `--skill-hotwords` (Pi 5 คืนเดียวกัน · รันทั้งสองแบบใหม่)
+- ข3: สกิลจริง 2 ตัวของบัญชี pakon (คัดลอกชั่วคราวไป `/tmp` บน Pi แล้วลบ · **ไม่ commit ข้อความ** · รายงานตัวเลข) · `--skill-hotwords` → `voice_skill_confirm_eval`
+- ข4: `voice_h_eval --zip-only` ชุด H (120) · ไม่มี vs `--extra-hotwords skill-hotwords.json` (ประโยคตัวอย่างของสกิลโค้ดล้วนจากชุด Claude · 17 ประโยค · อังกฤษถูกตัดทิ้งในตัวถอด)
+
+```bash
+# บน Pi ใน ~/aipc-0026 (สาขา feature/0028-voice-skills)
+PYTHONPATH=src ~/aipc-0025/.venv/bin/python -m aipc.spikes.voice_skill_asr ~/voice-bench/sk-a --skills docs/benchmarks/2026-09-30-skill-author/claude --zip-base /opt/aipc-voice/zipformer --out ~/voice-bench/sk-a.json
+PYTHONPATH=src ~/aipc-0025/.venv/bin/python -m aipc.spikes.voice_skill_asr ~/voice-bench/sk-b --skills docs/benchmarks/2026-09-30-skill-author/claude --zip-base /opt/aipc-voice/zipformer --out ~/voice-bench/sk-b.json --skill-hotwords
+PYTHONPATH=src ~/aipc-0025/.venv/bin/python -m aipc.spikes.voice_h_eval ~/voice-bench/h-synth --zip-base /opt/aipc-voice/zipformer --zip-only --out ~/voice-bench/h-a.json
+PYTHONPATH=src ~/aipc-0025/.venv/bin/python -m aipc.spikes.voice_h_eval ~/voice-bench/h-synth --zip-base /opt/aipc-voice/zipformer --zip-only --extra-hotwords docs/benchmarks/2026-10-15-voice-skills/skill-hotwords.json --out ~/voice-bench/h-b.json
+```
+
+### ผลรอบ 2 ทาง ข
+
+(ยังไม่รัน)

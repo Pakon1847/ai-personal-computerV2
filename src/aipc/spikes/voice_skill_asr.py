@@ -30,6 +30,7 @@ def main() -> None:
     ap.add_argument("--skills", required=True, type=Path)
     ap.add_argument("--zip-base", required=True)
     ap.add_argument("--out", required=True, type=Path)
+    ap.add_argument("--skill-hotwords", action="store_true", help="ทาง ข: ประโยคสกิลเข้า hotwords")
     a = ap.parse_args()
     work = Path(a.work)
     work.mkdir(parents=True, exist_ok=True)
@@ -57,7 +58,8 @@ def main() -> None:
                         "-ar", "16000", "-ac", "1", str(work / f"{i:03d}-16k.wav")],
                        check=True)  # fmt: skip
     print(f"เสียงพร้อม {len(items)} ไฟล์ · {temp()}", flush=True)
-    z = Transcriber(base=Path(a.zip_base))
+    extra = [t for m in voice for t in m.examples] if a.skill_hotwords else []
+    z = Transcriber(base=Path(a.zip_base), extra_hotwords=lambda: extra)
     assert z.available, "ไม่มี venv/ หรือ model/ ใต้ --zip-base"
     z.transcribe(work / "000-16k.wav")  # อุ่นก่อน = เหมือนกดคีย์ลัดแล้วพูด
     for i, it in enumerate(items):
@@ -73,6 +75,7 @@ def main() -> None:
     wrong = sum(bool(i["picked"]) and i["picked"] != i["skill"] for i in items)
     reach = [i for i in items if i["reaches_skill"]]
     summary = {"phrases": len(items), "skipped_non_thai": skipped, "exact": exact,
+               "skill_hotwords": a.skill_hotwords, "hotwords": len(z.hotwords()),
                "picked_right": right, "picked_wrong": wrong,
                "reaches_skill_phrases": len(reach),
                "reaches_skill_right": sum(i["picked"] == i["skill"] for i in reach),
