@@ -188,7 +188,16 @@ Item {
                 speakLastCard()
             return
         }
-        if (way === "unknown") {        // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
+        if (way === "unknown") {
+            // การ์ด 0029: คำถามที่โค้ดตอบเองได้ (เวลา นัด ไฟล์ สุขภาพเครื่อง) = ตอบแล้วอ่านออกเสียง · ไม่ใช้ AI
+            const answer = skills.voiceAnswer(t)
+            if (answer.kind !== undefined) {
+                push({ user: true, text: t })
+                showCard(answer)
+                speakLastCard()
+                return
+            }
+            // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
             if (ask.confirmToken) {
                 push({ user: true, text: t })

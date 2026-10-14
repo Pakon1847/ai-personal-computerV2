@@ -2229,6 +2229,39 @@ class SkillsController(QObject):
                     best, score = (s, example), r
         return best if key and score >= command.FUZZY_CUTOFF else (None, "")
 
+    # ---------- ถามด้วยเสียง ตอบด้วยโค้ด (การ์ด 0029) ----------
+    # สุขภาพเครื่องทางเสียง: คำสำคัญของสกิลมี "เครื่อง" เดี่ยว ๆ ("เปิดแอปเครื่องคิดเลข" จะตรง) → ใช้กฎที่เข้มกว่า
+    MACHINE_SYMPTOMS = ("ช้า", "อืด", "ค้าง", "ร้อน")
+    MACHINE_WORDS = ("อุณหภูมิ", "แรม", "ram", "หน่วยความจำ", "พื้นที่เหลือ", "พัดลม")
+
+    @Slot(str, result="QVariantMap")
+    def voiceAnswer(self, text: str) -> dict:  # noqa: N802
+        """คำถามที่แชทตอบด้วยโค้ดก่อนถึง AI (นาฬิกา สมุดนัด ค้นไฟล์ สุขภาพเครื่อง) · ไม่ตรง = {}.
+
+        ลำดับเดียวกับ _handle · ไม่ใช้ทางที่ส่งออก (อากาศ · สร้างสกิล) · ยกเลิกนัด = การ์ดยืนยันเดิม
+        """
+        from aipc.skills import router
+        from aipc.skills.fileintent import file_intent, file_time
+
+        t0 = time.monotonic()
+        for ask in (self._agenda_card, self._clock_card, self._until_card, self._cancel_card,
+                    self._next_card, self._move_card):  # fmt: skip
+            if card := ask(text):
+                return self._why(card, t0)
+        if label := file_time(text):
+            return self._why(self._files_card(text, label), t0)
+        if file_intent(text):
+            return self._why(self._files_card(text), t0)
+        t = text.lower().replace(" ", "")
+        machine = next((s for s in self._skills if s.id == "machine-status"), None)
+        about_machine = ("เครื่อง" in t and any(w in t for w in self.MACHINE_SYMPTOMS)) or any(
+            w in t for w in self.MACHINE_WORDS
+        )
+        if machine is not None and about_machine:
+            route = router.Route("skill", machine, "ถามสุขภาพเครื่องด้วยเสียง")
+            return self._why(self._card(route, text), t0)
+        return {}
+
     @Slot(str, result="QVariantMap")
     def voiceConfirm(self, text: str) -> dict:  # noqa: N802
         """ทาง ก (การ์ด 0028 หัวข้อ 12): ได้ยินใกล้เคียงสกิลแต่ไม่ตรงเป๊ะ → การ์ด "หมายถึง … ใช่ไหม" ใบเดียว.

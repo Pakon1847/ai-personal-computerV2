@@ -414,13 +414,19 @@ class ShellCardTest(unittest.TestCase):
         answered = answered.toVariant() if hasattr(answered, "toVariant") else answered
         self.assertTrue(answered.get("tok-1"))
         n = len(items_of(page))
+        page.voiceCommand("แต่งกลอนให้หน่อย")
+        settle(100)
+        rows = items_of(page)
+        self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + คำบอก · ไม่มีคำตอบของ AI ตามมา
+        self.assertEqual(rows[n]["text"], "แต่งกลอนให้หน่อย")
+        self.assertIn("ไม่รู้จักคำสั่ง", rows[-1]["text"])
+        self.assertNotIn("card", rows[-1])
+        # การ์ด 0029: คำถามที่โค้ดตอบเองได้ = การ์ดเวลาจากนาฬิกาเครื่อง (ไม่ใช่ AI · 0027 เดิมได้ "ไม่รู้จักคำสั่ง")
         page.voiceCommand("ตอนนี้กี่โมง")
         settle(100)
         rows = items_of(page)
-        self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + คำบอก · ไม่มีการ์ดเวลาหรือคำตอบของ AI ตามมา
-        self.assertEqual(rows[n]["text"], "ตอนนี้กี่โมง")
-        self.assertIn("ไม่รู้จักคำสั่ง", rows[-1]["text"])
-        self.assertNotIn("card", rows[-1])
+        self.assertEqual(rows[-2]["text"], "ตอนนี้กี่โมง")
+        self.assertEqual(rows[-1]["card"]["kind"], "clock")
         self.assertEqual(warnings, [])
 
     def test_hands_free_command_mode_routes(self):
