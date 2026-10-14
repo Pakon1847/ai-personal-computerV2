@@ -66,22 +66,75 @@ def sentences() -> list[tuple[str, str]]:
     return rows
 
 
+def install_skills(folder: Path) -> tuple[list, list[str]]:
+    """การ์ด 0028: ติดตั้งสกิล .md ทุกไฟล์ผ่านประตูตรวจจริง (UserSkills.install) ลงโฟลเดอร์ชั่วคราว.
+
+    ไม่ผ่านประตู = ไม่ใช้ (เหมือนในแอป)
+    """
+    import tempfile
+
+    from aipc.skills import manifest, userskills
+
+    store = userskills.UserSkills(Path(tempfile.mkdtemp(prefix="voice-skills-")))
+    builtin, rejected = manifest.load_builtin(), []
+    for f in sorted(folder.glob("*.md")):
+        try:
+            store.install(f.read_text(encoding="utf-8"), builtin + store.load(), request="")
+        except manifest.InvalidSkill as e:
+            rejected.append(f"{f.name}: {e.errors[0] if e.errors else e}")
+    return store.load(), rejected
+
+
 def main() -> int:
+    from aipc.skills import router
+
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, required=True, help="ไฟล์ค่าดิบ JSON")
+    ap.add_argument("--skills", type=Path, help="การ์ด 0028: โฟลเดอร์สกิล .md ที่ติดตั้งก่อนตัดสินทาง")
+    ap.add_argument("--baseline", type=Path, help="การ์ด 0028: ผล 0027 (routes.json) ไว้เทียบ")
     args = ap.parse_args()
+    sys.stdout.reconfigure(encoding="utf-8")
+    skill, extra = None, {}
+    if args.skills:
+        installed, rejected = install_skills(args.skills)
+        voice = [m for m in installed if m.steps and m.worker == "code"]  # เหมือน SkillsController
+
+        def skill(text: str) -> str:
+            m = router.repeat_of(text, voice)
+            return m.id if m else ""
+
+        # ประโยคของสกิลเอง: โค้ดล้วนต้องเป็น "skill" ทุกประโยค · สกิลที่ใช้ AI ต้องไม่เป็น
+        own = [{"skill": m.id, "worker": m.worker, "text": t, "way": route(t, False, skill)}
+               for m in installed for t in m.examples]  # fmt: skip
+        extra = {"installed": [f"{m.id} ({m.worker})" for m in installed], "rejected": rejected,
+                 "own_phrases": own}  # fmt: skip
+        n = f"ติดตั้งผ่านประตู {len(installed)} ตัว (สั่งด้วยเสียงได้ {len(voice)})"
+        print(f"{n} · ไม่ผ่าน {len(rejected)}")
+        for r in rejected:
+            print("  ไม่ผ่านประตู:", r)
+        ok = sum((o["way"] == "skill") == (o["worker"] == "code") for o in own)
+        print(f"ประโยคของสกิลเอง: ไปทางถูก {ok}/{len(own)} (โค้ดล้วน = skill · ใช้ AI = ไม่ใช่ skill)")
     out = []
     for src, text in sentences():
         for running in (False, True):
-            old, new = old_route(text, running), route(text, running)
+            old, new = old_route(text, running), route(text, running, skill)
             out.append({"set": src, "text": text, "browser_running": running,
                         "old": old, "new": new, "judge": judge(old, new)})  # fmt: skip
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    args.out.write_text(json.dumps({"cases": out, **extra} if extra else out, ensure_ascii=False,
+                                   indent=1), encoding="utf-8")  # fmt: skip
+    if args.baseline:
+        base = json.loads(args.baseline.read_text(encoding="utf-8"))
+        base = base["cases"] if isinstance(base, dict) else base
+        key = {(b["set"], b["text"], b["browser_running"]): b["new"] for b in base}
+        diff = [r for r in out if key.get((r["set"], r["text"], r["browser_running"])) != r["new"]]
+        print(f"ต่างจากผลเทียบ ({args.baseline}): {len(diff)} กรณี")
+        for r in diff:
+            was = key.get((r["set"], r["text"], r["browser_running"]))
+            print(f"  ต่าง: {r['text']} ({r['browser_running']}): {was} → {r['new']}")
     to_ai = sum(r["new"] == "chat" for r in out)
     counts = {k: sum(r["judge"] == k for r in out) for k in
               ("same", "intended", "new_action", "lost", "changed")}  # fmt: skip
-    sys.stdout.reconfigure(encoding="utf-8")
     print(f"ประโยค {len(out) // 2} × เบราว์เซอร์ปิด/เปิด = {len(out)} กรณี")
     print(f"เกณฑ์ 2 · ไปทาง AI ในเครื่อง (แชท): {to_ai}")
     print("เกณฑ์ 3 · เทียบแอปเดิม: " + " · ".join(f"{k} {v}" for k, v in counts.items()))
