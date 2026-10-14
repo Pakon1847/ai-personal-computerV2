@@ -192,9 +192,11 @@ class SessionConfigTest(unittest.TestCase):
     def test_no_default_keybinds_or_terminal(self):
         rc = self.code_only(self.DIR / "rc.xml")
         self.assertIn('key="A-Tab"', rc)
-        # คีย์ลัดเรียกโปรแกรมได้ตัวเดียว: F9 สั่งด้วยเสียง (การ์ด 0024) · ไม่มี terminal/โปรแกรมอื่น
+        # คีย์ลัดเรียกโปรแกรมได้ตัวเดียว: F9 / Alt+Space สั่งด้วยเสียง (การ์ด 0024 · 0026) · ไม่มี terminal
         runs = re.findall(r'<action name="Execute" command="([^"]*)"', rc)
-        self.assertEqual(runs, ["/opt/aipc-v2/scripts/pi/session/aipc-voice-key"])
+        self.assertEqual(runs, ["/opt/aipc-v2/scripts/pi/session/aipc-voice-key"] * 2)
+        keys = re.findall(r'<keybind key="([^"]*)">\s*<action name="Execute"', rc)
+        self.assertEqual(keys, ["F9", "A-space"])  # labwc: ผูกปุ่มเดียวกันซ้ำ = ใช้ได้แค่อันสุดท้าย
         rc = re.sub(r'<action name="Execute" command="[^"]*aipc-voice-key" />', "", rc)
         for bad in ("<default", "terminal", "Execute", "Exit", "wfpanelctl", "pishutdown"):
             self.assertNotIn(bad, rc, bad)

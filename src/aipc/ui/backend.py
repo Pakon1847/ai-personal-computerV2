@@ -432,7 +432,7 @@ class VoiceController(QObject):
 
     @Slot()
     def toggleHandsFree(self) -> None:  # noqa: N802
-        """คีย์ลัด F9: เริ่มฟัง (เสียงติ๊ก) · กดอีกครั้งระหว่างฟัง = หยุดแล้วถอดเลย."""
+        """คีย์ลัด F9 / Alt+Space: เริ่มฟัง (เสียงติ๊ก) · กดอีกครั้งระหว่างฟัง = หยุดแล้วถอดเลย."""
         if self._listener is None:
             return
         if self._listener.listening:

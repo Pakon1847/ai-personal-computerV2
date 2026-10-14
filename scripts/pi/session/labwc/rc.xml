@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ค่าตั้ง labwc ของเซสชัน V2 (การ์ด 0004)
-  มีคีย์ลัดแค่สลับหน้าต่าง (กลับจากเบราว์เซอร์ที่สกิล 4 เปิด) และ F9 สั่งด้วยเสียง (การ์ด 0024) · ไม่มีคีย์เปิด terminal/เมนู/ปิดเครื่องของ Pi
+  มีคีย์ลัดแค่สลับหน้าต่าง (กลับจากเบราว์เซอร์ที่สกิล 4 เปิด) และ F9 / Alt+Space สั่งด้วยเสียง (การ์ด 0024 · 0026) · ไม่มีคีย์เปิด terminal/เมนู/ปิดเครื่องของ Pi
   labwc โหลดคีย์ลัดค่าเริ่มต้นเฉพาะเมื่อไม่ได้กำหนดเลย หรือใส่ <default /> → ที่นี่กำหนดเอง จึงไม่มีค่าเริ่มต้น
 -->
 <openbox_config xmlns="http://openbox.org/3.4/rc">
@@ -22,6 +22,10 @@
     </keybind>
     <!-- F9 = เริ่ม/หยุดฟังเสียง ใช้ได้แม้เบราว์เซอร์เต็มจอ (การ์ด 0024 · Pakon เลือกปุ่มเดียวแทนคำปลุก 2026-10-13) -->
     <keybind key="F9">
+      <action name="Execute" command="/opt/aipc-v2/scripts/pi/session/aipc-voice-key" />
+    </keybind>
+    <!-- Alt+Space = ปุ่มเดียวกับ F9 สำหรับคีย์บอร์ดที่ไม่มี F9 (การ์ด 0026 · Pakon 2026-10-14) · labwc ผูกปุ่มเดียวกันซ้ำไม่ได้ แต่ต่างปุ่มได้ -->
+    <keybind key="A-space">
       <action name="Execute" command="/opt/aipc-v2/scripts/pi/session/aipc-voice-key" />
     </keybind>
   </keyboard>

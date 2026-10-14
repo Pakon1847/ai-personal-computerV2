@@ -1,6 +1,6 @@
 """สั่งด้วยเสียงไม่ใช้เมาส์ (การ์ด 0024): คีย์ลัดทั้งเครื่อง + เบราว์เซอร์ของผู้ช่วย.
 
-- labwc กด F9 → `scripts/pi/session/aipc-voice-key` เขียนหนึ่งไบต์ลง FIFO
+- labwc กด F9 หรือ Alt+Space (การ์ด 0026) → `scripts/pi/session/aipc-voice-key` เขียนหนึ่งไบต์ลง FIFO
   `$XDG_RUNTIME_DIR/aipc/voice-key` → HotkeyListener ส่ง pressed()
   (FIFO ของผู้ใช้คนนี้ 0600 · บัญชีอื่นกดแทนไม่ได้)
 - BrowserController ทำคำสั่งเว็บในเธรดแยก (หน้าเว็บโหลดหลายวินาที) แล้วส่ง finished(ประโยคสั้น, สำเร็จไหม)
