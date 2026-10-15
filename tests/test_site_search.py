@@ -74,6 +74,20 @@ class SiteSearchParseTest(unittest.TestCase):
             with self.subTest(t=t):
                 self.assertFalse(any(c.kind == "site_search" for c in browse.parse(t)))
 
+    def test_round1_fixes_are_general_rules(self):
+        # เล่าว่าหาไม่เจอ/ไม่พบ = ไม่ใช่สั่งค้น (ประโยคต่างจากชุดวัด)
+        for t in ("เปิดยูทูบแล้วหาคลิปที่เคยดูไม่เจอ", "หาโพสต์ของแม่ในเฟซบุ๊กไม่พบ"):
+            with self.subTest(t=t):
+                self.assertFalse(any(c.kind == "site_search" for c in browse.parse(t)))
+        # "อยู่ไหน" ยังเป็นคำค้นแผนที่ได้
+        where = BrowseCommand("site_search", query="โรงพยาบาลอยู่ไหน", site="maps")
+        self.assertEqual(browse.parse("ค้นในแผนที่ว่าโรงพยาบาลอยู่ไหน"), [where])
+        # "หารูป…" กับบริการที่พูดชื่อ = ค้นในบริการ · ไม่มีชื่อบริการ = ทางเดิม (ไม่ใช่ค้นเว็บ)
+        trip = BrowseCommand("site_search", query="รูปทริปเชียงใหม่", site="drive")
+        self.assertEqual(browse.parse("เปิดกูเกิลไดรฟ์แล้วหารูปทริปเชียงใหม่"), [trip])
+        self.assertEqual(browse.parse("หารูปแมวในเฟซบุ๊ก")[0].query, "รูปแมว")
+        self.assertEqual(browse.parse("หารูปแมว"), [])
+
     def test_then_open_first_link(self):
         self.assertEqual(browse.parse("ค้นในยูทูบว่าเพลงลูกทุ่งแล้วเข้าลิงก์แรก"),
                          [BrowseCommand("site_search", query="เพลงลูกทุ่ง", site="youtube"),
