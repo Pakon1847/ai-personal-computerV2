@@ -12,11 +12,11 @@
     ข้อเดือนหน้าขึ้นกับหน้าต่างสำเนา [now−1 วัน, now+60 วัน)
 - **เบี่ยงจากการ์ด:** ชุดวัดเขียนหลังเขียนโค้ด (`d1ab142`) แต่ก่อนรันครั้งแรก · ผู้เขียนไม่เห็นโค้ด
 - **วิธีรัน (ครั้งเดียว · วินโดวส์ · เขตเวลา UTC+7):**
-  `python -m aipc.spikes.agenda_eval --out docs/benchmarks/2026-10-16-agenda-detail-eval/results-run1.json`
+  `python -m aipc.spikes.agenda_eval --out docs/benchmarks/2026-10-15-agenda-detail-eval/results-run1.json`
 
 ## ผล
 
-**รอบ 1 (2026-10-16 ~00:45 · รันครั้งเดียว): ตอบได้ถูก 20/20 · ข้อหลอกไม่เข้า 10/10** ✅ · ค่าดิบ [`results-run1.json`](results-run1.json)
+**รอบ 1 (2026-10-15 ~23:33 · รันครั้งเดียว): ตอบได้ถูก 20/20 · ข้อหลอกไม่เข้า 10/10** ✅ · ค่าดิบ [`results-run1.json`](results-run1.json)
 
 | สภาพที่รัน | ค่า |
 |---|---|
