@@ -1567,11 +1567,21 @@ class SkillsController(QObject):
     skillsChanged = Signal()  # noqa: N815
     forgeDone = Signal("QVariantMap", str)  # noqa: N815 · สกิลอัตโนมัติ (การ์ด 0017): การ์ดผลลัพธ์, ข้อความเดิมของผู้ใช้
     _forged = Signal(object)
+    gcalChanged = Signal()  # noqa: N815 · ปฏิทิน Google (การ์ด 0014)
+    _gcal_done = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
-                 weather=None, claude_on=None, weather_on=None):  # fmt: skip
+                 weather=None, claude_on=None, weather_on=None, gcal=None):  # fmt: skip
         super().__init__()
+        # ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014 · aipc.skills.gcal.GoogleCalendar)
+        # · None = ไม่มี (หน้า Login)
+        self._gcal = gcal
+        self._gcal_busy = False
+        self._gcal_msg = ""  # ผลการเชื่อมต่อ/ดึงครั้งล่าสุดที่ผู้ใช้สั่ง (แสดงในหน้าตั้งค่า)
+        # ลองดึงเองครั้งล่าสุดเมื่อไหร่ · ออฟไลน์แล้วถามนัดซ้ำ ๆ ต้องไม่ลองดึงทุกครั้ง (สมุดบันทึกส่งออกจะรก)
+        self._gcal_tried = None
+        self._gcal_done.connect(self._on_gcal_done)
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
         from aipc.skills import actions, manifest, reminders
@@ -1613,6 +1623,120 @@ class SkillsController(QObject):
         self._timer = QTimer(self, interval=self.TICK_MS, timeout=self.tick)
         if run_timer:  # หน้า greeter (ยังไม่มีใครเข้าเครื่อง) ไม่มีนัดของใครให้เตือน และไม่เขียนไฟล์
             self._timer.start()
+            if (
+                self._gcal is not None and self._gcal.connected
+            ):  # ดึงปฏิทิน Google ตอนเข้าสู่ระบบ (เบื้องหลัง)
+                self._gcal_refresh()
+
+    # ---------- ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014) ----------
+
+    def _gcal_refresh(self, link: str | None = None) -> bool:
+        """ดึงใหม่ (หรือเชื่อมต่อด้วยลิงก์ใหม่) ในเธรดแยก · หน้าจอไม่ค้างระหว่างรอเน็ต · กำลังดึงอยู่ = ไม่ซ้อน."""
+        import threading
+
+        from aipc.skills import gcal
+
+        if self._gcal is None or self._gcal_busy:
+            return False
+        self._gcal_busy = True
+        self._gcal_tried = self._now()
+        self.gcalChanged.emit()
+
+        def work():
+            try:
+                r = self._gcal.connect(link) if link is not None else self._gcal.sync()
+            except Exception as e:  # noqa: BLE001 · เธรดเบื้องหลังห้ามล้มเงียบ (H2) · บอกผู้ใช้แทน
+                r = gcal.SyncResult(False, 0, f"ดึงปฏิทินไม่สำเร็จ: {e}")
+            self._gcal_done.emit(r)
+
+        threading.Thread(target=work, daemon=True).start()
+        return True
+
+    def _on_gcal_done(self, result) -> None:
+        self._gcal_busy = False
+        self._gcal_msg = result.message
+        self.gcalChanged.emit()
+        self.remindersChanged.emit()  # นัดถัดไปที่หน้าแรกรวมนัด Google ด้วย
+
+    def _gcal_between(self, start, days: int) -> list:
+        return self._gcal.between(start, days) if self._gcal is not None else []
+
+    def _gcal_upcoming(self, now) -> list:
+        return self._gcal.upcoming(now) if self._gcal is not None else []
+
+    def _gcal_note(self, now) -> str:
+        """บรรทัดบอกที่มาและความสด (H5) · ไม่ได้เชื่อมต่อ = "" · สำเนาเก่ากว่า 30 นาที = ดึงใหม่เบื้องหลัง."""
+        g = self._gcal
+        if g is None or not g.connected:
+            return ""
+        from aipc.skills.gcal import STALE
+
+        if g.stale(now) and (self._gcal_tried is None or now - self._gcal_tried > STALE):
+            self._gcal_refresh()
+        if g.last_sync is None:
+            return "ปฏิทิน Google: ยังดึงไม่สำเร็จ" + (f" ({g.error})" if g.error else "")
+        at = g.last_sync.astimezone()
+        when = (
+            f"{at:%H:%M} น."
+            if at.date() == now.date()
+            else f"{thaidate.short_date(at)} {at:%H:%M} น."
+        )
+        note = f"ปฏิทิน Google: ข้อมูลเมื่อ {when}"
+        if g.old(now):
+            note += " · เก่ากว่า 1 วัน"
+        if g.error:
+            note += " · ดึงครั้งล่าสุดไม่สำเร็จ"
+        return note
+
+    @Property(bool, constant=True)
+    def gcalAvailable(self) -> bool:  # noqa: N802
+        return self._gcal is not None
+
+    @Property(bool, notify=gcalChanged)
+    def gcalConnected(self) -> bool:  # noqa: N802
+        return self._gcal is not None and self._gcal.connected
+
+    @Property(str, notify=gcalChanged)
+    def gcalHint(self) -> str:  # noqa: N802
+        return self._gcal.hint if self._gcal is not None else ""
+
+    @Property(bool, notify=gcalChanged)
+    def gcalBusy(self) -> bool:  # noqa: N802
+        return self._gcal_busy
+
+    @Property(str, notify=gcalChanged)
+    def gcalStatus(self) -> str:  # noqa: N802
+        g = self._gcal
+        if g is None:
+            return ""
+        if self._gcal_busy:
+            return "กำลังดึงปฏิทินจาก Google…"
+        if not g.connected:
+            return self._gcal_msg
+        if g.last_sync is None:
+            return g.error or self._gcal_msg
+        at = g.last_sync.astimezone()
+        n = len(g.between(at.date(), 60))
+        text = f"ดึงล่าสุด {thaidate.short_date(at)} {at:%H:%M} น. · {n} นัดในช่วง 60 วัน"
+        return text + (f" · ครั้งล่าสุดดึงไม่ได้: {g.error}" if g.error else "")
+
+    @Slot(str, result=bool)
+    def gcalConnect(self, link: str) -> bool:  # noqa: N802
+        """เชื่อมต่อด้วยลิงก์ที่ผู้ใช้วาง · ลองดึงจริงก่อน สำเร็จแล้วจึงจำลิงก์ (aipc.skills.gcal)."""
+        return self._gcal_refresh(link)
+
+    @Slot(result=bool)
+    def gcalSyncNow(self) -> bool:  # noqa: N802
+        return self._gcal is not None and self._gcal.connected and self._gcal_refresh()
+
+    @Slot()
+    def gcalDisconnect(self) -> None:  # noqa: N802
+        if self._gcal is None or self._gcal_busy:
+            return
+        self._gcal.disconnect()
+        self._gcal_msg = "เลิกเชื่อมต่อแล้ว · ลบลิงก์และสำเนานัดจาก Google ออกจากเครื่องนี้แล้ว"
+        self.gcalChanged.emit()
+        self.remindersChanged.emit()
 
     def _badge(self, skill, reason: str) -> dict:
         badge = {"name": skill.name, "reason": reason, "worker": self.WORKER_LABEL[skill.worker]}
@@ -1655,12 +1779,33 @@ class SkillsController(QObject):
 
         return f" · ซ้ำ{repeat_name(r.repeat)}" if getattr(r, "repeat", "") else ""
 
+    def _item_when(self, r) -> str:
+        """เวลาของนัด · นัดทั้งวันจาก Google ไม่มีเวลา (การ์ด 0014)."""
+        if getattr(r, "all_day", False):
+            return f"{thaidate.short_date(r.when)} {r.when.year + thaidate.BE_OFFSET} · ทั้งวัน"
+        return self._when_text(r.when)
+
+    @staticmethod
+    def _source_text(r) -> str:
+        return " · Google" if getattr(r, "source", "") == "google" else ""
+
+    @staticmethod
+    def _is_past(r, now) -> bool:
+        """นัดทั้งวันผ่านไปเมื่อวันนั้นจบ ไม่ใช่ตอนเที่ยงคืนต้นวัน."""
+        end = r.end if getattr(r, "all_day", False) else r.when
+        return getattr(r, "fired", False) or end < now
+
     def _reminder_dict(self, r) -> dict:
-        return {"id": r.id, "what": r.what, "when": self._when_text(r.when) + self._repeat_text(r)}
+        when = self._item_when(r) + self._repeat_text(r) + self._source_text(r)
+        return {"id": r.id, "what": r.what, "when": when}
+
+    def _upcoming_all(self, now) -> list:
+        """นัดที่ยังไม่ถึงเวลา: นัดในเครื่อง + นัดจากปฏิทิน Google (ถ้าเชื่อมต่อ) · เรียงตามเวลา."""
+        return sorted([*self._store.upcoming(now), *self._gcal_upcoming(now)], key=lambda r: r.when)
 
     @Property("QVariantList", notify=remindersChanged)
     def upcoming(self) -> list:
-        return [self._reminder_dict(r) for r in self._store.upcoming(self._now())]
+        return [self._reminder_dict(r) for r in self._upcoming_all(self._now())]
 
     @Property("QVariantList", constant=True)
     def missed(self) -> list:
@@ -1717,6 +1862,12 @@ class SkillsController(QObject):
         def line(r):
             return f"{self._when_text(r.when)} · {r.what}{self._repeat_text(r)}"
 
+        google = [e for e in self._gcal_upcoming(self._now())
+                  if key and (key in (w := e.what.replace(" ", "")) or w in key)]  # fmt: skip
+        if not hits and google:  # การ์ด 0014: เครื่องนี้อ่านปฏิทิน Google อย่างเดียว ลบไม่ได้
+            lines = ["เครื่องนี้อ่านปฏิทิน Google อย่างเดียว · ลบหรือแก้ได้ในแอป Google Calendar"]
+            return self._plain("reminder", f"นัด “{key}” อยู่ในปฏิทิน Google",
+                               lines + [self._reminder_line(e) for e in google[:5]])  # fmt: skip
         if not hits:
             names = [line(r) for r in live[:5]]
             title = f"ไม่พบนัด “{key}”" if key and live else "ยังไม่มีนัดให้ลบ"
@@ -1724,14 +1875,17 @@ class SkillsController(QObject):
         self._counter += 1
         token = f"r{self._counter}"
         self._pending[token] = ("cancel", [r.id for r in hits])
-        card = self._plain("reminder", f"ลบนัด {len(hits)} รายการ ใช่ไหม", [line(r) for r in hits])
+        lines = [line(r) for r in hits]
+        if not key and self._gcal_upcoming(self._now()):
+            lines.append("นัดจากปฏิทิน Google ไม่ถูกลบ (เครื่องนี้อ่านอย่างเดียว)")
+        card = self._plain("reminder", f"ลบนัด {len(hits)} รายการ ใช่ไหม", lines)
         card["confirmToken"] = token
         if reminder := next((s for s in self._skills if s.id == "reminder"), None):
             card["badge"] = self._badge(reminder, "ขอลบนัด · ลบด้วยโค้ดหลังกดยืนยัน")
         return card
 
     def _reminder_line(self, r) -> str:
-        return f"{self._when_text(r.when)} · {r.what}{self._repeat_text(r)}"
+        return f"{self._item_when(r)} · {r.what}{self._repeat_text(r)}{self._source_text(r)}"
 
     def _with_reminder_badge(self, card: dict, why: str) -> dict:
         if reminder := next((s for s in self._skills if s.id == "reminder"), None):
@@ -1744,11 +1898,14 @@ class SkillsController(QObject):
 
         if not agenda.asks_next(text):
             return None
-        up = self._store.upcoming(self._now())
+        now = self._now()
+        up = self._upcoming_all(now)
         title = f"นัดที่ยังไม่ถึงเวลา {len(up)} นัด" if up else "ยังไม่มีนัดที่รออยู่"
         lines = [self._reminder_line(r) for r in up[:10]] or [
             "จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"
         ]
+        if note := self._gcal_note(now):
+            lines.append(note)
         return self._with_reminder_badge(
             self._plain("reminder", title, lines), "ถามนัด · อ่านจากนัดที่บันทึกไว้"
         )
@@ -1764,6 +1921,11 @@ class SkillsController(QObject):
                 if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
         lines = ["ทำได้ 2 ขั้น: พิมพ์ “ยกเลิกนัด…” แล้วจดนัดใหม่ เช่น “พรุ่งนี้บ่ายสามประชุม”"]
         lines += [self._reminder_line(r) for r in hits[:5]]
+        google = [e for e in self._gcal_upcoming(self._now())
+                  if e.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
+        if google:  # การ์ด 0014: นัดจาก Google แก้ได้ในแอป Google Calendar เท่านั้น
+            lines.append("นัดจากปฏิทิน Google เลื่อนได้ในแอป Google Calendar เท่านั้น:")
+            lines += [self._reminder_line(e) for e in google[:5]]
         card = self._plain("reminder", "ยังเลื่อนนัดให้ไม่ได้", lines)
         return self._with_reminder_badge(card, "ขอเลื่อนนัด · ยังไม่รองรับ จึงไม่จดนัดใหม่")
 
@@ -1790,7 +1952,10 @@ class SkillsController(QObject):
         q = agenda.parse(text, self._now().date())
         if q is None:
             return None
-        items = agenda.items_for(self._store, q)
+        now = self._now()
+        # นัดในเครื่อง + นัดจากปฏิทิน Google ในช่วงเดียวกัน (การ์ด 0014 · อ่านจากสำเนา ไม่ต้องใช้เน็ต)
+        items = sorted([*agenda.items_for(self._store, q), *self._gcal_between(q.start, q.days)],
+                       key=lambda r: r.when)  # fmt: skip
         day = thaidate.short_date(q.start)
         span = (
             day
@@ -1800,14 +1965,15 @@ class SkillsController(QObject):
         reminder = next((s for s in self._skills if s.id == "reminder"), None)
         card = self._plain("reminder", f"{q.label} ({span}) มี {len(items)} นัด" if items
                            else f"{q.label} ({span}) ยังไม่มีนัด")  # fmt: skip
+        note = self._gcal_note(now)
         if reminder is not None:
-            card["badge"] = self._badge(reminder, "ถามตารางนัด · อ่านจากนัดที่บันทึกไว้")
-        now = self._now()
+            why = "ถามตารางนัด · อ่านจากนัดที่บันทึกไว้" + (" + สำเนาปฏิทิน Google" if note else "")
+            card["badge"] = self._badge(reminder, why)
         card["lines"] = [
-            f"{'✓ ' if r.fired or r.when < now else ''}{self._when_text(r.when)} · {r.what}"
-            + self._repeat_text(r)
-            for r in items
+            f"{'✓ ' if self._is_past(r, now) else ''}{self._reminder_line(r)}" for r in items
         ] or ["จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"]
+        if note:
+            card["lines"].append(note)
         return card
 
     def _reminder_card(self, route, text: str) -> dict:

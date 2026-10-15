@@ -136,6 +136,15 @@ def _weather(ledger=None):
     return Weather(record=lambda sent: ledger.record("weather", sent))
 
 
+def _gcal(ledger=None):
+    """ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014) · ทุกครั้งที่ดึง = บันทึกใน ledger (ไม่มีลิงก์ลับในข้อความ)."""
+    from aipc.skills.gcal import GoogleCalendar
+
+    if ledger is None:
+        return GoogleCalendar()
+    return GoogleCalendar(record=lambda sent, ok: ledger.record("calendar", sent, ok=ok))
+
+
 def _start_idle_lock(ui_settings, app):
     """ล็อกจอเมื่อไม่ได้ใช้เครื่อง แล้วออกเอง (aipc.ui.idle · ขั้น A) · เฉพาะเซสชันจริง ·
     ค่าเปลี่ยน = เริ่ม swayidle ใหม่."""
@@ -275,6 +284,7 @@ def build(opts: Options, argv: list[str] | None = None):
             weather=_weather(ledger) if in_session else None,
             claude_on=claude_on,
             weather_on=lambda: ui_settings.useWeather,
+            gcal=_gcal(ledger) if in_session else None,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),

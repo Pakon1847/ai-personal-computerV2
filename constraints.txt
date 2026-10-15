@@ -7,3 +7,11 @@ shiboken6==6.11.2
 opencv-python-headless==5.0.0.93
 numpy==2.5.3
 ruff==0.16.8
+# ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014 · Pakon อนุมัติ dependency 2026-10-15 · ไลเซนส์ใน ADR-014)
+icalendar==7.3.0
+recurring-ical-events==3.8.2
+x-wr-timezone==2.0.1
+click==8.5.0
+python-dateutil==2.9.0.post0
+six==1.17.0
+tzdata==2026.5

@@ -28,6 +28,14 @@
 | IBM Plex Sans Thai, IBM Plex Mono (ฟอนต์ใน `src/aipc/ui/fonts/`) | SIL Open Font License 1.1 | ได้ (ห้ามขายตัวฟอนต์แยก) | `src/aipc/ui/fonts/OFL.txt` ดาวน์โหลดจาก github.com/google/fonts | 2026-09-23 |
 | PySide6-Essentials 6.11.2 + shiboken6 6.11.2 (Qt for Python) | `LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only` (หรือเชิงพาณิชย์จาก Qt) | ได้ ถ้าใช้ตาม LGPL: ลิงก์แบบ dynamic และให้ผู้ใช้เปลี่ยนไลบรารีได้ — เราติดตั้งผ่าน pip จึงเข้าเงื่อนไข | metadata ของ wheel ที่ติดตั้ง (`importlib.metadata`) | 2026-10-07 |
 | opencv-python-headless 5.0.0.93 | Apache-2.0 | ได้ | metadata ของ wheel ที่ติดตั้ง | 2026-10-07 |
+| icalendar 7.3.0 (อ่านไฟล์ปฏิทิน .ics · การ์ด 0014) | BSD-2-Clause | ได้ | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| recurring-ical-events 3.8.2 (กางนัดซ้ำ · การ์ด 0014) | LGPL-3.0-or-later | ได้ ถ้าใช้ตาม LGPL แบบเดียวกับ PySide6 (ติดตั้งผ่าน pip ผู้ใช้เปลี่ยนไลบรารีได้ · ไม่ได้แก้โค้ดของไลบรารี) | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| x-wr-timezone 2.0.1 (ตัวที่ recurring-ical-events ต้องใช้) | LGPL-3.0-or-later | ได้ (เงื่อนไขเดียวกับแถวบน) | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| click 8.5.0 (ตัวที่ x-wr-timezone ต้องใช้) | BSD-3-Clause | ได้ | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| python-dateutil 2.9.0.post0 (กฎนัดซ้ำ) | Apache-2.0 หรือ BSD-3-Clause (เลือกได้) | ได้ | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| six 1.17.0 (ตัวที่ python-dateutil ต้องใช้) | MIT | ได้ | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| tzdata 2026.5 (ข้อมูลเขตเวลา) | Apache-2.0 | ได้ | PyPI + metadata ของ wheel ที่ติดตั้ง | 2026-10-15 |
+| ปฏิทิน Google ผ่าน "ที่อยู่ลับในรูปแบบ iCal" (บริการภายนอก · การ์ด 0014) | ข้อตกลงการใช้บริการของ Google (ไม่ใช่ไลเซนส์ซอฟต์แวร์) · ผู้ใช้ดึงปฏิทินของตัวเอง | **ไม่ได้ตรวจเงื่อนไขเชิงพาณิชย์** | support.google.com/calendar/answer/37648 | 2026-10-15 |
 | numpy 2.5.3 | `BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0` | ได้ | metadata ของ wheel ที่ติดตั้ง | 2026-10-07 |
 | YuNet (`opencv_zoo/models/face_detection_yunet`) | MIT | ได้ | README ในโฟลเดอร์โมเดล | 2026-10-07 |
 | SFace (`opencv_zoo/models/face_recognition_sface`) | Apache-2.0 | ได้ | README ในโฟลเดอร์โมเดล | 2026-10-07 |
