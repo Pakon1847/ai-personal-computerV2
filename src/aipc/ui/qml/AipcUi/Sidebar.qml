@@ -24,6 +24,7 @@ Rectangle {
             AppText { anchors.centerIn: parent; text: "AI"; strong: true; oneLine: true; color: Theme.textOnAccent; size: Theme.px(15) }
         }
         NavItem { text: "ผู้ช่วย AI"; shortText: "ผู้ช่วย"; iconPath: Icons.chat; pageName: "workspace" }
+        NavItem { text: "ปฏิทิน"; iconPath: Icons.calendar; pageName: "calendar" }
         NavItem { text: "ไฟล์ของฉัน"; shortText: "ไฟล์"; iconPath: Icons.folder; pageName: "files" }
         NavItem { text: "Skill"; iconPath: Icons.sparkle; pageName: "skills" }
         NavItem { text: "สุขภาพเครื่อง"; shortText: "เครื่อง"; iconPath: Icons.activity; pageName: "health" }

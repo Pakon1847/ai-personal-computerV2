@@ -2158,8 +2158,7 @@ class SkillsController(QObject):
             card["route"] = "agenda"
             return card
         # นัดในเครื่อง + นัดจากปฏิทิน Google ในช่วงเดียวกัน (การ์ด 0014 · อ่านจากสำเนา ไม่ต้องใช้เน็ต)
-        items = sorted([*agenda.items_for(self._store, q), *self._gcal_between(q.start, q.days)],
-                       key=lambda r: r.when)  # fmt: skip
+        items = self._range_items(q)
         day = thaidate.short_date(q.start)
         span = (
             day
@@ -2189,6 +2188,60 @@ class SkillsController(QObject):
             card["lines"].append(note)
         card["route"] = "agenda"
         return card
+
+    def _range_items(self, q) -> list:
+        """นัดในเครื่อง + Google + วันหยุดในช่วงวันของคำถาม · เรียงตามเวลา.
+
+        ใช้ทั้งคำตอบนัดและหน้าปฏิทิน (การ์ด 0038) · สองที่จึงแสดงตรงกันเสมอ
+        """
+        from aipc.skills import agenda
+
+        return sorted([*agenda.items_for(self._store, q), *self._gcal_between(q.start, q.days)],
+                      key=lambda r: r.when)  # fmt: skip
+
+    @Slot(int, int, result="QVariantMap")
+    def monthItems(self, year: int, month: int) -> dict:  # noqa: N802
+        """ตารางเดือน 6 × 7 ช่อง (เริ่มวันจันทร์) สำหรับหน้าปฏิทิน (การ์ด 0038) · ปี/เดือน 0 = เดือนนี้.
+
+        บรรทัดของแต่ละวันสร้างแบบเดียวกับคำตอบ "…มีนัดอะไร" ทุกตัวอักษร (H5: หน้าจอกับคำตอบไม่มีทางต่างกัน)
+        """
+        from datetime import date
+
+        from aipc.skills import agenda
+
+        now = self._now()
+        if not 1 <= month <= 12 or year < 1:
+            year, month = now.year, now.month
+        first = date(year, month, 1)
+        start = first - timedelta(days=first.weekday())
+        cells = []
+        for i in range(42):
+            d = start + timedelta(days=i)
+            items = self._range_items(agenda.Query(d, 1, ""))
+            sources = {getattr(r, "source", "") for r in items}
+            kinds = {getattr(r, "kind", "") for r in items}
+            lines = [
+                f"{'✓ ' if self._is_past(r, now) else ''}{self._reminder_line(r)}" for r in items
+            ]
+            cells.append({
+                "day": d.day, "iso": d.isoformat(), "inMonth": d.month == month,
+                "today": d == now.date(), "local": "" in sources, "google": "google" in sources,
+                "holiday": "holiday" in kinds, "observance": "observance" in kinds, "lines": lines,
+                "label": thaidate.long_date(datetime.combine(d, datetime.min.time())),
+            })  # fmt: skip
+        note = ""
+        g = self._gcal
+        if g is not None and g.connected and g.last_sync is not None:
+            from aipc.skills.gcal import FUTURE
+
+            until = (g.last_sync + FUTURE).astimezone().date()
+            last = start + timedelta(days=41)
+            if last > until:
+                when = f"{thaidate.short_date(until)} {until.year + thaidate.BE_OFFSET}"
+                note = f"นัดจาก Google มีข้อมูลถึง {when}"
+        title = f"{thaidate.MONTHS[month - 1]} {year + thaidate.BE_OFFSET}"
+        return {"year": year, "month": month, "title": title, "cells": cells, "note": note,
+                "todayIso": now.date().isoformat()}  # fmt: skip
 
     def _agenda_step(self, step_text: str) -> list[str]:
         """ขั้น "บอกนัดวันนี้/พรุ่งนี้/สัปดาห์นี้" ของสกิล → บรรทัดเดียวกับคำตอบ "…มีนัดอะไร" (การ์ด 0034)."""

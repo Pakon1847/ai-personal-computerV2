@@ -37,3 +37,4 @@ EnrollPreview 1.0 EnrollPreview.qml
 WhyPanel 1.0 WhyPanel.qml
 DeleteFlow 1.0 DeleteFlow.qml
 ClaudeGuide 1.0 ClaudeGuide.qml
+CalendarPage 1.0 CalendarPage.qml

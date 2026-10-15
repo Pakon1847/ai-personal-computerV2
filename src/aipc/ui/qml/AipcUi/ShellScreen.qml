@@ -23,10 +23,15 @@ Rectangle {
                 Layout.fillHeight: true
                 Layout.minimumHeight: 0
                 // หน้าความเป็นส่วนตัวตัดออกในขอบเขตรอบ 3 · ที่ลบข้อมูลใบหน้าอยู่ในหน้าตั้งค่า จึงพาไปหน้านั้นแทน
-                readonly property var order: ["workspace", "files", "skills", "health", "settings"]
+                readonly property var order: ["workspace", "calendar", "files", "skills", "health", "settings"]
                 currentIndex: Math.max(0, order.indexOf(AppState.page === "privacy" ? "settings" : AppState.page))
 
                 WorkspacePage {}
+                // ปฏิทินตารางเดือน (การ์ด 0038) · อ่านอย่างเดียว · ข้อมูลชุดเดียวกับคำตอบนัด
+                PageScroll {
+                    contentHeight: calendarPage.implicitHeight + 40
+                    CalendarPage { id: calendarPage; x: 32; y: 8; width: parent.width - 64 }
+                }
                 Item {
                     FilesPage { anchors.fill: parent; anchors.margins: 24; anchors.topMargin: 8; anchors.leftMargin: 32; anchors.rightMargin: 32 }
                 }

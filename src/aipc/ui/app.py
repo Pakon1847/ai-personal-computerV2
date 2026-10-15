@@ -35,7 +35,7 @@ HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
 FONT_DIR = HERE / "fonts"
 SCREENS = ("login", "signup", "recover", "delete", "shell")
-PAGES = ("workspace", "files", "skills", "health", "settings")
+PAGES = ("workspace", "calendar", "files", "skills", "health", "settings")
 
 
 @dataclass
