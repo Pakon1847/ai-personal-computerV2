@@ -2153,6 +2153,10 @@ class SkillsController(QObject):
         if q is None:
             return None
         now = self._now()
+        if q.days == 0:  # วันที่ไม่มีจริง (การ์ด 0037) · ไม่เดาวันใกล้เคียง
+            card = self._plain("reminder", f"ไม่มี{q.label}", ["ลองระบุวันที่ใหม่ เช่น “วันที่ 30 มีนัดอะไร”"])
+            card["route"] = "agenda"
+            return card
         # นัดในเครื่อง + นัดจากปฏิทิน Google ในช่วงเดียวกัน (การ์ด 0014 · อ่านจากสำเนา ไม่ต้องใช้เน็ต)
         items = sorted([*agenda.items_for(self._store, q), *self._gcal_between(q.start, q.days)],
                        key=lambda r: r.when)  # fmt: skip
@@ -2166,6 +2170,15 @@ class SkillsController(QObject):
         card = self._plain("reminder", f"{q.label} ({span}) มี {len(items)} นัด" if items
                            else f"{q.label} ({span}) ยังไม่มีนัด")  # fmt: skip
         note = self._gcal_note(now)
+        g = self._gcal
+        if (
+            note and g is not None and g.last_sync is not None
+        ):  # ช่วงยาวเกินสำเนา Google (เดือนหน้า) = บอก (H5)
+            from aipc.skills.gcal import FUTURE
+
+            until = (g.last_sync + FUTURE).astimezone().date()
+            if q.start + timedelta(days=q.days - 1) > until:
+                note += f" · มีข้อมูลถึง {thaidate.short_date(until)}"
         if reminder is not None:
             why = "ถามตารางนัด · อ่านจากนัดที่บันทึกไว้" + (" + สำเนาปฏิทิน Google" if note else "")
             card["badge"] = self._badge(reminder, why)
@@ -2174,6 +2187,29 @@ class SkillsController(QObject):
         ] or ["จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"]
         if note:
             card["lines"].append(note)
+        card["route"] = "agenda"
+        return card
+
+    def _title_card(self, text: str) -> dict | None:
+        """ "นัดหมอวันไหน" · "มีนัดกับหมอไหม" (การ์ด 0037) → นัดที่ยังไม่ถึงซึ่งชื่อมีคำนั้น · ไม่ใช่คำถามนี้ = None."""
+        from aipc.skills import agenda
+
+        hit = agenda.title_query(text)
+        if hit is None:
+            return None
+        name, strict = hit
+        now = self._now()
+        found = [r for r in self._upcoming_all(now) if name in r.what.replace(" ", "")]
+        if not found and not strict:
+            return None  # "ทีมชาติไทยแข่งครั้งหน้าเมื่อไหร่" ที่ไม่มีนัดชื่อนี้ = ไม่ใช่คำถามนัด
+        title = f"นัด “{name}” ที่ยังไม่ถึง {len(found)} นัด" if found else f"ไม่พบนัด “{name}” ที่ยังไม่ถึง"
+        lines = [self._reminder_line(r) for r in found[:10]]
+        if note := self._gcal_note(now):
+            lines.append(note)
+        card = self._with_reminder_badge(
+            self._plain("reminder", title, lines), "ค้นนัดตามชื่อ · อ่านจากนัดที่บันทึกไว้"
+        )
+        card["route"] = "agenda"
         return card
 
     def _reminder_card(self, route, text: str) -> dict:
@@ -2618,8 +2654,9 @@ class SkillsController(QObject):
         from aipc.skills.fileintent import file_intent, file_time
 
         t0 = time.monotonic()
-        for ask in (self._agenda_card, self._clock_card, self._until_card, self._holiday_card,
-                    self._cancel_card, self._next_card, self._move_card):  # fmt: skip
+        asks = (self._agenda_card, self._clock_card, self._until_card, self._holiday_card,
+                self._cancel_card, self._next_card, self._move_card, self._title_card)  # fmt: skip
+        for ask in asks:
             if card := ask(text):
                 return self._why(card, t0)
         if label := file_time(text):
@@ -2766,6 +2803,8 @@ class SkillsController(QObject):
         if card := self._cancel_card(text):  # ยกเลิก/ลบนัด = การ์ดยืนยัน แล้วลบด้วยโค้ด
             return card
         if card := self._next_card(text) or self._move_card(text):  # นัดถัดไป · ขอเลื่อนนัด
+            return card
+        if card := self._title_card(text):  # "นัดหมอวันไหน" (การ์ด 0037)
             return card
         # ขอสกิลใหม่ระหว่างปิดสวิตช์ Claude (AI ไม่มีเครื่องมือ create-skill) = บอกให้เปิดที่หน้าตั้งค่า
         # · พบบน Pi 5 2026-10-12: เดิม AI ในเครื่องตอบ "ไม่รู้ครับ สร้างสกิลไม่ได้"
