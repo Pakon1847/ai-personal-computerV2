@@ -1,0 +1,496 @@
+{
+ "positive_ok": 20,
+ "positive": 20,
+ "wrong_site": 0,
+ "negative_ok": 9,
+ "negative": 10,
+ "passed": false,
+ "rows": [
+  {
+   "id": "R01",
+   "text": "ช่วยค้นในยูทูบว่ารีวิวหม้อทอดไร้น้ำมันหน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "รีวิวหม้อทอดไร้น้ำมัน",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "รีวิวหม้อทอดไร้น้ำมัน"
+   }
+  },
+  {
+   "id": "R02",
+   "text": "หาวิธีใช้ Canva ทำสไลด์ ในยูทูบ หน่อยครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "วิธีใช้ canva ทำสไลด์",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "วิธีใช้ Canva ทำสไลด์"
+   }
+  },
+  {
+   "id": "R03",
+   "text": "เปิดยูทูปแล้วหาเพลงกล่อมเด็กให้หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพลงกล่อมเด็ก",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "เพลงกล่อมเด็ก"
+   }
+  },
+  {
+   "id": "R04",
+   "text": "หาในยูทูบท่าออกกำลังกายลดพุงค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ท่าออกกำลังกายลดพุง",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "ท่าออกกำลังกายลดพุง"
+   }
+  },
+  {
+   "id": "R05",
+   "text": "ช่วยหาร้านซ่อมรถมอเตอร์ไซค์แถวบางนาในแผนที่หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ร้านซ่อมรถมอเตอร์ไซค์แถวบางนา",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ร้านซ่อมรถมอเตอร์ไซค์แถวบางนา"
+   }
+  },
+  {
+   "id": "R06",
+   "text": "ค้นหาร้าน Starbucks แถวสยาม ในกูเกิลแมพ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ร้าน starbucks แถวสยาม",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ร้าน Starbucks แถวสยาม"
+   }
+  },
+  {
+   "id": "R07",
+   "text": "ค้นในแผนที่กูเกิลว่าปั๊มน้ำมันที่ใกล้ที่สุดครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปั๊มน้ำมันที่ใกล้ที่สุด",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ปั๊มน้ำมันที่ใกล้ที่สุด"
+   }
+  },
+  {
+   "id": "R08",
+   "text": "เปิดแผนที่แล้วค้นหาตลาดน้ำอัมพวานะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ตลาดน้ำอัมพวา",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ตลาดน้ำอัมพวา"
+   }
+  },
+  {
+   "id": "R09",
+   "text": "ค้นใน Gmail ว่า ใบเสร็จ Shopee ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ใบเสร็จ shopee",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ใบเสร็จ Shopee"
+   }
+  },
+  {
+   "id": "R10",
+   "text": "ช่วยค้นหาสลิปโอนค่าเทอมในอีเมลหน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สลิปโอนค่าเทอม",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "สลิปโอนค่าเทอม"
+   }
+  },
+  {
+   "id": "R11",
+   "text": "เปิดจีเมลแล้วเสิร์ชคำว่าสัมภาษณ์งาน",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สัมภาษณ์งาน",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "สัมภาษณ์งาน"
+   }
+  },
+  {
+   "id": "R12",
+   "text": "หาไฟล์รายรับรายจ่ายร้านกาแฟในกูเกิลไดรฟ์ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ไฟล์รายรับรายจ่ายร้านกาแฟ",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "ไฟล์รายรับรายจ่ายร้านกาแฟ"
+   }
+  },
+  {
+   "id": "R13",
+   "text": "ค้นในกูเกิลไดรฟ์ว่า รูปงานแต่งพี่สาว",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "รูปงานแต่งพี่สาว",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "รูปงานแต่งพี่สาว"
+   }
+  },
+  {
+   "id": "R14",
+   "text": "เปิดกูเกิลไดรฟ์หาสไลด์วิชาชีววิทยาให้หน่อยค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สไลด์วิชาชีววิทยา",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "สไลด์วิชาชีววิทยา"
+   }
+  },
+  {
+   "id": "R15",
+   "text": "ค้นในวิกิพีเดียคำว่าภาวะโลกร้อน",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ภาวะโลกร้อน",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ภาวะโลกร้อน"
+   }
+  },
+  {
+   "id": "R16",
+   "text": "ขอค้นหาคำว่า การสังเคราะห์ด้วยแสง ในวิกิพีเดีย หน่อยครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "การสังเคราะห์ด้วยแสง",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "การสังเคราะห์ด้วยแสง"
+   }
+  },
+  {
+   "id": "R17",
+   "text": "เปิดวิกิแล้วค้นหาดาวอังคาร",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ดาวอังคาร",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ดาวอังคาร"
+   }
+  },
+  {
+   "id": "R18",
+   "text": "ช่วยเปิดเฟสบุ๊คแล้วค้นหากลุ่มคนรักแมว",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "กลุ่มคนรักแมว",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "กลุ่มคนรักแมว"
+   }
+  },
+  {
+   "id": "R19",
+   "text": "เสิร์ชในเฟซบุ๊กว่า เพจข่าวท้องถิ่นเชียงราย หน่อยนะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพจข่าวท้องถิ่นเชียงราย",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "เพจข่าวท้องถิ่นเชียงราย"
+   }
+  },
+  {
+   "id": "R20",
+   "text": "ค้นกลุ่มซื้อขายของมือสองในเฟซบุ๊กค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "กลุ่มซื้อขายของมือสอง",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "กลุ่มซื้อขายของมือสอง"
+   }
+  },
+  {
+   "id": "Q01",
+   "text": "ช่วยหาไฟล์รายงานฝึกงานในแฟลชไดรฟ์หน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q02",
+   "text": "ค้นในไดรฟ์ว่าไฟล์ใบสมัครงาน",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "ในไดรฟ์ว่าไฟล์ใบสมัครงาน"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q03",
+   "text": "ช่วยหาไฟล์เรซูเม่ในเครื่องนี้หน่อยครับ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q04",
+   "text": "ค้นในกูเกิล ว่า วิธีล้างแอร์ด้วยตัวเอง",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีล้างแอร์ด้วยตัวเอง"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q05",
+   "text": "เปิดยูทูบให้หน่อยเดี๋ยวหาเองครับ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q06",
+   "text": "ค้นในเฟซบุ๊กแล้วมันค้างทุกที",
+   "positive": false,
+   "ok": false,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "แล้วมันค้างทุก",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q07",
+   "text": "หารูปรับปริญญาในกูเกิลไดรฟ์ไม่เจอเลย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q08",
+   "text": "เดี๋ยวตอนเย็นค่อยค้นในวิกิพีเดียว่าประวัติสุโขทัยนะ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q09",
+   "text": "เตือนผมตอนห้าโมงเย็นให้หาร้านดอกไม้ในแผนที่",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "Q10",
+   "text": "เปิดจีเมลแล้วส่งอีเมลหาครูประจำชั้นหน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  }
+ ]
+}
