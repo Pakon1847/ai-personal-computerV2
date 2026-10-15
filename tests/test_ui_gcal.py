@@ -1,13 +1,17 @@
 """ปฏิทิน Google ในคำตอบนัด หน้าแรก เสียง และหน้าตั้งค่า (การ์ด 0014) · ตัวดึงปลอม ไม่ใช้เน็ตจริง."""
 
+import os
 import tempfile
 import time
 import unittest
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
+
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 try:
     from PySide6.QtCore import QCoreApplication
+    from PySide6.QtGui import QGuiApplication
 
     from aipc.skills import gcal
     from aipc.ui.backend import SkillsController
@@ -20,7 +24,9 @@ NOW = datetime(2026, 10, 15, 9, 0).astimezone()  # พฤหัสบดี · �
 
 
 def wait_until(cond, timeout=5.0):
-    app = QCoreApplication.instance() or QCoreApplication([])
+    # สร้างแบบมีหน้าจอ (QGuiApplication) ไม่ใช่ QCoreApplication: ไม่งั้นเทสต์หน้าจอที่รันต่อในโปรเซสเดียวกัน
+    # สร้างหน้าต่างไม่ได้และโปรเซสหายเงียบ (พบ 2026-10-15 ตอนรันพ่วงกับ tests.test_ui_qml)
+    app = QCoreApplication.instance() or QGuiApplication([])
     end = time.monotonic() + timeout
     while not cond() and time.monotonic() < end:
         app.processEvents()
@@ -154,6 +160,76 @@ class GoogleAgendaTest(unittest.TestCase):
         self.assertFalse(s.gcalConnected)
         self.assertIn("เลิกเชื่อมต่อแล้ว", s.gcalStatus)
         self.assertFalse(any(u["what"] == "ไปเชียงใหม่" for u in s.upcoming))
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class GoogleAlertTest(unittest.TestCase):
+    """การ์ด 0032: ตัวคุมเตือนนัด Google ผ่าน reminderDue เดียวกับนัดในเครื่อง."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.now = NOW
+        self.minutes = 10
+        self.got = []
+
+    def make(self, ics=ICS):
+        cal = gcal.GoogleCalendar(self.root / "link.json", self.root / "events.json",
+                                  fetcher=lambda link: ics, clock=lambda: self.now)  # fmt: skip
+        if not cal.connected:
+            self.assertTrue(cal.connect(LINK).ok)
+        s = SkillsController(
+            reminders_path=self.root / "r.json",
+            clock=lambda: self.now,
+            run_timer=False,
+            gcal=cal,
+            gcal_alert_min=lambda: self.minutes,
+        )
+        s.reminderDue.connect(self.got.append)
+        return s, cal
+
+    def test_alert_once_with_lead_title_and_source(self):
+        s, cal = self.make()
+        doctor = next(e for e in cal.between(date(2026, 10, 16), 1) if e.what == "โทรหาหมอ")
+        self.now = doctor.when - timedelta(minutes=10, seconds=5)
+        s.tick()
+        self.assertEqual(self.got, [])
+        self.now = doctor.when - timedelta(minutes=9, seconds=50)
+        s.tick()
+        s.tick()  # รอบถัดไป (30 วิ) ต้องไม่เตือนซ้ำ
+        self.assertEqual(len(self.got), 1)
+        r = self.got[0]
+        self.assertEqual((r["what"], r["title"]), ("โทรหาหมอ", "อีก 10 นาที"))
+        self.assertIn("ปฏิทิน Google", r["when"])
+        again, _ = self.make()  # เข้าเครื่องใหม่
+        self.now += timedelta(minutes=1)
+        again.tick()
+        self.assertEqual(len(self.got), 1)
+
+    def test_off_means_no_alert(self):
+        self.minutes = 0
+        s, cal = self.make()
+        doctor = next(e for e in cal.between(date(2026, 10, 16), 1) if e.what == "โทรหาหมอ")
+        self.now = doctor.when - timedelta(minutes=5)
+        s.tick()
+        self.assertEqual(self.got, [])
+
+    def test_many_at_once_are_capped(self):
+        events = "".join(
+            f"BEGIN:VEVENT\nUID:m{i}\nDTSTART:20261016T020000Z\nDTEND:20261016T030000Z\n"
+            f"SUMMARY:ประชุม {i}\nEND:VEVENT\n"
+            for i in range(5)
+        )
+        ics = f"BEGIN:VCALENDAR\nVERSION:2.0\n{events}END:VCALENDAR\n".encode()
+        s, cal = self.make(ics)
+        first = cal.between(date(2026, 10, 16), 1)[0]
+        self.now = first.when - timedelta(minutes=5)
+        s.tick()
+        self.assertEqual(len(self.got), 4)  # 3 นัด + สรุปที่เหลือ
+        self.assertIn("และอีก 2 นัด", self.got[-1]["what"])
+        s.tick()
+        self.assertEqual(len(self.got), 4)  # ทั้ง 5 นัดถูกจำว่าเตือนแล้ว
 
 
 if __name__ == "__main__":

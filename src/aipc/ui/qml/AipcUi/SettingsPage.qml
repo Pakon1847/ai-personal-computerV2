@@ -277,6 +277,22 @@ ColumnLayout {
                     dot: true
                 }
             }
+            // เตือนก่อนนัด (การ์ด 0032) · อ่านจากสำเนาในเครื่อง เตือนได้แม้ไม่มีเน็ต
+            RowLayout {
+                visible: skills.gcalConnected
+                spacing: 8
+                AppText { text: "เตือนก่อนนัด"; size: Theme.fontSmall; color: Theme.inkMuted }
+                Repeater {
+                    model: uiSettings.gcalAlertChoices
+                    AppButton {
+                        required property int modelData
+                        objectName: "gcalAlert" + modelData
+                        text: modelData === 0 ? "ไม่เตือน" : modelData + " นาที"
+                        kind: uiSettings.gcalAlertMin === modelData ? "primary" : "secondary"
+                        onClicked: uiSettings.setGcalAlertMin(modelData)
+                    }
+                }
+            }
             AppText {
                 objectName: "gcalStatus"
                 visible: text !== ""

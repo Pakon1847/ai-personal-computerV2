@@ -98,6 +98,9 @@ class IdleLockTest(unittest.TestCase):
 class LockPrefsTest(unittest.TestCase):
     def test_defaults_round_trip_and_bad_values(self):
         self.assertEqual((settings.UiPrefs().lock_min, settings.UiPrefs().logout_min), (5, 10))
+        self.assertEqual(settings.UiPrefs().gcal_alert_min, 10)  # การ์ด 0032
+        self.assertEqual(settings.UiPrefs(gcal_alert_min=7).cleaned().gcal_alert_min, 10)
+        self.assertEqual(settings.UiPrefs(gcal_alert_min=True).cleaned().gcal_alert_min, 10)
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "ui.json"
             settings.save(settings.UiPrefs(lock_min=0, logout_min=30), p)

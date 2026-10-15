@@ -732,6 +732,10 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(field.property("text"), "")  # ลิงก์ลับไม่ค้างบนจอ
         self.assertFalse(field.property("visible"))
         self.assertIn("ดึงล่าสุด", find_items(win, "gcalStatus")[0].property("text"))
+        ui = engine._backends["uiSettings"]
+        find_items(win, "gcalAlert30")[0].clicked.emit()  # การ์ด 0032: เลือกเตือนก่อน 30 นาที
+        settle(30)
+        self.assertEqual(ui.gcalAlertMin, 30)
         off = find_items(win, "gcalDisconnect")[0]
         off.clicked.emit()
         settle(30)
@@ -739,6 +743,17 @@ class ShellCardTest(unittest.TestCase):
         off.clicked.emit()
         settle(30)
         self.assertFalse(skills.gcalConnected)
+        self.assertEqual(warnings, [])
+
+    def test_google_alert_toast_title_and_choices(self):
+        """การ์ด 0032: เตือนนัด Google ขึ้นหัว "อีก N นาที" (ไม่ใช่ "ถึงเวลาแล้ว") · เลือกเวลาเตือนในหน้าตั้งค่า."""
+        engine, win, warnings = self.open_shell("settings")
+        skills, ui = engine._backends["skills"], engine._backends["uiSettings"]
+        skills.reminderDue.emit({"what": "ประชุม", "when": "16 ต.ค. · 10:00 น. · ปฏิทิน Google",
+                                 "id": "g:1", "title": "อีก 10 นาที"})  # fmt: skip
+        settle(30)
+        self.assertEqual(find_items(win, "reminderToastTitle")[0].property("text"), "อีก 10 นาที")
+        self.assertEqual(ui.gcalAlertMin, 10)
         self.assertEqual(warnings, [])
 
     def test_claude_guide_only_without_claude(self):

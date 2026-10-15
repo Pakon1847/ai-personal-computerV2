@@ -285,6 +285,7 @@ def build(opts: Options, argv: list[str] | None = None):
             claude_on=claude_on,
             weather_on=lambda: ui_settings.useWeather,
             gcal=_gcal(ledger) if in_session else None,
+            gcal_alert_min=lambda: ui_settings.gcalAlertMin,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),

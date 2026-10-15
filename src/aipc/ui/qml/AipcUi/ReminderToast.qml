@@ -23,7 +23,7 @@ Rectangle {
             toast.show(r)
             // อ่านเตือนออกเสียง (การ์ด 0019) · เปิดเองในหน้าตั้งค่า · ไม่ขัดคำตอบที่กำลังอ่านอยู่
             if (uiSettings.speakReminders && voice.available && voice.speakingKey === -1)
-                voice.speak(-3, "ถึงเวลาแล้ว " + r.what + " " + r.when)
+                voice.speak(-3, (r.title ? r.title : "ถึงเวลาแล้ว") + " " + r.what + " " + r.when)
         }
     }
 
@@ -37,7 +37,12 @@ Rectangle {
         RowLayout {
             spacing: 8
             Icon { path: Icons.alert; color: Theme.accentInk }
-            AppText { text: "ถึงเวลาแล้ว"; strong: true; color: Theme.accentInk; oneLine: true }
+            // นัดจาก Google เตือนล่วงหน้า (การ์ด 0032) = "อีก N นาที" · นัดในเครื่อง = "ถึงเวลาแล้ว"
+            AppText {
+                objectName: "reminderToastTitle"
+                text: toast.current && toast.current.title ? toast.current.title : "ถึงเวลาแล้ว"
+                strong: true; color: Theme.accentInk; oneLine: true
+            }
             Item { Layout.fillWidth: true }
             AppText { visible: toast.queue.length > 1; text: "อีก " + (toast.queue.length - 1) + " รายการ"; size: Theme.fontCaption; color: Theme.inkMuted; oneLine: true }
         }

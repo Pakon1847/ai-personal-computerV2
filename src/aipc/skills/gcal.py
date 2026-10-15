@@ -52,6 +52,11 @@ def cache_path() -> Path:
     return Path(base) / "aipc" / "gcal-events.json"
 
 
+def alert_path() -> Path:
+    """นัดที่เตือนไปแล้ว (การ์ด 0032) · เข้าเครื่องใหม่แล้วไม่เตือนซ้ำ."""
+    return cache_path().with_name("gcal-alerted.json")
+
+
 class SyncError(Exception):
     """ดึงหรืออ่านปฏิทินไม่ได้ · ข้อความเป็นภาษาไทยสำหรับแสดงให้ผู้ใช้."""
 
@@ -129,6 +134,13 @@ class Event:
         )
 
 
+def _parse_time(text) -> datetime | None:
+    try:
+        return datetime.fromisoformat(str(text))
+    except ValueError:
+        return None
+
+
 def clean_title(text: str) -> str:
     t = re.sub(r"[\x00-\x1f\x7f]+", " ", str(text or ""))
     t = re.sub(r"\s+", " ", t).strip()
@@ -192,9 +204,13 @@ class GoogleCalendar:
     """
 
     def __init__(self, link_file: Path | None = None, cache_file: Path | None = None,
-                 fetcher=fetch, record=lambda sent, ok: None, clock=None, tz=None):  # fmt: skip
+                 fetcher=fetch, record=lambda sent, ok: None, clock=None, tz=None,
+                 alert_file: Path | None = None):  # fmt: skip
         self._link_file = link_file or link_path()
         self._cache_file = cache_file or cache_path()
+        # เก็บข้างไฟล์สำเนา (โฟลเดอร์เดียวกัน) · เทสต์ที่ให้ cache_file ชั่วคราวจึงไม่แตะไฟล์จริง
+        self._alert_file = alert_file or self._cache_file.with_name("gcal-alerted.json")
+        self._alerted_mem: set[str] = set()  # บันทึกไฟล์ไม่ได้ = ยังไม่เตือนซ้ำในรอบนี้
         self._fetch = fetcher
         self._record = record
         self._now = clock or (lambda: datetime.now().astimezone())
@@ -260,6 +276,38 @@ class GoogleCalendar:
         now = now or self._now()
         return [e for e in self._events if (e.end if e.all_day else e.when) >= now]
 
+    # ---------- เตือน (การ์ด 0032) ----------
+    def _alerted(self) -> dict:
+        try:
+            d = json.loads(self._alert_file.read_text(encoding="utf-8"))
+            return d if isinstance(d, dict) else {}
+        except (OSError, ValueError):
+            return {}
+
+    def due_alerts(self, now: datetime, lead: timedelta) -> list[Event]:
+        """นัดที่มีเวลา (ไม่ใช่ทั้งวัน) ซึ่ง เวลาเริ่ม − lead ≤ ตอนนี้ < เวลาเริ่ม และยังไม่เคยเตือน · เรียงตามเวลา."""
+        if lead <= timedelta(0) or not self.connected:
+            return []
+        done = set(self._alerted()) | self._alerted_mem
+        return [
+            e
+            for e in self._events
+            if not e.all_day and e.when - lead <= now < e.when and e.id not in done
+        ]
+
+    def mark_alerted(self, events: list[Event], now: datetime) -> None:
+        """จำว่าเตือนแล้ว · เก็บแค่นัดที่เริ่มไม่เกิน 2 วันก่อน (ไฟล์ไม่โตไปเรื่อย ๆ)."""
+        keep_after = now - timedelta(days=2)
+        data = {k: v for k, v in self._alerted().items()
+                if _parse_time(v) is not None and _parse_time(v) >= keep_after}  # fmt: skip
+        for e in events:
+            data[e.id] = e.when.isoformat()
+            self._alerted_mem.add(e.id)
+        try:
+            fsutil.write_json(self._alert_file, data)
+        except OSError:
+            pass  # พื้นที่เต็ม: ยังกันเตือนซ้ำในรอบนี้ด้วย _alerted_mem
+
     # ---------- ดึง ----------
     def _sync(self, link: str) -> SyncResult:
         now = self._now()
@@ -307,7 +355,7 @@ class GoogleCalendar:
     def disconnect(self) -> None:
         """ลืมลิงก์และลบสำเนา · ไม่แตะนัดที่ผู้ใช้จดในเครื่อง."""
         with self._lock:
-            for p in (self._link_file, self._cache_file):
+            for p in (self._link_file, self._cache_file, self._alert_file):
                 try:
                     p.unlink()
                 except FileNotFoundError:

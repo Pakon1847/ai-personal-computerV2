@@ -351,5 +351,57 @@ class CalendarTest(unittest.TestCase):
         self.assertEqual(self.fetched, [])
 
 
+class AlertTest(unittest.TestCase):
+    """การ์ด 0032: เตือนนัด Google ล่วงหน้า · เตือนครั้งเดียว · จำไว้ข้ามการเปิดแอปใหม่."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        self.files = (root / "link.json", root / "events.json")
+        self.cal = self.make()
+        self.assertTrue(self.cal.connect(LINK).ok)
+        self.doctor = datetime(2026, 10, 16, 9, 0, tzinfo=BKK)  # "โทรหาหมอ" 02:00Z
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def make(self):
+        return gcal.GoogleCalendar(*self.files, fetcher=lambda link: ICS, clock=lambda: NOW, tz=BKK)
+
+    def due(self, cal, at, minutes=10):
+        return [e.what for e in cal.due_alerts(at, timedelta(minutes=minutes))]
+
+    def test_window_and_only_timed_events(self):
+        c = self.cal
+        self.assertEqual(self.due(c, self.doctor - timedelta(minutes=10, seconds=1)), [])
+        self.assertEqual(self.due(c, self.doctor - timedelta(minutes=10)), ["โทรหาหมอ"])
+        self.assertEqual(self.due(c, self.doctor - timedelta(minutes=1)), ["โทรหาหมอ"])
+        self.assertEqual(self.due(c, self.doctor), [])  # เริ่มแล้ว = ไม่เตือน (ไม่รายงานย้อนหลัง)
+        trip_day = datetime(2026, 10, 15, 23, 55, tzinfo=BKK)  # ก่อน "ไปเชียงใหม่" (ทั้งวัน) 5 นาที
+        self.assertEqual(self.due(c, trip_day), [])
+        self.assertEqual(self.due(c, self.doctor - timedelta(minutes=5), minutes=0), [])  # 0 = ปิด
+
+    def test_alert_once_even_after_restart(self):
+        at = self.doctor - timedelta(minutes=9)
+        hits = self.cal.due_alerts(at, timedelta(minutes=10))
+        self.cal.mark_alerted(hits, at)
+        self.assertEqual(self.due(self.cal, at + timedelta(seconds=30)), [])
+        self.assertEqual(self.due(self.make(), at + timedelta(seconds=60)), [])  # เปิดแอปใหม่
+
+    def test_old_marks_are_pruned_and_disconnect_clears(self):
+        at = self.doctor - timedelta(minutes=9)
+        self.cal.mark_alerted(self.cal.due_alerts(at, timedelta(minutes=10)), at)
+        alert_file = self.files[1].with_name("gcal-alerted.json")
+        self.assertIn("โทรหาหมอ", "".join(e.what for e in self.cal.between(date(2026, 10, 16), 1)))
+        self.assertEqual(len(json.loads(alert_file.read_text(encoding="utf-8"))), 1)
+        later = at + timedelta(days=3)
+        self.cal.mark_alerted([], later)
+        self.assertEqual(json.loads(alert_file.read_text(encoding="utf-8")), {})  # เกิน 2 วัน = ทิ้ง
+        self.cal.mark_alerted(self.cal.due_alerts(at, timedelta(minutes=10)), at)
+        self.cal.disconnect()
+        self.assertFalse(alert_file.exists())
+        self.assertEqual(self.due(self.cal, at), [])  # ไม่เชื่อมต่อ = ไม่เตือน
+
+
 if __name__ == "__main__":
     unittest.main()

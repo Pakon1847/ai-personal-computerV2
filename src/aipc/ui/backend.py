@@ -132,6 +132,22 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
+    # เตือนนัดจากปฏิทิน Google ล่วงหน้า (การ์ด 0032)
+    @Property(int, notify=changed)
+    def gcalAlertMin(self) -> int:  # noqa: N802
+        return self._prefs.gcal_alert_min
+
+    @Property("QVariantList", constant=True)
+    def gcalAlertChoices(self) -> list:  # noqa: N802
+        return list(settings.GCAL_ALERT_CHOICES)
+
+    @Slot(int)
+    def setGcalAlertMin(self, minutes: int) -> None:  # noqa: N802
+        if minutes in settings.GCAL_ALERT_CHOICES and minutes != self._prefs.gcal_alert_min:
+            self._prefs.gcal_alert_min = int(minutes)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     # ขั้น C: กล้องช่วยดูว่าเจ้าของยังอยู่ (aipc.ui.presence)
     @Property(bool, notify=changed)
     def presence(self) -> bool:
@@ -1572,7 +1588,8 @@ class SkillsController(QObject):
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
-                 weather=None, claude_on=None, weather_on=None, gcal=None):  # fmt: skip
+                 weather=None, claude_on=None, weather_on=None, gcal=None,
+                 gcal_alert_min=None):  # fmt: skip
         super().__init__()
         # ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014 · aipc.skills.gcal.GoogleCalendar)
         # · None = ไม่มี (หน้า Login)
@@ -1582,6 +1599,8 @@ class SkillsController(QObject):
         # ลองดึงเองครั้งล่าสุดเมื่อไหร่ · ออฟไลน์แล้วถามนัดซ้ำ ๆ ต้องไม่ลองดึงทุกครั้ง (สมุดบันทึกส่งออกจะรก)
         self._gcal_tried = None
         self._gcal_done.connect(self._on_gcal_done)
+        # เตือนนัด Google ก่อนเวลากี่นาที (การ์ด 0032 · ค่าตั้งในหน้าตั้งค่า · 0 = ไม่เตือน)
+        self._gcal_alert_min = gcal_alert_min or (lambda: 10)
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
         from aipc.skills import actions, manifest, reminders
@@ -1836,6 +1855,39 @@ class SkillsController(QObject):
             self._save_failed = True
         if t.due or t.save_failed:
             self.remindersChanged.emit()
+        self._gcal_tick()
+
+    GCAL_ALERT_MAX = (
+        3  # การ์ด 0032: นัดพร้อมกันหลายนัด = เตือนทีละไม่เกิน 3 + บอกที่เหลือ (ไม่อ่านออกเสียงยาวเหยียด)
+    )
+
+    def _gcal_tick(self) -> None:
+        """เตือนนัดจากปฏิทิน Google ล่วงหน้า (การ์ด 0032).
+
+        อ่านจากสำเนาในเครื่อง ไม่ใช้เน็ต · เตือนแล้วจำไว้ไม่เตือนซ้ำ
+        """
+        import math
+
+        g = self._gcal
+        minutes = self._gcal_alert_min()
+        if g is None or minutes <= 0:
+            return
+        now = self._now()
+        due = g.due_alerts(now, timedelta(minutes=minutes))
+        if not due:
+            return
+        at = g.last_sync.astimezone() if g.last_sync else None
+        source = " · ปฏิทิน Google" + (f" (ข้อมูลเมื่อ {at:%H:%M} น.)" if at else "")
+        for e in due[: self.GCAL_ALERT_MAX]:
+            left = max(1, math.ceil((e.when - now).total_seconds() / 60))
+            self.reminderDue.emit({"id": e.id, "what": e.what, "title": f"อีก {left} นาที",
+                                   "when": self._item_when(e) + source})  # fmt: skip
+        if len(due) > self.GCAL_ALERT_MAX:
+            more = len(due) - self.GCAL_ALERT_MAX
+            self.reminderDue.emit({"id": "g:more", "what": f"และอีก {more} นัดจากปฏิทิน Google",
+                                   "title": "นัดใกล้ถึงเวลา",
+                                   "when": "ถาม “วันนี้มีนัดอะไร” เพื่อดูทั้งหมด"})  # fmt: skip
+        g.mark_alerted(due, now)
 
     def _clock_card(self, text: str) -> dict | None:
         """ "ตอนนี้กี่โมง" · None = ไม่ใช่คำถามเวลา (agenda.asks_time)."""
