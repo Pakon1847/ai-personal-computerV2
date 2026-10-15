@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import threading
 import time
 from dataclasses import dataclass
@@ -171,6 +172,45 @@ def default_profile() -> Path:
     return Path(base) / "aipc" / "browser"
 
 
+REMOVING = ".removing-"  # ชื่อชั่วคราวของโปรไฟล์ที่กำลังลบ (ออกจากบัญชีเว็บทั้งหมด · การ์ด 0031)
+
+
+def profile_in_use(profile: Path) -> bool:
+    """Chromium ตัวอื่นยังเปิดโปรไฟล์นี้อยู่ไหม.
+
+    Chromium บน Linux ทำลิงก์ SingletonLock ชี้ไปที่ "<ชื่อเครื่อง>-<pid>" และลบเองตอนปิดปกติ ·
+    ลิงก์ค้างจากไฟดับ = โปรเซสเลขนั้นไม่มีแล้ว = ไม่มีใครใช้
+    """
+    try:
+        pid = int(os.readlink(profile / "SingletonLock").rsplit("-", 1)[1])
+    except (OSError, ValueError, IndexError):
+        return False
+    return Path(f"/proc/{pid}").exists()
+
+
+def remove_profile(profile: Path) -> threading.Thread | None:
+    """ลบโปรไฟล์ทั้งโฟลเดอร์ (การเข้าสู่ระบบ คุกกี้ ประวัติ แคช) · การ์ด 0031.
+
+    เปลี่ยนชื่อก่อน (เสร็จในคราวเดียว = ออกจากบัญชีทันที) แล้วค่อยลบเบื้องหลัง เพราะแคชหลายร้อย MB บน microSD
+    ลบนานจนหน้าจอค้างได้ · ไฟดับระหว่างลบ = ชื่อเดิมว่างแล้ว เปิดครั้งหน้าได้โปรไฟล์ใหม่ · ของค้างถูกลบครั้งหน้า
+    """
+    if profile.exists():
+        profile.rename(profile.with_name(f"{profile.name}{REMOVING}{time.time_ns()}"))
+    return sweep_removed(profile)
+
+
+def sweep_removed(profile: Path) -> threading.Thread | None:
+    """ลบโฟลเดอร์ชื่อชั่วคราวที่ค้างอยู่ในเธรดเบื้องหลัง · คืนเธรดให้เทสต์รอได้ · ไม่มีของค้าง = None."""
+    left = sorted(profile.parent.glob(profile.name + REMOVING + "*"))
+    if not left:
+        return None
+    t = threading.Thread(
+        target=lambda: [shutil.rmtree(p, ignore_errors=True) for p in left], daemon=True
+    )
+    t.start()
+    return t
+
+
 class BrowserControl:
     def __init__(
         self,
@@ -191,6 +231,11 @@ class BrowserControl:
         self._google_blocked = False  # เจอ /sorry/ แล้ว = ค้นด้วย DuckDuckGo ตรง ๆ จนปิดเบราว์เซอร์
 
     # ---------- เปิด / ต่อ ----------
+    @property
+    def available(self) -> bool:
+        """เครื่องมีโปรแกรม Chromium ไหม · ไม่มี = เปิดเว็บด้วยเบราว์เซอร์ปกติแทน (การ์ด 0031)."""
+        return shutil.which(self._chromium) is not None
+
     @property
     def running(self) -> bool:
         return self._cdp is not None and not self._cdp.closed and self._proc.poll() is None
@@ -309,6 +354,11 @@ class BrowserControl:
         self._page()
         if cmd.kind != "app":
             self._front()
+        # ขั้น "เปิดเว็บ https://…" ของสกิล (ลิงก์ตายตัวในไฟล์ที่ผ่านประตูตรวจแล้ว · การ์ด 0031)
+        if cmd.kind == "url":
+            if not cmd.query.lower().startswith("https://"):
+                return Result(False, "เปิดได้เฉพาะลิงก์ https")
+            return Result(True, "เปิดเว็บแล้ว", url=self._go(cmd.query))
         if cmd.kind in ("search", "site"):
             url = self._go(
                 self._search_url(cmd.query) if cmd.kind == "search" else SITES[cmd.site][1]
@@ -556,6 +606,12 @@ class BrowserControl:
                 self._proc.wait(5)
             except Exception:  # noqa: BLE001
                 self._proc.kill()
+                # เก็บโปรเซสที่ฆ่าแล้ว · ค้างเป็น zombie = /proc/<pid> ยังอยู่
+                # → profile_in_use คิดว่ายังมีคนใช้โปรไฟล์ (การ์ด 0031)
+                try:
+                    self._proc.wait(2)
+                except Exception:  # noqa: BLE001
+                    pass
         self._proc = self._cdp = None
         self._session = self._target = ""
         self._google_blocked = False

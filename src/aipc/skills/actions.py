@@ -49,7 +49,17 @@ SITES = {
     "google": ("Google", "https://www.google.com"),
     "wikipedia": ("วิกิพีเดีย", "https://th.wikipedia.org"),
     "maps": ("Google Maps", "https://maps.google.com"),
+    # แอปเว็บที่ใช้บ่อย (การ์ด 0031) · เปิดอย่างเดียว ผู้ใช้เข้าสู่ระบบในหน้าเว็บเอง · ระบบไม่เก็บรหัส
+    "facebook": ("Facebook", "https://www.facebook.com"),
+    "instagram": ("Instagram", "https://www.instagram.com"),
+    "calendar": ("Google Calendar", "https://calendar.google.com"),
+    "drive": ("Google Drive", "https://drive.google.com"),
 }
+# เว็บที่ต้องเปิดด้วยเบราว์เซอร์ปกติแทนเบราว์เซอร์ของผู้ช่วย (การ์ด 0031 ข้อ 0: บริการที่ไม่ยอมให้เข้าสู่ระบบ
+# ในเบราว์เซอร์ที่ถูกโปรแกรมควบคุม) · ยังไม่มีผลทดสอบ = ว่าง · ได้ผลแล้วใส่ชื่อเว็บที่โดนบล็อกที่นี่ที่เดียว
+SYSTEM_BROWSER_SITES: frozenset[str] = frozenset()
+FALLBACK_NOTE = (" · เปิดด้วยเบราว์เซอร์ปกติแทน"
+                 " (เบราว์เซอร์ของผู้ช่วยไม่ว่างหรือใช้ไม่ได้ · ต้องเข้าสู่ระบบแยกกัน)")  # fmt: skip
 
 # แอปบน Raspberry Pi OS: ชื่อไฟล์ .desktop ที่ gtk-launch ใช้ · ยังไม่ได้ตรวจกับ image จริงทุกตัว
 # ถ้าเครื่องไม่มีแอปนั้น ผลจะบอกว่า "ไม่พบแอป" ไม่ใช่ทำเป็นว่าเปิดได้
@@ -223,9 +233,13 @@ class Executor:
         runner: Runner = run_process,
         dry_run: bool | None = None,
         reader: Reader = read_output,
+        browser=None,
     ):
         self._run = runner
         self._read = reader
+        # การ์ด 0031: เปิดเว็บด้วยเบราว์เซอร์ของผู้ช่วยตัวเดียวกับคำสั่งเสียง (เข้าสู่ระบบครั้งเดียว) ·
+        # browser(site, url) -> เริ่มเปิดได้ไหม · None / ไม่ว่าง = เปิดด้วยเบราว์เซอร์ปกติแล้วบอก (H2)
+        self._browser = browser
         self.dry_run = (not sys.platform.startswith("linux")) if dry_run is None else dry_run
 
     def execute(self, plan: Plan) -> Outcome:
@@ -240,13 +254,21 @@ class Executor:
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)
+        note = ""
+        if plan.action == "open_url" and self._browser is not None:
+            site = plan.params.get("site", "")
+            url = plan.params.get("url") or SITES[site][1]
+            if site not in SYSTEM_BROWSER_SITES:
+                if self._browser(site, url):
+                    return Outcome(True, f"{plan.summary or 'เปิดเว็บ'} ในเบราว์เซอร์ของผู้ช่วย")
+                note = FALLBACK_NOTE
         before = None
         if plan.action in VOLUME_ACTIONS:
             before = parse_volume(self._read(["wpctl", "get-volume", SINK]))
         code = self._run(args)
         if code == 0:
             return Outcome(
-                True, plan.summary or "เรียบร้อย", undo=undo_plans(before) if before else ()
+                True, (plan.summary or "เรียบร้อย") + note, undo=undo_plans(before) if before else ()
             )
         if plan.action == "open_app":
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")

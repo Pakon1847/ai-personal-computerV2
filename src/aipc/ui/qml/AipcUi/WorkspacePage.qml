@@ -145,6 +145,15 @@ Item {
             if (voice.available) voice.speak(i.length - 1, say)
         }
     }
+    // เปิดเว็บจากปุ่ม/พิมพ์/สกิล (การ์ด 0031) เสร็จทีหลัง · ไม่แก้ข้อความล่าสุดในแชท (ต่างจาก onFinished ของคำสั่งเสียง) ·
+    // ไม่สำเร็จต้องบอก (H5): หน้าแรก = ใต้ปุ่ม · ในแชท = เพิ่มข้อความใหม่
+    Connections {
+        target: browser
+        function onOpened(say, ok) {
+            if (root.home) appsNote.text = ok ? "" : say
+            else if (!ok) root.push({ ai: true, text: say, note: "ทำไม่สำเร็จ", done: true })
+        }
+    }
     function pendingConfirm() {
         for (let k = items.length - 1; k >= 0; k--) {
             const c = items[k].card
@@ -610,6 +619,50 @@ Item {
                     ToolTip.visible: hovered
                     ToolTip.text: enabled ? "สกิล: " + modelData.name : "ต้องมีก่อน: " + modelData.missing.join(", ")
                     onClicked: root.sendText(example)
+                }
+            }
+        }
+
+        // แอปเว็บที่ใช้บ่อย (การ์ด 0031) · ไอคอนทั่วไป ไม่ใช้โลโก้ของบริษัท · กดแล้วไปทางเดียวกับพิมพ์ "เปิด…"
+        // (เบราว์เซอร์ของผู้ช่วย = เข้าสู่ระบบครั้งเดียว ใช้ได้ทั้งปุ่ม พิมพ์ และเสียง) · ผู้ใช้ใส่รหัสในหน้าเว็บของบริการเอง
+        Card {
+            objectName: "webAppsCard"
+            Layout.fillWidth: true
+            implicitHeight: appsCol.implicitHeight + 32
+            ColumnLayout {
+                id: appsCol
+                anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                anchors.margins: 16
+                spacing: 10
+                AppText { text: "แอปที่ใช้บ่อย"; size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 8
+                    Repeater {
+                        model: [
+                            { key: "youtube", name: "YouTube", icon: Icons.play },
+                            { key: "facebook", name: "Facebook", icon: Icons.chat },
+                            { key: "instagram", name: "Instagram", icon: Icons.camera },
+                            { key: "gmail", name: "Gmail", icon: Icons.mail },
+                            { key: "calendar", name: "ปฏิทิน Google", icon: Icons.calendar },
+                            { key: "drive", name: "ไดรฟ์ Google", icon: Icons.folder }
+                        ]
+                        AppButton {
+                            required property var modelData
+                            objectName: "webApp_" + modelData.key
+                            kind: "secondary"
+                            iconPath: modelData.icon
+                            text: modelData.name
+                            onClicked: appsNote.text = skills.openSite(modelData.key)
+                        }
+                    }
+                }
+                // ผลการเปิด: เปิดด้วยเบราว์เซอร์ปกติแทน / จำลอง (เครื่องพัฒนา) / ไม่สำเร็จ · สำเร็จ = เบราว์เซอร์ขึ้นจอแล้ว ล้างข้อความ
+                AppText {
+                    id: appsNote
+                    objectName: "webAppsNote"
+                    visible: text !== ""
+                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                 }
             }
         }

@@ -2407,6 +2407,19 @@ class SkillsController(QObject):
         card["lines"] = done
         return card
 
+    @Slot(str, result=str)
+    def openSite(self, key: str) -> str:  # noqa: N802
+        """ปุ่มแอปที่ใช้บ่อยในหน้าแรก (การ์ด 0031) · ทางเดียวกับพิมพ์ "เปิดเฟซบุ๊ก" (ตัวสั่งงาน → เบราว์เซอร์ของผู้ช่วย).
+
+        หน้าจอส่งมาได้แค่ชื่อเว็บในรายการ ไม่ใช่ URL (H7) · คืนข้อความผล (บอกเมื่อเปิดด้วยเบราว์เซอร์ปกติแทน)
+        """
+        from aipc.skills.actions import SITES, Plan
+
+        if key not in SITES:
+            return "ไม่มีเว็บนี้ในรายการ"
+        out = self._exec.execute(Plan("open_url", {"site": key}, f"เปิด {SITES[key][0]}"))
+        return out.message
+
     def _run_plan(self, plan) -> dict:
         out = self._exec.execute(plan)
         if out.simulated:
@@ -2417,7 +2430,9 @@ class SkillsController(QObject):
             "title": title,
             "chips": [{"text": "จำลอง" if out.simulated else ("ทำแล้ว" if out.ok else "ไม่สำเร็จ"),
                        "kind": "warn" if out.simulated else ("ok" if out.ok else "danger")}],
-            "lines": [out.message] if out.simulated else [],
+            # เปิดเว็บ: บอกว่าเปิดในเบราว์เซอร์ไหน (การ์ด 0031) · ข้อความต่างจากหัวเรื่องเท่านั้นถึงแสดง
+            "lines": [out.message] if out.simulated or (out.ok and out.message != plan.summary)
+                     else [],
             "page": out.page,
         }  # fmt: skip
         if out.undo:

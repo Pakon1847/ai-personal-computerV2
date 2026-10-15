@@ -40,4 +40,6 @@ QtObject {
     readonly property string trash: "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"
     readonly property string download: "M12 4v11M7 10l5 5 5-5M5 20h14"
     readonly property string stop: "M8 6h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"
+    readonly property string play: "M8 5l11 7-11 7z"
+    readonly property string mail: "M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM3 7l9 6 9-6"
 }

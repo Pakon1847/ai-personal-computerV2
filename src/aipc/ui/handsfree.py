@@ -143,13 +143,18 @@ class BrowserController(QObject):
     """คำสั่งเว็บจากเสียง · route() บอกหน้าจอว่าคำพูดจากคีย์ลัดไปทางไหน (การ์ด 0027)."""
 
     finished = Signal(str, bool)
+    # การ์ด 0031: เปิดจากปุ่ม/สกิล ไม่ใช่คำสั่งเสียง → ไม่ไปแก้ข้อความล่าสุดในแชท (เดิมแชทรับ finished ทุกครั้ง)
+    opened = Signal(str, bool)
     busyChanged = Signal()  # noqa: N815
-    _done = Signal(str, bool)
+    _done = Signal(str, bool, bool)
 
-    def __init__(self, active: bool = True, control=None, ledger=None, skill_match=None):
+    def __init__(self, active: bool = True, control=None, ledger=None, skill_match=None,
+                 profile=None):  # fmt: skip
         super().__init__()
         self._active = active
         self._control = control
+        # โฟลเดอร์โปรไฟล์ของเบราว์เซอร์ของผู้ช่วย · None = ค่าเริ่มต้น (เทสต์ใส่โฟลเดอร์ชั่วคราว)
+        self._profile = profile
         self._ledger = ledger
         self._skill_match = skill_match  # การ์ด 0028: SkillsController.voiceSkill (app.py ต่อให้)
         self._busy = False
@@ -157,9 +162,11 @@ class BrowserController(QObject):
 
     def _ctl(self):
         if self._control is None:
-            from aipc.browser.control import BrowserControl
+            from aipc.browser.control import BrowserControl, default_profile, sweep_removed
 
-            self._control = BrowserControl()
+            self._control = BrowserControl(profile=self._profile)
+            # ของค้างจากกด "ออกจากบัญชีเว็บทั้งหมด" แล้วไฟดับระหว่างลบ (การ์ด 0031) · ลบเบื้องหลัง
+            sweep_removed(self._profile or default_profile())
         return self._control
 
     @Property(bool, notify=busyChanged)
@@ -196,13 +203,53 @@ class BrowserController(QObject):
             return False
         return self._start([BrowseCommand(kind="site", site="google")])
 
-    def _start(self, cmds) -> bool:
+    def open_web(self, site: str, url: str) -> bool:
+        """ตัวสั่งงาน (actions.Executor) ส่งงานเปิดเว็บมาที่นี่ · การ์ด 0031.
+
+        มาจาก: ปุ่มหน้าแรก · พิมพ์ "เปิด…" · ขั้น "เปิดเว็บ" ของสกิล
+
+        True = เริ่มเปิดในเบราว์เซอร์ของผู้ช่วยแล้ว (ผลจริงมาทางสัญญาณ opened) ·
+        False = ให้ตัวสั่งงานเปิดด้วยเบราว์เซอร์ปกติแทน (หน้า Login · กำลังทำคำสั่งอื่น · เครื่องไม่มี Chromium)
+        """
+        from aipc.skills.browse import BrowseCommand
+
+        if not self._active or self._busy or not self._ctl().available:
+            return False
+        cmd = BrowseCommand("site", site=site) if site else BrowseCommand("url", query=url)
+        return self._start([cmd], quiet=True)
+
+    @Slot(result=str)
+    def signOutAll(self) -> str:  # noqa: N802
+        """ออกจากบัญชีเว็บทั้งหมดในเครื่องนี้ของผู้ใช้คนนี้ (การ์ด 0031).
+
+        ปิดเบราว์เซอร์ของผู้ช่วย → ลบโฟลเดอร์โปรไฟล์ · backend ตรวจเอง (H7):
+        หน้า Login ไม่มีเจ้าของเซสชัน = ไม่ทำ · Chromium ตัวอื่นยังใช้โปรไฟล์ = ไม่ลบ (H1) ·
+        ไม่แตะไฟล์ดาวน์โหลด (อยู่นอกโปรไฟล์)
+        """
+        from aipc.browser import control
+
+        if not self._active:
+            return "ทำไม่ได้ในหน้าเข้าสู่ระบบ"
+        if self._busy:
+            return "เบราว์เซอร์ของผู้ช่วยกำลังทำงาน · รอสักครู่แล้วกดใหม่"
+        if self._control is not None:
+            self._control.close()
+        profile = self._profile or control.default_profile()
+        if control.profile_in_use(profile):
+            return "ยังมีหน้าต่างเบราว์เซอร์ของผู้ช่วยเปิดค้างอยู่ · ปิดหน้าต่างนั้นก่อนแล้วกดใหม่"
+        try:
+            control.remove_profile(profile)
+        except OSError as e:
+            return f"ลบไม่สำเร็จ: {e.strerror or e} · การเข้าสู่ระบบเว็บยังอยู่"
+        return "ออกจากบัญชีเว็บทั้งหมดในเครื่องนี้แล้ว · ลบการเข้าสู่ระบบ คุกกี้ และประวัติของเบราว์เซอร์ของผู้ช่วย"
+
+    def _start(self, cmds, quiet: bool = False) -> bool:
         self._busy = True
         self.busyChanged.emit()
-        threading.Thread(target=self._work, args=(cmds,), daemon=True).start()
+        threading.Thread(target=self._work, args=(cmds, quiet), daemon=True).start()
         return True
 
-    def _work(self, cmds) -> None:
+    def _work(self, cmds, quiet: bool = False) -> None:
         says, ok = [], True
         for c in cmds:
             r = self._ctl().run(c)
@@ -215,13 +262,13 @@ class BrowserController(QObject):
             if not r.ok:
                 ok = False
                 break
-        self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok)
+        self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok, quiet)
 
-    @Slot(str, bool)
-    def _on_done(self, say: str, ok: bool) -> None:
+    @Slot(str, bool, bool)
+    def _on_done(self, say: str, ok: bool, quiet: bool) -> None:
         self._busy = False
         self.busyChanged.emit()
-        self.finished.emit(say, ok)
+        (self.opened if quiet else self.finished).emit(say, ok)
 
     @Slot()
     def close(self) -> None:

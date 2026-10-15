@@ -374,6 +374,49 @@ ColumnLayout {
         }
     }
 
+    // บัญชีเว็บในเครื่องนี้ (การ์ด 0031): การเข้าสู่ระบบ Facebook/Instagram/Gmail… อยู่ในโปรไฟล์เบราว์เซอร์ของผู้ช่วย (โฟลเดอร์ของผู้ใช้)
+    // ออกจากบัญชีเว็บทั้งหมด = ลบโปรไฟล์นั้นของคนที่กด · ต้องกดสองครั้ง · backend ตรวจเจ้าของเซสชันเอง (H7)
+    Card {
+        id: webCard
+        objectName: "webAccountsCard"
+        Layout.fillWidth: true
+        implicitHeight: webCol.implicitHeight + 40
+        property bool confirmOut: false
+        property string result: ""
+        ColumnLayout {
+            id: webCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            AppText { text: "บัญชีเว็บในเครื่องนี้"; strong: true }
+            AppText {
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                text: "ปุ่มแอปที่ใช้บ่อยในหน้าแรกเปิดเว็บในเบราว์เซอร์ของผู้ช่วย · ใส่รหัสผ่านในหน้าเว็บของบริการเอง ระบบไม่เห็นและไม่เก็บรหัสผ่าน"
+            }
+            AppText {
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                text: "ใครเข้าบัญชีเครื่องนี้ของคุณได้ จะเปิดเว็บที่เข้าสู่ระบบค้างไว้ได้ด้วย · ใช้เครื่องร่วมกับคนอื่นหรือจะคืนเครื่อง ให้กดปุ่มนี้"
+            }
+            AppButton {
+                objectName: "webSignOut"
+                kind: webCard.confirmOut ? "danger" : "secondary"
+                iconPath: Icons.logout
+                text: webCard.confirmOut ? "กดอีกครั้งเพื่อออกจากบัญชีเว็บทั้งหมด" : "ออกจากบัญชีเว็บทั้งหมด"
+                enabled: !browser.busy
+                onClicked: {
+                    if (webCard.confirmOut) { webCard.result = browser.signOutAll(); webCard.confirmOut = false }
+                    else { webCard.confirmOut = true; webCard.result = "" }
+                }
+            }
+            AppText {
+                objectName: "webSignOutResult"
+                visible: webCard.result !== ""
+                Layout.fillWidth: true; size: Theme.fontSmall
+                text: webCard.result
+            }
+        }
+    }
+
     // ล็อกเมื่อไม่ได้ใช้เครื่อง (aipc.ui.idle · ขั้น A 2026-10-06): ลืมออกแล้วลุกไป → ล็อกทุกหน้าต่าง → ออกเอง
     Card {
         objectName: "idleLockCard"

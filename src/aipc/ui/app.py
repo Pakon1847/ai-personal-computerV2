@@ -265,6 +265,10 @@ def build(opts: Options, argv: list[str] | None = None):
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
     ui_settings = UiSettings(opts.settings_path, opts.theme)
+    from aipc.skills.actions import Executor
+
+    # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
+    browser_ctl = BrowserController(active=in_session, ledger=ledger)
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client(budget, ledger) if in_session else None,
@@ -289,6 +293,8 @@ def build(opts: Options, argv: list[str] | None = None):
         ),
         "filesBrowser": FilesBrowser(),
         "skills": SkillsController(
+            # การ์ด 0031: เปิดเว็บ (พิมพ์ · ปุ่ม · ขั้นตอนสกิล) ด้วยเบราว์เซอร์ของผู้ช่วยตัวเดียวกับคำสั่งเสียง
+            executor=Executor(browser=browser_ctl.open_web) if in_session else None,
             run_timer=not opts.greeter_session,
             llm_ready=lambda: chat.ready,
             forge=skill_forge,
@@ -313,8 +319,7 @@ def build(opts: Options, argv: list[str] | None = None):
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session),
-        # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก
-        "browser": BrowserController(active=in_session, ledger=ledger),
+        "browser": browser_ctl,
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),

@@ -36,7 +36,14 @@ SITE_ALIASES = {
     "google": ("google", "กูเกิล", "กูเกิ้ล"),
     "wikipedia": ("wikipedia", "วิกิพีเดีย", "วิกิ"),
     "maps": ("googlemaps", "maps", "แผนที่", "กูเกิลแมพ"),
+    # การ์ด 0031 · "ปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง (การ์ด 0038) · ต้องมีคำว่ากูเกิลถึงเป็นเว็บ
+    "facebook": ("facebook", "เฟซบุ๊ก", "เฟสบุ๊ก", "เฟสบุ๊ค", "เฟซบุ๊ค", "เฟซบุค", "เฟสบุค"),
+    "instagram": ("instagram", "อินสตาแกรม", "อินสตา", "ไอจี"),
+    "calendar": ("googlecalendar", "ปฏิทินกูเกิล", "กูเกิลปฏิทิน", "ปฏิทินกูเกิ้ล", "ปฏิทินgoogle"),
+    "drive": ("googledrive", "กูเกิลไดรฟ์", "กูเกิ้ลไดรฟ์", "กูเกิลไดร์ฟ", "กูเกิ้ลไดร์ฟ", "ไดรฟ์", "ไดร์ฟ"),
 }
+# "ไดรฟ์" ในเครื่องนี้ยังหมายถึงไดรฟ์ USB (หน้าสำรองข้อมูล) · มีคำพวกนี้ = ไม่ใช่ Google Drive (การ์ด 0031)
+LOCAL_DRIVE_WORDS = ("usb", "ยูเอสบี", "แฟลช", "ฮาร์ด", "สำรอง")
 APP_ALIASES = {
     # "เบาเซอร์" = ที่ Pakon พิมพ์จริงบน Pi 5 (2026-10-14 · เดิมต้องกด "ใช่" ก่อนเปิด)
     # "เบราเซอร์" = สะกดที่พบบ่อย
@@ -249,6 +256,8 @@ def parse(text: str) -> Command | None:
     if not hit:
         return None
     group, key, conf = hit
+    if key == "drive" and any(w in raw for w in LOCAL_DRIVE_WORDS):
+        return None  # "เปิดแฟลชไดรฟ์" · "เปิดไดรฟ์ USB" = ไดรฟ์ในเครื่อง ไม่ใช่เว็บ
     if group == "page":
         plan = Plan("open_page", {"page": key}, f"เปิดหน้า{PAGES[key]}")
     elif group == "site":

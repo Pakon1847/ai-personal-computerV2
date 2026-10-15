@@ -14,7 +14,8 @@ from aipc.skills import fileintent
 
 @dataclass(frozen=True)
 class BrowseCommand:
-    kind: str  # search · open · back · forward · reload · scroll · close · app · site
+    # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031)
+    kind: str
     query: str = ""
     n: int = 0
     direction: str = ""
@@ -64,6 +65,11 @@ SITE_NAMES = {
     "youtube": r"ยูทู[บป]|youtube",
     "wikipedia": r"วิกิพีเดีย|wikipedia",
     "gmail": r"จีเมล|gmail",
+    # การ์ด 0031 · ปฏิทินต้องมีคำว่ากูเกิล ("เปิดปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง ทางคำสั่งเครื่อง)
+    "facebook": r"เฟ[ซส]\s*บุ[๊]?[กค]|facebook",
+    "instagram": r"อินสตา(?:แกรม)?|ไอจี|instagram",
+    "calendar": r"ปฏิทิน\s*กูเกิ้?ล|กูเกิ้?ล\s*ปฏิทิน|google\s*calendar",
+    "drive": r"กูเกิ้?ล\s*ไดร์?[ฟบ]์?|ไดร์?[ฟบ]์?|google\s*drive",
 }
 _SITE = re.compile(
     r"(?:เปิด|เข้า|ไป\s*(?:ที่)?)\s*(?:เว็บ\s*)?("
