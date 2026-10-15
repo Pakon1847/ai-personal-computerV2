@@ -400,7 +400,7 @@ ColumnLayout {
             AppButton {
                 objectName: "webSignOut"
                 kind: webCard.confirmOut ? "danger" : "secondary"
-                iconPath: Icons.logout
+                iconPath: Icons.globe   // ไม่ใช้ไอคอนออกจากระบบ: นี่คือออกจากบัญชีเว็บ ไม่ใช่ออกจากเครื่อง (BRIEF 4)
                 text: webCard.confirmOut ? "กดอีกครั้งเพื่อออกจากบัญชีเว็บทั้งหมด" : "ออกจากบัญชีเว็บทั้งหมด"
                 enabled: !browser.busy
                 onClicked: {
