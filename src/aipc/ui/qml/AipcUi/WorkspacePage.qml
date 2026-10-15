@@ -168,6 +168,12 @@ Item {
         }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
         const way = browser.route(t)
+        if (way === "skill") {          // การ์ด 0028: ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด = การ์ดสกิลเดียวกับตอนพิมพ์ (ยืนยันตามกติกาเดิม)
+            push({ user: true, text: t })
+            dispatch(skills.handleAs(skills.voiceSkill(t), t), t)
+            speakLastCard()
+            return
+        }
         if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
             push({ user: true, text: t })
             push({ ai: true, text: "", note: "", done: false, skill: "เบราว์เซอร์ของผู้ช่วย" })
@@ -181,6 +187,32 @@ Item {
             else
                 speakLastCard()
             return
+        }
+        if (way === "unknown") {
+            // การ์ด 0029: คำถามที่โค้ดตอบเองได้ (เวลา นัด ไฟล์ สุขภาพเครื่อง) = ตอบแล้วอ่านออกเสียง · ไม่ใช้ AI
+            const answer = skills.voiceAnswer(t)
+            if (answer.kind !== undefined) {
+                push({ user: true, text: t })
+                showCard(answer)
+                speakLastCard()
+                return
+            }
+            // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
+            const ask = skills.voiceConfirm(t)
+            if (ask.confirmToken) {
+                push({ user: true, text: t })
+                showCard(ask)
+                speakLastCard()
+                return
+            }
+            // การ์ด 0030: ขอโหมดใหม่ = การ์ดยืนยันข้อความก่อนส่ง Claude (ไม่มี Claude/ปิดสวิตช์ = การ์ดอธิบาย)
+            const create = skills.voiceCreate(t)
+            if (create.kind !== undefined) {
+                push({ user: true, text: t })
+                showCard(create)
+                speakLastCard()
+                return
+            }
         }
         const say = way === "needs_browser"
             ? "ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า \"เปิดเบราว์เซอร์\" ก่อน"
@@ -228,6 +260,8 @@ Item {
                 return
             }
             root.dispatch(card, text)
+            if (card.voice === true)    // การ์ด 0030: สร้างจากเสียง = อ่านผลออกเสียง (ไม่ได้มองจอก็รู้)
+                root.speakLastCard()
         }
     }
     function sendText(text) {

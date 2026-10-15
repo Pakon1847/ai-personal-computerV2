@@ -20,6 +20,7 @@ import subprocess
 import tempfile
 import threading
 import time
+from collections.abc import Callable
 from pathlib import Path
 
 from aipc.voice.tts import VOICE_DIR, sandboxed
@@ -87,8 +88,13 @@ class Transcriber:
     """ถอดไฟล์ WAV ทีละไฟล์ (เรียกจากเธรดของตัวอัด) · transcribe() คืน (ข้อความ, ข้อผิดพลาด)."""
 
     def __init__(self, base: Path = BASE, worker_cmd: list[str] | None = None,
-                 idle_s: float = IDLE_S, load_timeout_s: float = LOAD_TIMEOUT_S):  # fmt: skip
+                 idle_s: float = IDLE_S, load_timeout_s: float = LOAD_TIMEOUT_S,
+                 extra_hotwords: Callable[[], list[str]] | None = None):  # fmt: skip
         self._base = base
+        # การ์ด 0028 ทาง ข: ประโยคของสกิลผู้ใช้ต่อท้าย hotwords (SkillsController.voicePhrases)
+        # None = รายการเดิมของ 0026
+        self.extra_hotwords = extra_hotwords
+        self._hot_used: list[str] | None = None  # รายการที่ตัวถอดที่เปิดอยู่ใช้
         self._custom = worker_cmd is not None  # เทสต์ใช้ตัวถอดปลอม
         self._worker_cmd = worker_cmd
         self._idle_s = idle_s
@@ -110,9 +116,18 @@ class Transcriber:
     def running(self) -> bool:
         return self._proc is not None and self._proc.poll() is None
 
+    def hotwords(self) -> list[str]:
+        """รายการเดิมของ 0026 (ไม่เปลี่ยน) + ประโยคไทยของสกิลผู้ใช้ (ไม่ซ้ำ · บรรทัดเดียว)."""
+        words = list(HOTWORDS)
+        for p in self.extra_hotwords() if self.extra_hotwords else []:
+            p = re.sub(r"\s+", " ", str(p)).strip()
+            if re.search("[฀-๿]", p) and p not in words:  # Zipformer ไทยไม่รู้จักคำอังกฤษ
+                words.append(p)
+        return words
+
     def warm(self) -> None:
         """เริ่มโหลดโมเดลเบื้องหลัง (กดคีย์ลัด = ผู้ใช้กำลังจะพูด ~2–3 วิ ซ่อนเวลาโหลดได้)."""
-        if self.available and not self.running:
+        if self.available and (not self.running or self.hotwords() != self._hot_used):
             threading.Thread(target=self._warm, daemon=True).start()
 
     def _warm(self) -> None:
@@ -174,15 +189,17 @@ class Transcriber:
 
     # ---------- ภายใน (เรียกขณะถือ _lock) ----------
     def _ensure(self) -> None:
-        if self.running:
+        words = self.hotwords()
+        if self.running and words == self._hot_used:
             return
-        self._kill()
+        self._kill()  # สกิลเปลี่ยน = เริ่มใหม่พร้อมรายการใหม่ (โหลด ~3.7 วิ · เฉพาะครั้งแรกหลังเปลี่ยน)
+        self._hot_used = words
         if self._custom:
             cmd = list(self._worker_cmd)
         else:
             self._dir.mkdir(mode=0o700, exist_ok=True)
             hot = self._dir / "hotwords.txt"
-            hot.write_text("\n".join(HOTWORDS) + "\n", encoding="utf-8")
+            hot.write_text("\n".join(words) + "\n", encoding="utf-8")
             py = self._base / "venv" / "bin" / "python"
             model = self._base / "model"
             cmd = [str(py), str(WORKER), str(model), str(hot), str(SCORE), str(THREADS)]

@@ -1,0 +1,116 @@
+{
+ "summary": {
+  "exact": 4,
+  "confirm_right": 7,
+  "wrong": 0,
+  "command": 3,
+  "none": 1
+ },
+ "rows": [
+  {
+   "text": "อยากจัดไฟล์หน่อย",
+   "heard": "อยากจัดไฟหน่อย",
+   "skill": "file-organizer",
+   "verdict": "confirm_right",
+   "picked": "file-organizer"
+  },
+  {
+   "text": "เปิดไฟล์ของฉันให้หน่อย",
+   "heard": "เปิดไฟของฉันให้หน่อย",
+   "skill": "file-organizer",
+   "verdict": "command",
+   "picked": ""
+  },
+  {
+   "text": "ช่วยเปิดตัวจัดการไฟล์ จะจัดโฟลเดอร์",
+   "heard": "ช่วยเปิดตัวจัดการไฟจะจัดโฟลาเดอร์",
+   "skill": "file-organizer",
+   "verdict": "confirm_right",
+   "picked": "file-organizer"
+  },
+  {
+   "text": "เตรียมทำการบ้าน",
+   "heard": "เตรียมทำการบ้าน",
+   "skill": "homework-prep",
+   "verdict": "exact",
+   "picked": "homework-prep"
+  },
+  {
+   "text": "เข้าโหมดการบ้านหน่อย",
+   "heard": "โหมดการบ้านหน่อย",
+   "skill": "homework-prep",
+   "verdict": "confirm_right",
+   "picked": "homework-prep"
+  },
+  {
+   "text": "จะทำการบ้านแล้ว เปิดให้ที",
+   "heard": "จะทำการบ้านแล้วเปิดให้ที",
+   "skill": "homework-prep",
+   "verdict": "exact",
+   "picked": "homework-prep"
+  },
+  {
+   "text": "เปิดแผนที่ให้หน่อย",
+   "heard": "เปิดแผลที่ให้หน่อย",
+   "skill": "map-open",
+   "verdict": "command",
+   "picked": ""
+  },
+  {
+   "text": "อยากไปสยามพารากอน ไปยังไง",
+   "heard": "อยากไปสยามภารากรไปยังไง",
+   "skill": "map-open",
+   "verdict": "confirm_right",
+   "picked": "map-open"
+  },
+  {
+   "text": "ขอดูเส้นทางไปสถานีรถไฟ",
+   "heard": "ขอดูเส้นทางไปสถานีรถไฟ",
+   "skill": "map-open",
+   "verdict": "exact",
+   "picked": "map-open"
+  },
+  {
+   "text": "เปิด google maps",
+   "heard": "เปิด",
+   "skill": "map-open",
+   "verdict": "none",
+   "picked": ""
+  },
+  {
+   "text": "เข้าโหมดประชุมให้หน่อย",
+   "heard": "โหมดประชุมให้หน่อย",
+   "skill": "meeting-mode",
+   "verdict": "confirm_right",
+   "picked": "meeting-mode"
+  },
+  {
+   "text": "จะเข้าประชุมแล้ว",
+   "heard": "หลังจากเข้าประชุมแล้ว",
+   "skill": "meeting-mode",
+   "verdict": "confirm_right",
+   "picked": "meeting-mode"
+  },
+  {
+   "text": "เข้าโหมดดูวิดีโอ",
+   "heard": "เข้าโหมดดูวีดีโอ",
+   "skill": "video-mode",
+   "verdict": "confirm_right",
+   "picked": "video-mode"
+  },
+  {
+   "text": "ขอดูคลิปหน่อย",
+   "heard": "ขอดูคลิปหน่อย",
+   "skill": "video-mode",
+   "verdict": "exact",
+   "picked": "video-mode"
+  },
+  {
+   "text": "อยากดูยูทูบ",
+   "heard": "อยากดูยูทูป",
+   "skill": "video-mode",
+   "verdict": "command",
+   "picked": ""
+  }
+ ]
+}

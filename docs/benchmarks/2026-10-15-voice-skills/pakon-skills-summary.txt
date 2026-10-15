@@ -1,0 +1,4 @@
+pk-pa {"phrases": 6, "exact": 3, "skill_hotwords": false, "hotwords": 59, "picked_right": 3, "picked_wrong": 0, "reaches_skill_phrases": 6, "reaches_skill_right": 3, "temp": "temp=71.9'C"}
+pk-pa-confirm {"exact": 3, "confirm_right": 3, "wrong": 0, "command": 0, "none": 0}
+pk-pb {"phrases": 6, "exact": 5, "skill_hotwords": true, "hotwords": 65, "picked_right": 5, "picked_wrong": 0, "reaches_skill_phrases": 6, "reaches_skill_right": 5, "temp": "temp=72.5'C"}
+pk-pb-confirm {"exact": 5, "confirm_right": 1, "wrong": 0, "command": 0, "none": 0}

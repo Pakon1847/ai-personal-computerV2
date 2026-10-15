@@ -1,0 +1,169 @@
+{
+ "summary": {
+  "phrases": 15,
+  "skipped_non_thai": [
+   "homework mode",
+   "meeting mode"
+  ],
+  "exact": 7,
+  "skill_hotwords": false,
+  "hotwords": 59,
+  "picked_right": 7,
+  "picked_wrong": 0,
+  "reaches_skill_phrases": 10,
+  "reaches_skill_right": 7,
+  "temp": "temp=71.9'C"
+ },
+ "items": [
+  {
+   "skill": "file-organizer",
+   "text": "อยากจัดไฟล์หน่อย",
+   "reaches_skill": true,
+   "heard": "อยากจัดไฟหน่อย",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.83
+  },
+  {
+   "skill": "file-organizer",
+   "text": "เปิดไฟล์ของฉันให้หน่อย",
+   "reaches_skill": false,
+   "heard": "เปิดไฟของฉันให้หน่อย",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.92
+  },
+  {
+   "skill": "file-organizer",
+   "text": "ช่วยเปิดตัวจัดการไฟล์ จะจัดโฟลเดอร์",
+   "reaches_skill": false,
+   "heard": "ช่วยเปิดตัวจัดการไฟจะจัดโฟลาเดอร์",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.95
+  },
+  {
+   "skill": "homework-prep",
+   "text": "เตรียมทำการบ้าน",
+   "reaches_skill": true,
+   "heard": "เตรียมทำการบ้าน",
+   "err": "",
+   "exact": true,
+   "picked": "homework-prep",
+   "near": 1.0
+  },
+  {
+   "skill": "homework-prep",
+   "text": "เข้าโหมดการบ้านหน่อย",
+   "reaches_skill": true,
+   "heard": "เข้าโหมดการบ้านหน่อย",
+   "err": "",
+   "exact": true,
+   "picked": "homework-prep",
+   "near": 1.0
+  },
+  {
+   "skill": "homework-prep",
+   "text": "จะทำการบ้านแล้ว เปิดให้ที",
+   "reaches_skill": true,
+   "heard": "จะทำการบ้านแล้วเปิดให้ที",
+   "err": "",
+   "exact": true,
+   "picked": "homework-prep",
+   "near": 1.0
+  },
+  {
+   "skill": "map-open",
+   "text": "เปิดแผนที่ให้หน่อย",
+   "reaches_skill": false,
+   "heard": "เปิดแผลที่ให้หน่อย",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.9
+  },
+  {
+   "skill": "map-open",
+   "text": "อยากไปสยามพารากอน ไปยังไง",
+   "reaches_skill": true,
+   "heard": "อยากไปสยามพารากรไปยังไง",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.92
+  },
+  {
+   "skill": "map-open",
+   "text": "ขอดูเส้นทางไปสถานีรถไฟ",
+   "reaches_skill": true,
+   "heard": "ขอดูเส้นทางไปสถานีรถไฟ",
+   "err": "",
+   "exact": true,
+   "picked": "map-open",
+   "near": 1.0
+  },
+  {
+   "skill": "map-open",
+   "text": "เปิด google maps",
+   "reaches_skill": false,
+   "heard": "เปิด",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.44
+  },
+  {
+   "skill": "meeting-mode",
+   "text": "เข้าโหมดประชุมให้หน่อย",
+   "reaches_skill": true,
+   "heard": "เข้าโหมดประชุมให้หน่อย",
+   "err": "",
+   "exact": true,
+   "picked": "meeting-mode",
+   "near": 1.0
+  },
+  {
+   "skill": "meeting-mode",
+   "text": "จะเข้าประชุมแล้ว",
+   "reaches_skill": true,
+   "heard": "จะเข้าประชุมแล้ว",
+   "err": "",
+   "exact": true,
+   "picked": "meeting-mode",
+   "near": 1.0
+  },
+  {
+   "skill": "video-mode",
+   "text": "เข้าโหมดดูวิดีโอ",
+   "reaches_skill": true,
+   "heard": "เข้าโหมดดูวีดีโอ",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.94
+  },
+  {
+   "skill": "video-mode",
+   "text": "ขอดูคลิปหน่อย",
+   "reaches_skill": true,
+   "heard": "ขอดูคลิปหน่อย",
+   "err": "",
+   "exact": true,
+   "picked": "video-mode",
+   "near": 1.0
+  },
+  {
+   "skill": "video-mode",
+   "text": "อยากดูยูทูบ",
+   "reaches_skill": false,
+   "heard": "อยากดูยูทูป",
+   "err": "",
+   "exact": false,
+   "picked": "",
+   "near": 0.86
+  }
+ ]
+}

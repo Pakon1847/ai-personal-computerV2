@@ -24,7 +24,7 @@ from pathlib import Path
 from aipc.skills import browse
 from aipc.spikes.voice_models_analyze import matches, only_query_differs
 from aipc.voice import stt, tts
-from aipc.voice.zipformer import Transcriber
+from aipc.voice.zipformer import HOTWORDS, Transcriber
 
 ROOT = Path(__file__).resolve().parents[3]
 PROMPTS = ROOT / "tests/data/voice_real_prompts.json"
@@ -113,6 +113,9 @@ def main() -> None:
     ap.add_argument("work")
     ap.add_argument("--zip-base", required=True)
     ap.add_argument("--out", default="")
+    # การ์ด 0028 ข4: hotwords ของสกิลต่อท้าย (ไฟล์ JSON รายการประโยค) · วัดเฉพาะ Zipformer (ข้าม whisper)
+    ap.add_argument("--extra-hotwords", default="")
+    ap.add_argument("--zip-only", action="store_true")
     a = ap.parse_args()
     work = Path(a.work)
     work.mkdir(parents=True, exist_ok=True)
@@ -156,7 +159,13 @@ def main() -> None:
     print(f"เสียงพร้อม 120 ไฟล์ · {temp()}", flush=True)
 
     # 2) ทางใหม่: ตัวถอดของแอปจริง (อุ่นก่อน = เหมือนกดคีย์ลัดแล้วพูด)
-    z = Transcriber(base=Path(a.zip_base))
+    extra = (
+        json.loads(Path(a.extra_hotwords).read_text(encoding="utf-8")) if a.extra_hotwords else []
+    )
+    z = Transcriber(base=Path(a.zip_base), extra_hotwords=lambda: extra)
+    print(
+        f"hotwords {len(z.hotwords())} (เพิ่มจากสกิล {len(z.hotwords()) - len(HOTWORDS)})", flush=True
+    )
     assert z.available, "ไม่มี venv/ หรือ model/ ใต้ --zip-base"
     t0 = time.monotonic()
     z.transcribe(work / "000-16k.wav")
@@ -186,6 +195,20 @@ def main() -> None:
         )
     z.close()
     print(f"zipformer จบ · {temp()}", flush=True)
+
+    if a.zip_only:  # การ์ด 0028 ข4: เทียบแค่ Zipformer ก่อน/หลังเพิ่ม hotwords
+        zs = summarize(rows, "zip")
+        print(json.dumps({"zipformer": zs}, ensure_ascii=False, indent=1))
+        if a.out:
+            Path(a.out).write_text(
+                json.dumps(
+                    {"zipformer": zs, "extra_hotwords": extra, "rows": rows},
+                    ensure_ascii=False,
+                    indent=1,
+                ),
+                encoding="utf-8",
+            )
+        return
 
     # 3) ทางเดิม: whisper ค่าเดียวกับแอป (เปิดใหม่ทุกประโยคเหมือนแอป)
     whisper = [

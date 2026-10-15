@@ -6,7 +6,7 @@ import time
 import unittest
 from pathlib import Path
 
-from aipc.skills import forge, manifest, userskills
+from aipc.skills import actions, forge, manifest, userskills
 
 ROOT = Path(__file__).resolve().parent.parent
 GOOD = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text(
@@ -271,11 +271,53 @@ class ControllerTest(unittest.TestCase):
         card, text = done[0]
         self.assertEqual(card["badge"]["forgedId"], "meeting-mode")
         self.assertIn("Claude สร้าง", card["lines"][0])
+        # การ์ด 0028: บอกประโยคที่พูดผ่านคีย์ลัดได้จริง
+        self.assertEqual(card["lines"][1], "กด Alt+Space แล้วพูดได้: “เข้าโหมดประชุมให้หน่อย”")
         self.assertNotEqual(card["confirmToken"], "")  # ขั้นที่สั่งเครื่องยังถามยืนยันตามกติกาเดิม
         s.confirm(card["confirmToken"], True)
         self.assertEqual(len(self.calls), 2)  # ปิดเสียง + เปิด Gmail
         self.assertIn("meeting-mode", [t["function"]["name"] for t in s.tool_catalog()])
         self.assertTrue(any(k["byClaude"] for k in s.skills))
+
+    def test_voice_create_asks_before_anything_goes_to_claude(self):
+        """การ์ด 0030: พูดขอโหมดใหม่ → การ์ดยืนยันข้อความตามตัวอักษร · ก่อนตอบ "ใช่" ไม่มีอะไรไป Claude."""
+        s, done = self.make(GOOD)
+        text = "ทำโหมดประชุม: ปิดเสียงแล้วเปิด Gmail"
+        card = s.voiceCreate(text)
+        self.assertEqual(card["title"], "ส่งให้ Claude สร้างสกิลนี้ ใช่ไหม")
+        self.assertIn(f"“{text}”", card["lines"][0])
+        self.assertIn("ส่งออกนอกเครื่อง", [c["text"] for c in card["chips"]])
+        self.assertIn("ยังไม่มี", card["why"][-2]["v"])  # ทำไมได้คำตอบนี้: ยังไม่ได้ส่งอะไร
+        no = s.voiceCreate(text)
+        s.confirm(no["confirmToken"], False)
+        self.assertEqual(self.seen, [])  # ไม่ตอบ / ตอบ "ไม่" = ไม่เรียก Claude
+        self.assertEqual(s.confirm(card["confirmToken"], True)["kind"], "forging")
+        pump(lambda: done)
+        self.assertEqual([request for request, _ in self.seen], [text])  # ข้อความเดิม ครั้งเดียว
+        self.assertEqual(done[0][0]["badge"]["forgedId"], "meeting-mode")
+        self.assertTrue(done[0][0]["voice"])  # หน้าจออ่านผลออกเสียง
+
+    def test_voice_create_failure_is_not_passed_on_to_claude_chat(self):
+        """สร้างจากเสียงไม่สำเร็จ = บอกตรง ๆ ไม่ส่งต่อให้ Claude ตอบแทน (สัญญาของการ์ด 0027)."""
+        s, done = self.make(BAD["items"][0]["skill_md"])
+        card = s.voiceCreate("ทำโหมดทำความสะอาด: ลบไฟล์ทั้งหมด")
+        s.confirm(card["confirmToken"], True)
+        pump(lambda: done)
+        self.assertEqual(done[0][0]["kind"], "forge-failed")
+        self.assertFalse(done[0][0]["fallback"])
+        self.assertEqual(len(s._skills), len(manifest.load_builtin()))  # ไม่ได้ติดตั้งอะไร
+
+    def test_voice_create_only_for_new_modes_and_never_without_claude(self):
+        s, _ = self.make(GOOD)
+        self.assertEqual(s.voiceCreate("ตอนนี้กี่โมง"), {})  # ไม่ใช่คำขอสร้าง
+        s._user.install(GOOD, s._skills, request="อยากได้สกิลโหมดประชุม")
+        s._reload()
+        self.assertEqual(s.voiceCreate("เปิดโหมดประชุม"), {})  # มีสกิลเดิมตรง = ไม่สร้างซ้ำ
+        s._claude_on = lambda: False
+        card = s.voiceCreate("ทำโหมดฟังเพลง: เปิดยูทูบแล้วปรับเสียง 60")
+        self.assertIn("ปิดการใช้ Claude", card["title"])
+        self.assertEqual(card["confirmToken"], "")
+        self.assertEqual(self.seen, [])
 
     def test_failed_forge_installs_nothing_and_asks_cloud_instead(self):
         s, done = self.make(BAD["items"][0]["skill_md"])
@@ -372,3 +414,102 @@ class ForgeLedgerTest(unittest.TestCase):
     def test_no_skill_is_not_ok(self):
         e = self._run(forge.Proposal(False, "ทำโหมดประชุม", errors=["Claude ตอบไม่สำเร็จ"]))
         self.assertFalse(e["ok"])
+
+
+# สกิลที่ขั้นสุดท้ายถาม AI (code+llm) · ใช้ตรวจว่าไม่เข้าทางเสียง (การ์ด 0028)
+ASK_AI = GOOD
+for old, new in (
+    ("id: meeting-mode", "id: news-mode"),
+    ("name: โหมดประชุม", "name: โหมดข่าว"),
+    ("worker: code", "worker: code+llm"),
+    ("  - จะเข้าประชุมแล้ว", "  - ขอฟังข่าวหน่อย"),
+    ("  - เข้าโหมดประชุมให้หน่อย", "  - เข้าโหมดข่าวให้หน่อย"),
+    ("  - meeting mode", "  - news mode"),
+):
+    ASK_AI = ASK_AI.replace(old, new)
+ASK_AI = ASK_AI.split("## ขั้นตอน")[0] + "## ขั้นตอน\n1. ปิดเสียง\n2. ถาม AI: สรุปข่าวเด่นสั้น ๆ\n"
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class VoiceSkillTest(unittest.TestCase):
+    """การ์ด 0028: พูดประโยคของสกิลที่ทำด้วยโค้ดผ่านคีย์ลัด = ทำสกิลนั้น · ตรงเป๊ะเท่านั้น."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QCoreApplication.instance() or QCoreApplication([])
+
+    def setUp(self):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        self.store = userskills.UserSkills(Path(d.name) / "skills")
+        builtin = manifest.load_builtin()
+        self.store.install(GOOD, builtin, request="อยากได้สกิลโหมดประชุม: ปิดเสียงเครื่อง แล้วเปิด Gmail ให้")
+        self.store.install(GOOD_LLM, builtin + self.store.load(), request="อยากได้สกิลคิดเมนู")
+        self.ran = []  # ตัวสั่งเครื่องจำลอง: จดคำสั่งแทนการปิดเสียง/เปิดเว็บจริง
+        ex = actions.Executor(runner=lambda a: self.ran.append(a) or 0, dry_run=False)
+        self.s = SkillsController(executor=ex, reminders_path=Path(d.name) / "r.json",
+                                  run_timer=False, llm_ready=lambda: True,
+                                  user_skills=self.store)  # fmt: skip
+        ask = Path(d.name) / "news-mode.md"
+        ask.write_text(ASK_AI, encoding="utf-8")
+        self.ask_ai = manifest.load(ask)
+
+    def test_exact_phrases_of_code_skills_only(self):
+        s = self.s
+        for text in ("เข้าโหมดประชุมให้หน่อย", "ช่วยเข้าโหมดประชุม", "meeting mode", "จะเข้าประชุมแล้วครับ",
+                     "อยากได้สกิลโหมดประชุม: ปิดเสียงเครื่อง แล้วเปิด Gmail ให้"):  # fmt: skip
+            self.assertEqual(s.voiceSkill(text), "meeting-mode", text)
+        self.assertEqual(s.voiceSkill("ในตู้เย็นมีไข่ หมูสับ ผักกาด ทำอะไรกินดี"), "")  # สกิล llm
+        s._skills = [*s._skills, self.ask_ai]
+        self.assertEqual(self.ask_ai.worker, "code+llm")
+        self.assertEqual(s.voiceSkill("เข้าโหมดข่าวให้หน่อย"), "")  # ขั้นสุดท้ายถาม AI
+        self.assertEqual(s.voiceSkill("เข้าโหมดประชม"), "")  # ได้ยินเพี้ยน = ไม่ทำ
+        self.assertEqual(s.voiceSkill("ปิดเสียง"), "")  # คำสั่งเครื่องไม่ใช่สกิลของผู้ใช้
+
+    def test_near_miss_asks_once_and_does_nothing_until_yes(self):
+        """ทาง ก (การ์ด 0028 หัวข้อ 12): ได้ยินใกล้เคียง = "หมายถึง … ใช่ไหม" · ไม่สั่งเครื่องก่อนตอบ."""
+        card = self.s.voiceConfirm("โหมดประชุมให้หน่อย")  # คำแรก "เข้า" หาย (พบในข้อ 3)
+        self.assertEqual(card["title"], "หมายถึง “โหมดประชุม” ใช่ไหม")
+        self.assertIn("ใกล้กับ “เข้าโหมดประชุมให้หน่อย”", card["lines"][0])
+        self.assertEqual(card["lines"][1:], ["1. ปิดเสียง", "2. เปิด Gmail",
+                                             card["lines"][3]])  # fmt: skip
+        self.assertEqual(self.ran, [])  # ยังไม่ทำอะไร
+        done = self.s.confirm(card["confirmToken"], True)
+        self.assertEqual(len(self.ran), 2)  # ปิดเสียง + เปิด Gmail · ยืนยันครั้งเดียว
+        self.assertEqual(done["kind"], "steps")
+        no = self.s.voiceConfirm("เข้าโหมดประชม")
+        self.s.confirm(no["confirmToken"], False)
+        self.assertEqual(len(self.ran), 2)  # "ไม่" = ไม่ทำ
+
+    def test_voice_phrases_for_hotwords_are_code_skill_examples(self):
+        """การ์ด 0028 ทาง ข: ประโยคที่ส่งให้ตัวถอดเป็น hotwords = ตัวอย่างของสกิลโค้ดล้วนเท่านั้น."""
+        phrases = self.s.voicePhrases()
+        self.assertIn("เข้าโหมดประชุมให้หน่อย", phrases)
+        self.assertNotIn("ในตู้เย็นมีไข่ หมูสับ ผักกาด ทำอะไรกินดี", phrases)  # สกิล llm
+
+    def test_exact_or_far_phrases_get_no_confirm_card(self):
+        self.assertEqual(self.s.voiceConfirm("เข้าโหมดประชุมให้หน่อย"), {})  # ตรงเป๊ะ = ทางสกิลปกติ
+        self.assertEqual(self.s.voiceConfirm("ราคาทองวันนี้"), {})  # ไม่ใกล้ = ไม่รู้จักคำสั่ง
+        self.assertEqual(self.s.voiceConfirm("คิดเมนูจากของในตู้เย็นหน่อย"), {})  # สกิล llm ไม่เข้า
+
+    def test_disabled_skill_is_not_voice_command(self):
+        self.store.set_enabled("meeting-mode", False)
+        self.s._reload()
+        self.assertEqual(self.s.voiceSkill("เข้าโหมดประชุมให้หน่อย"), "")
+
+    def test_spoken_example_skips_phrases_that_are_existing_commands(self):
+        """การ์ดสร้างสกิลบอกประโยคที่พูดแล้วถึงสกิลจริง ·
+        "เปิดแผนที่ให้หน่อย" = คำสั่งเปิด Google Maps เดิม (H5)."""
+        s3 = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s3.md").read_text(
+            encoding="utf-8"
+        )
+        self.store.install(s3, self.s._skills, request="อยากได้สกิลดูแผนที่")
+        self.s._reload()
+        self.assertEqual(self.s.voiceExample("map-open"), "อยากไปสยามพารากอน ไปยังไง")
+        self.assertEqual(self.s.voiceExample("meeting-mode"), "เข้าโหมดประชุมให้หน่อย")
+        self.assertEqual(self.s.voiceExample("fridge-menu"), "")  # สกิลที่ใช้ AI ไม่มีประโยคเสียง
+
+    def test_voice_runs_the_same_card_as_typing(self):
+        card = self.s.handleAs(self.s.voiceSkill("เข้าโหมดประชุม"), "เข้าโหมดประชุม")
+        self.assertEqual(card["kind"], "steps")
+        self.assertEqual(card["badge"]["name"], "โหมดประชุม")

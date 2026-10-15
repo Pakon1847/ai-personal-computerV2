@@ -456,3 +456,53 @@ class HybridRouteTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class VoiceAnswerTest(unittest.TestCase):
+    """การ์ด 0029: ถามด้วยเสียง → ทางที่โค้ดตอบเองในแชท (ก่อนถึง AI) · ไม่ใช้ AI ไม่ใช้เน็ต."""
+
+    def setUp(self):
+        self.calls = []
+        ex = actions.Executor(runner=lambda a: self.calls.append(a) or 0, dry_run=False)
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.now = datetime(2026, 10, 15, 9, 30).astimezone()
+        self.s = SkillsController(executor=ex, reminders_path=Path(self.tmp.name) / "r.json",
+                                  clock=lambda: self.now)  # fmt: skip
+        home = Path(self.tmp.name) / "home"
+        home.mkdir()
+        (home / "รายงานประจำเดือน.txt").write_text("ยอดขายเดือนกันยายน", encoding="utf-8")
+        self.s._home = home  # ค้นไฟล์ในโฟลเดอร์ทดสอบ ไม่ใช่ home จริง
+
+    def test_questions_answered_by_code(self):
+        self.s.confirm(self.s.handle("เตือนกินยาพรุ่งนี้แปดโมง")["confirmToken"], True)
+        cases = {
+            "ตอนนี้กี่โมง": "clock",
+            "อีกกี่วันจะถึงปีใหม่": "",
+            "พรุ่งนี้มีนัดอะไร": "",
+            "นัดถัดไปของฉันคืออะไร": "",
+            "หาไฟล์รายงาน": "files",
+            "เครื่องร้อนไหม": "",
+            "ทำไมเครื่องช้า": "",
+        }
+        for text, kind in cases.items():
+            card = self.s.voiceAnswer(text)
+            self.assertTrue(card, text)
+            self.assertFalse(card.get("llm"), text)  # ไม่ส่งให้ AI
+            if kind:
+                self.assertEqual(card["kind"], kind, text)
+        self.assertIn("รายงานประจำเดือน.txt", str(self.s.voiceAnswer("หาไฟล์รายงาน")))
+        self.assertEqual(self.s.voiceAnswer("เครื่องร้อนไหม")["badge"]["name"], "ถามเครื่องว่าเป็นอะไร")
+        self.assertEqual(self.calls, [])  # ถามอย่างเดียว ไม่สั่งเครื่อง
+
+    def test_cancel_by_voice_still_asks_first(self):
+        self.s.confirm(self.s.handle("เตือนกินยาพรุ่งนี้แปดโมง")["confirmToken"], True)
+        card = self.s.voiceAnswer("ยกเลิกนัดกินยา")
+        self.assertEqual(card["title"], "ลบนัด 1 รายการ ใช่ไหม")
+        self.assertEqual(len(self.s._store.items), 1)  # ยังไม่ลบ
+
+    def test_not_for_code_returns_nothing(self):
+        for text in ("แต่งกลอนให้หน่อย", "สวัสดีครับ", "อากาศเชียงใหม่พรุ่งนี้เป็นยังไง",
+                     "เปิดแอปเครื่องคิดเลข", "หาแว่นไม่เจอ วางไว้ไหนนะ"):  # fmt: skip
+            self.assertEqual(self.s.voiceAnswer(text), {}, text)

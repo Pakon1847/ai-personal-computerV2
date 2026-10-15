@@ -18,7 +18,7 @@ from pathlib import Path
 
 from aipc.browser.control import NEEDS_PAGE
 from aipc.skills import browse, command
-from aipc.ui.handsfree import route
+from aipc.ui.handsfree import UNKNOWN, route
 
 DATA = Path(__file__).resolve().parents[3] / "tests" / "data"
 SETS = ("browse_v1.json", "browse_heard_dev.json")  # ชุดพัฒนาของ 0024 · ไม่ใช้ V2/V4/H (ชุดทดสอบ)
@@ -66,22 +66,128 @@ def sentences() -> list[tuple[str, str]]:
     return rows
 
 
+def install_store(folder: Path):
+    """ติดตั้งสกิล .md ทุกไฟล์ผ่านประตูตรวจจริงลงโฟลเดอร์ชั่วคราว → (UserSkills, รายการที่ไม่ผ่าน)."""
+    import tempfile
+
+    from aipc.skills import manifest, userskills
+
+    store = userskills.UserSkills(Path(tempfile.mkdtemp(prefix="voice-skills-")))
+    builtin, rejected = manifest.load_builtin(), []
+    for f in sorted(folder.glob("*.md")):
+        try:
+            store.install(f.read_text(encoding="utf-8"), builtin + store.load(), request="")
+        except manifest.InvalidSkill as e:
+            rejected.append(f"{f.name}: {e.errors[0] if e.errors else e}")
+    return store, rejected
+
+
+def app_answers(store, create: bool = False):
+    """การ์ด 0029: ตัวคุมสกิลตัวจริง (ตัวสั่งเครื่องจำลอง · home ว่าง).
+
+    คืน (ฟังก์ชันจัดประเภททาง unknown, รายการคำสั่งที่ถูกสั่ง, ตัวคุม)
+    """
+    import tempfile
+
+    from PySide6.QtCore import QCoreApplication
+
+    from aipc.skills import actions
+    from aipc.ui.backend import SkillsController
+
+    QCoreApplication.instance() or QCoreApplication([])
+    calls: list = []
+    tmp = Path(tempfile.mkdtemp(prefix="voice-answers-"))
+    s = SkillsController(executor=actions.Executor(runner=lambda a: calls.append(a) or 0,
+                                                   dry_run=False),
+                         reminders_path=tmp / "r.json", run_timer=False, llm_ready=lambda: True,
+                         user_skills=store)  # fmt: skip
+    (tmp / "home").mkdir()
+    s._home = tmp / "home"
+    if create:  # การ์ด 0030: Claude ปลอมที่จดทุกครั้งที่ถูกเรียก (ต้องไม่ถูกเรียกเลย เพราะไม่มีใครตอบ "ใช่")
+        s._forge = lambda request, **kw: calls.append(("claude", request))
+        s._claude_on = lambda: True
+
+    def classify(text: str) -> str:
+        if card := s.voiceAnswer(text):
+            gate = ":confirm" if card.get("confirmToken") else ""
+            return f"answer:{card.get('kind', '')}{gate}"
+        if card := s.voiceConfirm(text):
+            return "confirm_skill:" + s._pending[card["confirmToken"]][1].id
+        if create and (card := s.voiceCreate(text)):
+            info = f"create_info:{card.get('kind', '')}"
+            return "create_ask" if card.get("confirmToken") else info
+        return UNKNOWN
+
+    return classify, calls, s
+
+
+def install_skills(folder: Path) -> tuple[list, list[str]]:
+    """การ์ด 0028: สกิลที่ติดตั้งผ่านประตูตรวจจริง (ไม่ผ่านประตู = ไม่ใช้ เหมือนในแอป)."""
+    store, rejected = install_store(folder)
+    return store.load(), rejected
+
+
 def main() -> int:
+    from aipc.skills import router
+
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, required=True, help="ไฟล์ค่าดิบ JSON")
+    ap.add_argument("--skills", type=Path, help="การ์ด 0028: โฟลเดอร์สกิล .md ที่ติดตั้งก่อนตัดสินทาง")
+    ap.add_argument("--baseline", type=Path, help="การ์ด 0028: ผล 0027 (routes.json) ไว้เทียบ")
+    ap.add_argument("--create", action="store_true", help="การ์ด 0030: ทางขอสร้างสกิล (คู่ --answers)")
+    ap.add_argument("--answers", action="store_true",
+                    help="การ์ด 0029: ตอบด้วยโค้ด + การ์ดยืนยันสกิล (คู่กับ --skills)")  # fmt: skip
     args = ap.parse_args()
+    sys.stdout.reconfigure(encoding="utf-8")
+    skill, extra, classify, calls = None, {}, None, []
+    if args.skills:
+        store, rejected = install_store(args.skills)
+        installed = store.load()
+        if args.answers:
+            classify, calls, _ = app_answers(store, create=args.create)
+        voice = [m for m in installed if m.steps and m.worker == "code"]  # เหมือน SkillsController
+
+        def skill(text: str) -> str:
+            m = router.repeat_of(text, voice)
+            return m.id if m else ""
+
+        # ประโยคของสกิลเอง: โค้ดล้วนต้องเป็น "skill" ทุกประโยค · สกิลที่ใช้ AI ต้องไม่เป็น
+        own = [{"skill": m.id, "worker": m.worker, "text": t, "way": route(t, False, skill)}
+               for m in installed for t in m.examples]  # fmt: skip
+        extra = {"installed": [f"{m.id} ({m.worker})" for m in installed], "rejected": rejected,
+                 "own_phrases": own}  # fmt: skip
+        n = f"ติดตั้งผ่านประตู {len(installed)} ตัว (สั่งด้วยเสียงได้ {len(voice)})"
+        print(f"{n} · ไม่ผ่าน {len(rejected)}")
+        for r in rejected:
+            print("  ไม่ผ่านประตู:", r)
+        ok = sum((o["way"] == "skill") == (o["worker"] == "code") for o in own)
+        print(f"ประโยคของสกิลเอง: ไปทางถูก {ok}/{len(own)} (โค้ดล้วน = skill · ใช้ AI = ไม่ใช่ skill)")
     out = []
     for src, text in sentences():
         for running in (False, True):
-            old, new = old_route(text, running), route(text, running)
+            old, new = old_route(text, running), route(text, running, skill)
+            if classify is not None and new == UNKNOWN:
+                new = classify(text)
             out.append({"set": src, "text": text, "browser_running": running,
                         "old": old, "new": new, "judge": judge(old, new)})  # fmt: skip
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    args.out.write_text(json.dumps({"cases": out, **extra} if extra else out, ensure_ascii=False,
+                                   indent=1), encoding="utf-8")  # fmt: skip
+    if args.baseline:
+        base = json.loads(args.baseline.read_text(encoding="utf-8"))
+        base = base["cases"] if isinstance(base, dict) else base
+        key = {(b["set"], b["text"], b["browser_running"]): b["new"] for b in base}
+        diff = [r for r in out if key.get((r["set"], r["text"], r["browser_running"])) != r["new"]]
+        print(f"ต่างจากผลเทียบ ({args.baseline}): {len(diff)} กรณี")
+        for r in diff:
+            was = key.get((r["set"], r["text"], r["browser_running"]))
+            print(f"  ต่าง: {r['text']} ({r['browser_running']}): {was} → {r['new']}")
+    if args.answers:
+        print(f"การ์ด 0029: คำสั่งเครื่องที่ถูกสั่งโดยไม่ได้ยืนยัน {len(calls)} ครั้ง"
+              + (" (รวมการเรียก Claude ของการ์ด 0030)" if args.create else ""))  # fmt: skip
     to_ai = sum(r["new"] == "chat" for r in out)
     counts = {k: sum(r["judge"] == k for r in out) for k in
               ("same", "intended", "new_action", "lost", "changed")}  # fmt: skip
-    sys.stdout.reconfigure(encoding="utf-8")
     print(f"ประโยค {len(out) // 2} × เบราว์เซอร์ปิด/เปิด = {len(out)} กรณี")
     print(f"เกณฑ์ 2 · ไปทาง AI ในเครื่อง (แชท): {to_ai}")
     print("เกณฑ์ 3 · เทียบแอปเดิม: " + " · ".join(f"{k} {v}" for k, v in counts.items()))
