@@ -277,6 +277,21 @@ ColumnLayout {
                     dot: true
                 }
             }
+            // วันหยุดไทย (การ์ด 0033): ปฏิทินสาธารณะของ Google · ค่าเริ่มต้นปิด · ไม่ขึ้นกับปฏิทินส่วนตัว
+            AppCheck {
+                objectName: "holidaysCheck"
+                visible: skills.holidaysAvailable
+                enabled: !skills.holidaysBusy
+                text: "วันหยุดไทย (ปฏิทินสาธารณะของ Google)"
+                detail: skills.holidaysStatus !== "" ? skills.holidaysStatus
+                        : skills.holidaysOn ? "เปิดอยู่" : "ปิดอยู่: ไม่ดึงอะไร · เปิดแล้วถามได้ เช่น “วันหยุดถัดไปคือวันอะไร”"
+                checked: skills.holidaysOn
+                // เปิดต้องรอดึงเสร็จ (ไม่มีเน็ต = เปิดไม่สำเร็จ) → ผูกช่องติ๊กกลับกับสถานะจริงทุกครั้ง ไม่ให้ติ๊กค้างทั้งที่ปิด (H5)
+                onClicked: {
+                    skills.setHolidays(checked)
+                    checked = Qt.binding(function() { return skills.holidaysOn })
+                }
+            }
             // เตือนก่อนนัด (การ์ด 0032) · อ่านจากสำเนาในเครื่อง เตือนได้แม้ไม่มีเน็ต
             RowLayout {
                 visible: skills.gcalConnected

@@ -41,6 +41,19 @@ OLD = timedelta(hours=24)  # สำเนาเก่ากว่านี้ = 
 TITLE_MAX = 120
 SENT = "ดาวน์โหลดปฏิทินจาก calendar.google.com (อ่านอย่างเดียว · ไม่ได้ส่งนัด แชท หรือไฟล์ของคุณ)"
 
+# วันหยุดไทย (การ์ด 0033): ปฏิทินสาธารณะของ Google · ไม่มีความลับในลิงก์ ·
+# ตรวจ 2026-10-15: HTTP 200 · 317 รายการ ·
+# ปี 2021–2031 · คำอธิบายบรรทัดแรก "วันหยุดนักขัตฤกษ์" / "วันสำคัญ" · ชื่อบางวันมี U+200B
+HOLIDAYS_TH = (
+    "https://calendar.google.com/calendar/ical/"
+    "th.th%23holiday%40group.v.calendar.google.com/public/basic.ics"
+)
+HOLIDAY_SENT = "ดาวน์โหลดปฏิทินวันหยุดไทยสาธารณะจาก calendar.google.com (ไม่มีข้อมูลของคุณ)"
+HOLIDAY_FUTURE = timedelta(days=400)  # ถาม "อีกกี่วันถึงสงกรานต์" ได้ตลอดปี
+HOLIDAY_STALE = timedelta(days=7)  # วันหยุดเปลี่ยนไม่บ่อย · ดึงตอนเข้าเครื่องเมื่อสำเนาเก่ากว่านี้
+# อักขระล่องหนที่พบในชื่อวันหยุดของ Google (U+200B) · ไม่ตัด = ค้นชื่อไม่เจอ
+ZERO_WIDTH = re.compile("[\u200b\u200c\u200d\u2060\ufeff]")
+
 
 def link_path() -> Path:
     base = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
@@ -50,6 +63,11 @@ def link_path() -> Path:
 def cache_path() -> Path:
     base = os.environ.get("XDG_CACHE_HOME") or str(Path.home() / ".cache")
     return Path(base) / "aipc" / "gcal-events.json"
+
+
+def holiday_files() -> tuple[Path, Path]:
+    """(ไฟล์เปิด/ปิด, สำเนา) ของปฏิทินวันหยุด · แยกจากปฏิทินส่วนตัว."""
+    return link_path().with_name("holidays-link.json"), cache_path().with_name("holidays-th.json")
 
 
 def alert_path() -> Path:
@@ -113,7 +131,8 @@ class Event:
     uid: str = ""
     fired: bool = False  # นัด Google ไม่ถูกเตือนโดยเครื่องนี้ (การ์ด 0014 หัวข้อ 9)
     repeat: str = ""  # กางนัดซ้ำแล้ว ทุกครั้งเป็นนัดเดี่ยว
-    source: str = "google"
+    source: str = "google"  # google = ปฏิทินส่วนตัว · holidays = วันหยุดไทย (การ์ด 0033)
+    kind: str = "event"  # event · holiday (วันหยุดนักขัตฤกษ์) · observance (วันสำคัญ ไม่หยุด)
 
     @property
     def id(self) -> str:
@@ -121,7 +140,8 @@ class Event:
 
     def to_json(self) -> dict:
         return {"what": self.what, "when": self.when.isoformat(), "end": self.end.isoformat(),
-                "all_day": self.all_day, "uid": self.uid}  # fmt: skip
+                "all_day": self.all_day, "uid": self.uid, "source": self.source,
+                "kind": self.kind}  # fmt: skip
 
     @staticmethod
     def from_json(d: dict) -> Event:
@@ -131,6 +151,8 @@ class Event:
             datetime.fromisoformat(d["end"]),
             bool(d.get("all_day")),
             str(d.get("uid", "")),
+            source=str(d.get("source", "google")),
+            kind=str(d.get("kind", "event")),
         )
 
 
@@ -142,7 +164,8 @@ def _parse_time(text) -> datetime | None:
 
 
 def clean_title(text: str) -> str:
-    t = re.sub(r"[\x00-\x1f\x7f]+", " ", str(text or ""))
+    t = ZERO_WIDTH.sub("", str(text or ""))
+    t = re.sub(r"[\x00-\x1f\x7f]+", " ", t)
     t = re.sub(r"\s+", " ", t).strip()
     if len(t) > TITLE_MAX:
         t = t[: TITLE_MAX - 1] + "…"
@@ -162,8 +185,22 @@ def _as_dt(value, tz) -> tuple[datetime, bool]:
     raise SyncError("ไฟล์ปฏิทินมีวันเวลาที่อ่านไม่ได้")
 
 
-def expand(data: bytes, start: datetime, end: datetime, tz=None) -> list[Event]:
-    """นัดทุกครั้งในช่วง [start, end) · นัดซ้ำกางแล้ว · ข้ามนัดที่ถูกยกเลิก · เรียงตามเวลา."""
+def _kind(component) -> str:
+    """ปฏิทินวันหยุดของ Google: คำอธิบายบรรทัดแรกบอกว่าหยุดจริงหรือเป็นแค่วันสำคัญ (การ์ด 0033)."""
+    first = str(component.get("DESCRIPTION", "")).strip().split("\n")[0].strip()
+    if first.startswith("วันหยุดนักขัตฤกษ์"):
+        return "holiday"
+    if first.startswith("วันสำคัญ"):
+        return "observance"
+    return "event"
+
+
+def expand(data: bytes, start: datetime, end: datetime, tz=None, classify: bool = False,
+           source: str = "google") -> list[Event]:  # fmt: skip
+    """นัดทุกครั้งในช่วง [start, end) · นัดซ้ำกางแล้ว · ข้ามนัดที่ถูกยกเลิก · เรียงตามเวลา.
+
+    classify = อ่านชนิดวันจากคำอธิบาย (ใช้กับปฏิทินวันหยุดเท่านั้น · ปฏิทินส่วนตัวเป็น "event" เสมอ)
+    """
     try:
         import icalendar
         import recurring_ical_events
@@ -185,7 +222,8 @@ def expand(data: bytes, start: datetime, end: datetime, tz=None) -> list[Event]:
         except (KeyError, ValueError) as e:
             raise SyncError("ไฟล์ปฏิทินมีนัดที่ไม่มีเวลาเริ่ม") from e
         out.append(Event(clean_title(c.get("SUMMARY", "")), when, max(stop, when), all_day,
-                         str(c.get("UID", ""))))  # fmt: skip
+                         str(c.get("UID", "")), source=source,
+                         kind=_kind(c) if classify else "event"))  # fmt: skip
     return sorted(out, key=lambda e: (e.when, e.what))
 
 
@@ -205,7 +243,16 @@ class GoogleCalendar:
 
     def __init__(self, link_file: Path | None = None, cache_file: Path | None = None,
                  fetcher=fetch, record=lambda sent, ok: None, clock=None, tz=None,
-                 alert_file: Path | None = None):  # fmt: skip
+                 alert_file: Path | None = None, source: str = "google",
+                 future: timedelta = FUTURE, stale_after: timedelta = STALE, sent: str = SENT,
+                 classify: bool = False):  # fmt: skip
+        self.source = source
+        self._future, self._stale_after, self._sent, self._classify = (
+            future,
+            stale_after,
+            sent,
+            classify,
+        )
         self._link_file = link_file or link_path()
         self._cache_file = cache_file or cache_path()
         # เก็บข้างไฟล์สำเนา (โฟลเดอร์เดียวกัน) · เทสต์ที่ให้ cache_file ชั่วคราวจึงไม่แตะไฟล์จริง
@@ -251,7 +298,9 @@ class GoogleCalendar:
             self._events, self._at = [], None
 
     def stale(self, now: datetime | None = None) -> bool:
-        return self.connected and (self._at is None or (now or self._now()) - self._at > STALE)
+        return self.connected and (
+            self._at is None or (now or self._now()) - self._at > self._stale_after
+        )
 
     def old(self, now: datetime | None = None) -> bool:
         return self._at is not None and (now or self._now()) - self._at > OLD
@@ -313,21 +362,25 @@ class GoogleCalendar:
         now = self._now()
         try:
             data = self._fetch(link)
-            events = expand(data, now - PAST, now + FUTURE, self._tz)
+            events = expand(data, now - PAST, now + self._future, self._tz, self._classify,
+                            self.source)  # fmt: skip
         except SyncError as e:
             self.error = str(e)
-            self._record(SENT, False)
+            self._record(self._sent, False)
             return SyncResult(False, 0, str(e), self._at)
         try:
             copy = {"version": 1, "at": now.isoformat(), "events": [e.to_json() for e in events]}
             fsutil.write_json(self._cache_file, copy)
         except OSError:
             self.error = "บันทึกสำเนาปฏิทินไม่ได้ (พื้นที่อาจเต็ม)"
-            self._record(SENT, True)
+            self._record(self._sent, True)
             return SyncResult(False, 0, self.error, self._at)
-        self._record(SENT, True)
+        self._record(self._sent, True)
         self._events, self._at, self.error = events, now, ""
-        return SyncResult(True, len(events), f"ดึงแล้ว {len(events)} นัด (ช่วง 60 วันข้างหน้า)", now)
+        days = self._future.days
+        return SyncResult(
+            True, len(events), f"ดึงแล้ว {len(events)} รายการ (ช่วง {days} วันข้างหน้า)", now
+        )
 
     def sync(self) -> SyncResult:
         with self._lock:

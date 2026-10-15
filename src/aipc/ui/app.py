@@ -136,6 +136,18 @@ def _weather(ledger=None):
     return Weather(record=lambda sent: ledger.record("weather", sent))
 
 
+def _holidays(ledger=None):
+    """วันหยุดไทยจากปฏิทินสาธารณะของ Google (การ์ด 0033) · ค่าเริ่มต้นปิด · ทุกครั้งที่ดึง = บันทึกใน ledger."""
+    from aipc.skills import gcal
+
+    link_file, cache_file = gcal.holiday_files()
+    record = (lambda sent, ok: None) if ledger is None else (
+        lambda sent, ok: ledger.record("calendar", sent, ok=ok))  # fmt: skip
+    return gcal.GoogleCalendar(link_file, cache_file, record=record, source="holidays",
+                               future=gcal.HOLIDAY_FUTURE, stale_after=gcal.HOLIDAY_STALE,
+                               sent=gcal.HOLIDAY_SENT, classify=True)  # fmt: skip
+
+
 def _gcal(ledger=None):
     """ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014) · ทุกครั้งที่ดึง = บันทึกใน ledger (ไม่มีลิงก์ลับในข้อความ)."""
     from aipc.skills.gcal import GoogleCalendar
@@ -286,6 +298,7 @@ def build(opts: Options, argv: list[str] | None = None):
             weather_on=lambda: ui_settings.useWeather,
             gcal=_gcal(ledger) if in_session else None,
             gcal_alert_min=lambda: ui_settings.gcalAlertMin,
+            holidays=_holidays(ledger) if in_session else None,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),

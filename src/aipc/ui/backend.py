@@ -1583,13 +1583,14 @@ class SkillsController(QObject):
     skillsChanged = Signal()  # noqa: N815
     forgeDone = Signal("QVariantMap", str)  # noqa: N815 · สกิลอัตโนมัติ (การ์ด 0017): การ์ดผลลัพธ์, ข้อความเดิมของผู้ใช้
     _forged = Signal(object)
-    gcalChanged = Signal()  # noqa: N815 · ปฏิทิน Google (การ์ด 0014)
+    gcalChanged = Signal()  # noqa: N815 · ปฏิทิน Google (การ์ด 0014) และวันหยุดไทย (0033)
     _gcal_done = Signal(object)
+    _hol_done = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
-                 gcal_alert_min=None):  # fmt: skip
+                 gcal_alert_min=None, holidays=None):  # fmt: skip
         super().__init__()
         # ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014 · aipc.skills.gcal.GoogleCalendar)
         # · None = ไม่มี (หน้า Login)
@@ -1601,6 +1602,11 @@ class SkillsController(QObject):
         self._gcal_done.connect(self._on_gcal_done)
         # เตือนนัด Google ก่อนเวลากี่นาที (การ์ด 0032 · ค่าตั้งในหน้าตั้งค่า · 0 = ไม่เตือน)
         self._gcal_alert_min = gcal_alert_min or (lambda: 10)
+        # วันหยุดไทย (การ์ด 0033 · GoogleCalendar ของปฏิทินสาธารณะ) · None = ไม่มี (หน้า Login)
+        self._hol = holidays
+        self._hol_busy = False
+        self._hol_msg = ""
+        self._hol_done.connect(self._on_hol_done)
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
         from aipc.skills import actions, manifest, reminders
@@ -1642,10 +1648,12 @@ class SkillsController(QObject):
         self._timer = QTimer(self, interval=self.TICK_MS, timeout=self.tick)
         if run_timer:  # หน้า greeter (ยังไม่มีใครเข้าเครื่อง) ไม่มีนัดของใครให้เตือน และไม่เขียนไฟล์
             self._timer.start()
-            if (
-                self._gcal is not None and self._gcal.connected
-            ):  # ดึงปฏิทิน Google ตอนเข้าสู่ระบบ (เบื้องหลัง)
+            # ดึงปฏิทิน Google ตอนเข้าสู่ระบบ (เบื้องหลัง)
+            if self._gcal is not None and self._gcal.connected:
                 self._gcal_refresh()
+            # วันหยุดไทย (การ์ด 0033): สำเนาเก่ากว่า 7 วัน = ดึงใหม่
+            if self._hol is not None and self._hol.stale():
+                self._hol_refresh(True)
 
     # ---------- ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014) ----------
 
@@ -1678,7 +1686,9 @@ class SkillsController(QObject):
         self.remindersChanged.emit()  # นัดถัดไปที่หน้าแรกรวมนัด Google ด้วย
 
     def _gcal_between(self, start, days: int) -> list:
-        return self._gcal.between(start, days) if self._gcal is not None else []
+        """นัด Google + วันหยุดไทย (ถ้าเปิด) ในช่วงวัน · ส่วน "นัดถัดไป" ไม่รวมวันหยุด (ไม่ใช่นัด)."""
+        out = self._gcal.between(start, days) if self._gcal is not None else []
+        return out + (self._hol.between(start, days) if self._hol is not None else [])
 
     def _gcal_upcoming(self, now) -> list:
         return self._gcal.upcoming(now) if self._gcal is not None else []
@@ -1748,6 +1758,141 @@ class SkillsController(QObject):
     def gcalSyncNow(self) -> bool:  # noqa: N802
         return self._gcal is not None and self._gcal.connected and self._gcal_refresh()
 
+    # ---------- วันหยุดไทย (การ์ด 0033) ----------
+    def _hol_refresh(self, on: bool) -> bool:
+        import threading
+
+        from aipc.skills import gcal
+
+        if self._hol is None or self._hol_busy:
+            return False
+        if not on:
+            self._hol.disconnect()
+            self._hol_msg = "ปิดแล้ว · ลบสำเนาวันหยุดออกจากเครื่องแล้ว"
+            self.gcalChanged.emit()
+            return True
+        self._hol_busy = True
+        self.gcalChanged.emit()
+
+        def work():
+            try:
+                r = self._hol.connect(gcal.HOLIDAYS_TH)
+            except Exception as e:  # noqa: BLE001 · เธรดเบื้องหลังห้ามล้มเงียบ (H2)
+                r = gcal.SyncResult(False, 0, f"ดึงวันหยุดไม่สำเร็จ: {e}")
+            self._hol_done.emit(r)
+
+        threading.Thread(target=work, daemon=True).start()
+        return True
+
+    def _on_hol_done(self, result) -> None:
+        self._hol_busy = False
+        self._hol_msg = result.message
+        self.gcalChanged.emit()
+
+    @Property(bool, constant=True)
+    def holidaysAvailable(self) -> bool:  # noqa: N802
+        return self._hol is not None
+
+    @Property(bool, notify=gcalChanged)
+    def holidaysOn(self) -> bool:  # noqa: N802
+        return self._hol is not None and self._hol.connected
+
+    @Property(bool, notify=gcalChanged)
+    def holidaysBusy(self) -> bool:  # noqa: N802
+        return self._hol_busy
+
+    @Property(str, notify=gcalChanged)
+    def holidaysStatus(self) -> str:  # noqa: N802
+        h = self._hol
+        if h is None:
+            return ""
+        if self._hol_busy:
+            return "กำลังดึงวันหยุดจาก Google…"
+        if h.connected and h.last_sync is not None:
+            at = h.last_sync.astimezone()
+            text = f"ดึงล่าสุด {thaidate.short_date(at)} {at:%H:%M} น. · ดึงใหม่สัปดาห์ละครั้ง"
+            return text + (f" · ครั้งล่าสุดดึงไม่ได้: {h.error}" if h.error else "")
+        return self._hol_msg
+
+    @Slot(bool, result=bool)
+    def setHolidays(self, on: bool) -> bool:  # noqa: N802
+        """สวิตช์วันหยุดไทย: เปิด = ดึงปฏิทินสาธารณะ (เบื้องหลัง) · ปิด = ลบสำเนา (H3)."""
+        return self._hol_refresh(bool(on))
+
+    def _holidays(self, now) -> list:
+        """วันหยุดและวันสำคัญที่ยังไม่ผ่าน (รวมวันนี้) จากสำเนา · เรียงตามวัน."""
+        if self._hol is None or not self._hol.connected:
+            return []
+        today = now.date()
+        return [e for e in self._hol.between(today, 400) if e.when.date() >= today]
+
+    def _hol_date(self, d) -> str:
+        return f"{thaidate.short_date(d)} {d.year + thaidate.BE_OFFSET}"
+
+    def _holiday_until(self, text: str, now) -> dict | None:
+        """ "อีกกี่วันจะถึงวันมาฆบูชา" ที่ไม่อยู่ในรายการวันตายตัว → หาในปฏิทินวันหยุด (การ์ด 0033)."""
+        from aipc.skills import agenda
+
+        target = agenda.until_target(text)
+        if target is None or self._hol is None or not self._hol.connected:
+            return None
+        key = agenda.holiday_key(target)
+        if not key or key.startswith("หยุด"):
+            return None  # "อีกกี่วันถึงวันหยุด" = _holiday_card
+        hits = [e for e in self._holidays(now)
+                if key in agenda.holiday_key(e.what)
+                and ("ชดเชย" in key or not e.what.startswith("วันหยุดชดเชย"))]  # fmt: skip
+        if not hits:
+            return self._plain("clock", f"ยังไม่มีข้อมูล{target}", [
+                "ปฏิทินวันหยุดของ Google ยังไม่มีวันนี้ในช่วง 1 ปีข้างหน้า "
+                "(วันทางจันทรคติของปีหน้ามักมีหลังประกาศทางการ) · ไม่เดาวันที่",
+            ])  # fmt: skip
+        e = hits[0]
+        n = (e.when.date() - now.date()).days
+        title = f"อีก {n} วันถึง{e.what}" if n else f"วันนี้คือ{e.what}"
+        kind = "วันหยุดราชการ" if e.kind == "holiday" else "วันสำคัญ (ไม่ได้หยุด)"
+        return self._plain(
+            "clock", title, [f"{self._hol_date(e.when)} · {kind} · จากปฏิทินวันหยุดของ Google"]
+        )
+
+    def _holiday_card(self, text: str) -> dict | None:
+        """วันหยุดถัดไป · อีกกี่วันถึงวันหยุด · ช่วงวันนี้มีวันหยุดไหม (การ์ด 0033) · ไม่ใช่คำถามวันหยุด = None."""
+        from aipc.skills import agenda
+
+        now = self._now()
+        nxt = agenda.asks_next_holiday(text)
+        rng = None if nxt else agenda.holiday_range(text, now.date())
+        if not nxt and rng is None:
+            return None
+        if self._hol is None:
+            return None
+        if not self._hol.connected:
+            hint = "เปิดได้ที่หน้าตั้งค่า ส่วน “ปฏิทิน Google” · ดึงปฏิทินสาธารณะ ไม่ส่งข้อมูลของคุณ"
+            return self._plain("clock", "ยังไม่ได้เปิดปฏิทินวันหยุดไทย", [hint])
+        if nxt:
+            public = [e for e in self._holidays(now) if e.kind == "holiday"]
+            if not public:
+                return self._plain(
+                    "clock", "ยังไม่มีข้อมูลวันหยุดถัดไป", ["ปฏิทินวันหยุดของ Google ยังไม่มีข้อมูลช่วงนี้"]
+                )
+            first = public[0]
+            n = (first.when.date() - now.date()).days
+            title = f"วันนี้เป็นวันหยุด: {first.what}" if n == 0 else f"วันหยุดถัดไป: {first.what}"
+            lines = [f"{self._hol_date(first.when)} · " + ("วันนี้" if n == 0 else f"อีก {n} วัน")]
+            lines += [f"ถัดไป: {self._hol_date(e.when)} · {e.what}" for e in public[1:3]]
+            return self._plain("clock", title, lines)
+        days = [e for e in self._hol.between(rng.start, rng.days) if e.kind == "holiday"]
+        day = thaidate.short_date(rng.start)
+        span = (
+            day
+            if rng.days == 1
+            else f"{day}–{thaidate.short_date(rng.start + timedelta(days=rng.days - 1))}"
+        )
+        if not days:
+            return self._plain("clock", f"{rng.label} ({span}) ไม่มีวันหยุดราชการ", [])
+        return self._plain("clock", f"{rng.label} ({span}) มีวันหยุด {len(days)} วัน",
+                           [f"{self._hol_date(e.when)} · {e.what}" for e in days])  # fmt: skip
+
     @Slot()
     def gcalDisconnect(self) -> None:  # noqa: N802
         if self._gcal is None or self._gcal_busy:
@@ -1806,7 +1951,10 @@ class SkillsController(QObject):
 
     @staticmethod
     def _source_text(r) -> str:
-        return " · Google" if getattr(r, "source", "") == "google" else ""
+        source = getattr(r, "source", "")
+        if source == "holidays":  # การ์ด 0033: แยกวันหยุดราชการกับวันสำคัญที่ไม่ได้หยุด
+            return " · วันหยุด" if getattr(r, "kind", "") == "holiday" else " · วันสำคัญ"
+        return " · Google" if source == "google" else ""
 
     @staticmethod
     def _is_past(r, now) -> bool:
@@ -1988,7 +2136,7 @@ class SkillsController(QObject):
         now = self._now()
         hit = agenda.days_until(text, now.date())
         if hit is None:
-            return None
+            return self._holiday_until(text, now)
         name, d = hit
         n = (d - now.date()).days
         title = f"อีก {n} วันถึง{name}" if n else f"วันนี้คือ{name}"
@@ -2470,8 +2618,8 @@ class SkillsController(QObject):
         from aipc.skills.fileintent import file_intent, file_time
 
         t0 = time.monotonic()
-        for ask in (self._agenda_card, self._clock_card, self._until_card, self._cancel_card,
-                    self._next_card, self._move_card):  # fmt: skip
+        for ask in (self._agenda_card, self._clock_card, self._until_card, self._holiday_card,
+                    self._cancel_card, self._next_card, self._move_card):  # fmt: skip
             if card := ask(text):
                 return self._why(card, t0)
         if label := file_time(text):
@@ -2612,6 +2760,8 @@ class SkillsController(QObject):
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
             return card
         if card := self._clock_card(text) or self._until_card(text):  # เวลา · อีกกี่วัน = นาฬิกาเครื่อง
+            return card
+        if card := self._holiday_card(text):  # วันหยุดถัดไป · ช่วงนี้มีวันหยุดไหม (การ์ด 0033)
             return card
         if card := self._cancel_card(text):  # ยกเลิก/ลบนัด = การ์ดยืนยัน แล้วลบด้วยโค้ด
             return card

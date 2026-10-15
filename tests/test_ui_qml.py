@@ -756,6 +756,60 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ui.gcalAlertMin, 10)
         self.assertEqual(warnings, [])
 
+    def test_holidays_switch(self):
+        """การ์ด 0033: สวิตช์วันหยุดไทย ค่าเริ่มต้นปิด · เปิด = ดึง (ตัวดึงปลอม) · ปิด = ลบสำเนา."""
+        from aipc.skills import gcal
+        from tests.test_ui_holidays import HOLIDAY_ICS
+
+        engine, win, warnings = self.open_shell("settings")
+        skills = engine._backends["skills"]
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        online = {"ok": False}
+
+        def fetch(link):
+            if not online["ok"]:
+                raise gcal.SyncError("ดึงปฏิทินไม่ได้ (ไม่มีอินเทอร์เน็ต?)")
+            return HOLIDAY_ICS
+
+        skills._hol = gcal.GoogleCalendar(
+            tmp / "hl.json",
+            tmp / "hc.json",
+            fetcher=fetch,
+            source="holidays",
+            future=gcal.HOLIDAY_FUTURE,
+            classify=True,
+        )
+        skills.gcalChanged.emit()
+        settle(50)
+        check = find_items(win, "holidaysCheck")[0]
+        self.assertTrue(check.property("visible"))
+        self.assertFalse(check.property("checked"))
+        check.setProperty("checked", True)  # กดตอนไม่มีเน็ต
+        check.clicked.emit()
+        for _ in range(100):
+            if not skills.holidaysBusy:
+                break
+            settle(20)
+        settle(50)
+        self.assertFalse(skills.holidaysOn)
+        self.assertFalse(check.property("checked"))  # ไม่ติ๊กค้างทั้งที่เปิดไม่สำเร็จ (H5)
+        self.assertIn("ไม่มีอินเทอร์เน็ต", check.property("detail"))
+        online["ok"] = True
+        check.setProperty("checked", True)
+        check.clicked.emit()
+        for _ in range(100):
+            if skills.holidaysOn and not skills.holidaysBusy:
+                break
+            settle(20)
+        settle(50)
+        self.assertTrue(skills.holidaysOn)
+        self.assertTrue(check.property("checked"))
+        check.setProperty("checked", False)
+        check.clicked.emit()
+        settle(50)
+        self.assertFalse(skills.holidaysOn)
+        self.assertEqual(warnings, [])
+
     def test_claude_guide_only_without_claude(self):
         """การ์ด 0021 เกณฑ์ข้อ 3: ไม่มี claude = ปุ่มคู่มือ กดแล้วเห็นทุกขั้นพร้อมกรอบคำสั่ง · มี claude = ไม่มีคู่มือ."""
         engine, win, warnings = self.open_shell("settings")
