@@ -27,7 +27,38 @@ GOOGLE = "https://www.google.com/search?hl=th&q="
 # DuckDuckGo ตรง 8/8 และลิงก์ชี้เว็บปลายทางตรง ๆ (Bing ผ่านตัวพาไป bing.com/ck/a)
 DDG = "https://duckduckgo.com/?kl=th-th&q="
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
-NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app"}
+NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media"}
+
+# คุมเพลง/วิดีโอ (การ์ด 0035): สั่งตัวเล่น <video>/<audio> ของหน้าโดยตรง (ใช้ได้ทุกเว็บ รวมโฆษณา YouTube) ·
+# ไม่อ่านเนื้อหาหน้า · คืนแค่สถานะ: none = หน้านี้ไม่มีตัวเล่น · idle = อยู่ในสภาพที่สั่งอยู่แล้ว
+PAUSE_JS = r"""(() => {
+  const m = [...document.querySelectorAll('video, audio')];
+  if (!m.length) return 'none';
+  const on = m.filter(e => !e.paused && !e.ended);
+  on.forEach(e => e.pause());
+  return on.length ? 'ok' : 'idle';
+})()"""
+PLAY_JS = r"""(async () => {
+  const m = [...document.querySelectorAll('video, audio')];
+  if (!m.length) return 'none';
+  if (m.some(e => !e.paused && !e.ended)) return 'idle';
+  const e = m.find(x => x.currentTime > 0 && !x.ended) || m[0];
+  try { await e.play(); return 'ok'; } catch (err) { return 'blocked'; }
+})()"""
+# YouTube: ปุ่ม "ถัดไป" ของตัวเล่น (ทางสำรองเมื่อ Shift+N ไม่ได้ผล) · ซ่อนอยู่ = ไม่มีเพลงถัดไป
+NEXT_BUTTON_JS = r"""(() => {
+  const b = document.querySelector('.ytp-next-button');
+  if (!b || b.offsetParent === null) return false;
+  b.click();
+  return true;
+})()"""
+MEDIA_SAY = {
+    ("pause", "ok"): (True, "หยุดแล้ว"),
+    ("pause", "idle"): (True, "ไม่มีเพลงหรือวิดีโอที่กำลังเล่นอยู่"),
+    ("play", "ok"): (True, "เล่นต่อแล้ว"),
+    ("play", "idle"): (True, "กำลังเล่นอยู่แล้ว"),
+    ("play", "blocked"): (False, "เว็บไม่ยอมให้เล่นต่อ · กดเล่นที่หน้าจอเอง"),
+}
 
 # ลิงก์ที่ N = "อันที่เห็นบนจอ" (Pakon เลือก 2026-10-13 · รวมโฆษณา) เรียงจากบนลงล่าง ·
 # หน้าผลค้นหา = หัวข้อผลค้นหา · หน้าอื่น = ลิงก์ที่มองเห็นในจอตอนนี้
@@ -275,12 +306,13 @@ class BrowserControl:
             self._target = target
         return self._session
 
-    def _eval(self, js: str):
+    def _eval(self, js: str, **opts):
+        """opts ส่งต่อให้ Runtime.evaluate (เช่น awaitPromise · userGesture ของคำสั่งเล่นต่อ การ์ด 0035)."""
         for _ in range(20):  # ระหว่างเปลี่ยนหน้า หน้าใหม่ยังไม่มี context ให้รันสคริปต์ (~0.1–1 วิ)
             try:
                 r = self._cdp.call(
                     "Runtime.evaluate",
-                    {"expression": js, "returnByValue": True},
+                    {"expression": js, "returnByValue": True, **opts},
                     session=self._page(),
                 )
                 return r.get("result", {}).get("value")
@@ -422,6 +454,42 @@ class BrowserControl:
         if after == before:
             return Result(False, "เลื่อนลงต่อไม่ได้ สุดหน้าแล้ว" if sign > 0 else "อยู่บนสุดแล้ว")
         return Result(True, "เลื่อนลงแล้ว" if sign > 0 else "เลื่อนขึ้นแล้ว")
+
+    def _do_media(self, cmd: BrowseCommand) -> Result:
+        """หยุด / เล่นต่อ / เพลงถัดไป (การ์ด 0035)."""
+        if cmd.direction == "next":
+            return self._media_next()
+        # userGesture: นับเป็นการกดของผู้ใช้ (Chromium ไม่ยอมให้เล่นเสียงเองถ้าไม่มีคนสั่ง)
+        state = self._eval(PAUSE_JS if cmd.direction == "pause" else PLAY_JS,
+                           awaitPromise=True, userGesture=True)  # fmt: skip
+        ok, say = MEDIA_SAY.get((cmd.direction, state), (False, "หน้านี้ไม่มีเพลงหรือวิดีโอ"))
+        return Result(ok, say)
+
+    def _media_next(self) -> Result:
+        """YouTube เท่านั้น: กด Shift+N (คีย์ลัดเพลงถัดไป) · ที่อยู่ไม่เปลี่ยน = กดปุ่ม "ถัดไป" ของตัวเล่นแทน ·
+        ข้อความบอกว่าได้ผลทางไหน (เกณฑ์ข้อ 3: บันทึกว่า Shift+N ใช้ได้ไหม)."""
+        host = urlsplit(self._url()).hostname or ""
+        if host != "youtube.com" and not host.endswith(".youtube.com"):
+            return Result(False, "ข้ามเพลงได้เฉพาะใน YouTube")
+        before, token = self._marked()
+        # rawKeyDown = กดปุ่มโดยไม่พิมพ์ตัวอักษรลงช่องใด · modifiers 8 = Shift
+        for kind in ("rawKeyDown", "keyUp"):
+            key = {
+                "type": kind,
+                "key": "N",
+                "code": "KeyN",
+                "windowsVirtualKeyCode": 78,
+                "modifiers": 8,
+            }
+            self._cdp.call("Input.dispatchKeyEvent", key, session=self._page())
+        url, moved = self._wait_change(before, token)
+        if moved:
+            return Result(True, "เปิดเพลงถัดไปแล้ว", url=url)
+        if self._eval(NEXT_BUTTON_JS):
+            url, moved = self._wait_change(before, token)
+            if moved:
+                return Result(True, "กดปุ่มถัดไปให้แล้ว", url=url)
+        return Result(False, "ข้ามไม่ได้ · หน้านี้ไม่มีเพลงถัดไป")
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
         pages = [

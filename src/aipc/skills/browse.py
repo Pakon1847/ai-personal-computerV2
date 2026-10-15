@@ -14,7 +14,8 @@ from aipc.skills import fileintent
 
 @dataclass(frozen=True)
 class BrowseCommand:
-    # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031)
+    # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031) ·
+    # media (การ์ด 0035 · direction = pause | play | next)
     kind: str
     query: str = ""
     n: int = 0
@@ -55,6 +56,14 @@ _SCROLL = re.compile(
     r"(?:เลื่อน|สกรอ(?:ลล์|ล)?)\s*(?:หน้า\s*(?:จอ|เว็บ)?\s*)?(?:กลับ\s*)?(ลง|ขึ้น)\s*(?:ไป|มา)?\s*(?:ดู\s*)?"
     r"(?:ข้าง\s*(?:ล่าง|บน))?\s*(?:ดู\s*ต่อ|อีก)?"
 )
+# คุมเพลง/วิดีโอ (การ์ด 0035) · ต้องมีคำว่าเพลง/วิดีโอ/คลิป ("หยุด" เดี่ยว ๆ ไม่ใช่คำสั่ง) ·
+# "ปิดเสียง/เปิดเสียง/เพิ่มเสียง" ยังเป็นเสียงของเครื่อง (การ์ด 0008) · มีเวลาต่อท้าย ("…ตอนสามทุ่ม") = ไม่ตรงทั้งประโยค
+_MEDIA = r"(?:เพลง|ว[ิี]ด[ิี]โอ|คลิป)"
+_PAUSE = re.compile(
+    rf"(?:หยุด|พัก|ปิด)\s*(?:เล่น\s*)?{_MEDIA}(?:\s*(?:นี้|ก่อน|ชั่วคราว|แป๊บ|แปบ))*|หยุด\s*ชั่วคราว"
+)
+_PLAY = re.compile(rf"(?:เล่น\s*(?:{_MEDIA}\s*)?|เปิด\s*{_MEDIA}\s*)ต่อ(?:\s*เลย)?")
+_NEXT = re.compile(rf"(?:(?:ไป|เปิด|เล่น)\s*)?{_MEDIA}\s*(?:ถัด|ต่อ)\s*ไป|ข้าม\s*{_MEDIA}(?:\s*นี้)?")
 _CLOSE = re.compile(r"ปิด\s*(?:แท็บ|แทบ|tab|หน้า\s*(?:นี้|เว็บ)|เว็บ)\s*(?:นี้|ที่\s*เปิด\s*อยู่)?\s*(?:ไป)?")
 _APP = re.compile(
     r"(?:กลับ|ไป|สลับ)\s*(?:ไป)?\s*(?:ที่|หา)?\s*(?:แอป|แอพ|หน้า(?:ต่าง)?\s*(?:ผู้ช่วย|แชท|หลัก|แอป|แอพ)|ผู้ช่วย)"
@@ -166,6 +175,9 @@ def _single_exact(t: str, asked: bool) -> BrowseCommand | None:
         return BrowseCommand("reload")
     if m := _SCROLL.fullmatch(t):
         return BrowseCommand("scroll", direction="down" if m.group(1) == "ลง" else "up")
+    for direction, pat in (("pause", _PAUSE), ("play", _PLAY), ("next", _NEXT)):
+        if pat.fullmatch(t):
+            return BrowseCommand("media", direction=direction)
     if _CLOSE.fullmatch(t):
         return BrowseCommand("close")
     if _APP.fullmatch(t):

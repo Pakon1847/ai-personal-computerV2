@@ -194,6 +194,15 @@ class BrowserController(QObject):
             return UNKNOWN
         return route(text, self._ctl().running, self._skill_match)
 
+    @Slot(str, result=str)
+    def hint(self, text: str) -> str:
+        """คำบอกเมื่อสั่งงานที่ต้องมีหน้าเว็บ แต่ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย (route = needs_browser)."""
+        from aipc.skills import browse
+
+        if any(c.kind == "media" for c in browse.parse(text)):  # การ์ด 0035
+            return 'ยังไม่ได้เปิดเพลงในเบราว์เซอร์ของผู้ช่วย · พูดว่า "เปิดยูทูบ" แล้วเลือกเพลงก่อน'
+        return 'ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย พูดว่า "เปิดเบราว์เซอร์" ก่อน'
+
     @Slot(result=bool)
     def openHome(self) -> bool:  # noqa: N802
         """พูด "เปิดเบราว์เซอร์" → เปิดเบราว์เซอร์ของผู้ช่วยที่หน้า Google (คำสั่งเปิดเว็บตัวเดิมของ 0024)."""
