@@ -2190,6 +2190,14 @@ class SkillsController(QObject):
         card["route"] = "agenda"
         return card
 
+    def _agenda_step(self, step_text: str) -> list[str]:
+        """ขั้น "บอกนัดวันนี้/พรุ่งนี้/สัปดาห์นี้" ของสกิล → บรรทัดเดียวกับคำตอบ "…มีนัดอะไร" (การ์ด 0034)."""
+        label = step_text.removeprefix("บอกนัด")
+        card = self._agenda_card(f"{label}มีนัดอะไร")
+        if card is None:  # ไม่ควรเกิด: ตัวตรวจสกิลรับแค่ 3 ช่วงนี้
+            return [f"อ่านนัด{label}ไม่ได้"]
+        return [card["title"], *card["lines"]]
+
     def _title_card(self, text: str) -> dict | None:
         """ "นัดหมอวันไหน" · "มีนัดกับหมอไหม" (การ์ด 0037) → นัดที่ยังไม่ถึงซึ่งชื่อมีคำนั้น · ไม่ใช่คำถามนี้ = None."""
         from aipc.skills import agenda
@@ -2257,7 +2265,7 @@ class SkillsController(QObject):
     def _steps_card(self, route, text: str) -> dict:
         """แสดงทุกขั้นก่อนทำ · มีขั้นที่สั่งเครื่อง = ถามยืนยันครั้งเดียว (ความเสี่ยงของขั้นที่สูงสุด) แล้วทำตามลำดับ."""
         skill = route.skill
-        prefix = {"llm": "ถาม AI: ", "say": "บอก: ", "action": ""}
+        prefix = {"llm": "ถาม AI: ", "say": "บอก: ", "action": "", "agenda": ""}
         lines = [f"{i}. {prefix[s.kind]}{s.text}" for i, s in enumerate(skill.steps, 1)]
         card = {"kind": "steps", "badge": self._badge(skill, route.reason), "title": "",
                 "chips": [], "lines": lines, "confirmToken": "", "page": ""}  # fmt: skip
@@ -2280,6 +2288,8 @@ class SkillsController(QObject):
         for i, s in enumerate(skill.steps, 1):
             if s.kind == "say":
                 lines.append(s.text)
+            elif s.kind == "agenda":  # การ์ด 0034: โค้ดอ่านนัด (ในเครื่อง + Google + วันหยุด) · ไม่ใช้ AI
+                lines.extend(self._agenda_step(s.text))
             elif s.kind == "llm":  # ขั้นสุดท้ายเสมอ (ตัวตรวจบังคับ) · หน้าจอส่งข้อความของผู้ใช้ให้ AI พร้อมคำสั่งนี้
                 card.update(llm=True, prompt=s.text, llmText=text)
                 lines.append(f"{i}. ส่งให้ AI ในเครื่องทำต่อ")
@@ -2713,7 +2723,7 @@ class SkillsController(QObject):
         self._counter += 1
         token = f"v{self._counter}"
         self._pending[token] = ("steps", skill, text)
-        prefix = {"llm": "ถาม AI: ", "say": "บอก: ", "action": ""}
+        prefix = {"llm": "ถาม AI: ", "say": "บอก: ", "action": "", "agenda": ""}
         steps = [f"{i}. {prefix[s.kind]}{s.text}" for i, s in enumerate(skill.steps, 1)]
         card = {"kind": "steps", "badge": self._badge(skill, "ได้ยินใกล้เคียง · ยืนยันก่อนทำ"),
                 "title": f"หมายถึง “{skill.name}” ใช่ไหม", "chips": [], "confirmToken": token,
