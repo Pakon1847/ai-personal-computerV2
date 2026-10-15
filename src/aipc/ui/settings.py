@@ -22,6 +22,8 @@ LOCK_CHOICES = (0, 1, 5, 10, 15)
 LOGOUT_CHOICES = (5, 10, 30)
 # ขั้น C (aipc.ui.presence): กล้องตรวจว่าเจ้าของยังอยู่ · วินาทีที่ไม่เห็นเจ้าของก่อนล็อก และหลังล็อกก่อนออก
 PRESENCE_CHOICES = (30, 60, 120)
+# เตือนนัดจากปฏิทิน Google ล่วงหน้ากี่นาที (การ์ด 0032 · 0 = ไม่เตือน)
+GCAL_ALERT_CHOICES = (0, 5, 10, 30)
 
 
 def default_path() -> Path:
@@ -50,6 +52,8 @@ class UiPrefs:
     presence: bool = False
     presence_lock_s: int = 30
     presence_logout_s: int = 30
+    # เตือนนัดจากปฏิทิน Google ก่อนเวลานัด (การ์ด 0032) · ค่าเริ่มต้น 10 นาที
+    gcal_alert_min: int = 10
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
@@ -76,6 +80,9 @@ class UiPrefs:
             presence_logout_s=self.presence_logout_s
             if self.presence_logout_s in PRESENCE_CHOICES and type(self.presence_logout_s) is int
             else 30,
+            gcal_alert_min=self.gcal_alert_min
+            if self.gcal_alert_min in GCAL_ALERT_CHOICES and type(self.gcal_alert_min) is int
+            else 10,
         )
 
 
@@ -96,6 +103,7 @@ def load(path: Path | None = None) -> UiPrefs:
             presence=data.get("presence") is True,
             presence_lock_s=data.get("presence_lock_s", 30),
             presence_logout_s=data.get("presence_logout_s", 30),
+            gcal_alert_min=data.get("gcal_alert_min", 10),
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()

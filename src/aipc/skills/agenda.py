@@ -25,6 +25,20 @@ class Query:
     label: str
 
 
+def _range(t: str, today: date) -> Query | None:
+    """ช่วงวันจากคำในประโยค (สัปดาห์นี้/หน้า · วันนี้/พรุ่งนี้/มะรืน) · ไม่มี = None."""
+    for w in WEEK_WORDS:
+        if w in t:
+            nxt = "หน้า" in w
+            start = today + timedelta(days=7 - today.weekday()) if nxt else today
+            end = start + timedelta(days=6 - start.weekday())
+            return Query(start, (end - start).days + 1, w)
+    for w in sorted(DAYS, key=len, reverse=True):
+        if w in t:
+            return Query(today + timedelta(days=DAYS[w]), 1, w)
+    return None
+
+
 def parse(text: str, today: date) -> Query | None:
     t = re.sub(r"\s+", "", text)
     topic = any(k in t for k in TOPIC) or (t.startswith(WHEN_FIRST) and "มีอะไร" in t)
@@ -32,6 +46,10 @@ def parse(text: str, today: date) -> Query | None:
         return None
     if t.startswith(("เตือน", "จด", "บันทึก", "ตั้ง", "สร้าง")):  # สั่งจดนัด ไม่ใช่ถาม
         return None
+    if "วันหยุด" in t and not any(k in t for k in ("นัด", "ต้องทำ", "ตาราง")):
+        return None  # "สัปดาห์หน้ามีวันหยุดไหม" = คำถามวันหยุด (การ์ด 0033) ไม่ใช่ตารางนัด
+    if q := _detail_range(t, today):  # วันในสัปดาห์ · วันที่ · เดือน (การ์ด 0037)
+        return q
     for w in WEEK_WORDS:
         if w in t:
             nxt = "หน้า" in w
@@ -163,4 +181,140 @@ def days_until(text: str, today: date) -> tuple[str, date] | None:
         if d <= today:
             d = date(today.year + 1, d.month, d.day)
         return (f"วันที่ {d.day}/{d.month}", d)
+    return None
+
+
+# ---------- วันหยุดไทย (การ์ด 0033) ----------
+# "วันหยุดถัดไปคือวันอะไร" · "วันหยุดราชการครั้งหน้าวันไหน"
+_NEXT_HOLIDAY = re.compile(
+    r"(?:ขอ)?(?:ดู|บอก)?วันหยุด(?:ราชการ|นักขัตฤกษ์)?(?:ครั้ง)?(?:ถัดไป|ต่อไป|หน้า|ที่จะถึง|ที่ใกล้ที่สุด)"
+    r"(?:คือ|เป็น|ตรงกับ)?(?:วัน)?(?:อะไร|ไหน|เมื่อไหร่|เมื่อไร)?(?:ครับ|ค่ะ|คะ|หน่อย|นะ|บ้าง)*[?？]*"
+)
+# "อีกกี่วันจะถึงวันหยุด" (วันหยุดราชการถัดไป ไม่ระบุชื่อ)
+_UNTIL_ANY_HOLIDAY = re.compile(
+    r"(?:อีก|เหลือ)กี่วัน(?:จะ)?(?:ถึง)?วันหยุด(?:ราชการ|นักขัตฤกษ์)?(?:ครั้ง)?(?:ถัดไป|หน้า)?"
+    r"(?:ครับ|ค่ะ|คะ|นะ|อะ)*[?？]*"
+)
+_POLITE_END = ("ครับ", "ค่ะ", "คะ", "นะ", "อะ", "จ้ะ", "จ้า", "แล้ว", "?", "？")
+
+
+def asks_next_holiday(text: str) -> bool:
+    t = re.sub(r"\s+", "", text)
+    return bool(_NEXT_HOLIDAY.fullmatch(t) or _UNTIL_ANY_HOLIDAY.fullmatch(t))
+
+
+def holiday_range(text: str, today: date) -> Query | None:
+    """ "สัปดาห์หน้ามีวันหยุดไหม" · "พรุ่งนี้หยุดไหม" → ช่วงวัน · ไม่ใช่คำถามนี้ = None."""
+    t = re.sub(r"\s+", "", text)
+    if not any(a in t for a in ASK):
+        return None
+    if "วันหยุด" not in t and not re.search(r"(?:หยุด|เป็นวันหยุด)(?:ไหม|มั้ย|หรือเปล่า)", t):
+        return None
+    if any(k in t for k in ("นัด", "ต้องทำ", "ไปเที่ยว", "ทำอะไรดี", "ไปไหน")):
+        return None  # "วันหยุดไปเที่ยวไหนดี" ไม่ใช่ถามวันที่
+    return _range(t, today)
+
+
+def until_target(text: str) -> str | None:
+    """ชื่อวันในคำถาม "อีกกี่วันจะถึง X" / "X อีกกี่วัน" (ใช้หาในปฏิทินวันหยุด) · ไม่ใช่คำถามนี้ = None."""
+    t = re.sub(r"\s+", "", text)
+    m = _UNTIL.search(t)
+    if m is None:
+        return None
+    rest = t[m.end() :] or t[: m.start()]
+    rest = rest.removeprefix("ถึง").removeprefix("จะถึง")
+    changed = True
+    while changed:
+        changed = False
+        for w in _POLITE_END:
+            if rest.endswith(w) and len(rest) > len(w):
+                rest, changed = rest[: -len(w)], True
+    return rest or None
+
+
+def holiday_key(name: str) -> str:
+    """ชื่อสำหรับเทียบ: ตัดช่องว่าง/คำว่า "วัน" นำหน้า · ทนสะกดของ Google ("วันขื้นปีใหม่")."""
+    k = re.sub(r"\s+", "", name).replace("ขื้น", "ขึ้น")
+    return k.removeprefix("วัน")
+
+
+# ---------- ถามนัดละเอียดขึ้น (การ์ด 0037) ----------
+# "วันศุกร์นี้" · "วันจันทร์หน้า" · ต้องมีคำว่า "วัน" นำหน้า: "อาทิตย์นี้" เดี่ยว ๆ = สัปดาห์นี้ (กฎเดิม)
+_WEEKDAY = re.compile(r"วัน(จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์|อาทิตย์)(นี้|หน้า)?")
+
+
+def _month_end(d: date) -> date:
+    nxt = date(d.year + (d.month == 12), d.month % 12 + 1, 1)
+    return nxt - timedelta(days=1)
+
+
+def _invalid(label: str, today: date) -> Query:
+    """วันที่ไม่มีจริง (31 พ.ย.) · days = 0 → ตัวตอบบอกว่าไม่มีวันนี้ ไม่เดาวันใกล้เคียง."""
+    return Query(today, 0, label)
+
+
+def _detail_range(t: str, today: date) -> Query | None:
+    from aipc.skills.when import MONTHS, WEEKDAYS
+    from aipc.ui.thaidate import MONTHS_SHORT
+
+    if m := _WEEKDAY.search(t):
+        wd = WEEKDAYS[m[1]]
+        if m[2] == "หน้า":  # วันนั้นของสัปดาห์หน้า (จันทร์–อาทิตย์ถัดไป)
+            d = today + timedelta(days=7 - today.weekday() + wd)
+        else:  # ครั้งถัดไป นับวันนี้ด้วย
+            d = today + timedelta(days=(wd - today.weekday()) % 7)
+        return Query(d, 1, f"วัน{m[1]}{m[2] or ''}")
+    months = "|".join(sorted((re.escape(k) for k in MONTHS), key=len, reverse=True))
+    if m := re.search(rf"(?:วันที่)?(\d{{1,2}})({months})\.?", t):
+        day, mon = int(m[1]), MONTHS[m[2]]
+        label = f"วันที่ {day} {MONTHS_SHORT[mon - 1]}"
+        try:
+            d = date(today.year, mon, day)
+            if d < today:
+                d = date(today.year + 1, mon, day)
+        except ValueError:
+            return _invalid(label, today)
+        return Query(d, 1, label)
+    if m := re.search(r"วันที่(\d{1,2})", t):
+        day = int(m[1])
+        y, mon = today.year, today.month
+        if day < today.day:
+            y, mon = (y + 1, 1) if mon == 12 else (y, mon + 1)
+        label = f"วันที่ {day}"
+        try:
+            return Query(date(y, mon, day), 1, label)
+        except ValueError:
+            return _invalid(f"{label} {MONTHS_SHORT[mon - 1]}", today)
+    if "เดือนนี้" in t:
+        return Query(today, (_month_end(today) - today).days + 1, "เดือนนี้")
+    if "เดือนหน้า" in t:
+        first = _month_end(today) + timedelta(days=1)
+        return Query(first, (_month_end(first) - first).days + 1, "เดือนหน้า")
+    return None
+
+
+# ค้นนัดตามชื่อ: "นัดหมอวันไหน" · "มีนัดกับหมอไหม" · "ประชุมทีมครั้งหน้าเมื่อไหร่"
+_WHEN_ASK = r"(?:วันไหน|เมื่อไหร่|เมื่อไร|กี่โมง|วันที่เท่าไหร่)"
+_END = r"(?:ครับ|ค่ะ|คะ|นะ|จ๊ะ|จ้ะ)*[?？]*"
+_TITLE_ASK = re.compile(rf"(?:ขอ)?(?:มี)?นัด(.+?)(?:ครั้ง(?:หน้า|ถัดไป))?{_WHEN_ASK}{_END}")
+_TITLE_HAVE = re.compile(rf"มีนัด(.+?)(?:ไหม|มั้ย|หรือเปล่า){_END}")
+_TITLE_NEXT = re.compile(rf"(.+?)ครั้ง(?:หน้า|ถัดไป){_WHEN_ASK}{_END}")
+_NOT_NAMES = ("ถัดไป", "ต่อไป", "ล่าสุด", "ทั้งหมด", "ที่เหลือ", "ของฉัน", "ของผม", "อะไร", "ไหน")
+
+
+def title_query(text: str) -> tuple[str, bool] | None:
+    """(คำที่ใช้ค้นชื่อนัด, ต้องตอบแม้ไม่เจอไหม) · ไม่ใช่คำถามนี้ = None.
+
+    มีคำว่า "นัด" = คำถามเรื่องนัดแน่ ๆ (ไม่เจอก็ตอบว่าไม่เจอ) · "<ชื่อ>ครั้งหน้าเมื่อไหร่" ไม่มีคำว่านัด
+    อาจถามเรื่องอื่น ("ทีมชาติไทยแข่งครั้งหน้าเมื่อไหร่") → ตอบเฉพาะเมื่อเจอนัดชื่อนี้
+    """
+    t = re.sub(r"\s+", "", text)
+    for rx, strict in ((_TITLE_ASK, True), (_TITLE_HAVE, True), (_TITLE_NEXT, False)):
+        if m := rx.fullmatch(t):
+            name = m[1]
+            for pre in ("กับ", "เรื่อง", "ที่"):
+                name = name.removeprefix(pre)
+            if len(name) < 2 or any(w in name for w in _NOT_NAMES):
+                return None
+            return name, strict
     return None

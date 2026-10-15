@@ -232,6 +232,148 @@ ColumnLayout {
         }
     }
 
+    // ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014): วางลิงก์ iCal ลับ → นัดจาก Google ขึ้นในคำตอบนัด หน้าแรก และเสียง
+    // ลิงก์ผิด/ดึงไม่ได้ = ไม่จำลิงก์ · เครื่องไม่เห็นรหัสผ่าน Google · เลิกเชื่อมต่อต้องกดสองครั้ง
+    Card {
+        id: gcalCard
+        objectName: "gcalCard"
+        visible: skills.gcalAvailable
+        Layout.fillWidth: true
+        implicitHeight: gcalCol.implicitHeight + 40
+        property bool guideOpen: false
+        property bool confirmOff: false
+        readonly property var steps: [
+            "ใช้เบราว์เซอร์บนคอมพิวเตอร์เปิด calendar.google.com แล้วเข้าสู่ระบบบัญชี Google ของคุณ",
+            "กดรูปเฟือง (การตั้งค่า) มุมขวาบน → “การตั้งค่า” → ด้านซ้ายกดชื่อปฏิทินของคุณ ใต้ “การตั้งค่าสำหรับปฏิทินของฉัน”",
+            "เลื่อนลงไปที่ “ผสานรวมปฏิทิน” (Integrate calendar) → คัดลอก “ที่อยู่ลับในรูปแบบ iCal” (Secret address in iCal format)",
+            "วางลิงก์ในช่องข้างล่างแล้วกด “เชื่อมต่อ” · ถ้าเผลอส่งลิงก์ให้คนอื่น ให้กด “รีเซ็ต” ใน Google แล้วนำลิงก์ใหม่มาวาง"
+        ]
+        Connections {
+            target: skills
+            // เชื่อมต่อสำเร็จ = ล้างลิงก์ออกจากช่อง (ไม่ค้างบนจอ)
+            function onGcalChanged() { if (skills.gcalConnected) gcalLink.text = "" }
+        }
+        ColumnLayout {
+            id: gcalCol
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 16
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 2
+                    AppText { text: "ปฏิทิน Google (อ่านอย่างเดียว)"; strong: true }
+                    AppText {
+                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        text: "นัดจาก Google จะขึ้นในคำตอบ “พรุ่งนี้มีนัดอะไร” หน้าแรก และคำถามด้วยเสียง · ใช้ได้แม้ไม่มีเน็ต (ใช้ข้อมูลที่ดึงไว้ล่าสุด) · เครื่องนี้แก้หรือลบนัดใน Google ไม่ได้"
+                    }
+                }
+                Chip {
+                    visible: skills.gcalConnected
+                    text: "เชื่อมต่อแล้ว " + skills.gcalHint
+                    kind: "ok"
+                    dot: true
+                }
+            }
+            // วันหยุดไทย (การ์ด 0033): ปฏิทินสาธารณะของ Google · ค่าเริ่มต้นปิด · ไม่ขึ้นกับปฏิทินส่วนตัว
+            AppCheck {
+                objectName: "holidaysCheck"
+                visible: skills.holidaysAvailable
+                enabled: !skills.holidaysBusy
+                text: "วันหยุดไทย (ปฏิทินสาธารณะของ Google)"
+                detail: skills.holidaysStatus !== "" ? skills.holidaysStatus
+                        : skills.holidaysOn ? "เปิดอยู่" : "ปิดอยู่: ไม่ดึงอะไร · เปิดแล้วถามได้ เช่น “วันหยุดถัดไปคือวันอะไร”"
+                checked: skills.holidaysOn
+                // เปิดต้องรอดึงเสร็จ (ไม่มีเน็ต = เปิดไม่สำเร็จ) → ผูกช่องติ๊กกลับกับสถานะจริงทุกครั้ง ไม่ให้ติ๊กค้างทั้งที่ปิด (H5)
+                onClicked: {
+                    skills.setHolidays(checked)
+                    checked = Qt.binding(function() { return skills.holidaysOn })
+                }
+            }
+            // เตือนก่อนนัด (การ์ด 0032) · อ่านจากสำเนาในเครื่อง เตือนได้แม้ไม่มีเน็ต
+            RowLayout {
+                visible: skills.gcalConnected
+                spacing: 8
+                AppText { text: "เตือนก่อนนัด"; size: Theme.fontSmall; color: Theme.inkMuted }
+                Repeater {
+                    model: uiSettings.gcalAlertChoices
+                    AppButton {
+                        required property int modelData
+                        objectName: "gcalAlert" + modelData
+                        text: modelData === 0 ? "ไม่เตือน" : modelData + " นาที"
+                        kind: uiSettings.gcalAlertMin === modelData ? "primary" : "secondary"
+                        onClicked: uiSettings.setGcalAlertMin(modelData)
+                    }
+                }
+            }
+            AppText {
+                objectName: "gcalStatus"
+                visible: text !== ""
+                Layout.fillWidth: true; size: Theme.fontSmall
+                color: skills.gcalBusy ? Theme.accentInk : Theme.inkMuted
+                text: skills.gcalStatus
+            }
+            AppButton {
+                objectName: "gcalGuideButton"
+                visible: !skills.gcalConnected
+                kind: "secondary"
+                text: gcalCard.guideOpen ? "ซ่อนวิธีรับลิงก์" : "วิธีรับลิงก์จาก Google (4 ขั้น)"
+                onClicked: gcalCard.guideOpen = !gcalCard.guideOpen
+            }
+            Repeater {
+                model: gcalCard.guideOpen && !skills.gcalConnected ? gcalCard.steps : []
+                delegate: AppText {
+                    required property string modelData
+                    required property int index
+                    objectName: "gcalGuideStep"
+                    Layout.fillWidth: true
+                    size: Theme.fontSmall
+                    text: (index + 1) + ". " + modelData
+                }
+            }
+            AppField {
+                id: gcalLink
+                objectName: "gcalLinkField"
+                visible: !skills.gcalConnected
+                Layout.fillWidth: true
+                mono: true
+                placeholder: "วางลิงก์ที่ขึ้นต้นด้วย https://calendar.google.com/…"
+                hint: "ลิงก์นี้เป็นความลับ ใครได้ไปจะเห็นนัดของคุณ · อย่าส่งให้ใคร"
+            }
+            RowLayout {
+                spacing: 8
+                AppButton {
+                    objectName: "gcalConnect"
+                    visible: !skills.gcalConnected
+                    text: "เชื่อมต่อ"
+                    enabled: gcalLink.text.trim() !== "" && !skills.gcalBusy
+                    onClicked: skills.gcalConnect(gcalLink.text)
+                }
+                AppButton {
+                    objectName: "gcalSyncNow"
+                    visible: skills.gcalConnected
+                    kind: "secondary"
+                    text: "ดึงตอนนี้"
+                    enabled: !skills.gcalBusy
+                    onClicked: skills.gcalSyncNow()
+                }
+                AppButton {
+                    objectName: "gcalDisconnect"
+                    visible: skills.gcalConnected
+                    kind: gcalCard.confirmOff ? "danger" : "ghost"
+                    text: gcalCard.confirmOff ? "กดอีกครั้งเพื่อเลิกเชื่อมต่อ" : "เลิกเชื่อมต่อ"
+                    enabled: !skills.gcalBusy
+                    onClicked: {
+                        if (gcalCard.confirmOff) { skills.gcalDisconnect(); gcalCard.confirmOff = false }
+                        else gcalCard.confirmOff = true
+                    }
+                }
+            }
+        }
+    }
+
     // ล็อกเมื่อไม่ได้ใช้เครื่อง (aipc.ui.idle · ขั้น A 2026-10-06): ลืมออกแล้วลุกไป → ล็อกทุกหน้าต่าง → ออกเอง
     Card {
         objectName: "idleLockCard"

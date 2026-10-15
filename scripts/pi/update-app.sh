@@ -94,7 +94,7 @@ python3 -m venv "$TMP/.venv"
 PIP="$TMP/.venv/bin/pip"
 # เก็บ wheel ไว้ในเครื่อง: ครั้งหน้าติดตั้งได้แม้ไม่มีเน็ต · ออฟไลน์ตอนนี้ = ใช้ wheel ที่เคยเก็บไว้
 "$PIP" download -q -d "$WHEELS" -c "$TMP/constraints.txt" "setuptools>=68" \
-  PySide6-Essentials opencv-python-headless numpy \
+  PySide6-Essentials opencv-python-headless numpy icalendar recurring-ical-events \
   || say "   ดาวน์โหลดไม่ได้ (ออฟไลน์?) · ใช้ wheel ที่เก็บไว้ใน $WHEELS"
 "$PIP" install -q --no-index --find-links "$WHEELS" "setuptools>=68"
 "$PIP" install -q --no-index --find-links "$WHEELS" --no-build-isolation \

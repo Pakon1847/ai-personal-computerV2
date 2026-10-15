@@ -14,12 +14,16 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 _OLD_DATA_HOME = os.environ.get("XDG_DATA_HOME")
+# ลิงก์และสำเนาปฏิทิน Google (การ์ด 0014) อยู่ใน config/cache · เทสต์ต้องไม่อ่านลิงก์จริงของเครื่องแล้วออกเน็ต
+_OLD_HOMES = {k: os.environ.get(k) for k in ("XDG_CONFIG_HOME", "XDG_CACHE_HOME")}
 
 
 def setUpModule():
     # ไม่ให้เทสต์เขียนนัดหมายลง home จริงของผู้ใช้ · ตั้งเฉพาะช่วงเทสต์ไฟล์นี้ แล้วคืนค่าเดิม
     # (เดิมตั้งตอน import ค้างทั้งโปรเซส → เทสต์ไฟล์อื่นหาโมเดลที่ดาวน์โหลดไว้ไม่เจอ)
     os.environ["XDG_DATA_HOME"] = tempfile.mkdtemp(prefix="aipc-test-")
+    for k in _OLD_HOMES:
+        os.environ[k] = tempfile.mkdtemp(prefix="aipc-test-")
 
 
 def tearDownModule():
@@ -27,6 +31,11 @@ def tearDownModule():
         os.environ.pop("XDG_DATA_HOME", None)
     else:
         os.environ["XDG_DATA_HOME"] = _OLD_DATA_HOME
+    for k, v in _OLD_HOMES.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
 
 
 try:
@@ -680,6 +689,125 @@ class ShellCardTest(unittest.TestCase):
         btn.clicked.emit()
         settle(30)
         self.assertEqual(usage.outboundTotal, 0)
+        self.assertEqual(warnings, [])
+
+    def test_google_calendar_card_connects_and_disconnects(self):
+        """การ์ด 0014: ส่วนปฏิทิน Google · คู่มือ 4 ขั้น · ลิงก์ผิดไม่จำ · เชื่อมต่อแล้วล้างช่อง · เลิกต้องกดสองครั้ง."""
+        from aipc.skills import gcal
+        from tests.test_skill_gcal import ICS, LINK
+
+        engine, win, warnings = self.open_shell("settings")
+        skills = engine._backends["skills"]
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        skills._gcal = gcal.GoogleCalendar(
+            tmp / "link.json", tmp / "events.json", fetcher=lambda link: ICS
+        )
+        skills.gcalChanged.emit()
+        settle(50)
+
+        def wait_idle():
+            for _ in range(100):
+                if not skills.gcalBusy:
+                    break
+                settle(20)
+            settle(50)
+
+        self.assertTrue(find_items(win, "gcalCard")[0].property("visible"))
+        find_items(win, "gcalGuideButton")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(len(find_items(win, "gcalGuideStep")), 4)
+        field, connect = find_items(win, "gcalLinkField")[0], find_items(win, "gcalConnect")[0]
+        self.assertFalse(connect.property("enabled"))  # ช่องว่าง = กดไม่ได้
+        field.setProperty("text", "https://evil.example/basic.ics")
+        settle(30)
+        connect.clicked.emit()
+        wait_idle()
+        self.assertFalse(skills.gcalConnected)
+        self.assertIn("ไม่ใช่ที่อยู่ปฏิทินของ Google", find_items(win, "gcalStatus")[0].property("text"))
+        field.setProperty("text", LINK)
+        settle(30)
+        connect.clicked.emit()
+        wait_idle()
+        self.assertTrue(skills.gcalConnected)
+        self.assertEqual(field.property("text"), "")  # ลิงก์ลับไม่ค้างบนจอ
+        self.assertFalse(field.property("visible"))
+        self.assertIn("ดึงล่าสุด", find_items(win, "gcalStatus")[0].property("text"))
+        ui = engine._backends["uiSettings"]
+        find_items(win, "gcalAlert30")[0].clicked.emit()  # การ์ด 0032: เลือกเตือนก่อน 30 นาที
+        settle(30)
+        self.assertEqual(ui.gcalAlertMin, 30)
+        off = find_items(win, "gcalDisconnect")[0]
+        off.clicked.emit()
+        settle(30)
+        self.assertTrue(skills.gcalConnected)  # ครั้งแรกแค่ถามยืนยัน
+        off.clicked.emit()
+        settle(30)
+        self.assertFalse(skills.gcalConnected)
+        self.assertEqual(warnings, [])
+
+    def test_google_alert_toast_title_and_choices(self):
+        """การ์ด 0032: เตือนนัด Google ขึ้นหัว "อีก N นาที" (ไม่ใช่ "ถึงเวลาแล้ว") · เลือกเวลาเตือนในหน้าตั้งค่า."""
+        engine, win, warnings = self.open_shell("settings")
+        skills, ui = engine._backends["skills"], engine._backends["uiSettings"]
+        skills.reminderDue.emit({"what": "ประชุม", "when": "16 ต.ค. · 10:00 น. · ปฏิทิน Google",
+                                 "id": "g:1", "title": "อีก 10 นาที"})  # fmt: skip
+        settle(30)
+        self.assertEqual(find_items(win, "reminderToastTitle")[0].property("text"), "อีก 10 นาที")
+        self.assertEqual(ui.gcalAlertMin, 10)
+        self.assertEqual(warnings, [])
+
+    def test_holidays_switch(self):
+        """การ์ด 0033: สวิตช์วันหยุดไทย ค่าเริ่มต้นปิด · เปิด = ดึง (ตัวดึงปลอม) · ปิด = ลบสำเนา."""
+        from aipc.skills import gcal
+        from tests.test_ui_holidays import HOLIDAY_ICS
+
+        engine, win, warnings = self.open_shell("settings")
+        skills = engine._backends["skills"]
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        online = {"ok": False}
+
+        def fetch(link):
+            if not online["ok"]:
+                raise gcal.SyncError("ดึงปฏิทินไม่ได้ (ไม่มีอินเทอร์เน็ต?)")
+            return HOLIDAY_ICS
+
+        skills._hol = gcal.GoogleCalendar(
+            tmp / "hl.json",
+            tmp / "hc.json",
+            fetcher=fetch,
+            source="holidays",
+            future=gcal.HOLIDAY_FUTURE,
+            classify=True,
+        )
+        skills.gcalChanged.emit()
+        settle(50)
+        check = find_items(win, "holidaysCheck")[0]
+        self.assertTrue(check.property("visible"))
+        self.assertFalse(check.property("checked"))
+        check.setProperty("checked", True)  # กดตอนไม่มีเน็ต
+        check.clicked.emit()
+        for _ in range(100):
+            if not skills.holidaysBusy:
+                break
+            settle(20)
+        settle(50)
+        self.assertFalse(skills.holidaysOn)
+        self.assertFalse(check.property("checked"))  # ไม่ติ๊กค้างทั้งที่เปิดไม่สำเร็จ (H5)
+        self.assertIn("ไม่มีอินเทอร์เน็ต", check.property("detail"))
+        online["ok"] = True
+        check.setProperty("checked", True)
+        check.clicked.emit()
+        for _ in range(100):
+            if skills.holidaysOn and not skills.holidaysBusy:
+                break
+            settle(20)
+        settle(50)
+        self.assertTrue(skills.holidaysOn)
+        self.assertTrue(check.property("checked"))
+        check.setProperty("checked", False)
+        check.clicked.emit()
+        settle(50)
+        self.assertFalse(skills.holidaysOn)
         self.assertEqual(warnings, [])
 
     def test_claude_guide_only_without_claude(self):

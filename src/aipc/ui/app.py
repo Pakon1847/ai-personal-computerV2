@@ -35,7 +35,7 @@ HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
 FONT_DIR = HERE / "fonts"
 SCREENS = ("login", "signup", "recover", "delete", "shell")
-PAGES = ("workspace", "files", "skills", "health", "settings")
+PAGES = ("workspace", "calendar", "files", "skills", "health", "settings")
 
 
 @dataclass
@@ -134,6 +134,27 @@ def _weather(ledger=None):
     if ledger is None:
         return Weather()
     return Weather(record=lambda sent: ledger.record("weather", sent))
+
+
+def _holidays(ledger=None):
+    """วันหยุดไทยจากปฏิทินสาธารณะของ Google (การ์ด 0033) · ค่าเริ่มต้นปิด · ทุกครั้งที่ดึง = บันทึกใน ledger."""
+    from aipc.skills import gcal
+
+    link_file, cache_file = gcal.holiday_files()
+    record = (lambda sent, ok: None) if ledger is None else (
+        lambda sent, ok: ledger.record("calendar", sent, ok=ok))  # fmt: skip
+    return gcal.GoogleCalendar(link_file, cache_file, record=record, source="holidays",
+                               future=gcal.HOLIDAY_FUTURE, stale_after=gcal.HOLIDAY_STALE,
+                               sent=gcal.HOLIDAY_SENT, classify=True)  # fmt: skip
+
+
+def _gcal(ledger=None):
+    """ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014) · ทุกครั้งที่ดึง = บันทึกใน ledger (ไม่มีลิงก์ลับในข้อความ)."""
+    from aipc.skills.gcal import GoogleCalendar
+
+    if ledger is None:
+        return GoogleCalendar()
+    return GoogleCalendar(record=lambda sent, ok: ledger.record("calendar", sent, ok=ok))
 
 
 def _start_idle_lock(ui_settings, app):
@@ -275,6 +296,9 @@ def build(opts: Options, argv: list[str] | None = None):
             weather=_weather(ledger) if in_session else None,
             claude_on=claude_on,
             weather_on=lambda: ui_settings.useWeather,
+            gcal=_gcal(ledger) if in_session else None,
+            gcal_alert_min=lambda: ui_settings.gcalAlertMin,
+            holidays=_holidays(ledger) if in_session else None,
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
