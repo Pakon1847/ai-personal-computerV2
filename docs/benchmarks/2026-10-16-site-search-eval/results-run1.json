@@ -1,0 +1,500 @@
+{
+ "positive_ok": 19,
+ "positive": 20,
+ "wrong_site": 0,
+ "negative_ok": 9,
+ "negative": 10,
+ "passed": false,
+ "rows": [
+  {
+   "id": "S01",
+   "text": "ช่วยค้นในยูทูบว่าไฮไลต์ฟุตบอลไทยลีกเมื่อคืนให้หน่อยค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ไฮไลต์ฟุตบอลไทยลีกเมื่อคืน",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "ไฮไลต์ฟุตบอลไทยลีกเมื่อคืน"
+   }
+  },
+  {
+   "id": "S02",
+   "text": "เสิร์ชใน YouTube ว่า lofi hip hop หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "lofi hip hop",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "lofi hip hop"
+   }
+  },
+  {
+   "id": "S03",
+   "text": "หาวิธีปลูกผักบุ้งในกระถางในยูทูบหน่อยครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "วิธีปลูกผักบุ้งในกระถาง",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "วิธีปลูกผักบุ้งในกระถาง"
+   }
+  },
+  {
+   "id": "S04",
+   "text": "เปิดยูทูปหาเพลงกล่อมเด็ก",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพลงกล่อมเด็ก",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "เพลงกล่อมเด็ก"
+   }
+  },
+  {
+   "id": "S05",
+   "text": "ช่วยหา ปั๊มน้ำมันที่ใกล้ที่สุด ในแผนที่ หน่อยครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปั๊มน้ำมันที่ใกล้ที่สุด",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ปั๊มน้ำมันที่ใกล้ที่สุด"
+   }
+  },
+  {
+   "id": "S06",
+   "text": "ค้นหาวัดพระธาตุดอยสุเทพในแผนที่กูเกิล",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "วัดพระธาตุดอยสุเทพ",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "วัดพระธาตุดอยสุเทพ"
+   }
+  },
+  {
+   "id": "S07",
+   "text": "ค้นในกูเกิลแมพร้านส้มตำอร่อยๆแถวนี้นะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ร้านส้มตำอร่อยๆแถวนี้",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ร้านส้มตำอร่อยๆแถวนี้"
+   }
+  },
+  {
+   "id": "S08",
+   "text": "ช่วยเปิดแผนที่หาโรงพยาบาลศิริราชให้หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "โรงพยาบาลศิริราช",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "โรงพยาบาลศิริราช"
+   }
+  },
+  {
+   "id": "S09",
+   "text": "ช่วยค้นในอีเมลว่าใบแจ้งหนี้บัตรเครดิตหน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ใบแจ้งหนี้บัตรเครดิต",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ใบแจ้งหนี้บัตรเครดิต"
+   }
+  },
+  {
+   "id": "S10",
+   "text": "หาคำสั่งซื้อ Shopee ในจีเมลหน่อยค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "คำสั่งซื้อ shopee",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "คำสั่งซื้อ Shopee"
+   }
+  },
+  {
+   "id": "S11",
+   "text": "เปิดจีเมลแล้วค้นหาตั๋วเครื่องบินไปเชียงใหม่ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ตั๋วเครื่องบินไปเชียงใหม่",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ตั๋วเครื่องบินไปเชียงใหม่"
+   }
+  },
+  {
+   "id": "S12",
+   "text": "ค้นหาในวิกิพีเดียคำว่าปรากฏการณ์เรือนกระจก",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปรากฏการณ์เรือนกระจก",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ปรากฏการณ์เรือนกระจก"
+   }
+  },
+  {
+   "id": "S13",
+   "text": "หา ประวัติสุนทรภู่ ในวิกิ ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ประวัติสุนทรภู่",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ประวัติสุนทรภู่"
+   }
+  },
+  {
+   "id": "S14",
+   "text": "เปิดวิกิพีเดียแล้วค้นคำว่าสงครามโลกครั้งที่สอง",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สงครามโลกครั้งที่สอง",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "สงครามโลกครั้งที่สอง"
+   }
+  },
+  {
+   "id": "S15",
+   "text": "ช่วยเสิร์ชในเฟซบุ๊กว่ากลุ่มคนรักแมวเชียงใหม่หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "กลุ่มคนรักแมวเชียงใหม่",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "กลุ่มคนรักแมวเชียงใหม่"
+   }
+  },
+  {
+   "id": "S16",
+   "text": "ขอหา iPhone 13 มือสองในเฟสบุ๊คหน่อยค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "iphone 13 มือสอง",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "iPhone 13 มือสอง"
+   }
+  },
+  {
+   "id": "S17",
+   "text": "เปิดเฟซบุ๊กค้นหาเพจกรมอุตุนิยมวิทยานะครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพจกรมอุตุนิยมวิทยา",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "เพจกรมอุตุนิยมวิทยา"
+   }
+  },
+  {
+   "id": "S18",
+   "text": "ค้นในกูเกิลไดรฟ์ว่าสไลด์นำเสนอโครงงานครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สไลด์นำเสนอโครงงาน",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "สไลด์นำเสนอโครงงาน"
+   }
+  },
+  {
+   "id": "S19",
+   "text": "ช่วยหาไฟล์ตารางสอนเทอมสองในกูเกิลไดรฟ์ให้หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ไฟล์ตารางสอนเทอมสอง",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "ไฟล์ตารางสอนเทอมสอง"
+   }
+  },
+  {
+   "id": "S20",
+   "text": "เปิด google drive แล้วหา รูปงานแต่งพี่สาว",
+   "positive": true,
+   "ok": false,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site": "drive",
+    "query": "รูปงานแต่งพี่สาว"
+   }
+  },
+  {
+   "id": "N01",
+   "text": "หาไฟล์รูปรับปริญญาในแฟลชไดรฟ์ให้หน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N02",
+   "text": "ค้นในไดรฟ์ว่ามีไฟล์สัญญาเช่าบ้านไหม",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "ในไดรฟ์ว่ามีไฟล์สัญญาเช่าบ้านไหม"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N03",
+   "text": "หาไฟล์สไลด์ที่แก้ล่าสุดในเครื่องหน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N04",
+   "text": "หาไฟล์ที่โหลดมาจากกูเกิลไดรฟ์เมื่อวาน",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N05",
+   "text": "ค้นในกูเกิลว่าแฟลชไดรฟ์ยี่ห้อไหนทนที่สุด",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "แฟลชไดรฟ์ยี่ห้อไหนทนที่สุด"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N06",
+   "text": "หาแผนที่โลกชัดๆไว้ปริ้นให้ลูกทำการบ้าน",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "แผนที่โลกชัดๆไว้ปริ้นให้ลูกทำการบ้าน"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N07",
+   "text": "เปิดเฟซบุ๊กให้หน่อยค่ะ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N08",
+   "text": "ส่งอีเมลหาอาจารย์ว่าขอเลื่อนส่งงาน",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N09",
+   "text": "พรุ่งนี้แปดโมงเตือนให้ค้นในจีเมลว่าตั๋วเครื่องบินด้วยนะ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site_search": false
+   }
+  },
+  {
+   "id": "N10",
+   "text": "เปิดยูทูบแล้วหาปุ่มตั้งค่าไม่เจอ",
+   "positive": false,
+   "ok": false,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปุ่มตั้งค่าไม่เจอ",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site_search": false
+   }
+  }
+ ]
+}
