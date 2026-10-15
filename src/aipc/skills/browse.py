@@ -15,7 +15,7 @@ from aipc.skills import fileintent
 @dataclass(frozen=True)
 class BrowseCommand:
     # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031) ·
-    # media (การ์ด 0035 · direction = pause | play | next)
+    # media (การ์ด 0035 · direction = pause | play | next) · site_search (การ์ด 0036 · site + query)
     kind: str
     query: str = ""
     n: int = 0
@@ -80,6 +80,39 @@ SITE_NAMES = {
     "calendar": r"ปฏิทิน\s*กูเกิ้?ล|กูเกิ้?ล\s*ปฏิทิน|google\s*calendar",
     "drive": r"กูเกิ้?ล\s*ไดร์?[ฟบ]์?|ไดร์?[ฟบ]์?|google\s*drive",
 }
+# ค้นในบริการ (การ์ด 0036) · ชื่อบริการต้องตามหลัง "ใน" หรือ "เปิด" ·
+# ไม่มีชื่อบริการ = ทางเดิม (ค้น Google / หาไฟล์) · ไดรฟ์ต้องมีคำว่ากูเกิล ("ไดรฟ์" เดี่ยว ๆ อาจหมายถึง USB) ·
+# Google เองใช้ทางค้นเว็บเดิม
+SEARCH_SITE_NAMES = {
+    "youtube": SITE_NAMES["youtube"],
+    "maps": SITE_NAMES["maps"] + r"|แผนที่",
+    "wikipedia": SITE_NAMES["wikipedia"] + r"|วิกิ",
+    "facebook": SITE_NAMES["facebook"],
+    "drive": r"กูเกิ้?ล\s*ไดร์?[ฟบ]์?|google\s*drive",
+    "gmail": r"จีเมล์?|อีเมล์?|gmail",
+}
+_SVC = "(?:" + "|".join(f"(?P<{k}>{v})" for k, v in SEARCH_SITE_NAMES.items()) + ")"
+# "หา" ที่เป็นต้นคำอื่นไม่นับ (เหมือน _FIND ข้างล่าง: หาย หาก หาด …)
+_VERB = r"(?:ค้น\s*หา|ค้น|หา(?![กดยม]|ว(?!ิ)|ร(?![้า]))|เสิร์[ชด]|เซิร์ช)"
+_SAID = r"(?:คำว่า|ว่า)?"
+# "ค้นในยูทูบว่า X" · "ค้นหา X ในยูทูบ" · "เปิดยูทูบ(แล้ว)หา X" · คำค้น = กลุ่มชื่อ q
+_IN_FIRST = re.compile(rf"(?:ช่วย\s*)?{_VERB}\s*(?:ดู\s*)?ใน\s*{_SVC}\s*{_SAID}\s*(?P<q>.*)")
+_IN_LAST = re.compile(rf"(?:ช่วย\s*)?{_VERB}\s*{_SAID}\s*(?P<q>.+?)\s*ใน\s*{_SVC}")
+_OPEN_THEN = re.compile(rf"เปิด\s*{_SVC}\s*(?:แล้ว\s*)?{_VERB}\s*{_SAID}\s*(?P<q>.+)")
+MAX_QUERY = 200
+
+
+def _site_search(t: str) -> BrowseCommand | None:
+    for pat in (_IN_FIRST, _IN_LAST, _OPEN_THEN):
+        if m := pat.fullmatch(t):
+            site = next(k for k in SEARCH_SITE_NAMES if m.group(k))
+            query = m.group("q").strip(" \"'“”")[:MAX_QUERY].strip()
+            if not query:  # "ค้นในยูทูบ" เฉย ๆ = เปิดหน้าบริการ
+                return BrowseCommand("site", site=site)
+            return BrowseCommand("site_search", query=query, site=site)
+    return None
+
+
 _SITE = re.compile(
     r"(?:เปิด|เข้า|ไป\s*(?:ที่)?)\s*(?:เว็บ\s*)?("
     + "|".join(f"(?P<{k}>{v})" for k, v in SITE_NAMES.items())
@@ -184,6 +217,8 @@ def _single_exact(t: str, asked: bool) -> BrowseCommand | None:
         return BrowseCommand("app")
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
+    if found := _site_search(t):  # ก่อนค้นเว็บทั่วไปและก่อนตัดเรื่องไฟล์: พูดชื่อบริการชัดเจนแล้ว
+        return found
     m = _SEARCH.fullmatch(t) or _FIND.fullmatch(t)
     end = None
     if not m:

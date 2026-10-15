@@ -52,6 +52,15 @@ NEXT_BUTTON_JS = r"""(() => {
   b.click();
   return true;
 })()"""
+# หน้าค้นของแต่ละบริการ (การ์ด 0036 หัวข้อ 3 · ตรวจลิงก์แล้ว 2026-10-15) · เขียนตายตัว คำค้นเข้ารหัส URL เสมอ
+SITE_SEARCH = {
+    "youtube": "https://www.youtube.com/results?search_query=",
+    "maps": "https://www.google.com/maps/search/",
+    "wikipedia": "https://th.wikipedia.org/w/index.php?search=",
+    "facebook": "https://www.facebook.com/search/top/?q=",
+    "drive": "https://drive.google.com/drive/search?q=",
+    "gmail": "https://mail.google.com/mail/u/0/#search/",
+}
 MEDIA_SAY = {
     ("pause", "ok"): (True, "หยุดแล้ว"),
     ("pause", "idle"): (True, "ไม่มีเพลงหรือวิดีโอที่กำลังเล่นอยู่"),
@@ -391,12 +400,25 @@ class BrowserControl:
             if not cmd.query.lower().startswith("https://"):
                 return Result(False, "เปิดได้เฉพาะลิงก์ https")
             return Result(True, "เปิดเว็บแล้ว", url=self._go(cmd.query))
+        if cmd.kind == "site_search":  # การ์ด 0036
+            name = SITES[cmd.site][0]
+            url = self._open_search(SITE_SEARCH[cmd.site] + quote_plus(cmd.query))
+            return Result(True, f"ค้นหา {cmd.query} ใน {name} แล้ว", url=url)
         if cmd.kind in ("search", "site"):
             url = self._go(
                 self._search_url(cmd.query) if cmd.kind == "search" else SITES[cmd.site][1]
             )
             return self._after_open(cmd, url)
         return getattr(self, "_do_" + cmd.kind)(cmd)
+
+    def _open_search(self, url: str) -> str:
+        """เปิดหน้าค้นของบริการ · ต่างจากหน้าปัจจุบันแค่หลัง # (ค้นในจีเมลขณะเปิดจีเมลอยู่) = เปลี่ยนในหน้าเดิม
+        ไม่มีเอกสารใหม่ให้รอ → รอแค่ที่อยู่เปลี่ยน (ไม่งั้นรอจนหมดเวลา 12 วิ)."""
+        if self._url().split("#")[0] != url.split("#")[0]:
+            return self._go(url)
+        before, token = self._marked()
+        self._cdp.call("Page.navigate", {"url": url}, session=self._page())
+        return self._wait_change(before, token)[0]
 
     def _search_url(self, query: str) -> str:
         return (DDG if self._google_blocked else GOOGLE) + quote_plus(query)

@@ -259,12 +259,15 @@ class BrowserController(QObject):
         return True
 
     def _work(self, cmds, quiet: bool = False) -> None:
+        from aipc.skills.actions import SITES
+
         says, ok = [], True
         for c in cmds:
             r = self._ctl().run(c)
-            if c.kind == "search" and self._ledger is not None:
-                # คำค้นออกไป Google/Bing = ส่งออกนอกเครื่อง (แผงความเป็นส่วนตัวนับด้วย)
-                self._ledger.record("web", f"ค้นเว็บ: {c.query}", ok=r.ok,
+            if c.kind in ("search", "site_search") and self._ledger is not None:
+                # คำค้นออกไป Google/DuckDuckGo หรือบริการที่พูดชื่อ (การ์ด 0036) = ส่งออกนอกเครื่อง
+                where = "ค้นเว็บ" if c.kind == "search" else f"ค้นใน {SITES[c.site][0]}"
+                self._ledger.record("web", f"{where}: {c.query}", ok=r.ok,
                                     note="เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง")  # fmt: skip
             if r.say:
                 says.append(r.say)

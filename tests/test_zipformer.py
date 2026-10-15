@@ -58,8 +58,8 @@ class TidyTest(unittest.TestCase):
 
         self.assertEqual(zipformer.HOTWORDS, voice_cands.SEARCH_STEMS + voice_cands.FIXED)
         # +7 = การ์ด 0031 (เปิดเฟซบุ๊ก ไอจี … เปิดปฏิทิน) · +5 = การ์ด 0035 (หยุดเพลง … ข้ามเพลง) ·
-        # วัดใหม่ด้วยชุด H บน Pi = เกณฑ์ข้อ 2 ของการ์ด 0031/0035
-        self.assertEqual(len(zipformer.HOTWORDS), 7 + 24 + 15 + 3 + 10 + 7 + 5)
+        # +6 = การ์ด 0036 (ค้นในยูทูบ …) · วัดใหม่ด้วยชุด H บน Pi = เกณฑ์ของการ์ด 0031/0035/0036
+        self.assertEqual(len(zipformer.HOTWORDS), 7 + 24 + 15 + 3 + 10 + 7 + 5 + 6)
         self.assertEqual((zipformer.SCORE, zipformer.THREADS), (5.0, 4))
 
 
