@@ -14,6 +14,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from aipc.doctor.hardware import FAIL, PASS, UNKNOWN, WARN, Check
+from aipc.i18n import tr
 
 Runner = Callable[[list[str]], str | None]
 
@@ -28,42 +29,42 @@ def _run(cmd: list[str]) -> str | None:
 
 def check_ai(ready: bool) -> Check:
     if ready:
-        return Check("ai", "AI ในเครื่อง", PASS, "ตอบได้")
+        return Check("ai", tr("AI ในเครื่อง"), PASS, tr("ตอบได้"))
     return Check(
         "ai",
-        "AI ในเครื่อง",
+        tr("AI ในเครื่อง"),
         FAIL,
-        "ยังไม่พร้อม (กำลังโหลด หรือหยุดทำงาน)",
-        "รอ 1–2 นาทีหลังเข้าระบบ · ถ้ายังไม่พร้อม ออกจากระบบแล้วเข้าใหม่",
+        tr("ยังไม่พร้อม (กำลังโหลด หรือหยุดทำงาน)"),
+        tr("รอ 1–2 นาทีหลังเข้าระบบ · ถ้ายังไม่พร้อม ออกจากระบบแล้วเข้าใหม่"),
     )
 
 
 def check_network(connect=socket.create_connection) -> Check:
     try:
         connect(("api.open-meteo.com", 443), timeout=3).close()
-        return Check("net", "อินเทอร์เน็ต", PASS, "ต่อได้ (สกิลอากาศ · Claude ใช้ได้)")
+        return Check("net", tr("อินเทอร์เน็ต"), PASS, tr("ต่อได้ (สกิลอากาศ · Claude ใช้ได้)"))
     except OSError:
         return Check(
             "net",
-            "อินเทอร์เน็ต",
+            tr("อินเทอร์เน็ต"),
             WARN,
-            "ต่อไม่ได้ · AI ในเครื่องยังใช้ได้ แต่ถามข้อมูลสด/อากาศ/Claude ไม่ได้",
-            "ต่อ Wi-Fi หรือฮอตสปอต แล้วตรวจอีกครั้ง",
+            tr("ต่อไม่ได้ · AI ในเครื่องยังใช้ได้ แต่ถามข้อมูลสด/อากาศ/Claude ไม่ได้"),
+            tr("ต่อ Wi-Fi หรือฮอตสปอต แล้วตรวจอีกครั้ง"),
         )
 
 
 def check_clock(run: Runner = _run) -> Check:
     out = run(["timedatectl", "show", "-p", "NTPSynchronized", "--value"])
     if out is None:
-        return Check("clock", "นาฬิกาเครื่อง", UNKNOWN, "อ่านสถานะการตั้งเวลาไม่ได้")
+        return Check("clock", tr("นาฬิกาเครื่อง"), UNKNOWN, tr("อ่านสถานะการตั้งเวลาไม่ได้"))
     if out == "yes":
-        return Check("clock", "นาฬิกาเครื่อง", PASS, "ตั้งเวลาจากอินเทอร์เน็ตแล้ว · นัดเตือนตรงเวลา")
+        return Check("clock", tr("นาฬิกาเครื่อง"), PASS, tr("ตั้งเวลาจากอินเทอร์เน็ตแล้ว · นัดเตือนตรงเวลา"))
     return Check(
         "clock",
-        "นาฬิกาเครื่อง",
+        tr("นาฬิกาเครื่อง"),
         WARN,
-        "ยังไม่ได้ตั้งเวลาจากอินเทอร์เน็ต · หลังบูตเวลาอาจผิด นัดอาจเตือนผิดเวลา",
-        "ต่อเน็ตแล้วรอ ~1 นาที · ถ้าไม่มีเน็ตวันสาธิต ให้ใส่แบต RTC (ดูการ์ดนาฬิกา RTC)",
+        tr("ยังไม่ได้ตั้งเวลาจากอินเทอร์เน็ต · หลังบูตเวลาอาจผิด นัดอาจเตือนผิดเวลา"),
+        tr("ต่อเน็ตแล้วรอ ~1 นาที · ถ้าไม่มีเน็ตวันสาธิต ให้ใส่แบต RTC (ดูการ์ดนาฬิกา RTC)"),
     )
 
 
@@ -75,17 +76,17 @@ def check_power_and_heat(run: Runner = _run) -> list[Check]:
     except (IndexError, ValueError):
         temp = None
     if temp is None:
-        out.append(Check("heat", "ความร้อน", UNKNOWN, "อ่านอุณหภูมิไม่ได้"))
+        out.append(Check("heat", tr("ความร้อน"), UNKNOWN, tr("อ่านอุณหภูมิไม่ได้")))
     elif temp < 75:
-        out.append(Check("heat", "ความร้อน", PASS, f"{temp:.0f}°C"))
+        out.append(Check("heat", tr("ความร้อน"), PASS, f"{temp:.0f}°C"))
     else:
         out.append(
             Check(
                 "heat",
-                "ความร้อน",
+                tr("ความร้อน"),
                 WARN if temp < 85 else FAIL,
-                f"{temp:.0f}°C · ร้อนแล้วเครื่องจะช้าลงเอง",
-                "เช็กว่าพัดลมหมุนและช่องลมของเคสไม่ถูกบัง · พักเครื่องสักครู่",
+                tr("{t}°C · ร้อนแล้วเครื่องจะช้าลงเอง", t=f"{temp:.0f}"),
+                tr("เช็กว่าพัดลมหมุนและช่องลมของเคสไม่ถูกบัง · พักเครื่องสักครู่"),
             )
         )
     th = run(["vcgencmd", "get_throttled"])
@@ -94,29 +95,29 @@ def check_power_and_heat(run: Runner = _run) -> list[Check]:
     except (IndexError, ValueError):
         bits = None
     if bits is None:
-        out.append(Check("power", "ไฟเลี้ยง", UNKNOWN, "อ่านสถานะไฟไม่ได้"))
+        out.append(Check("power", tr("ไฟเลี้ยง"), UNKNOWN, tr("อ่านสถานะไฟไม่ได้")))
     elif bits & 0x1:
         out.append(
             Check(
                 "power",
-                "ไฟเลี้ยง",
+                tr("ไฟเลี้ยง"),
                 FAIL,
-                "ไฟตกอยู่ตอนนี้",
-                "ใช้อะแดปเตอร์ Pi 5 ของแท้ (5V 5A) · เสียบปลั๊กให้แน่น",
+                tr("ไฟตกอยู่ตอนนี้"),
+                tr("ใช้อะแดปเตอร์ Pi 5 ของแท้ (5V 5A) · เสียบปลั๊กให้แน่น"),
             )
         )
     elif bits & 0x10000:
         out.append(
             Check(
                 "power",
-                "ไฟเลี้ยง",
+                tr("ไฟเลี้ยง"),
                 WARN,
-                "ไฟเคยตกตั้งแต่เปิดเครื่อง",
-                "เช็กอะแดปเตอร์และสาย · เสียบปลั๊กให้แน่น (เคยหลุดจนเครื่องรีบูต)",
+                tr("ไฟเคยตกตั้งแต่เปิดเครื่อง"),
+                tr("เช็กอะแดปเตอร์และสาย · เสียบปลั๊กให้แน่น (เคยหลุดจนเครื่องรีบูต)"),
             )
         )
     else:
-        out.append(Check("power", "ไฟเลี้ยง", PASS, "ไม่เคยตกตั้งแต่เปิดเครื่อง"))
+        out.append(Check("power", tr("ไฟเลี้ยง"), PASS, tr("ไม่เคยตกตั้งแต่เปิดเครื่อง")))
     return out
 
 
@@ -124,10 +125,12 @@ def check_disk(home: Path) -> Check:
     try:
         free = shutil.disk_usage(home).free / 1e9
     except OSError:
-        return Check("disk", "พื้นที่ว่าง", UNKNOWN, "อ่านพื้นที่ไม่ได้")
+        return Check("disk", tr("พื้นที่ว่าง"), UNKNOWN, tr("อ่านพื้นที่ไม่ได้"))
     if free >= 2:
-        return Check("disk", "พื้นที่ว่าง", PASS, f"ว่าง {free:.0f} GB")
-    return Check("disk", "พื้นที่ว่าง", WARN, f"ว่างแค่ {free:.1f} GB", "ลบไฟล์ที่ไม่ใช้")
+        return Check("disk", tr("พื้นที่ว่าง"), PASS, tr("ว่าง {gb} GB", gb=f"{free:.0f}"))
+    return Check(
+        "disk", tr("พื้นที่ว่าง"), WARN, tr("ว่างแค่ {gb} GB", gb=f"{free:.1f}"), tr("ลบไฟล์ที่ไม่ใช้")
+    )
 
 
 def check_devices(
@@ -141,31 +144,31 @@ def check_devices(
     return [
         Check(
             "camera",
-            "กล้อง",
+            tr("กล้อง"),
             PASS if cams else WARN,
-            "พบกล้อง" if cams else "ไม่พบกล้อง (เข้าเครื่องด้วยใบหน้าไม่ได้)",
-            "" if cams else "เสียบกล้อง USB แล้วตรวจอีกครั้ง",
+            tr("พบกล้อง") if cams else tr("ไม่พบกล้อง (เข้าเครื่องด้วยใบหน้าไม่ได้)"),
+            "" if cams else tr("เสียบกล้อง USB แล้วตรวจอีกครั้ง"),
         ),
         Check(
             "speak",
-            "อ่านออกเสียง",
+            tr("อ่านออกเสียง"),
             PASS if voice_available else WARN,
-            "พร้อม" if voice_available else "ยังไม่ได้ติดตั้ง หรือไม่มีตัวเล่นเสียง",
+            tr("พร้อม") if voice_available else tr("ยังไม่ได้ติดตั้ง หรือไม่มีตัวเล่นเสียง"),
             "" if voice_available else "sudo ./scripts/pi/install-voice.sh --apply",
         ),
         Check(
             "mic",
-            "สั่งด้วยเสียง",
+            tr("สั่งด้วยเสียง"),
             PASS if mic_available else WARN,
-            "พร้อม (ไมค์ใกล้ปากแม่นกว่าไมค์ในกล้อง)" if mic_available else "ยังไม่ได้ติดตั้งตัวถอดเสียง",
+            tr("พร้อม (ไมค์ใกล้ปากแม่นกว่าไมค์ในกล้อง)") if mic_available else tr("ยังไม่ได้ติดตั้งตัวถอดเสียง"),
             "" if mic_available else "install-voice.sh --apply --stt-model …",
         ),
         Check(
             "claude",
-            "Claude (ถามข้อมูลสด · สร้างสกิล)",
+            tr("Claude (ถามข้อมูลสด · สร้างสกิล)"),
             PASS if claude else WARN,
-            "ติดตั้งในบัญชีนี้แล้ว" if claude else "บัญชีนี้ยังไม่มี Claude Code · ใช้ได้แค่ AI ในเครื่อง",
-            "" if claude else "ติดตั้ง Claude Code ในบัญชีนี้แล้วเข้าสู่ระบบ",
+            tr("ติดตั้งในบัญชีนี้แล้ว") if claude else tr("บัญชีนี้ยังไม่มี Claude Code · ใช้ได้แค่ AI ในเครื่อง"),
+            "" if claude else tr("ติดตั้ง Claude Code ในบัญชีนี้แล้วเข้าสู่ระบบ"),
         ),
     ]
 

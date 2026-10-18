@@ -25,6 +25,7 @@ from pathlib import Path
 
 from aipc.bench import machine
 from aipc.bench.machine import Runner, run_command
+from aipc.i18n import tr
 
 PASS, WARN, FAIL, UNKNOWN = "ผ่าน", "เตือน", "ไม่ผ่าน", "ไม่รู้"
 
@@ -68,20 +69,22 @@ def check_board(root: Path) -> Check:
     model = machine.board_model(root)
     cls = machine.board_class(model)
     if cls == "pi5":
-        return Check("board", "บอร์ด", PASS, f"{model} — เครื่องจริง")
+        return Check("board", tr("บอร์ด"), PASS, tr("{model} — เครื่องจริง", model=model))
     if cls == "pi4":
-        return Check("board", "บอร์ด", WARN, f"{model} — เครื่องทดสอบ ใช้พิสูจน์ความถูกต้องเท่านั้น")
-    return Check("board", "บอร์ด", UNKNOWN, "ไม่ใช่ Raspberry Pi (หรืออ่าน device tree ไม่ได้)")
+        return Check(
+            "board", tr("บอร์ด"), WARN, tr("{model} — เครื่องทดสอบ ใช้พิสูจน์ความถูกต้องเท่านั้น", model=model)
+        )
+    return Check("board", tr("บอร์ด"), UNKNOWN, tr("ไม่ใช่ Raspberry Pi (หรืออ่าน device tree ไม่ได้)"))
 
 
 def check_ram(root: Path) -> Check:
     mb = machine.ram_total_mb(root)
     if mb is None:
-        return Check("ram", "RAM", UNKNOWN, "อ่าน /proc/meminfo ไม่ได้")
+        return Check("ram", "RAM", UNKNOWN, tr("อ่าน /proc/meminfo ไม่ได้"))
     # 8GB ที่ OS เห็นจริงจะน้อยกว่า 8192 MB เล็กน้อย เพราะบางส่วนถูกกันให้ GPU/firmware
     if mb >= 7500:
         return Check("ram", "RAM", PASS, f"{mb} MB")
-    return Check("ram", "RAM", WARN, f"{mb} MB — น้อยกว่า 8GB ที่ BRIEF ออกแบบไว้")
+    return Check("ram", "RAM", WARN, tr("{mb} MB — น้อยกว่า 8GB ที่ BRIEF ออกแบบไว้", mb=mb))
 
 
 def check_power(root: Path, run: Runner) -> Check:
@@ -90,20 +93,20 @@ def check_power(root: Path, run: Runner) -> Check:
     throttled = machine.throttled_raw(run)
     parts = []
     if max_ma is not None:
-        parts.append(f"บอร์ดรับรู้กระแสสูงสุด {max_ma} mA")
+        parts.append(tr("บอร์ดรับรู้กระแสสูงสุด {ma} mA", ma=max_ma))
     if throttled is not None:
         problems = machine.decode_throttled(throttled)
-        parts.append("ไม่เคยไฟตก/ร้อนเกินตั้งแต่บูต" if not problems else ", ".join(problems))
-    detail = " · ".join(parts) or "อ่านค่าไม่ได้ทั้งสองทาง"
-    fix = "ใช้อะแดปเตอร์ 27W ของแท้ ต่อสายตรง ไม่ผ่านฮับ แล้วรีบูตก่อนตรวจซ้ำ"
+        parts.append(tr("ไม่เคยไฟตก/ร้อนเกินตั้งแต่บูต") if not problems else ", ".join(problems))
+    detail = " · ".join(parts) or tr("อ่านค่าไม่ได้ทั้งสองทาง")
+    fix = tr("ใช้อะแดปเตอร์ 27W ของแท้ ต่อสายตรง ไม่ผ่านฮับ แล้วรีบูตก่อนตรวจซ้ำ")
 
     if throttled is not None and throttled & 0x10001:  # บิตไฟตก ตอนนี้ หรือเคยเกิด
-        return Check("power", "ไฟเลี้ยง", FAIL, detail, fix)
+        return Check("power", tr("ไฟเลี้ยง"), FAIL, detail, fix)
     if max_ma is not None and max_ma < 5000:
-        return Check("power", "ไฟเลี้ยง", WARN, detail + " — ต่ำกว่า 5A", fix)
+        return Check("power", tr("ไฟเลี้ยง"), WARN, detail + tr(" — ต่ำกว่า 5A"), fix)
     if max_ma is None or throttled is None:
-        return Check("power", "ไฟเลี้ยง", UNKNOWN, detail, fix)
-    return Check("power", "ไฟเลี้ยง", PASS, detail)
+        return Check("power", tr("ไฟเลี้ยง"), UNKNOWN, detail, fix)
+    return Check("power", tr("ไฟเลี้ยง"), PASS, detail)
 
 
 # พัดลมหมุนแล้วยังร้อนเกินนี้ = ระบายความร้อนไม่พอ ·
@@ -119,7 +122,7 @@ def check_cooling(root: Path) -> Check:
     """
     hwmon = _p(root, "/sys/class/hwmon")
     temp = machine.cpu_temp_c(root)
-    temp_txt = f"อุณหภูมิ {temp:.1f} °C" if temp is not None else "อ่านอุณหภูมิไม่ได้"
+    temp_txt = tr("อุณหภูมิ {t} °C", t=f"{temp:.1f}") if temp is not None else tr("อ่านอุณหภูมิไม่ได้")
     try:
         entries = sorted(hwmon.iterdir())
     except OSError:
@@ -133,42 +136,54 @@ def check_cooling(root: Path) -> Check:
                     # และถูกลดความเร็ว (0xe0008) ขณะ AI ตอบ
                     return Check(
                         "cooling",
-                        "ระบายความร้อน",
+                        tr("ระบายความร้อน"),
                         WARN,
-                        f"พัดลม {rpm} rpm แต่ {temp_txt} (≥ {HOT_C:.0f} °C)",
-                        "ตรวจแผ่นระบายความร้อนของ Active Cooler "
-                        "(ลอกฟิล์มแล้วหรือยัง · กดแนบชิป) · ขาสปริงล็อกครบ · เคส/ช่องลม",
+                        tr(
+                            "พัดลม {rpm} rpm แต่ {temp} (≥ {hot} °C)",
+                            rpm=rpm,
+                            temp=temp_txt,
+                            hot=f"{HOT_C:.0f}",
+                        ),
+                        tr(
+                            "ตรวจแผ่นระบายความร้อนของ Active Cooler "
+                            "(ลอกฟิล์มแล้วหรือยัง · กดแนบชิป) · ขาสปริงล็อกครบ · เคส/ช่องลม"
+                        ),
                     )
-                return Check("cooling", "ระบายความร้อน", PASS, f"พัดลม {rpm} rpm · {temp_txt}")
+                return Check(
+                    "cooling",
+                    tr("ระบายความร้อน"),
+                    PASS,
+                    tr("พัดลม {rpm} rpm · {temp}", rpm=rpm, temp=temp_txt),
+                )
             return Check(
                 "cooling",
-                "ระบายความร้อน",
+                tr("ระบายความร้อน"),
                 UNKNOWN,
-                f"เจอตัวควบคุมพัดลม แต่รอบ = {rpm or '?'} · {temp_txt}",
-                "รันซ้ำตอนเครื่องทำงานหนัก ถ้ายัง 0 rpm ให้ตรวจสายพัดลม",
+                tr("เจอตัวควบคุมพัดลม แต่รอบ = {rpm} · {temp}", rpm=rpm or "?", temp=temp_txt),
+                tr("รันซ้ำตอนเครื่องทำงานหนัก ถ้ายัง 0 rpm ให้ตรวจสายพัดลม"),
             )
     return Check(
         "cooling",
-        "ระบายความร้อน",
+        tr("ระบายความร้อน"),
         UNKNOWN,
-        f"ไม่เจอตัวควบคุมพัดลม · {temp_txt}",
-        "ตรวจการต่อ Active Cooler",
+        tr("ไม่เจอตัวควบคุมพัดลม · {temp}", temp=temp_txt),
+        tr("ตรวจการต่อ Active Cooler"),
     )
 
 
 def check_rtc(root: Path) -> Check:
     if not _p(root, "/sys/class/rtc/rtc0").exists():
-        return Check("rtc", "นาฬิกา RTC", UNKNOWN, "ไม่เจอ /sys/class/rtc/rtc0")
+        return Check("rtc", tr("นาฬิกา RTC"), UNKNOWN, tr("ไม่เจอ /sys/class/rtc/rtc0"))
     volt = _read(root, "/sys/class/rtc/rtc0/charging_voltage")
-    fix = (
+    fix = tr(
         "BRIEF หัวข้อ 2 ให้เพิ่ม dtparam=rtc_bbat_vchg=3000000 ใน /boot/firmware/config.txt "
         "— เป็นไฟล์บูต ต้องสำรองไฟล์ก่อนแก้ และให้ Pakon ตัดสินใจเอง เครื่องมือนี้ไม่แก้ให้"
     )
     if volt is None:
-        return Check("rtc", "นาฬิกา RTC", UNKNOWN, "มี RTC แต่อ่านสถานะการชาร์จแบตไม่ได้", fix)
+        return Check("rtc", tr("นาฬิกา RTC"), UNKNOWN, tr("มี RTC แต่อ่านสถานะการชาร์จแบตไม่ได้"), fix)
     if volt.isdigit() and int(volt) > 0:
-        return Check("rtc", "นาฬิกา RTC", PASS, f"ชาร์จแบตที่ {int(volt) / 1e6:.1f} V")
-    return Check("rtc", "นาฬิกา RTC", WARN, "ไม่ได้ชาร์จแบต RTC (charging_voltage = 0)", fix)
+        return Check("rtc", tr("นาฬิกา RTC"), PASS, tr("ชาร์จแบตที่ {v} V", v=f"{int(volt) / 1e6:.1f}"))
+    return Check("rtc", tr("นาฬิกา RTC"), WARN, tr("ไม่ได้ชาร์จแบต RTC (charging_voltage = 0)"), fix)
 
 
 def check_os(root: Path) -> Check:
@@ -180,11 +195,15 @@ def check_os(root: Path) -> Check:
     arch = platform.machine()
     detail = f"{info.get('PRETTY_NAME', '?').strip(chr(34))} · {arch}"
     if not codename:
-        return Check("os", "OS", UNKNOWN, "อ่าน /etc/os-release ไม่ได้")
+        return Check("os", "OS", UNKNOWN, tr("อ่าน /etc/os-release ไม่ได้"))
     if codename == "trixie" and arch == "aarch64":
         return Check("os", "OS", PASS, detail)
     return Check(
-        "os", "OS", FAIL, detail, "BRIEF หัวข้อ 2 ต้องการ Raspberry Pi OS 64-bit บน Debian 13 trixie"
+        "os",
+        "OS",
+        FAIL,
+        detail,
+        tr("BRIEF หัวข้อ 2 ต้องการ Raspberry Pi OS 64-bit บน Debian 13 trixie"),
     )
 
 
@@ -195,12 +214,12 @@ def check_glibc() -> Check:
     except (AttributeError, ValueError, OSError):
         version = None
     if not version:
-        return Check("glibc", "glibc", UNKNOWN, "ไม่ใช่ระบบที่ใช้ glibc")
+        return Check("glibc", "glibc", UNKNOWN, tr("ไม่ใช่ระบบที่ใช้ glibc"))
     num = version.split()[-1]
     major, minor = (int(x) for x in num.split(".")[:2])
     if (major, minor) >= (2, 39):
         return Check("glibc", "glibc", PASS, version)
-    return Check("glibc", "glibc", FAIL, version, "ต่ำกว่า 2.39 — pip จะได้ PySide6 รุ่นเก่า")
+    return Check("glibc", "glibc", FAIL, version, tr("ต่ำกว่า 2.39 — pip จะได้ PySide6 รุ่นเก่า"))
 
 
 def root_device(root: Path) -> str | None:
@@ -214,7 +233,7 @@ def root_device(root: Path) -> str | None:
 
 def check_storage(root: Path, usage_path: Path) -> Check:
     dev = root_device(root)
-    kind = "ไม่รู้ชนิด"
+    kind = tr("ไม่รู้ชนิด")
     if dev:
         if "mmcblk" in dev:
             kind = "microSD"
@@ -225,18 +244,22 @@ def check_storage(root: Path, usage_path: Path) -> Check:
     try:
         du = shutil.disk_usage(usage_path)
     except OSError:
-        return Check("storage", "ที่เก็บข้อมูล", UNKNOWN, f"{dev or '?'} ({kind})")
+        return Check("storage", tr("ที่เก็บข้อมูล"), UNKNOWN, f"{dev or '?'} ({kind})")
     used_pct = du.used / du.total * 100
-    detail = (
-        f"{dev or '?'} ({kind}) · ทั้งหมด {du.total / 1e9:.1f} GB · "
-        f"ใช้แล้ว {used_pct:.0f}% · ว่าง {du.free / 1e9:.1f} GB"
+    detail = tr(
+        "{dev} ({kind}) · ทั้งหมด {total} GB · ใช้แล้ว {pct}% · ว่าง {free} GB",
+        dev=dev or "?",
+        kind=kind,
+        total=f"{du.total / 1e9:.1f}",
+        pct=f"{used_pct:.0f}",
+        free=f"{du.free / 1e9:.1f}",
     )
     # เกณฑ์เดียวกับ BRIEF 5.9 ข้อ 6: เตือนที่ 80%, ที่ 90% ต้องหยุดงานที่ไม่จำเป็น
     if used_pct >= 90:
-        return Check("storage", "ที่เก็บข้อมูล", FAIL, detail, "พื้นที่เกิน 90% (BRIEF 5.9 ข้อ 6)")
+        return Check("storage", tr("ที่เก็บข้อมูล"), FAIL, detail, tr("พื้นที่เกิน 90% (BRIEF 5.9 ข้อ 6)"))
     if used_pct >= 80:
-        return Check("storage", "ที่เก็บข้อมูล", WARN, detail, "พื้นที่เกิน 80% (BRIEF 5.9 ข้อ 6)")
-    return Check("storage", "ที่เก็บข้อมูล", PASS, detail)
+        return Check("storage", tr("ที่เก็บข้อมูล"), WARN, detail, tr("พื้นที่เกิน 80% (BRIEF 5.9 ข้อ 6)"))
+    return Check("storage", tr("ที่เก็บข้อมูล"), PASS, detail)
 
 
 def check_fscrypt_kernel(root: Path) -> Check:
@@ -246,9 +269,11 @@ def check_fscrypt_kernel(root: Path) -> Check:
     เพราะการตรวจนั้นต้องใช้สิทธิ์ root และการเปิดธงคือการแก้ระบบไฟล์ที่กำลังบูตอยู่ (เสี่ยง)
     """
     if _p(root, "/sys/fs/ext4/features/encryption").exists():
-        return Check("fscrypt", "เคอร์เนลรองรับ fscrypt", PASS, "มี /sys/fs/ext4/features/encryption")
+        return Check(
+            "fscrypt", tr("เคอร์เนลรองรับ fscrypt"), PASS, tr("มี /sys/fs/ext4/features/encryption")
+        )
     return Check(
-        "fscrypt", "เคอร์เนลรองรับ fscrypt", UNKNOWN, "ไม่เจอ /sys/fs/ext4/features/encryption"
+        "fscrypt", tr("เคอร์เนลรองรับ fscrypt"), UNKNOWN, tr("ไม่เจอ /sys/fs/ext4/features/encryption")
     )
 
 
@@ -269,7 +294,7 @@ def check_camera(root: Path) -> Check:
     except OSError:
         videos = []
     if not videos:
-        return Check("camera", "กล้อง", UNKNOWN, "ไม่เจอ /dev/video*")
+        return Check("camera", tr("กล้อง"), UNKNOWN, tr("ไม่เจอ /dev/video*"))
 
     cameras, unnamed = [], []
     for v in videos:
@@ -279,26 +304,35 @@ def check_camera(root: Path) -> Check:
         elif not name.startswith(SOC_VIDEO_NODES):
             cameras.append(f"{v} ({name})")
     if cameras:
-        return Check("camera", "กล้อง", PASS, f"เจอกล้อง: {', '.join(cameras[:4])}")
+        return Check(
+            "camera", tr("กล้อง"), PASS, tr("เจอกล้อง: {names}", names=", ".join(cameras[:4]))
+        )
     if unnamed:
         # อ่านชื่อไม่ได้ = ไม่รู้ว่าเป็นกล้องหรือของชิป · ไม่เดาว่าเป็นกล้อง (H5)
-        return Check("camera", "กล้อง", UNKNOWN, f"เจอ {', '.join(unnamed[:4])} แต่อ่านชื่ออุปกรณ์ไม่ได้")
+        return Check(
+            "camera",
+            tr("กล้อง"),
+            UNKNOWN,
+            tr("เจอ {names} แต่อ่านชื่ออุปกรณ์ไม่ได้", names=", ".join(unnamed[:4])),
+        )
     return Check(
         "camera",
-        "กล้อง",
+        tr("กล้อง"),
         WARN,
-        f"ไม่พบกล้อง · โหนดวิดีโอ {len(videos)} ตัวเป็นของชิป (ถอดรหัสวิดีโอ/ISP) ไม่ใช่กล้อง",
-        "ต่อกล้องแล้วตรวจด้วย `python -m aipc.vision.camera test` หรือ `v4l2-ctl --list-devices` · "
-        "`rpicam-hello` เห็นเฉพาะกล้อง CSI (กล้อง USB จะขึ้นว่า No cameras available ทั้งที่ใช้ได้)",
+        tr("ไม่พบกล้อง · โหนดวิดีโอ {n} ตัวเป็นของชิป (ถอดรหัสวิดีโอ/ISP) ไม่ใช่กล้อง", n=len(videos)),
+        tr(
+            "ต่อกล้องแล้วตรวจด้วย `python -m aipc.vision.camera test` หรือ `v4l2-ctl --list-devices` · "
+            "`rpicam-hello` เห็นเฉพาะกล้อง CSI (กล้อง USB จะขึ้นว่า No cameras available ทั้งที่ใช้ได้)"
+        ),
     )
 
 
 def check_audio(root: Path) -> Check:
     cards = _read(root, "/proc/asound/cards")
     if not cards or "no soundcards" in cards:
-        return Check("audio", "เสียง", UNKNOWN, "ไม่เจอการ์ดเสียง")
+        return Check("audio", tr("เสียง"), UNKNOWN, tr("ไม่เจอการ์ดเสียง"))
     names = [line.split(":", 1)[1].strip() for line in cards.splitlines() if ":" in line]
-    return Check("audio", "เสียง", PASS, " | ".join(names))
+    return Check("audio", tr("เสียง"), PASS, " | ".join(names))
 
 
 def check_memory_cgroup(root: Path) -> Check:
@@ -307,18 +341,18 @@ def check_memory_cgroup(root: Path) -> Check:
     ctl = _read(root, "/sys/fs/cgroup/cgroup.controllers")
     if ctl is None:
         return Check(
-            "memcg", "memory cgroup", UNKNOWN, "อ่าน /sys/fs/cgroup/cgroup.controllers ไม่ได้"
+            "memcg", "memory cgroup", UNKNOWN, tr("อ่าน /sys/fs/cgroup/cgroup.controllers ไม่ได้")
         )
     if "memory" in ctl.split():
-        return Check("memcg", "memory cgroup", PASS, "เปิดอยู่ · MemoryMax ของ AI มีผล")
+        return Check("memcg", "memory cgroup", PASS, tr("เปิดอยู่ · MemoryMax ของ AI มีผล"))
     cmd = _read(root, "/proc/cmdline") or ""
-    why = " (cmdline มี cgroup_disable=memory)" if "cgroup_disable=memory" in cmd else ""
+    why = tr(" (cmdline มี cgroup_disable=memory)") if "cgroup_disable=memory" in cmd else ""
     return Check(
         "memcg",
         "memory cgroup",
         WARN,
-        f"ปิดอยู่{why} · MemoryMax ของ aipc-llm.service ไม่มีผล",
-        "สำรอง /boot/firmware/cmdline.txt แล้วเติม cgroup_enable=memory ท้ายบรรทัดเดียวกัน · รีบูต",
+        tr("ปิดอยู่{why} · MemoryMax ของ aipc-llm.service ไม่มีผล", why=why),
+        tr("สำรอง /boot/firmware/cmdline.txt แล้วเติม cgroup_enable=memory ท้ายบรรทัดเดียวกัน · รีบูต"),
     )
 
 

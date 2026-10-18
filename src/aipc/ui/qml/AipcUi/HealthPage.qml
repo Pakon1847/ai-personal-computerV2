@@ -42,7 +42,7 @@ ColumnLayout {
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 8
-                        Chip { text: rc.modelData.status; kind: rc.modelData.level }
+                        Chip { text: Tr.t(rc.modelData.status); kind: rc.modelData.level }
                         AppText { text: rc.modelData.title; strong: true }
                         AppText { text: rc.modelData.detail; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
                     }
@@ -82,7 +82,7 @@ ColumnLayout {
                     RowLayout {
                         Layout.fillWidth: true
                         AppText { text: parent.parent.parent.modelData.title; strong: true; Layout.fillWidth: true }
-                        Chip { Layout.alignment: Qt.AlignTop; text: parent.parent.parent.modelData.status; kind: parent.parent.parent.modelData.level }
+                        Chip { Layout.alignment: Qt.AlignTop; text: Tr.t(parent.parent.parent.modelData.status); kind: parent.parent.parent.modelData.level }
                     }
                     AppText {
                         Layout.fillWidth: true
