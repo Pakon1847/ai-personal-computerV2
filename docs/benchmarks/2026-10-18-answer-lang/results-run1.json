@@ -1,0 +1,607 @@
+{
+ "en_ok": 28,
+ "th_ok": 30,
+ "passed": true,
+ "rows": [
+  {
+   "id": "E01",
+   "q": "Why is the sky blue?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "The sky appears blue due to a phenomenon called Rayleigh scattering. Sunlight, which is composed of various colors, interacts with the molecules in the Earth's atmosphere. These molecules scatter shorter wavelengths of light, such as blue and violet, more effectively than longer wavelengths like red. This scattered blue light reaches our eyes from all directions, making the sky look blue.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E02",
+   "q": "What is the capital of Thailand?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "The capital of Thailand is Bangkok.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E03",
+   "q": "What does 'sawasdee' mean?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "'Sawasdee' is a common Thai greeting. It is used to mean hello, goodbye, and thank you.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E04",
+   "q": "How do I make pad thai at home?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "I do not have a specific recipe to provide, but I can give you the general steps for making Pad Thai at home. You will need ingredients like rice noodles, tofu or shrimp, eggs, bean sprouts, peanuts, tamarind paste, fish sauce, garlic, shallots, and chili. The key is to cook the noodles, stir-fry the protein, add the sauce mixture, and finish with vegetables and garnish.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E05",
+   "q": "how many hours of sleep does an adult need",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "An adult generally needs 7 to 9 hours of sleep per night for optimal physical and cognitive function. However, individual needs can vary based on age, health, and lifestyle.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E06",
+   "q": "What's the difference between RAM and storage?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "RAM (Random Access Memory) is volatile, fast memory used for actively running programs and data. It provides quick access for the CPU. Storage, on the other hand, is non-volatile memory (like SSD or HDD) used for permanently saving files, operating systems, and applications.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E07",
+   "q": "How do you say 'thank you' in Thai?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "You can say \"khop khun\" (ขอบคุณ) to say 'thank you' in Thai.",
+   "answer_lang": "mixed",
+   "ok": false,
+   "error": ""
+  },
+  {
+   "id": "E08",
+   "q": "Write a short birthday message for my coworker.",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Happy Birthday! Wishing you a wonderful day filled with joy and celebration. Hope you have a fantastic year ahead!",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E09",
+   "q": "What is photosynthesis? Explain simply.",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Photosynthesis is the process where plants use sunlight to convert water and carbon dioxide into glucose (sugar) for energy and oxygen as a byproduct. It is how plants create their own food.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E10",
+   "q": "Tips for staying focused while studying?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Use the Pomodoro Technique to break study sessions into focused intervals. Minimize distractions by putting your phone away during study time. Create a dedicated, quiet study space to signal to your brain that it's time to concentrate. Plan your tasks clearly to avoid feeling overwhelmed.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E11",
+   "q": "What is Songkran?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Songkran is the traditional Thai New Year festival, celebrated primarily in April. It is a time for cleansing, making offerings to elders, and celebrating with water splashing, which symbolizes purification and the washing away of bad luck.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E12",
+   "q": "How do I boil an egg so the yolk is soft?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "To boil an egg with a soft yolk, cook it in **simmering water** over medium-low heat. Start with cold water and bring it to a gentle boil. Once boiling, carefully place the eggs into the water. Cook for about 5 to 7 minutes for a runnier, softer yolk. Immediately transfer the eggs to an ice bath to stop the cooking process.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E13",
+   "q": "What does a VPN do?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "A VPN (Virtual Private Network) encrypts your internet connection and routes your traffic through a server in a different location. This masks your real IP address, enhancing your privacy and security online. It also helps bypass geographical restrictions and censorship by making it appear as if you are browsing from the VPN server's location.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E14",
+   "q": "What is 15% of 240?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "90",
+   "answer_lang": "empty",
+   "ok": false,
+   "error": ""
+  },
+  {
+   "id": "E15",
+   "q": "Is it bad to drink coffee on an empty stomach?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Drinking coffee on an empty stomach can have various effects depending on the individual. Some people find it causes stomach upset, acid reflux, or anxiety. Others report a temporary boost in alertness or metabolism. If you are sensitive to caffeine or acid, it might be uncomfortable.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E16",
+   "q": "Explain what an algorithm is like I'm 10.",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "An algorithm is like a recipe for solving a problem. It's a set of step-by-step instructions that you follow to get a specific result. For example, a recipe tells you exactly how to bake a cake: first, mix the flour, then add the sugar, then mix in the eggs, and finally bake it. If you follow the steps in the right order, you get a cake! Algorithms are just clear instructions for computers to follow.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E17",
+   "q": "Which is the largest planet in our solar system?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Jupiter is the largest planet in our solar system.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E18",
+   "q": "Give me 3 ideas for a cheap weekend date.",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Here are 3 cheap weekend date ideas:\n\n1. **Picnic in a Local Park:** Pack a simple picnic with snacks and drinks. It's relaxing and costs very little.\n2. **Visit a Free Museum or Gallery:** Many cities offer free admission days or have free entry for certain exhibits.\n3. **Stargazing/Hiking:** Find a local spot away from city lights for stargazing or a short, scenic hike.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E19",
+   "q": "What is tom yum soup made of?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Tom Yum soup is a spicy and sour Thai soup. It typically includes ingredients like lemongrass, galangal, kaffir lime leaves, chili peppers, fish sauce, lime juice, mushrooms, and various seafood or meat.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E20",
+   "q": "how do i make a strong password",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Use a combination of length, complexity, and randomness. Aim for a password of at least 12-16 characters. Include a mix of uppercase letters, lowercase letters, numbers, and symbols. Avoid using personal information or common words. Using a passphrase of random, unrelated words can also create a strong and memorable password.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E21",
+   "q": "What does 'procrastinate' mean?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Procrastinate means to delay or postpone a task or set of tasks that should be completed. It is the action of putting off doing something, often because of a lack of motivation or a tendency to put off unpleasant or difficult tasks.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E22",
+   "q": "Why do we have leap years?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "We have leap years to keep our calendar synchronized with the Earth's orbit around the Sun. The Earth takes approximately 365.2422 days to orbit the Sun. A standard year is 365 days, which is too short, leading to a drift over time. Adding a leap day every four years corrects this drift, keeping our calendar accurate relative to the seasons.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E23",
+   "q": "Write a polite email asking my teacher for a deadline extension.",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Subject: Deadline Extension Request - [Your Name] - [Assignment Name]\n\nDear [Teacher's Name],\n\nI am writing to respectfully request a short extension for the [Assignment Name] assignment, which is currently due on [Original Due Date].\n\n[Briefly and politely state a valid reason for the extension, e.g., \"I have been dealing with a minor personal matter,\" or \"I have encountered unexpected difficulties with the research phase.\" Keep it concise.]\n\nI would be very grateful if I could have an extension until [Proposed New Due Date]. I am committed to submitting high-quality work and am confident I can complete the assignment by this new date.\n\nThank you for considering my request.\n\nSincerely,\n\n[Your Name]\n[Your Student ID]",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E24",
+   "q": "What should I pack for a trip to Chiang Mai?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Chiang Mai has a generally warm and humid climate. Pack light, breathable clothing like cotton or linen. Don't forget comfortable walking shoes and light rain gear just in case. Bring insect repellent and sunscreen, as mosquitoes and sun exposure can be significant.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E25",
+   "q": "What's the difference between a virus and bacteria?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Viruses are much smaller than bacteria and require a host cell to replicate. Bacteria are single-celled, living organisms that can reproduce independently. Viruses are not considered living entities as they need a host to hijack a cell's machinery to reproduce.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E26",
+   "q": "How can I speed up my slow laptop?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "To speed up your slow laptop, try these steps:\n\n1. **Close unnecessary programs:** Shut down applications you are not currently using to free up RAM and CPU resources.\n2. **Manage startup programs:** Disable programs that launch automatically when you start your computer.\n3. **Uninstall unnecessary software:** Remove programs you no longer use to free up disk space and system resources.\n4. **Check your hard drive:** If you are using a traditional Hard Disk Drive (HDD), consider upgrading to a Solid State Drive (SSD) for a significant speed boost.\n5. **Keep software updated:** Ensure your operating system and applications are running the latest versions.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E27",
+   "q": "If a train goes 60 km/h for 2.5 hours, how far does it go?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "The train goes 150 km.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E28",
+   "q": "What is the meaning of 'mai pen rai' in Thai culture?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "\"Mai pen rai\" is a common Thai phrase that translates roughly to \"it's nothing,\" \"no problem,\" or \"never mind.\" It is used to express indifference, forgiveness, or to dismiss a problem or inconvenience. It conveys a relaxed and non-confrontational attitude in social interactions.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E29",
+   "q": "How do I keep basil fresh longer?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Store basil stems in a jar of water, covered loosely with a plastic bag, and keep it in the refrigerator. This method helps retain moisture and keeps the leaves fresh for longer.",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "E30",
+   "q": "Can you explain what inflation is?",
+   "asked": "en",
+   "prompt_english": true,
+   "answer": "Inflation is the rate at which the general level of prices for goods and services is rising, and consequently, the purchasing power of money is falling. It means that each unit of currency buys fewer goods and services than it did before. This is typically measured by indices like the Consumer Price Index (CPI).",
+   "answer_lang": "en",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T01",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ท้องฟ้าเป็นสีฟ้าเนื่องจากปรากฏการณ์ที่เรียกว่าการกระเจิงของแสง (Rayleigh scattering) แสงแดดที่ส่องมาจะเดินทางผ่านชั้นบรรยากาศ ซึ่งประกอบด้วยโมเลกุลของก๊าซในอากาศ เมื่อแสงสีขาว (ซึ่งประกอบด้วยหลายสี) เข้ามาปะทะ โมเลกุลอากาศจะกระเจิงแสงที่มีความยาวคลื่นสั้นกว่า (เช่น สีน้ำเงินและสีม่วง) ได้ดีกว่าแสงที่มีความยาวคลื่นยาวกว่า (เช่น สีแดง) ทำให้เรามองเห็นแสงสีน้ำเงินเป็นหลัก จึงทำให้ท้องฟ้าปรากฏเป็นสีฟ้า",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T02",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคืออะไร",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือ ดาวพฤหัสบดี (Jupiter) ครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T03",
+   "q": "ทำไข่ต้มยางมะตูมต้องต้มกี่นาที",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การทำไข่ต้มยางมะตูมโดยทั่วไปควรต้มประมาณ 6-7 นาที หลังจากน้ำเดือดแล้ว เพื่อให้ไข่แดงยังเยิ้มอยู่ภายใน",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T04",
+   "q": "ผู้ใหญ่ควรนอนวันละกี่ชั่วโมง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ผู้ใหญ่ควรนอนหลับประมาณ 7-9 ชั่วโมงต่อคืน เพื่อให้ร่างกายและจิตใจได้พักผ่อนอย่างเต็มที่ การนอนหลับที่มีคุณภาพมีความสำคัญต่อสุขภาพกายและสุขภาพจิตโดยรวม",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T05",
+   "q": "RAM กับ ฮาร์ดดิสก์ ต่างกันยังไง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "RAM (Random Access Memory) คือหน่วยความจำชั่วคราวที่ใช้เก็บข้อมูลที่โปรแกรมกำลังใช้งานอยู่ เพื่อให้ CPU เข้าถึงข้อมูลได้รวดเร็วมาก ส่วนฮาร์ดดิสก์ (Hard Disk) คือหน่วยความจำถาวร ใช้เก็บข้อมูลทั้งหมดของระบบและไฟล์ต่าง ๆ ไว้ แม้จะปิดเครื่องก็ยังคงเก็บข้อมูลไว้ได้",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T06",
+   "q": "ช่วยเขียนข้อความอวยพรวันเกิดให้แม่หน่อย สั้น ๆ",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "สุขสันต์วันเกิดคุณแม่ครับ/ค่ะ ขอให้แม่มีแต่ความสุข สุขภาพแข็งแรง คิดหวังสิ่งใดก็ขอให้สมปรารถนาทุกอย่างนะครับ/คะ รักแม่ที่สุดครับ/ค่ะ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T07",
+   "q": "การสังเคราะห์ด้วยแสงคืออะไร อธิบายง่าย ๆ",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การสังเคราะห์ด้วยแสง คือ กระบวนการที่พืชใช้แสงแดด น้ำ และคาร์บอนไดออกไซด์ เพื่อสร้างอาหาร (น้ำตาล) สำหรับการดำรงชีวิตของตัวเอง โดยจะปล่อยออกซิเจนออกมาเป็นผลพลอยได้",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T08",
+   "q": "มีเทคนิคอ่านหนังสือให้จำได้นานไหม",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "มีหลายเทคนิคที่ช่วยให้จำได้นานขึ้น ลองใช้เทคนิคเหล่านี้ดูครับ:\n\n1. **การทบทวนแบบเว้นระยะ (Spaced Repetition):** ทบทวนเนื้อหาเป็นระยะๆ แทนที่จะอัดทั้งหมดในครั้งเดียว วิธีนี้ช่วยให้สมองประมวลผลและจดจำได้ดีขึ้น\n2. **การทำความเข้าใจและเชื่อมโยง:** อย่าแค่ท่องจำ แต่ให้พยายามทำความเข้าใจแนวคิดหลัก และเชื่อมโยงข้อมูลใหม่เข้ากับความรู้เดิมที่คุณมีอยู่\n3. **การสอนผู้อื่น (Feynman Technique):** ลองอธิบายเนื้อหาที่คุณเรียนให้คนอื่นฟัง ถ้าคุณอธิบายได้ชัดเจน แสดงว่าคุณเข้าใจเนื้อหานั้นอย่างแท้จริง\n4. **การใช้ภาพและแผนผังความคิด (Mind Mapping):** เปลี่ยนข้อมูลที่เป็นข้อความยาวๆ ให้เป็นภาพหรือแผนผัง จะช่วยให้จำได้ง่ายและเห็นภาพรวมได้ดีขึ้น",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T09",
+   "q": "ต้มยำกุ้งน้ำข้นใส่อะไรบ้าง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ต้มยำกุ้งน้ำข้นโดยทั่วไปจะประกอบด้วย:\n\n1.  **น้ำซุป:** น้ำซุปที่เคี่ยวจากเครื่องต้มยำ (เช่น กะทิ น้ำปลา น้ำมะนาว)\n2.  **เครื่องต้มยำ:** พริก, กระเทียม, ข่า, ตะไคร้, ใบมะกรูด\n3.  **เนื้อสัตว์:** กุ้ง\n4.  **เครื่องปรุงรส:** น้ำปลา, น้ำมะนาว, น้ำตาล (เพื่อปรับรสชาติ)\n5.  **ส่วนประกอบอื่น ๆ:** อาจมีการใส่เห็ด หรือผักอื่น ๆ ตามชอบ\n\nส่วน \"น้ำข้น\" มักจะมาจากการเคี่ยวให้กะทิแตกมันหรือใส่กะทิลงไปเพื่อให้รสชาติเข้มข้นขึ้น",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T10",
+   "q": "ตั้งรหัสผ่านยังไงให้ปลอดภัย",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การตั้งรหัสผ่านที่ปลอดภัยควรมีลักษณะดังนี้:\n\n1. **ความยาว:** ควรมีความยาวอย่างน้อย 12-16 ตัวอักษรขึ้นไป\n2. **ความหลากหลาย:** ใช้การผสมผสานระหว่างตัวอักษรพิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข และสัญลักษณ์พิเศษ\n3. **ความไม่ซ้ำกัน:** อย่าใช้รหัสผ่านเดิมซ้ำกับบัญชีอื่น\n4. **หลีกเลี่ยงข้อมูลส่วนตัว:** ไม่ใช้ชื่อ วันเกิด หรือข้อมูลที่คาดเดาง่าย\n5. **ใช้ตัวจัดการรหัสผ่าน (Password Manager):** เพื่อช่วยสร้างและจัดเก็บรหัสผ่านที่ซับซ้อนให้คุณ\n\nหากคุณต้องการคำแนะนำเฉพาะเจาะจงสำหรับบริการใด แจ้งได้เลยครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T11",
+   "q": "คำว่า ผัดวันประกันพรุ่ง หมายความว่าอะไร",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ผัดวันประกันพรุ่ง หมายถึง การเลื่อนหรือชะลอการทำงานหรือการทำสิ่งใดสิ่งหนึ่งออกไปเรื่อยๆ โดยไม่ได้ทำในทันที แม้ว่าจะรู้ว่าควรจะทำก็ตาม เป็นการผัดผ่อนความรับผิดชอบและการลงมือทำที่ควรจะทำในปัจจุบัน",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T12",
+   "q": "ทำไมต้องมีปีอธิกสุรทิน",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ปีอธิกสุรทินมีขึ้นเพื่อปรับให้ปฏิทินสุริยคติสอดคล้องกับรอบการโคจรของโลกและระยะเวลาของปีสุริยคติ (ประมาณ 365.2422 วัน) การเพิ่มวันอธิกสุรทิน (วันพิเศษที่เพิ่มขึ้นหนึ่งวันต่อสี่ปี) ช่วยให้ปฏิทินไม่คลาดเคลื่อนจากฤดูกาลตามธรรมชาติ ทำให้การคำนวณทางดาราศาสตร์และปฏิทินมีความแม่นยำมากขึ้น",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T13",
+   "q": "กินกาแฟตอนท้องว่างไม่ดีจริงไหม",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การดื่มกาแฟตอนท้องว่างอาจไม่ดีสำหรับบางคนได้ครับ เพราะกาแฟมีคาเฟอีนซึ่งสามารถกระตุ้นให้เกิดอาการ เช่น ใจสั่น กระสับกระส่าย หรืออาจทำให้เกิดอาการปวดท้องได้ง่ายขึ้น\n\nหากคุณมีปัญหาเกี่ยวกับกระเพาะอาหาร ควรลองดื่มกาแฟพร้อมอาหารเล็กน้อยเพื่อช่วยลดการระคายเคือง และสังเกตอาการของตัวเองว่าร่างกายของคุณตอบสนองอย่างไรครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T14",
+   "q": "240 ลด 15% เหลือเท่าไหร่",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "240 ลด 15% เหลือ 204",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T15",
+   "q": "ไวรัสกับแบคทีเรียต่างกันยังไง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ไวรัสและแบคทีเรียเป็นสิ่งมีชีวิตที่แตกต่างกันอย่างชัดเจน\n\n**แบคทีเรีย** เป็นสิ่งมีชีวิตเซลล์เดียว มีโครงสร้างพื้นฐานเป็นเซลล์ มีวิธีการสืบพันธุ์และดำรงชีวิตเป็นของตัวเอง\n\n**ไวรัส** เป็นสิ่งมีชีวิตที่ไม่มีโครงสร้างที่ซับซ้อน ไม่ใช่สิ่งมีชีวิตที่แท้จริง แต่เป็นสารพันธุกรรม (DNA หรือ RNA) ที่ห่อหุ้มด้วยโปรตีน ซึ่งต้องอาศัยเซลล์เจ้าบ้านในการเพิ่มจำนวนและก่อให้เกิดโรค",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T16",
+   "q": "ช่วยเขียนอีเมลขอเลื่อนส่งงานกับอาจารย์ให้หน่อย สุภาพ ๆ",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "เรียน อาจารย์ [ชื่ออาจารย์],\n\nผม/ดิฉัน [ชื่อของคุณ] นักศึกษา [รหัสนักศึกษา] ขออนุญาตเรียนปรึกษาเรื่องการขอเลื่อนกำหนดส่งงาน [ชื่อชิ้นงาน] ครับ/ค่ะ เนื่องจาก [ระบุเหตุผลอย่างสุภาพและกระชับ เช่น มีเหตุจำเป็นบางอย่างที่ทำให้ไม่สามารถทำงานให้เสร็จทันตามกำหนดเดิมได้]\n\nจึงใคร่ขอความกรุณาอาจารย์พิจารณาอนุญาตให้ขยายเวลาส่งงานออกไปเป็นวันที่ [ระบุวันที่ที่ต้องการขอเลื่อน] แทนครับ/ค่ะ ผม/ดิฉันจะตั้งใจทำงานให้เสร็จสมบูรณ์และส่งงานภายในกำหนดใหม่ตามที่ขออย่างแน่นอน\n\nขอขอบพระคุณอาจารย์เป็นอย่างสูงสำหรับความเข้าใจและการพิจารณาครับ/ค่ะ\n\nขอแสดงความนับถือ\n[ชื่อของคุณ]",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T17",
+   "q": "เงินเฟ้อคืออะไร",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "เงินเฟ้อคือภาวะที่ระดับราคาสินค้าและบริการโดยทั่วไปเพิ่มสูงขึ้น ทำให้มูลค่าของเงินลดลง พูดง่ายๆ คือ เงินจำนวนเท่าเดิมซื้อของได้น้อยลง\n\nสาเหตุหลักของเงินเฟ้อมีหลายอย่าง เช่น อุปทานของสินค้าและบริการลดลง อุปสงค์ของสินค้าและบริการสูงเกินไป หรือนโยบายการเงินของธนาคารกลางที่ผ่อนคลายเกินไป",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T18",
+   "q": "ไปเที่ยวญี่ปุ่นหน้าหนาวควรเตรียมอะไรบ้าง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การไปเที่ยวญี่ปุ่นหน้าหนาวควรเตรียมเสื้อผ้าที่อบอุ่นเป็นพิเศษ เนื่องจากอากาศจะหนาวเย็นมาก ควรเตรียมเสื้อผ้าหลายชั้น เช่น เสื้อลองจอน เสื้อสเวตเตอร์ เสื้อโค้ทกันหนาว และอุปกรณ์เสริม เช่น ผ้าพันคอ ถุงมือ หมวก และรองเท้าที่กันลื่นหรือกันน้ำได้ครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T19",
+   "q": "เก็บใบโหระพายังไงให้สดนาน",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การเก็บใบโหระพาให้สดนานขึ้น สามารถทำได้หลายวิธีครับ:\n\n1. **เก็บในน้ำ:** ห่อใบโหระพาด้วยกระดาษทิชชูหนาๆ แล้วใส่ในน้ำสะอาดที่ผสมน้ำแข็งเล็กน้อย เก็บไว้ในตู้เย็น วิธีนี้จะช่วยรักษาความชื้นและทำให้ใบสดนานขึ้น\n2. **แช่แข็ง:** หากต้องการเก็บในระยะยาว สามารถนำใบโหระพาที่ล้างสะอาดแล้วมาปั่นหรือหั่นเป็นชิ้นเล็กๆ แล้วนำไปแช่แข็งในถาดน้ำแข็ง จากนั้นนำไปเก็บในถุงซิปล็อก\n3. **เก็บในที่ร่มและเย็น:** เก็บใบโหระพาไว้ในที่ที่อากาศถ่ายเทสะดวก แต่ไม่โดนแดดจัด และควรเก็บไว้ในที่ที่อุณหภูมิไม่สูงเกินไป\n\nหลีกเลี่ยงการเก็บในที่ร้อนจัดหรือแสงแดดโดยตรง จะช่วยยืดอายุความสดของใบโหระพาได้ครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T20",
+   "q": "รถวิ่ง 60 กม./ชม. นาน 2 ชั่วโมงครึ่ง ได้ระยะทางเท่าไหร่",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "รถจะวิ่งได้ระยะทาง 105 กิโลเมตร",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T21",
+   "q": "ปวดหัวบ่อย ๆ ควรทำยังไงดี",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ฉันไม่สามารถให้คำแนะนำทางการแพทย์ได้ หากคุณปวดหัวบ่อย ๆ ควรปรึกษาแพทย์เพื่อรับการวินิจฉัยและการรักษาที่ถูกต้องค่ะ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T22",
+   "q": "อัลกอริทึมคืออะไร อธิบายแบบเด็กเข้าใจ",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "อัลกอริทึมก็เหมือนกับ **สูตรอาหาร** หรือ **ขั้นตอนการทำอะไรบางอย่าง** นั่นเองครับ\n\nลองนึกภาพว่าคุณต้องการทำแซนด์วิช อัลกอริทึมก็คือ **รายการขั้นตอน** ที่บอกว่าต้องทำอะไรบ้าง เช่น:\n\n1. หยิบขนมปังมา 2 แผ่น\n2. ทาเนยบนขนมปังแผ่นแรก\n3. วางแฮมลงไป\n4. ทามายองเนสบนขนมปังอีกแผ่น\n5. นำขนมปังทั้งสองมาประกบกัน\n\nถ้าเราทำตามขั้นตอนเหล่านี้อย่างถูกต้อง เราก็จะได้แซนด์วิชที่อร่อย! อัลกอริทึมก็คือชุดคำสั่งที่ชัดเจน เพื่อให้คอมพิวเตอร์หรือเราทำสิ่งใดสิ่งหนึ่งให้สำเร็จตามที่เราต้องการครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T23",
+   "q": "ขอไอเดียของขวัญให้เพื่อนงบไม่เกิน 500 บาท",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ขึ้นอยู่กับความสนใจของเพื่อนค่ะ ลองดูไอเดียเหล่านี้:\n\n1.  **ของใช้ส่วนตัว:** เทียนหอมกลิ่นที่ชอบ, สบู่แฮนด์เมด, หรือเครื่องประดับเล็กๆ น้อยๆ\n2.  **ของกิน/เครื่องดื่ม:** ชุดชา/กาแฟพิเศษ, ขนมอบโฮมเมด, หรือช็อกโกแลตพรีเมียม\n3.  **ของใช้สำหรับงานอดิเรก:** สมุดบันทึกสวยๆ ถ้าเพื่อนชอบเขียน, หรืออุปกรณ์เล็กๆ สำหรับงานอดิเรกของเขา\n4.  **ของที่ระลึก:** พวงกุญแจน่ารักๆ หรือโปสการ์ดที่ออกแบบเอง\n\nเลือกสิ่งที่เพื่อนของคุณจะชอบเป็นพิเศษค่ะ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T24",
+   "q": "ทำไมน้ำแข็งถึงลอยน้ำได้",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "น้ำแข็งลอยน้ำได้เพราะน้ำแข็งมีความหนาแน่นน้อยกว่าน้ำในสถานะของของแข็ง เมื่อน้ำแข็งถูกทำให้เย็นลง น้ำจะขยายตัวและมีโครงสร้างที่เป็นผลึก ทำให้มีปริมาตรมากกว่าน้ำปริมาตรเท่ากัน แต่มีมวลน้อยกว่า จึงทำให้ความหนาแน่นของน้ำแข็งน้อยกว่าน้ำ และตามหลักการแล้ว วัตถุที่มีความหนาแน่นน้อยกว่าของเหลวจะลอยอยู่บนของเหลวนั้น",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T25",
+   "q": "Wi-Fi บ้านช้ามาก ควรทำยังไง restart router แล้วก็ยังช้า",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "ลองทำตามขั้นตอนเหล่านี้เพื่อแก้ไขปัญหา Wi-Fi ช้าครับ:\n\n1. **รีสตาร์ทอุปกรณ์ทั้งหมด:** ลองรีสตาร์ทเราเตอร์และโมเด็มอีกครั้ง เพื่อล้างแคชและรีเฟรชการเชื่อมต่อ\n2. **ตรวจสอบตำแหน่งเราเตอร์:** ย้ายเราเตอร์ให้อยู่ในตำแหน่งที่อยู่ตรงกลางและสูงที่สุดในบ้าน เพื่อให้สัญญาณกระจายตัวได้ดีที่สุด\n3. **ตรวจสอบสัญญาณรบกวน:** ลองดูว่ามีอุปกรณ์อื่น ๆ ที่ปล่อยสัญญาณรบกวนความถี่เดียวกันหรือไม่ (เช่น ไมโครเวฟ, โทรศัพท์ไร้สาย)\n4. **ตรวจสอบการตั้งค่าเราเตอร์:** เข้าไปตั้งค่าเราเตอร์เพื่อตรวจสอบว่ามีการตั้งค่าที่ผิดปกติหรือไม่ หรือลองเปลี่ยนช่องสัญญาณ (Channel) เป็นช่องที่คนใช้น้อยกว่า\n\nหากยังไม่ดีขึ้น อาจต้องพิจารณาอัปเกรดเราเตอร์ใหม่ครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T26",
+   "q": "ใน Excel ใช้ VLOOKUP ยังไง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "VLOOKUP ใน Excel ใช้สำหรับค้นหาข้อมูลในตารางหนึ่งและดึงข้อมูลที่เกี่ยวข้องจากคอลัมน์อื่นมาแสดง\n\n**สูตรพื้นฐาน:**\n\n`=VLOOKUP(ค่าที่ต้องการค้นหา, ช่วงข้อมูล, ลำดับคอลัมน์ที่ต้องการดึงค่า, [ช่วงการค้นหา])`\n\n*   **ค่าที่ต้องการค้นหา:** คือข้อมูลที่คุณต้องการค้นหา (เช่น รหัสสินค้า)\n*   **ช่วงข้อมูล:** คือช่วงของตารางที่คุณต้องการค้นหาข้อมูล\n*   **ลำดับคอลัมน์ที่ต้องการดึงค่า:** คือหมายเลขคอลัมน์ในตารางข้อมูลที่ต้องการให้แสดงผลลัพธ์\n*   **[ช่วงการค้นหา]:** ถ้าคุณใส่ค่าเป็น TRUE หรือ 1 (ค่าเริ่มต้น) จะเป็นการค้นหาแบบตรงกัน (Exact Match) ถ้าใส่ FALSE หรือ 0 จะเป็นการค้นหาแบบประมาณค่า (Approximate Match)\n\n**ตัวอย่าง:** หากคุณต้องการค้นหาราคาจากตารางที่ A1:C10 โดยค้นหาจากรหัสสินค้าที่อยู่ในเซลล์ E1 และต้องการดึงข้อมูลจากคอลัมน์ที่ 3 ของช่วงข้อมูล ให้ใช้สูตรประมาณนี้: `=VLOOKUP(E1, A1:C10, 3, FALSE)`",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T27",
+   "q": "VPN คืออะไร จำเป็นต้องใช้ไหม",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "VPN ย่อมาจาก Virtual Private Network เป็นเทคโนโลยีที่สร้างการเชื่อมต่ออินเทอร์เน็ตที่ปลอดภัยและเป็นส่วนตัว ช่วยปกปิดที่อยู่ IP จริงของคุณ และเข้ารหัสข้อมูลที่ส่งผ่านอินเทอร์เน็ต\n\n**จำเป็นต้องใช้หรือไม่:**\n\n*   **จำเป็น** หากคุณต้องการเพิ่มความเป็นส่วนตัว ความปลอดภัยในการใช้งานอินเทอร์เน็ต โดยเฉพาะเมื่อใช้ Wi-Fi สาธารณะ หรือต้องการเข้าถึงเนื้อหาที่ถูกจำกัดตามภูมิภาค\n*   **ไม่จำเป็น** หากคุณใช้งานอินเทอร์เน็ตในสภาพแวดล้อมที่ปลอดภัยและไม่กังวลเรื่องความเป็นส่วนตัวเป็นพิเศษ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T28",
+   "q": "notebook ช้ามาก CPU 100% ตลอด แก้ยังไงดี",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "เนื่องจากเครื่องของคุณทำงานบน Raspberry Pi 5 RAM 8 GB และ AI ในเครื่องทำงานบน CPU ของ Pi ซึ่งมีข้อจำกัดด้านประสิทธิภาพ คุณควรลองทำตามวิธีต่อไปนี้เพื่อแก้ไขปัญหา CPU 100% ครับ:\n\n1. **ตรวจสอบกระบวนการที่ใช้ CPU สูง:** ลองเปิด Task Manager (ถ้ามี) หรือใช้คำสั่ง `top` ใน Terminal เพื่อดูว่าโปรแกรมใดกำลังใช้ CPU มากที่สุด\n2. **ปิดโปรแกรมที่ไม่จำเป็น:** ปิดแอปพลิเคชันหรือโปรแกรมเบื้องหลังทั้งหมดที่ไม่จำเป็น เพื่อให้ CPU มีทรัพยากรไปทำงานหลัก\n3. **ตรวจสอบการใช้งานหน่วยความจำ (RAM):** แม้ว่าปัญหาหลักคือ CPU แต่การใช้ RAM มากเกินไปก็อาจทำให้ระบบช้าลง ลองตรวจสอบว่ามีโปรแกรมใดใช้ RAM มากผิดปกติหรือไม่\n4. **อัปเดตระบบปฏิบัติการ:** ตรวจสอบให้แน่ใจว่าระบบปฏิบัติการของ Raspberry Pi ของคุณได้รับการอัปเดตเป็นเวอร์ชันล่าสุดแล้ว\n5. **ปรับลดความซับซ้อนของงาน:** หากคุณกำลังรันงานที่ซับซ้อน ลองลดความซับซ้อนของงานนั้นลงชั่วคราว เพื่อดูว่าประสิทธิภาพดีขึ้นหรือไม่\n\nหากยังไม่ดีขึ้น อาจเป็นไปได้ว่างานที่คุณกำลังทำนั้นเกินขีดจำกัดของฮาร์ดแวร์ในปัจจุบันครับ",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T29",
+   "q": "Machine Learning กับ AI ต่างกันยังไง",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "Machine Learning (ML) เป็นส่วนหนึ่งของ Artificial Intelligence (AI) ครับ\n\n**AI** คือเป้าหมายที่ใหญ่กว่า คือการสร้างระบบที่สามารถคิด เรียนรู้ และตัดสินใจเหมือนมนุษย์ได้\n**ML** คือวิธีการหนึ่งในการทำให้ AI เป็นจริง โดยเน้นที่การสร้างอัลกอริทึมที่ให้คอมพิวเตอร์เรียนรู้จากข้อมูลเพื่อทำการคาดการณ์หรือตัดสินใจโดยไม่ต้องถูกโปรแกรมอย่างชัดเจน",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "id": "T30",
+   "q": "ช่วยแนะนำวิธีทำ presentation ด้วย PowerPoint ให้ดูน่าสนใจหน่อย",
+   "asked": "th",
+   "prompt_english": false,
+   "answer": "การทำ Presentation ที่น่าสนใจมีเคล็ดลับดังนี้ครับ:\n\n1. **เรียบง่ายแต่ทรงพลัง:** ใช้ข้อความน้อย เน้นภาพและกราฟที่สื่อความหมายชัดเจน\n2. **ออกแบบสไลด์ให้สอดคล้องกัน:** ใช้ชุดสีและฟอนต์ที่สม่ำเสมอทั่วทั้งงาน\n3. **ใช้ภาพ/วิดีโอคุณภาพสูง:** เลือกภาพที่เกี่ยวข้องและมีความคมชัด เพื่อดึงดูดความสนใจ\n4. **เล่าเรื่อง (Storytelling):** จัดลำดับเนื้อหาให้เป็นเรื่องราว ไม่ใช่แค่การนำเสนอข้อมูล\n5. **ใช้ภาพเคลื่อนไหวอย่างเหมาะสม:** ใช้ภาพเคลื่อนไหวหรือแอนิเมชันเพื่อเน้นประเด็นสำคัญ ไม่ใช่เพื่อความสวยงามเพียงอย่างเดียว",
+   "answer_lang": "th",
+   "ok": true,
+   "error": ""
+  }
+ ]
+}
