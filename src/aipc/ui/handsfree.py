@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -139,6 +140,28 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
     return NEEDS_BROWSER if cmds else UNKNOWN
 
 
+# ตอบการ์ดที่รอยืนยันด้วยเสียง (การ์ด 0024) · ตรวจทั้งระบบ 2026-10-18 ข้อ 2.1: เดิมดูแค่คำแรก →
+# "ตกลงไม่ลบแล้ว" นับเป็น "ใช่" แล้วลบนัด · กติกาใหม่ (ปลอดภัยไว้ก่อน = ไม่ทำ):
+# ขึ้นต้นด้วยคำปฏิเสธ หรือขึ้นต้นด้วยคำยืนยันแต่มีคำปฏิเสธอยู่ด้วย = ไม่ ·
+# ใช่ = คำยืนยัน + คำลงท้ายเท่านั้น · ขึ้นต้นด้วยคำยืนยันแต่มีคำอื่นต่อท้าย = ถามซ้ำ ไม่ทำ ·
+# ไม่ได้ขึ้นต้นด้วยคำตอบ = "" (ไม่ใช่คำตอบ → ทางเดิมของคีย์ลัด การ์ดยังรออยู่)
+YES, NO, UNCLEAR = "yes", "no", "unclear"
+_NEGATIVE = r"(?:ไม่|ยกเลิก|อย่า)"
+_YES_WORD = r"(?:ใช่|ตกลง|ยืนยัน|โอเค|ok|เอาเลย|ได้เลย)"
+_YES = re.compile(_YES_WORD + r"(?:ครับ|ค่ะ|คะ|จ้ะ|จ้า|นะ|เลย|แล้ว|ลบเลย|ทำเลย|ส่งเลย)*")
+
+
+def yes_no(text: str) -> str:
+    t = re.sub(r"[\s.!?。,]+", "", text).lower()
+    if re.match(_NEGATIVE, t):
+        return NO
+    if re.match(_YES_WORD, t):
+        if re.search(_NEGATIVE, t):
+            return NO
+        return YES if _YES.fullmatch(t) else UNCLEAR
+    return ""
+
+
 class BrowserController(QObject):
     """คำสั่งเว็บจากเสียง · route() บอกหน้าจอว่าคำพูดจากคีย์ลัดไปทางไหน (การ์ด 0027)."""
 
@@ -180,6 +203,10 @@ class BrowserController(QObject):
         if not ctl.running and all(c.kind in NEEDS_PAGE for c in cmds):
             return False  # ยังไม่เปิดเบราว์เซอร์ เช่น "กลับไปหน้าแชท" = คำสั่งเดิมของแอป
         return self._start(cmds)
+
+    @Slot(str, result=str)
+    def yesNo(self, text: str) -> str:  # noqa: N802
+        return yes_no(text)
 
     @Slot(str, result=str)
     def route(self, text: str) -> str:

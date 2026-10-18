@@ -156,9 +156,17 @@ Item {
     function voiceCommand(text) {
         const t = text.trim().replace(/[.!?。\s]+$/, "")
         const tok = pendingConfirm()
-        // งานที่ลบ/แตะเครื่องยังต้องยืนยัน · พูด "ใช่" / "ไม่" แทนการกดปุ่ม
-        if (tok !== "" && /^(ใช่|ตกลง|ยืนยัน|โอเค|ok|เอาเลย)/i.test(t)) { push({ user: true, text: t }); answer(tok, true); speakLastCard(); return }
-        if (tok !== "" && /^(ไม่|ยกเลิก|ไม่เอา)/.test(t)) { push({ user: true, text: t }); answer(tok, false); speakLastCard(); return }
+        // งานที่ลบ/แตะเครื่องยังต้องยืนยัน · พูด "ใช่" / "ไม่" แทนการกดปุ่ม · ตัดสินในโค้ด Python (handsfree.yes_no):
+        // มีคำปฏิเสธ = ไม่ · "ใช่" ต้องไม่มีคำอื่นต่อ ("ตกลงไม่ลบแล้ว" เคยนับเป็นใช่ · ตรวจทั้งระบบ 2.1)
+        const yn = tok !== "" ? browser.yesNo(t) : ""
+        if (yn === "yes" || yn === "no") { push({ user: true, text: t }); answer(tok, yn === "yes"); speakLastCard(); return }
+        if (yn === "unclear") {
+            const again = "ยังไม่ได้ทำ · ตอบว่า “ใช่” หรือ “ไม่” อย่างเดียว"
+            push({ user: true, text: t })
+            push({ ai: true, text: again, note: "", done: true, skill: "สั่งงานด้วยเสียง" })
+            if (voice.available) voice.speak(items.length - 1, again)
+            return
+        }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
         if (browser.busy) {
             push({ user: true, text: t })
@@ -180,9 +188,12 @@ Item {
             return
         }
         if (way === "command") {        // คำสั่งเครื่อง: ทางเดิมของแชททำคำสั่งก่อนถึง AI (ยืนยันตามกติกาเดิม)
+            // ไม่ผ่าน send(): send() ส่งข้อความไปให้ Claude แก้สกิล (เมื่อกด "ไม่ใช่แบบนี้" ค้างไว้) หรือถามไฟล์ที่แนบ
+            // และเขียนทับข้อความที่ผู้ใช้พิมพ์ค้างในช่อง (ตรวจทั้งระบบ 2.2 · 2.7)
             const before = items.length
-            sendText(t)
-            if (items.length > before && items[items.length - 1].ai)
+            push({ user: true, text: t })
+            dispatch(skills.handle(t), t)
+            if (items.length > before + 1 && items[items.length - 1].ai)
                 speakNext = true        // รอ AI ตอบ แล้วอ่านใน onFinished
             else
                 speakLastCard()

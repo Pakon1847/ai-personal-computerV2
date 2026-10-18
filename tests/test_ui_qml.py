@@ -465,6 +465,38 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง ไม่ใช่คำตอบของ AI
         self.assertEqual(warnings, [])
 
+    def test_hands_free_command_never_goes_to_claude_or_wipes_draft(self):
+        """ตรวจทั้งระบบ 2026-10-18 ข้อ 2.1 2.2 2.7: กด "ไม่ใช่แบบนี้" ค้างไว้ + พิมพ์ค้าง แล้วพูดคำสั่งเครื่อง =
+        ทำคำสั่ง ไม่ส่งให้ Claude แก้สกิล และข้อความที่พิมพ์ยังอยู่ · "ตกลงไม่ลบแล้ว" = ไม่ ไม่ใช่ใช่."""
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        skills = engine._backends["skills"]
+        sent = []
+        skills._forge = lambda request, **kw: sent.append(request)  # Claude ปลอม: จดว่าถูกเรียกไหม
+        skills._start_forge = lambda *a, **kw: sent.append(a) or {}
+        page.setProperty("feedbackFor", {"id": "work-mode", "name": "โหมดทำงาน"})
+        box = find_all(win, "chatInput")[0]
+        box.setProperty("text", "ร่างที่พิมพ์ค้างไว้")
+        page.voiceCommand("เปิดหน้าตั้งค่า")
+        settle(100)
+        rows = items_of(page)
+        self.assertEqual(rows[-2]["text"], "เปิดหน้าตั้งค่า")
+        self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง
+        self.assertEqual(sent, [])  # ไม่ถึง Claude
+        self.assertEqual(box.property("text"), "ร่างที่พิมพ์ค้างไว้")
+        base = {"chips": [], "lines": [], "page": "", "badge": {}, "kind": "command"}
+        page.setProperty("items", [{"user": True, "text": "ยกเลิกนัดกินยา"},
+                                   {"user": False, "card": {**base, "title": "ลบนัด 1 รายการ ใช่ไหม",
+                                                            "confirmToken": "tok-2"}}])  # fmt: skip
+        settle(50)
+        page.voiceCommand("ตกลงไม่ลบแล้ว")
+        settle(100)
+        self.assertNotEqual(items_of(page)[-1]["card"]["title"], "ลบนัด 1 รายการ ใช่ไหม")
+        answered = page.property("answered")
+        answered = answered.toVariant() if hasattr(answered, "toVariant") else answered
+        self.assertTrue(answered.get("tok-2"))  # ตอบแล้ว (ว่าไม่)
+        self.assertEqual(warnings, [])
+
     def test_hands_free_create_skill_asks_before_sending(self):
         """การ์ด 0030: พูดขอโหมดใหม่ → การ์ดยืนยันข้อความก่อนส่ง Claude · พูด "ไม่" = ไม่ส่งอะไร."""
         engine, win, warnings = self.open_shell()
