@@ -139,6 +139,16 @@ class HolidayAnswerTest(unittest.TestCase):
         self.now = datetime(2026, 12, 6, 9, 0).astimezone()  # ผ่านวันจริงแล้ว เหลือวันชดเชย
         self.assertIn("ยังไม่มีข้อมูล", s.handle("อีกกี่วันถึงวันคล้ายวันพระบรมราชสมภพ")["title"])
 
+    def test_until_questions_that_are_not_holidays_keep_their_old_path(self):
+        """ตรวจทั้งระบบ 2026-10-18 ข้อ 3.5: เปิดสวิตช์วันหยุดแล้ว "อีกกี่วัน…" ที่ไม่ใช่ชื่อวันหยุด ต้องไปทางเดิม
+        เหมือนตอนปิดสวิตช์ (เดิม "…วันพระ" ได้วันคล้ายวันพระบรมราชสมภพ · "…นัด…" ได้ "ยังไม่มีข้อมูล")."""
+        on, _ = self.make()
+        off, _ = self.make(on=False)
+        for q in ["อีกกี่วันจะถึงวันพระหน้า", "อีกกี่วันจะถึงนัดทำฟัน", "อีกกี่วันจะถึงวันที่ 28"]:
+            a, b = on.handle(q), off.handle(q)
+            self.assertEqual((a["kind"], a["title"]), (b["kind"], b["title"]), q)
+            self.assertNotIn("ยังไม่มีข้อมูล", a["title"], q)
+
     def test_missing_data_is_said_not_guessed(self):
         s, _ = self.make()
         card = s.handle("อีกกี่วันจะถึงวันมาฆบูชา")  # ปีหน้ายังไม่มีในไฟล์

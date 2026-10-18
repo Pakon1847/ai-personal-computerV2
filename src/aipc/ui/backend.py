@@ -1840,8 +1840,10 @@ class SkillsController(QObject):
         if not key or key.startswith("หยุด"):
             return None  # "อีกกี่วันถึงวันหยุด" = _holiday_card
         hits = [e for e in self._holidays(now)
-                if key in agenda.holiday_key(e.what)
+                if agenda.holiday_match(key, e.what)
                 and ("ชดเชย" in key or not e.what.startswith("วันหยุดชดเชย"))]  # fmt: skip
+        if not hits and not agenda.is_holiday_name(target):
+            return None  # ไม่ใช่ชื่อวันหยุด ("นัดโทรหาหมอ" "วันพระ" "วันที่ 25") → ทางเดิม ไม่ตอบว่า "ยังไม่มีข้อมูล"
         if not hits:
             return self._plain("clock", f"ยังไม่มีข้อมูล{target}", [
                 "ปฏิทินวันหยุดของ Google ยังไม่มีวันนี้ในช่วง 1 ปีข้างหน้า "
