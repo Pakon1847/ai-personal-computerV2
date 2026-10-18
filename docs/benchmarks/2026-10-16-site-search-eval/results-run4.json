@@ -1,0 +1,468 @@
+{
+ "positive_ok": 17,
+ "positive": 20,
+ "wrong_site": 0,
+ "negative_ok": 9,
+ "negative": 10,
+ "passed": false,
+ "strict": true,
+ "rows": [
+  {
+   "id": "P01",
+   "text": "ค้นในยูทูบว่าสูตรไข่ตุ๋นห้านาที",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สูตรไข่ตุ๋นห้านาที",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "สูตรไข่ตุ๋นห้านาที"
+   }
+  },
+  {
+   "id": "P02",
+   "text": "หา แต่งหน้าเจ้าสาวโทนธรรมชาติ ในยูทูป หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "แต่งหน้าเจ้าสาวโทนธรรมชาติ",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "แต่งหน้าเจ้าสาวโทนธรรมชาติ"
+   }
+  },
+  {
+   "id": "P03",
+   "text": "เปิดยูทูบแล้วเสิร์ชเพลงลูกทุ่งฟังสบายครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพลงลูกทุ่งฟังสบาย",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "เพลงลูกทุ่งฟังสบาย"
+   }
+  },
+  {
+   "id": "P04",
+   "text": "เสิร์ชใน YouTube คำว่า ไฮไลต์มวยไทยคู่เอกใครชนะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ไฮไลต์มวยไทยคู่เอกใครชนะ",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "ไฮไลต์มวยไทยคู่เอกใครชนะ"
+   }
+  },
+  {
+   "id": "P05",
+   "text": "ค้นหาที่พักภูกระดึงจังหวัดเลยในแผนที่",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ที่พักภูกระดึงจังหวัดเลย",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ที่พักภูกระดึงจังหวัดเลย"
+   }
+  },
+  {
+   "id": "P06",
+   "text": "ค้นในกูเกิลแมพว่า ปั๊มน้ำมันใกล้ที่สุด ให้หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปั๊มน้ำมันใกล้ที่สุด",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ปั๊มน้ำมันใกล้ที่สุด"
+   }
+  },
+  {
+   "id": "P07",
+   "text": "เปิดแผนที่กูเกิลแล้วหาร้านก๋วยเตี๋ยวเรือแถวอนุสาวรีย์ค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ร้านก๋วยเตี๋ยวเรือแถวอนุสาวรีย์",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ร้านก๋วยเตี๋ยวเรือแถวอนุสาวรีย์"
+   }
+  },
+  {
+   "id": "P08",
+   "text": "หา โรงพยาบาลศิริราช ใน Google Maps",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "โรงพยาบาลศิริราช",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "โรงพยาบาลศิริราช"
+   }
+  },
+  {
+   "id": "P09",
+   "text": "ค้นหาในจีเมลว่าใบเสร็จค่าไฟเดือนกันยายน",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ใบเสร็จค่าไฟเดือนกันยายน",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ใบเสร็จค่าไฟเดือนกันยายน"
+   }
+  },
+  {
+   "id": "P10",
+   "text": "หาว่าที่บัณฑิตรุ่นหกในจีเมลหน่อย",
+   "positive": true,
+   "ok": false,
+   "wrong_site": false,
+   "got": [],
+   "want": {
+    "site": "gmail",
+    "query": "ว่าที่บัณฑิตรุ่นหก"
+   }
+  },
+  {
+   "id": "P11",
+   "text": "เปิด Gmail ค้นหา ตั๋วเครื่องบินเชียงใหม่ นะครับ",
+   "positive": true,
+   "ok": false,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ตั๋วเครื่องบินเชียงใหม่นะ",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ตั๋วเครื่องบินเชียงใหม่"
+   }
+  },
+  {
+   "id": "P12",
+   "text": "หาในกูเกิลไดรฟ์คำว่าไฟล์สไลด์นำเสนอโปรเจกต์",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ไฟล์สไลด์นำเสนอโปรเจกต์",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "ไฟล์สไลด์นำเสนอโปรเจกต์"
+   }
+  },
+  {
+   "id": "P13",
+   "text": "ค้นหา รูปงานรับปริญญา ใน Google Drive ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "รูปงานรับปริญญา",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "รูปงานรับปริญญา"
+   }
+  },
+  {
+   "id": "P14",
+   "text": "เปิดกูเกิลไดรฟ์แล้วค้นหาสัญญาเช่าบ้านปีนี้",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สัญญาเช่าบ้านปีนี้",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "สัญญาเช่าบ้านปีนี้"
+   }
+  },
+  {
+   "id": "P15",
+   "text": "ค้นในวิกิพีเดียว่าในหลวงรัชกาลที่เก้า",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ในหลวงรัชกาลที่เก้า",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ในหลวงรัชกาลที่เก้า"
+   }
+  },
+  {
+   "id": "P16",
+   "text": "ค้นหา ประชาธิปไตยแบบตัวแทน ในวิกิพีเดีย ค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ประชาธิปไตยแบบตัวแทน",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ประชาธิปไตยแบบตัวแทน"
+   }
+  },
+  {
+   "id": "P17",
+   "text": "เปิดวิกิแล้วหาประวัติสุนทรภู่",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ประวัติสุนทรภู่",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ประวัติสุนทรภู่"
+   }
+  },
+  {
+   "id": "P18",
+   "text": "หาเพจร้านเค้กบ้านสวนในเฟซบุ๊กให้หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพจร้านเค้กบ้านสวน",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "เพจร้านเค้กบ้านสวน"
+   }
+  },
+  {
+   "id": "P19",
+   "text": "เสิร์ชในเฟสบุ๊ค ว่า กลุ่มคนรักแมวเชียงราย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "กลุ่มคนรักแมวเชียงราย",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "กลุ่มคนรักแมวเชียงราย"
+   }
+  },
+  {
+   "id": "P20",
+   "text": "เปิดเฟซบุ๊กหารีวิวร้านหมูกระทะแถวบางแสนนะคะ",
+   "positive": true,
+   "ok": false,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "รีวิวร้านหมูกระทะแถวบางแสนนะคะ",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "รีวิวร้านหมูกระทะแถวบางแสน"
+   }
+  },
+  {
+   "id": "Q01",
+   "text": "ยูทูบช่วงนี้โฆษณาเยอะจนดูไม่ไหวเลย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q02",
+   "text": "เมื่อวานหาร้านในแผนที่ตั้งนานก็ไม่เจอ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q03",
+   "text": "พรุ่งนี้ค่อยหาเพลงในยูทูบละกัน วันนี้ง่วงแล้ว",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q04",
+   "text": "ไม่ต้องค้นในเฟซบุ๊กแล้วนะ เจอแล้ว",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q05",
+   "text": "หาไฟล์รายงานในไดรฟ์ให้หน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q06",
+   "text": "คิดว่าวิกิพีเดียเชื่อถือได้แค่ไหน",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q07",
+   "text": "น้องบอกให้หาเบอร์ร้านในเฟซบุ๊ก แต่ฉันลืมไปแล้ว",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q08",
+   "text": "ค้นในกูเกิลว่าวันนี้ฝนตกไหม",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "วันนี้ฝนตกไหม"
+    }
+   ],
+   "want": {
+    "kind": "search"
+   }
+  },
+  {
+   "id": "Q09",
+   "text": "จีเมลเข้าไม่ได้ ลืมรหัสผ่าน ทำยังไงดี",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "Q10",
+   "text": "หาในยูทูบก็มีแต่คลิปเก่า ๆ ทั้งนั้น",
+   "positive": false,
+   "ok": false,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ก็มีแต่คลิปเก่าๆทั้งนั้น",
+     "site": "youtube"
+    }
+   ],
+   "want": null
+  }
+ ]
+}
