@@ -30,7 +30,8 @@ def settle(ms=150):
     loop.exec()
 
 
-CLOCK = re.compile(r"^\d\d:\d\d · ")  # นาฬิกาบนแถบสถานะเปลี่ยนนาทีระหว่างเทสต์ได้ → ไม่เอามาเทียบ
+# นาฬิกาและอุณหภูมิบนแถบสถานะเปลี่ยนระหว่างเทสต์ได้ (เจอบน Pi) → ไม่เอามาเทียบ
+CLOCK = re.compile(r"^\d\d:\d\d · |°C$")
 
 
 def visible_texts(item, out):

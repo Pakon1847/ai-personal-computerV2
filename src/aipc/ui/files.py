@@ -11,6 +11,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 
+from aipc.i18n import tr
 from aipc.ui import thaidate
 
 
@@ -50,7 +51,7 @@ def modified(ts: float, now: datetime | None = None) -> str:
     dt = datetime.fromtimestamp(ts)
     now = now or datetime.now()
     if dt.date() == now.date():
-        return "วันนี้ " + thaidate.clock(dt)
+        return tr("วันนี้ {time}", time=thaidate.clock(dt))
     return f"{dt.day} {thaidate.month_short(dt.month)} {thaidate.year(dt)}"
 
 
