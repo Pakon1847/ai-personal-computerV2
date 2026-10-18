@@ -1,0 +1,3391 @@
+{
+ "set": "tests/data/english_cmd/set.json",
+ "models": {
+  "ggml-tiny.en.bin": {
+   "summary": {
+    "median_s": 0.41,
+    "p90_s": 0.51,
+    "max_hwm_mb": 154.3,
+    "commands_same": "41/50",
+    "negatives_converted": 0
+   },
+   "rows": [
+    {
+     "id": "C01",
+     "ref_text": "open youtube",
+     "heard": "Open YouTube.",
+     "secs": 0.36,
+     "hwm_mb": 153.9,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดยูทูบ",
+      "kind": "open",
+      "target": "site:youtube"
+     }
+    },
+    {
+     "id": "C02",
+     "ref_text": "Can you open Gmail for me?",
+     "heard": "Can you open Gmail for me?",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดจีเมล",
+      "kind": "open",
+      "target": "site:gmail"
+     }
+    },
+    {
+     "id": "C03",
+     "ref_text": "launch the terminal",
+     "heard": "Launch the terminal.",
+     "secs": 1.99,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดเทอร์มินัล",
+      "kind": "open",
+      "target": "app:terminal"
+     }
+    },
+    {
+     "id": "C04",
+     "ref_text": "Open Google Maps please",
+     "heard": "Open Google Maps, please. Open Google Maps, please.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "open",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C05",
+     "ref_text": "show my calendar",
+     "heard": "Show my calendar.",
+     "secs": 0.36,
+     "hwm_mb": 152.9,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดปฏิทิน",
+      "kind": "open",
+      "target": "page:calendar"
+     }
+    },
+    {
+     "id": "C06",
+     "ref_text": "go to the settings page",
+     "heard": "Go to the settings page.",
+     "secs": 0.36,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดหน้าตั้งค่า",
+      "kind": "open",
+      "target": "page:settings"
+     }
+    },
+    {
+     "id": "C07",
+     "ref_text": "Open the file manager",
+     "heard": "Open the File Manager.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดตัวจัดการไฟล์",
+      "kind": "open",
+      "target": "app:filemanager"
+     }
+    },
+    {
+     "id": "C08",
+     "ref_text": "open wikipedia",
+     "heard": "Open WikiCadia.",
+     "secs": 0.36,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "open",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C09",
+     "ref_text": "mute the sound",
+     "heard": "mute the sound.",
+     "secs": 1.93,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปิดเสียง",
+      "kind": "volume",
+      "volume": "mute"
+     }
+    },
+    {
+     "id": "C10",
+     "ref_text": "Turn the volume up",
+     "heard": "turn the volume up.",
+     "secs": 0.36,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "เพิ่มเสียง",
+      "kind": "volume",
+      "volume": "up"
+     }
+    },
+    {
+     "id": "C11",
+     "ref_text": "lower the volume please",
+     "heard": "Lower the volume please.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ลดเสียง",
+      "kind": "volume",
+      "volume": "down"
+     }
+    },
+    {
+     "id": "C12",
+     "ref_text": "set volume to 40%",
+     "heard": "Set volume to 40%.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปรับเสียงเป็น 40",
+      "kind": "volume",
+      "volume": "set:40"
+     }
+    },
+    {
+     "id": "C13",
+     "ref_text": "Unmute the speakers",
+     "heard": "on you, the speakers.",
+     "secs": 0.36,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "volume",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C14",
+     "ref_text": "Volume 70",
+     "heard": "Volume 70",
+     "secs": 1.94,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปรับเสียงเป็น 70",
+      "kind": "volume",
+      "volume": "set:70"
+     }
+    },
+    {
+     "id": "C15",
+     "ref_text": "remind me to call mom at 3",
+     "heard": "Remind me to call Mom at 3.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน call Mom 3 โมง",
+      "kind": "remind",
+      "what": "call Mom",
+      "date": "2026-10-21",
+      "time": "15:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C16",
+     "ref_text": "Remind me to take my medicine at 8",
+     "heard": "Remind me to take my med soon at 8.",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน take my med soon 8 โมง",
+      "kind": "remind",
+      "what": "take my med soon",
+      "date": "2026-10-22",
+      "time": "08:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C17",
+     "ref_text": "remind me to pick up the kids tomorrow at 4:30",
+     "heard": "Remind me to pick up the kids tomorrow at 4.30.",
+     "secs": 0.51,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน pick up the kids พรุ่งนี้ 16:30",
+      "kind": "remind",
+      "what": "pick up the kids",
+      "date": "2026-10-22",
+      "time": "16:30",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C18",
+     "ref_text": "Set a reminder to submit the report on Friday at 10am",
+     "heard": "Set a reminder to submit the report on Friday at 10 AM.",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน submit the report วันศุกร์นี้ 10:00",
+      "kind": "remind",
+      "what": "submit the report",
+      "date": "2026-10-23",
+      "time": "10:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C19",
+     "ref_text": "remind me in 20 minutes to check the oven",
+     "heard": "Remind me in 20 minutes to check the oven.",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน check the oven อีก 20 นาที",
+      "kind": "remind",
+      "what": "check the oven",
+      "date": "2026-10-21",
+      "time": "10:20",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C20",
+     "ref_text": "Remind me to move the laundry in 2 hours",
+     "heard": "Remind me to move the laundry in two hours.",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน move the laundry อีก 2 ชั่วโมง",
+      "kind": "remind",
+      "what": "move the laundry",
+      "date": "2026-10-21",
+      "time": "12:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C21",
+     "ref_text": "remind me to water the plants every day at 7am",
+     "heard": "Remind me to water the plants every day at set an AM.",
+     "secs": 0.51,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน water the plants every day at set an AM",
+      "kind": "remind",
+      "what": "water the plants every day at set an AM",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C22",
+     "ref_text": "Remind me to go to the gym every Monday at 6",
+     "heard": "Remind me to go to the gym every Monday at 6.",
+     "secs": 0.51,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน go to the gym ทุกวันจันทร์ 6 โมง",
+      "kind": "remind",
+      "what": "go to the gym",
+      "date": "2026-10-26",
+      "time": "18:00",
+      "repeat": "weekly:0"
+     }
+    },
+    {
+     "id": "C23",
+     "ref_text": "remind me about the dentist on November 3 at 2pm",
+     "heard": "Remind me about the dentist on November 3 at 2pm.",
+     "secs": 0.51,
+     "hwm_mb": 154.3,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน the dentist 3 พฤศจิกายน 14:00",
+      "kind": "remind",
+      "what": "the dentist",
+      "date": "2026-11-03",
+      "time": "14:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C24",
+     "ref_text": "remind me to renew my passport on March 15",
+     "heard": "Remind me to renew my passport on March 15.",
+     "secs": 0.51,
+     "hwm_mb": 154.3,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน renew my passport 15 มีนาคม",
+      "kind": "remind",
+      "what": "renew my passport",
+      "date": "2027-03-15",
+      "time": "09:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C25",
+     "ref_text": "Remind me to buy milk",
+     "heard": "Remind me to buy milk.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน buy milk",
+      "kind": "remind",
+      "what": "buy milk",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C26",
+     "ref_text": "remind me to email Sarah next Tuesday at 9",
+     "heard": "Remind me to email Sarah next Tuesday at 9.",
+     "secs": 0.51,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน email Sarah วันอังคารหน้า 9 โมง",
+      "kind": "remind",
+      "what": "email Sarah",
+      "date": "2026-10-27",
+      "time": "09:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C27",
+     "ref_text": "remind me to call the bank tonight at 8",
+     "heard": "Remind me to call the bank tonight at 8.",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน call the bank คืนนี้ 20:00",
+      "kind": "remind",
+      "what": "call the bank",
+      "date": "2026-10-21",
+      "time": "20:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C28",
+     "ref_text": "Remind me to stand up and stretch every weekday at 11",
+     "heard": "Remind me to stand up and stretch every weekday at 11.",
+     "secs": 0.51,
+     "hwm_mb": 154.3,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน stand up and stretch วันธรรมดา 11 โมง",
+      "kind": "remind",
+      "what": "stand up and stretch",
+      "date": "2026-10-21",
+      "time": "11:00",
+      "repeat": "weekdays"
+     }
+    },
+    {
+     "id": "C29",
+     "ref_text": "remind me to pay rent on the 1st",
+     "heard": "Remind me to pay rent on the first.",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน pay rent on the first",
+      "kind": "remind",
+      "what": "pay rent on the first",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C30",
+     "ref_text": "remind me to clean the house on weekends at 10am",
+     "heard": "Remind me to clean the house on weekends at 10am.",
+     "secs": 0.51,
+     "hwm_mb": 154.3,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน clean the house ทุกเสาร์อาทิตย์ 10:00",
+      "kind": "remind",
+      "what": "clean the house",
+      "date": "2026-10-24",
+      "time": "10:00",
+      "repeat": "weekends"
+     }
+    },
+    {
+     "id": "C31",
+     "ref_text": "cancel my dentist appointment",
+     "heard": "Cancel my dentist appointment.",
+     "secs": 0.36,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด dentist",
+      "kind": "cancel",
+      "what": "dentist"
+     }
+    },
+    {
+     "id": "C32",
+     "ref_text": "Delete the reminder to call mom",
+     "heard": "Delete the reminder to call mom.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด call mom",
+      "kind": "cancel",
+      "what": "callmom"
+     }
+    },
+    {
+     "id": "C33",
+     "ref_text": "Cancel my meeting with Jessica",
+     "heard": "cancel my meeting with Jessica.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด Jessica",
+      "kind": "cancel",
+      "what": "Jessica"
+     }
+    },
+    {
+     "id": "C34",
+     "ref_text": "delete all my reminders",
+     "heard": "Delete all my reminders.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัดทั้งหมด",
+      "kind": "cancel",
+      "what": "all"
+     }
+    },
+    {
+     "id": "C35",
+     "ref_text": "remove the gym reminder",
+     "heard": "Remove the gym reminder.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด gym",
+      "kind": "cancel",
+      "what": "gym"
+     }
+    },
+    {
+     "id": "C36",
+     "ref_text": "what's on my schedule today?",
+     "heard": "What's on my schedule today?",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "วันนี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-21",
+      "days": 1
+     }
+    },
+    {
+     "id": "C37",
+     "ref_text": "Do I have anything tomorrow",
+     "heard": "Do I have anything tomorrow?",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "พรุ่งนี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-22",
+      "days": 1
+     }
+    },
+    {
+     "id": "C38",
+     "ref_text": "what do I have this week",
+     "heard": "What do I have this week?",
+     "secs": 0.51,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "สัปดาห์นี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-21",
+      "days": 5
+     }
+    },
+    {
+     "id": "C39",
+     "ref_text": "Show me my appointments for next week",
+     "heard": "Show me my appointments for next week.",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "สัปดาห์หน้ามีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-26",
+      "days": 7
+     }
+    },
+    {
+     "id": "C40",
+     "ref_text": "Am I busy on Friday?",
+     "heard": "Am I busy on Friday?",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "วันศุกร์นี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-23",
+      "days": 1
+     }
+    },
+    {
+     "id": "C41",
+     "ref_text": "what's my next appointment",
+     "heard": "Once my next appointment.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "next",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C42",
+     "ref_text": "When is my next meeting?",
+     "heard": "when is mine next meeting?",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "next",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C43",
+     "ref_text": "what time is it",
+     "heard": "What time is it?",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C44",
+     "ref_text": "What's the time now?",
+     "heard": "Watch the time now.",
+     "secs": 0.41,
+     "hwm_mb": 153.9,
+     "command": true,
+     "ref_kind": "time",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C45",
+     "ref_text": "tell me the time please",
+     "heard": "Tell me the time please.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C46",
+     "ref_text": "show files I edited today",
+     "heard": "Show files I edited today.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้วันนี้",
+      "kind": "files",
+      "range": "today"
+     }
+    },
+    {
+     "id": "C47",
+     "ref_text": "What files did I change yesterday?",
+     "heard": "What files did I change yesterday?",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้เมื่อวาน",
+      "kind": "files",
+      "range": "yesterday"
+     }
+    },
+    {
+     "id": "C48",
+     "ref_text": "show me the files I modified this week",
+     "heard": "Show me the files I modified this week.",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+      "kind": "files",
+      "range": "this_week"
+     }
+    },
+    {
+     "id": "C49",
+     "ref_text": "list the documents I edited yesterday",
+     "heard": "list the documents I edited yesterday.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้เมื่อวาน",
+      "kind": "files",
+      "range": "yesterday"
+     }
+    },
+    {
+     "id": "C50",
+     "ref_text": "files changed this week",
+     "heard": "files changed this week.",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+      "kind": "files",
+      "range": "this_week"
+     }
+    },
+    {
+     "id": "N01",
+     "ref_text": "How do I open a PDF on Linux?",
+     "heard": "How do I open a PDF on Linux?",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N02",
+     "ref_text": "What time does the pharmacy close?",
+     "heard": "what time does the pharmacy close?",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N03",
+     "ref_text": "What's the weather like tomorrow?",
+     "heard": "What's the weather like tomorrow?",
+     "secs": 0.51,
+     "hwm_mb": 154.0,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N04",
+     "ref_text": "Can you write an email to my boss asking for a day off?",
+     "heard": "Can you write an email to my boss asking for a day off?",
+     "secs": 0.51,
+     "hwm_mb": 154.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N05",
+     "ref_text": "I want to open a coffee shop someday",
+     "heard": "I want to open a coffee shop someday.",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N06",
+     "ref_text": "Why does my phone keep cancelling my alarms?",
+     "heard": "Why does my phone keep canceling my alarms?",
+     "secs": 0.56,
+     "hwm_mb": 154.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N07",
+     "ref_text": "What is the volume of a sphere?",
+     "heard": "what is the volume of a sphere?",
+     "secs": 0.51,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N08",
+     "ref_text": "Search the web for cheap flights to Tokyo",
+     "heard": "search the web for cheap flights to Tokyo",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N09",
+     "ref_text": "How do I remind myself to drink more water?",
+     "heard": "How do I remind myself to drink more water?",
+     "secs": 0.56,
+     "hwm_mb": 154.2,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N10",
+     "ref_text": "The meeting yesterday was really long",
+     "heard": "The meeting yesterday was really long.",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N11",
+     "ref_text": "What's a good time to plant tomatoes?",
+     "heard": "What's a good time to plant tomatoes?",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N12",
+     "ref_text": "Can you explain how file permissions work?",
+     "heard": "Can you explain how file permissions work?",
+     "secs": 0.51,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N13",
+     "ref_text": "Tell me a joke",
+     "heard": "Tell me a joke.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N14",
+     "ref_text": "My schedule is crazy this week",
+     "heard": "My schedule is crazy this week.",
+     "secs": 0.4,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N15",
+     "ref_text": "What does 'open source' mean?",
+     "heard": "What does open source mean?",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N16",
+     "ref_text": "How many files can a folder hold?",
+     "heard": "How many files can a folder hold?",
+     "secs": 0.46,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N17",
+     "ref_text": "Translate 'good morning' into Japanese",
+     "heard": "Translate Good Morning into Japanese",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N18",
+     "ref_text": "Is it rude to cancel plans at the last minute?",
+     "heard": "Is it rude to cancel plans at the last minute?",
+     "secs": 0.46,
+     "hwm_mb": 154.2,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N19",
+     "ref_text": "thanks, that was helpful",
+     "heard": "Thanks, that was helpful.",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N20",
+     "ref_text": "Who invented the alarm clock?",
+     "heard": "who invented the alarm clock.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N21",
+     "ref_text": "Summarize this article for me",
+     "heard": "Sunrise this article for me.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N22",
+     "ref_text": "What year did YouTube start?",
+     "heard": "What year did YouTube start?",
+     "secs": 0.41,
+     "hwm_mb": 154.0,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N23",
+     "ref_text": "Recommend a good book for the weekend",
+     "heard": "recommend a good book for the weekend.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N24",
+     "ref_text": "How loud is too loud for headphones?",
+     "heard": "How loud is too loud for headphones?",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N25",
+     "ref_text": "What time zone is London in?",
+     "heard": "Wop Time Zone is London Inn.",
+     "secs": 0.41,
+     "hwm_mb": 154.1,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    }
+   ]
+  },
+  "ggml-base.en.bin": {
+   "summary": {
+    "median_s": 0.81,
+    "p90_s": 0.91,
+    "max_hwm_mb": 256.5,
+    "commands_same": "47/50",
+    "negatives_converted": 0
+   },
+   "rows": [
+    {
+     "id": "C01",
+     "ref_text": "open youtube",
+     "heard": "Open YouTube.",
+     "secs": 0.71,
+     "hwm_mb": 256.2,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดยูทูบ",
+      "kind": "open",
+      "target": "site:youtube"
+     }
+    },
+    {
+     "id": "C02",
+     "ref_text": "Can you open Gmail for me?",
+     "heard": "Can you open Gmail for me?",
+     "secs": 0.81,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดจีเมล",
+      "kind": "open",
+      "target": "site:gmail"
+     }
+    },
+    {
+     "id": "C03",
+     "ref_text": "launch the terminal",
+     "heard": "Launch the terminal",
+     "secs": 0.71,
+     "hwm_mb": 256.2,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดเทอร์มินัล",
+      "kind": "open",
+      "target": "app:terminal"
+     }
+    },
+    {
+     "id": "C04",
+     "ref_text": "Open Google Maps please",
+     "heard": "Open Google Maps, please.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดกูเกิลแมพ",
+      "kind": "open",
+      "target": "site:maps"
+     }
+    },
+    {
+     "id": "C05",
+     "ref_text": "show my calendar",
+     "heard": "Show my calendar.",
+     "secs": 0.71,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดปฏิทิน",
+      "kind": "open",
+      "target": "page:calendar"
+     }
+    },
+    {
+     "id": "C06",
+     "ref_text": "go to the settings page",
+     "heard": "Go to the settings page.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดหน้าตั้งค่า",
+      "kind": "open",
+      "target": "page:settings"
+     }
+    },
+    {
+     "id": "C07",
+     "ref_text": "Open the file manager",
+     "heard": "Open the file manager",
+     "secs": 0.71,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดตัวจัดการไฟล์",
+      "kind": "open",
+      "target": "app:filemanager"
+     }
+    },
+    {
+     "id": "C08",
+     "ref_text": "open wikipedia",
+     "heard": "Open Wikipedia.",
+     "secs": 0.71,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดวิกิพีเดีย",
+      "kind": "open",
+      "target": "site:wikipedia"
+     }
+    },
+    {
+     "id": "C09",
+     "ref_text": "mute the sound",
+     "heard": "mute the sound",
+     "secs": 0.71,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปิดเสียง",
+      "kind": "volume",
+      "volume": "mute"
+     }
+    },
+    {
+     "id": "C10",
+     "ref_text": "Turn the volume up",
+     "heard": "turn the volume up.",
+     "secs": 0.71,
+     "hwm_mb": 256.2,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "เพิ่มเสียง",
+      "kind": "volume",
+      "volume": "up"
+     }
+    },
+    {
+     "id": "C11",
+     "ref_text": "lower the volume please",
+     "heard": "Lower the volume, please.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ลดเสียง",
+      "kind": "volume",
+      "volume": "down"
+     }
+    },
+    {
+     "id": "C12",
+     "ref_text": "set volume to 40%",
+     "heard": "Set volume to 40%.",
+     "secs": 0.76,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปรับเสียงเป็น 40",
+      "kind": "volume",
+      "volume": "set:40"
+     }
+    },
+    {
+     "id": "C13",
+     "ref_text": "Unmute the speakers",
+     "heard": "Unmute the speakers.",
+     "secs": 0.71,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "เปิดเสียง",
+      "kind": "volume",
+      "volume": "unmute"
+     }
+    },
+    {
+     "id": "C14",
+     "ref_text": "Volume 70",
+     "heard": "Volume 70",
+     "secs": 0.71,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปรับเสียงเป็น 70",
+      "kind": "volume",
+      "volume": "set:70"
+     }
+    },
+    {
+     "id": "C15",
+     "ref_text": "remind me to call mom at 3",
+     "heard": "remind me to call Monat 3.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน call Monat 3 โมง",
+      "kind": "remind",
+      "what": "call Monat",
+      "date": "2026-10-21",
+      "time": "15:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C16",
+     "ref_text": "Remind me to take my medicine at 8",
+     "heard": "remind me to take my medicine at 8.",
+     "secs": 0.86,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน take my medicine 8 โมง",
+      "kind": "remind",
+      "what": "take my medicine",
+      "date": "2026-10-22",
+      "time": "08:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C17",
+     "ref_text": "remind me to pick up the kids tomorrow at 4:30",
+     "heard": "Remind me to pick up the kids tomorrow at 4.30",
+     "secs": 0.97,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน pick up the kids พรุ่งนี้ 16:30",
+      "kind": "remind",
+      "what": "pick up the kids",
+      "date": "2026-10-22",
+      "time": "16:30",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C18",
+     "ref_text": "Set a reminder to submit the report on Friday at 10am",
+     "heard": "set a reminder to submit the report on Friday at 10am.",
+     "secs": 0.91,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน submit the report วันศุกร์นี้ 10:00",
+      "kind": "remind",
+      "what": "submit the report",
+      "date": "2026-10-23",
+      "time": "10:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C19",
+     "ref_text": "remind me in 20 minutes to check the oven",
+     "heard": "Remind me in 20 minutes to check the oven.",
+     "secs": 0.81,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน check the oven อีก 20 นาที",
+      "kind": "remind",
+      "what": "check the oven",
+      "date": "2026-10-21",
+      "time": "10:20",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C20",
+     "ref_text": "Remind me to move the laundry in 2 hours",
+     "heard": "remind me to move the laundry in two hours.",
+     "secs": 0.91,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน move the laundry อีก 2 ชั่วโมง",
+      "kind": "remind",
+      "what": "move the laundry",
+      "date": "2026-10-21",
+      "time": "12:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C21",
+     "ref_text": "remind me to water the plants every day at 7am",
+     "heard": "remind me to water the plants every day at 7 a.m.",
+     "secs": 0.91,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน water the plants ทุกวัน 07:00",
+      "kind": "remind",
+      "what": "water the plants",
+      "date": "2026-10-22",
+      "time": "07:00",
+      "repeat": "daily"
+     }
+    },
+    {
+     "id": "C22",
+     "ref_text": "Remind me to go to the gym every Monday at 6",
+     "heard": "remind me to go to the gym every Monday at 6.",
+     "secs": 0.92,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน go to the gym ทุกวันจันทร์ 6 โมง",
+      "kind": "remind",
+      "what": "go to the gym",
+      "date": "2026-10-26",
+      "time": "18:00",
+      "repeat": "weekly:0"
+     }
+    },
+    {
+     "id": "C23",
+     "ref_text": "remind me about the dentist on November 3 at 2pm",
+     "heard": "remind me about the dentist on November 3 at 2 p.m.",
+     "secs": 0.92,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน the dentist 3 พฤศจิกายน 14:00",
+      "kind": "remind",
+      "what": "the dentist",
+      "date": "2026-11-03",
+      "time": "14:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C24",
+     "ref_text": "remind me to renew my passport on March 15",
+     "heard": "remind me to renew my passport on March 15.",
+     "secs": 0.86,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน renew my passport 15 มีนาคม",
+      "kind": "remind",
+      "what": "renew my passport",
+      "date": "2027-03-15",
+      "time": "09:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C25",
+     "ref_text": "Remind me to buy milk",
+     "heard": "Remind me to buy milk.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน buy milk",
+      "kind": "remind",
+      "what": "buy milk",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C26",
+     "ref_text": "remind me to email Sarah next Tuesday at 9",
+     "heard": "Remind me to email Sarah next Tuesday at 9.",
+     "secs": 0.86,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน email Sarah วันอังคารหน้า 9 โมง",
+      "kind": "remind",
+      "what": "email Sarah",
+      "date": "2026-10-27",
+      "time": "09:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C27",
+     "ref_text": "remind me to call the bank tonight at 8",
+     "heard": "remind me to call the bank tonight at 8.",
+     "secs": 0.86,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน call the bank คืนนี้ 20:00",
+      "kind": "remind",
+      "what": "call the bank",
+      "date": "2026-10-21",
+      "time": "20:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C28",
+     "ref_text": "Remind me to stand up and stretch every weekday at 11",
+     "heard": "remind me to stand up and stretch every weekday at 11.",
+     "secs": 0.86,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน stand up and stretch วันธรรมดา 11 โมง",
+      "kind": "remind",
+      "what": "stand up and stretch",
+      "date": "2026-10-21",
+      "time": "11:00",
+      "repeat": "weekdays"
+     }
+    },
+    {
+     "id": "C29",
+     "ref_text": "remind me to pay rent on the 1st",
+     "heard": "remind me to pay rent on the first.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน pay rent on the first",
+      "kind": "remind",
+      "what": "pay rent on the first",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C30",
+     "ref_text": "remind me to clean the house on weekends at 10am",
+     "heard": "remind me to clean the house on weekends at 10am.",
+     "secs": 0.91,
+     "hwm_mb": 256.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน clean the house ทุกเสาร์อาทิตย์ 10:00",
+      "kind": "remind",
+      "what": "clean the house",
+      "date": "2026-10-24",
+      "time": "10:00",
+      "repeat": "weekends"
+     }
+    },
+    {
+     "id": "C31",
+     "ref_text": "cancel my dentist appointment",
+     "heard": "Cancel my dentist appointment.",
+     "secs": 0.76,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด dentist",
+      "kind": "cancel",
+      "what": "dentist"
+     }
+    },
+    {
+     "id": "C32",
+     "ref_text": "Delete the reminder to call mom",
+     "heard": "delete the reminder to call mom.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด call mom",
+      "kind": "cancel",
+      "what": "callmom"
+     }
+    },
+    {
+     "id": "C33",
+     "ref_text": "Cancel my meeting with Jessica",
+     "heard": "cancel my meeting with Jessica.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด Jessica",
+      "kind": "cancel",
+      "what": "Jessica"
+     }
+    },
+    {
+     "id": "C34",
+     "ref_text": "delete all my reminders",
+     "heard": "Delete all my reminders.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัดทั้งหมด",
+      "kind": "cancel",
+      "what": "all"
+     }
+    },
+    {
+     "id": "C35",
+     "ref_text": "remove the gym reminder",
+     "heard": "Remove the gym reminder.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด gym",
+      "kind": "cancel",
+      "what": "gym"
+     }
+    },
+    {
+     "id": "C36",
+     "ref_text": "what's on my schedule today?",
+     "heard": "What's on my schedule today?",
+     "secs": 0.86,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "วันนี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-21",
+      "days": 1
+     }
+    },
+    {
+     "id": "C37",
+     "ref_text": "Do I have anything tomorrow",
+     "heard": "Do I have anything tomorrow?",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "พรุ่งนี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-22",
+      "days": 1
+     }
+    },
+    {
+     "id": "C38",
+     "ref_text": "what do I have this week",
+     "heard": "What do I have this week?",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "สัปดาห์นี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-21",
+      "days": 5
+     }
+    },
+    {
+     "id": "C39",
+     "ref_text": "Show me my appointments for next week",
+     "heard": "Show me my appointments for next week.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "สัปดาห์หน้ามีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-26",
+      "days": 7
+     }
+    },
+    {
+     "id": "C40",
+     "ref_text": "Am I busy on Friday?",
+     "heard": "Am I busy on Friday?",
+     "secs": 0.81,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "วันศุกร์นี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-23",
+      "days": 1
+     }
+    },
+    {
+     "id": "C41",
+     "ref_text": "what's my next appointment",
+     "heard": "Once my next appointment.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "next",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C42",
+     "ref_text": "When is my next meeting?",
+     "heard": "when is my next meeting.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "next",
+     "same": true,
+     "got": {
+      "thai": "นัดถัดไปคืออะไร",
+      "kind": "next"
+     }
+    },
+    {
+     "id": "C43",
+     "ref_text": "what time is it",
+     "heard": "What time is it?",
+     "secs": 0.76,
+     "hwm_mb": 256.2,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C44",
+     "ref_text": "What's the time now?",
+     "heard": "What's the time now?",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C45",
+     "ref_text": "tell me the time please",
+     "heard": "Tell me the time please.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C46",
+     "ref_text": "show files I edited today",
+     "heard": "Show files I edited today.",
+     "secs": 0.76,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้วันนี้",
+      "kind": "files",
+      "range": "today"
+     }
+    },
+    {
+     "id": "C47",
+     "ref_text": "What files did I change yesterday?",
+     "heard": "What files did I change yesterday?",
+     "secs": 0.76,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้เมื่อวาน",
+      "kind": "files",
+      "range": "yesterday"
+     }
+    },
+    {
+     "id": "C48",
+     "ref_text": "show me the files I modified this week",
+     "heard": "Show me the files I modified this week.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+      "kind": "files",
+      "range": "this_week"
+     }
+    },
+    {
+     "id": "C49",
+     "ref_text": "list the documents I edited yesterday",
+     "heard": "List the documents I edited yesterday.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้เมื่อวาน",
+      "kind": "files",
+      "range": "yesterday"
+     }
+    },
+    {
+     "id": "C50",
+     "ref_text": "files changed this week",
+     "heard": "files changed this week.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+      "kind": "files",
+      "range": "this_week"
+     }
+    },
+    {
+     "id": "N01",
+     "ref_text": "How do I open a PDF on Linux?",
+     "heard": "How do I open a PDF on Linux?",
+     "secs": 0.82,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N02",
+     "ref_text": "What time does the pharmacy close?",
+     "heard": "What time does the pharmacy close?",
+     "secs": 0.76,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N03",
+     "ref_text": "What's the weather like tomorrow?",
+     "heard": "What's the weather like tomorrow?",
+     "secs": 0.81,
+     "hwm_mb": 256.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N04",
+     "ref_text": "Can you write an email to my boss asking for a day off?",
+     "heard": "Can you write an email to my boss asking for a day off?",
+     "secs": 0.97,
+     "hwm_mb": 256.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N05",
+     "ref_text": "I want to open a coffee shop someday",
+     "heard": "I want to open a coffee shop someday.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N06",
+     "ref_text": "Why does my phone keep cancelling my alarms?",
+     "heard": "Why does my phone keep canceling my alarms?",
+     "secs": 0.86,
+     "hwm_mb": 256.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N07",
+     "ref_text": "What is the volume of a sphere?",
+     "heard": "What is the volume of a sphere?",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N08",
+     "ref_text": "Search the web for cheap flights to Tokyo",
+     "heard": "Search the web for cheap flights to Tokyo.",
+     "secs": 0.92,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N09",
+     "ref_text": "How do I remind myself to drink more water?",
+     "heard": "How do I remind myself to drink more water?",
+     "secs": 0.86,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N10",
+     "ref_text": "The meeting yesterday was really long",
+     "heard": "The meeting yesterday was really long.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N11",
+     "ref_text": "What's a good time to plant tomatoes?",
+     "heard": "What's a good time to plant tomatoes?",
+     "secs": 0.86,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N12",
+     "ref_text": "Can you explain how file permissions work?",
+     "heard": "Can you explain how file permissions work?",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N13",
+     "ref_text": "Tell me a joke",
+     "heard": "Tell me a joke.",
+     "secs": 0.71,
+     "hwm_mb": 256.2,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N14",
+     "ref_text": "My schedule is crazy this week",
+     "heard": "My schedule is crazy this week.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N15",
+     "ref_text": "What does 'open source' mean?",
+     "heard": "What does open source mean?",
+     "secs": 0.81,
+     "hwm_mb": 256.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N16",
+     "ref_text": "How many files can a folder hold?",
+     "heard": "How many files can a folder hold?",
+     "secs": 0.82,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N17",
+     "ref_text": "Translate 'good morning' into Japanese",
+     "heard": "translate \"good morning\" into Japanese.",
+     "secs": 0.76,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N18",
+     "ref_text": "Is it rude to cancel plans at the last minute?",
+     "heard": "Is it rude to cancel plans at the last minute?",
+     "secs": 0.91,
+     "hwm_mb": 256.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N19",
+     "ref_text": "thanks, that was helpful",
+     "heard": "Thanks. That was helpful.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N20",
+     "ref_text": "Who invented the alarm clock?",
+     "heard": "who invented the alarm clock.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N21",
+     "ref_text": "Summarize this article for me",
+     "heard": "summarize this article for me.",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N22",
+     "ref_text": "What year did YouTube start?",
+     "heard": "What year did YouTube start?",
+     "secs": 0.76,
+     "hwm_mb": 256.3,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N23",
+     "ref_text": "Recommend a good book for the weekend",
+     "heard": "recommend a good book for the weekend.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N24",
+     "ref_text": "How loud is too loud for headphones?",
+     "heard": "How loud is too loud for headphones.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N25",
+     "ref_text": "What time zone is London in?",
+     "heard": "WAP Time Zone as London Inn.",
+     "secs": 0.81,
+     "hwm_mb": 256.4,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    }
+   ]
+  },
+  "ggml-small.en-q5_1.bin": {
+   "summary": {
+    "median_s": 3.7,
+    "p90_s": 3.9,
+    "max_hwm_mb": 425.8,
+    "commands_same": "43/50",
+    "negatives_converted": 0
+   },
+   "rows": [
+    {
+     "id": "C01",
+     "ref_text": "open youtube",
+     "heard": "Open YouTube.",
+     "secs": 3.44,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดยูทูบ",
+      "kind": "open",
+      "target": "site:youtube"
+     }
+    },
+    {
+     "id": "C02",
+     "ref_text": "Can you open Gmail for me?",
+     "heard": "Can you open Gmail for me?",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดจีเมล",
+      "kind": "open",
+      "target": "site:gmail"
+     }
+    },
+    {
+     "id": "C03",
+     "ref_text": "launch the terminal",
+     "heard": "Launch the terminal.",
+     "secs": 3.49,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดเทอร์มินัล",
+      "kind": "open",
+      "target": "app:terminal"
+     }
+    },
+    {
+     "id": "C04",
+     "ref_text": "Open Google Maps please",
+     "heard": "Open Google Maps please.",
+     "secs": 3.59,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดกูเกิลแมพ",
+      "kind": "open",
+      "target": "site:maps"
+     }
+    },
+    {
+     "id": "C05",
+     "ref_text": "show my calendar",
+     "heard": "Show my calendar.",
+     "secs": 3.44,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดปฏิทิน",
+      "kind": "open",
+      "target": "page:calendar"
+     }
+    },
+    {
+     "id": "C06",
+     "ref_text": "go to the settings page",
+     "heard": "Go to the Settings page.",
+     "secs": 3.59,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดหน้าตั้งค่า",
+      "kind": "open",
+      "target": "page:settings"
+     }
+    },
+    {
+     "id": "C07",
+     "ref_text": "Open the file manager",
+     "heard": "Open the File Manager.",
+     "secs": 3.54,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": true,
+     "got": {
+      "thai": "เปิดตัวจัดการไฟล์",
+      "kind": "open",
+      "target": "app:filemanager"
+     }
+    },
+    {
+     "id": "C08",
+     "ref_text": "open wikipedia",
+     "heard": "Open Wikikedia.",
+     "secs": 3.49,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "open",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C09",
+     "ref_text": "mute the sound",
+     "heard": "mute the sound,",
+     "secs": 7.39,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปิดเสียง",
+      "kind": "volume",
+      "volume": "mute"
+     }
+    },
+    {
+     "id": "C10",
+     "ref_text": "Turn the volume up",
+     "heard": "Return the volume up.",
+     "secs": 3.49,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "volume",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C11",
+     "ref_text": "lower the volume please",
+     "heard": "Lower the volume please.",
+     "secs": 3.6,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ลดเสียง",
+      "kind": "volume",
+      "volume": "down"
+     }
+    },
+    {
+     "id": "C12",
+     "ref_text": "set volume to 40%",
+     "heard": "Set volume to 40%.",
+     "secs": 3.54,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปรับเสียงเป็น 40",
+      "kind": "volume",
+      "volume": "set:40"
+     }
+    },
+    {
+     "id": "C13",
+     "ref_text": "Unmute the speakers",
+     "heard": "unmute the speakers.",
+     "secs": 3.55,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "เปิดเสียง",
+      "kind": "volume",
+      "volume": "unmute"
+     }
+    },
+    {
+     "id": "C14",
+     "ref_text": "Volume 70",
+     "heard": "Volume 70.",
+     "secs": 3.49,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "volume",
+     "same": true,
+     "got": {
+      "thai": "ปรับเสียงเป็น 70",
+      "kind": "volume",
+      "volume": "set:70"
+     }
+    },
+    {
+     "id": "C15",
+     "ref_text": "remind me to call mom at 3",
+     "heard": "Remind me to call mom at three.",
+     "secs": 3.8,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน call mom at three",
+      "kind": "remind",
+      "what": "call mom at three",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C16",
+     "ref_text": "Remind me to take my medicine at 8",
+     "heard": "Remind me to take my medicine at eight.",
+     "secs": 3.8,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน take my medicine at eight",
+      "kind": "remind",
+      "what": "take my medicine at eight",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C17",
+     "ref_text": "remind me to pick up the kids tomorrow at 4:30",
+     "heard": "remind me to pick up the kids tomorrow at 4.30.",
+     "secs": 3.89,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน pick up the kids พรุ่งนี้ 16:30",
+      "kind": "remind",
+      "what": "pick up the kids",
+      "date": "2026-10-22",
+      "time": "16:30",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C18",
+     "ref_text": "Set a reminder to submit the report on Friday at 10am",
+     "heard": "Set a reminder to submit the report on Friday at 10 a.m.",
+     "secs": 4.05,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน submit the report วันศุกร์นี้ 10:00",
+      "kind": "remind",
+      "what": "submit the report",
+      "date": "2026-10-23",
+      "time": "10:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C19",
+     "ref_text": "remind me in 20 minutes to check the oven",
+     "heard": "Remind me in 20 minutes to check the oven.",
+     "secs": 3.84,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน check the oven อีก 20 นาที",
+      "kind": "remind",
+      "what": "check the oven",
+      "date": "2026-10-21",
+      "time": "10:20",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C20",
+     "ref_text": "Remind me to move the laundry in 2 hours",
+     "heard": "Remind me to move the laundry in two hours.",
+     "secs": 3.9,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน move the laundry อีก 2 ชั่วโมง",
+      "kind": "remind",
+      "what": "move the laundry",
+      "date": "2026-10-21",
+      "time": "12:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C21",
+     "ref_text": "remind me to water the plants every day at 7am",
+     "heard": "Remind me to whopper the plans every day at 7 a.m.",
+     "secs": 4.15,
+     "hwm_mb": 425.8,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน whopper the plans ทุกวัน 07:00",
+      "kind": "remind",
+      "what": "whopper the plans",
+      "date": "2026-10-22",
+      "time": "07:00",
+      "repeat": "daily"
+     }
+    },
+    {
+     "id": "C22",
+     "ref_text": "Remind me to go to the gym every Monday at 6",
+     "heard": "Remind me to go to the gym every Monday at 6.",
+     "secs": 3.95,
+     "hwm_mb": 425.8,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน go to the gym ทุกวันจันทร์ 6 โมง",
+      "kind": "remind",
+      "what": "go to the gym",
+      "date": "2026-10-26",
+      "time": "18:00",
+      "repeat": "weekly:0"
+     }
+    },
+    {
+     "id": "C23",
+     "ref_text": "remind me about the dentist on November 3 at 2pm",
+     "heard": "remind me about the dentist on November 3 at 2 p.m.",
+     "secs": 4.05,
+     "hwm_mb": 425.8,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน the dentist 3 พฤศจิกายน 14:00",
+      "kind": "remind",
+      "what": "the dentist",
+      "date": "2026-11-03",
+      "time": "14:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C24",
+     "ref_text": "remind me to renew my passport on March 15",
+     "heard": "Remind me to renew my passport on March 15.",
+     "secs": 3.9,
+     "hwm_mb": 425.8,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน renew my passport 15 มีนาคม",
+      "kind": "remind",
+      "what": "renew my passport",
+      "date": "2027-03-15",
+      "time": "09:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C25",
+     "ref_text": "Remind me to buy milk",
+     "heard": "Remind me to buy milk.",
+     "secs": 3.7,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน buy milk",
+      "kind": "remind",
+      "what": "buy milk",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C26",
+     "ref_text": "remind me to email Sarah next Tuesday at 9",
+     "heard": "Remind me to email Sarah next Tuesday at 9.",
+     "secs": 3.89,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน email Sarah วันอังคารหน้า 9 โมง",
+      "kind": "remind",
+      "what": "email Sarah",
+      "date": "2026-10-27",
+      "time": "09:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C27",
+     "ref_text": "remind me to call the bank tonight at 8",
+     "heard": "Remind me to call the bank tonight at 8.",
+     "secs": 3.85,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน call the bank คืนนี้ 20:00",
+      "kind": "remind",
+      "what": "call the bank",
+      "date": "2026-10-21",
+      "time": "20:00",
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C28",
+     "ref_text": "Remind me to stand up and stretch every weekday at 11",
+     "heard": "Remind me to stand up and stretch every weekday at 11.",
+     "secs": 4.0,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน stand up and stretch วันธรรมดา 11 โมง",
+      "kind": "remind",
+      "what": "stand up and stretch",
+      "date": "2026-10-21",
+      "time": "11:00",
+      "repeat": "weekdays"
+     }
+    },
+    {
+     "id": "C29",
+     "ref_text": "remind me to pay rent on the 1st",
+     "heard": "Remind me to pay rent on the first.",
+     "secs": 3.9,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": false,
+     "got": {
+      "thai": "เตือน pay rent on the first",
+      "kind": "remind",
+      "what": "pay rent on the first",
+      "date": null,
+      "time": null,
+      "repeat": ""
+     }
+    },
+    {
+     "id": "C30",
+     "ref_text": "remind me to clean the house on weekends at 10am",
+     "heard": "Remind me to clean the house on weekends at 10 a.m.",
+     "secs": 4.1,
+     "hwm_mb": 425.7,
+     "command": true,
+     "ref_kind": "remind",
+     "same": true,
+     "got": {
+      "thai": "เตือน clean the house ทุกเสาร์อาทิตย์ 10:00",
+      "kind": "remind",
+      "what": "clean the house",
+      "date": "2026-10-24",
+      "time": "10:00",
+      "repeat": "weekends"
+     }
+    },
+    {
+     "id": "C31",
+     "ref_text": "cancel my dentist appointment",
+     "heard": "Cancel my dentist appointment.",
+     "secs": 3.64,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด dentist",
+      "kind": "cancel",
+      "what": "dentist"
+     }
+    },
+    {
+     "id": "C32",
+     "ref_text": "Delete the reminder to call mom",
+     "heard": "Just delete the reminder to call Mom.",
+     "secs": 3.69,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": false,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "C33",
+     "ref_text": "Cancel my meeting with Jessica",
+     "heard": "Cancel my meeting with Jessica.",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด Jessica",
+      "kind": "cancel",
+      "what": "Jessica"
+     }
+    },
+    {
+     "id": "C34",
+     "ref_text": "delete all my reminders",
+     "heard": "delete all my reminders.",
+     "secs": 3.55,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัดทั้งหมด",
+      "kind": "cancel",
+      "what": "all"
+     }
+    },
+    {
+     "id": "C35",
+     "ref_text": "remove the gym reminder",
+     "heard": "Remove the gym reminder.",
+     "secs": 3.6,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "cancel",
+     "same": true,
+     "got": {
+      "thai": "ยกเลิกนัด gym",
+      "kind": "cancel",
+      "what": "gym"
+     }
+    },
+    {
+     "id": "C36",
+     "ref_text": "what's on my schedule today?",
+     "heard": "What's on my schedule today?",
+     "secs": 3.69,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "วันนี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-21",
+      "days": 1
+     }
+    },
+    {
+     "id": "C37",
+     "ref_text": "Do I have anything tomorrow",
+     "heard": "Do I have anything tomorrow?",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "พรุ่งนี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-22",
+      "days": 1
+     }
+    },
+    {
+     "id": "C38",
+     "ref_text": "what do I have this week",
+     "heard": "What do I have this week?",
+     "secs": 3.69,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "สัปดาห์นี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-21",
+      "days": 5
+     }
+    },
+    {
+     "id": "C39",
+     "ref_text": "Show me my appointments for next week",
+     "heard": "Show me my appointments for next week.",
+     "secs": 3.74,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "สัปดาห์หน้ามีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-26",
+      "days": 7
+     }
+    },
+    {
+     "id": "C40",
+     "ref_text": "Am I busy on Friday?",
+     "heard": "Am I busy on Friday?",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "agenda",
+     "same": true,
+     "got": {
+      "thai": "วันศุกร์นี้มีนัดอะไร",
+      "kind": "agenda",
+      "start": "2026-10-23",
+      "days": 1
+     }
+    },
+    {
+     "id": "C41",
+     "ref_text": "what's my next appointment",
+     "heard": "What's my next appointment?",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "next",
+     "same": true,
+     "got": {
+      "thai": "นัดถัดไปคืออะไร",
+      "kind": "next"
+     }
+    },
+    {
+     "id": "C42",
+     "ref_text": "When is my next meeting?",
+     "heard": "When is my next meeting?",
+     "secs": 3.7,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "next",
+     "same": true,
+     "got": {
+      "thai": "นัดถัดไปคืออะไร",
+      "kind": "next"
+     }
+    },
+    {
+     "id": "C43",
+     "ref_text": "what time is it",
+     "heard": "What time is it?",
+     "secs": 3.55,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C44",
+     "ref_text": "What's the time now?",
+     "heard": "What's the time now?",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C45",
+     "ref_text": "tell me the time please",
+     "heard": "Tell me the time please.",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "time",
+     "same": true,
+     "got": {
+      "thai": "ตอนนี้กี่โมง",
+      "kind": "time"
+     }
+    },
+    {
+     "id": "C46",
+     "ref_text": "show files I edited today",
+     "heard": "show files I edited today,",
+     "secs": 3.6,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้วันนี้",
+      "kind": "files",
+      "range": "today"
+     }
+    },
+    {
+     "id": "C47",
+     "ref_text": "What files did I change yesterday?",
+     "heard": "What files did I change yesterday?",
+     "secs": 3.69,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้เมื่อวาน",
+      "kind": "files",
+      "range": "yesterday"
+     }
+    },
+    {
+     "id": "C48",
+     "ref_text": "show me the files I modified this week",
+     "heard": "Show me the files I modified this week.",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+      "kind": "files",
+      "range": "this_week"
+     }
+    },
+    {
+     "id": "C49",
+     "ref_text": "list the documents I edited yesterday",
+     "heard": "List the documents I edited yesterday.",
+     "secs": 3.7,
+     "hwm_mb": 425.6,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้เมื่อวาน",
+      "kind": "files",
+      "range": "yesterday"
+     }
+    },
+    {
+     "id": "C50",
+     "ref_text": "files changed this week",
+     "heard": "Files changed this week.",
+     "secs": 3.55,
+     "hwm_mb": 425.5,
+     "command": true,
+     "ref_kind": "files",
+     "same": true,
+     "got": {
+      "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+      "kind": "files",
+      "range": "this_week"
+     }
+    },
+    {
+     "id": "N01",
+     "ref_text": "How do I open a PDF on Linux?",
+     "heard": "How do I open a PDF on Linux?",
+     "secs": 3.8,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N02",
+     "ref_text": "What time does the pharmacy close?",
+     "heard": "What time does the pharmacy close?",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N03",
+     "ref_text": "What's the weather like tomorrow?",
+     "heard": "What's the weather like tomorrow?",
+     "secs": 3.7,
+     "hwm_mb": 425.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N04",
+     "ref_text": "Can you write an email to my boss asking for a day off?",
+     "heard": "Can you write an email to my boss asking for a day off?",
+     "secs": 4.15,
+     "hwm_mb": 425.8,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N05",
+     "ref_text": "I want to open a coffee shop someday",
+     "heard": "I want to open a coffee shop someday.",
+     "secs": 3.8,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N06",
+     "ref_text": "Why does my phone keep cancelling my alarms?",
+     "heard": "Why does my phone keep canceling my alarms?",
+     "secs": 3.85,
+     "hwm_mb": 425.7,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N07",
+     "ref_text": "What is the volume of a sphere?",
+     "heard": "what is the volume of a sphere?",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N08",
+     "ref_text": "Search the web for cheap flights to Tokyo",
+     "heard": "Search the web for cheap flights to Tokyo.",
+     "secs": 3.84,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N09",
+     "ref_text": "How do I remind myself to drink more water?",
+     "heard": "How do I remind myself to drink more water?",
+     "secs": 3.85,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N10",
+     "ref_text": "The meeting yesterday was really long",
+     "heard": "The meeting yesterday was really long.",
+     "secs": 3.85,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N11",
+     "ref_text": "What's a good time to plant tomatoes?",
+     "heard": "What's a good time to plant tomatoes?",
+     "secs": 3.85,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N12",
+     "ref_text": "Can you explain how file permissions work?",
+     "heard": "Can you explain how file permissions work?",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N13",
+     "ref_text": "Tell me a joke",
+     "heard": "Tell me a joke.",
+     "secs": 3.54,
+     "hwm_mb": 425.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N14",
+     "ref_text": "My schedule is crazy this week",
+     "heard": "My schedule is crazy this week.",
+     "secs": 3.69,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N15",
+     "ref_text": "What does 'open source' mean?",
+     "heard": "What does open source mean?",
+     "secs": 3.74,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N16",
+     "ref_text": "How many files can a folder hold?",
+     "heard": "How many files can a folder hold?",
+     "secs": 3.7,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N17",
+     "ref_text": "Translate 'good morning' into Japanese",
+     "heard": "translate \"Good morning\" into Japanese.",
+     "secs": 3.65,
+     "hwm_mb": 425.7,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N18",
+     "ref_text": "Is it rude to cancel plans at the last minute?",
+     "heard": "Is it rude to cancel plans at the last minute?",
+     "secs": 3.9,
+     "hwm_mb": 425.7,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N19",
+     "ref_text": "thanks, that was helpful",
+     "heard": "Thanks. That was helpful.",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N20",
+     "ref_text": "Who invented the alarm clock?",
+     "heard": "who invented the alarm clock.",
+     "secs": 3.65,
+     "hwm_mb": 425.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N21",
+     "ref_text": "Summarize this article for me",
+     "heard": "Summarize this article for me.",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N22",
+     "ref_text": "What year did YouTube start?",
+     "heard": "What year did YouTube start?",
+     "secs": 3.7,
+     "hwm_mb": 425.5,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N23",
+     "ref_text": "Recommend a good book for the weekend",
+     "heard": "recommend a good book for the weekend.",
+     "secs": 3.69,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N24",
+     "ref_text": "How loud is too loud for headphones?",
+     "heard": "How loud is too loud for headphones?",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    },
+    {
+     "id": "N25",
+     "ref_text": "What time zone is London in?",
+     "heard": "WAP time zone is London Inn.",
+     "secs": 3.75,
+     "hwm_mb": 425.6,
+     "command": false,
+     "ref_kind": "none",
+     "same": true,
+     "got": {
+      "kind": "none"
+     }
+    }
+   ]
+  }
+ }
+}
