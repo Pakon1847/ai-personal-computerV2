@@ -247,7 +247,7 @@ class BrowserControllerWebTest(unittest.TestCase):
         left.mkdir()
         b = self.make()
         msg = b.signOutAll()
-        self.assertIn("ออกจากบัญชีเว็บทั้งหมดในเครื่องนี้แล้ว", msg)
+        self.assertIn("ออกจากบัญชีเว็บในเบราว์เซอร์ของผู้ช่วยแล้ว", msg)
         self.assertEqual(self.ctl.closed, 1)  # ปิดเบราว์เซอร์ก่อนลบ
         self.assertFalse(self.prof.exists())  # ออกจากบัญชีทันที (เปลี่ยนชื่อแล้ว)
         end = time.monotonic() + 5
@@ -357,7 +357,7 @@ class WebAppsQmlTest(unittest.TestCase):
         qml.settle(50)
         self.assertFalse(prof.exists())
         result = qml.find_items(win, "webSignOutResult")[0]
-        self.assertIn("ออกจากบัญชีเว็บทั้งหมดในเครื่องนี้แล้ว", result.property("text"))
+        self.assertIn("ออกจากบัญชีเว็บในเบราว์เซอร์ของผู้ช่วยแล้ว", result.property("text"))
         self.assertEqual(warnings, [])
 
     def test_large_font_and_dark_theme_have_no_warnings(self):
