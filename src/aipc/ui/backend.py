@@ -1996,15 +1996,16 @@ class SkillsController(QObject):
     def tick(self) -> None:
         from aipc.skills import reminders
 
-        if self._store.broken:
-            return
-        t = reminders.tick(self._store, self._now())
-        for r in t.due:
-            self.reminderDue.emit(self._reminder_dict(r))
-        if t.save_failed:
-            self._save_failed = True
-        if t.due or t.save_failed:
-            self.remindersChanged.emit()
+        # ไฟล์นัดในเครื่องเสีย = หยุดแค่นัดในเครื่อง · เตือนนัด Google ยังทำ
+        # (เดิม return ก่อน → เตือน Google หยุดเงียบ · ตรวจทั้งระบบ 2026-10-18 ข้อ 3.9)
+        if not self._store.broken:
+            t = reminders.tick(self._store, self._now())
+            for r in t.due:
+                self.reminderDue.emit(self._reminder_dict(r))
+            if t.save_failed:
+                self._save_failed = True
+            if t.due or t.save_failed:
+                self.remindersChanged.emit()
         self._gcal_tick()
 
     GCAL_ALERT_MAX = (

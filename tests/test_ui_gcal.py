@@ -207,6 +207,15 @@ class GoogleAlertTest(unittest.TestCase):
         again.tick()
         self.assertEqual(len(self.got), 1)
 
+    def test_broken_local_reminders_file_does_not_stop_google_alerts(self):
+        """ตรวจทั้งระบบ 2026-10-18 ข้อ 3.9: ไฟล์นัดในเครื่องเสีย (ไม่มีสำรอง) เดิมทำให้เตือนนัด Google หยุดเงียบ."""
+        (self.root / "r.json").write_text("{not json", "utf-8")
+        s, cal = self.make()
+        doctor = next(e for e in cal.between(date(2026, 10, 16), 1) if e.what == "โทรหาหมอ")
+        self.now = doctor.when - timedelta(minutes=9)
+        s.tick()
+        self.assertEqual([r["what"] for r in self.got], ["โทรหาหมอ"])
+
     def test_off_means_no_alert(self):
         self.minutes = 0
         s, cal = self.make()
