@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from aipc.skills import forge
-from aipc.skills.catalog import ABOUT
+from aipc.skills.catalog import ABOUT, is_english
 
 MODEL = "sonnet"
 BUDGET_USD = "0.50"
@@ -50,7 +50,18 @@ class CloudReply:
     model: str = ""
 
 
-def instructions(today: date | None = None) -> str:
+def instructions(today: date | None = None, english: bool = False) -> str:
+    """english = ผู้ใช้ถามเป็นภาษาอังกฤษ (การ์ด 0039) → ตอบอังกฤษ · ถามไทย = ข้อความเดิมทุกตัวอักษร."""
+    text = _instructions(today)
+    if english:
+        text = (
+            text.replace("ตอบภาษาไทย", "ตอบภาษาอังกฤษ")
+            + " · The user wrote in English. Answer in English."
+        )
+    return text
+
+
+def _instructions(today: date | None = None) -> str:
     from aipc.ui.thaidate import BE_OFFSET, DAYS, MONTHS
 
     d = today or date.today()
@@ -142,7 +153,7 @@ def ask(
         # ถาม "ทำอะไรได้บ้าง" แล้ว Claude เล่าความสามารถของตัวเอง (Claude Docs, PDF)
         # แทนของเครื่อง (ชุดสอบจบ H07)
         "--system-prompt",
-        instructions(today),
+        instructions(today, english=is_english(question)),
         "--strict-mcp-config",
         "--disable-slash-commands",
     ]

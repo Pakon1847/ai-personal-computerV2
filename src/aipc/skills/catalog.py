@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+import re
+
 from aipc.skills.manifest import Manifest
 
 # ไม่ให้ AI เลือก "สั่งงานเครื่อง": ต้องใช้ชื่อแอป/เว็บที่แน่นอน ให้ตัวแปลคำสั่งแบบกฎทำ
@@ -55,7 +57,18 @@ RULES = ("กติกา: ตอบภาษาไทย กระชับ ไ
          "ปฏิเสธเฉพาะคำขอที่ผิดกฎหมายหรืออันตราย")  # fmt: skip
 
 
-def system_prompt(today=None, cloud: bool = False, model: str = "", forge: bool = False) -> str:
+THAI_CHAR = re.compile(r"[฀-๿]")
+
+
+def is_english(text: str) -> bool:
+    """ผู้ใช้ถามเป็นภาษาอังกฤษไหม (การ์ด 0039 · โค้ดตัดสิน ไม่ให้ AI เดา · H6):
+    ไม่มีตัวอักษรไทยเลย และมีคำภาษาอังกฤษอย่างน้อย 2 ตัวอักษร · ไทยปนอังกฤษ ("เปิด YouTube") = ไทย."""
+    return not THAI_CHAR.search(text) and bool(re.search(r"[A-Za-z]{2}", text))
+
+
+def system_prompt(
+    today=None, cloud: bool = False, model: str = "", forge: bool = False, english: bool = False
+) -> str:
     """system prompt ของแชท (แอปและตัววัดใช้ตัวเดียวกัน) · เปลี่ยนแค่วันละครั้ง แคชของ llama-server จึงใช้ได้ทั้งวัน.
 
     today = วันที่ของเครื่อง (ตอบเรื่องวันเวลาได้) · cloud = มีทางส่งต่อ Claude (การ์ด 0016)
@@ -68,6 +81,12 @@ def system_prompt(today=None, cloud: bool = False, model: str = "", forge: bool 
     day = f"{d.day} {MONTHS[d.month - 1]} พ.ศ. {d.year + BE_OFFSET} (ค.ศ. {d.year})"
     when = f"วันนี้คือวัน{DAYS[d.weekday()]}ที่ {day}"
     parts = [SYSTEM, when, TOOL_RULE, RULES, ABOUT]
+    if (
+        english
+    ):  # ถามเป็นอังกฤษ = ตอบอังกฤษ · ถามไทยได้ prompt เดิมทุกตัวอักษร (ภาษาไทยไม่ถอยหลัง · แคชเดิมใช้ได้)
+        parts = [p.replace("ตอบเป็นภาษาไทย", "ตอบเป็นภาษาอังกฤษ").replace("ตอบภาษาไทย", "ตอบภาษาอังกฤษ")
+                 for p in parts]  # fmt: skip
+        parts.append("The user wrote in English. Answer in English.")
     if model:
         parts.append(f"โมเดลภาษาในเครื่องคือ {model}")
     if cloud:

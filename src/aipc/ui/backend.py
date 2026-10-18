@@ -3325,8 +3325,9 @@ class ChatController(QObject):
         if self._status == "ready":
             self._warm_up()
 
-    def _system(self, tools: list) -> str:
-        """system prompt ชุดเดียวกับตัววัด (catalog.system_prompt) · มีวันที่ของวันนี้ · ส่งต่อ Claude ได้ถ้ามี."""
+    def _system(self, tools: list, text: str = "") -> str:
+        """system prompt ชุดเดียวกับตัววัด (catalog.system_prompt) · มีวันที่ของวันนี้ · ส่งต่อ Claude ได้ถ้ามี ·
+        text = ข้อความล่าสุดของผู้ใช้: เป็นภาษาอังกฤษ = ให้ตอบอังกฤษ (การ์ด 0039)."""
         from datetime import date
 
         from aipc.skills import catalog
@@ -3336,6 +3337,7 @@ class ChatController(QObject):
             cloud=self._cloud_ok(),
             model=self._model_name,
             forge=self._forge and self._cloud_ok(),
+            english=catalog.is_english(text),
         )
         return base + (self.TOOLS_HINT if tools else "")
 
@@ -3403,7 +3405,9 @@ class ChatController(QObject):
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
-            messages, trimmed = client.fit_context(self._system(tools), self._conv["messages"])
+            messages, trimmed = client.fit_context(
+                self._system(tools, text), self._conv["messages"]
+            )
             messages = [self._for_local(m) for m in messages]
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""

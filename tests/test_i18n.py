@@ -57,5 +57,35 @@ class LanguagePrefTest(unittest.TestCase):
             self.assertEqual(settings.load(path).language, "th")
 
 
+class AnswerLanguageTest(unittest.TestCase):
+    """เกณฑ์ A3 ส่วนโค้ด: ถามอังกฤษ = สั่งให้ตอบอังกฤษ · ถามไทย = prompt เดิมทุกตัวอักษร (ภาษาไทยไม่ถอยหลัง)."""
+
+    def test_question_language_is_decided_by_code(self):
+        from aipc.skills import catalog
+
+        for text in ("Why is the sky blue?", "what time is it", "OK thanks"):
+            self.assertTrue(catalog.is_english(text), text)
+        for text in ("ทำไมท้องฟ้าสีฟ้า", "เปิด YouTube", "แปลว่า hello", "123", ""):
+            self.assertFalse(catalog.is_english(text), text)
+
+    def test_thai_prompt_unchanged_and_english_prompt_says_english(self):
+        from datetime import date
+
+        from aipc.cloud import ask
+        from aipc.skills import catalog
+
+        d = date(2026, 10, 18)
+        th = catalog.system_prompt(d, cloud=True, model="m", forge=True)
+        self.assertIn("ตอบภาษาไทย", th)
+        self.assertEqual(
+            th, catalog.system_prompt(d, cloud=True, model="m", forge=True, english=False)
+        )
+        en = catalog.system_prompt(d, cloud=True, model="m", forge=True, english=True)
+        self.assertNotIn("ตอบภาษาไทย", en)
+        self.assertIn("Answer in English", en)
+        self.assertEqual(ask.instructions(d), ask._instructions(d))
+        self.assertIn("Answer in English", ask.instructions(d, english=True))
+
+
 if __name__ == "__main__":
     unittest.main()
