@@ -25,4 +25,23 @@ PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -m aipc.spikes.english_cmd_eva
 
 ## ผล C1
 
-(ยังไม่รัน)
+### รอบ 1 · 2026-10-19 · โค้ด `ac59847` · วินโดวส์ · รันครั้งเดียว · **ไม่ผ่าน ❌** · ค่าดิบ [`results-run1.json`](results-run1.json)
+
+| ตรวจ | ผล | เกณฑ์ | ตัดสิน |
+|---|---|---|---|
+| คำสั่งถูกทุกช่อง | **43/50 = 86.0%** | ≥ 90% | ❌ |
+| ไม่ใช่คำสั่งแต่ถูกแปลงเป็นคำสั่ง | **0/25** | 0 | ✅ |
+
+ข้อที่พลาด 7 ข้อ (เฉลยถูกตามกติกาทุกข้อ · ตรวจด้วยตา):
+
+| ข้อ | ประโยค | เกิดอะไร | ผลต่อผู้ใช้ |
+|---|---|---|---|
+| C13 | Unmute the speakers | กฎ "unmute" ไม่รู้จักคำว่า speakers (กฎ mute รู้จัก) | ไปหา AI · ไม่ได้เปิดเสียง |
+| C14 | Volume 70 | ไม่มีรูป "volume N" ห้วน ๆ | ไปหา AI |
+| C30 | remind me to … on weekends at 10am | ไม่มีรูป "on weekends" (มีแค่ every weekend) → แปลงเป็นนัดไม่มีเวลา | การ์ดขอให้ระบุเวลา · **ไม่บันทึกผิด** |
+| C37 | Do I have anything tomorrow | ไม่มีรูป "anything" | ไปหา AI (AI ไม่เห็นนัด) |
+| C47 | What files did I change yesterday? | ไม่มีรูปคำถาม "what files did I …" | ไปหา AI |
+| C49 | list the documents I edited yesterday | ไม่รู้จัก documents | ไปหา AI |
+| C50 | files changed this week | ไม่มีรูปห้วนไม่มีคำกริยานำ | ไปหา AI |
+
+ทุกข้อที่พลาดเป็น "ไม่รู้จักรูปประโยค" (ไม่มีข้อไหนทำคำสั่งผิด/บันทึกนัดผิดวัน) · ข้อไม่ใช่คำสั่ง 25 ข้อไม่ถูกแปลงเลย

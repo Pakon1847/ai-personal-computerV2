@@ -1,0 +1,1163 @@
+{
+ "summary": {
+  "now": "2026-10-21T10:00:00",
+  "commands": 50,
+  "commands_ok": 43,
+  "percent": 86.0,
+  "negatives": 25,
+  "negatives_converted": 0,
+  "passed": false
+ },
+ "rows": [
+  {
+   "id": "C01",
+   "text": "open youtube",
+   "gold": {
+    "kind": "open",
+    "target": "site:youtube"
+   },
+   "got": {
+    "thai": "เปิดยูทูบ",
+    "kind": "open",
+    "target": "site:youtube"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C02",
+   "text": "Can you open Gmail for me?",
+   "gold": {
+    "kind": "open",
+    "target": "site:gmail"
+   },
+   "got": {
+    "thai": "เปิดจีเมล",
+    "kind": "open",
+    "target": "site:gmail"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C03",
+   "text": "launch the terminal",
+   "gold": {
+    "kind": "open",
+    "target": "app:terminal"
+   },
+   "got": {
+    "thai": "เปิดเทอร์มินัล",
+    "kind": "open",
+    "target": "app:terminal"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C04",
+   "text": "Open Google Maps please",
+   "gold": {
+    "kind": "open",
+    "target": "site:maps"
+   },
+   "got": {
+    "thai": "เปิดกูเกิลแมพ",
+    "kind": "open",
+    "target": "site:maps"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C05",
+   "text": "show my calendar",
+   "gold": {
+    "kind": "open",
+    "target": "page:calendar"
+   },
+   "got": {
+    "thai": "เปิดปฏิทิน",
+    "kind": "open",
+    "target": "page:calendar"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C06",
+   "text": "go to the settings page",
+   "gold": {
+    "kind": "open",
+    "target": "page:settings"
+   },
+   "got": {
+    "thai": "เปิดหน้าตั้งค่า",
+    "kind": "open",
+    "target": "page:settings"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C07",
+   "text": "Open the file manager",
+   "gold": {
+    "kind": "open",
+    "target": "app:filemanager"
+   },
+   "got": {
+    "thai": "เปิดตัวจัดการไฟล์",
+    "kind": "open",
+    "target": "app:filemanager"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C08",
+   "text": "open wikipedia",
+   "gold": {
+    "kind": "open",
+    "target": "site:wikipedia"
+   },
+   "got": {
+    "thai": "เปิดวิกิพีเดีย",
+    "kind": "open",
+    "target": "site:wikipedia"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C09",
+   "text": "mute the sound",
+   "gold": {
+    "kind": "volume",
+    "volume": "mute"
+   },
+   "got": {
+    "thai": "ปิดเสียง",
+    "kind": "volume",
+    "volume": "mute"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C10",
+   "text": "Turn the volume up",
+   "gold": {
+    "kind": "volume",
+    "volume": "up"
+   },
+   "got": {
+    "thai": "เพิ่มเสียง",
+    "kind": "volume",
+    "volume": "up"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C11",
+   "text": "lower the volume please",
+   "gold": {
+    "kind": "volume",
+    "volume": "down"
+   },
+   "got": {
+    "thai": "ลดเสียง",
+    "kind": "volume",
+    "volume": "down"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C12",
+   "text": "set volume to 40%",
+   "gold": {
+    "kind": "volume",
+    "volume": "set:40"
+   },
+   "got": {
+    "thai": "ปรับเสียงเป็น 40",
+    "kind": "volume",
+    "volume": "set:40"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C13",
+   "text": "Unmute the speakers",
+   "gold": {
+    "kind": "volume",
+    "volume": "unmute"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": false,
+   "wrong": [
+    "kind"
+   ]
+  },
+  {
+   "id": "C14",
+   "text": "Volume 70",
+   "gold": {
+    "kind": "volume",
+    "volume": "set:70"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": false,
+   "wrong": [
+    "kind"
+   ]
+  },
+  {
+   "id": "C15",
+   "text": "remind me to call mom at 3",
+   "gold": {
+    "kind": "remind",
+    "what": "call mom",
+    "date": "2026-10-21",
+    "time": "15:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน call mom 3 โมง",
+    "kind": "remind",
+    "what": "call mom",
+    "date": "2026-10-21",
+    "time": "15:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C16",
+   "text": "Remind me to take my medicine at 8",
+   "gold": {
+    "kind": "remind",
+    "what": "take my medicine",
+    "date": "2026-10-22",
+    "time": "08:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน take my medicine 8 โมง",
+    "kind": "remind",
+    "what": "take my medicine",
+    "date": "2026-10-22",
+    "time": "08:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C17",
+   "text": "remind me to pick up the kids tomorrow at 4:30",
+   "gold": {
+    "kind": "remind",
+    "what": "pick up the kids",
+    "date": "2026-10-22",
+    "time": "16:30",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน pick up the kids พรุ่งนี้ 16:30",
+    "kind": "remind",
+    "what": "pick up the kids",
+    "date": "2026-10-22",
+    "time": "16:30",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C18",
+   "text": "Set a reminder to submit the report on Friday at 10am",
+   "gold": {
+    "kind": "remind",
+    "what": "submit the report",
+    "date": "2026-10-23",
+    "time": "10:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน submit the report วันศุกร์นี้ 10:00",
+    "kind": "remind",
+    "what": "submit the report",
+    "date": "2026-10-23",
+    "time": "10:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C19",
+   "text": "remind me in 20 minutes to check the oven",
+   "gold": {
+    "kind": "remind",
+    "what": "check the oven",
+    "date": "2026-10-21",
+    "time": "10:20",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน check the oven อีก 20 นาที",
+    "kind": "remind",
+    "what": "check the oven",
+    "date": "2026-10-21",
+    "time": "10:20",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C20",
+   "text": "Remind me to move the laundry in 2 hours",
+   "gold": {
+    "kind": "remind",
+    "what": "move the laundry",
+    "date": "2026-10-21",
+    "time": "12:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน move the laundry อีก 2 ชั่วโมง",
+    "kind": "remind",
+    "what": "move the laundry",
+    "date": "2026-10-21",
+    "time": "12:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C21",
+   "text": "remind me to water the plants every day at 7am",
+   "gold": {
+    "kind": "remind",
+    "what": "water the plants",
+    "date": "2026-10-22",
+    "time": "07:00",
+    "repeat": "daily"
+   },
+   "got": {
+    "thai": "เตือน water the plants ทุกวัน 07:00",
+    "kind": "remind",
+    "what": "water the plants",
+    "date": "2026-10-22",
+    "time": "07:00",
+    "repeat": "daily"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C22",
+   "text": "Remind me to go to the gym every Monday at 6",
+   "gold": {
+    "kind": "remind",
+    "what": "go to the gym",
+    "date": "2026-10-26",
+    "time": "18:00",
+    "repeat": "weekly:0"
+   },
+   "got": {
+    "thai": "เตือน go to the gym ทุกวันจันทร์ 6 โมง",
+    "kind": "remind",
+    "what": "go to the gym",
+    "date": "2026-10-26",
+    "time": "18:00",
+    "repeat": "weekly:0"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C23",
+   "text": "remind me about the dentist on November 3 at 2pm",
+   "gold": {
+    "kind": "remind",
+    "what": "the dentist",
+    "date": "2026-11-03",
+    "time": "14:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน the dentist 3 พฤศจิกายน 14:00",
+    "kind": "remind",
+    "what": "the dentist",
+    "date": "2026-11-03",
+    "time": "14:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C24",
+   "text": "remind me to renew my passport on March 15",
+   "gold": {
+    "kind": "remind",
+    "what": "renew my passport",
+    "date": "2027-03-15",
+    "time": "09:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน renew my passport 15 มีนาคม",
+    "kind": "remind",
+    "what": "renew my passport",
+    "date": "2027-03-15",
+    "time": "09:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C25",
+   "text": "Remind me to buy milk",
+   "gold": {
+    "kind": "remind",
+    "what": "buy milk",
+    "date": null,
+    "time": null,
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน buy milk",
+    "kind": "remind",
+    "what": "buy milk",
+    "date": null,
+    "time": null,
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C26",
+   "text": "remind me to email Sarah next Tuesday at 9",
+   "gold": {
+    "kind": "remind",
+    "what": "email Sarah",
+    "date": "2026-10-27",
+    "time": "09:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน email Sarah วันอังคารหน้า 9 โมง",
+    "kind": "remind",
+    "what": "email Sarah",
+    "date": "2026-10-27",
+    "time": "09:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C27",
+   "text": "remind me to call the bank tonight at 8",
+   "gold": {
+    "kind": "remind",
+    "what": "call the bank",
+    "date": "2026-10-21",
+    "time": "20:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน call the bank คืนนี้ 20:00",
+    "kind": "remind",
+    "what": "call the bank",
+    "date": "2026-10-21",
+    "time": "20:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C28",
+   "text": "Remind me to stand up and stretch every weekday at 11",
+   "gold": {
+    "kind": "remind",
+    "what": "stand up and stretch",
+    "date": "2026-10-21",
+    "time": "11:00",
+    "repeat": "weekdays"
+   },
+   "got": {
+    "thai": "เตือน stand up and stretch วันธรรมดา 11 โมง",
+    "kind": "remind",
+    "what": "stand up and stretch",
+    "date": "2026-10-21",
+    "time": "11:00",
+    "repeat": "weekdays"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C29",
+   "text": "remind me to pay rent on the 1st",
+   "gold": {
+    "kind": "remind",
+    "what": "pay rent",
+    "date": "2026-11-01",
+    "time": "09:00",
+    "repeat": ""
+   },
+   "got": {
+    "thai": "เตือน pay rent วันที่ 1",
+    "kind": "remind",
+    "what": "pay rent",
+    "date": "2026-11-01",
+    "time": "09:00",
+    "repeat": ""
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C30",
+   "text": "remind me to clean the house on weekends at 10am",
+   "gold": {
+    "kind": "remind",
+    "what": "clean the house",
+    "date": "2026-10-24",
+    "time": "10:00",
+    "repeat": "weekends"
+   },
+   "got": {
+    "thai": "เตือน clean the house on weekends at 10am",
+    "kind": "remind",
+    "what": "clean the house on weekends at 10am",
+    "date": null,
+    "time": null,
+    "repeat": ""
+   },
+   "ok": false,
+   "wrong": [
+    "what",
+    "date",
+    "time",
+    "repeat"
+   ]
+  },
+  {
+   "id": "C31",
+   "text": "cancel my dentist appointment",
+   "gold": {
+    "kind": "cancel",
+    "what": "dentist"
+   },
+   "got": {
+    "thai": "ยกเลิกนัด dentist",
+    "kind": "cancel",
+    "what": "dentist"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C32",
+   "text": "Delete the reminder to call mom",
+   "gold": {
+    "kind": "cancel",
+    "what": "call mom"
+   },
+   "got": {
+    "thai": "ยกเลิกนัด call mom",
+    "kind": "cancel",
+    "what": "callmom"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C33",
+   "text": "Cancel my meeting with Jessica",
+   "gold": {
+    "kind": "cancel",
+    "what": "Jessica"
+   },
+   "got": {
+    "thai": "ยกเลิกนัด Jessica",
+    "kind": "cancel",
+    "what": "Jessica"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C34",
+   "text": "delete all my reminders",
+   "gold": {
+    "kind": "cancel",
+    "what": "all"
+   },
+   "got": {
+    "thai": "ยกเลิกนัดทั้งหมด",
+    "kind": "cancel",
+    "what": "all"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C35",
+   "text": "remove the gym reminder",
+   "gold": {
+    "kind": "cancel",
+    "what": "gym"
+   },
+   "got": {
+    "thai": "ยกเลิกนัด gym",
+    "kind": "cancel",
+    "what": "gym"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C36",
+   "text": "what's on my schedule today?",
+   "gold": {
+    "kind": "agenda",
+    "start": "2026-10-21",
+    "days": 1
+   },
+   "got": {
+    "thai": "วันนี้มีนัดอะไร",
+    "kind": "agenda",
+    "start": "2026-10-21",
+    "days": 1
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C37",
+   "text": "Do I have anything tomorrow",
+   "gold": {
+    "kind": "agenda",
+    "start": "2026-10-22",
+    "days": 1
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": false,
+   "wrong": [
+    "kind"
+   ]
+  },
+  {
+   "id": "C38",
+   "text": "what do I have this week",
+   "gold": {
+    "kind": "agenda",
+    "start": "2026-10-21",
+    "days": 5
+   },
+   "got": {
+    "thai": "สัปดาห์นี้มีนัดอะไร",
+    "kind": "agenda",
+    "start": "2026-10-21",
+    "days": 5
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C39",
+   "text": "Show me my appointments for next week",
+   "gold": {
+    "kind": "agenda",
+    "start": "2026-10-26",
+    "days": 7
+   },
+   "got": {
+    "thai": "สัปดาห์หน้ามีนัดอะไร",
+    "kind": "agenda",
+    "start": "2026-10-26",
+    "days": 7
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C40",
+   "text": "Am I busy on Friday?",
+   "gold": {
+    "kind": "agenda",
+    "start": "2026-10-23",
+    "days": 1
+   },
+   "got": {
+    "thai": "วันศุกร์นี้มีนัดอะไร",
+    "kind": "agenda",
+    "start": "2026-10-23",
+    "days": 1
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C41",
+   "text": "what's my next appointment",
+   "gold": {
+    "kind": "next"
+   },
+   "got": {
+    "thai": "นัดถัดไปคืออะไร",
+    "kind": "next"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C42",
+   "text": "When is my next meeting?",
+   "gold": {
+    "kind": "next"
+   },
+   "got": {
+    "thai": "นัดถัดไปคืออะไร",
+    "kind": "next"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C43",
+   "text": "what time is it",
+   "gold": {
+    "kind": "time"
+   },
+   "got": {
+    "thai": "ตอนนี้กี่โมง",
+    "kind": "time"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C44",
+   "text": "What's the time now?",
+   "gold": {
+    "kind": "time"
+   },
+   "got": {
+    "thai": "ตอนนี้กี่โมง",
+    "kind": "time"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C45",
+   "text": "tell me the time please",
+   "gold": {
+    "kind": "time"
+   },
+   "got": {
+    "thai": "ตอนนี้กี่โมง",
+    "kind": "time"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C46",
+   "text": "show files I edited today",
+   "gold": {
+    "kind": "files",
+    "range": "today"
+   },
+   "got": {
+    "thai": "ไฟล์ที่แก้วันนี้",
+    "kind": "files",
+    "range": "today"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C47",
+   "text": "What files did I change yesterday?",
+   "gold": {
+    "kind": "files",
+    "range": "yesterday"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": false,
+   "wrong": [
+    "kind"
+   ]
+  },
+  {
+   "id": "C48",
+   "text": "show me the files I modified this week",
+   "gold": {
+    "kind": "files",
+    "range": "this_week"
+   },
+   "got": {
+    "thai": "ไฟล์ที่แก้สัปดาห์นี้",
+    "kind": "files",
+    "range": "this_week"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "C49",
+   "text": "list the documents I edited yesterday",
+   "gold": {
+    "kind": "files",
+    "range": "yesterday"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": false,
+   "wrong": [
+    "kind"
+   ]
+  },
+  {
+   "id": "C50",
+   "text": "files changed this week",
+   "gold": {
+    "kind": "files",
+    "range": "this_week"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": false,
+   "wrong": [
+    "kind"
+   ]
+  },
+  {
+   "id": "N01",
+   "text": "How do I open a PDF on Linux?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N02",
+   "text": "What time does the pharmacy close?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N03",
+   "text": "What's the weather like tomorrow?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N04",
+   "text": "Can you write an email to my boss asking for a day off?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N05",
+   "text": "I want to open a coffee shop someday",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N06",
+   "text": "Why does my phone keep cancelling my alarms?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N07",
+   "text": "What is the volume of a sphere?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N08",
+   "text": "Search the web for cheap flights to Tokyo",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N09",
+   "text": "How do I remind myself to drink more water?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N10",
+   "text": "The meeting yesterday was really long",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N11",
+   "text": "What's a good time to plant tomatoes?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N12",
+   "text": "Can you explain how file permissions work?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N13",
+   "text": "Tell me a joke",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N14",
+   "text": "My schedule is crazy this week",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N15",
+   "text": "What does 'open source' mean?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N16",
+   "text": "How many files can a folder hold?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N17",
+   "text": "Translate 'good morning' into Japanese",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N18",
+   "text": "Is it rude to cancel plans at the last minute?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N19",
+   "text": "thanks, that was helpful",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N20",
+   "text": "Who invented the alarm clock?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N21",
+   "text": "Summarize this article for me",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N22",
+   "text": "What year did YouTube start?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N23",
+   "text": "Recommend a good book for the weekend",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N24",
+   "text": "How loud is too loud for headphones?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  },
+  {
+   "id": "N25",
+   "text": "What time zone is London in?",
+   "gold": {
+    "kind": "none"
+   },
+   "got": {
+    "kind": "none"
+   },
+   "ok": true,
+   "wrong": []
+  }
+ ]
+}
