@@ -15,6 +15,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 THEMES = ("light", "dark")
+LANGS = ("th", "en")  # ภาษาของหน้าจอ (การ์ด 0039) · ค่าเริ่มต้นไทย
 FONT_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0)  # BRIEF 5.7: 100–200%
 # ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด)
 # และนาทีหลังล็อกก่อนออกจากระบบเอง
@@ -54,6 +55,7 @@ class UiPrefs:
     presence_logout_s: int = 30
     # เตือนนัดจากปฏิทิน Google ก่อนเวลานัด (การ์ด 0032) · ค่าเริ่มต้น 10 นาที
     gcal_alert_min: int = 10
+    language: str = "th"  # การ์ด 0039
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
@@ -83,6 +85,7 @@ class UiPrefs:
             gcal_alert_min=self.gcal_alert_min
             if self.gcal_alert_min in GCAL_ALERT_CHOICES and type(self.gcal_alert_min) is int
             else 10,
+            language=self.language if self.language in LANGS else "th",
         )
 
 
@@ -104,6 +107,7 @@ def load(path: Path | None = None) -> UiPrefs:
             presence_lock_s=data.get("presence_lock_s", 30),
             presence_logout_s=data.get("presence_logout_s", 30),
             gcal_alert_min=data.get("gcal_alert_min", 10),
+            language=str(data.get("language", "th")),
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()

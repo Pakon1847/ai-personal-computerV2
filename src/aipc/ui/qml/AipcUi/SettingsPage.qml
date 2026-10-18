@@ -17,6 +17,16 @@ ColumnLayout {
             anchors.fill: parent
             anchors.margins: 20
             spacing: 14
+            // ภาษา (การ์ด 0039) · ชื่อหัวข้อแสดงสองภาษาเสมอ: คนที่อ่านไทยไม่ออกก็หาเจอ · ชื่อภาษาเขียนด้วยภาษานั้นเอง
+            RowLayout {
+                objectName: "languageRow"
+                Layout.fillWidth: true
+                spacing: 16
+                AppText { text: "ภาษา · Language"; strong: true; Layout.fillWidth: true }
+                AppCheck { objectName: "langTh"; text: "ไทย"; radio: true; autoExclusive: true; checked: uiSettings.language === "th"; onClicked: uiSettings.setLanguage("th") }
+                AppCheck { objectName: "langEn"; text: "English"; radio: true; autoExclusive: true; checked: uiSettings.language === "en"; onClicked: uiSettings.setLanguage("en") }
+            }
+            Rectangle { Layout.fillWidth: true; height: 1; color: Theme.lineSoft }
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 16

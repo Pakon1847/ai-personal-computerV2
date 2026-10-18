@@ -34,6 +34,9 @@ class UiSettings(QObject):
         self._prefs = settings.load(path)
         if override_theme in settings.THEMES:
             self._prefs.theme = override_theme
+        from aipc import i18n
+
+        i18n.set_lang(self._prefs.language)  # ภาษาของบัญชีนี้ (การ์ด 0039)
 
     @Property(str, notify=changed)
     def theme(self) -> str:
@@ -48,6 +51,20 @@ class UiSettings(QObject):
         if theme in settings.THEMES and theme != self._prefs.theme:
             self._prefs.theme = theme
             settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Property(str, notify=changed)
+    def language(self) -> str:  # การ์ด 0039: "th" | "en" · หน้าจอผูกกับค่านี้ผ่าน Tr.lang
+        return self._prefs.language
+
+    @Slot(str)
+    def setLanguage(self, lang: str) -> None:  # noqa: N802
+        from aipc import i18n
+
+        if lang in settings.LANGS and lang != self._prefs.language:
+            self._prefs.language = lang
+            settings.save(self._prefs, self._path)
+            i18n.set_lang(lang)  # ข้อความที่สร้างจาก Python (การ์ดคำตอบ ฯลฯ)
             self.changed.emit()
 
     @Property(bool, notify=changed)

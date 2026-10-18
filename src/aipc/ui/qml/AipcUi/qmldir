@@ -2,6 +2,7 @@ module AipcUi
 singleton Theme 1.0 Theme.qml
 singleton Icons 1.0 Icons.qml
 singleton AppState 1.0 AppState.qml
+singleton Tr 1.0 Tr.qml
 Icon 1.0 Icon.qml
 AppText 1.0 AppText.qml
 AppButton 1.0 AppButton.qml

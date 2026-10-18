@@ -19,6 +19,9 @@ ApplicationWindow {
     // ผูกธีมกับค่าที่ผู้ใช้ตั้ง (อยู่ใน Python) · เปลี่ยนในหน้าตั้งค่าแล้วทั้งจอเปลี่ยนทันที
     Binding { target: Theme; property: "dark"; value: uiSettings.theme === "dark" }
     Binding { target: Theme; property: "fontScale"; value: uiSettings.fontScale }
+    // ภาษา (การ์ด 0039) · ตารางแปลเดียวกับ Python · หน้าเข้าสู่ระบบใช้ Tr.both() แสดงสองภาษา
+    Binding { target: Tr; property: "lang"; value: uiSettings.language }
+    Binding { target: Tr; property: "table"; value: i18nTable }
 
     Component.onCompleted: {
         AppState.devMode = devMode

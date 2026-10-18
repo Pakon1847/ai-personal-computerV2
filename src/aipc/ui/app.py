@@ -12,6 +12,7 @@ from PySide6.QtGui import QFontDatabase, QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
+from aipc import i18n
 from aipc.ui.backend import (
     BackupController,
     ChatController,
@@ -383,6 +384,7 @@ def build(opts: Options, argv: list[str] | None = None):
     ctx.setContextProperty("startSignupStep", max(0, min(opts.signup_step, 3)))
     dev = (opts.dev or opts.demo_scan is not None) and not real
     ctx.setContextProperty("devMode", dev)
+    ctx.setContextProperty("i18nTable", i18n.table())  # การ์ด 0039: ตารางแปล (ไทย → อังกฤษ)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))
