@@ -403,5 +403,16 @@
   "ทำไมเครื่องช้า": "Why is the computer slow?",
   "สรุปข้อความนี้ให้หน่อย: ": "Summarize this text: ",
   "เปิดโหมดทำงานให้หน่อย": "Turn on work mode",
-  "เปิดยูทูบ": "Open YouTube"
+  "เปิดยูทูบ": "Open YouTube",
+  "ว่าง {gb} GB": "{gb} GB free",
+  "ว่าง {free} จาก {total} GB": "{free} of {total} GB free",
+  "โมเดล: พร้อม · ในเครื่อง": "Model: ready · local",
+  "โมเดล: กำลังโหลด…": "Model: loading…",
+  "โมเดล: ไม่พร้อม": "Model: not ready",
+  "โมเดล: ไม่ใช้ในหน้านี้": "Model: not used on this screen",
+  "AI กำลังเริ่มใหม่…": "AI is restarting…",
+  "AI ในเครื่อง: ต่อเน็ตไม่ได้": "Local AI: no network access",
+  "AI ในเครื่อง: ไม่ได้ล็อกเน็ต": "Local AI: network not locked",
+  "Claude/อากาศ: ปิด": "Claude/weather: off",
+  "ส่งออกวันนี้ {n} ครั้ง": "Sent out today: {n}"
 }

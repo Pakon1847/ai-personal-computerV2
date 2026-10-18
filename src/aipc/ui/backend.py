@@ -21,6 +21,7 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 from aipc.accounts import validation
 from aipc.bench import machine
 from aipc.doctor import hardware
+from aipc.i18n import tr
 from aipc.skills import machine as skill_machine
 from aipc.ui import files, privacy, settings, thaidate
 
@@ -823,7 +824,7 @@ class SystemStatus(QObject):
 
     @Property(str, notify=changed)
     def storageText(self) -> str:  # noqa: N802
-        return f"ว่าง {self._free_gb:.0f} GB" if self._free_gb is not None else "—"
+        return tr("ว่าง {gb} GB", gb=f"{self._free_gb:.0f}") if self._free_gb is not None else "—"
 
     @Property(bool, notify=changed)
     def cameraPresent(self) -> bool:  # noqa: N802
@@ -894,7 +895,9 @@ class FilesBrowser(QObject):
             du = shutil.disk_usage(self._root)
         except OSError:
             return "—"
-        return f"ว่าง {du.free / 1e9:.0f} จาก {du.total / 1e9:.0f} GB"
+        return tr(
+            "ว่าง {free} จาก {total} GB", free=f"{du.free / 1e9:.0f}", total=f"{du.total / 1e9:.0f}"
+        )
 
     @Slot(str)
     def open(self, name: str) -> None:
@@ -1844,7 +1847,7 @@ class SkillsController(QObject):
         return [e for e in self._hol.between(today, 400) if e.when.date() >= today]
 
     def _hol_date(self, d) -> str:
-        return f"{thaidate.short_date(d)} {d.year + thaidate.BE_OFFSET}"
+        return f"{thaidate.short_date(d)} {thaidate.year(d)}"
 
     def _holiday_until(self, text: str, now) -> dict | None:
         """ "อีกกี่วันจะถึงวันมาฆบูชา" ที่ไม่อยู่ในรายการวันตายตัว → หาในปฏิทินวันหยุด (การ์ด 0033)."""
@@ -1954,7 +1957,7 @@ class SkillsController(QObject):
 
     @staticmethod
     def _when_text(dt) -> str:
-        return f"{thaidate.short_date(dt)} {dt.year + thaidate.BE_OFFSET} · {dt:%H:%M} น."
+        return f"{thaidate.short_date(dt)} {thaidate.year(dt)} · {dt:%H:%M} น."
 
     @staticmethod
     def _repeat_text(r) -> str:
@@ -1965,7 +1968,7 @@ class SkillsController(QObject):
     def _item_when(self, r) -> str:
         """เวลาของนัด · นัดทั้งวันจาก Google ไม่มีเวลา (การ์ด 0014)."""
         if getattr(r, "all_day", False):
-            return f"{thaidate.short_date(r.when)} {r.when.year + thaidate.BE_OFFSET} · ทั้งวัน"
+            return f"{thaidate.short_date(r.when)} {thaidate.year(r.when)} · ทั้งวัน"
         return self._when_text(r.when)
 
     @staticmethod
@@ -2160,7 +2163,7 @@ class SkillsController(QObject):
         name, d = hit
         n = (d - now.date()).days
         title = f"อีก {n} วันถึง{name}" if n else f"วันนี้คือ{name}"
-        when = f"{thaidate.short_date(d)} {d.year + thaidate.BE_OFFSET}"
+        when = f"{thaidate.short_date(d)} {thaidate.year(d)}"
         return self._plain(
             "clock", title, [f"{when} · นับจากวันที่ของเครื่องนี้ ({thaidate.short_date(now)})"]
         )
@@ -2257,9 +2260,9 @@ class SkillsController(QObject):
             until = (g.last_sync + FUTURE).astimezone().date()
             last = start + timedelta(days=41)
             if last > until:
-                when = f"{thaidate.short_date(until)} {until.year + thaidate.BE_OFFSET}"
+                when = f"{thaidate.short_date(until)} {thaidate.year(until)}"
                 note = f"นัดจาก Google มีข้อมูลถึง {when}"
-        title = f"{thaidate.MONTHS[month - 1]} {year + thaidate.BE_OFFSET}"
+        title = f"{thaidate.month_name(month)} {thaidate.year(year)}"
         return {"year": year, "month": month, "title": title, "cells": cells, "note": note,
                 "todayIso": now.date().isoformat()}  # fmt: skip
 
@@ -3216,7 +3219,7 @@ class ChatController(QObject):
 
     @Property(str, notify=statusChanged)
     def statusText(self) -> str:  # noqa: N802
-        return self.STATUS_TEXT[self._status]
+        return tr(self.STATUS_TEXT[self._status])
 
     @Property(bool, notify=statusChanged)
     def ready(self) -> bool:

@@ -51,7 +51,7 @@ def modified(ts: float, now: datetime | None = None) -> str:
     now = now or datetime.now()
     if dt.date() == now.date():
         return "วันนี้ " + thaidate.clock(dt)
-    return f"{dt.day} {thaidate.MONTHS_SHORT[dt.month - 1]} {dt.year + thaidate.BE_OFFSET}"
+    return f"{dt.day} {thaidate.month_short(dt.month)} {thaidate.year(dt)}"
 
 
 def list_dir(root: Path, relative: str = "") -> list[Entry]:

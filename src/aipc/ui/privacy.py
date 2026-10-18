@@ -13,6 +13,8 @@ import subprocess
 from datetime import date, datetime
 from pathlib import Path
 
+from aipc.i18n import tr
+
 
 def llm_pid(run=subprocess.run) -> int | None:
     """PID ของ llama-server ของผู้ใช้คนนี้ · ไม่มี systemd / service ไม่ได้รัน = None."""
@@ -65,14 +67,14 @@ def today_counts(entries: list[dict], today: date) -> dict[str, int]:
 def panel_text(llm: str, sent_today: int, all_off: bool) -> str:
     parts = []
     if llm == "locked":
-        parts.append("AI ในเครื่อง: ต่อเน็ตไม่ได้")
+        parts.append(tr("AI ในเครื่อง: ต่อเน็ตไม่ได้"))
     elif llm == "open":
-        parts.append("AI ในเครื่อง: ไม่ได้ล็อกเน็ต")
+        parts.append(tr("AI ในเครื่อง: ไม่ได้ล็อกเน็ต"))
     # all_off = ปิดทางที่ส่งออกเอง (Claude · อากาศ) · ค้นเว็บด้วยเสียงไม่มีสวิตช์และส่งเมื่อผู้ใช้สั่ง →
     # ห้ามเขียน "ปิดทั้งหมด" และนับครั้งที่ส่งจริงเสมอ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.6 · H5)
     if all_off:
-        parts.append("Claude/อากาศ: ปิด")
-    parts.append(f"ส่งออกวันนี้ {sent_today} ครั้ง")
+        parts.append(tr("Claude/อากาศ: ปิด"))
+    parts.append(tr("ส่งออกวันนี้ {n} ครั้ง", n=sent_today))
     return " · ".join(parts)
 
 
