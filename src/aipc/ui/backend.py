@@ -26,6 +26,16 @@ from aipc.skills import machine as skill_machine
 from aipc.ui import files, privacy, settings, thaidate
 
 
+class I18nBridge(QObject):
+    """ให้ QML แปลข้อความที่สร้างตอนทำงาน (การ์ดคำตอบ การเตือน) ด้วยแม่แบบในตารางแปล (การ์ด 0039 · Tr.x)."""
+
+    @Slot(str, result=str)
+    def text(self, s: str) -> str:
+        from aipc import i18n
+
+        return i18n.tr_text(s)
+
+
 class UiSettings(QObject):
     changed = Signal()
     languageChanged = Signal()  # noqa: N815 · การ์ด 0039

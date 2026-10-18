@@ -34,12 +34,12 @@ Rectangle {
             visible: card.hasBadge
             Layout.fillWidth: true
             spacing: 8
-            Chip { text: card.hasBadge ? Tr.t("ใช้ Skill: ") + card.info.badge.name : ""; iconPath: Icons.sparkle }
-            AppText { text: card.hasBadge ? card.info.badge.reason : ""; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
-            Chip { text: card.hasBadge ? card.info.badge.worker : "" }
+            Chip { text: card.hasBadge ? Tr.t("ใช้ Skill: ") + Tr.x(card.info.badge.name) : ""; iconPath: Icons.sparkle }
+            AppText { text: card.hasBadge ? Tr.x(card.info.badge.reason) : ""; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
+            Chip { text: card.hasBadge ? Tr.x(card.info.badge.worker) : "" }
         }
 
-        AppText { text: card.info.title || ""; strong: true; Layout.fillWidth: true }
+        AppText { text: Tr.x(card.info.title || ""); strong: true; Layout.fillWidth: true }
 
         Flow {
             Layout.fillWidth: true
@@ -47,7 +47,7 @@ Rectangle {
             visible: (card.info.chips || []).length > 0
             Repeater {
                 model: card.info.chips || []
-                Chip { required property var modelData; text: modelData.text; kind: modelData.kind }
+                Chip { required property var modelData; text: Tr.x(modelData.text); kind: modelData.kind }
             }
         }
 
@@ -55,7 +55,7 @@ Rectangle {
             model: card.info.lines || []
             AppText {
                 required property string modelData
-                text: modelData
+                text: Tr.x(modelData)
                 size: Theme.fontSmall
                 color: Theme.inkMuted
                 Layout.fillWidth: true

@@ -100,7 +100,7 @@ ColumnLayout {
             anchors.leftMargin: 20
             anchors.rightMargin: 20
             AppText { text: Tr.t("ชื่อ"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true; oneLine: true }
-            AppText { text: Tr.t("แก้ไขล่าสุด"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 180; oneLine: true }
+            AppText { text: Tr.t("แก้ไขล่าสุด", "หัวตาราง"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 180; oneLine: true }
             AppText { text: Tr.t("ขนาด"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 100; oneLine: true }
         }
         Rectangle { id: headLine; anchors.top: tableHead.bottom; anchors.topMargin: 12; width: parent.width; height: 1; color: Theme.line }

@@ -40,14 +40,14 @@ Rectangle {
             // นัดจาก Google เตือนล่วงหน้า (การ์ด 0032) = "อีก N นาที" · นัดในเครื่อง = "ถึงเวลาแล้ว"
             AppText {
                 objectName: "reminderToastTitle"
-                text: toast.current && toast.current.title ? toast.current.title : Tr.t("ถึงเวลาแล้ว")
+                text: toast.current && toast.current.title ? Tr.x(toast.current.title) : Tr.t("ถึงเวลาแล้ว")
                 strong: true; color: Theme.accentInk; oneLine: true
             }
             Item { Layout.fillWidth: true }
             AppText { visible: toast.queue.length > 1; text: Tr.t("อีก ") + (toast.queue.length - 1) + Tr.t(" รายการ"); size: Theme.fontCaption; color: Theme.inkMuted; oneLine: true }
         }
         AppText { text: toast.current ? toast.current.what : ""; size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
-        AppText { text: toast.current ? toast.current.when : ""; color: Theme.inkMuted; oneLine: true }
+        AppText { text: toast.current ? Tr.x(toast.current.when) : ""; color: Theme.inkMuted; oneLine: true }
         AppButton { text: Tr.t("รับทราบ"); onClicked: toast.queue = toast.queue.slice(1) }
     }
 }

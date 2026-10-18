@@ -15,6 +15,12 @@ QtObject {
         const v = table[ctx ? s + "#" + ctx : s]
         return v === undefined ? s : v
     }
+    // ข้อความที่สร้างตอนทำงาน (การ์ดคำตอบ การเตือน) · แปลด้วยแม่แบบในตารางเดียวกัน (aipc.i18n.tr_text)
+    property var bridge: null
+    function x(s) {
+        if (lang !== "en" || !s || bridge === null) return s
+        return bridge.text(s)
+    }
     function both(s) {
         const v = table[s]
         return v === undefined || v === s ? s : s + " · " + v

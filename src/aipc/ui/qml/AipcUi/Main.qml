@@ -22,6 +22,7 @@ ApplicationWindow {
     // ภาษา (การ์ด 0039) · ตารางแปลเดียวกับ Python · หน้าเข้าสู่ระบบใช้ Tr.both() แสดงสองภาษา
     Binding { target: Tr; property: "lang"; value: uiSettings.language }
     Binding { target: Tr; property: "table"; value: i18nTable }
+    Binding { target: Tr; property: "bridge"; value: i18nBridge }
 
     Component.onCompleted: {
         AppState.devMode = devMode

@@ -37,7 +37,9 @@ class TrTest(unittest.TestCase):
         data = json.loads((ROOT / "src/aipc/i18n/en.json").read_text(encoding="utf-8"))
         for th, en in data.items():
             self.assertTrue(THAI.search(th), f"กุญแจต้องเป็นข้อความไทย: {th!r}")
-            self.assertFalse(THAI.search(en), f"คำแปลยังมีภาษาไทย: {th!r} → {en!r}")
+            # ภาษาไทยในคำแปลได้เฉพาะในเครื่องหมายคำพูด “…” = ตัวอย่างคำสั่งที่ยังต้องพิมพ์เป็นไทย (ระยะ C ยังไม่ทำ)
+            outside = re.sub(r"“[^”]*”", "", en)
+            self.assertFalse(THAI.search(outside), f"คำแปลยังมีภาษาไทย: {th!r} → {en!r}")
             # ค่าแทรก {ชื่อ} ต้องครบเท่ากันทั้งสองภาษา (ไม่งั้น format พัง)
             self.assertEqual(
                 sorted(re.findall(r"\{(\w+)\}", th)), sorted(re.findall(r"\{(\w+)\}", en)), th
@@ -85,6 +87,32 @@ class AnswerLanguageTest(unittest.TestCase):
         self.assertIn("Answer in English", en)
         self.assertEqual(ask.instructions(d), ask._instructions(d))
         self.assertIn("Answer in English", ask.instructions(d, english=True))
+
+
+class CardTextTest(unittest.TestCase):
+    """ข้อความที่สร้างตอนทำงาน (การ์ด) แปลด้วยแม่แบบ · ข้อมูลผู้ใช้ (ชื่อนัด) คงเดิม."""
+
+    def setUp(self):
+        i18n.set_lang("en")
+
+    def tearDown(self):
+        i18n.set_lang("th")
+
+    def test_templates_values_and_user_data(self):
+        self.assertEqual(i18n.tr_text("อีก 8 วันถึงวันปิยมหาราช"), "8 days until Chulalongkorn Day")
+        self.assertEqual(i18n.tr_text("บันทึกนัด “ประชุมทีม” ใช่ไหม"), "Save the reminder “ประชุมทีม”?")
+        self.assertEqual(i18n.tr_text("ซ้ำทุกวันจันทร์–ศุกร์ 07:00 น."), "Repeats every weekday 07:00")
+        self.assertEqual(i18n.tr_text("ประชุมทีม"), "ประชุมทีม")  # ชื่อนัดของผู้ใช้
+        self.assertEqual(i18n.tr_text("Weather API error"), "Weather API error")
+
+    def test_lists_are_translated_piece_by_piece(self):
+        self.assertEqual(i18n.tr_text("ทั้งวัน · ประชุมทีม"), "All day · ประชุมทีม")
+
+    def test_thai_mode_returns_text_unchanged_in_qml_path(self):
+        i18n.set_lang(
+            "th"
+        )  # Tr.x ไม่เรียกตัวแปลเมื่อเป็นไทย แต่ tr_text เองไม่ดูภาษา (สะพานเรียกเฉพาะโหมดอังกฤษ)
+        self.assertEqual(i18n.tr_text("ทั้งวัน"), "All day")
 
 
 if __name__ == "__main__":

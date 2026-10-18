@@ -18,6 +18,7 @@ from aipc.ui.backend import (
     ChatController,
     CloudUsage,
     FilesBrowser,
+    I18nBridge,
     LoginController,
     PresenceStatus,
     PrivacyStatus,
@@ -407,6 +408,8 @@ def build(opts: Options, argv: list[str] | None = None):
     dev = (opts.dev or opts.demo_scan is not None) and not real
     ctx.setContextProperty("devMode", dev)
     ctx.setContextProperty("i18nTable", i18n.table())  # การ์ด 0039: ตารางแปล (ไทย → อังกฤษ)
+    engine._i18n_bridge = I18nBridge()  # เก็บอ้างอิงไว้ (Qt ไม่ถือเป็นเจ้าของ)
+    ctx.setContextProperty("i18nBridge", engine._i18n_bridge)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))

@@ -23,7 +23,7 @@ ColumnLayout {
             objectName: "whyRow"
             Layout.fillWidth: true
             textFormat: Text.PlainText
-            text: modelData.k + ": " + modelData.v
+            text: Tr.x(modelData.k) + ": " + Tr.x(modelData.v)
             size: Theme.fontSmall
             color: Theme.inkMuted
         }

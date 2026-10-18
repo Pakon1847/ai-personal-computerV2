@@ -69,7 +69,7 @@ Item {
     Component.onCompleted: Qt.callLater(focusInput)
     // ข้อความสรุปวันนี้: ทักทาย · วันที่ · นัดใกล้สุด 3 รายการ · สถานะเครื่อง (ไม่เดา: อ่านไม่ได้ก็บอกว่าไม่รู้)
     function briefingText() {
-        const lines = [system.greeting + " " + system.userName, Tr.t("วันนี้") + system.longDate]
+        const lines = [system.greeting + " " + system.userName, Tr.t("วันนี้", "หัวสรุป") + system.longDate]
         const up = skills.upcoming
         if (skills.reminderWarning !== "") lines.push(skills.reminderWarning)
         else if (up.length === 0) lines.push(Tr.t("ยังไม่มีนัด"))
@@ -827,7 +827,7 @@ Item {
                     AppText {
                         // ตอบโดย Claude = หัวต้องบอกว่า Claude (พบบนจอ Pi: หัวเขียน "AI ในเครื่อง" แต่หมายเหตุบอก Claude)
                         text: ((row.modelData.note || "").indexOf("ตอบโดย Claude") === 0 ? "Claude (cloud)" : Tr.t("AI ในเครื่อง"))
-                              + (row.modelData.skill ? " · " + row.modelData.skill : "")
+                              + (row.modelData.skill ? " · " + Tr.x(row.modelData.skill) : "")
                         size: Theme.fontCaption; color: Theme.inkMuted
                     }
                     AppText {
@@ -839,7 +839,7 @@ Item {
                     AppText {
                         visible: !!row.modelData.note
                         Layout.fillWidth: true
-                        text: row.modelData.note || ""
+                        text: Tr.x(row.modelData.note || "")
                         size: Theme.fontSmall; color: Theme.warnInk
                     }
                     // เอาคำตอบไปใช้ต่อ (เช่น จดหมายที่ร่าง) · คลิปบอร์ดอยู่ในเครื่อง ไม่ได้ส่งไปไหน

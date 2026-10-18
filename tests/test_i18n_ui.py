@@ -95,6 +95,27 @@ class EnglishPagesTest(unittest.TestCase):
                 self.assertEqual(visible_texts(win.contentItem(), []), thai_before, page)
                 self.assertEqual(warnings, [])
 
+    def test_answer_cards_follow_language_and_keep_user_data(self):
+        """การ์ดคำตอบ (สร้างตอนทำงาน) แปลตอนแสดง · ชื่อนัดของผู้ใช้คงเดิม · สลับกลับไทย = การ์ดเดิมทุกตัวอักษร."""
+        engine, win, warnings = self.open_page("workspace")
+        page = [o for o in win.findChildren(object) if o.objectName() == "workspace"][0]
+        card = {"kind": "reminder", "badge": {}, "title": "ยังจดนัดนี้ไม่ได้", "page": "", "confirmToken": "",
+                "lines": ["ทั้งวัน · ประชุมทีม"], "chips": [{"text": "ทำแล้ว", "kind": "ok"}]}  # fmt: skip
+        page.setProperty("items", [{"user": False, "card": card}])
+        settle(200)
+        ui = engine._backends["uiSettings"]
+        thai = visible_texts(win.contentItem(), [])
+        self.assertIn("ยังจดนัดนี้ไม่ได้", thai)
+        ui.setLanguage("en")
+        settle(300)
+        en = visible_texts(win.contentItem(), [])
+        for want in ("Couldn't save this reminder", "All day · ประชุมทีม", "Done"):
+            self.assertIn(want, en)
+        ui.setLanguage("th")
+        settle(300)
+        self.assertEqual(visible_texts(win.contentItem(), []), thai)
+        self.assertEqual(warnings, [])
+
 
 if __name__ == "__main__":
     unittest.main()
