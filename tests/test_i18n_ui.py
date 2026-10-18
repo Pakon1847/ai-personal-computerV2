@@ -31,7 +31,7 @@ def settle(ms=150):
 
 
 # นาฬิกาและอุณหภูมิบนแถบสถานะเปลี่ยนระหว่างเทสต์ได้ (เจอบน Pi) → ไม่เอามาเทียบ
-CLOCK = re.compile(r"^\d\d:\d\d · |°C$")
+CLOCK = re.compile(r"^\d\d:\d\d · |°C|rpm")  # ค่าเซนเซอร์สด (อุณหภูมิ รอบพัดลม)
 
 
 def visible_texts(item, out):
@@ -39,7 +39,7 @@ def visible_texts(item, out):
         return out
     for prop in ("text", "placeholderText", "title", "subtitle"):
         v = item.property(prop)
-        if isinstance(v, str) and v and not CLOCK.match(v):
+        if isinstance(v, str) and v and not CLOCK.search(v):
             out.append(v)
     for c in item.childItems():
         visible_texts(c, out)
