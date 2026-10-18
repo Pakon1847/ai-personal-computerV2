@@ -115,5 +115,17 @@ class CardTextTest(unittest.TestCase):
         self.assertEqual(i18n.tr_text("ทั้งวัน"), "All day")
 
 
+class AnswerLangJudgeTest(unittest.TestCase):
+    """ตัวตัดสินภาษาของคำตอบในตัววัด A3 (นับตัวอักษร · ประกาศก่อนมีชุดคำถาม)."""
+
+    def test_judge(self):
+        from aipc.spikes.answer_lang_eval import answer_lang
+
+        self.assertEqual(answer_lang("The sky looks blue because of Rayleigh scattering."), "en")
+        self.assertEqual(answer_lang("ท้องฟ้าเป็นสีฟ้าเพราะการกระเจิงแบบ Rayleigh"), "th")
+        self.assertEqual(answer_lang("Water boils at one hundred degrees · น้ำเดือด"), "mixed")
+        self.assertEqual(answer_lang(""), "empty")
+
+
 if __name__ == "__main__":
     unittest.main()
