@@ -27,20 +27,20 @@ Card {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 2
-                AppText { text: Tr.both("เข้าเครื่องด้วยใบหน้า"); strong: true }
+                AppText { text: Tr.t("เข้าเครื่องด้วยใบหน้า"); strong: true }
                 AppText {
                     objectName: "loginFaceStatus"
                     Layout.fillWidth: true
                     size: Theme.fontSmall
                     color: Theme.inkMuted
-                    text: loginFace.state === "enabled" ? Tr.both("เปิดอยู่ · ที่หน้า Login แค่มองกล้องก็เข้าได้")
-                        : loginFace.state === "disabled" ? Tr.both("ปิดอยู่ · เข้าเครื่องด้วยรหัสผ่าน")
-                        : Tr.both("ระบบใบหน้าของหน้า Login ยังไม่ได้ติดตั้งในเครื่องนี้")
+                    text: loginFace.state === "enabled" ? Tr.t("เปิดอยู่ · ที่หน้า Login แค่มองกล้องก็เข้าได้")
+                        : loginFace.state === "disabled" ? Tr.t("ปิดอยู่ · เข้าเครื่องด้วยรหัสผ่าน")
+                        : Tr.t("ระบบใบหน้าของหน้า Login ยังไม่ได้ติดตั้งในเครื่องนี้")
                 }
             }
             Chip {
                 visible: loginFace.state !== "unavailable"
-                text: root.on ? Tr.both("เปิด") : Tr.both("ปิด")
+                text: root.on ? Tr.t("เปิด") : Tr.t("ปิด")
                 kind: root.on ? "ok" : "neutral"
             }
         }
@@ -62,8 +62,8 @@ Card {
             objectName: "loginFaceConsent"
             visible: loginFace.state === "disabled"
             Layout.fillWidth: true
-            text: Tr.both("ยินยอมให้เก็บข้อมูลใบหน้าสำหรับหน้า Login")
-            detail: Tr.both("ตัวเลข 128 ค่าในเครื่องนี้ ไม่เก็บรูป · รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ถ้าระบบกันรูปปลอมพลาด · งานสำคัญยังต้องใช้รหัสผ่าน")
+            text: Tr.t("ยินยอมให้เก็บข้อมูลใบหน้าสำหรับหน้า Login")
+            detail: Tr.t("ตัวเลข 128 ค่าในเครื่องนี้ ไม่เก็บรูป · รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ถ้าระบบกันรูปปลอมพลาด · งานสำคัญยังต้องใช้รหัสผ่าน")
         }
 
         RowLayout {
@@ -73,12 +73,12 @@ Card {
                 id: pw
                 objectName: "loginFacePassword"
                 Layout.preferredWidth: 260
-                placeholder: Tr.both("รหัสผ่านของคุณ"); password: true
+                placeholder: Tr.t("รหัสผ่านของคุณ"); password: true
                 enabled: !loginFace.busy
             }
             AppButton {
                 objectName: "loginFaceToggle"
-                text: root.on ? Tr.both("ปิดเข้าด้วยใบหน้า") : Tr.both("เปิดและสแกนใบหน้า")
+                text: root.on ? Tr.t("ปิดเข้าด้วยใบหน้า") : Tr.t("เปิดและสแกนใบหน้า")
                 kind: root.on ? "secondary" : "primary"
                 enabled: !loginFace.busy && pw.text !== "" && (root.on || consentBox.checked)
                 onClicked: {
@@ -93,7 +93,7 @@ Card {
             objectName: "loginFaceMessage"
             visible: loginFace.message !== "" || loginFace.busy
             Layout.fillWidth: true
-            text: loginFace.busy && loginFace.message === "" ? Tr.both("กำลังทำงาน… ถ้าสแกน ให้มองกล้องแล้วค่อย ๆ หันซ้าย ขวา เงย ก้ม") : loginFace.message
+            text: loginFace.busy && loginFace.message === "" ? Tr.t("กำลังทำงาน… ถ้าสแกน ให้มองกล้องแล้วค่อย ๆ หันซ้าย ขวา เงย ก้ม") : loginFace.message
             color: Theme.inkMuted
         }
     }

@@ -361,6 +361,28 @@ def build(opts: Options, argv: list[str] | None = None):
 
     engine._backends["system"].ready_inputs = ready_inputs  # ตรวจความพร้อมก่อนสาธิต (หน้าเครื่อง)
     holder["skills"] = engine._backends["skills"]
+
+    # การ์ด 0039: สลับภาษาแล้ว ข้อความที่สร้างจาก Python (วันที่ สถานะ สุขภาพเครื่อง สกิล ไฟล์) ต้องอ่านใหม่ทันที
+    # Qt อัปเดตหน้าจอเมื่อมีสัญญาณ "ค่าเปลี่ยน" เท่านั้น → ส่งสัญญาณของตัวที่แสดงข้อความเหล่านี้
+    def relabel() -> None:
+        b = engine._backends
+        b["system"].refresh()
+        for name, signals in (("system", ("changed", "healthChanged", "readyChanged")),
+                              ("filesBrowser", ("changed", "searchChanged")),
+                              ("skills", ("skillsChanged", "remindersChanged", "gcalChanged")),
+                              ("chat", ("statusChanged",)), ("privacyStatus", ("changed",)),
+                              ("backupCtl", ("changed",)),
+                              ("cloudUsage", ("changed",))):  # fmt: skip
+            for sig in signals:
+                if name in b and hasattr(b[name], sig):
+                    getattr(b[name], sig).emit()
+        if "backupCtl" in b:
+            b["backupCtl"].refresh()
+        if "filesBrowser" in b:
+            b["filesBrowser"]._load()  # วันที่ในรายการไฟล์สร้างตอนอ่านโฟลเดอร์ → อ่านใหม่
+            b["filesBrowser"].changed.emit()
+
+    ui_settings.languageChanged.connect(relabel)
     ctx = engine.rootContext()
     for name, obj in engine._backends.items():
         ctx.setContextProperty(name, obj)

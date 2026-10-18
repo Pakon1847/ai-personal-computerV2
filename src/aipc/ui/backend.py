@@ -28,6 +28,7 @@ from aipc.ui import files, privacy, settings, thaidate
 
 class UiSettings(QObject):
     changed = Signal()
+    languageChanged = Signal()  # noqa: N815 · การ์ด 0039
 
     def __init__(self, path: Path | None = None, override_theme: str | None = None):
         super().__init__()
@@ -67,6 +68,7 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             i18n.set_lang(lang)  # ข้อความที่สร้างจาก Python (การ์ดคำตอบ ฯลฯ)
             self.changed.emit()
+            self.languageChanged.emit()  # app.py ให้ตัวอื่นอ่านข้อความใหม่ในภาษานี้
 
     @Property(bool, notify=changed)
     def onboarded(self) -> bool:
@@ -879,7 +881,9 @@ class FilesBrowser(QObject):
 
     @Property(str, notify=changed)
     def location(self) -> str:
-        return "ไฟล์ของฉัน" + ("".join(" / " + p for p in Path(self._rel).parts) if self._rel else "")
+        return tr("ไฟล์ของฉัน") + (
+            "".join(" / " + p for p in Path(self._rel).parts) if self._rel else ""
+        )
 
     @Property(bool, notify=changed)
     def canGoUp(self) -> bool:  # noqa: N802
@@ -969,7 +973,7 @@ class FilesBrowser(QObject):
         self._results = []
         for h in hits:
             parent = Path(h.name).parent.as_posix()
-            folder = "ไฟล์ของฉัน" + ("" if parent == "." else " / " + parent.replace("/", " / "))
+            folder = tr("ไฟล์ของฉัน") + ("" if parent == "." else " / " + parent.replace("/", " / "))
             self._results.append({"path": h.name, "name": Path(h.name).name, "folder": folder,
                                   "snippet": h.snippet})  # fmt: skip
         if err:
@@ -1942,9 +1946,11 @@ class SkillsController(QObject):
         for s in self._skills:
             missing = [n for n in s.needs if n not in self.available()]
             out.append({
-                "id": s.id, "name": s.name, "description": s.description,
-                "worker": self.WORKER_LABEL[s.worker], "permissions": s.permission_labels(),
-                "ready": not missing, "missing": [self.NEED_LABEL[n] for n in missing],
+                # แปลตอนแสดง (การ์ด 0039) · สกิลที่ Claude สร้างไม่มีคำแปล = แสดงภาษาเดิม
+                "id": s.id, "name": tr(s.name), "description": tr(s.description),
+                "worker": tr(self.WORKER_LABEL[s.worker]),
+                "permissions": [tr(p) for p in s.permission_labels()],
+                "ready": not missing, "missing": [tr(self.NEED_LABEL[n]) for n in missing],
                 "byClaude": self._is_user(s.id),
             })  # fmt: skip
         return out
@@ -2996,7 +3002,7 @@ class SkillsController(QObject):
         files = []
         for h in hits:
             parent = Path(h.name).parent.as_posix()
-            folder = "ไฟล์ของฉัน" + ("" if parent == "." else " / " + parent.replace("/", " / "))
+            folder = tr("ไฟล์ของฉัน") + ("" if parent == "." else " / " + parent.replace("/", " / "))
             files.append({"name": Path(h.name).name, "abs": str(self._home / h.name),
                           "folder": folder, "snippet": h.snippet})  # fmt: skip
         more = f" · อ่านแค่ {n} ไฟล์ล่าสุด" if capped else ""

@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from aipc.i18n import tr
+
 APP_DIRS = (".local/share/aipc", ".config/aipc")
 ROOT_NAME = "AIPC-backup"
 SKIP_TOP = {".cache", ".local", ".config", ".claude", ".ssh", ".gnupg", ".mozilla", ".var"}
@@ -65,7 +67,7 @@ def mount_usb(run=None) -> list[str]:
                 text=True, timeout=10)  # fmt: skip
         tree = json.loads(r.stdout or "{}").get("blockdevices", [])
     except (OSError, ValueError, subprocess.TimeoutExpired):
-        return ["อ่านรายการไดรฟ์ไม่ได้"]
+        return [tr("อ่านรายการไดรฟ์ไม่ได้")]
     errors = []
 
     def walk(devs, usb=False):
