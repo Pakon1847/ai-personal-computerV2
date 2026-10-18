@@ -2905,8 +2905,18 @@ class SkillsController(QObject):
     @Slot(str, result="QVariantMap")
     def handle(self, text: str) -> dict:
         """AI ในเครื่องพร้อม = แบบผสม (router.route_ai_first) · ไม่พร้อม = กฎก่อน (router.route)."""
+        from aipc.skills import english
+
         t0 = time.monotonic()
-        return self._why(self._handle(text), t0)
+        # คำสั่งอังกฤษ → รูปไทยให้ตัวแปลเดิม (การ์ด 0039 ระยะ C) · แปลงแล้วยังไปจบที่ AI = ส่งข้อความเดิม
+        # ให้ AI แทน (AI ตอบอังกฤษตามภาษาคำถาม) · ไม่ใช่คำสั่ง = to_thai คืน None ไม่แตะอะไร
+        th = english.to_thai(text)
+        card = self._handle(th) if th else None
+        if card is None or card.get("llm"):
+            return self._why(self._handle(text), t0)
+        card = self._why(card, t0)
+        card.setdefault("why", []).insert(1, {"k": "แปลงคำสั่งอังกฤษ", "v": th})
+        return card
 
     def _handle(self, text: str) -> dict:
         from aipc.skills import router
