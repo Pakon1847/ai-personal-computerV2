@@ -58,4 +58,6 @@
 | piper-tts 1.8.0 (`OHF-voice/piper1-gpl` · ตัวอ่านออกเสียง การ์ด 0019) | GPL-3.0-or-later | ได้แต่ต้องเปิดซอร์สตาม GPL ถ้าแจกจ่าย · แอปเรียกเป็นโปรเซสแยก | `pip show piper-tts` บน Pi | 2026-10-01 |
 | เสียง Piper `th_TH-tsync2-medium` (ชุดข้อมูล NECTEC TSync2 ผ่าน `dubbing-ai/vaja-thai`) | CC BY-NC-SA 3.0 | **ไม่** | MODEL_CARD ใน `rhasspy/piper-voices` | 2026-10-01 |
 | tltk 1.11 (ตัวแปลงหน่วยเสียงไทยของ piper-tts) | BSD-3-Clause | ได้ | `pip show tltk` บน Pi | 2026-10-01 |
+| เสียง Piper `en_US-ljspeech-medium` (อ่านออกเสียงอังกฤษ · การ์ด 0039 ระยะ B · เทรนจากศูนย์บนชุดข้อมูล LJ Speech) | ชุดข้อมูล: public domain · repo `rhasspy/piper-voices`: MIT | ได้ | MODEL_CARD ใน `rhasspy/piper-voices` + Hugging Face API (`cardData.license`) | 2026-10-19 |
+| espeak-ng (ตัวแปลงหน่วยเสียงอังกฤษของ piper-tts · มากับ wheel `piper-tts` 1.8.0 เป็น `espeakbridge.so` + `espeak-ng-data` · ไม่ได้ติดตั้งแยก) | อยู่ใต้ไลเซนส์ของ wheel: GPL-3.0-or-later (`COPYING` ใน dist-info) | ได้แต่ต้องเปิดซอร์สตาม GPL ถ้าแจกจ่าย (เหมือน piper-tts) | `piper_tts-1.8.0.dist-info/METADATA` + `licenses/` บน Pi | 2026-10-19 |
 | onnxruntime 1.30.0 | MIT | ได้ | `pip show onnxruntime` บน Pi | 2026-10-01 |
