@@ -1,0 +1,465 @@
+{
+ "positive_ok": 19,
+ "positive": 20,
+ "wrong_site": 0,
+ "negative_ok": 10,
+ "negative": 10,
+ "passed": true,
+ "rows": [
+  {
+   "id": "T01",
+   "text": "ค้นในยูทูบว่าวิธีทำต้มยำกุ้ง",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "วิธีทำต้มยำกุ้ง",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "วิธีทำต้มยำกุ้ง"
+   }
+  },
+  {
+   "id": "T02",
+   "text": "หาในแผนที่ร้านกาแฟใกล้ๆหน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ร้านกาแฟใกล้ๆ",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ร้านกาแฟใกล้ๆ"
+   }
+  },
+  {
+   "id": "T03",
+   "text": "ค้นหาในจีเมลคำว่าใบแจ้งหนี้ค่าไฟ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ใบแจ้งหนี้ค่าไฟ",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ใบแจ้งหนี้ค่าไฟ"
+   }
+  },
+  {
+   "id": "T04",
+   "text": "เสิร์ชในวิกิพีเดียว่า ปราสาทหินพนมรุ้ง ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปราสาทหินพนมรุ้ง",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ปราสาทหินพนมรุ้ง"
+   }
+  },
+  {
+   "id": "T05",
+   "text": "ค้นในกูเกิลไดรฟ์ไฟล์รายงานบทที่สอง",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ไฟล์รายงานบทที่สอง",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "ไฟล์รายงานบทที่สอง"
+   }
+  },
+  {
+   "id": "T06",
+   "text": "หาในเฟซบุ๊กเพจร้านส้มตำป้าแดง",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพจร้านส้มตำป้าแดง",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "เพจร้านส้มตำป้าแดง"
+   }
+  },
+  {
+   "id": "T07",
+   "text": "ค้นในยูทูปคำว่า เพลงลูกทุ่งเก่า ให้หน่อย",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "เพลงลูกทุ่งเก่า",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "เพลงลูกทุ่งเก่า"
+   }
+  },
+  {
+   "id": "T08",
+   "text": "หาปั๊มน้ำมันในแผนที่หน่อยครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ปั๊มน้ำมัน",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "ปั๊มน้ำมัน"
+   }
+  },
+  {
+   "id": "T09",
+   "text": "ค้นหารีวิวกล้องโซนี่ในยูทูบ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "รีวิวกล้องโซนี่",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "รีวิวกล้องโซนี่"
+   }
+  },
+  {
+   "id": "T10",
+   "text": "หาข้อความจากอาจารย์ที่ปรึกษาในจีเมล",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ข้อความจากอาจารย์ที่ปรึกษา",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ข้อความจากอาจารย์ที่ปรึกษา"
+   }
+  },
+  {
+   "id": "T11",
+   "text": "ค้นหา รูปทริปเชียงใหม่ ใน Google Drive",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "รูปทริปเชียงใหม่",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "รูปทริปเชียงใหม่"
+   }
+  },
+  {
+   "id": "T12",
+   "text": "หาประวัติสุนทรภู่ในวิกิพีเดียค่ะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ประวัติสุนทรภู่",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ประวัติสุนทรภู่"
+   }
+  },
+  {
+   "id": "T13",
+   "text": "ค้นหากลุ่มซื้อขายพระเครื่องในเฟสบุ๊ค",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "กลุ่มซื้อขายพระเครื่อง",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "กลุ่มซื้อขายพระเครื่อง"
+   }
+  },
+  {
+   "id": "T14",
+   "text": "เปิดยูทูบแล้วหาคลิปสอนโยคะ",
+   "positive": true,
+   "ok": false,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "คลิปสอนโย",
+     "site": "youtube"
+    }
+   ],
+   "want": {
+    "site": "youtube",
+    "query": "คลิปสอนโยคะ"
+   }
+  },
+  {
+   "id": "T15",
+   "text": "เปิดกูเกิลแมพหาโรงพยาบาลศิริราช",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "โรงพยาบาลศิริราช",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "โรงพยาบาลศิริราช"
+   }
+  },
+  {
+   "id": "T16",
+   "text": "เปิดแผนที่แล้วค้นหา สนามบินดอนเมือง นะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สนามบินดอนเมือง",
+     "site": "maps"
+    }
+   ],
+   "want": {
+    "site": "maps",
+    "query": "สนามบินดอนเมือง"
+   }
+  },
+  {
+   "id": "T17",
+   "text": "เปิดจีเมลแล้วเสิร์ชตั๋วเครื่องบิน",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ตั๋วเครื่องบิน",
+     "site": "gmail"
+    }
+   ],
+   "want": {
+    "site": "gmail",
+    "query": "ตั๋วเครื่องบิน"
+   }
+  },
+  {
+   "id": "T18",
+   "text": "เปิดกูเกิลไดรฟ์แล้วหาสไลด์นำเสนอโปรเจกต์",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "สไลด์นำเสนอโปรเจกต์",
+     "site": "drive"
+    }
+   ],
+   "want": {
+    "site": "drive",
+    "query": "สไลด์นำเสนอโปรเจกต์"
+   }
+  },
+  {
+   "id": "T19",
+   "text": "เปิดวิกิแล้วค้นหาระบบสุริยะ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ระบบสุริยะ",
+     "site": "wikipedia"
+    }
+   ],
+   "want": {
+    "site": "wikipedia",
+    "query": "ระบบสุริยะ"
+   }
+  },
+  {
+   "id": "T20",
+   "text": "เปิดเฟซบุ๊กแล้วหา ร้านซ่อมมือถือแถวบางนา ครับ",
+   "positive": true,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "site_search",
+     "query": "ร้านซ่อมมือถือแถวบางนา",
+     "site": "facebook"
+    }
+   ],
+   "want": {
+    "site": "facebook",
+    "query": "ร้านซ่อมมือถือแถวบางนา"
+   }
+  },
+  {
+   "id": "U01",
+   "text": "เมื่อวานหาในยูทูบตั้งนานก็ไม่เจอคลิปนั้น",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U02",
+   "text": "ทำไมค้นในจีเมลแล้วไม่ขึ้นอะไรเลย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U03",
+   "text": "เดี๋ยวพรุ่งนี้ค่อยเปิดกูเกิลไดรฟ์หาไฟล์รายงานนะ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U04",
+   "text": "หาไฟล์รูปในไดรฟ์ที่เสียบอยู่ให้หน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U05",
+   "text": "ค้นในกูเกิลว่าวิธีปลูกมะนาวในกระถาง",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [
+    {
+     "kind": "search",
+     "query": "วิธีปลูกมะนาวในกระถาง"
+    }
+   ],
+   "want": null
+  },
+  {
+   "id": "U06",
+   "text": "คิดว่าหาร้านอาหารในแผนที่หรือในเฟซบุ๊กดีกว่ากัน",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U07",
+   "text": "ลูกชอบเปิดยูทูบหาการ์ตูนดูทั้งวันเลย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U08",
+   "text": "อย่าเพิ่งค้นในวิกิพีเดียนะ",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U09",
+   "text": "สอนวิธีค้นหาในเฟซบุ๊กหน่อย",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  },
+  {
+   "id": "U10",
+   "text": "แม่บอกว่าหาเบอร์ร้านในแผนที่ไม่เป็น",
+   "positive": false,
+   "ok": true,
+   "wrong_site": false,
+   "got": [],
+   "want": null
+  }
+ ]
+}
