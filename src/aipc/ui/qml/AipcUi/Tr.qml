@@ -9,9 +9,10 @@ QtObject {
     property string lang: "th"
     property var table: ({})
 
-    function t(s) {
+    // ctx = คำเดียวกันแต่ความหมายต่างกัน ("ปิด" สวิตช์ = Off · "ปิด" หน้าต่าง = Close) → กุญแจ "ปิด#หน้าต่าง"
+    function t(s, ctx) {
         if (lang !== "en") return s
-        const v = table[s]
+        const v = table[ctx ? s + "#" + ctx : s]
         return v === undefined ? s : v
     }
     function both(s) {

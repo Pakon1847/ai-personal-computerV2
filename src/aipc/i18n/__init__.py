@@ -34,7 +34,8 @@ def lang() -> str:
     return _lang
 
 
-def tr(text: str, **values) -> str:
-    """ข้อความในภาษาปัจจุบัน · ค่าแทรก {ชื่อ} แทนหลังแปล (ลำดับคำในประโยคอังกฤษต่างจากไทยได้)."""
-    out = table().get(text, text) if _lang == "en" else text
+def tr(text: str, ctx: str = "", **values) -> str:
+    """ข้อความในภาษาปัจจุบัน · ค่าแทรก {ชื่อ} แทนหลังแปล (ลำดับคำในประโยคอังกฤษต่างจากไทยได้) ·
+    ctx = คำเดียวกันแต่ความหมายต่างกัน → กุญแจ "ข้อความ#บริบท" (เหมือน Tr.t ใน QML)."""
+    out = table().get(f"{text}#{ctx}" if ctx else text, text) if _lang == "en" else text
     return out.format(**values) if values else out

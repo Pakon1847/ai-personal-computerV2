@@ -390,7 +390,7 @@ Item {
                 RowLayout {
                     Layout.fillWidth: true
                     AppText { text: Tr.t("เชื่อมต่อ Claude"); size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
-                    AppButton { objectName: "claudeGuideClose"; kind: "secondary"; text: Tr.t("ปิด"); onClicked: guidePopup.close() }
+                    AppButton { objectName: "claudeGuideClose"; kind: "secondary"; text: Tr.t("ปิด", "หน้าต่าง"); onClicked: guidePopup.close() }
                 }
                 AppText {
                     Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
