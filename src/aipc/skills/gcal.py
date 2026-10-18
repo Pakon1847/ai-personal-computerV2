@@ -13,6 +13,7 @@ icalendar อ่านไฟล์ + recurring-ical-events กางนัดซ
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import re
@@ -52,7 +53,8 @@ HOLIDAY_SENT = "ดาวน์โหลดปฏิทินวันหยุ�
 HOLIDAY_FUTURE = timedelta(days=400)  # ถาม "อีกกี่วันถึงสงกรานต์" ได้ตลอดปี
 HOLIDAY_STALE = timedelta(days=7)  # วันหยุดเปลี่ยนไม่บ่อย · ดึงตอนเข้าเครื่องเมื่อสำเนาเก่ากว่านี้
 # อักขระล่องหนที่พบในชื่อวันหยุดของ Google (U+200B) · ไม่ตัด = ค้นชื่อไม่เจอ
-ZERO_WIDTH = re.compile("[\u200b\u200c\u200d\u2060\ufeff]")
+# + ตัวกลับทิศทาง (bidi) ที่ทำให้ชื่อนัดแสดงสลับลำดับหลอกตาได้ (ตรวจทั้งระบบ 3.11)
+ZERO_WIDTH = re.compile("[\u200b\u200c\u200d\u2060\ufeff\u200e\u200f\u202a-\u202e\u2066-\u2069]")
 
 
 def link_path() -> Path:
@@ -113,7 +115,8 @@ def fetch(link: str) -> bytes:
         if e.code in (401, 403, 404):
             raise SyncError("ลิงก์ใช้ไม่ได้แล้ว (อาจถูกรีเซ็ตใน Google) · รับลิงก์ใหม่ตามคู่มือ") from e
         raise SyncError(f"Google ตอบกลับผิดพลาด (รหัส {e.code}) · ลองใหม่ภายหลัง") from e
-    except (urllib.error.URLError, OSError, ValueError) as e:
+    except (urllib.error.URLError, OSError, ValueError, http.client.HTTPException) as e:
+        # HTTPException = ดาวน์โหลดขาดกลางทาง (IncompleteRead · ตรวจทั้งระบบ 3.10)
         raise SyncError("ดึงปฏิทินไม่ได้ (ไม่มีอินเทอร์เน็ต?) · ใช้ข้อมูลที่ดึงไว้ล่าสุด") from e
     if len(data) > MAX_BYTES:
         raise SyncError("ไฟล์ปฏิทินใหญ่เกิน 5 MB · ไม่ได้อ่าน")
@@ -195,6 +198,27 @@ def _kind(component) -> str:
     return "event"
 
 
+def _expand_each(cal, start: datetime, end: datetime, icalendar, rie) -> list:
+    """กางทีละชุดนัด (UID เดียวกัน = ชุดเดียว รวมครั้งที่ถูกแก้) · ชุดที่กางไม่ได้ข้ามไป ชุดอื่นยังได้ ·
+    ทุกชุดเสีย = อ่านไม่ได้ทั้งไฟล์."""
+    zones = list(cal.walk("VTIMEZONE"))
+    groups: dict[str, list] = {}
+    for ev in cal.walk("VEVENT"):
+        groups.setdefault(str(ev.get("UID", id(ev))), []).append(ev)
+    out, bad = [], 0
+    for events in groups.values():
+        mini = icalendar.Calendar()
+        for c in zones + events:
+            mini.add_component(c)
+        try:
+            out += rie.of(mini).between(start, end)
+        except Exception:  # noqa: BLE001
+            bad += 1
+    if groups and bad == len(groups):
+        raise SyncError("ไฟล์ปฏิทินอ่านไม่ได้ (รูปแบบไม่ถูกต้อง)")
+    return out
+
+
 def expand(data: bytes, start: datetime, end: datetime, tz=None, classify: bool = False,
            source: str = "google") -> list[Event]:  # fmt: skip
     """นัดทุกครั้งในช่วง [start, end) · นัดซ้ำกางแล้ว · ข้ามนัดที่ถูกยกเลิก · เรียงตามเวลา.
@@ -209,9 +233,12 @@ def expand(data: bytes, start: datetime, end: datetime, tz=None, classify: bool 
     tz = _local(tz)
     try:
         cal = icalendar.Calendar.from_ical(data)
-        comps = recurring_ical_events.of(cal).between(start, end)
     except Exception as e:  # ไฟล์จากภายนอกผิดรูปได้ทุกแบบ · ไม่ให้แอปล่ม (H2)
         raise SyncError("ไฟล์ปฏิทินอ่านไม่ได้ (รูปแบบไม่ถูกต้อง)") from e
+    try:
+        comps = recurring_ical_events.of(cal).between(start, end)
+    except Exception:  # noqa: BLE001 · นัดซ้ำชุดเดียวผิด (RRULE เสีย) เคยทำให้ทั้งปฏิทินพัง (3.11)
+        comps = _expand_each(cal, start, end, icalendar, recurring_ical_events)
     out = []
     for c in comps:
         if c.name != "VEVENT" or str(c.get("STATUS", "")).upper() == "CANCELLED":

@@ -1,12 +1,13 @@
 """ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014) · ไม่ใช้เน็ตจริง: ตัวดึงปลอม + ไฟล์ .ics ตัวอย่าง."""
 
+import http.client
 import json
 import os
 import tempfile
 import unittest
 import urllib.error
 import urllib.request
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -172,6 +173,35 @@ class ExpandTest(unittest.TestCase):
         self.assertIn("ยังไม่ได้ติดตั้ง", str(ctx.exception))
 
 
+BAD_ONE = b"""BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+UID:good
+DTSTART:20261020T030000Z
+DTEND:20261020T040000Z
+SUMMARY:\xe2\x80\xaeevil\xe2\x80\xac name
+END:VEVENT
+BEGIN:VEVENT
+UID:bad
+DTSTART:20261021T030000Z
+DTEND:20261021T040000Z
+RRULE:FREQ=BOGUS;COUNT=x
+SUMMARY:broken
+END:VEVENT
+END:VCALENDAR
+"""
+
+
+class BrokenSeriesTest(unittest.TestCase):
+    """ตรวจทั้งระบบ 3.11: นัดซ้ำชุดเดียวเสียไม่ทำให้ทั้งปฏิทินอ่านไม่ได้ · ตัวกลับทิศทางในชื่อนัดถูกตัด."""
+
+    def test_bad_rrule_skips_only_that_series(self):
+        s = datetime(2026, 10, 19, tzinfo=UTC)
+        evs = gcal.expand(BAD_ONE, s, s + timedelta(days=10))
+        self.assertEqual([e.uid for e in evs], ["good"])
+        self.assertEqual(evs[0].what, "evil name")
+
+
 class _Resp:
     def __init__(self, data):
         self._data = data
@@ -219,6 +249,7 @@ class FetchTest(unittest.TestCase):
             (urllib.error.HTTPError(LINK, 500, "x", {}, None), "รหัส 500"),
             (urllib.error.URLError("down"), "ไม่มีอินเทอร์เน็ต"),
             (TimeoutError(), "ไม่มีอินเทอร์เน็ต"),
+            (http.client.IncompleteRead(b"BEGIN"), "ไม่มีอินเทอร์เน็ต"),  # ตรวจทั้งระบบ 3.10
         ]
         for exc, words in cases:
             with mock.patch.object(urllib.request, "build_opener", return_value=self._opener(exc)):
