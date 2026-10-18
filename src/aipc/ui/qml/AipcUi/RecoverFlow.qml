@@ -37,9 +37,9 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            BrandMark { title: "ลืมรหัสผ่าน" }
+            BrandMark { title: Tr.both("ลืมรหัสผ่าน") }
             Item { Layout.fillWidth: true }
-            AppButton { text: "กลับหน้า Login"; kind: "ghost"; enabled: !signup.busy; onClicked: AppState.go("login") }
+            AppButton { text: Tr.both("กลับหน้า Login"); kind: "ghost"; enabled: !signup.busy; onClicked: AppState.go("login") }
         }
 
         Card {
@@ -50,32 +50,32 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 32
                 spacing: 14
-                AppText { text: "ตั้งรหัสผ่านใหม่ด้วย PIN"; size: Theme.fontTitle; strong: true }
-                AppText { text: "PIN คือตัวเลข 6–12 หลักที่ตั้งไว้ตอนสมัคร · ใส่ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ"
+                AppText { text: Tr.both("ตั้งรหัสผ่านใหม่ด้วย PIN"); size: Theme.fontTitle; strong: true }
+                AppText { text: Tr.both("PIN คือตัวเลข 6–12 หลักที่ตั้งไว้ตอนสมัคร · ใส่ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ")
                           color: Theme.inkMuted; Layout.fillWidth: true }
                 GridLayout {
                     Layout.fillWidth: true
                     columns: 2
                     columnSpacing: 16
                     rowSpacing: 12
-                    AppField { id: userField; objectName: "recoverUser"; Layout.fillWidth: true; label: "ชื่อผู้ใช้"; mono: true }
+                    AppField { id: userField; objectName: "recoverUser"; Layout.fillWidth: true; label: Tr.both("ชื่อผู้ใช้"); mono: true }
                     AppField { id: pinField; objectName: "recoverPin"; Layout.fillWidth: true; label: "PIN"; mono: true; password: true
                                field.inputMethodHints: Qt.ImhDigitsOnly; field.maximumLength: 12 }
-                    AppField { id: pw1; objectName: "recoverPw1"; Layout.fillWidth: true; label: "รหัสผ่านใหม่"; password: true; emphasis: true }
+                    AppField { id: pw1; objectName: "recoverPw1"; Layout.fillWidth: true; label: Tr.both("รหัสผ่านใหม่"); password: true; emphasis: true }
                     AppField {
                         id: pw2
                         Layout.fillWidth: true
-                        label: "ยืนยันรหัสผ่านใหม่"; password: true
+                        label: Tr.both("ยืนยันรหัสผ่านใหม่"); password: true
                         hint: pw2.text === "" ? "" : root.pwCheck.message
                         hintKind: root.pwCheck.ok ? "ok" : "error"
                     }
                 }
                 AppText { id: msg; objectName: "recoverMsg"; visible: text !== ""; color: Theme.danger; Layout.fillWidth: true }
-                AppText { visible: signup.busy; text: "กำลังตรวจ PIN…"; color: Theme.inkMuted }
+                AppText { visible: signup.busy; text: Tr.both("กำลังตรวจ PIN…"); color: Theme.inkMuted }
                 Item { Layout.fillHeight: true }
                 AppButton {
                     Layout.alignment: Qt.AlignRight
-                    text: "ตั้งรหัสผ่านใหม่"
+                    text: Tr.both("ตั้งรหัสผ่านใหม่")
                     enabled: root.formValid && !signup.busy
                     onClicked: signup.recover(userField.text, pinField.text, pw1.text)
                 }
@@ -90,10 +90,10 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 32
                 spacing: 18
-                AppText { text: root.simulated ? "ตั้งรหัสผ่านใหม่แล้ว (จำลอง)" : "ตั้งรหัสผ่านใหม่แล้ว"; size: Theme.fontTitle; strong: true }
-                AppText { text: "เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย · PIN เดิมยังใช้กู้คืนครั้งต่อไปได้"; Layout.fillWidth: true }
+                AppText { text: root.simulated ? Tr.both("ตั้งรหัสผ่านใหม่แล้ว (จำลอง)") : Tr.both("ตั้งรหัสผ่านใหม่แล้ว"); size: Theme.fontTitle; strong: true }
+                AppText { text: Tr.both("เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย · PIN เดิมยังใช้กู้คืนครั้งต่อไปได้"); Layout.fillWidth: true }
                 Item { Layout.fillHeight: true }
-                AppButton { Layout.alignment: Qt.AlignRight; text: "ไปหน้า Login"; onClicked: AppState.go("login") }
+                AppButton { Layout.alignment: Qt.AlignRight; text: Tr.both("ไปหน้า Login"); onClicked: AppState.go("login") }
             }
         }
     }

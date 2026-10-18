@@ -34,7 +34,7 @@ Rectangle {
             visible: card.hasBadge
             Layout.fillWidth: true
             spacing: 8
-            Chip { text: card.hasBadge ? "ใช้ Skill: " + card.info.badge.name : ""; iconPath: Icons.sparkle }
+            Chip { text: card.hasBadge ? Tr.t("ใช้ Skill: ") + card.info.badge.name : ""; iconPath: Icons.sparkle }
             AppText { text: card.hasBadge ? card.info.badge.reason : ""; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
             Chip { text: card.hasBadge ? card.info.badge.worker : "" }
         }
@@ -78,23 +78,23 @@ Rectangle {
                     AppText { text: fileRow.modelData.name; strong: true; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
                     AppText { text: fileRow.modelData.folder + " · " + fileRow.modelData.snippet; size: Theme.fontCaption; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
                 }
-                AppButton { objectName: "summarizeFileButton"; text: "สรุป"; kind: "secondary"; onClicked: card.summarizeFile(fileRow.modelData.abs) }
-                AppButton { text: "ถาม AI"; kind: "ghost"; onClicked: card.askFile(fileRow.modelData.abs) }
+                AppButton { objectName: "summarizeFileButton"; text: Tr.t("สรุป"); kind: "secondary"; onClicked: card.summarizeFile(fileRow.modelData.abs) }
+                AppButton { text: Tr.t("ถาม AI"); kind: "ghost"; onClicked: card.askFile(fileRow.modelData.abs) }
             }
         }
 
         RowLayout {
             visible: (card.info.confirmToken || "") !== "" && !card.answered
             spacing: 8
-            AppButton { text: "ใช่ ทำเลย"; onClicked: card.answer(true) }
-            AppButton { text: "ไม่ใช่"; kind: "secondary"; onClicked: card.answer(false) }
+            AppButton { text: Tr.t("ใช่ ทำเลย"); onClicked: card.answer(true) }
+            AppButton { text: Tr.t("ไม่ใช่"); kind: "secondary"; onClicked: card.answer(false) }
         }
 
         // ย้อนกลับ (ข้อเสนอ 2026-10-03): ถอดเสียงผิดจนทำคำสั่งผิด แก้คืนได้ในกดเดียว · เฉพาะคำสั่งล่าสุด
         AppButton {
             objectName: "undoButton"
             visible: (card.info.undoToken || "") !== "" && !card.undone
-            text: "ย้อนกลับ"
+            text: Tr.t("ย้อนกลับ")
             kind: "secondary"
             onClicked: card.undo()
         }
@@ -107,15 +107,15 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 8
             AppText {
-                text: card.forged ? "สกิลที่ Claude สร้าง · รุ่น " + card.info.badge.forgedVersion : ""
+                text: card.forged ? Tr.t("สกิลที่ Claude สร้าง · รุ่น ") + card.info.badge.forgedVersion : ""
                 size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; Layout.fillWidth: true
             }
             AppButton {
-                text: "ไม่ใช่แบบนี้"; kind: "ghost"
+                text: Tr.t("ไม่ใช่แบบนี้"); kind: "ghost"
                 onClicked: card.wrongSkill(card.info.badge.forgedId, card.info.badge.name)
             }
             AppButton {
-                text: "ลบสกิลนี้"; kind: "ghost"
+                text: Tr.t("ลบสกิลนี้"); kind: "ghost"
                 onClicked: card.removeSkill(card.info.badge.forgedId)
             }
         }

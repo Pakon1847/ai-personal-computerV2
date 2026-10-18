@@ -13,7 +13,7 @@ RowLayout {
     AppButton {
         kind: "secondary"
         iconPath: Icons.back
-        Accessible.name: "ย้อนกลับ"
+        Accessible.name: Tr.t("ย้อนกลับ")
         onClicked: AppState.page = "workspace"
     }
     ColumnLayout {

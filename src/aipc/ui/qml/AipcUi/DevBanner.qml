@@ -12,7 +12,7 @@ Rectangle {
         spacing: 8
         Icon { path: Icons.alert; color: Theme.textOnWarn; Layout.preferredWidth: 16; Layout.preferredHeight: 16 }
         AppText {
-            text: "โหมดพัฒนา — ยังไม่มีการยืนยันตัวตน การสร้างบัญชี หรือระบบใบหน้าจริง"
+            text: Tr.t("โหมดพัฒนา — ยังไม่มีการยืนยันตัวตน การสร้างบัญชี หรือระบบใบหน้าจริง")
             size: Theme.fontSmall
             strong: true
             color: Theme.textOnWarn

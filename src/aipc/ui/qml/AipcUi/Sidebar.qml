@@ -23,22 +23,22 @@ Rectangle {
             Accessible.name: "AI PC"
             AppText { anchors.centerIn: parent; text: "AI"; strong: true; oneLine: true; color: Theme.textOnAccent; size: Theme.px(15) }
         }
-        NavItem { text: "ผู้ช่วย AI"; shortText: "ผู้ช่วย"; iconPath: Icons.chat; pageName: "workspace" }
-        NavItem { text: "ปฏิทิน"; iconPath: Icons.calendar; pageName: "calendar" }
-        NavItem { text: "ไฟล์ของฉัน"; shortText: "ไฟล์"; iconPath: Icons.folder; pageName: "files" }
+        NavItem { text: Tr.t("ผู้ช่วย AI"); shortText: Tr.t("ผู้ช่วย"); iconPath: Icons.chat; pageName: "workspace" }
+        NavItem { text: Tr.t("ปฏิทิน"); iconPath: Icons.calendar; pageName: "calendar" }
+        NavItem { text: Tr.t("ไฟล์ของฉัน"); shortText: Tr.t("ไฟล์"); iconPath: Icons.folder; pageName: "files" }
         NavItem { text: "Skill"; iconPath: Icons.sparkle; pageName: "skills" }
-        NavItem { text: "สุขภาพเครื่อง"; shortText: "เครื่อง"; iconPath: Icons.activity; pageName: "health" }
-        NavItem { text: "ตั้งค่า"; iconPath: Icons.sliders; pageName: "settings" }
+        NavItem { text: Tr.t("สุขภาพเครื่อง"); shortText: Tr.t("เครื่อง"); iconPath: Icons.activity; pageName: "health" }
+        NavItem { text: Tr.t("ตั้งค่า"); iconPath: Icons.sliders; pageName: "settings" }
         Item { Layout.fillHeight: true }
 
         AppButton {
             objectName: "logoutButton"
             Layout.alignment: Qt.AlignHCenter
             kind: "ghost"; iconPath: Icons.logout
-            Accessible.name: "ออกจากระบบ"
+            Accessible.name: Tr.t("ออกจากระบบ")
             // ออกไม่สำเร็จ → ข้อความค้างให้เห็น ไม่เงียบ (H2)
             ToolTip.visible: hovered || session.error !== ""
-            ToolTip.text: session.error !== "" ? session.error : "ออกจากระบบ"
+            ToolTip.text: session.error !== "" ? session.error : Tr.t("ออกจากระบบ")
             // เซสชันจริง: จบเซสชันทั้งหมดแล้ว greetd กลับหน้า Login (การ์ด 0004) · หน้าต่างพัฒนา: สลับหน้าในแอป
             onClicked: if (!session.active) AppState.go("login"); else session.logout()
         }
@@ -51,7 +51,7 @@ Rectangle {
             Layout.preferredHeight: 40
             HoverHandler { id: who }
             ToolTip.visible: who.hovered
-            ToolTip.text: system.userName + (AppState.devMode ? " · โหมดพัฒนา" : "")
+            ToolTip.text: system.userName + (AppState.devMode ? Tr.t(" · โหมดพัฒนา") : "")
         }
     }
 }

@@ -13,7 +13,7 @@ ColumnLayout {
     property bool done: false          // ลงทะเบียนสำเร็จแล้ว
     spacing: 10
 
-    readonly property var poseNames: ({ front: "ตรง", left: "ซ้าย", right: "ขวา", up: "เงย", down: "ก้ม" })
+    readonly property var poseNames: ({ front: Tr.t("ตรง"), left: Tr.t("ซ้าย"), right: Tr.t("ขวา"), up: Tr.t("เงย"), down: Tr.t("ก้ม") })
     readonly property var poseOrder: ["front", "left", "right", "up", "down"]
     readonly property var poseArrow: ({ front: 0, left: 0, right: 180, up: 90, down: -90 })
     readonly property bool live: running && view.previewSerial > 0
@@ -86,9 +86,9 @@ ColumnLayout {
                 color: "#FFFFFF"
                 size: Theme.fontSmall
                 strong: root.done
-                text: root.done ? "ลงทะเบียนสำเร็จ"
-                    : root.running ? "กำลังเปิดกล้อง…"
-                    : "กล้องจะเปิดเมื่อกด “เริ่มสแกน” · ภาพอยู่บนจอนี้เท่านั้น ไม่ถูกบันทึก"
+                text: root.done ? Tr.t("ลงทะเบียนสำเร็จ")
+                    : root.running ? Tr.t("กำลังเปิดกล้อง…")
+                    : Tr.t("กล้องจะเปิดเมื่อกด “เริ่มสแกน” · ภาพอยู่บนจอนี้เท่านั้น ไม่ถูกบันทึก")
             }
         }
 
@@ -128,7 +128,7 @@ ColumnLayout {
                 anchors.centerIn: parent
                 color: "#FFFFFF"
                 size: Theme.fontSmall
-                text: "ท่า " + (root.poseOrder.indexOf(stage.pose) + 1) + "/5 · " + (root.poseNames[stage.pose] || "")
+                text: Tr.t("ท่า ") + (root.poseOrder.indexOf(stage.pose) + 1) + "/5 · " + (root.poseNames[stage.pose] || "")
             }
         }
     }
@@ -156,7 +156,7 @@ ColumnLayout {
         visible: root.running
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
-        text: root.view.advice !== "" ? root.view.advice : "มองตรงมาที่กล้อง"
+        text: root.view.advice !== "" ? root.view.advice : Tr.t("มองตรงมาที่กล้อง")
         size: Theme.fontHeading
         strong: true
         color: Theme.accentInk

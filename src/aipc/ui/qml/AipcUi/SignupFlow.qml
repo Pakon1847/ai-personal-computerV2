@@ -65,9 +65,9 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            BrandMark { title: "สมัครบัญชี" }
+            BrandMark { title: Tr.both("สมัครบัญชี") }
             Item { Layout.fillWidth: true }
-            AppButton { text: "ยกเลิก กลับหน้า Login"; kind: "ghost"; visible: root.page < 2; enabled: !signup.busy
+            AppButton { text: Tr.both("ยกเลิก กลับหน้า Login"); kind: "ghost"; visible: root.page < 2; enabled: !signup.busy
                         onClicked: AppState.go("login") }
         }
 
@@ -90,7 +90,7 @@ Rectangle {
                         anchors.fill: parent
                         anchors.margins: 28
                         spacing: 16
-                        AppText { text: "ข้อมูลบัญชี"; size: Theme.fontTitle; strong: true }
+                        AppText { text: Tr.both("ข้อมูลบัญชี"); size: Theme.fontTitle; strong: true }
                         GridLayout {
                             Layout.fillWidth: true
                             columns: 2
@@ -99,21 +99,21 @@ Rectangle {
                             AppField {
                                 id: nameField
                                 Layout.fillWidth: true
-                                label: "ชื่อที่แสดง"
-                                hint: text === "" ? "ใช้ทักทายในหน้าจอ" : root.nameCheck.message
+                                label: Tr.both("ชื่อที่แสดง")
+                                hint: text === "" ? Tr.both("ใช้ทักทายในหน้าจอ") : root.nameCheck.message
                                 hintKind: text === "" ? "normal" : root.nameCheck.ok ? "ok" : "error"
                             }
                             AppField {
                                 id: userField
                                 Layout.fillWidth: true
-                                label: "ชื่อผู้ใช้"; mono: true; placeholder: "เช่น namfon"
-                                hint: text === "" ? "a–z ตัวเลข และ - ใช้พิมพ์ตอนเข้าสู่ระบบ" : root.userCheck.message
+                                label: Tr.both("ชื่อผู้ใช้"); mono: true; placeholder: Tr.both("เช่น namfon")
+                                hint: text === "" ? Tr.both("a–z ตัวเลข และ - ใช้พิมพ์ตอนเข้าสู่ระบบ") : root.userCheck.message
                                 hintKind: text === "" ? "normal" : root.userCheck.ok ? "ok" : "error"
                             }
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: 6
-                                AppField { id: pw1; objectName: "signupPw1"; Layout.fillWidth: true; label: "รหัสผ่าน"; password: true; emphasis: true }
+                                AppField { id: pw1; objectName: "signupPw1"; Layout.fillWidth: true; label: Tr.both("รหัสผ่าน"); password: true; emphasis: true }
                                 RowLayout {
                                     spacing: 8
                                     Repeater {
@@ -133,7 +133,7 @@ Rectangle {
                                 id: pw2
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignTop
-                                label: "ยืนยันรหัสผ่าน"; password: true
+                                label: Tr.both("ยืนยันรหัสผ่าน"); password: true
                                 hint: pw2.text === "" ? "" : root.pwCheck.message
                                 hintKind: root.pwCheck.ok ? "ok" : "error"
                             }
@@ -142,8 +142,8 @@ Rectangle {
                         RowLayout {
                             Layout.alignment: Qt.AlignRight
                             spacing: 12
-                            AppButton { text: "ย้อนกลับ"; kind: "secondary"; onClicked: AppState.go("login") }
-                            AppButton { text: "ถัดไป"; enabled: root.accountValid; onClicked: root.page = 1 }
+                            AppButton { text: Tr.both("ย้อนกลับ"); kind: "secondary"; onClicked: AppState.go("login") }
+                            AppButton { text: Tr.both("ถัดไป"); enabled: root.accountValid; onClicked: root.page = 1 }
                         }
                     }
                 }
@@ -157,11 +157,11 @@ Rectangle {
                         anchors.margins: 24
                         spacing: 12
                         Icon { path: Icons.lock; color: Theme.bubbleInk; width: 28; height: 28 }
-                        AppText { text: "บัญชีของคุณแยกจากคนอื่น"; size: Theme.fontHeading; strong: true; color: Theme.bubbleInk }
+                        AppText { text: Tr.both("บัญชีของคุณแยกจากคนอื่น"); size: Theme.fontHeading; strong: true; color: Theme.bubbleInk }
                         AppText { Layout.fillWidth: true; color: Theme.bubbleInk
-                                  text: "ทุกบัญชีเป็นบัญชีของเครื่องจริง ไฟล์ แชท และนัดหมายของคุณอยู่ในโฟลเดอร์ที่ผู้ใช้คนอื่นเปิดไม่ได้" }
+                                  text: Tr.both("ทุกบัญชีเป็นบัญชีของเครื่องจริง ไฟล์ แชท และนัดหมายของคุณอยู่ในโฟลเดอร์ที่ผู้ใช้คนอื่นเปิดไม่ได้") }
                         AppText { Layout.fillWidth: true; color: Theme.bubbleInk
-                                  text: "ลืมรหัสผ่านได้ ใช้ PIN ที่ตั้งในขั้นถัดไปตั้งรหัสใหม่ · ขั้นถัดไปเลือกเข้าเครื่องด้วยใบหน้าได้ (ไม่บังคับ)" }
+                                  text: Tr.both("ลืมรหัสผ่านได้ ใช้ PIN ที่ตั้งในขั้นถัดไปตั้งรหัสใหม่ · ขั้นถัดไปเลือกเข้าเครื่องด้วยใบหน้าได้ (ไม่บังคับ)") }
                         Item { Layout.fillHeight: true }
                     }
                 }
@@ -179,10 +179,10 @@ Rectangle {
                             width: 44; height: 44; radius: Theme.radiusCard; color: Theme.accentSoft
                             Icon { anchors.centerIn: parent; path: Icons.key; color: Theme.accentInk; width: 22; height: 22 }
                         }
-                        AppText { text: "ตั้ง PIN สำหรับกู้คืนรหัสผ่าน"; size: Theme.fontTitle; strong: true }
+                        AppText { text: Tr.both("ตั้ง PIN สำหรับกู้คืนรหัสผ่าน"); size: Theme.fontTitle; strong: true }
                     }
                     AppText { Layout.fillWidth: true; color: Theme.inkMuted
-                              text: "ถ้าลืมรหัสผ่าน ใช้ PIN นี้ที่หน้า Login (“ลืมรหัสผ่าน?”) เพื่อตั้งรหัสใหม่ · ตัวเลข 6–12 หลัก" }
+                              text: Tr.both("ถ้าลืมรหัสผ่าน ใช้ PIN นี้ที่หน้า Login (“ลืมรหัสผ่าน?”) เพื่อตั้งรหัสใหม่ · ตัวเลข 6–12 หลัก") }
                     GridLayout {
                         Layout.fillWidth: true
                         columns: 2
@@ -199,7 +199,7 @@ Rectangle {
                             id: pin2
                             objectName: "pin2"
                             Layout.fillWidth: true
-                            label: "ยืนยัน PIN"; password: true; mono: true
+                            label: Tr.both("ยืนยัน PIN"); password: true; mono: true
                             field.inputMethodHints: Qt.ImhDigitsOnly
                             field.maximumLength: 12
                             hint: pin1.text === "" ? "" : root.pinCheck.message
@@ -220,7 +220,7 @@ Rectangle {
                                 id: warnText
                                 Layout.fillWidth: true
                                 color: Theme.warnInk
-                                text: "ใครรู้ PIN นี้ ตั้งรหัสผ่านใหม่ให้บัญชีของคุณได้ · อย่าใช้วันเกิด เบอร์โทร หรือ PIN เดียวกับบัตร ATM · ใส่ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ"
+                                text: Tr.both("ใครรู้ PIN นี้ ตั้งรหัสผ่านใหม่ให้บัญชีของคุณได้ · อย่าใช้วันเกิด เบอร์โทร หรือ PIN เดียวกับบัตร ATM · ใส่ผิดหลายครั้งต้องรอนานขึ้นเรื่อย ๆ")
                             }
                         }
                     }
@@ -231,14 +231,14 @@ Rectangle {
                         color: Theme.danger
                         Layout.fillWidth: true
                     }
-                    AppText { visible: signup.busy; text: "กำลังสร้างบัญชี…"; color: Theme.inkMuted }
+                    AppText { visible: signup.busy; text: Tr.both("กำลังสร้างบัญชี…"); color: Theme.inkMuted }
                     Item { Layout.fillHeight: true }
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
                         spacing: 12
-                        AppButton { text: "ย้อนกลับ"; kind: "secondary"; enabled: !signup.busy; onClicked: root.page = 0 }
+                        AppButton { text: Tr.both("ย้อนกลับ"); kind: "secondary"; enabled: !signup.busy; onClicked: root.page = 0 }
                         AppButton {
-                            text: "สร้างบัญชี"
+                            text: Tr.both("สร้างบัญชี")
                             enabled: root.accountValid && root.pinCheck.ok && !signup.busy
                             onClicked: signup.create(nameField.text, userField.text, pw1.text, pin1.text)
                         }
@@ -270,18 +270,18 @@ Rectangle {
                         Layout.preferredWidth: 2
                         Layout.fillHeight: true
                         spacing: 14
-                        AppText { text: "เข้าเครื่องด้วยใบหน้า"; size: Theme.fontTitle; strong: true }
-                        Chip { text: "ไม่บังคับ · ข้ามได้"; kind: "neutral" }
+                        AppText { text: Tr.both("เข้าเครื่องด้วยใบหน้า"); size: Theme.fontTitle; strong: true }
+                        Chip { text: Tr.both("ไม่บังคับ · ข้ามได้"); kind: "neutral" }
                         AppText { Layout.fillWidth: true; color: Theme.inkMuted
-                                  text: "เปิดแล้ว ที่หน้า Login แค่มองกล้องก็เข้าเครื่องได้ ไม่ต้องพิมพ์รหัสผ่าน · รหัสผ่านยังใช้ได้เสมอ และยังต้องใช้กับงานสำคัญ" }
+                                  text: Tr.both("เปิดแล้ว ที่หน้า Login แค่มองกล้องก็เข้าเครื่องได้ ไม่ต้องพิมพ์รหัสผ่าน · รหัสผ่านยังใช้ได้เสมอ และยังต้องใช้กับงานสำคัญ") }
                         AppCheck {
                             id: faceConsent
                             objectName: "faceConsent"
                             Layout.fillWidth: true
                             boxed: true
                             enabled: !signup.busy && !root.faceDone
-                            text: "ยินยอมให้เก็บข้อมูลใบหน้า"
-                            detail: "เก็บเป็นตัวเลข 128 ค่าในเครื่องนี้ ไม่เก็บรูป (ข้อมูลชีวภาพ · PDPA มาตรา 26) · ปิดและลบได้ในหน้าตั้งค่า · รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ถ้าระบบกันรูปปลอมพลาด"
+                            text: Tr.both("ยินยอมให้เก็บข้อมูลใบหน้า")
+                            detail: Tr.both("เก็บเป็นตัวเลข 128 ค่าในเครื่องนี้ ไม่เก็บรูป (ข้อมูลชีวภาพ · PDPA มาตรา 26) · ปิดและลบได้ในหน้าตั้งค่า · รูปถ่ายหรือคนหน้าคล้ายอาจเข้าได้ถ้าระบบกันรูปปลอมพลาด")
                         }
                         AppText {
                             objectName: "faceHint"
@@ -295,17 +295,17 @@ Rectangle {
                             visible: !signup.busy && !root.faceDone
                             size: Theme.fontSmall
                             color: Theme.inkMuted
-                            text: "เคล็ดลับ: นั่งห่างกล้อง 40–70 ซม. · แสงส่องจากด้านหน้า · ถอดหมวกและหน้ากาก"
+                            text: Tr.both("เคล็ดลับ: นั่งห่างกล้อง 40–70 ซม. · แสงส่องจากด้านหน้า · ถอดหมวกและหน้ากาก")
                         }
                         Item { Layout.fillHeight: true }
                         RowLayout {
                             Layout.alignment: Qt.AlignRight
                             spacing: 12
-                            AppButton { text: "ข้าม"; kind: "secondary"; enabled: !signup.busy; visible: !root.faceDone
+                            AppButton { text: Tr.both("ข้าม"); kind: "secondary"; enabled: !signup.busy; visible: !root.faceDone
                                         onClicked: root.page = 3 }
                             AppButton {
                                 objectName: "faceStart"
-                                text: root.faceHint !== "" && !root.faceDone ? "ลองอีกครั้ง" : "เริ่มสแกน"
+                                text: root.faceHint !== "" && !root.faceDone ? Tr.both("ลองอีกครั้ง") : Tr.both("เริ่มสแกน")
                                 visible: !root.faceDone
                                 enabled: faceConsent.checked && !signup.busy
                                 onClicked: { root.faceHint = ""; signup.enrollFace(userField.text, pw1.text) }
@@ -330,7 +330,7 @@ Rectangle {
                     }
                     AppText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root.simulated ? "เดินครบทุกขั้นแล้ว (จำลอง)" : "บัญชีของ " + nameField.text + " พร้อมใช้แล้ว"
+                        text: root.simulated ? Tr.both("เดินครบทุกขั้นแล้ว (จำลอง)") : Tr.both("บัญชีของ ") + nameField.text + Tr.both(" พร้อมใช้แล้ว")
                         size: Theme.px(30); strong: true
                     }
                     AppText {
@@ -338,20 +338,20 @@ Rectangle {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         color: Theme.warnInk
-                        text: "หน้าต่างพัฒนา: ไม่ได้สร้างบัญชีจริง · บัญชีจริงสร้างได้จากหน้า Login ของเครื่องเท่านั้น"
+                        text: Tr.both("หน้าต่างพัฒนา: ไม่ได้สร้างบัญชีจริง · บัญชีจริงสร้างได้จากหน้า Login ของเครื่องเท่านั้น")
                     }
                     AppText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: root.faceDone ? "เข้าเครื่องด้วยใบหน้า: เปิดแล้ว" : "เข้าเครื่องด้วยใบหน้า: ยังไม่เปิด (เปิดได้ในหน้าตั้งค่า)"
+                        text: root.faceDone ? Tr.both("เข้าเครื่องด้วยใบหน้า: เปิดแล้ว") : Tr.both("เข้าเครื่องด้วยใบหน้า: ยังไม่เปิด (เปิดได้ในหน้าตั้งค่า)")
                         color: root.faceDone ? Theme.okInk : Theme.inkMuted
                     }
                     AppText { visible: root.loginError !== ""; text: root.loginError; color: Theme.danger; Layout.fillWidth: true }
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 12
-                        AppButton { text: "ไปหน้า Login"; kind: "secondary"; onClicked: AppState.go("login") }
+                        AppButton { text: Tr.both("ไปหน้า Login"); kind: "secondary"; onClicked: AppState.go("login") }
                         AppButton {
-                            text: "เข้าสู่ระบบเลย"
+                            text: Tr.both("เข้าสู่ระบบเลย")
                             visible: !root.simulated
                             onClicked: root.loginError = login.signIn(userField.text, pw1.text)
                         }

@@ -13,16 +13,16 @@ Card {
     radius: Theme.radiusCard
     implicitHeight: col.implicitHeight + 40
 
-    readonly property var poseNames: ({ front: "ตรง", left: "ซ้าย", right: "ขวา", up: "เงย", down: "ก้ม" })
+    readonly property var poseNames: ({ front: Tr.t("ตรง"), left: Tr.t("ซ้าย"), right: Tr.t("ขวา"), up: Tr.t("เงย"), down: Tr.t("ก้ม") })
     readonly property var poseOrder: ["front", "left", "right", "up", "down"]
     // ลูกศรบอกทิศบนภาพกระจก: หันซ้ายของผู้ใช้ = ซ้ายของจอ
     readonly property var poseArrow: ({ front: 0, left: 0, right: 180, up: 90, down: -90 })
     readonly property bool enrolling: face.busy && face.currentPose !== ""
     readonly property string statusText: ({
-        none: "ยังไม่ได้ลงทะเบียน",
-        enrolled: "ลงทะเบียนแล้ว · " + face.enrolledAt.slice(0, 16).replace("T", " ") + " · ความยินยอม " + face.consentVersion,
+        none: Tr.t("ยังไม่ได้ลงทะเบียน"),
+        enrolled: Tr.t("ลงทะเบียนแล้ว · ") + face.enrolledAt.slice(0, 16).replace("T", " ") + Tr.t(" · ความยินยอม ") + face.consentVersion,
         broken: face.problem,
-        unavailable: face.problem !== "" ? face.problem : "ยังใช้ไม่ได้ในเครื่องนี้"
+        unavailable: face.problem !== "" ? face.problem : Tr.t("ยังใช้ไม่ได้ในเครื่องนี้")
     })[face.state] || ""
 
     ColumnLayout {
@@ -40,7 +40,7 @@ Card {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 2
-                AppText { text: "ใบหน้าของฉัน"; strong: true }
+                AppText { text: Tr.t("ใบหน้าของฉัน"); strong: true }
                 AppText {
                     objectName: "faceStatus"
                     Layout.fillWidth: true
@@ -56,8 +56,8 @@ Card {
             size: Theme.fontSmall
             color: Theme.inkMuted
             // แม่แบบตรงนี้อยู่ใน home ของคุณ ใช้ทดลองสแกน · เข้าเครื่องด้วยใบหน้าแยกไปที่ LoginFacePanel (การ์ด 0015)
-            text: "ลงทะเบียนและทดลองสแกนได้ในหน้านี้ · เข้าเครื่องด้วยใบหน้าตั้งค่าที่ส่วนถัดไป · "
-                + "เก็บแค่ตัวเลข 128 ค่า ไม่เก็บภาพ · รหัสผ่านยังเป็นกุญแจเสมอ"
+            text: Tr.t("ลงทะเบียนและทดลองสแกนได้ในหน้านี้ · เข้าเครื่องด้วยใบหน้าตั้งค่าที่ส่วนถัดไป · ")
+                + Tr.t("เก็บแค่ตัวเลข 128 ค่า ไม่เก็บภาพ · รหัสผ่านยังเป็นกุญแจเสมอ")
         }
 
         // ---------- ระหว่างลงทะเบียน: ภาพสด (กระจก) · นอกวงรีมืดลง · ลูกศรอยู่นอกวงรี ไม่บังหน้า ----------
@@ -93,7 +93,7 @@ Card {
             AppText {
                 anchors.centerIn: parent
                 visible: face.previewSerial === 0
-                text: "กำลังเปิดกล้อง…"
+                text: Tr.t("กำลังเปิดกล้อง…")
                 color: Theme.cameraText
             }
             // ม่านมืดนอกวงรี + เส้นวงรี · สีเขียว = ระบบเห็นหน้าแล้ว (ไม่มีกรอบทับหน้า)
@@ -157,7 +157,7 @@ Card {
                     anchors.centerIn: parent
                     color: "#FFFFFF"
                     size: Theme.fontSmall
-                    text: "ท่า " + (root.poseOrder.indexOf(preview.pose) + 1) + "/5 · " + (root.poseNames[preview.pose] || "")
+                    text: Tr.t("ท่า ") + (root.poseOrder.indexOf(preview.pose) + 1) + "/5 · " + (root.poseNames[preview.pose] || "")
                 }
             }
         }
@@ -212,7 +212,7 @@ Card {
                 }
             }
             AppButton {
-                text: "ยกเลิก"; kind: "secondary"; onClicked: face.cancel()
+                text: Tr.t("ยกเลิก"); kind: "secondary"; onClicked: face.cancel()
                 Layout.alignment: root.enrolling ? Qt.AlignHCenter : Qt.AlignLeft
             }
         }
@@ -224,17 +224,17 @@ Card {
             spacing: 8
             AppButton {
                 objectName: "faceEnrollButton"
-                text: face.state === "enrolled" ? "ลงทะเบียนใหม่" : "ลงทะเบียนใบหน้า"
+                text: face.state === "enrolled" ? Tr.t("ลงทะเบียนใหม่") : Tr.t("ลงทะเบียนใบหน้า")
                 enabled: face.state !== "unavailable"
                 onClicked: consent.open()
             }
             AppButton {
-                text: "ทดลองสแกน"; kind: "secondary"
+                text: Tr.t("ทดลองสแกน"); kind: "secondary"
                 enabled: face.state === "enrolled"
                 onClicked: face.tryScan()
             }
             AppButton {
-                text: "ลบใบหน้า"; kind: "secondary"; iconPath: Icons.trash
+                text: Tr.t("ลบใบหน้า"); kind: "secondary"; iconPath: Icons.trash
                 enabled: face.state === "enrolled" || face.state === "broken"
                 onClicked: confirmDelete.open()
             }
@@ -263,9 +263,9 @@ Card {
             RowLayout {
                 Layout.alignment: Qt.AlignRight
                 spacing: 8
-                AppButton { text: "ไม่ยินยอม"; kind: "secondary"; onClicked: { consent.close(); face.startEnroll(false) } }
+                AppButton { text: Tr.t("ไม่ยินยอม"); kind: "secondary"; onClicked: { consent.close(); face.startEnroll(false) } }
                 AppButton {
-                    text: "ยินยอม · เริ่มลงทะเบียน"
+                    text: Tr.t("ยินยอม · เริ่มลงทะเบียน")
                     onClicked: { consent.close(); face.startEnroll(true) }
                 }
             }
@@ -280,12 +280,12 @@ Card {
         background: Rectangle { radius: Theme.radiusCard; color: Theme.surface; border.width: 1; border.color: Theme.line }
         contentItem: ColumnLayout {
             spacing: 14
-            AppText { text: "ลบแม่แบบใบหน้า? · ใช้ใบหน้าไม่ได้ทันที · เข้าเครื่องด้วยรหัสผ่านได้ตามปกติ" }
+            AppText { text: Tr.t("ลบแม่แบบใบหน้า? · ใช้ใบหน้าไม่ได้ทันที · เข้าเครื่องด้วยรหัสผ่านได้ตามปกติ") }
             RowLayout {
                 Layout.alignment: Qt.AlignRight
                 spacing: 8
-                AppButton { text: "ไม่ลบ"; kind: "secondary"; onClicked: confirmDelete.close() }
-                AppButton { text: "ลบ"; onClicked: { confirmDelete.close(); face.deleteTemplate() } }
+                AppButton { text: Tr.t("ไม่ลบ"); kind: "secondary"; onClicked: confirmDelete.close() }
+                AppButton { text: Tr.t("ลบ"); onClicked: { confirmDelete.close(); face.deleteTemplate() } }
             }
         }
     }

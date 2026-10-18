@@ -12,7 +12,7 @@ ColumnLayout {
 
     AppButton {
         objectName: "whyButton"
-        text: root.open ? "ซ่อนเหตุผล" : "ทำไมได้คำตอบนี้"
+        text: root.open ? Tr.t("ซ่อนเหตุผล") : Tr.t("ทำไมได้คำตอบนี้")
         kind: "ghost"
         onClicked: root.open = !root.open
     }

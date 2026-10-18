@@ -26,12 +26,12 @@ Rectangle {
     }
 
     readonly property var status: ({
-        unavailable: { text: system.cameraPresent ? "เข้าสู่ระบบด้วยรหัสผ่าน"
-                                                  : "ไม่พบกล้อง · ใช้รหัสผ่านได้เลย", kind: "neutral" },
-        scanning: { text: "กำลังสแกนใบหน้า… มองมาที่กล้อง", kind: "accent" },
-        found: { text: "จำหน้าได้", kind: "ok" },
-        unknown: { text: "ยังไม่พบบัญชีที่ตรงกับใบหน้านี้", kind: "warn" },
-        manual: { text: "หยุดสแกนแล้ว · ใช้ชื่อผู้ใช้และรหัสผ่าน", kind: "neutral" }
+        unavailable: { text: system.cameraPresent ? Tr.both("เข้าสู่ระบบด้วยรหัสผ่าน")
+                                                  : Tr.both("ไม่พบกล้อง · ใช้รหัสผ่านได้เลย"), kind: "neutral" },
+        scanning: { text: Tr.both("กำลังสแกนใบหน้า… มองมาที่กล้อง"), kind: "accent" },
+        found: { text: Tr.both("จำหน้าได้"), kind: "ok" },
+        unknown: { text: Tr.both("ยังไม่พบบัญชีที่ตรงกับใบหน้านี้"), kind: "warn" },
+        manual: { text: Tr.both("หยุดสแกนแล้ว · ใช้ชื่อผู้ใช้และรหัสผ่าน"), kind: "neutral" }
     })[scan]
 
     // ---------- แถบบน ----------
@@ -45,7 +45,7 @@ Rectangle {
         anchors.rightMargin: 32
         BrandMark {}
         Item { Layout.fillWidth: true }
-        Chip { text: "ใบหน้าประมวลผลในเครื่อง ไม่บันทึกภาพ"; kind: "ok"; iconPath: Icons.shield }
+        Chip { text: Tr.both("ใบหน้าประมวลผลในเครื่อง ไม่บันทึกภาพ"); kind: "ok"; iconPath: Icons.shield }
     }
 
     // ---------- กลางจอ ----------
@@ -84,7 +84,7 @@ Rectangle {
             implicitWidth: Theme.fontScale > 1.5 ? 112 : Theme.fontScale > 1.2 ? 160 : 200
             implicitHeight: implicitWidth; radius: implicitWidth / 2
             color: Theme.camera
-            Accessible.name: "สแกนใบหน้า"
+            Accessible.name: Tr.both("สแกนใบหน้า")
             clip: true
             readonly property bool live: root.scan === "scanning" && loginScan.previewSerial > 0
 
@@ -171,7 +171,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 16
             visible: root.scan === "scanning"
-            text: "พิมพ์ชื่อผู้ใช้และรหัสผ่านแทน"; kind: "secondary"
+            text: Tr.both("พิมพ์ชื่อผู้ใช้และรหัสผ่านแทน"); kind: "secondary"
             onClicked: login.setScanState("manual")
         }
 
@@ -181,8 +181,8 @@ Rectangle {
             Layout.topMargin: 14
             visible: root.scan === "found"
             spacing: 12
-            AppText { text: "สวัสดี " + login.foundName; size: Theme.px(22); strong: true; oneLine: true }
-            AppButton { text: "ไม่ใช่ฉัน"; kind: "ghost"; onClicked: login.setScanState("manual") }
+            AppText { text: Tr.both("สวัสดี ") + login.foundName; size: Theme.px(22); strong: true; oneLine: true }
+            AppButton { text: Tr.both("ไม่ใช่ฉัน"); kind: "ghost"; onClicked: login.setScanState("manual") }
         }
         // เข้าด้วยใบหน้า (การ์ด 0015): ไม่มีช่องรหัสผ่าน · Python เข้าระบบเองใน 1.5 วิ ถ้าไม่กด "ไม่ใช่ฉัน"
         AppText {
@@ -190,7 +190,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 6
             visible: root.scan === "found"
-            text: login.demo ? "(สาธิต) จะเข้าสู่ระบบด้วยใบหน้า" : "กำลังเข้าสู่ระบบด้วยใบหน้า…"
+            text: login.demo ? Tr.both("(สาธิต) จะเข้าสู่ระบบด้วยใบหน้า") : Tr.both("กำลังเข้าสู่ระบบด้วยใบหน้า…")
             color: Theme.inkMuted; oneLine: true
         }
 
@@ -199,15 +199,15 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 14
             visible: root.scan === "unknown"
-            text: "อาจยังไม่ได้ลงทะเบียนใบหน้า หรือแสงไม่พอ"; color: Theme.inkMuted; oneLine: true
+            text: Tr.both("อาจยังไม่ได้ลงทะเบียนใบหน้า หรือแสงไม่พอ"); color: Theme.inkMuted; oneLine: true
         }
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 10
             visible: root.scan === "unknown"
             spacing: 8
-            AppButton { text: "สแกนอีกครั้ง"; onClicked: login.setScanState("scanning") }
-            AppButton { text: "พิมพ์ชื่อผู้ใช้แทน"; kind: "secondary"; onClicked: login.setScanState("manual") }
+            AppButton { text: Tr.both("สแกนอีกครั้ง"); onClicked: login.setScanState("scanning") }
+            AppButton { text: Tr.both("พิมพ์ชื่อผู้ใช้แทน"); kind: "secondary"; onClicked: login.setScanState("manual") }
         }
 
         // พิมพ์ชื่อผู้ใช้ (รวมกรณียังไม่มีระบบใบหน้า) · ช่องเรียงแถวเดียวเพื่อไม่ให้ดันจอล้น
@@ -216,21 +216,21 @@ Rectangle {
             Layout.topMargin: 16
             visible: root.typing
             spacing: 8
-            AppField { id: userField; Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5)); placeholder: "ชื่อผู้ใช้"; mono: true }
+            AppField { id: userField; Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5)); placeholder: Tr.both("ชื่อผู้ใช้"); mono: true }
             AppField {
                 id: pwField
                 objectName: "loginPw"
                 Layout.preferredWidth: Math.round(220 * Math.min(Theme.fontScale, 1.5))
-                placeholder: "รหัสผ่าน"; password: true; emphasis: true
+                placeholder: Tr.both("รหัสผ่าน"); password: true; emphasis: true
                 field.onAccepted: root.submit(userField.text, text)
             }
-            AppButton { text: "เข้าสู่ระบบ"; onClicked: root.submit(userField.text, pwField.text) }
+            AppButton { text: Tr.both("เข้าสู่ระบบ"); onClicked: root.submit(userField.text, pwField.text) }
         }
         AppButton {
             objectName: "scanAgain"
             Layout.alignment: Qt.AlignHCenter
             visible: root.scan === "manual" || (root.scan === "unavailable" && login.faceReady)
-            text: "สแกนหน้าแทน"; kind: "ghost"; iconPath: Icons.camera
+            text: Tr.both("สแกนหน้าแทน"); kind: "ghost"; iconPath: Icons.camera
             onClicked: login.setScanState("scanning")
         }
 
@@ -246,12 +246,12 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             spacing: 4
             AppButton {
-                text: "ลืมรหัสผ่าน? ใช้ PIN กู้คืน"; kind: "ghost"
+                text: Tr.both("ลืมรหัสผ่าน? ใช้ PIN กู้คืน"); kind: "ghost"
                 onClicked: AppState.go("recover")   // การ์ด 0012
             }
             AppButton {
                 objectName: "deleteAccountLink"
-                text: "ลบบัญชี"; kind: "ghost"
+                text: Tr.both("ลบบัญชี"); kind: "ghost"
                 onClicked: AppState.go("delete")   // ข้อเสนอ 2026-10-03
             }
         }
@@ -269,15 +269,15 @@ Rectangle {
         anchors.rightMargin: 32
         spacing: 8
         AppText {
-            text: "เข้าสู่ระบบด้วยรหัสผ่าน · ข้อมูลของแต่ละคนแยกกันด้วยบัญชีของเครื่อง"
+            text: Tr.both("เข้าสู่ระบบด้วยรหัสผ่าน · ข้อมูลของแต่ละคนแยกกันด้วยบัญชีของเครื่อง")
             size: Theme.fontSmall; color: Theme.inkFaint
             Layout.fillWidth: true
         }
         // สมัครจริงผ่านตัวช่วย root · สมัครเสรี ไม่ต้องมีผู้ดูแลอนุมัติ (การ์ด 0012)
-        AppButton { text: "สมัครบัญชี"; kind: "secondary"; iconPath: Icons.userPlus
+        AppButton { text: Tr.both("สมัครบัญชี"); kind: "secondary"; iconPath: Icons.userPlus
                     onClicked: AppState.go("signup") }
-        AppButton { text: "ภาษา: ไทย"; kind: "secondary"; iconPath: Icons.globe; enabled: false }
-        AppButton { text: "ปิดเครื่อง"; kind: "secondary"; iconPath: Icons.power; enabled: false
-                    ToolTip.visible: hovered; ToolTip.text: "ยังไม่พร้อม (เฟส 1)" }
+        AppButton { text: Tr.both("ภาษา: ไทย"); kind: "secondary"; iconPath: Icons.globe; enabled: false }
+        AppButton { text: Tr.both("ปิดเครื่อง"); kind: "secondary"; iconPath: Icons.power; enabled: false
+                    ToolTip.visible: hovered; ToolTip.text: Tr.both("ยังไม่พร้อม (เฟส 1)") }
     }
 }

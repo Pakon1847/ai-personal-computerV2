@@ -9,8 +9,8 @@ ColumnLayout {
     property string pendingSkill: ""   // ไฟล์สกิลที่ตรวจแล้ว รอกดยืนยันติดตั้ง
 
     PageHeader {
-        title: "ไฟล์ของฉัน"
-        subtitle: "เห็นเฉพาะบัญชีนี้ · อ่านอย่างเดียวในรอบนี้"
+        title: Tr.t("ไฟล์ของฉัน")
+        subtitle: Tr.t("เห็นเฉพาะบัญชีนี้ · อ่านอย่างเดียวในรอบนี้")
         AppText { text: filesBrowser.quotaText; color: Theme.inkMuted; oneLine: true }
     }
 
@@ -22,13 +22,13 @@ ColumnLayout {
             id: searchBox
             objectName: "fileSearchBox"
             Layout.fillWidth: true
-            placeholder: "ค้นในเนื้อหาไฟล์ เช่น ใบเสร็จซ่อมแอร์ · ค่าเทอมลูก"
+            placeholder: Tr.t("ค้นในเนื้อหาไฟล์ เช่น ใบเสร็จซ่อมแอร์ · ค่าเทอมลูก")
             field.onAccepted: filesBrowser.search(text)
         }
-        AppButton { objectName: "fileSearchButton"; text: "ค้น"; iconPath: Icons.search; kind: "primary"; onClicked: filesBrowser.search(searchBox.text) }
+        AppButton { objectName: "fileSearchButton"; text: Tr.t("ค้น"); iconPath: Icons.search; kind: "primary"; onClicked: filesBrowser.search(searchBox.text) }
         AppButton {
             visible: filesBrowser.searchResults.length > 0 || filesBrowser.searchNote !== ""
-            text: "ล้าง"; kind: "ghost"
+            text: Tr.t("ล้าง"); kind: "ghost"
             onClicked: { searchBox.text = ""; filesBrowser.search("") }
         }
     }
@@ -63,14 +63,14 @@ ColumnLayout {
                         AppText { text: hit.modelData.snippet; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; elide: Text.ElideRight; Layout.fillWidth: true }
                     }
                     AppButton {
-                        text: "ถาม AI"; kind: "secondary"; iconPath: Icons.chat
+                        text: Tr.t("ถาม AI"); kind: "secondary"; iconPath: Icons.chat
                         onClicked: {
                             const err = chat.attachFile(filesBrowser.resultPath(hit.modelData.path))
                             if (err === "") AppState.page = "workspace"
                             else fileError.text = err
                         }
                     }
-                    AppButton { text: "เปิดโฟลเดอร์"; kind: "ghost"; onClicked: filesBrowser.openFolderOf(hit.modelData.path) }
+                    AppButton { text: Tr.t("เปิดโฟลเดอร์"); kind: "ghost"; onClicked: filesBrowser.openFolderOf(hit.modelData.path) }
                 }
             }
         }
@@ -79,7 +79,7 @@ ColumnLayout {
     RowLayout {
         Layout.fillWidth: true
         spacing: 8
-        AppButton { text: "ขึ้นไป"; kind: "secondary"; iconPath: Icons.back; enabled: filesBrowser.canGoUp; onClicked: filesBrowser.up() }
+        AppButton { text: Tr.t("ขึ้นไป"); kind: "secondary"; iconPath: Icons.back; enabled: filesBrowser.canGoUp; onClicked: filesBrowser.up() }
         AppText { text: filesBrowser.location; strong: true; oneLine: true; Layout.fillWidth: true; elide: Text.ElideMiddle }
     }
 
@@ -99,9 +99,9 @@ ColumnLayout {
             anchors.margins: 12
             anchors.leftMargin: 20
             anchors.rightMargin: 20
-            AppText { text: "ชื่อ"; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true; oneLine: true }
-            AppText { text: "แก้ไขล่าสุด"; size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 180; oneLine: true }
-            AppText { text: "ขนาด"; size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 100; oneLine: true }
+            AppText { text: Tr.t("ชื่อ"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true; oneLine: true }
+            AppText { text: Tr.t("แก้ไขล่าสุด"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 180; oneLine: true }
+            AppText { text: Tr.t("ขนาด"); size: Theme.fontSmall; color: Theme.inkMuted; Layout.preferredWidth: 100; oneLine: true }
         }
         Rectangle { id: headLine; anchors.top: tableHead.bottom; anchors.topMargin: 12; width: parent.width; height: 1; color: Theme.line }
             // ยึดขอบกับการ์ดตรง ๆ: รายการยาวแค่ไหนก็อยู่ในการ์ด แล้วเลื่อนดูส่วนที่เกิน
@@ -132,7 +132,7 @@ ColumnLayout {
                         AppButton {
                             objectName: "askFileButton"
                             visible: row.modelData.askable === true
-                            text: "ถาม AI"; kind: "secondary"; iconPath: Icons.chat
+                            text: Tr.t("ถาม AI"); kind: "secondary"; iconPath: Icons.chat
                             onClicked: {
                                 const err = chat.attachFile(filesBrowser.pathOf(row.modelData.name))
                                 if (err === "") AppState.page = "workspace"
@@ -143,7 +143,7 @@ ColumnLayout {
                         AppButton {
                             objectName: "installSkillButton"
                             visible: !row.modelData.is_dir && row.modelData.name.toLowerCase().endsWith(".md")
-                            text: page.pendingSkill === row.modelData.name ? "ยืนยันติดตั้ง" : "ติดตั้งเป็นสกิล"
+                            text: page.pendingSkill === row.modelData.name ? Tr.t("ยืนยันติดตั้ง") : Tr.t("ติดตั้งเป็นสกิล")
                             kind: page.pendingSkill === row.modelData.name ? "primary" : "secondary"
                             onClicked: {
                                 const path = filesBrowser.pathOf(row.modelData.name)

@@ -7,12 +7,12 @@ ColumnLayout {
     spacing: 16
 
     PageHeader {
-        title: "สุขภาพเครื่อง"
-        subtitle: "ตรวจจริงทุก 10 วินาที · อ่านอย่างเดียว ไม่แก้อะไรบนเครื่อง"
-        AppButton { text: "ตรวจตอนนี้"; kind: "secondary"; onClicked: system.refresh() }
+        title: Tr.t("สุขภาพเครื่อง")
+        subtitle: Tr.t("ตรวจจริงทุก 10 วินาที · อ่านอย่างเดียว ไม่แก้อะไรบนเครื่อง")
+        AppButton { text: Tr.t("ตรวจตอนนี้"); kind: "secondary"; onClicked: system.refresh() }
         AppButton {
             objectName: "readyButton"
-            text: system.readyBusy ? "กำลังตรวจ…" : "ตรวจความพร้อมก่อนสาธิต"
+            text: system.readyBusy ? Tr.t("กำลังตรวจ…") : Tr.t("ตรวจความพร้อมก่อนสาธิต")
             kind: "primary"; iconPath: Icons.check
             enabled: !system.readyBusy
             onClicked: system.checkReady()
@@ -48,7 +48,7 @@ ColumnLayout {
                     }
                     AppText {
                         visible: rc.modelData.fix !== "" && rc.modelData.level !== "ok"
-                        text: "วิธีแก้: " + rc.modelData.fix
+                        text: Tr.t("วิธีแก้: ") + rc.modelData.fix
                         size: Theme.fontSmall; color: Theme.warnInk; Layout.fillWidth: true
                     }
                 }

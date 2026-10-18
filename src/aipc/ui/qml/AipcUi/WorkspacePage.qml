@@ -27,6 +27,7 @@ Item {
     readonly property int colWidth: Math.min(760, width - 48)
 
     // ตัวอย่างประโยคของสกิลที่โค้ดทำงานได้แล้ว · สกิลที่ยังไม่พร้อมแสดงชื่อพร้อมคำว่า "ยังไม่พร้อม"
+    // ตัวอย่างที่กดแล้วส่งเข้าแชท = ข้อความไทยต้นฉบับ (ตัวแปลคำสั่งยังเป็นภาษาไทย · การ์ด 0039 ระยะ C) · แปลแค่ตอนแสดง
     readonly property var examples: ({
         "system-command": "เปิดยูทูบ",
         "machine-status": "ทำไมเครื่องช้า",
@@ -68,15 +69,15 @@ Item {
     Component.onCompleted: Qt.callLater(focusInput)
     // ข้อความสรุปวันนี้: ทักทาย · วันที่ · นัดใกล้สุด 3 รายการ · สถานะเครื่อง (ไม่เดา: อ่านไม่ได้ก็บอกว่าไม่รู้)
     function briefingText() {
-        const lines = [system.greeting + " " + system.userName, "วันนี้" + system.longDate]
+        const lines = [system.greeting + " " + system.userName, Tr.t("วันนี้") + system.longDate]
         const up = skills.upcoming
         if (skills.reminderWarning !== "") lines.push(skills.reminderWarning)
-        else if (up.length === 0) lines.push("ยังไม่มีนัด")
+        else if (up.length === 0) lines.push(Tr.t("ยังไม่มีนัด"))
         else {
-            lines.push("มีนัด " + up.length + " รายการ")
+            lines.push(Tr.t("มีนัด ") + up.length + Tr.t(" รายการ"))
             for (let i = 0; i < Math.min(3, up.length); i++) lines.push(up[i].when + " " + up[i].what)
         }
-        lines.push("เครื่อง" + machineCard.summary)
+        lines.push(Tr.t("เครื่อง") + machineCard.summary)
         return lines.join("\n")
     }
     function push(item) {
@@ -93,7 +94,7 @@ Item {
         input.text = ""
         if (chat.attachedFile !== "") {  // ถามเกี่ยวกับไฟล์: ตรงไป AI ในเครื่อง ไม่ผ่านสกิล (ฟีเจอร์ข้อ 4)
             if (chat.send(text, "", false))
-                push({ ai: true, text: "", note: "", done: false, skill: "ไฟล์ " + chat.attachedFile })
+                push({ ai: true, text: "", note: "", done: false, skill: Tr.t("ไฟล์ ") + chat.attachedFile })
             return
         }
         if (feedbackFor) {
@@ -108,7 +109,7 @@ Item {
     function dispatch(card, text) {
         const toAi = card.llm === true && chat.send(text, card.prompt || "", card.tools !== false)
         if (card.llm && !toAi)
-            card.title = "ยังตอบไม่ได้: " + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
+            card.title = Tr.t("ยังตอบไม่ได้: ") + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
         // สกิลแบบขั้นตอนเห็นการ์ดขั้นตอนเสมอ แม้ขั้นสุดท้ายจะส่งต่อให้ AI
         if (!toAi || card.kind === "steps")
             showCard(card)
@@ -140,7 +141,7 @@ Item {
         function onFinished(say, ok) {
             const i = root.items.slice()
             if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done)
-                i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: say, note: ok ? "" : "ทำไม่สำเร็จ", done: true })
+                i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: say, note: ok ? "" : Tr.t("ทำไม่สำเร็จ"), done: true })
             root.items = i
             if (voice.available) voice.speak(i.length - 1, say)
         }
@@ -151,7 +152,7 @@ Item {
         target: browser
         function onOpened(say, ok) {
             if (root.home) appsNote.text = ok ? "" : say
-            else if (!ok) root.push({ ai: true, text: say, note: "ทำไม่สำเร็จ", done: true })
+            else if (!ok) root.push({ ai: true, text: say, note: Tr.t("ทำไม่สำเร็จ"), done: true })
         }
     }
     function pendingConfirm() {
@@ -170,17 +171,17 @@ Item {
         const yn = tok !== "" ? browser.yesNo(t) : ""
         if (yn === "yes" || yn === "no") { push({ user: true, text: t }); answer(tok, yn === "yes"); speakLastCard(); return }
         if (yn === "unclear") {
-            const again = "ยังไม่ได้ทำ · ตอบว่า “ใช่” หรือ “ไม่” อย่างเดียว"
+            const again = Tr.t("ยังไม่ได้ทำ · ตอบว่า “ใช่” หรือ “ไม่” อย่างเดียว")
             push({ user: true, text: t })
-            push({ ai: true, text: again, note: "", done: true, skill: "สั่งงานด้วยเสียง" })
+            push({ ai: true, text: again, note: "", done: true, skill: Tr.t("สั่งงานด้วยเสียง") })
             if (voice.available) voice.speak(items.length - 1, again)
             return
         }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
         if (browser.busy) {
             push({ user: true, text: t })
-            push({ ai: true, text: "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่", note: "", done: true, skill: "เบราว์เซอร์ของผู้ช่วย" })
-            if (voice.available) voice.speak(items.length - 1, "ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")
+            push({ ai: true, text: Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่"), note: "", done: true, skill: Tr.t("เบราว์เซอร์ของผู้ช่วย") })
+            if (voice.available) voice.speak(items.length - 1, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่"))
             return
         }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
@@ -193,7 +194,7 @@ Item {
         }
         if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
             push({ user: true, text: t })
-            push({ ai: true, text: "", note: "", done: false, skill: "เบราว์เซอร์ของผู้ช่วย" })
+            push({ ai: true, text: "", note: "", done: false, skill: Tr.t("เบราว์เซอร์ของผู้ช่วย") })
             return
         }
         if (way === "command") {        // คำสั่งเครื่อง: ทางเดิมของแชททำคำสั่งก่อนถึง AI (ยืนยันตามกติกาเดิม)
@@ -236,9 +237,9 @@ Item {
         }
         const say = way === "needs_browser"
             ? browser.hint(t)   // คุมเพลงก่อนเปิดเพลง = บอกให้เปิดเพลงก่อน (การ์ด 0035)
-            : "ไม่รู้จักคำสั่ง \"" + t + "\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท"
+            : Tr.t("ไม่รู้จักคำสั่ง \"") + t + Tr.t("\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท")
         push({ user: true, text: t })
-        push({ ai: true, text: say, note: "", done: true, skill: "สั่งงานด้วยเสียง" })
+        push({ ai: true, text: say, note: "", done: true, skill: Tr.t("สั่งงานด้วยเสียง") })
         if (voice.available) voice.speak(items.length - 1, say)
     }
     function speakLastCard() {
@@ -312,8 +313,8 @@ Item {
             visible: voice.available
             kind: uiSettings.speakAnswers ? "primary" : "secondary"
             iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
-            text: "อ่านคำตอบออกเสียง: " + (uiSettings.speakAnswers ? "เปิด" : "ปิด")
-            Accessible.name: text + " · แตะเพื่อ" + (uiSettings.speakAnswers ? "ปิด" : "เปิด")
+            text: Tr.t("อ่านคำตอบออกเสียง: ") + (uiSettings.speakAnswers ? Tr.t("เปิด") : Tr.t("ปิด"))
+            Accessible.name: text + Tr.t(" · แตะเพื่อ") + (uiSettings.speakAnswers ? Tr.t("ปิด") : Tr.t("เปิด"))
             onClicked: {
                 const on = !uiSettings.speakAnswers
                 uiSettings.setSpeakAnswers(on)
@@ -322,17 +323,17 @@ Item {
         }
         AppButton {
             id: historyButton
-            text: "ประวัติ"; kind: "secondary"; iconPath: Icons.chat
+            text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
             onClicked: historyPopup.open()
         }
         AppButton {
             visible: !root.home
-            text: "แชทใหม่"; kind: "secondary"; iconPath: Icons.plus
+            text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
             onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
         }
         AppButton {
-            text: chat.temporary ? "แชทชั่วคราว ✓" : "แชทชั่วคราว"; kind: "secondary"
-            ToolTip.visible: hovered; ToolTip.text: "ไม่บันทึกประวัติของบทสนทนานี้"
+            text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
+            ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
             onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
         }
     }
@@ -345,11 +346,11 @@ Item {
         background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
         contentItem: ColumnLayout {
             spacing: 6
-            AppText { text: "ประวัติบทสนทนา"; strong: true }
+            AppText { text: Tr.t("ประวัติบทสนทนา"); strong: true }
             AppText {
                 Layout.fillWidth: true
                 visible: chat.history.length === 0
-                text: "ยังไม่มีบทสนทนาที่บันทึกไว้"
+                text: Tr.t("ยังไม่มีบทสนทนาที่บันทึกไว้")
                 size: Theme.fontSmall; color: Theme.inkMuted
             }
             Repeater {
@@ -358,7 +359,7 @@ Item {
                     required property var modelData
                     Layout.fillWidth: true
                     kind: "ghost"
-                    text: modelData.title || "(ไม่มีชื่อ)"
+                    text: modelData.title || Tr.t("(ไม่มีชื่อ)")
                     onClicked: { root.loadChat(chat.openChat(modelData.id)); historyPopup.close() }
                 }
             }
@@ -388,12 +389,12 @@ Item {
                 spacing: 16
                 RowLayout {
                     Layout.fillWidth: true
-                    AppText { text: "เชื่อมต่อ Claude"; size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
-                    AppButton { objectName: "claudeGuideClose"; kind: "secondary"; text: "ปิด"; onClicked: guidePopup.close() }
+                    AppText { text: Tr.t("เชื่อมต่อ Claude"); size: Theme.fontHeading; strong: true; Layout.fillWidth: true }
+                    AppButton { objectName: "claudeGuideClose"; kind: "secondary"; text: Tr.t("ปิด"); onClicked: guidePopup.close() }
                 }
                 AppText {
                     Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                    text: "ทำครั้งเดียวต่อบัญชี · การเข้าสู่ระบบ Claude เป็นของบัญชีนี้คนเดียว คนอื่นในเครื่องใช้ไม่ได้"
+                    text: Tr.t("ทำครั้งเดียวต่อบัญชี · การเข้าสู่ระบบ Claude เป็นของบัญชีนี้คนเดียว คนอื่นในเครื่องใช้ไม่ได้")
                 }
                 // ทางที่ 2 (การ์ด 0021 หัวข้อ 10): เปิดหน้าต่างคำสั่งบนจอนี้ · ไม่ต้องใช้คอมพิวเตอร์อีกเครื่อง
                 Rectangle {
@@ -410,30 +411,30 @@ Item {
                         anchors.top: parent.top
                         anchors.margins: 16
                         spacing: 8
-                        AppText { text: "เชื่อมต่อที่เครื่องนี้ (ง่ายที่สุด)"; strong: true; color: Theme.accentInk; Layout.fillWidth: true }
+                        AppText { text: Tr.t("เชื่อมต่อที่เครื่องนี้ (ง่ายที่สุด)"); strong: true; color: Theme.accentInk; Layout.fillWidth: true }
                         AppText {
                             Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.accentInk
-                            text: "กดปุ่มแล้วหน้าต่างเชื่อมต่อจะเปิดขึ้น ติดตั้งให้เอง แล้วหน้าเข้าสู่ระบบ Claude จะเปิดใน Chromium · "
-                                  + "เข้าสู่ระบบเสร็จ กลับมาที่หน้าต่างเชื่อมต่อ พิมพ์ /exit แล้วกด Enter"
+                            text: Tr.t("กดปุ่มแล้วหน้าต่างเชื่อมต่อจะเปิดขึ้น ติดตั้งให้เอง แล้วหน้าเข้าสู่ระบบ Claude จะเปิดใน Chromium · ")
+                                  + Tr.t("เข้าสู่ระบบเสร็จ กลับมาที่หน้าต่างเชื่อมต่อ พิมพ์ /exit แล้วกด Enter")
                         }
                         AppButton {
                             objectName: "claudeConnectHere"
                             enabled: !cloudUsage.connecting
                             iconPath: Icons.terminal
-                            text: cloudUsage.connecting ? "หน้าต่างเชื่อมต่อเปิดอยู่…" : "เชื่อมต่อที่เครื่องนี้"
+                            text: cloudUsage.connecting ? Tr.t("หน้าต่างเชื่อมต่อเปิดอยู่…") : Tr.t("เชื่อมต่อที่เครื่องนี้")
                             onClicked: cloudUsage.connectHere()
                         }
                         AppText {
                             objectName: "claudeConnectedNow"
                             visible: cloudUsage.connectedNow
                             Layout.fillWidth: true; strong: true; color: Theme.okInk
-                            text: "เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude"
+                            text: Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
                         }
                     }
                 }
                 AppText {
                     visible: cloudUsage.canConnectHere
-                    text: "หรือใช้คอมพิวเตอร์อีกเครื่อง"; strong: true; Layout.fillWidth: true; Layout.topMargin: 4
+                    text: Tr.t("หรือใช้คอมพิวเตอร์อีกเครื่อง"); strong: true; Layout.fillWidth: true; Layout.topMargin: 4
                 }
                 ClaudeGuide { Layout.fillWidth: true }
             }
@@ -445,7 +446,7 @@ Item {
         id: notice
         property bool dismissed: false
         readonly property string missedText: skills.missed.length === 0 ? ""
-            : "พลาดการเตือน " + skills.missed.length + " รายการขณะไม่ได้ใช้เครื่อง: "
+            : Tr.t("พลาดการเตือน ") + skills.missed.length + Tr.t(" รายการขณะไม่ได้ใช้เครื่อง: ")
               + skills.missed.map(r => r.what + " (" + r.when + ")").join(" · ")
         readonly property string message: [missedText, skills.reminderWarning].filter(t => t !== "").join("\n")
         visible: message !== "" && !dismissed
@@ -463,7 +464,7 @@ Item {
             spacing: 10
             Icon { path: Icons.alert; color: Theme.warnInk; Layout.alignment: Qt.AlignTop }
             AppText { text: notice.message; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
-            AppButton { text: "รับทราบ"; kind: "secondary"; onClicked: notice.dismissed = true }
+            AppButton { text: Tr.t("รับทราบ"); kind: "secondary"; onClicked: notice.dismissed = true }
         }
     }
 
@@ -501,7 +502,7 @@ Item {
             }
             AppText {
                 Layout.alignment: Qt.AlignHCenter
-                text: "วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้"
+                text: Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
                 color: Theme.inkMuted; oneLine: true
             }
             // อ่านสรุปวันนี้ให้ฟัง (การ์ด 0019) · สำหรับคนที่ไม่สะดวกอ่านจอ · ใช้ข้อมูลเดียวกับการ์ดข้างล่าง
@@ -511,7 +512,7 @@ Item {
                 visible: voice.available
                 kind: "ghost"
                 iconPath: Icons.chat
-                text: voice.speakingKey === -2 ? "หยุดอ่าน" : "อ่านสรุปวันนี้ให้ฟัง"
+                text: voice.speakingKey === -2 ? Tr.t("หยุดอ่าน") : Tr.t("อ่านสรุปวันนี้ให้ฟัง")
                 onClicked: voice.speakingKey === -2 ? voice.stop() : voice.speak(-2, root.briefingText())
             }
         }
@@ -542,23 +543,23 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 2
-                    AppText { text: "เชื่อมต่อ Claude เพื่อถามข่าวและข้อมูลสด"; strong: true; Layout.fillWidth: true }
+                    AppText { text: Tr.t("เชื่อมต่อ Claude เพื่อถามข่าวและข้อมูลสด"); strong: true; Layout.fillWidth: true }
                     AppText {
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                         text: cloudUsage.connectedNow
-                              ? "เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude"
-                              : "ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย"
+                              ? Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
+                              : Tr.t("ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย")
                     }
                 }
                 AppButton {
                     objectName: "claudeConnectLater"
                     kind: "ghost"
-                    text: "ไว้ทีหลัง"
+                    text: Tr.t("ไว้ทีหลัง")
                     onClicked: connectCard.later = true
                 }
                 AppButton {
                     objectName: "claudeConnectOpen"
-                    text: "ดูวิธีเชื่อมต่อ"
+                    text: Tr.t("ดูวิธีเชื่อมต่อ")
                     onClicked: { cloudUsage.refreshGuide(); guidePopup.open() }
                 }
             }
@@ -577,7 +578,7 @@ Item {
                 anchors.top: parent.top
                 anchors.margins: 16
                 spacing: 10
-                AppText { text: "ยินดีต้อนรับ · ลองพิมพ์แบบนี้ได้เลย"; strong: true; Layout.fillWidth: true }
+                AppText { text: Tr.t("ยินดีต้อนรับ · ลองพิมพ์แบบนี้ได้เลย"); strong: true; Layout.fillWidth: true }
                 Flow {
                     Layout.fillWidth: true
                     spacing: 8
@@ -591,7 +592,7 @@ Item {
                         AppButton {
                             required property string modelData
                             kind: "secondary"; iconPath: Icons.sparkle
-                            text: "“" + modelData.replace(/: $/, "") + "”"
+                            text: "“" + Tr.t(modelData).replace(/: $/, "") + "”"
                             onClicked: modelData.endsWith(": ") ? (input.text = modelData, input.forceActiveFocus())
                                                                 : root.sendText(modelData)
                         }
@@ -599,13 +600,13 @@ Item {
                 }
                 AppText {
                     Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                    text: "แชท นัด และไฟล์เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · คำสั่งเครื่องกับคำถามทั่วไป AI ในเครื่องทำเอง"
-                          + (skills.canForge ? " · ข้อมูลสด (อากาศ ข่าว) และงานใหม่ที่ยังไม่มีสกิล จะส่งเฉพาะประโยคนั้นให้ Claude" : "")
-                          + " · ตั้งเข้าเครื่องด้วยใบหน้าได้ที่หน้าตั้งค่า"
+                    text: Tr.t("แชท นัด และไฟล์เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · คำสั่งเครื่องกับคำถามทั่วไป AI ในเครื่องทำเอง")
+                          + (skills.canForge ? Tr.t(" · ข้อมูลสด (อากาศ ข่าว) และงานใหม่ที่ยังไม่มีสกิล จะส่งเฉพาะประโยคนั้นให้ Claude") : "")
+                          + Tr.t(" · ตั้งเข้าเครื่องด้วยใบหน้าได้ที่หน้าตั้งค่า")
                 }
                 AppButton {
                     objectName: "onboardingDone"
-                    text: "เข้าใจแล้ว"
+                    text: Tr.t("เข้าใจแล้ว")
                     onClicked: uiSettings.finishOnboarding()
                 }
             }
@@ -626,9 +627,9 @@ Item {
                     enabled: modelData.ready && example !== ""
                     kind: "secondary"
                     iconPath: Icons.sparkle
-                    text: enabled ? "“" + example + "”" : modelData.name + " · ยังไม่พร้อม"
+                    text: enabled ? "“" + Tr.t(example) + "”" : modelData.name + Tr.t(" · ยังไม่พร้อม")
                     ToolTip.visible: hovered
-                    ToolTip.text: enabled ? "สกิล: " + modelData.name : "ต้องมีก่อน: " + modelData.missing.join(", ")
+                    ToolTip.text: enabled ? Tr.t("สกิล: ") + modelData.name : Tr.t("ต้องมีก่อน: ") + modelData.missing.join(", ")
                     onClicked: root.sendText(example)
                 }
             }
@@ -645,7 +646,7 @@ Item {
                 anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                 anchors.margins: 16
                 spacing: 10
-                AppText { text: "แอปที่ใช้บ่อย"; size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
+                AppText { text: Tr.t("แอปที่ใช้บ่อย"); size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
                 Flow {
                     Layout.fillWidth: true
                     spacing: 8
@@ -655,8 +656,8 @@ Item {
                             { key: "facebook", name: "Facebook", icon: Icons.chat },
                             { key: "instagram", name: "Instagram", icon: Icons.camera },
                             { key: "gmail", name: "Gmail", icon: Icons.mail },
-                            { key: "calendar", name: "ปฏิทิน Google", icon: Icons.calendar },
-                            { key: "drive", name: "ไดรฟ์ Google", icon: Icons.folder }
+                            { key: "calendar", name: Tr.t("ปฏิทิน Google"), icon: Icons.calendar },
+                            { key: "drive", name: Tr.t("ไดรฟ์ Google"), icon: Icons.folder }
                         ]
                         AppButton {
                             required property var modelData
@@ -699,7 +700,7 @@ Item {
                     RowLayout {
                         spacing: 8
                         Icon { path: Icons.alert; color: Theme.accent; width: 18; height: 18; visible: skills.reminderWarning !== "" }
-                        AppText { text: "นัดถัดไป"; size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
+                        AppText { text: Tr.t("นัดถัดไป"); size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
                     }
                     AppText {
                         visible: skills.reminderWarning !== ""
@@ -710,7 +711,7 @@ Item {
                         objectName: "nextReminderWhat"
                         visible: skills.reminderWarning === ""
                         Layout.fillWidth: true
-                        text: skills.upcoming.length > 0 ? skills.upcoming[0].what : "ยังไม่มีนัด"
+                        text: skills.upcoming.length > 0 ? skills.upcoming[0].what : Tr.t("ยังไม่มีนัด")
                         size: Theme.fontHeading; strong: true
                         elide: Text.ElideRight; maximumLineCount: 2
                     }
@@ -719,8 +720,8 @@ Item {
                         spacing: 8
                         Chip { objectName: "nextReminderWhen"; visible: skills.upcoming.length > 0; text: skills.upcoming.length > 0 ? skills.upcoming[0].when : ""; kind: "accent" }
                         AppText {
-                            text: skills.upcoming.length > 1 ? "และอีก " + (skills.upcoming.length - 1) + " นัด"
-                                : skills.upcoming.length === 0 ? "ลองพิมพ์ “เตือน…” ในช่องด้านบน" : ""
+                            text: skills.upcoming.length > 1 ? Tr.t("และอีก ") + (skills.upcoming.length - 1) + Tr.t(" นัด")
+                                : skills.upcoming.length === 0 ? Tr.t("ลองพิมพ์ “เตือน…” ในช่องด้านบน") : ""
                             size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true
                         }
                     }
@@ -736,15 +737,15 @@ Item {
                 implicitHeight: macCol.implicitHeight + 32
                 readonly property int unknown: system.checks.filter(c => c.level === "neutral").length
                 readonly property int known: system.checks.length - unknown
-                readonly property string summary: system.healthIssues > 0 ? "มีเรื่องควรดู " + system.healthIssues + " ข้อ"
-                    : known === 0 ? "ยังไม่รู้" : unknown > 0 ? "ไม่พบปัญหา · อ่านไม่ได้ " + unknown + " ข้อ" : "ปกติ"
+                readonly property string summary: system.healthIssues > 0 ? Tr.t("มีเรื่องควรดู ") + system.healthIssues + Tr.t(" ข้อ")
+                    : known === 0 ? Tr.t("ยังไม่รู้") : unknown > 0 ? Tr.t("ไม่พบปัญหา · อ่านไม่ได้ ") + unknown + Tr.t(" ข้อ") : Tr.t("ปกติ")
                 id: machineCard
                 ColumnLayout {
                     id: macCol
                     anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                     anchors.margins: 16
                     spacing: 6
-                    AppText { text: "เครื่อง"; size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
+                    AppText { text: Tr.t("เครื่อง"); size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
                     RowLayout {
                         spacing: 8
                         Rectangle {
@@ -757,9 +758,9 @@ Item {
                     }
                     RowLayout {
                         spacing: 8
-                        AppText { text: "อุณหภูมิ " + system.tempText + " · " + system.storageText; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true }
+                        AppText { text: Tr.t("อุณหภูมิ ") + system.tempText + " · " + system.storageText; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true }
                         Item { Layout.fillWidth: true }
-                        AppButton { text: "ดูรายละเอียด"; kind: "ghost"; onClicked: AppState.page = "health" }
+                        AppButton { text: Tr.t("ดูรายละเอียด"); kind: "ghost"; onClicked: AppState.page = "health" }
                     }
                 }
             }
@@ -825,7 +826,7 @@ Item {
                     spacing: 6
                     AppText {
                         // ตอบโดย Claude = หัวต้องบอกว่า Claude (พบบนจอ Pi: หัวเขียน "AI ในเครื่อง" แต่หมายเหตุบอก Claude)
-                        text: ((row.modelData.note || "").indexOf("ตอบโดย Claude") === 0 ? "Claude (cloud)" : "AI ในเครื่อง")
+                        text: ((row.modelData.note || "").indexOf("ตอบโดย Claude") === 0 ? "Claude (cloud)" : Tr.t("AI ในเครื่อง"))
                               + (row.modelData.skill ? " · " + row.modelData.skill : "")
                         size: Theme.fontCaption; color: Theme.inkMuted
                     }
@@ -833,7 +834,7 @@ Item {
                         objectName: "aiText"
                         Layout.fillWidth: true
                         textFormat: Text.PlainText  // ค่าเริ่มต้น AutoText เดาเป็น HTML ได้ถ้าคำตอบหน้าตาเหมือนแท็ก
-                        text: root.tidy(row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : "กำลังอ่านข้อความ…"))
+                        text: root.tidy(row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : Tr.t("กำลังอ่านข้อความ…")))
                     }
                     AppText {
                         visible: !!row.modelData.note
@@ -847,7 +848,7 @@ Item {
                         visible: !!row.modelData.done && (row.modelData.text || "") !== ""
                         AppButton {
                             objectName: "copyAnswer"
-                            text: root.copiedRow === row.index ? "คัดลอกแล้ว" : "คัดลอก"
+                            text: root.copiedRow === row.index ? Tr.t("คัดลอกแล้ว") : Tr.t("คัดลอก")
                             kind: "ghost"
                             onClicked: { chat.copyText(row.modelData.text); root.copiedRow = row.index }
                         }
@@ -855,7 +856,7 @@ Item {
                         AppButton {
                             objectName: "speakAnswer"
                             visible: voice.available
-                            text: voice.speakingKey === row.index ? "หยุดอ่าน" : "ฟังคำตอบนี้"
+                            text: voice.speakingKey === row.index ? Tr.t("หยุดอ่าน") : Tr.t("ฟังคำตอบนี้")
                             kind: "ghost"
                             onClicked: {
                                 root.speakRow = row.index
@@ -897,7 +898,7 @@ Item {
                 onSummarizeFile: (path) => {
                     const err = chat.attachFile(path)
                     if (err !== "") { root.showCard({ kind: "chat", title: err, chips: [], lines: [], confirmToken: "", page: "", badge: {} }); return }
-                    input.text = "สรุปเนื้อหาไฟล์นี้เป็นข้อ ๆ สั้น ๆ"
+                    input.text = Tr.t("สรุปเนื้อหาไฟล์นี้เป็นข้อ ๆ สั้น ๆ")
                     root.send()
                 }
                 onAskFile: (path) => {
@@ -938,8 +939,8 @@ Item {
                     id: input
                     objectName: "chatInput"
                     placeholderText: !!root.feedbackFor
-                                     ? "บอกว่าสกิล “" + root.feedbackFor.name + "” ผิดตรงไหน เช่น ให้เปิด Gmail แทน · Esc = ยกเลิก"
-                                     : "พิมพ์ข้อความถึงผู้ช่วย AI"
+                                     ? Tr.t("บอกว่าสกิล “") + root.feedbackFor.name + Tr.t("” ผิดตรงไหน เช่น ให้เปิด Gmail แทน · Esc = ยกเลิก")
+                                     : Tr.t("พิมพ์ข้อความถึงผู้ช่วย AI")
                     placeholderTextColor: Theme.inkFaint
                     color: Theme.ink
                     font.family: Theme.family
@@ -947,7 +948,7 @@ Item {
                     wrapMode: TextEdit.Wrap
                     verticalAlignment: TextEdit.AlignVCenter
                     background: null
-                    Accessible.name: "ข้อความ"
+                    Accessible.name: Tr.t("ข้อความ")
                     Keys.onPressed: (event) => {
                         const enter = event.key === Qt.Key_Return || event.key === Qt.Key_Enter
                         // inputMethodComposing = กำลังพิมพ์ผ่าน IME และคำยังไม่เสร็จ → ห้ามส่ง
@@ -972,13 +973,13 @@ Item {
                 enabled: !voice.transcribing && !chat.busy
                 kind: voice.listening ? "warn" : "secondary"
                 iconPath: Icons.mic
-                text: voice.listening ? "กำลังฟัง · แตะเพื่อหยุด" : voice.transcribing ? "กำลังถอด…" : ""
-                Accessible.name: "แตะเพื่อพูด"
+                text: voice.listening ? Tr.t("กำลังฟัง · แตะเพื่อหยุด") : voice.transcribing ? Tr.t("กำลังถอด…") : ""
+                Accessible.name: Tr.t("แตะเพื่อพูด")
                 onClicked: voice.listening ? voice.stopListening() : voice.startListening()
             }
             AppButton {
                 objectName: "sendButton"
-                text: chat.busy ? "หยุด" : "ส่ง"; iconPath: chat.busy ? Icons.stop : Icons.send
+                text: chat.busy ? Tr.t("หยุด") : Tr.t("ส่ง"); iconPath: chat.busy ? Icons.stop : Icons.send
                 enabled: chat.busy || input.text.trim() !== ""
                 onClicked: chat.busy ? chat.stop() : root.send()
             }
@@ -1005,11 +1006,11 @@ Item {
             AppText {
                 Layout.fillWidth: true
                 text: !!root.feedbackFor
-                      ? "ข้อความถัดไปจะส่งให้ Claude แก้สกิล “" + root.feedbackFor.name + "” · บอกว่าผิดตรงไหน"
+                      ? Tr.t("ข้อความถัดไปจะส่งให้ Claude แก้สกิล “") + root.feedbackFor.name + Tr.t("” · บอกว่าผิดตรงไหน")
                       : ""
                 size: Theme.fontSmall; color: Theme.warnInk
             }
-            AppButton { text: "ยกเลิก"; kind: "ghost"; onClicked: root.feedbackFor = null }
+            AppButton { text: Tr.t("ยกเลิก"); kind: "ghost"; onClicked: root.feedbackFor = null }
         }
     }
     // แนบไฟล์อยู่ (ฟีเจอร์ข้อ 4): คำถามถัดไปตอบจากไฟล์นี้ · กด ✕ เลิกแนบ
@@ -1031,10 +1032,10 @@ Item {
             spacing: 8
             AppText {
                 Layout.fillWidth: true
-                text: "ถามเกี่ยวกับไฟล์ “" + chat.attachedFile + "” · AI ในเครื่องอ่าน ไม่ส่งไฟล์ออกนอกเครื่อง"
+                text: Tr.t("ถามเกี่ยวกับไฟล์ “") + chat.attachedFile + Tr.t("” · AI ในเครื่องอ่าน ไม่ส่งไฟล์ออกนอกเครื่อง")
                 size: Theme.fontSmall; color: Theme.accentInk
             }
-            AppButton { text: "เลิกแนบ"; kind: "ghost"; onClicked: chat.detachFile() }
+            AppButton { text: Tr.t("เลิกแนบ"); kind: "ghost"; onClicked: chat.detachFile() }
         }
     }
     AppText {
@@ -1045,9 +1046,9 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         objectName: "chatHint"
         text: chat.notice !== "" ? chat.notice
-              : voice.listening ? "กำลังฟัง · พูดจบแล้วเงียบสักครู่ ระบบหยุดเอง (หรือแตะไมค์อีกครั้ง)"
+              : voice.listening ? Tr.t("กำลังฟัง · พูดจบแล้วเงียบสักครู่ ระบบหยุดเอง (หรือแตะไมค์อีกครั้ง)")
               : voice.micMessage !== "" ? voice.micMessage
-              : chat.busy ? "Esc หรือปุ่มหยุด = หยุดตอบ" : "Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่"
+              : chat.busy ? Tr.t("Esc หรือปุ่มหยุด = หยุดตอบ") : Tr.t("Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่")
         size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true
     }
 }

@@ -35,9 +35,9 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            BrandMark { title: "ลบบัญชี" }
+            BrandMark { title: Tr.both("ลบบัญชี") }
             Item { Layout.fillWidth: true }
-            AppButton { text: "กลับหน้า Login"; kind: "ghost"; enabled: !signup.busy; onClicked: AppState.go("login") }
+            AppButton { text: Tr.both("กลับหน้า Login"); kind: "ghost"; enabled: !signup.busy; onClicked: AppState.go("login") }
         }
 
         Card {
@@ -48,10 +48,10 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 32
                 spacing: 14
-                AppText { text: "ลบบัญชีและข้อมูลทั้งหมดถาวร"; size: Theme.fontTitle; strong: true }
+                AppText { text: Tr.both("ลบบัญชีและข้อมูลทั้งหมดถาวร"); size: Theme.fontTitle; strong: true }
                 AppText {
-                    text: "ลบแชท นัด ไฟล์ การตั้งค่า สกิล ใบหน้า PIN และประวัติการส่งข้อมูลออก · กู้คืนไม่ได้ · "
-                          + "ต้องออกจากระบบบัญชีนั้นก่อน · บัญชีผู้ดูแลเครื่องลบที่นี่ไม่ได้"
+                    text: Tr.both("ลบแชท นัด ไฟล์ การตั้งค่า สกิล ใบหน้า PIN และประวัติการส่งข้อมูลออก · กู้คืนไม่ได้ · ")
+                          + Tr.both("ต้องออกจากระบบบัญชีนั้นก่อน · บัญชีผู้ดูแลเครื่องลบที่นี่ไม่ได้")
                     color: Theme.inkMuted; Layout.fillWidth: true
                 }
                 GridLayout {
@@ -59,26 +59,26 @@ Rectangle {
                     columns: 2
                     columnSpacing: 16
                     rowSpacing: 12
-                    AppField { id: userField; objectName: "deleteUser"; Layout.fillWidth: true; label: "ชื่อผู้ใช้"; mono: true }
-                    AppField { id: pwField; objectName: "deletePassword"; Layout.fillWidth: true; label: "รหัสผ่าน"; password: true }
+                    AppField { id: userField; objectName: "deleteUser"; Layout.fillWidth: true; label: Tr.both("ชื่อผู้ใช้"); mono: true }
+                    AppField { id: pwField; objectName: "deletePassword"; Layout.fillWidth: true; label: Tr.both("รหัสผ่าน"); password: true }
                     AppField {
                         id: confirmField
                         objectName: "deleteConfirm"
                         Layout.fillWidth: true
                         Layout.columnSpan: 2
-                        label: "พิมพ์ชื่อผู้ใช้อีกครั้งเพื่อยืนยัน"; mono: true
-                        hint: confirmField.text === "" || confirmField.text.trim() === userField.text.trim() ? "" : "ไม่ตรงกับชื่อผู้ใช้"
+                        label: Tr.both("พิมพ์ชื่อผู้ใช้อีกครั้งเพื่อยืนยัน"); mono: true
+                        hint: confirmField.text === "" || confirmField.text.trim() === userField.text.trim() ? "" : Tr.both("ไม่ตรงกับชื่อผู้ใช้")
                         hintKind: "error"
                     }
                 }
-                AppCheck { id: understood; objectName: "deleteUnderstood"; text: "เข้าใจแล้วว่าลบแล้วกู้คืนไม่ได้" }
+                AppCheck { id: understood; objectName: "deleteUnderstood"; text: Tr.both("เข้าใจแล้วว่าลบแล้วกู้คืนไม่ได้") }
                 AppText { id: msg; objectName: "deleteMsg"; visible: text !== ""; color: Theme.danger; Layout.fillWidth: true }
-                AppText { visible: signup.busy; text: "กำลังลบและตรวจทีละที่…"; color: Theme.inkMuted }
+                AppText { visible: signup.busy; text: Tr.both("กำลังลบและตรวจทีละที่…"); color: Theme.inkMuted }
                 Item { Layout.fillHeight: true }
                 AppButton {
                     objectName: "deleteButton"
                     Layout.alignment: Qt.AlignRight
-                    text: "ลบบัญชีถาวร"
+                    text: Tr.both("ลบบัญชีถาวร")
                     kind: "danger"
                     enabled: root.formValid && !signup.busy
                     onClicked: signup.deleteAccount(userField.text, pwField.text, confirmField.text)
@@ -98,14 +98,14 @@ Rectangle {
                 spacing: 10
                 AppText {
                     text: root.result === null ? ""
-                          : root.result.simulated ? "ใบยืนยันการลบ (จำลอง · ไม่ได้ลบจริง)"
-                          : root.result.ok ? "ใบยืนยันการลบบัญชี " + root.result.user
-                          : "ลบไม่ครบ · ยังเหลือบางที่"
+                          : root.result.simulated ? Tr.both("ใบยืนยันการลบ (จำลอง · ไม่ได้ลบจริง)")
+                          : root.result.ok ? Tr.both("ใบยืนยันการลบบัญชี ") + root.result.user
+                          : Tr.both("ลบไม่ครบ · ยังเหลือบางที่")
                     size: Theme.fontTitle; strong: true; Layout.fillWidth: true
                 }
                 AppText {
                     visible: root.result !== null && !!root.result.at
-                    text: root.result !== null && root.result.at ? "ลบเมื่อ " + root.result.at + " · ตรวจซ้ำหลังลบทีละที่" : ""
+                    text: root.result !== null && root.result.at ? Tr.both("ลบเมื่อ ") + root.result.at + Tr.both(" · ตรวจซ้ำหลังลบทีละที่") : ""
                     color: Theme.inkMuted
                 }
                 Repeater {
@@ -115,20 +115,20 @@ Rectangle {
                         objectName: "deleteCheck"
                         Layout.fillWidth: true
                         spacing: 10
-                        Chip { text: modelData.gone ? "ลบแล้ว" : "ยังอยู่"; kind: modelData.gone ? "ok" : "danger" }
+                        Chip { text: modelData.gone ? Tr.both("ลบแล้ว") : Tr.both("ยังอยู่"); kind: modelData.gone ? "ok" : "danger" }
                         AppText { text: modelData.what; Layout.fillWidth: true }
                     }
                 }
                 AppText {
                     visible: root.result !== null && (root.result.limits || []).length > 0
-                    text: "ข้อจำกัดที่ต้องรู้"; strong: true; Layout.topMargin: 8
+                    text: Tr.both("ข้อจำกัดที่ต้องรู้"); strong: true; Layout.topMargin: 8
                 }
                 Repeater {
                     model: root.result === null ? [] : (root.result.limits || [])
                     AppText { required property string modelData; text: "· " + modelData; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
                 }
                 Item { Layout.fillHeight: true }
-                AppButton { Layout.alignment: Qt.AlignRight; text: "ไปหน้า Login"; onClicked: AppState.go("login") }
+                AppButton { Layout.alignment: Qt.AlignRight; text: Tr.both("ไปหน้า Login"); onClicked: AppState.go("login") }
             }
         }
     }

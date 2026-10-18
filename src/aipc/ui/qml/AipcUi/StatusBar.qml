@@ -21,7 +21,7 @@ Item {
         Item { Layout.fillWidth: true }
         Chip {
             objectName: "networkIndicator"
-            text: ({ on: "เครือข่าย: ต่ออยู่", off: "ออฟไลน์", unknown: "เครือข่าย: ไม่รู้" })[system.networkState]
+            text: ({ on: Tr.t("เครือข่าย: ต่ออยู่"), off: Tr.t("ออฟไลน์"), unknown: Tr.t("เครือข่าย: ไม่รู้") })[system.networkState]
             kind: system.networkState === "off" ? "warn" : "neutral"
             iconPath: Icons.globe
             compact: bar.tight
@@ -29,12 +29,12 @@ Item {
         Chip {
             objectName: "cameraIndicator"
             // H3: กำลังใช้กล้อง (ลงทะเบียน/ทดลองใบหน้า) ต้องเห็นชัดทุกหน้า
-            text: face.busy ? "กล้องกำลังใช้" : system.cameraPresent ? "กล้องพร้อม · ไม่ได้ใช้" : "ไม่พบกล้อง"
+            text: face.busy ? Tr.t("กล้องกำลังใช้") : system.cameraPresent ? Tr.t("กล้องพร้อม · ไม่ได้ใช้") : Tr.t("ไม่พบกล้อง")
             kind: face.busy ? "warn" : "neutral"
             iconPath: system.cameraPresent || face.busy ? Icons.camera : Icons.cameraOff
         }
         // H3: ไมค์เปิดเฉพาะตอนกดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · ต้องเห็นชัดทุกหน้า
-        Chip { objectName: "micIndicator"; text: voice.listening ? "ไมค์เปิด · กำลังฟัง" : "ไมค์ปิด"; iconPath: Icons.mic
+        Chip { objectName: "micIndicator"; text: voice.listening ? Tr.t("ไมค์เปิด · กำลังฟัง") : Tr.t("ไมค์ปิด"); iconPath: Icons.mic
                kind: voice.listening ? "warn" : "neutral" }
         // สถานะจริงจาก /health ของ llama-server (การ์ด 0013 · H5)
         Chip { objectName: "modelIndicator"; text: chat.statusText; iconPath: Icons.cpu; compact: bar.tight
@@ -52,6 +52,6 @@ Item {
             TapHandler { onTapped: AppState.open("settings") }
         }
         Chip { text: system.storageText; iconPath: Icons.hdd; compact: bar.tight }
-        Chip { text: system.tempText; iconPath: Icons.thermo; compact: bar.tight; Accessible.name: "อุณหภูมิ " + system.tempText }
+        Chip { text: system.tempText; iconPath: Icons.thermo; compact: bar.tight; Accessible.name: Tr.t("อุณหภูมิ ") + system.tempText }
     }
 }

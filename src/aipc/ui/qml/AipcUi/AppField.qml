@@ -17,7 +17,7 @@ ColumnLayout {
     property bool emphasis: false
     property alias field: input
     readonly property bool thaiInPassword: password && /[\u0E01-\u0E4F\u0E5A-\u0E7F]/.test(input.text)
-    readonly property string shownHint: thaiInPassword ? "มีตัวอักษรไทย · ถ้าไม่ได้ตั้งใจ กด ~ สลับเป็นอังกฤษ" : hint
+    readonly property string shownHint: thaiInPassword ? Tr.t("มีตัวอักษรไทย · ถ้าไม่ได้ตั้งใจ กด ~ สลับเป็นอังกฤษ") : hint
     readonly property string shownKind: thaiInPassword ? "warn" : hintKind
     spacing: 6
 

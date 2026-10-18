@@ -12,7 +12,7 @@ ColumnLayout {
     // ไม่ตั้งชื่อว่า data: ชื่อนี้ Qt สงวนไว้เก็บลูกของทุกชิ้นบนจอ (ตั้งทับแล้วตารางว่าง · พบ 2026-10-15)
     property var info: ({ cells: [], title: "", note: "", todayIso: "" })
     property string selected: ""
-    readonly property var weekdays: ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."]
+    readonly property var weekdays: [Tr.t("จ."), Tr.t("อ."), Tr.t("พ."), Tr.t("พฤ."), Tr.t("ศ."), Tr.t("ส."), Tr.t("อา.")]
     readonly property var picked: {
         for (let i = 0; i < info.cells.length; i++)
             if (info.cells[i].iso === selected) return info.cells[i]
@@ -42,14 +42,14 @@ ColumnLayout {
     }
 
     PageHeader {
-        title: "ปฏิทิน"
-        subtitle: "นัดในเครื่อง · ปฏิทิน Google · วันหยุดไทย · อ่านอย่างเดียว (จดนัดได้ที่หน้าผู้ช่วย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”)"
+        title: Tr.t("ปฏิทิน")
+        subtitle: Tr.t("นัดในเครื่อง · ปฏิทิน Google · วันหยุดไทย · อ่านอย่างเดียว (จดนัดได้ที่หน้าผู้ช่วย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”)")
     }
 
     RowLayout {
         Layout.fillWidth: true
         spacing: 8
-        AppButton { objectName: "calendarPrev"; text: "เดือนก่อน"; kind: "secondary"; onClicked: root.shift(-1) }
+        AppButton { objectName: "calendarPrev"; text: Tr.t("เดือนก่อน"); kind: "secondary"; onClicked: root.shift(-1) }
         AppText {
             objectName: "calendarMonthTitle"
             text: root.info.title
@@ -57,8 +57,8 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
         }
-        AppButton { objectName: "calendarToday"; text: "เดือนนี้"; kind: "secondary"; onClicked: { root.year = 0; root.month = 0; root.selected = ""; root.reload() } }
-        AppButton { objectName: "calendarNext"; text: "เดือนถัดไป"; kind: "secondary"; onClicked: root.shift(1) }
+        AppButton { objectName: "calendarToday"; text: Tr.t("เดือนนี้"); kind: "secondary"; onClicked: { root.year = 0; root.month = 0; root.selected = ""; root.reload() } }
+        AppButton { objectName: "calendarNext"; text: Tr.t("เดือนถัดไป"); kind: "secondary"; onClicked: root.shift(1) }
     }
 
     // คำอธิบายสี
@@ -67,10 +67,10 @@ ColumnLayout {
         spacing: 16
         Repeater {
             model: [
-                { label: "นัดในเครื่อง", color: Theme.accent },
-                { label: "ปฏิทิน Google", color: Theme.ok },
-                { label: "วันหยุดราชการ", color: Theme.danger },
-                { label: "วันสำคัญ (ไม่ได้หยุด)", color: Theme.warn }
+                { label: Tr.t("นัดในเครื่อง"), color: Theme.accent },
+                { label: Tr.t("ปฏิทิน Google"), color: Theme.ok },
+                { label: Tr.t("วันหยุดราชการ"), color: Theme.danger },
+                { label: Tr.t("วันสำคัญ (ไม่ได้หยุด)"), color: Theme.warn }
             ]
             delegate: Row {
                 required property var modelData
@@ -112,7 +112,7 @@ ColumnLayout {
                 border.width: modelData.today ? 2 : 1
                 border.color: modelData.today ? Theme.accent : Theme.line
                 Accessible.role: Accessible.Button
-                Accessible.name: modelData.label + (modelData.lines.length ? " · " + modelData.lines.length + " รายการ" : "")
+                Accessible.name: modelData.label + (modelData.lines.length ? " · " + modelData.lines.length + Tr.t(" รายการ") : "")
 
                 AppText {
                     id: dayText
@@ -159,7 +159,7 @@ ColumnLayout {
             AppText { objectName: "calendarDayTitle"; text: root.picked ? root.picked.label : ""; strong: true; Layout.fillWidth: true }
             AppText {
                 visible: root.picked !== null && root.picked.lines.length === 0
-                text: "ไม่มีนัดในวันนี้"
+                text: Tr.t("ไม่มีนัดในวันนี้")
                 color: Theme.inkMuted
             }
             Repeater {
@@ -173,7 +173,7 @@ ColumnLayout {
             }
             AppText {
                 visible: root.picked !== null && root.picked.google
-                text: "นัดจาก Google แก้หรือลบได้ในแอป Google Calendar เท่านั้น (เครื่องนี้อ่านอย่างเดียว)"
+                text: Tr.t("นัดจาก Google แก้หรือลบได้ในแอป Google Calendar เท่านั้น (เครื่องนี้อ่านอย่างเดียว)")
                 size: Theme.fontSmall; color: Theme.inkMuted
                 Layout.fillWidth: true
             }
