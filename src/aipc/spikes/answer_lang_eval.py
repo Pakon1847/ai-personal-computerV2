@@ -65,8 +65,10 @@ def main(argv: list[str] | None = None) -> int:
     th = [r for r in rows if r["asked"] == "th"]
     en_ok, th_ok = sum(r["ok"] for r in en), sum(r["ok"] for r in th)
     passed = en_ok >= NEED_EN and th_ok == len(th) == NEED_TH
-    print(f"ถามอังกฤษ ตอบอังกฤษ {en_ok}/{len(en)} (เกณฑ์ ≥ {NEED_EN}) · "
-          f"ถามไทย ตอบไทย {th_ok}/{len(th)} (เกณฑ์ {NEED_TH})")
+    print(
+        f"ถามอังกฤษ ตอบอังกฤษ {en_ok}/{len(en)} (เกณฑ์ ≥ {NEED_EN}) · "
+        f"ถามไทย ตอบไทย {th_ok}/{len(th)} (เกณฑ์ {NEED_TH})"
+    )
     print("ผ่าน" if passed else "ไม่ผ่าน")
     summary = {"en_ok": en_ok, "th_ok": th_ok, "passed": passed, "rows": rows}
     Path(a.out).write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")

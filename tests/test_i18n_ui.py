@@ -99,8 +99,9 @@ class EnglishPagesTest(unittest.TestCase):
         """การ์ดคำตอบ (สร้างตอนทำงาน) แปลตอนแสดง · ชื่อนัดของผู้ใช้คงเดิม · สลับกลับไทย = การ์ดเดิมทุกตัวอักษร."""
         engine, win, warnings = self.open_page("workspace")
         page = [o for o in win.findChildren(object) if o.objectName() == "workspace"][0]
-        card = {"kind": "reminder", "badge": {}, "title": "ยังจดนัดนี้ไม่ได้", "page": "", "confirmToken": "",
-                "lines": ["ทั้งวัน · ประชุมทีม"], "chips": [{"text": "ทำแล้ว", "kind": "ok"}]}  # fmt: skip
+        card = {"kind": "reminder", "badge": {}, "title": "ยังจดนัดนี้ไม่ได้", "page": "",
+                "confirmToken": "", "lines": ["ทั้งวัน · ประชุมทีม"],
+                "chips": [{"text": "ทำแล้ว", "kind": "ok"}]}  # fmt: skip
         page.setProperty("items", [{"user": False, "card": card}])
         settle(200)
         ui = engine._backends["uiSettings"]
