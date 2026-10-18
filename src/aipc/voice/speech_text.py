@@ -141,6 +141,23 @@ def to_speech(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+EN_SYMBOLS = {"°C": " degrees Celsius ", "° C": " degrees Celsius ", "°": " degrees ",
+              "%": " percent ", "&": " and ", "+": " plus ", "=": " equals ", "×": " times ",
+              "÷": " divided by "}  # fmt: skip
+EN_KEEP = set(".,?!:;'-")
+
+
+def to_speech_en(text: str) -> str:
+    """ข้อความภาษาอังกฤษ → ข้อความให้เสียงอังกฤษ (การ์ด 0039 ระยะ B) · ไม่แปลงเป็นคำอ่านไทย ·
+    คงตัวเลขและวรรคตอนไว้ (ตัวอ่านหน่วยเสียงของ Piper อ่านตัวเลขอังกฤษและใช้วรรคตอนกำหนดจังหวะเอง)."""
+    text = _plain(text[:MAX_CHARS]).translate(SUBSCRIPTS)
+    for sym, word in EN_SYMBOLS.items():
+        text = text.replace(sym, word)
+    text = "".join(c if unicodedata.category(c)[0] in "LMN" or c.isspace() or c in EN_KEEP else " "
+                   for c in text)  # fmt: skip
+    return re.sub(r"\s+", " ", text).strip(" -")
+
+
 def sentences(text: str, max_chars: int = 160) -> list[str]:
     """แบ่งข้อความที่แปลงแล้วเป็นท่อน ≤ max_chars ตามช่องว่าง · ท่อนแรกสั้นเพื่อให้เริ่มพูดเร็ว."""
     words, out, cur = text.split(), [], ""

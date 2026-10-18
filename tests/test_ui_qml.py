@@ -984,7 +984,7 @@ class ShellCardTest(unittest.TestCase):
         said = []
 
         class FakeSpeaker:
-            available, current = True, -1
+            available, current, english_available = True, -1, False
 
             def say(self, text):
                 said.append(text)
@@ -1027,7 +1027,7 @@ class ShellCardTest(unittest.TestCase):
         said = []
 
         class FakeSpeaker:
-            available, current = True, -1
+            available, current, english_available = True, -1, False
 
             def say(self, text):
                 said.append(text)
@@ -1094,7 +1094,7 @@ class ShellCardTest(unittest.TestCase):
         said = []
 
         class FakeSpeaker:
-            available, current = True, -1
+            available, current, english_available = True, -1, False
 
             def say(self, text):
                 said.append(text)
@@ -1329,7 +1329,7 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(btn.property("visible"))  # ไม่มีตัวอ่าน = ไม่มีปุ่ม
 
         class FakeSpeaker:
-            available, current, said, stopped = True, -1, [], 0
+            available, current, said, stopped, english_available = True, -1, [], 0, False
 
             def say(self, text):
                 self.said.append(text)

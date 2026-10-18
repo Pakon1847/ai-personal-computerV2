@@ -18,10 +18,13 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
-from aipc.voice.speech_text import sentences, to_speech
+from aipc.skills.catalog import is_english
+from aipc.voice.speech_text import sentences, to_speech, to_speech_en
 
 VOICE_DIR = Path(os.environ.get("AIPC_VOICE_DIR", "/opt/aipc-voice"))
 MODEL = "th_TH-tsync2-medium.onnx"
+# เสียงอังกฤษ (การ์ด 0039 ระยะ B) · ชุดข้อมูล LJ Speech = public domain · โหลดเมื่อมีข้อความอังกฤษครั้งแรก
+EN_MODEL = "en_US-ljspeech-medium.onnx"
 WORKER = Path(__file__).with_name("piper_worker.py")
 PLAYERS = ("pw-play", "aplay", "paplay")
 IDLE_S = 600
@@ -57,18 +60,31 @@ def installed(voice_dir: Path = VOICE_DIR) -> bool:
     return (voice_dir / "venv" / "bin" / "python").exists() and (voice_dir / MODEL).exists()
 
 
+def english_installed(voice_dir: Path = VOICE_DIR) -> bool:
+    return installed(voice_dir) and (voice_dir / EN_MODEL).exists()
+
+
+def language(text: str) -> str:
+    """เสียงที่ใช้อ่าน: "en" | "th" · ตัดสินทั้งข้อความด้วยกฎเดียวกับภาษาคำตอบ (catalog.is_english · H6) ·
+    ไทยปนอังกฤษ = ไทยแบบเดิม (ไม่สลับเสียงกลางประโยค)"""
+    return "en" if is_english(text) else "th"
+
+
 class Speaker:
     """พูดได้ครั้งละเรื่อง · say() ใหม่ = หยุดเรื่องเก่า · on_state(id, กำลังพูด, ข้อผิดพลาด) เรียกจากเธรดอื่น."""
 
     def __init__(self, on_state: Callable[[int, bool, str], None] = lambda *a: None,
                  voice_dir: Path = VOICE_DIR, play_cmd: list[str] | None = None,
-                 worker_cmd: list[str] | None = None, idle_s: float = IDLE_S):  # fmt: skip
+                 worker_cmd: list[str] | None = None, idle_s: float = IDLE_S,
+                 english: bool | None = None):  # fmt: skip
         self._on_state = on_state
         self._voice_dir = voice_dir
         self._play_cmd = play_cmd if play_cmd is not None else player()
-        self._worker_cmd = worker_cmd or [str(voice_dir / "venv" / "bin" / "python"), str(WORKER),
-                                          str(voice_dir / MODEL)]  # fmt: skip
+        py = str(voice_dir / "venv" / "bin" / "python")
+        self._worker_cmd = worker_cmd or [py, str(WORKER), str(voice_dir / MODEL),
+                                          str(voice_dir / EN_MODEL)]  # fmt: skip
         self._custom_worker = worker_cmd is not None  # เทสต์ใช้ตัวสังเคราะห์ปลอม
+        self._english = english  # None = ดูจากไฟล์ที่ติดตั้ง
         self._idle_s = idle_s
         self._lock = threading.Lock()
         self._proc: subprocess.Popen | None = None
@@ -84,12 +100,23 @@ class Speaker:
         return self._play_cmd is not None and (self._custom_worker or installed(self._voice_dir))
 
     @property
+    def english_available(self) -> bool:
+        if self._english is not None:
+            return self._english and self.available
+        return self.available and english_installed(self._voice_dir)
+
+    @property
     def current(self) -> int:
         return self._current
 
     def say(self, text: str) -> int:
-        """เริ่มอ่าน · คืน id ของเรื่องนี้ (-1 = ไม่มีอะไรให้อ่าน)."""
-        chunks = sentences(to_speech(text))
+        """เริ่มอ่าน · คืน id ของเรื่องนี้ (-1 = ไม่มีอะไรให้อ่าน · ข้อความอังกฤษแต่ไม่มีเสียงอังกฤษก็ -1:
+        ตัวแปลงไทยตัดคำอังกฤษทิ้ง อ่านไปก็แทบเงียบ · หน้าจอบอกเหตุผลเอง · H5)."""
+        voice = language(text)
+        if voice == "en" and not self.english_available:
+            self.stop()
+            return -1
+        chunks = sentences(to_speech_en(text) if voice == "en" else to_speech(text))
         self.stop()
         if not chunks:
             return -1
@@ -100,7 +127,8 @@ class Speaker:
             try:
                 self._ensure_worker()
                 self._dir.mkdir(mode=0o700, exist_ok=True)
-                msg = {"cmd": "say", "id": jid, "chunks": chunks, "dir": str(self._dir)}
+                msg = {"cmd": "say", "id": jid, "chunks": chunks, "dir": str(self._dir),
+                       "voice": voice}  # fmt: skip
                 self._proc.stdin.write(json.dumps(msg) + "\n")  # ASCII ล้วน ไม่ขึ้นกับ locale
                 self._proc.stdin.flush()
             except (OSError, ValueError) as e:

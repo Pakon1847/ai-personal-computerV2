@@ -875,7 +875,7 @@ Item {
                         objectName: "speakError"
                         visible: root.speakRow === row.index && voice.message !== ""
                         Layout.fillWidth: true
-                        text: voice.message
+                        text: Tr.x(voice.message)
                         size: Theme.fontSmall; color: Theme.warnInk
                     }
                 }

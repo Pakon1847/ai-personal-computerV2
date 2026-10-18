@@ -11,7 +11,8 @@ import time
 import unittest
 from pathlib import Path
 
-from aipc.voice.speech_text import number_words, sentences, to_speech
+from aipc.voice import tts
+from aipc.voice.speech_text import number_words, sentences, to_speech, to_speech_en
 from aipc.voice.tts import Speaker, sandboxed
 
 DATA = Path(__file__).parent / "data" / "tts_normalize.json"
@@ -29,6 +30,8 @@ def read():
 threading.Thread(target=read, daemon=True).start()
 print(json.dumps({"ready": True}), flush=True)
 while (j := jobs.get()) is not None:
+    if os.environ.get("FAKE_LOG"):
+        print(json.dumps(j), file=open(os.environ["FAKE_LOG"], "a", encoding="utf-8"), flush=True)
     for i, t in enumerate(j["chunks"]):
         if j["id"] in cancelled: break
         time.sleep(0.05)
@@ -140,6 +143,84 @@ class SpeakerTest(unittest.TestCase):
         sp = Speaker(play_cmd=None)
         sp._play_cmd = None
         self.assertFalse(sp.available)
+
+
+class EnglishVoiceTest(unittest.TestCase):
+    """การ์ด 0039 เกณฑ์ B1: เลือกเสียงด้วยโค้ดจากภาษาของทั้งข้อความ."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        worker = Path(self.tmp.name) / "worker.py"
+        worker.write_text(FAKE_WORKER, encoding="utf-8")
+        self.log = Path(self.tmp.name) / "jobs.jsonl"
+        os.environ["FAKE_LOG"] = str(self.log)
+        self.addCleanup(os.environ.pop, "FAKE_LOG", None)
+        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        self.done = threading.Event()
+        self.play = [sys.executable, "-c", "pass"]
+        self.cmd = [sys.executable, str(worker)]
+
+    def speaker(self, english):
+        sp = Speaker(lambda j, speaking, e: speaking or self.done.set(), play_cmd=self.play,
+                     worker_cmd=self.cmd, english=english)  # fmt: skip
+        self.addCleanup(sp.close)
+        return sp
+
+    def jobs(self):
+        return [json.loads(x) for x in self.log.read_text(encoding="utf-8").splitlines()]
+
+    def test_language_rule(self):
+        for text, want in [("Why is the sky blue? Because of Rayleigh scattering.", "en"),
+                           ("ท้องฟ้าเป็นสีฟ้าเพราะการกระเจิงของแสง", "th"),
+                           ("เปิด YouTube ให้แล้ว", "th"), ("OK", "en"), ("42", "th"),
+                           ("", "th")]:  # fmt: skip
+            with self.subTest(text=text):
+                self.assertEqual(tts.language(text), want)
+
+    def test_thai_test_data_never_goes_to_english_voice(self):
+        n = 0
+        for f in (Path(__file__).parent / "data").glob("*.json"):
+            for text in _strings(json.loads(f.read_text(encoding="utf-8"))):
+                if any("฀" <= c <= "๿" for c in text):
+                    n += 1
+                    self.assertEqual(tts.language(text), "th", text)
+        self.assertGreater(n, 1000)
+
+    def test_english_text_keeps_numbers_and_punctuation(self):
+        self.assertEqual(to_speech_en("**It is 25°C** today, see [this](http://x.y) 😀"),
+                         "It is 25 degrees Celsius today, see this")  # fmt: skip
+        self.assertEqual(to_speech_en("- 50% off & free"), "50 percent off and free")
+        self.assertEqual(to_speech_en("😀 **"), "")
+
+    def test_english_goes_to_english_voice_thai_unchanged(self):
+        sp = self.speaker(english=True)
+        sp.say("Hello there. It is 3 PM.")
+        self.assertTrue(self.done.wait(10))
+        self.done.clear()
+        sp.say("สวัสดีครับ ตอนนี้ 15:00 น.")
+        self.assertTrue(self.done.wait(10))
+        en, th = self.jobs()
+        self.assertEqual((en["voice"], en["chunks"]), ("en", ["Hello there. It is 3 PM."]))
+        self.assertEqual(th["voice"], "th")
+        self.assertEqual(th["chunks"], sentences(to_speech("สวัสดีครับ ตอนนี้ 15:00 น.")))
+
+    def test_english_without_english_voice_is_not_read(self):
+        sp = self.speaker(english=False)
+        self.assertEqual(sp.say("Hello there"), -1)
+        self.assertFalse(self.log.exists())  # ไม่ส่งให้ตัวสังเคราะห์เลย
+        self.assertNotEqual(sp.say("สวัสดี"), -1)  # ภาษาไทยยังอ่านได้
+
+
+def _strings(x):
+    if isinstance(x, str):
+        yield x
+    elif isinstance(x, dict):
+        for v in x.values():
+            yield from _strings(v)
+    elif isinstance(x, list):
+        for v in x:
+            yield from _strings(v)
 
 
 class SandboxTest(unittest.TestCase):

@@ -3,8 +3,11 @@
 เปิดค้างเพราะวัดบน Pi 5 แล้ว: เปิดใหม่ทุกครั้ง 6.3 วิ · โหลดค้างไว้ 0.4–0.8 วิต่อประโยค
 ไฟล์นี้ต้องไม่ import อะไรจาก aipc (venv ของเสียงไม่มีแพ็กเกจแอป)
 
+argv: <โมเดลเสียงไทย> [<โมเดลเสียงอังกฤษ>] · เสียงอังกฤษโหลดเมื่อมีงาน "voice": "en" ครั้งแรก
+(การ์ด 0039 ระยะ B)
+
 รับคำสั่งทาง stdin บรรทัดละ JSON:
-  {"cmd": "say", "id": 3, "chunks": ["...", "..."], "dir": "/run/user/1001/aipc-tts"}
+  {"cmd": "say", "id": 3, "chunks": ["...", "..."], "dir": "/run/user/1001/aipc-tts", "voice": "th"}
   {"cmd": "cancel", "id": 3}
 ตอบทาง stdout: {"ready": true} · {"id": 3, "i": 0, "path": ".../3-0.wav", "last": false}
   · {"id": 3, "error": "..."}
@@ -23,7 +26,8 @@ import wave
 def main() -> int:
     from piper import PiperVoice
 
-    voice = PiperVoice.load(sys.argv[1])
+    voices = {"th": PiperVoice.load(sys.argv[1])}
+    en_path = sys.argv[2] if len(sys.argv) > 2 else ""
     out = sys.stdout
     jobs: queue.Queue = queue.Queue()
     cancelled: set[int] = set()
@@ -44,6 +48,15 @@ def main() -> int:
     print(json.dumps({"ready": True}), file=out, flush=True)
     while (job := jobs.get()) is not None:
         jid, chunks = int(job["id"]), job["chunks"]
+        lang = job.get("voice", "th")
+        try:
+            if lang not in voices:  # เสียงอังกฤษ: โหลดครั้งแรกที่ใช้ (ไม่เพิ่ม RAM ถ้าไม่เคยอ่านอังกฤษ)
+                voices[lang] = PiperVoice.load(en_path)
+            voice = voices[lang]
+        except Exception as e:  # noqa: BLE001 · ไม่มีไฟล์/โหลดไม่ได้ = บอกแอป ไม่ตายเงียบ
+            err = {"id": jid, "error": f"{type(e).__name__}: {e}"}
+            print(json.dumps(err), file=out, flush=True)
+            continue
         for i, text in enumerate(chunks):
             if jid in cancelled:
                 break

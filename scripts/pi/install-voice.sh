@@ -12,6 +12,10 @@
 #     /opt/aipc-voice/zipformer/{venv,model} · sherpa-onnx ตาม scripts/pi/zipformer-requirements.txt ·
 #     โมเดล yfyeung/icefall-asr-gigaspeech2-th-zipformer-2024-06-20 (Apache-2.0 · ข้อมูลเทรนใช้ได้เฉพาะงานศึกษา) ~161 MB · ตรวจ sha256
 #     ไม่ติดตั้ง = คีย์ลัดใช้ whisper เหมือนเดิม · ถอนเฉพาะส่วนนี้: sudo rm -rf /opt/aipc-voice/zipformer
+#   ./scripts/pi/install-voice.sh --english                        ดูว่าจะทำอะไร (เสียงอ่านภาษาอังกฤษ · การ์ด 0039 ระยะ B)
+#   sudo ./scripts/pi/install-voice.sh --english --apply
+#     /opt/aipc-voice/en_US-ljspeech-medium.onnx(.json) · ชุดข้อมูล LJ Speech = public domain · 63.5 MB · ตรวจ sha256 ทั้ง 2 ไฟล์
+#     ใช้ venv เดิม (ไม่ติดตั้งแพ็กเกจเพิ่ม) · ถอนเฉพาะส่วนนี้: sudo rm -f /opt/aipc-voice/en_US-ljspeech-medium.onnx*
 #
 # ทำอะไร: /opt/aipc-voice (root · อ่านได้ทุกคน)
 #   venv/   piper-tts 1.8.0 + รุ่นตาม scripts/pi/voice-requirements.txt
@@ -21,11 +25,12 @@
 # แอปเปิดตัวอ่านเมื่อกดปุ่มลำโพงครั้งแรก ไม่มี service · ไม่แตะ greetd, PAM, ไฟล์บูต · ไม่รีบูต
 set -euo pipefail
 
-MODE="dry-run"; STT_MODEL=""; ZIP=0
+MODE="dry-run"; STT_MODEL=""; ZIP=0; EN=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) MODE="apply" ;;
     --zipformer) ZIP=1 ;;
+    --english) EN=1 ;;
     --rollback) MODE="rollback" ;;
     --stt-model) STT_MODEL="${2:?}"; shift ;;
     *) echo "ไม่รู้จัก: $1" >&2; exit 2 ;;
@@ -40,6 +45,27 @@ V=https://huggingface.co/rhasspy/piper-voices/resolve/main/th/th_TH/tsync2/mediu
 ONNX_SHA=136669378ee72dd27012604994099ca3c833e625c7cfdff05ccdf468a1a2115f
 say() { printf '%s\n' "$*"; }
 need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย sudo" >&2; exit 1; }; }
+
+if [ "$EN" = 1 ]; then
+  E=en_US-ljspeech-medium
+  say "จะเพิ่มเสียงอ่านภาษาอังกฤษที่ $OPT/$E.onnx(.json) (~64 MB · ใช้ venv เดิม) · ต้องใช้อินเทอร์เน็ต"
+  [ "$MODE" = "apply" ] || { say "== โหมดดูก่อน: ยังไม่เปลี่ยนอะไร · ใส่ --apply เพื่อทำจริง =="; exit 0; }
+  need_root
+  [ -x "$OPT/venv/bin/python" ] || { say "หยุด: ติดตั้งตัวอ่านออกเสียงก่อน (--apply)" >&2; exit 1; }
+  umask 022
+  EV=https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium
+  # sha256 ตรวจ 2026-10-19 (ดาวน์โหลดบนโน้ตบุ๊ก · ตรงกับ lfs.oid ของ Hugging Face)
+  while read -r f sha; do
+    [ -f "$OPT/$f" ] || { curl -fsSL --retry 5 -o "$OPT/$f.part" "$EV/$f" && mv "$OPT/$f.part" "$OPT/$f"; }
+    echo "$sha  $OPT/$f" | sha256sum -c --quiet || { say "หยุด: sha256 ของ $f ไม่ตรง" >&2; rm -f "$OPT/$f"; exit 1; }
+  done <<'LIST'
+en_US-ljspeech-medium.onnx 6f52a751e2349abe7a76735eb09dc1875298c77ea2342ffd2fef79ff81b87f22
+en_US-ljspeech-medium.onnx.json 141d612cc0a95ed7efc1ca936b845c2364967f2e9217c5dbfcf69fc4d6c65860
+LIST
+  chmod a+r "$OPT/$E.onnx" "$OPT/$E.onnx.json"
+  echo "This is a test." | "$OPT/venv/bin/python" -m piper -m "$OPT/$E.onnx" -f /tmp/aipc-voice-en-test.wav >/dev/null 2>&1     && rm -f /tmp/aipc-voice-en-test.wav && say "เสร็จ · สังเคราะห์เสียงอังกฤษได้ · เปิดแอปใหม่ (หรือออกแล้วเข้าระบบใหม่) จึงใช้"     || { say "ติดตั้งแล้วแต่สังเคราะห์เสียงอังกฤษไม่ได้ · ลอง: echo test | $OPT/venv/bin/python -m piper -m $OPT/$E.onnx -f /tmp/t.wav" >&2; exit 1; }
+  exit 0
+fi
 
 if [ "$ZIP" = 1 ]; then
   say "จะติดตั้งตัวถอดของคีย์ลัดที่ $OPT/zipformer: venv (sherpa-onnx 1.13.8) + โมเดล Zipformer ไทย (~161 MB) · ต้องใช้อินเทอร์เน็ต"

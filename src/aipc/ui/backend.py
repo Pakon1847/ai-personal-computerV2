@@ -378,6 +378,11 @@ class VoiceController(QObject):
     def available(self) -> bool:
         return self._speaker is not None and self._speaker.available
 
+    @Property(bool, notify=changed)
+    def englishVoice(self) -> bool:  # noqa: N802
+        """มีเสียงอ่านภาษาอังกฤษ (การ์ด 0039 ระยะ B) · หน้าตั้งค่าบอกสถานะ."""
+        return self._speaker is not None and self._speaker.english_available
+
     @Property(int, notify=changed)
     def speakingKey(self) -> int:  # noqa: N802
         return self._key
@@ -391,8 +396,12 @@ class VoiceController(QObject):
         if not self.available:
             return
         self._message = ""
+        from aipc.voice import tts
+
         job = self._speaker.say(text)
-        if job < 0:
+        if job < 0 and tts.language(text) == "en" and not self._speaker.english_available:
+            self._key, self._message = -1, "ยังไม่ได้ติดตั้งเสียงอ่านภาษาอังกฤษ"
+        elif job < 0:
             self._key, self._message = -1, "ไม่มีข้อความที่อ่านออกเสียงได้"
         elif self._speaker.current == job:  # เปิดตัวอ่านไม่ได้ = _on_state แจ้งข้อผิดพลาดไปแล้ว
             self._key, self._job = key, job

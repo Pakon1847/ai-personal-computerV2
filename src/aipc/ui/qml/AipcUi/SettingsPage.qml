@@ -549,6 +549,13 @@ ColumnLayout {
                       ? Tr.t("อ่านออกเสียงในเครื่อง (Piper เสียงไทย tsync2) · กดอ่านครั้งแรกรอราว 7 วิ ครั้งต่อไปราว 1 วิ · ไม่ส่งเสียงออกนอกเครื่อง")
                       : Tr.t("ยังไม่ได้ติดตั้งตัวอ่านออกเสียง (sudo ./scripts/pi/install-voice.sh --apply) หรือไม่มีตัวเล่นเสียง")
             }
+            AppText {   // การ์ด 0039 ระยะ B: ข้อความภาษาอังกฤษอ่านด้วยเสียงอังกฤษ
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                visible: voice.available
+                text: voice.englishVoice
+                      ? Tr.t("ข้อความภาษาอังกฤษอ่านด้วยเสียงอังกฤษ (Piper ljspeech) · อ่านภาษาอังกฤษครั้งแรกรอนานขึ้นเล็กน้อย")
+                      : Tr.t("ยังไม่ได้ติดตั้งเสียงอ่านภาษาอังกฤษ · ข้อความภาษาอังกฤษจะไม่ถูกอ่านออกเสียง")
+            }
             AppCheck {
                 objectName: "speakAnswersCheck"
                 visible: voice.available

@@ -41,7 +41,7 @@ class FakeListener:
 
 
 class FakeSpeaker:
-    available, current = True, -1
+    available, current, english_available = True, -1, False
 
     def __init__(self):
         self.said = []
