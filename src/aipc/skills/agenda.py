@@ -336,6 +336,8 @@ _TITLE_ASK = re.compile(rf"(?:ขอ)?(?:มี)?นัด(.+?)(?:ครั้�
 _TITLE_HAVE = re.compile(rf"มีนัด(.+?)(?:ไหม|มั้ย|หรือเปล่า){_END}")
 _TITLE_NEXT = re.compile(rf"(.+?)ครั้ง(?:หน้า|ถัดไป){_WHEN_ASK}{_END}")
 _NOT_NAMES = ("ถัดไป", "ต่อไป", "ล่าสุด", "ทั้งหมด", "ที่เหลือ", "ของฉัน", "ของผม", "อะไร", "ไหน")
+_SPORT = ("ชิง", "รอบ", "แข่ง")
+_SPORT_WORDS = ("ฟุตบอล", "บอลโลก", "แมตช์", "ลีก", "คัพ", "ทีมชาติ", "พรีเมียร์", "แข่งขัน")
 
 
 def title_query(text: str) -> tuple[str, bool] | None:
@@ -352,5 +354,8 @@ def title_query(text: str) -> tuple[str, bool] | None:
                 name = name.removeprefix(pre)
             if len(name) < 2 or any(w in name for w in _NOT_NAMES):
                 return None
+            # "นัด" = แมตช์กีฬาได้ ("นัดชิงฟุตบอลโลกวันไหน" · ตรวจทั้งระบบ 3.8) → ตอบเฉพาะเมื่อเจอนัดชื่อนี้
+            if name.startswith(_SPORT) or any(w in name for w in _SPORT_WORDS):
+                strict = False
             return name, strict
     return None

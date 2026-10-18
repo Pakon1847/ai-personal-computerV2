@@ -68,6 +68,9 @@ class DetailParseTest(unittest.TestCase):
         self.assertEqual(agenda.title_query("นัดหมอวันไหน"), ("หมอ", True))
         self.assertEqual(agenda.title_query("มีนัดกับหมอไหมครับ"), ("หมอ", True))
         self.assertEqual(agenda.title_query("ประชุมทีมครั้งหน้าเมื่อไหร่"), ("ประชุมทีม", False))
+        # ตรวจทั้งระบบ 3.8: "นัด" = แมตช์กีฬา → ตอบเฉพาะเมื่อเจอนัดชื่อนี้ (ไม่เจอ = ไปหา AI)
+        self.assertEqual(agenda.title_query("นัดชิงฟุตบอลโลกวันไหน"), ("ชิงฟุตบอลโลก", False))
+        self.assertEqual(agenda.title_query("นัดประชุมทีมวันไหน"), ("ประชุมทีม", True))
         for text in ("นัดถัดไปของฉันวันไหน", "นัดต่อไปของแมนซิตี้เจอใคร", "มีนัดอะไรไหม", "นัดวันไหน"):
             self.assertIsNone(agenda.title_query(text), text)
 
