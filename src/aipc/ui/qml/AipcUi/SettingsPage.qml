@@ -423,7 +423,7 @@ ColumnLayout {
                 objectName: "webSignOutResult"
                 visible: webCard.result !== ""
                 Layout.fillWidth: true; size: Theme.fontSmall
-                text: webCard.result
+                text: Tr.x(webCard.result)
             }
         }
     }

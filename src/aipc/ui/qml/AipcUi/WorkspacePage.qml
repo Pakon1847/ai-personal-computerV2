@@ -141,7 +141,7 @@ Item {
         function onFinished(say, ok) {
             const i = root.items.slice()
             if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done)
-                i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: say, note: ok ? "" : Tr.t("ทำไม่สำเร็จ"), done: true })
+                i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: say, sys: true, note: ok ? "" : Tr.t("ทำไม่สำเร็จ"), done: true })
             root.items = i
             if (voice.available) voice.speak(i.length - 1, say)
         }
@@ -152,7 +152,7 @@ Item {
         target: browser
         function onOpened(say, ok) {
             if (root.home) appsNote.text = ok ? "" : say
-            else if (!ok) root.push({ ai: true, text: say, note: Tr.t("ทำไม่สำเร็จ"), done: true })
+            else if (!ok) root.push({ ai: true, text: say, sys: true, note: Tr.t("ทำไม่สำเร็จ"), done: true })
         }
     }
     function pendingConfirm() {
@@ -834,7 +834,9 @@ Item {
                         objectName: "aiText"
                         Layout.fillWidth: true
                         textFormat: Text.PlainText  // ค่าเริ่มต้น AutoText เดาเป็น HTML ได้ถ้าคำตอบหน้าตาเหมือนแท็ก
-                        text: root.tidy(row.modelData.done ? row.modelData.text : (chat.streamText !== "" ? chat.streamText : Tr.t("กำลังอ่านข้อความ…")))
+                        // sys = ข้อความของระบบ (ผลคำสั่งเบราว์เซอร์) แปลตามภาษา · คำตอบของ AI แสดงตามที่ AI เขียน
+                        text: root.tidy(row.modelData.done ? (row.modelData.sys ? Tr.x(row.modelData.text) : row.modelData.text)
+                                                           : (chat.streamText !== "" ? chat.streamText : Tr.t("กำลังอ่านข้อความ…")))
                     }
                     AppText {
                         visible: !!row.modelData.note
