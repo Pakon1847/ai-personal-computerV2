@@ -181,6 +181,14 @@ class TitleKeepsWordsTest(unittest.TestCase):
                      "ช่วยเตือนหน่อยนะ 10 โมง รดน้ำต้นไม้", "เตือนรดน้ำต้นไม้ 10 โมงครับ."]:  # fmt: skip
             self.assertEqual(when.parse(text, NOW).what, "รดน้ำต้นไม้", text)
 
+    def test_weekend_words_removed_from_title(self):
+        """พบตอนวัด 0039 C1: "ทุกเสาร์อาทิตย์" เคยเหลือ "อาทิตย์" ค้างในชื่อนัด."""
+        for text in ["เตือนทำความสะอาดบ้านทุกเสาร์อาทิตย์ 10:00",
+                     "เตือนทำความสะอาดบ้านทุกวันเสาร์และวันอาทิตย์ 10:00"]:  # fmt: skip
+            r = when.parse(text, NOW)
+            self.assertEqual((r.what, r.repeat), ("ทำความสะอาดบ้าน", "weekends"), text)
+        self.assertEqual(when.parse("เตือนรดน้ำต้นไม้ทุกวันเสาร์ 8 โมง", NOW).repeat, "weekly:5")
+
 
 if __name__ == "__main__":
     unittest.main()
