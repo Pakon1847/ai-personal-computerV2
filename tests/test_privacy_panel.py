@@ -130,7 +130,11 @@ class PanelTest(unittest.TestCase):
         self.claude = self.weather = False
         p = self.panel()
         self.assertTrue(p.allOff)
-        self.assertEqual(p.text, "AI ในเครื่อง: ต่อเน็ตไม่ได้ · ส่งออก: ปิดทั้งหมด")
+        # ค้นเว็บด้วยเสียงยังส่งได้เมื่อสั่ง → ห้ามอ้างว่า "ปิดทั้งหมด" (ตรวจทั้งระบบ 2.6)
+        self.assertEqual(p.text, "AI ในเครื่อง: ต่อเน็ตไม่ได้ · Claude/อากาศ: ปิด · ส่งออกวันนี้ 0 ครั้ง")
+        self.ledger.record("web", "ค้นเว็บ: ราคาทอง")
+        p.refresh()
+        self.assertIn("ส่งออกวันนี้ 1 ครั้ง", p.text)
         self.weather = True
         p.refresh()
         self.assertFalse(p.allOff)

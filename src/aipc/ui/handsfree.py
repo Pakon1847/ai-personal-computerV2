@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -139,6 +140,28 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
     return NEEDS_BROWSER if cmds else UNKNOWN
 
 
+# ตอบการ์ดที่รอยืนยันด้วยเสียง (การ์ด 0024) · ตรวจทั้งระบบ 2026-10-18 ข้อ 2.1: เดิมดูแค่คำแรก →
+# "ตกลงไม่ลบแล้ว" นับเป็น "ใช่" แล้วลบนัด · กติกาใหม่ (ปลอดภัยไว้ก่อน = ไม่ทำ):
+# ขึ้นต้นด้วยคำปฏิเสธ หรือขึ้นต้นด้วยคำยืนยันแต่มีคำปฏิเสธอยู่ด้วย = ไม่ ·
+# ใช่ = คำยืนยัน + คำลงท้ายเท่านั้น · ขึ้นต้นด้วยคำยืนยันแต่มีคำอื่นต่อท้าย = ถามซ้ำ ไม่ทำ ·
+# ไม่ได้ขึ้นต้นด้วยคำตอบ = "" (ไม่ใช่คำตอบ → ทางเดิมของคีย์ลัด การ์ดยังรออยู่)
+YES, NO, UNCLEAR = "yes", "no", "unclear"
+_NEGATIVE = r"(?:ไม่|ยกเลิก|อย่า)"
+_YES_WORD = r"(?:ใช่|ตกลง|ยืนยัน|โอเค|ok|เอาเลย|ได้เลย)"
+_YES = re.compile(_YES_WORD + r"(?:ครับ|ค่ะ|คะ|จ้ะ|จ้า|นะ|เลย|แล้ว|ลบเลย|ทำเลย|ส่งเลย)*")
+
+
+def yes_no(text: str) -> str:
+    t = re.sub(r"[\s.!?。,]+", "", text).lower()
+    if re.match(_NEGATIVE, t):
+        return NO
+    if re.match(_YES_WORD, t):
+        if re.search(_NEGATIVE, t):
+            return NO
+        return YES if _YES.fullmatch(t) else UNCLEAR
+    return ""
+
+
 class BrowserController(QObject):
     """คำสั่งเว็บจากเสียง · route() บอกหน้าจอว่าคำพูดจากคีย์ลัดไปทางไหน (การ์ด 0027)."""
 
@@ -187,6 +210,10 @@ class BrowserController(QObject):
         if not ctl.running and all(c.kind in NEEDS_PAGE for c in cmds):
             return False  # ยังไม่เปิดเบราว์เซอร์ เช่น "กลับไปหน้าแชท" = คำสั่งเดิมของแอป
         return self._start(cmds)
+
+    @Slot(str, result=str)
+    def yesNo(self, text: str) -> str:  # noqa: N802
+        return yes_no(text)
 
     @Slot(str, result=str)
     def route(self, text: str) -> str:
@@ -261,20 +288,30 @@ class BrowserController(QObject):
     def _work(self, cmds, quiet: bool = False) -> None:
         from aipc.skills.actions import SITES
 
+        # try/finally: เกิดข้อผิดพลาดกลางทางก็ต้องส่ง _done เสมอ · เดิมไม่ส่ง → busy ค้าง ทุกคำสั่งเสียงตอบ
+        # "ยังทำคำสั่งก่อนหน้าอยู่" จนออกจากระบบ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.8)
         says, ok = [], True
-        for c in cmds:
-            r = self._ctl().run(c)
-            if c.kind in ("search", "site_search") and self._ledger is not None:
-                # คำค้นออกไป Google/DuckDuckGo หรือบริการที่พูดชื่อ (การ์ด 0036) = ส่งออกนอกเครื่อง
-                where = "ค้นเว็บ" if c.kind == "search" else f"ค้นใน {SITES[c.site][0]}"
-                self._ledger.record("web", f"{where}: {c.query}", ok=r.ok,
-                                    note="เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง")  # fmt: skip
-            if r.say:
-                says.append(r.say)
-            if not r.ok:
-                ok = False
-                break
-        self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok, quiet)
+        try:
+            for c in cmds:
+                r = self._ctl().run(c)
+                if c.kind in ("search", "site_search") and self._ledger is not None:
+                    # คำค้นออกไป Google/DuckDuckGo หรือบริการที่พูดชื่อ (การ์ด 0036) = ส่งออกนอกเครื่อง
+                    where = "ค้นเว็บ" if c.kind == "search" else f"ค้นใน {SITES[c.site][0]}"
+                    try:
+                        self._ledger.record("web", f"{where}: {c.query}", ok=r.ok,
+                                            note="เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง")  # fmt: skip
+                    except OSError:  # ดิสก์เต็ม/อ่านอย่างเดียว: บอกตามจริงว่าออกไปแล้วแต่จดไม่ได้
+                        says.append("ค้นแล้ว แต่จดลงสมุดสิ่งที่ส่งออกไม่ได้ (พื้นที่อาจเต็ม)")
+                if r.say:
+                    says.append(r.say)
+                if not r.ok:
+                    ok = False
+                    break
+        except Exception as e:  # noqa: BLE001 · ทุกแบบต้องจบด้วยการบอกผู้ใช้ ไม่ค้างเงียบ
+            ok = False
+            says.append(f"ทำไม่สำเร็จ: {type(e).__name__}")
+        finally:
+            self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok, quiet)
 
     @Slot(str, bool, bool)
     def _on_done(self, say: str, ok: bool, quiet: bool) -> None:

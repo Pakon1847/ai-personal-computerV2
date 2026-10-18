@@ -99,6 +99,23 @@ class SiteSearchParseTest(unittest.TestCase):
         # คำค้นที่แค่มีคำเชื่อมอยู่กลางคำยังค้นได้
         self.assertEqual(browse.parse("ค้นในยูทูบเพลงแล้วแต่ใจ")[0].query, "เพลงแล้วแต่ใจ")
 
+    def test_audit_1018_fixes(self):
+        # ตรวจทั้งระบบ 2026-10-18 ข้อ 3.1–3.3 · ประโยคไม่ซ้ำกับชุดวัด
+        # 3.1 "แต่ง…" เป็นคำค้น ไม่ใช่คำเชื่อม "แต่"
+        for text, site, query in [("ค้นในยูทูบแต่งตัวไปงานบวช", "youtube", "แต่งตัวไปงานบวช"),
+                                  ("หาในเฟซบุ๊กแต่งเพลงวันแม่", "facebook", "แต่งเพลงวันแม่")]:  # fmt: skip
+            self.assertEqual(
+                browse.parse(text), [BrowseCommand("site_search", query=query, site=site)]
+            )
+        # 3.2 เล่าเรื่องที่มีชื่อบริการ = ไม่ใช่คำสั่งเว็บเลย (เดิมไหลไปค้น Google ด้วยคำขยะ)
+        # 3.3 เล่าว่า "ขอให้ช่วยค้นใน…" กลางประโยค = ไม่ค้น
+        for text in ["หาในจีเมลแต่ไม่ขึ้นสักฉบับ", "ค้นในแผนที่ทีไรก็ไม่ตรงสักที",
+                     "เมื่อเช้าน้องขอให้ช่วยค้นในยูทูบว่าเพลงอะไรดัง"]:  # fmt: skip
+            self.assertEqual(browse.parse(text), [], text)
+        # คำค้นท้ายประโยคไม่โดนตัดพยางค์ (เดิม "…โยคะ" → "…โย")
+        self.assertEqual(browse.parse("เปิดยูทูบแล้วหาท่าโยคะลดหลัง")[0].query, "ท่าโยคะลดหลัง")
+        self.assertEqual(browse.parse("ค้นในยูทูบว่าวิธีเล่นโยคะ")[0].query, "วิธีเล่นโยคะ")
+
     def test_then_open_first_link(self):
         self.assertEqual(browse.parse("ค้นในยูทูบว่าเพลงลูกทุ่งแล้วเข้าลิงก์แรก"),
                          [BrowseCommand("site_search", query="เพลงลูกทุ่ง", site="youtube"),

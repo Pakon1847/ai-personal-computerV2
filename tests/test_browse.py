@@ -106,5 +106,41 @@ class BrowseParseTest(unittest.TestCase):
         self.assertEqual(caught, [])
 
 
+class PoliteTailTest(unittest.TestCase):
+    """ตรวจทั้งระบบ 2026-10-18 ข้อ 2.4 2.5 2.11 · ประโยคไม่ซ้ำกับชุดวัด."""
+
+    def test_word_final_syllables_stay_in_query(self):
+        # พยางค์ท้ายที่หน้าตาเหมือนคำลงท้าย (คะ นะ ที แทน เลย) แต่เป็นส่วนของคำค้น
+        for text, query in [("ค้นหาท่าโยคะ", "ท่าโยคะ"), ("ค้นหาทีมไหนชนะ", "ทีมไหนชนะ"),
+                            ("ค้นหาทัศนะ", "ทัศนะ"), ("ค้นหาต้มไข่กี่นาที", "ต้มไข่กี่นาที"),
+                            ("ค้นหาบริษัทไอที", "บริษัทไอที"),
+                            ("ค้นหาที่เที่ยวจังหวัดเลย", "ที่เที่ยวจังหวัดเลย"),
+                            ("ค้นหาตัวแทนประกัน", "ตัวแทนประกัน"),
+                            ("ค้นหาพลังงานทดแทน", "พลังงานทดแทน")]:  # fmt: skip
+            self.assertEqual(parsed(text), [{"kind": "search", "query": query}], text)
+
+    def test_polite_words_still_removed(self):
+        # คำที่ไม่มีทางเป็นท้ายคำ (ครับ ค่ะ หน่อย ให้ที) ตัดเสมอ · คำที่อาจเป็นพยางค์ ตัดเมื่อตามหลังคำกลุ่มแรก
+        for text in ["ค้นหาราคาข้าวสารหน่อยนะ", "ค้นหาราคาข้าวสารให้หน่อยครับ", "ค้นหาราคาข้าวสารให้ที",
+                     "ช่วยค้นหาราคาข้าวสารด้วยนะคะ", "ราคาข้าวสาร ช่วยค้นหาให้หน่อยค่ะ"]:  # fmt: skip
+            self.assertEqual(parsed(text), [{"kind": "search", "query": "ราคาข้าวสาร"}], text)
+        self.assertEqual(parsed("ย้อนกลับเลยนะ"), [{"kind": "back"}])  # คำสั่งตายตัว: ตัดได้ทุกคำลงท้าย
+        self.assertEqual(parsed("เลื่อนลงทีสิ"), [{"kind": "scroll", "direction": "down"}])
+
+    def test_no_freeze_on_repeated_polite_words(self):
+        # เดิม regex ลองแบ่ง "ให้หน่อย" ได้หลายแบบ → 20 ครั้ง ~1.3 วิ และเพิ่มเท่าตัวทุกคำ (จอค้าง)
+        import time
+
+        start = time.perf_counter()
+        browse.parse("ค้นหา" + "ให้หน่อย" * 2000 + "ก")
+        self.assertLess(time.perf_counter() - start, 0.5)
+
+    def test_search_verb_without_query_is_not_sent(self):
+        # เดิมได้คำค้น "หา" แล้วส่งออก · "หา + เปิดลิงก์" = เปิดลิงก์ ไม่ส่งคำสั่งไปเป็นคำค้น
+        for text in ["ค้นหาหน่อยครับ", "ช่วยค้นหาอีกที", "เสิร์ชเลย"]:
+            self.assertEqual(parsed(text), [], text)
+        self.assertEqual(parsed("ค้นหา คลิกลิงก์ที่สอง"), [{"kind": "open", "n": 2}])
+
+
 if __name__ == "__main__":
     unittest.main()

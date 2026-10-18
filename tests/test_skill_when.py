@@ -165,5 +165,22 @@ class FoundOn20260928Test(unittest.TestCase):
         self.assertEqual(when.parse("เตือนประชุมพนักงาน 10 โมง", NOW).what, "ประชุมพนักงาน")
 
 
+class TitleKeepsWordsTest(unittest.TestCase):
+    """ตรวจทั้งระบบ 2026-10-18 ข้อ 2.3: คำสุภาพลบเฉพาะตอนจบคำ ไม่ลบกลางคำ (ประโยคไม่ซ้ำกับชุดวัด)."""
+
+    def test_words_containing_polite_syllables_stay_whole(self):
+        for text, what in [("เตือนโอนค่าจ้างคนสวน 10 โมง", "โอนค่าจ้างคนสวน"),
+                           ("เตือนเช็กคะแนนสอบ 10 โมง", "เช็กคะแนนสอบ"),
+                           ("เตือนซื้อคะน้า 10 โมง", "ซื้อคะน้า"),
+                           ("เตือนไปเที่ยวด้วยกัน 10 โมง", "ไปเที่ยวด้วยกัน"),
+                           ("เตือนเข้าคลาสโยคะ 10 โมง", "เข้าคลาสโยคะ")]:  # fmt: skip
+            self.assertEqual(when.parse(text, NOW).what, what, text)
+
+    def test_polite_words_at_the_end_still_removed(self):
+        for text in ["เตือนรดน้ำต้นไม้ 10 โมงนะ", "เตือนรดน้ำต้นไม้ 10 โมงด้วยนะคะ",
+                     "ช่วยเตือนหน่อยนะ 10 โมง รดน้ำต้นไม้", "เตือนรดน้ำต้นไม้ 10 โมงครับ."]:  # fmt: skip
+            self.assertEqual(when.parse(text, NOW).what, "รดน้ำต้นไม้", text)
+
+
 if __name__ == "__main__":
     unittest.main()

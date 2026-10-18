@@ -68,7 +68,11 @@ def panel_text(llm: str, sent_today: int, all_off: bool) -> str:
         parts.append("AI ในเครื่อง: ต่อเน็ตไม่ได้")
     elif llm == "open":
         parts.append("AI ในเครื่อง: ไม่ได้ล็อกเน็ต")
-    parts.append("ส่งออก: ปิดทั้งหมด" if all_off else f"ส่งออกวันนี้ {sent_today} ครั้ง")
+    # all_off = ปิดทางที่ส่งออกเอง (Claude · อากาศ) · ค้นเว็บด้วยเสียงไม่มีสวิตช์และส่งเมื่อผู้ใช้สั่ง →
+    # ห้ามเขียน "ปิดทั้งหมด" และนับครั้งที่ส่งจริงเสมอ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.6 · H5)
+    if all_off:
+        parts.append("Claude/อากาศ: ปิด")
+    parts.append(f"ส่งออกวันนี้ {sent_today} ครั้ง")
     return " · ".join(parts)
 
 

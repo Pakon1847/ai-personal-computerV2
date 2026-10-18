@@ -10,7 +10,7 @@ try:
 
     from aipc.browser.control import Result
     from aipc.ui.backend import VoiceController
-    from aipc.ui.handsfree import BrowserController, HotkeyListener, route
+    from aipc.ui.handsfree import BrowserController, HotkeyListener, route, yes_no
 except ImportError:  # pragma: no cover
     VoiceController = None
 
@@ -126,6 +126,29 @@ class HandsFreeTest(unittest.TestCase):
         self.assertEqual(ledger.rows, [("web", "ค้นเว็บ: ราคาทอง", True)])
         self.assertTrue(b.handle("ย้อนกลับ"))  # เปิดเบราว์เซอร์แล้ว = งานของเรา
 
+    def test_error_mid_command_never_leaves_voice_stuck(self):
+        """ตรวจทั้งระบบ 2.8: จดสมุดไม่ได้ (ดิสก์เต็ม) หรือเบราว์เซอร์พังกลางทาง = บอกผู้ใช้ + รับคำสั่งถัดไปได้."""
+
+        class FullDisk(FakeLedger):
+            def record(self, *a, **kw):
+                raise OSError(28, "No space left on device")
+
+        class Broken(FakeControl):
+            def run(self, cmd):
+                raise RuntimeError("pipe closed")
+
+        for ctl, ledger, said in [(FakeControl(), FullDisk(), "จดลงสมุดสิ่งที่ส่งออกไม่ได้"),
+                                  (Broken(), FakeLedger(), "ทำไม่สำเร็จ")]:  # fmt: skip
+            b = BrowserController(control=ctl, ledger=ledger)
+            done = []
+            b.finished.connect(lambda say, ok, d=done: d.append((say, ok)))
+            self.assertTrue(b.handle("ค้นหาราคาทอง"))
+            self.assertTrue(pump(lambda d=done: d))
+            self.assertIn(said, done[0][0])
+            self.assertFalse(b.busy)  # ไม่ค้าง: รับคำสั่งถัดไปได้
+            self.assertTrue(b.handle("ค้นหาราคาข้าว"))
+            self.assertTrue(pump(lambda d=done: len(d) == 2))
+
     def test_login_screen_has_no_browser(self):
         b = BrowserController(active=False, control=FakeControl())
         self.assertFalse(b.handle("ค้นหาราคาทอง"))
@@ -217,6 +240,28 @@ class HotkeyFifoTest(unittest.TestCase):
         r = subprocess.run(["sh", str(script)], env={**os.environ, "XDG_RUNTIME_DIR": d.name},
                            timeout=5)  # fmt: skip
         self.assertEqual(r.returncode, 0)
+
+
+@unittest.skipIf(VoiceController is None, "ไม่มี PySide6")
+class YesNoTest(unittest.TestCase):
+    """ตอบการ์ดยืนยันด้วยเสียง · ตรวจทั้งระบบ 2026-10-18 ข้อ 2.1 (เดิมดูแค่คำแรก)."""
+
+    def test_negation_anywhere_after_yes_word_means_no(self):
+        no = ["ตกลงไม่ลบแล้ว", "โอเค ไม่เอาดีกว่า", "เอาเลยไม่ได้หรอก", "ใช่ อย่าเพิ่งลบ", "ไม่", "ยกเลิกครับ"]
+        for text in no:
+            self.assertEqual(yes_no(text), "no", text)
+
+    def test_plain_yes_with_polite_endings(self):
+        for text in ["ใช่", "ใช่ครับ", "ตกลงค่ะ", "โอเคเลย", "OK", "ยืนยัน.", "ใช่ ลบเลย"]:
+            self.assertEqual(yes_no(text), "yes", text)
+
+    def test_yes_word_with_other_words_asks_again(self):
+        for text in ["ใช่ไหม", "ตกลงเปิดยูทูบ", "โอเคแล้วนัดพรุ่งนี้ล่ะ"]:
+            self.assertEqual(yes_no(text), "unclear", text)
+
+    def test_other_sentences_are_not_answers(self):
+        for text in ["เปิดยูทูบ", "เลื่อนลง", "ถ้าไม่ว่างก็ช่างมัน", ""]:
+            self.assertEqual(yes_no(text), "", text)
 
 
 if __name__ == "__main__":

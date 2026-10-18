@@ -37,9 +37,31 @@ _COMPOUND = re.compile(rf"^(.+?)\s*(?:แล้ว\s*)?({_OPEN})$")
 # "A แล้ว B" ทั่วไป (ปิดแท็บแล้วกลับไปหน้าผู้ช่วย · ค้นหา X แล้วเลื่อนลง · ชุด H2 = ชุดพัฒนารอบ 3)
 _THEN = re.compile(r"(.+?)\s*แล้ว\s*(.+)")
 
-_POLITE = re.compile(
-    r"(?:\s*(?:ให้หน่อย|หน่อย|ด้วย|เลย|ครับผม|ครับ|ค่ะ|คะ|นะ|ฮะ|จ้ะ|จ้า|ให้|อีกที|อีกครั้ง|ได้ไหม|ได้มั้ย|ได้ป่ะ|ที|สิ|อีกนิด|แทน))+$"
-)
+# คำลงท้าย/คำสุภาพท้ายประโยค · ตัดทีละคำจากท้าย (วนธรรมดา ไม่ใช้ regex ซ้อน: เดิมประโยคที่มี "ให้หน่อย"
+# ซ้ำหลายครั้งทำให้จอค้าง เพราะ regex ลองแบ่งคำได้หลายแบบจนเวลาเพิ่มเท่าตัวทุกคำ · ตรวจทั้งระบบ 2026-10-18 ข้อ 2.5)
+# _TAIL_SURE = ไม่มีคำไทยทั่วไปที่ลงท้ายด้วยคำพวกนี้ → ตัดเสมอ ·
+# _TAIL_MAYBE = อาจเป็นพยางค์ท้ายของคำจริง (โยคะ ชนะ นาที ไอที ทดแทน จังหวัดเลย) → ตัดเพื่อจับคำสั่ง
+# แต่คืนให้คำค้น ถ้าติดกับคำข้างหน้าและไม่ได้ตามหลังคำในกลุ่มแรก (ข้อ 2.4: "ค้นหาโยคะ" เคยได้ "โย")
+_TAIL_SURE = ("ให้หน่อย", "ให้ที", "หน่อย", "ครับผม", "ครับ", "ค่ะ", "จ้ะ", "ด้วย", "อีกที", "อีกครั้ง", "อีกนิด",
+              "ได้ไหม", "ได้มั้ย", "ได้ป่ะ")  # fmt: skip
+_TAIL_MAYBE = ("คะ", "นะ", "ฮะ", "จ้า", "เลย", "ให้", "ที", "สิ", "แทน")
+_TAIL = sorted(_TAIL_SURE + _TAIL_MAYBE, key=len, reverse=True)  # ยาวก่อน: "ให้หน่อย" ก่อน "หน่อย"
+
+
+def _cut_tail(t: str) -> tuple[str, str]:
+    """ตัดคำลงท้ายออกจากท้ายข้อความ → (ข้อความที่เหลือ, ส่วนที่ต้องคืนให้คำค้นถ้าคำค้นอยู่ท้ายประโยค)."""
+    cut: list[tuple[str, bool]] = []  # (คำ, มีเว้นวรรคคั่นจากข้างหน้า) เรียงจากท้าย
+    while (s := t.rstrip()) and (word := next((w for w in _TAIL if s.endswith(w)), None)):
+        t = s[: -len(word)]
+        cut.append((word, not t or t != t.rstrip()))
+    back = ""
+    for word, spaced in reversed(cut):  # อ่านจากซ้าย: คืนเฉพาะคำที่อาจเป็นพยางค์ของคำค้นที่ติดกันอยู่
+        if word in _TAIL_SURE or spaced:
+            break
+        back += word
+    return t.strip(), back
+
+
 # คำขอนำหน้า (ขอ… · ช่วย… · รบกวน… · ลอง… · กดปุ่ม… · กดย้อนกลับ) · ชุด H2 = ชุดพัฒนารอบ 3
 _ASK = re.compile(r"^(?:(?:ขอ|ช่วย|รบกวน|ลอง)\s*|กด\s*(?:ปุ่ม\s*)?(?=ย้อน|ถอย|ไป|รี|โหลด|ปิด|กลับ))+")
 # คำขอกลางประโยค ("หน้านี้ค้าง ช่วยโหลดใหม่ให้หน่อย") → ลองแปลส่วนหลังคำขอ (เฉพาะคำสั่งที่ไม่ใช่ค้นหา)
@@ -106,22 +128,36 @@ MAX_QUERY = 200
 _NOT_FOUND = re.compile(r"ไม่เจอ|ไม่พบ")
 # ไม่มี "ว่า" และคำค้นขึ้นต้นด้วยคำเชื่อม = เล่าเรื่องต่อ ไม่ใช่คำค้น
 # ("ค้นในเฟซบุ๊กแล้วมันค้างทุกที" · พบในชุดวัดรอบ 2 · Q06) · มี "ว่า" = ค้นได้ ("ค้นในยูทูบว่าแล้วไง")
-_STORY = re.compile(r"(?:แล้ว|แต่|ทีไร)")
+# "แต่(?!ง)": "แต่ง…" (แต่งหน้า แต่งงาน) เป็นคำค้น ไม่ใช่คำเชื่อม (ตรวจทั้งระบบ 2026-10-18 ข้อ 3.1)
+_STORY = re.compile(r"(?:แล้ว|แต่(?!ง)|ทีไร)")
 
 
-def _site_search(t: str) -> BrowseCommand | None:
-    if _NOT_FOUND.search(t):
-        return None
+def _site_match(t: str) -> re.Match | None:
     for pat in (_IN_FIRST, _IN_LAST, _OPEN_THEN):
         if m := pat.fullmatch(t):
-            if not m.group("said") and _STORY.match(m.group("q")):
-                return None
-            site = next(k for k in SEARCH_SITE_NAMES if m.group(k))
-            query = m.group("q").strip(" \"'“”")[:MAX_QUERY].strip()
-            if not query:  # "ค้นในยูทูบ" เฉย ๆ = เปิดหน้าบริการ
-                return BrowseCommand("site", site=site)
-            return BrowseCommand("site_search", query=query, site=site)
+            return m
     return None
+
+
+def _site_story(t: str) -> bool:
+    """พูดชื่อบริการ + กริยาค้น แต่เป็นการเล่าเรื่อง/เล่าปัญหา → ไม่ใช่คำสั่งเว็บเลย ·
+    เดิมคืน None แล้วไหลไปค้น Google ต่อ ("ค้นในเฟซบุ๊กแล้วมันค้างทุกที" → ค้น Google · ตรวจทั้งระบบ 3.2)."""
+    m = _site_match(t)
+    if m is None:
+        return False
+    return bool(_NOT_FOUND.search(t)) or (not m.group("said") and bool(_STORY.match(m.group("q"))))
+
+
+def _site_search(t: str, back: str = "") -> BrowseCommand | None:
+    m = _site_match(t)
+    if m is None or _site_story(t):
+        return None
+    site = next(k for k in SEARCH_SITE_NAMES if m.group(k))
+    q = m.group("q") + (back if m.end("q") == len(t) else "")  # คำค้นอยู่ท้ายประโยค: คืนพยางค์ ("…โยคะ")
+    query = q.strip(" \"'“”")[:MAX_QUERY].strip()
+    if not query:  # "ค้นในยูทูบ" เฉย ๆ = เปิดหน้าบริการ
+        return BrowseCommand("site", site=site)
+    return BrowseCommand("site_search", query=query, site=site)
 
 
 _SITE = re.compile(
@@ -188,27 +224,34 @@ _HEARD = [
 _HEARD_RE = [(re.compile(a), b) for a, b in _HEARD]
 
 
-def _clean(text: str) -> str:
+def _clean(text: str) -> tuple[str, str]:
+    """→ (ข้อความที่ตัดคำลงท้ายและแก้คำได้ยินผิดแล้ว, พยางค์ที่ต้องคืนให้คำค้นท้ายประโยค)."""
     t = re.sub(r"\s+", " ", text.strip().strip(".!?,。 ")).lower()
     t = re.sub(r"(?<=[ก-๙])\s+(?=[ก-๙])", "", t)  # whisper เว้นวรรคระหว่างคำไทย ("เลื่อน ลง")
-    t = _POLITE.sub("", t).strip()
+    t, back = _cut_tail(t)
     for pat, new in _HEARD_RE:
         t = pat.sub(new, t)
-    return t
+    return t, back
 
 
 def _ordinal(word: str) -> int:
     return int(word) if word.isdigit() else NUMBERS[word]
 
 
-def _single(t: str, asked: bool = False) -> BrowseCommand | None:
-    one = _single_exact(t, asked)
+def _single(t: str, asked: bool = False, back: str = "") -> BrowseCommand | None:
+    one = _single_exact(t, asked, back)
     if one is None and (bare := _ASK.sub("", t)) != t and bare:
-        one = _single_exact(bare, asked)  # "ขอกลับไปหน้าที่แล้ว" · "ลองหาข่าว…" · "กดปุ่มไปข้างหน้า"
+        one = _single_exact(bare, asked, back)  # "ขอกลับไปหน้าที่แล้ว" · "ลองหาข่าว…" · "กดปุ่มไปข้างหน้า"
     return one
 
 
-def _single_exact(t: str, asked: bool) -> BrowseCommand | None:
+# ขอค้นแต่ไม่มีคำค้น ("ช่วยค้นหาหน่อย" · "ค้นหาอีกครั้ง") · เดิมได้คำค้น "หา" แล้วส่งออก (ตรวจทั้งระบบ 2.11)
+_VERB_ONLY = re.compile(
+    r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|หา|เสิร์[ชด]|เซิร์ช|search|(?:กูเกิ้?ล|google)\s*(?:หา|ดู)?)"
+)
+
+
+def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
     if m := _OPEN_RE.fullmatch(t):
         return BrowseCommand("open", n=_ordinal(m.group(1)))
     if _BACK.fullmatch(t):
@@ -228,15 +271,20 @@ def _single_exact(t: str, asked: bool) -> BrowseCommand | None:
         return BrowseCommand("app")
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
-    if found := _site_search(t):  # ก่อนค้นเว็บทั่วไปและก่อนตัดเรื่องไฟล์: พูดชื่อบริการชัดเจนแล้ว
+    if found := _site_search(t, back):  # ก่อนค้นเว็บทั่วไปและก่อนตัดเรื่องไฟล์: พูดชื่อบริการชัดเจนแล้ว
         return found
+    if _VERB_ONLY.fullmatch(t):
+        return None
     m = _SEARCH.fullmatch(t) or _FIND.fullmatch(t)
     end = None
     if not m:
         end = _SEARCH_END.fullmatch(t) or (_SEARCH_END_ASKED.fullmatch(t) if asked else None)
     # หาไฟล์/โน้ตในเครื่อง = สกิลค้นไฟล์ ไม่ใช่ค้นเว็บ · หาของหาย/หาเพื่อนคุย ไม่ใช่ค้นเว็บ
     if (m or end) and not (fileintent.file_intent(t) or fileintent.file_time(t) or _LOST.search(t)):
-        query = _POLITE.sub("", (m or end).group(1)).strip()
+        if m:  # คำค้นอยู่ท้ายประโยค: คืนพยางค์ที่ตัดไปตอนตัดคำลงท้าย ("ค้นหาโยคะ" → "โยคะ")
+            query = (m.group(1) + back).strip()
+        else:  # กริยาอยู่ท้าย ("โยคะ ช่วยค้นหาให้หน่อย"): ตัดคำลงท้ายของคำค้นด้วยกฎเดียวกัน
+            query = "".join(_cut_tail(end.group(1)))
         # กริยาอยู่ท้าย: คำว่าไฟล์/เอกสารอยู่ตรงไหนของคำค้นก็ได้ ("…สรุปไว้ในไฟล์ไหน ช่วยหาให้หน่อย")
         bad = _NOT_WEB.search(query) if end else _NOT_WEB.match(query)
         if query and not bad:
@@ -247,23 +295,29 @@ def _single_exact(t: str, asked: bool) -> BrowseCommand | None:
 def parse(text: str) -> list[BrowseCommand]:
     raw = re.sub(r"(?<=[ก-๙])\s+(?=[ก-๙])", "", text.strip().lower())
     asked = bool(_ASKED_FIND.search(raw))
-    t = _clean(text)
-    if not t:
+    t, back = _clean(text)
+    if not t or _site_story(t):  # เล่าเรื่องที่มีชื่อบริการ = ไม่ใช่คำสั่งเว็บ (ไม่ไหลไปค้น Google)
         return []
     # ค้นหาแล้วเข้าลิงก์ในประโยคเดียว (ดูก่อน: ไม่งั้นคำค้นกินท่อน "เข้าลิงก์แรก" ไปด้วย)
     if m := _COMPOUND.fullmatch(t):
-        first, second = _single(_clean(m.group(1))), _single(m.group(2))
+        a, a_back = _clean(m.group(1))
+        first, second = _single(a, back=a_back), _single(m.group(2))
         if first and first.kind == "search" and second:
             return [first, second]
+        if _VERB_ONLY.fullmatch(a) and second:  # "ค้นหา เปิดลิงก์ที่สาม" = เปิดลิงก์ (ไม่ส่งคำสั่งไปเป็นคำค้น)
+            return [second]
     # "A แล้ว B" ทั่วไป · B ต้องไม่ใช่ค้นหา (คำค้นมีคำว่า "แล้ว" ได้)
     if m := _THEN.fullmatch(t):
-        first, second = _single(_clean(m.group(1))), _single(_clean(m.group(2)))
+        a, a_back = _clean(m.group(1))
+        first, second = _single(a, back=a_back), _single(_clean(m.group(2))[0])
         if first and second and second.kind != "search":
             return [first, second]
-    if one := _single(t, asked):
+    if one := _single(t, asked, back):
         return [one]
     # คำขอกลางประโยค: "หน้านี้ค้าง ช่วยโหลดใหม่ให้หน่อย" → แปลส่วนหลังคำขอ (ไม่ใช่ค้นหา)
     for m in _ASK_MID.finditer(t):
-        if m.start() > 0 and (one := _single(t[m.start() :])) and one.kind != "search":
+        # ไม่รับค้นหา/ค้นในบริการ: "เมื่อวานพี่สาวขอให้ช่วยค้นในเฟซบุ๊กว่า…" = เล่าเรื่อง (ตรวจทั้งระบบ 3.3)
+        one = _single(t[m.start() :], back=back) if m.start() > 0 else None
+        if one and one.kind not in ("search", "site_search"):
             return [one]
     return []
