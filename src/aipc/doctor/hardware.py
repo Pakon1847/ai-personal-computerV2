@@ -96,7 +96,9 @@ def check_power(root: Path, run: Runner) -> Check:
         parts.append(tr("บอร์ดรับรู้กระแสสูงสุด {ma} mA", ma=max_ma))
     if throttled is not None:
         problems = machine.decode_throttled(throttled)
-        parts.append(tr("ไม่เคยไฟตก/ร้อนเกินตั้งแต่บูต") if not problems else ", ".join(problems))
+        parts.append(
+            tr("ไม่เคยไฟตก/ร้อนเกินตั้งแต่บูต") if not problems else ", ".join(tr(p) for p in problems)
+        )
     detail = " · ".join(parts) or tr("อ่านค่าไม่ได้ทั้งสองทาง")
     fix = tr("ใช้อะแดปเตอร์ 27W ของแท้ ต่อสายตรง ไม่ผ่านฮับ แล้วรีบูตก่อนตรวจซ้ำ")
 

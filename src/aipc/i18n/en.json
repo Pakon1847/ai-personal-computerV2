@@ -813,5 +813,13 @@
   "ทำไม่สำเร็จ: {0}": "Failed: {0}",
   "ค้นแล้ว แต่จดลงสมุดสิ่งที่ส่งออกไม่ได้ (พื้นที่อาจเต็ม)": "Searched, but couldn't record it in the outbound log (disk may be full)",
   "ออกจากบัญชีเว็บในเบราว์เซอร์ของผู้ช่วยแล้ว · ลบการเข้าสู่ระบบ คุกกี้ ประวัติ บุ๊กมาร์ก และรหัสที่บันทึกไว้ในเบราว์เซอร์นั้น · เบราว์เซอร์ธรรมดาไม่ได้ลบ ถ้าเคยเข้าสู่ระบบที่นั่นให้ออกเองที่นั่น": "Signed out of web accounts in the assistant browser · its sign-ins, cookies, history, bookmarks and saved passwords were deleted · the regular browser was not touched; if you signed in there, sign out there yourself",
-  "วันนี้ {time}": "Today {time}"
+  "วันนี้ {time}": "Today {time}",
+  "ไฟตก (under-voltage) ตอนนี้": "under-voltage now",
+  "ความถี่ CPU ถูกจำกัด ตอนนี้": "CPU frequency capped now",
+  "กำลังถูกลดความเร็ว (throttled) ตอนนี้": "throttled now",
+  "ถึงขีดอุณหภูมิแบบนุ่ม ตอนนี้": "soft temperature limit reached now",
+  "เคยไฟตกตั้งแต่บูต": "under-voltage since boot",
+  "เคยถูกจำกัดความถี่ตั้งแต่บูต": "frequency capped since boot",
+  "เคยถูกลดความเร็วตั้งแต่บูต": "throttled since boot",
+  "เคยถึงขีดอุณหภูมิแบบนุ่มตั้งแต่บูต": "soft temperature limit reached since boot"
 }
