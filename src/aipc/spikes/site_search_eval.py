@@ -30,7 +30,7 @@ def judge(item: dict) -> dict:
     cmds = browse.parse(item["text"])
     found = next((c for c in cmds if c.kind == "site_search"), None)
     want = item["expect"]
-    positive = "site" in want
+    positive = bool(want) and "site" in want  # รอบ 3: ประโยคใกล้เคียงเขียน expect เป็น null
     if positive:
         same = found is not None and norm(found.query) == norm(want["query"])
         ok = same and found.site == want["site"]
