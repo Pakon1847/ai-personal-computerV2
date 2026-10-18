@@ -48,6 +48,18 @@ class DetailParseTest(unittest.TestCase):
         self.assertEqual(self.q("เดือนหน้ามีนัดอะไร"), (date(2026, 11, 1), 30))
         self.assertEqual(self.q("เดือนหน้ามีนัดอะไร", date(2026, 12, 20)), (date(2027, 1, 1), 31))
 
+    def test_weekday_with_date_uses_the_date(self):
+        """ตรวจทั้งระบบ 2026-10-18 ข้อ 3.6: วันที่ชัดเจนมาก่อนวันในสัปดาห์ (เดิม "วันศุกร์ที่ 20 พ.ย." = ศุกร์นี้)."""
+        self.assertEqual(self.q("วันอังคารที่ 17 พฤศจิกายนมีนัดอะไร"), (date(2026, 11, 17), 1))
+        self.assertEqual(self.q("วันเสาร์ที่ 24 มีนัดไหม"), (date(2026, 10, 24), 1))
+        self.assertEqual(self.q("วันที่ 1/12 มีนัดอะไร"), (date(2026, 12, 1), 1))
+        self.assertEqual(self.q("วันที่ 9 เดือนหน้ามีนัดไหม"), (date(2026, 11, 9), 1))
+        for text in ("วันพุธที่แล้วมีนัดอะไร", "สัปดาห์ที่แล้วมีนัดอะไรบ้าง"):  # ย้อนหลัง ไม่ใช่นัดที่จะถึง
+            self.assertIsNone(agenda.parse(text, TODAY), text)
+        # วันจันทร์ (19) ถาม "อาทิตย์หน้าวันอังคาร" = อังคารของสัปดาห์หน้า (27) ไม่ใช่พรุ่งนี้
+        monday = date(2026, 10, 19)
+        self.assertEqual(self.q("อาทิตย์หน้าวันอังคารมีนัดอะไร", monday), (date(2026, 10, 27), 1))
+
     def test_not_schedule_questions(self):
         for text in ("วันศุกร์นี้อากาศเป็นยังไง", "วันที่ 20 คือวันอะไร", "เดือนหน้าจะไปเที่ยวไหนดี"):
             self.assertIsNone(agenda.parse(text, TODAY), text)

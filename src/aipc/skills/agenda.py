@@ -39,6 +39,9 @@ def _range(t: str, today: date) -> Query | None:
     return None
 
 
+_PAST = re.compile(r"(?:วัน(?:จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์|อาทิตย์)|อาทิตย์|สัปดาห์|เดือน)(?:ที่)?แล้ว")
+
+
 def parse(text: str, today: date) -> Query | None:
     t = re.sub(r"\s+", "", text)
     topic = any(k in t for k in TOPIC) or (t.startswith(WHEN_FIRST) and "มีอะไร" in t)
@@ -48,6 +51,8 @@ def parse(text: str, today: date) -> Query | None:
         return None
     if "วันหยุด" in t and not any(k in t for k in ("นัด", "ต้องทำ", "ตาราง")):
         return None  # "สัปดาห์หน้ามีวันหยุดไหม" = คำถามวันหยุด (การ์ด 0033) ไม่ใช่ตารางนัด
+    if _PAST.search(t):  # ถามย้อนหลัง: ตอบนัดที่จะถึงไม่ได้ (เดิม "วันจันทร์ที่แล้ว" ได้จันทร์หน้า · ตรวจทั้งระบบ 3.6)
+        return None
     if q := _detail_range(t, today):  # วันในสัปดาห์ · วันที่ · เดือน (การ์ด 0037)
         return q
     for w in WEEK_WORDS:
@@ -275,38 +280,47 @@ def _invalid(label: str, today: date) -> Query:
     return Query(today, 0, label)
 
 
+def _on_or_after(today: date, mon: int, day: int, label: str) -> Query:
+    """วันที่ day/mon ครั้งถัดไป (ผ่านแล้วปีนี้ = ปีหน้า) · ไม่มีจริง (31 พ.ย.) = บอกว่าไม่มี."""
+    try:
+        d = date(today.year, mon, day)
+        if d < today:
+            d = date(today.year + 1, mon, day)
+    except ValueError:
+        return _invalid(label, today)
+    return Query(d, 1, label)
+
+
 def _detail_range(t: str, today: date) -> Query | None:
     from aipc.skills.when import MONTHS, WEEKDAYS
     from aipc.ui.thaidate import MONTHS_SHORT
 
-    if m := _WEEKDAY.search(t):
-        wd = WEEKDAYS[m[1]]
-        if m[2] == "หน้า":  # วันนั้นของสัปดาห์หน้า (จันทร์–อาทิตย์ถัดไป)
-            d = today + timedelta(days=7 - today.weekday() + wd)
-        else:  # ครั้งถัดไป นับวันนี้ด้วย
-            d = today + timedelta(days=(wd - today.weekday()) % 7)
-        return Query(d, 1, f"วัน{m[1]}{m[2] or ''}")
+    # วันที่ชัดเจนมาก่อนวันในสัปดาห์ (ตรวจทั้งระบบ 2026-10-18 ข้อ 3.6): "วันศุกร์ที่ 20 พฤศจิกายน" = 20 พ.ย.
+    # (เดิมได้ศุกร์นี้) · "วันพุธที่ 28" = วันที่ 28 · "วันที่ 25/12" = 25 ธ.ค. · "วันที่ 20 เดือนหน้า" = 20 ของเดือนหน้า
     months = "|".join(sorted((re.escape(k) for k in MONTHS), key=len, reverse=True))
-    if m := re.search(rf"(?:วันที่)?(\d{{1,2}})({months})\.?", t):
+    if m := re.search(r"(\d{1,2})/(\d{1,2})(?![/\d])", t):
+        return _on_or_after(today, int(m[2]), int(m[1]), f"วันที่ {int(m[1])}/{int(m[2])}")
+    if m := re.search(rf"(?:ที่)?(\d{{1,2}})({months})\.?", t):
         day, mon = int(m[1]), MONTHS[m[2]]
-        label = f"วันที่ {day} {MONTHS_SHORT[mon - 1]}"
-        try:
-            d = date(today.year, mon, day)
-            if d < today:
-                d = date(today.year + 1, mon, day)
-        except ValueError:
-            return _invalid(label, today)
-        return Query(d, 1, label)
-    if m := re.search(r"วันที่(\d{1,2})", t):
+        return _on_or_after(today, mon, day, f"วันที่ {day} {MONTHS_SHORT[mon - 1]}")
+    if m := re.search(r"ที่(\d{1,2})", t):
         day = int(m[1])
         y, mon = today.year, today.month
-        if day < today.day:
+        if "เดือนหน้า" in t or day < today.day:
             y, mon = (y + 1, 1) if mon == 12 else (y, mon + 1)
-        label = f"วันที่ {day}"
+        label = f"วันที่ {day}" + (f" {MONTHS_SHORT[mon - 1]}" if "เดือนหน้า" in t else "")
         try:
             return Query(date(y, mon, day), 1, label)
         except ValueError:
             return _invalid(f"{label} {MONTHS_SHORT[mon - 1]}", today)
+    if m := _WEEKDAY.search(t):
+        wd = WEEKDAYS[m[1]]
+        # วันนั้นของสัปดาห์หน้า · "อาทิตย์หน้าวันอังคาร" ก็นับ (เดิมได้อังคารนี้)
+        if m[2] == "หน้า" or re.search(r"(?:อาทิตย์|สัปดาห์)หน้า", t[: m.start()]):
+            d = today + timedelta(days=7 - today.weekday() + wd)
+        else:  # ครั้งถัดไป นับวันนี้ด้วย
+            d = today + timedelta(days=(wd - today.weekday()) % 7)
+        return Query(d, 1, f"วัน{m[1]}{m[2] or ''}")
     if "เดือนนี้" in t:
         return Query(today, (_month_end(today) - today).days + 1, "เดือนนี้")
     if "เดือนหน้า" in t:
