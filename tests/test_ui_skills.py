@@ -72,6 +72,16 @@ class SkillsControllerTest(unittest.TestCase):
         for text in ("อีกกี่วันจะสอบ", "ปีใหม่ไปเที่ยวไหนดี", "อีกกี่วันจะถึงวันเด็ก"):
             self.assertNotEqual(self.s.handle(text)["kind"], "clock", text)
 
+    def test_unsynced_clock_is_admitted(self):
+        """ตรวจทั้งระบบ 1.1: แบต RTC ไม่มีไฟ + ไม่มีเน็ต = เวลาเครื่องผิดได้ → การ์ดเวลา/นัดบอกตรง ๆ."""
+        from aipc.ui.backend import UNSYNCED
+
+        self.s._time_synced = lambda: False
+        self.assertIn(UNSYNCED, self.s.handle("ตอนนี้กี่โมง")["lines"])
+        self.assertIn(UNSYNCED, self.s.handle("วันนี้มีนัดอะไร")["lines"])
+        self.s._time_synced = lambda: True
+        self.assertNotIn(UNSYNCED, self.s.handle("ตอนนี้กี่โมง")["lines"])
+
     def test_time_question_answered_by_clock_not_ai(self):
         # สำรวจบน Pi 5 2026-10-12: "ตอนนี้กี่โมง" AI ในเครื่องตอบว่าไม่รู้ → ส่งต่อ Claude
         for text in ("ตอนนี้กี่โมง", "กี่โมงแล้วครับ", "ตอนนี้เวลาเท่าไหร่", "what time is it"):

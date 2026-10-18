@@ -1600,6 +1600,20 @@ class SignupController(QObject):
         return validation.STRENGTH_LABELS[max(0, min(score, 4))]
 
 
+UNSYNCED = "⚠ เครื่องยังไม่ได้ตั้งเวลาจากอินเทอร์เน็ต · เวลาอาจไม่ตรง (ต่อเน็ตแล้วรอ ~1 นาที)"
+_SYNC_CACHE: list = [0.0, True]
+
+
+def _ntp_synced() -> bool:
+    """timedatectl บอกว่าตั้งเวลาจากเน็ตแล้ว · อ่านได้ไม่เกินนาทีละครั้ง · อ่านไม่ได้ (วินโดวส์) = ไม่เตือน."""
+    from aipc.doctor.hardware import WARN
+    from aipc.doctor.ready import check_clock
+
+    if time.monotonic() - _SYNC_CACHE[0] > 60:
+        _SYNC_CACHE[:] = [time.monotonic(), check_clock().status != WARN]
+    return _SYNC_CACHE[1]
+
+
 class SkillsController(QObject):
     """ต่อสกิลเข้ากับหน้าแชท · handle(ข้อความ) คืน "การ์ดคำตอบ" ที่ QML วาดได้ทันที.
 
@@ -1636,8 +1650,11 @@ class SkillsController(QObject):
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
-                 gcal_alert_min=None, holidays=None):  # fmt: skip
+                 gcal_alert_min=None, holidays=None, time_synced=None):  # fmt: skip
         super().__init__()
+        # นาฬิกาตั้งจากเน็ตแล้วไหม (ตรวจทั้งระบบ 1.1: แบต RTC 0.00V → บูตไม่มีเน็ต = เวลาค้างที่ตอนปิดเครื่อง) ·
+        # ไม่ได้ตั้ง = การ์ดเวลา/นัดบอกว่าเวลาอาจไม่ตรง (H5) · เทสต์ที่ใส่นาฬิกาปลอม = ถือว่าตั้งแล้ว
+        self._time_synced = time_synced or ((lambda: True) if clock is not None else _ntp_synced)
         # ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014 · aipc.skills.gcal.GoogleCalendar)
         # · None = ไม่มี (หน้า Login)
         self._gcal = gcal
@@ -2095,8 +2112,10 @@ class SkillsController(QObject):
         if not agenda.asks_time(text):
             return None
         now = self._now()
-        return self._plain("clock", f"ตอนนี้ {thaidate.clock(now)} น.",
-                           [f"{thaidate.long_date(now)} · ตามนาฬิกาของเครื่องนี้"])  # fmt: skip
+        lines = [f"{thaidate.long_date(now)} · ตามนาฬิกาของเครื่องนี้"]
+        if not self._time_synced():
+            lines.append(UNSYNCED)
+        return self._plain("clock", f"ตอนนี้ {thaidate.clock(now)} น.", lines)
 
     def _cancel_card(self, text: str) -> dict | None:
         """ "ยกเลิกนัดส่งรายงาน" · "ลบนัดทั้งหมด" → แสดงนัดที่จะลบ แล้วรอยืนยัน · None = ไม่ใช่คำขอลบนัด."""
@@ -2237,6 +2256,8 @@ class SkillsController(QObject):
         ] or ["จดนัดได้เลย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”"]
         if note:
             card["lines"].append(note)
+        if not self._time_synced():  # "วันนี้" ของเครื่องอาจไม่ใช่วันนี้จริง (ตรวจทั้งระบบ 1.1)
+            card["lines"].append(UNSYNCED)
         card["route"] = "agenda"
         return card
 
