@@ -26,6 +26,8 @@ class BackupTest(unittest.TestCase):
         (self.home / ".cache/big.bin").write_bytes(b"x" * 100)
         (self.home / ".ssh").mkdir()
         (self.home / ".ssh/id").write_text("secret", "utf-8")
+        # ลิงก์ลับปฏิทิน Google = กุญแจ · ไม่สำรองลง USB (ตรวจทั้งระบบ 2026-10-18 ข้อ 3.7)
+        (self.home / ".config/aipc/gcal-link.json").write_text('{"link": "secret"}', "utf-8")
 
     def test_backup_contains_app_data_and_my_files_not_cache_or_keys(self):
         r = backup.backup(self.home, self.drive, "pakon1", datetime(2026, 10, 1, 3, 0))

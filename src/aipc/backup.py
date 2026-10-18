@@ -5,7 +5,8 @@
   → <ไดรฟ์>/AIPC-backup/<ชื่อผู้ใช้>/<วันเวลา>/ เป็นไฟล์ธรรมดา (เปิดดูในคอมอื่นได้) + manifest.json (sha256 ทุกไฟล์)
   เขียนลงโฟลเดอร์ .partial ก่อน ครบแล้วค่อยเปลี่ยนชื่อ = ถอดไดรฟ์กลางคัน ไม่มีชุดที่ดูเหมือนครบแต่ไม่ครบ
 กู้: ตรวจ sha256 ทุกไฟล์ก่อน · ของเดิมย้ายไป ~/.local/share/aipc-before-restore-<วันเวลา> (ไม่ลบ) แล้วคัดลอกกลับ
-ไม่รวม: แม่แบบใบหน้า (อยู่ใน /var/lib ของระบบ · สมัครใหม่ได้) · แคช · ไฟล์ซ่อนอื่น ๆ
+ไม่รวม: แม่แบบใบหน้า (อยู่ใน /var/lib ของระบบ · สมัครใหม่ได้) · แคช · ไฟล์ซ่อนอื่น ๆ ·
+  ลิงก์ลับปฏิทิน Google (= กุญแจอ่านปฏิทิน · ไดรฟ์ USB ส่วนใหญ่เป็น FAT ไม่มีสิทธิ์ไฟล์ · หลังกู้ให้เชื่อมต่อใหม่)
 · ไม่เข้ารหัส (ADR-003) → บอกผู้ใช้
 """
 
@@ -22,6 +23,9 @@ from pathlib import Path
 APP_DIRS = (".local/share/aipc", ".config/aipc")
 ROOT_NAME = "AIPC-backup"
 SKIP_TOP = {".cache", ".local", ".config", ".claude", ".ssh", ".gnupg", ".mozilla", ".var"}
+# ความลับที่ไม่สำรอง (ตรวจทั้งระบบ 2026-10-18 ข้อ 3.7: เดิมลิงก์ลับ iCal ติดไปกับ .config/aipc ·
+# ใครได้ไดรฟ์ USB อ่านปฏิทินได้จนกว่าจะรีเซ็ตลิงก์)
+SECRET_FILES = {Path(".config/aipc/gcal-link.json")}
 
 
 class BackupError(Exception):
@@ -89,7 +93,9 @@ def files_to_copy(home: Path) -> list[Path]:
         base = home / d
         if base.is_dir():
             out += [
-                p.relative_to(home) for p in base.rglob("*") if p.is_file() and not p.is_symlink()
+                p.relative_to(home)
+                for p in base.rglob("*")
+                if p.is_file() and not p.is_symlink() and p.relative_to(home) not in SECRET_FILES
             ]
     for top in sorted(home.iterdir()) if home.is_dir() else []:
         if top.name.startswith(".") or top.name in SKIP_TOP or top.is_symlink():
