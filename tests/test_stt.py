@@ -131,5 +131,63 @@ class SttTest(unittest.TestCase):
         self.assertIn("ยังไม่ได้ติดตั้ง", missing.start())
 
 
+class EnglishSttTest(unittest.TestCase):
+    """การ์ด 0040: ภาษาตัวถอด = ภาษาหน้าจอ (โค้ดเลือก) · หน้าจอไทย = ทางเดิม ·
+    คีย์ลัดอังกฤษไม่ใช้ Zipformer ไทย."""
+
+    FAKE_EN = [sys.executable, "-c", "print('Open YouTube.')", "-f"]
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        self.done = threading.Event()
+        self.result: list = []
+        self.lang = "en"
+
+    def listener(self, en_cmd, fast=None):
+        return Listener(lambda t, e, s: (self.result.append((t, e)), self.done.set()),
+                        record_cmd=FAKE_REC, transcribe_cmd=FAKE_STT, en_transcribe_cmd=en_cmd,
+                        fast=fast, language=lambda: self.lang)  # fmt: skip
+
+    def run_once(self, lis, fast=False):
+        self.assertEqual(lis.start(fast=fast), "")
+        time.sleep(0.6)
+        lis.stop()
+        self.assertTrue(self.done.wait(15))
+        self.done.clear()
+        return self.result.pop()
+
+    def test_english_screen_uses_english_model_thai_screen_unchanged(self):
+        lis = self.listener(self.FAKE_EN)
+        self.assertEqual(self.run_once(lis), ("Open YouTube.", ""))
+        self.lang = "th"
+        self.assertEqual(self.run_once(lis), ("เปิด ยูทูบ", ""))
+
+    def test_hotkey_in_english_skips_thai_zipformer(self):
+        class ThaiFast:
+            available, used = True, 0
+
+            def warm(self):
+                pass
+
+            def transcribe(self, path):
+                ThaiFast.used += 1
+                return "เปิดยูทูบ", ""
+
+        lis = self.listener(self.FAKE_EN, fast=ThaiFast())
+        self.assertEqual(self.run_once(lis, fast=True), ("Open YouTube.", ""))
+        self.assertEqual(ThaiFast.used, 0)
+        self.lang = "th"
+        self.assertEqual(self.run_once(lis, fast=True), ("เปิดยูทูบ", ""))
+        self.assertEqual(ThaiFast.used, 1)
+
+    def test_missing_english_model_says_so(self):
+        lis = Listener(record_cmd=FAKE_REC, voice_dir=Path(self.tmp.name), language=lambda: "en",
+                       transcribe_cmd=FAKE_STT)  # fmt: skip
+        self.assertEqual(lis.start(), "ยังไม่ได้ติดตั้งตัวถอดเสียงภาษาอังกฤษ")
+        self.assertFalse(lis.listening)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -22,6 +22,8 @@ from pathlib import Path
 VOICE_DIR = Path(os.environ.get("AIPC_VOICE_DIR", "/opt/aipc-voice"))
 WHISPER = "whisper/bin/whisper-cli"
 MODEL = "thonburian-distill-small-f16.bin"
+# หน้าจอภาษาอังกฤษ (การ์ด 0040 · D1 เลือกบน Pi 5: ถอด ~0.8 วิ · RAM ~257 MB · MIT)
+EN_MODEL = "ggml-base.en.bin"
 MAX_S = 15
 MIN_S = 0.4  # กดแล้วปล่อยทันที = ไม่ถอด
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
@@ -115,8 +117,13 @@ class Listener:
     def __init__(self, on_done: Callable[[str, str, float], None] = lambda *a: None,
                  voice_dir: Path = VOICE_DIR, record_cmd: list[str] | None = None,
                  transcribe_cmd: list[str] | None = None, max_s: float = MAX_S,
-                 auto_stop: bool = True, endpointer=None, fast=None):  # fmt: skip
+                 auto_stop: bool = True, endpointer=None, fast=None,
+                 language: Callable[[], str] = lambda: "th",
+                 en_transcribe_cmd: list[str] | None = None):  # fmt: skip
         self._on_done = on_done
+        # ภาษาของตัวถอด = ภาษาหน้าจอที่ผู้ใช้ตั้ง (การ์ด 0040 · โค้ดเลือก ไม่ให้โมเดลเดาภาษา · H6)
+        self._language = language
+        self._lang = "th"
         self._fast = fast
         self._use_fast = False
         self._voice_dir = voice_dir
@@ -126,7 +133,11 @@ class Listener:
         self._transcribe_cmd = transcribe_cmd or [
             str(voice_dir / WHISPER), "-m", str(voice_dir / MODEL), "-l", "th", "-t", "4", "-nt",
             "-ac", "512", "-f"]  # fmt: skip
+        self._en_cmd = en_transcribe_cmd or [
+            str(voice_dir / WHISPER), "-m", str(voice_dir / EN_MODEL), "-l", "en", "-t", "4", "-nt",
+            "-ac", "512", "-f"]  # fmt: skip
         self._custom = transcribe_cmd is not None
+        self._custom_en = en_transcribe_cmd is not None
         self._max_s = max_s
         self._auto_stop = auto_stop
         self._make_endpointer = endpointer or (lambda: Endpointer(max_s=max_s))
@@ -147,6 +158,14 @@ class Listener:
         )
 
     @property
+    def english_available(self) -> bool:
+        if self._record_cmd is None:
+            return False
+        return self._custom_en or (
+            (self._voice_dir / WHISPER).exists() and (self._voice_dir / EN_MODEL).exists()
+        )
+
+    @property
     def listening(self) -> bool:
         return self._proc is not None
 
@@ -157,7 +176,12 @@ class Listener:
                 return ""
             if not self.available:
                 return "ยังไม่ได้ติดตั้งตัวถอดเสียง หรือไม่มีไมค์"
-            self._use_fast = fast and self._fast is not None and self._fast.available
+            self._lang = "en" if self._language() == "en" else "th"
+            if self._lang == "en" and not self.english_available:
+                return "ยังไม่ได้ติดตั้งตัวถอดเสียงภาษาอังกฤษ"
+            # ตัวถอดของคีย์ลัด (Zipformer) เป็นภาษาไทยล้วน → หน้าจออังกฤษใช้ whisper อังกฤษเสมอ
+            self._use_fast = (fast and self._lang == "th" and self._fast is not None
+                              and self._fast.available)  # fmt: skip
             if self._use_fast:
                 self._fast.warm()  # โหลดโมเดล 3.7 วิ ระหว่างผู้ใช้พูด
             self._dir.mkdir(mode=0o700, exist_ok=True)
@@ -252,7 +276,8 @@ class Listener:
                 self._on_done(text, err, round(time.monotonic() - t0, 2))
                 return
         try:
-            r = subprocess.run([*self._transcribe_cmd, str(path)], capture_output=True, text=True,
+            cmd = self._en_cmd if self._lang == "en" else self._transcribe_cmd
+            r = subprocess.run([*cmd, str(path)], capture_output=True, text=True,
                                encoding="utf-8", timeout=60)  # fmt: skip
             text, err = clean(r.stdout), ("" if r.returncode == 0 else "ถอดเสียงไม่สำเร็จ")
         except (OSError, subprocess.TimeoutExpired):

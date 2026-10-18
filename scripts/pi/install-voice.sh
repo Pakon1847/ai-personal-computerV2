@@ -15,7 +15,9 @@
 #   ./scripts/pi/install-voice.sh --english                        ดูว่าจะทำอะไร (เสียงอ่านภาษาอังกฤษ · การ์ด 0039 ระยะ B)
 #   sudo ./scripts/pi/install-voice.sh --english --apply
 #     /opt/aipc-voice/en_US-ljspeech-medium.onnx(.json) · ชุดข้อมูล LJ Speech = public domain · 63.5 MB · ตรวจ sha256 ทั้ง 2 ไฟล์
-#     ใช้ venv เดิม (ไม่ติดตั้งแพ็กเกจเพิ่ม) · ถอนเฉพาะส่วนนี้: sudo rm -f /opt/aipc-voice/en_US-ljspeech-medium.onnx*
+#     + ตัวถอดเสียงอังกฤษ /opt/aipc-voice/ggml-base.en.bin (OpenAI Whisper · MIT · 148 MB · การ์ด 0040 D1)
+#     ใช้ venv และ whisper.cpp เดิม (ไม่ติดตั้งแพ็กเกจเพิ่ม) ·
+#     ถอนเฉพาะส่วนนี้: sudo rm -f /opt/aipc-voice/en_US-ljspeech-medium.onnx* /opt/aipc-voice/ggml-base.en.bin
 #
 # ทำอะไร: /opt/aipc-voice (root · อ่านได้ทุกคน)
 #   venv/   piper-tts 1.8.0 + รุ่นตาม scripts/pi/voice-requirements.txt
@@ -48,7 +50,7 @@ need_root() { [ "$(id -u)" -eq 0 ] || { say "ต้องรันด้วย s
 
 if [ "$EN" = 1 ]; then
   E=en_US-ljspeech-medium
-  say "จะเพิ่มเสียงอ่านภาษาอังกฤษที่ $OPT/$E.onnx(.json) (~64 MB · ใช้ venv เดิม) · ต้องใช้อินเทอร์เน็ต"
+  say "จะเพิ่มเสียงอ่านภาษาอังกฤษที่ $OPT/$E.onnx(.json) (~64 MB) + ตัวถอดเสียงอังกฤษ $OPT/ggml-base.en.bin (~148 MB) · ใช้ venv/whisper เดิม · ต้องใช้อินเทอร์เน็ต"
   [ "$MODE" = "apply" ] || { say "== โหมดดูก่อน: ยังไม่เปลี่ยนอะไร · ใส่ --apply เพื่อทำจริง =="; exit 0; }
   need_root
   [ -x "$OPT/venv/bin/python" ] || { say "หยุด: ติดตั้งตัวอ่านออกเสียงก่อน (--apply)" >&2; exit 1; }
@@ -62,7 +64,12 @@ if [ "$EN" = 1 ]; then
 en_US-ljspeech-medium.onnx 6f52a751e2349abe7a76735eb09dc1875298c77ea2342ffd2fef79ff81b87f22
 en_US-ljspeech-medium.onnx.json 141d612cc0a95ed7efc1ca936b845c2364967f2e9217c5dbfcf69fc4d6c65860
 LIST
-  chmod a+r "$OPT/$E.onnx" "$OPT/$E.onnx.json"
+  W=ggml-base.en.bin
+  if [ ! -f "$OPT/$W" ]; then
+    curl -fsSL --retry 5 -o "$OPT/$W.part" "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$W"       && mv "$OPT/$W.part" "$OPT/$W"
+  fi
+  echo "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002  $OPT/$W" | sha256sum -c --quiet     || { say "หยุด: sha256 ของ $W ไม่ตรง" >&2; rm -f "$OPT/$W"; exit 1; }
+  chmod a+r "$OPT/$E.onnx" "$OPT/$E.onnx.json" "$OPT/$W"
   echo "This is a test." | "$OPT/venv/bin/python" -m piper -m "$OPT/$E.onnx" -f /tmp/aipc-voice-en-test.wav >/dev/null 2>&1     && rm -f /tmp/aipc-voice-en-test.wav && say "เสร็จ · สังเคราะห์เสียงอังกฤษได้ · เปิดแอปใหม่ (หรือออกแล้วเข้าระบบใหม่) จึงใช้"     || { say "ติดตั้งแล้วแต่สังเคราะห์เสียงอังกฤษไม่ได้ · ลอง: echo test | $OPT/venv/bin/python -m piper -m $OPT/$E.onnx -f /tmp/t.wav" >&2; exit 1; }
   exit 0
 fi

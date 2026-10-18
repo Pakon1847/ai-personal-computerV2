@@ -360,7 +360,10 @@ class VoiceController(QObject):
         # กดค้างเพื่อพูด (การ์ด 0019 ข้อ 9) · None = หน้า Login
         # คีย์ลัดถอดด้วย Zipformer + hotwords (การ์ด 0026) · ปุ่มไมค์ใช้ whisper เหมือนเดิม
         if active and listener is None:
-            listener = stt.Listener(self._weak("_heard"), fast=zipformer.Transcriber())
+            from aipc import i18n
+
+            listener = stt.Listener(self._weak("_heard"), fast=zipformer.Transcriber(),
+                                    language=i18n.lang)  # fmt: skip # การ์ด 0040
         self._listener = listener if active else None
         self._key, self._job, self._message = -1, -1, ""
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
@@ -2776,10 +2779,11 @@ class SkillsController(QObject):
 
         ลำดับเดียวกับ _handle · ไม่ใช้ทางที่ส่งออก (อากาศ · สร้างสกิล) · ยกเลิกนัด = การ์ดยืนยันเดิม
         """
-        from aipc.skills import router
+        from aipc.skills import english, router
         from aipc.skills.fileintent import file_intent, file_time
 
         t0 = time.monotonic()
+        text = english.to_thai(text) or text  # คำถามอังกฤษทางคีย์ลัด (การ์ด 0040) · ไทยไม่แตะ
         asks = (self._agenda_card, self._clock_card, self._until_card, self._holiday_card,
                 self._cancel_card, self._next_card, self._move_card, self._title_card)  # fmt: skip
         for ask in asks:

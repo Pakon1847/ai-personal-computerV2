@@ -263,6 +263,22 @@ class YesNoTest(unittest.TestCase):
         for text in ["เปิดยูทูบ", "เลื่อนลง", "ถ้าไม่ว่างก็ช่างมัน", ""]:
             self.assertEqual(yes_no(text), "", text)
 
+    def test_english_answers(self):
+        """การ์ด 0040: หน้าจออังกฤษตอบด้วยเสียงอังกฤษ · กติกาเดียวกับไทย (ปฏิเสธชนะ · ยืนยันต้องไม่มีคำอื่น)."""
+        for text, want in [("yes", "yes"), ("Yes please.", "yes"), ("okay, go ahead", "yes"),
+                           ("no", "no"), ("No, cancel", "no"), ("yes but not now", "no"),
+                           ("don't", "no"), ("yes and open youtube", "unclear"),
+                           ("open youtube", ""), ("nobody knows", ""), ("notice", "")]:  # fmt: skip
+            self.assertEqual(yes_no(text), want, text)
+
+    def test_english_commands_route_like_thai(self):
+        from aipc.ui.handsfree import route
+
+        for running in (False, True):
+            self.assertEqual(route("open youtube", running), route("เปิดยูทูบ", running))
+            self.assertEqual(route("Mute the sound", running), "command")
+            self.assertEqual(route("Why is the sky blue?", running), "unknown")
+
 
 if __name__ == "__main__":
     unittest.main()

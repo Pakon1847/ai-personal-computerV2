@@ -124,8 +124,10 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
     (พบ 2026-10-15: สกิล "เปิดแผนที่" ของ Claude มีตัวอย่าง "เปิดแผนที่ให้หน่อย" = คำสั่งเปิด Google Maps)
     """
     from aipc.browser.control import NEEDS_PAGE
-    from aipc.skills import browse, command
+    from aipc.skills import browse, command, english
 
+    # คำสั่งอังกฤษ (หน้าจอภาษาอังกฤษ · การ์ด 0040) → รูปไทยของตัวแปลงระยะ C · ไทย = to_thai คืน None ไม่แตะ
+    text = english.to_thai(text) or text
     cmds = browse.parse(text)
     if cmds and (browser_running or not all(c.kind in NEEDS_PAGE for c in cmds)):
         return BROWSER
@@ -151,7 +153,22 @@ _YES_WORD = r"(?:ใช่|ตกลง|ยืนยัน|โอเค|ok|เ�
 _YES = re.compile(_YES_WORD + r"(?:ครับ|ค่ะ|คะ|จ้ะ|จ้า|นะ|เลย|แล้ว|ลบเลย|ทำเลย|ส่งเลย)*")
 
 
+# คำตอบภาษาอังกฤษ (การ์ด 0040) · กติกาเดียวกับไทย: ปฏิเสธมาก่อน · ยืนยันต้องไม่มีคำอื่นปน
+_EN_NO = re.compile(r"(?:no|nope|cancel|don'?t|do not|stop|never ?mind)\b")
+_EN_YES = re.compile(r"(?:yes|yeah|yep|sure|ok(?:ay)?|confirm(?:ed)?|correct|go ahead|do it)\b")
+_EN_YES_ONLY = re.compile(r"(?:(?:yes|yeah|yep|sure|ok(?:ay)?|confirm(?:ed)?|correct|go ahead|do it"
+                          r"|please|thanks|thank you)\s*)+")  # fmt: skip
+
+
 def yes_no(text: str) -> str:
+    e = re.sub(r"[.!?,]+", " ", text).lower().replace("’", "'").strip()
+    e = re.sub(r"\s+", " ", e)
+    if _EN_NO.match(e):
+        return NO
+    if _EN_YES.match(e):
+        if _EN_NO.search(e) or re.search(r"\bnot\b", e):
+            return NO
+        return YES if _EN_YES_ONLY.fullmatch(e) else UNCLEAR
     t = re.sub(r"[\s.!?。,]+", "", text).lower()
     if re.match(_NEGATIVE, t):
         return NO

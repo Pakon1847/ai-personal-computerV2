@@ -1047,9 +1047,9 @@ Item {
         anchors.topMargin: 6
         anchors.horizontalCenter: parent.horizontalCenter
         objectName: "chatHint"
-        text: chat.notice !== "" ? chat.notice
+        text: chat.notice !== "" ? Tr.x(chat.notice)
               : voice.listening ? Tr.t("กำลังฟัง · พูดจบแล้วเงียบสักครู่ ระบบหยุดเอง (หรือแตะไมค์อีกครั้ง)")
-              : voice.micMessage !== "" ? voice.micMessage
+              : voice.micMessage !== "" ? Tr.x(voice.micMessage)
               : chat.busy ? Tr.t("Esc หรือปุ่มหยุด = หยุดตอบ") : Tr.t("Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่")
         size: Theme.fontCaption; color: chat.notice !== "" ? Theme.warnInk : Theme.inkFaint; oneLine: true
     }
