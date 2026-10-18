@@ -80,7 +80,8 @@ _TIME_RE = re.compile(
 )
 _REL_RE = re.compile(rf"in\s+(?P<n>{_NUM}|half an)\s+(?P<u>minutes?|mins?|hours?|hrs?)")
 _DAY_RE = re.compile(
-    r"(?:(?P<rep>every\s*day|daily|every\s+weekday|on\s+weekdays|weekdays|every\s+weekend"
+    r"(?:(?P<rep>every\s*day|daily|every\s+weekday|on\s+weekdays|weekdays"
+    r"|(?:every|on)\s+(?:the\s+)?weekends?|weekends"
     rf"|every\s+(?P<rwd>{_WD}))"
     r"|(?P<d>today|tonight|tomorrow|the day after tomorrow|day after tomorrow)"
     rf"|(?:on\s+)?(?P<nx>next|this)?\s*(?P<wd>{_WD})"
@@ -159,7 +160,7 @@ _SOUND = r"(?:sound|audio)"
 _VOLUME = [
     (re.compile(r"(?:mute|silence)(?:\s+(?:the\s+)?(?:sound|audio|volume|computer|speakers?))?"
                 rf"|turn\s+(?:off\s+the\s+{_SOUND}|the\s+{_SOUND}\s+off)"), "ปิดเสียง"),
-    (re.compile(r"unmute(?:\s+(?:the\s+)?(?:sound|audio|computer))?"
+    (re.compile(r"unmute(?:\s+(?:the\s+)?(?:sound|audio|volume|computer|speakers?))?"
                 rf"|turn\s+(?:(?:back\s+)?on\s+the\s+{_SOUND}|the\s+{_SOUND}\s+(?:back\s+)?on)"),
      "เปิดเสียง"),
     (re.compile(r"(?:volume\s+up|louder|turn\s+(?:it|the\s+(?:volume|sound))\s+up"
@@ -171,7 +172,8 @@ _VOLUME = [
      "ลดเสียง"),
 ]  # fmt: skip
 _SET_VOL = re.compile(
-    r"(?:set|change|put|turn)\s+(?:the\s+)?(?:volume|sound)\s+(?:to|at)\s+(\d{1,3})\s*(?:%|percent)?"
+    r"(?:(?:set|change|put|turn)\s+(?:the\s+)?)?(?:volume|sound)\s+(?:(?:to|at)\s+)?(\d{1,3})"
+    r"\s*(?:%|percent)?"
 )
 _OPEN = re.compile(
     r"(?:open|launch|start|go\s+to|show(?:\s+me)?|take\s+me\s+to|bring\s+up)\s+(?:up\s+)?(?:the\s+)?(.+?)"
@@ -188,6 +190,8 @@ _AGENDA = [
         r"(?:what(?:'s|\s+is|\s+do\s+i\s+have)?(?:\s+(?:on|in))?(?:\s+my)?"
         r"(?:\s+(?:schedule|agenda|calendar|plan|plans))?"
         r"|(?:do\s+i\s+have\s+)?any\s+(?:appointments?|meetings?|events?|plans?|reminders?)"
+        r"|(?:do\s+i\s+have|is\s+there|have\s+i\s+got)\s+(?:anything|something)(?:\s+(?:planned|scheduled|on))?"
+        r"|what(?:'s|\s+is)\s+(?:planned|scheduled|coming\s+up)"
         r"|(?:show|list)(?:\s+me)?\s+(?:my\s+)?(?:schedule|agenda|appointments?|events?)"
         rf"|am\s+i\s+(?:busy|free))(?:\s+(?:for|on))?\s+{_RANGE}"
     ),
@@ -197,10 +201,18 @@ _NEXT = re.compile(
     r"(?:what(?:'s|\s+is)\s+)?(?:my\s+)?next\s+(?:appointment|meeting|event|reminder)"
     r"|when\s+is\s+my\s+next\s+(?:appointment|meeting|event)"
 )
-_FILES = re.compile(
-    r"(?:show|list|find)(?:\s+me)?\s+(?:the\s+|my\s+)?files\s+(?:that\s+)?(?:i\s+)?"
-    r"(?:edited|modified|changed|worked\s+on|saved)\s+(?P<w>today|yesterday|this\s+week)"
-)
+_DOCS = r"(?:files|documents|docs)"
+_EDITED = r"(?:edited|modified|changed|worked\s+on|saved|updated)"
+_FILE_WHEN = r"(?P<w>today|yesterday|this\s+week)"
+_FILES = [
+    # "show me the files I edited today" · "files changed this week"
+    re.compile(rf"(?:(?:show|list|find|get)(?:\s+me)?\s+)?(?:the\s+|my\s+|all\s+)?{_DOCS}"
+               rf"\s+(?:that\s+)?(?:i\s+|were\s+|i've\s+|i\s+have\s+)?{_EDITED}\s+{_FILE_WHEN}"),
+    # "what files did I change yesterday?" · "which documents have I edited this week"
+    re.compile(rf"(?:what|which)\s+{_DOCS}\s+(?:did\s+i|have\s+i|i)\s+"
+               rf"(?:edit|modify|change|work\s+on|save|update|edited|modified|changed|worked\s+on|saved)"
+               rf"\s+{_FILE_WHEN}"),
+]  # fmt: skip
 _CANCEL_ALL = re.compile(
     r"(?:cancel|delete|remove|clear)\s+(?:all\s+(?:of\s+)?(?:my\s+)?|every\s+)(?:reminders?|appointments?)"
 )
@@ -246,7 +258,7 @@ def to_thai(text: str) -> str | None:
             r = re.sub(r"\s+", " ", m.group("r"))
             day = {"today": "วันนี้", "tomorrow": "พรุ่งนี้", "this week": "สัปดาห์นี้"}.get(r, "สัปดาห์หน้า")
         return f"{day}มีนัดอะไร"
-    if m := _FILES.fullmatch(t):
+    if m := next((m for rx in _FILES if (m := rx.fullmatch(t))), None):
         return "ไฟล์ที่แก้" + {"today": "วันนี้", "yesterday": "เมื่อวาน"}.get(m.group("w"), "สัปดาห์นี้")
     if _CANCEL_ALL.fullmatch(t):
         return "ยกเลิกนัดทั้งหมด"

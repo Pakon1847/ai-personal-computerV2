@@ -34,7 +34,25 @@ class ToThaiTest(unittest.TestCase):
             ("turn up the volume a bit", "เพิ่มเสียง"),
             ("lower the volume", "ลดเสียง"),
             ("set volume to 40%", "ปรับเสียงเป็น 40"),
+            ("Unmute the speakers", "เปิดเสียง"),  # ชุด C1 รอบ 1 (กลายเป็นชุดพัฒนา)
+            ("Volume 70", "ปรับเสียงเป็น 70"),
         ])  # fmt: skip
+
+    def test_round1_forms(self):
+        """รูปประโยคที่ชุด C1 รอบ 1 พลาด · แก้ทั้งตระกูล ไม่ใช่เฉพาะประโยค."""
+        self.check([
+            ("Do I have anything tomorrow", "พรุ่งนี้มีนัดอะไร"),
+            ("is there anything planned for Friday", "วันศุกร์นี้มีนัดอะไร"),
+            ("What files did I change yesterday?", "ไฟล์ที่แก้เมื่อวาน"),
+            ("which documents have I edited this week", "ไฟล์ที่แก้สัปดาห์นี้"),
+            ("list the documents I edited yesterday", "ไฟล์ที่แก้เมื่อวาน"),
+            ("files changed this week", "ไฟล์ที่แก้สัปดาห์นี้"),
+            ("remind me to clean the house on weekends at 10am",
+             "เตือน clean the house ทุกเสาร์อาทิตย์ 10:00"),
+        ])  # fmt: skip
+        for text in ("what files did I need yesterday", "do I have anything to eat",
+                     "what's happening today", "the volume of a sphere"):  # fmt: skip
+            self.assertIsNone(english.to_thai(text), text)
 
     def test_questions(self):
         self.check([
