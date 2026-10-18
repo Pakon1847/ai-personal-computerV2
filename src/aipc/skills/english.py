@@ -233,6 +233,13 @@ _REMIND = [
     re.compile(rf"{_SET_REMINDER}\s+(?:for\s+)?(?P<when>.+?)\s+(?:to|for|about)\s+(?P<what>.+)"),
 ]
 _REMIND_NO_TIME = re.compile(rf"(?:remind\s+me|{_SET_REMINDER})\s+(?:to|about)\s+(?P<what>.+)")
+# ชื่อนัดที่ยังมีคำบอกวัน/ตัวเลข = ตัวแปลงตัดวันเวลาผิดที่ ("dentist friday 2:30" เคยได้ "วันนี้" · C1 รอบ 2 ข้อ C17)
+# → ไม่เดา ส่งข้อความเดิมให้ AI (ใช้ชื่อเต็มเท่านั้น: "may" "sat" เป็นคำทั่วไปได้)
+_DAY_LEFT = re.compile(
+    r"\b(?:(?:mon|tues|wednes|thurs|fri|satur|sun)day|january|february|march|april|june|july"
+    r"|august|september|october|november|december|today|tonight|tomorrow|weekends?|weekdays?"
+    r"|noon|midnight|\d+(?::\d\d)?\s*(?:am|pm|a\.m\.|p\.m\.)?)\b"
+)
 
 
 def to_thai(text: str) -> str | None:
@@ -267,10 +274,13 @@ def to_thai(text: str) -> str | None:
     for rx in _REMIND:
         if (m := rx.fullmatch(t)) and (when := when_th(m.group("when"))):
             what = _keep(m, raw, "what")
+            if _DAY_LEFT.search(what.lower()):
+                return None
             if what and not re.search(r"\b(?:to|about)\s*$", what):
                 return f"เตือน {what} {when}"
     if m := _REMIND_NO_TIME.fullmatch(t):  # ไม่บอกเวลา = การ์ดถามเวลาเหมือนพิมพ์ไทย ("เตือนซื้อนม")
-        return f"เตือน {_keep(m, raw, 'what')}"
+        what = _keep(m, raw, "what")
+        return None if _DAY_LEFT.search(what.lower()) else f"เตือน {what}"
     if (m := _OPEN.fullmatch(t)) and (site := SITES.get(m.group(1).strip())):
         return f"เปิด{site}"
     return None

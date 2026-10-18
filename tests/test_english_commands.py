@@ -84,6 +84,17 @@ class ToThaiTest(unittest.TestCase):
             ("delete all my reminders", "ยกเลิกนัดทั้งหมด"),
         ])  # fmt: skip
 
+    def test_day_words_left_in_title_are_not_guessed(self):
+        """C1 รอบ 2 ข้อ C17: วันเวลาที่ตัวแปลงตัดไม่ได้ ต้องไม่กลายเป็นนัด "วันนี้" · ส่งให้ AI แทน."""
+        for text in ("remind me to see the doctor thursday 4:15",
+                     "remind me to pay the bill monday",
+                     "remind me to call Ann tomorrow-ish",
+                     "remind me to email Bob 3pm sharp"):  # fmt: skip
+            with self.subTest(text=text):
+                self.assertIsNone(english.to_thai(text))
+        self.assertEqual(english.to_thai("remind me to see the doctor on thursday at 4:15"),
+                         "เตือน see the doctor วันพฤหัสบดีนี้ 16:15")  # fmt: skip
+
     def test_not_commands(self):
         for text in (
             "I want to open a coffee shop",
