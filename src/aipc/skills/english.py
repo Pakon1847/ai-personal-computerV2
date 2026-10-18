@@ -166,6 +166,8 @@ _VOLUME = [
     (re.compile(r"(?:volume\s+up|louder|turn\s+(?:it|the\s+(?:volume|sound))\s+up"
                 r"|turn\s+up\s+the\s+(?:volume|sound)|(?:increase|raise)\s+(?:the\s+)?(?:volume|sound))"
                 r"(?:\s+a\s+(?:bit|little))?"), "เพิ่มเสียง"),
+    (re.compile(r"(?:it'?s\s+)?too\s+quiet|(?:it'?s\s+)?too\s+soft"), "เพิ่มเสียง"),
+    (re.compile(r"(?:it'?s\s+)?too\s+loud"), "ลดเสียง"),
     (re.compile(r"(?:volume\s+down|quieter|lower\s+the\s+(?:volume|sound)"
                 r"|turn\s+(?:it|the\s+(?:volume|sound))\s+down|turn\s+down\s+the\s+(?:volume|sound)"
                 r"|(?:decrease|reduce)\s+(?:the\s+)?(?:volume|sound))(?:\s+a\s+(?:bit|little))?"),
@@ -175,13 +177,16 @@ _SET_VOL = re.compile(
     r"(?:(?:set|change|put|turn)\s+(?:the\s+)?)?(?:volume|sound)\s+(?:(?:to|at)\s+)?(\d{1,3})"
     r"\s*(?:%|percent)?"
 )
+# "too loud, turn it down" = บ่นแล้วสั่ง · ตัดคำบ่นออกก่อนจับรูปคำสั่งเสียง (C1 รอบ 2 ข้อ C12)
+_VOL_PRE = re.compile(r"(?:it'?s\s+|that'?s\s+)?too\s+(?:loud|quiet|soft)[,.!]?\s+")
 _OPEN = re.compile(
-    r"(?:open|launch|start|go\s+to|show(?:\s+me)?|take\s+me\s+to|bring\s+up)\s+(?:up\s+)?(?:the\s+)?(.+?)"
-    r"(?:\s+(?:page|app|website|site|screen))?"
+    r"(?:open|launch|start|go\s+to|show(?:\s+me)?|take\s+me\s+to|bring\s+up|pull\s+up|visit"
+    r"|fire\s+up|load)\s+(?:up\s+)?(?:the\s+)?(.+?)(?:\s+(?:page|app|website|site|screen))?"
 )
 _TIME_Q = re.compile(
-    r"what(?:'s|\s+is)?\s+(?:the\s+)?time(?:\s+is\s+it)?(?:\s+now)?|what\s+time\s+is\s+it(?:\s+now)?"
-    r"|tell\s+me\s+the\s+time|current\s+time|time\s+now"
+    r"what(?:'s|\s+is)?\s+(?:the\s+)?(?:current\s+)?time(?:\s+is\s+it)?(?:\s+now)?"
+    r"|what\s+time\s+is\s+it(?:\s+now)?|tell\s+me\s+the\s+(?:current\s+)?time|current\s+time|time\s+now"
+    r"|(?:(?:do\s+you\s+know|tell\s+me)\s+)?what\s+time\s+it\s+is(?:\s+now)?"
 )
 _RANGE = (r"(?P<r>today|tomorrow|this\s+week|next\s+week"
           rf"|(?:on\s+)?(?:(?P<nx>next|this)\s+)?(?P<wd>{_WD}))")  # fmt: skip
@@ -190,7 +195,8 @@ _AGENDA = [
         r"(?:what(?:'s|\s+is|\s+do\s+i\s+have)?(?:\s+(?:on|in))?(?:\s+my)?"
         r"(?:\s+(?:schedule|agenda|calendar|plan|plans))?"
         r"|(?:do\s+i\s+have\s+)?any\s+(?:appointments?|meetings?|events?|plans?|reminders?)"
-        r"|(?:do\s+i\s+have|is\s+there|have\s+i\s+got)\s+(?:anything|something)(?:\s+(?:planned|scheduled|on))?"
+        r"|(?:do\s+i\s+have|is\s+there|have\s+i\s+got)\s+(?:anything|something)"
+        r"(?:\s+(?:planned|scheduled|on))?|(?:anything|something)\s+(?:planned|scheduled)"
         r"|what(?:'s|\s+is)\s+(?:planned|scheduled|coming\s+up)"
         r"|(?:show|list)(?:\s+me)?\s+(?:my\s+)?(?:schedule|agenda|appointments?|events?)"
         rf"|am\s+i\s+(?:busy|free))(?:\s+(?:for|on))?\s+{_RANGE}"
@@ -200,7 +206,31 @@ _AGENDA = [
 _NEXT = re.compile(
     r"(?:what(?:'s|\s+is)\s+)?(?:my\s+)?next\s+(?:appointment|meeting|event|reminder)"
     r"|when\s+is\s+my\s+next\s+(?:appointment|meeting|event)"
+    # "what's coming up next on my calendar" · ต้องมี "on my calendar"
+    # ("what's next?" เฉย ๆ อาจเป็นเรื่องอื่น)
+    r"|what(?:'s|\s+is)\s+(?:coming\s+up\s+(?:next\s+)?|next\s+)on\s+my\s+(?:calendar|schedule|agenda)"
 )
+_ORD_WORDS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
+              "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
+              "seventeenth", "eighteenth", "nineteenth", "twentieth"]  # fmt: skip
+_ORD_N = {w: i + 1 for i, w in enumerate(_ORD_WORDS)}
+_ORD_N |= {f"twenty-{w}": 20 + i + 1 for i, w in enumerate(_ORD_WORDS[:9])}
+_ORD_N |= {"thirtieth": 30, "thirty-first": 31}
+# "on the first" · "November third" → ตัวเลข (D1: ตัวถอดเสียงสะกดลำดับที่เป็นคำ) · เฉพาะหลัง the/ชื่อเดือน
+_ORD_RE = re.compile(
+    rf"(?i)\b(the|{_MON})\s+(" + "|".join(sorted(_ORD_N, key=len, reverse=True)) + r")\b"
+)
+
+
+def _ordinals(text: str) -> str:
+    def digits(m: re.Match) -> str:
+        n = _ORD_N[m.group(2).lower()]
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10 if n not in (11, 12, 13) else 0, "th")
+        return f"{m.group(1)} {n}{suffix}"
+
+    return _ORD_RE.sub(digits, text)
+
+
 _DOCS = r"(?:files|documents|docs)"
 _EDITED = r"(?:edited|modified|changed|worked\s+on|saved|updated)"
 _FILE_WHEN = r"(?P<w>today|yesterday|this\s+week)"
@@ -233,6 +263,23 @@ _REMIND = [
     re.compile(rf"{_SET_REMINDER}\s+(?:for\s+)?(?P<when>.+?)\s+(?:to|for|about)\s+(?P<what>.+)"),
 ]
 _REMIND_NO_TIME = re.compile(rf"(?:remind\s+me|{_SET_REMINDER})\s+(?:to|about)\s+(?P<what>.+)")
+_REMIND_HEAD = re.compile(rf"(?:remind\s+me|{_SET_REMINDER})\s+(?:to|about|for)\s+")
+
+
+def _split_remind(t: str, raw: str) -> tuple[str, str] | None:
+    """แยก "remind me to <ชื่อนัด> <วันเวลา>" · ลองทุกจุดตัดจากชื่อนัดสั้นไปยาว ·
+    เอาจุดแรกที่ส่วนท้ายเป็นวันเวลาทั้งวลี ("go to the dentist friday 2:30" · C1 รอบ 2 ข้อ C17) ·
+    คืน (ชื่อนัดตามตัวพิมพ์เดิม, วันเวลาไทย)."""
+    m = _REMIND_HEAD.match(t)
+    if m is None:
+        return None
+    starts = [w.start() for w in re.finditer(r"\S+", t[m.end() :])][1:]
+    for s in starts:
+        if when := when_th(t[m.end() + s :]):
+            return raw[m.end() : m.end() + s].strip(), when
+    return None
+
+
 # ชื่อนัดที่ยังมีคำบอกวัน/ตัวเลข = ตัวแปลงตัดวันเวลาผิดที่ ("dentist friday 2:30" เคยได้ "วันนี้" · C1 รอบ 2 ข้อ C17)
 # → ไม่เดา ส่งข้อความเดิมให้ AI (ใช้ชื่อเต็มเท่านั้น: "may" "sat" เป็นคำทั่วไปได้)
 _DAY_LEFT = re.compile(
@@ -246,12 +293,13 @@ def to_thai(text: str) -> str | None:
     """ประโยคอังกฤษที่เป็นคำสั่งในขอบเขต → ข้อความไทยสำหรับตัวแปลเดิม · ไม่ใช่ = None."""
     if not is_english(text):
         return None
-    raw = _clean(text)
+    raw = _ordinals(_clean(text))
     t = raw.lower()
+    tv = _VOL_PRE.sub("", t, count=1) if _VOL_PRE.match(t) else t
     for rx, th in _VOLUME:
-        if rx.fullmatch(t):
+        if rx.fullmatch(tv):
             return th
-    if m := _SET_VOL.fullmatch(t):
+    if m := _SET_VOL.fullmatch(tv):
         n = int(m.group(1))
         return f"ปรับเสียงเป็น {n}" if 0 <= n <= 100 else None
     if _TIME_Q.fullmatch(t):
@@ -271,16 +319,22 @@ def to_thai(text: str) -> str | None:
         return "ยกเลิกนัดทั้งหมด"
     if m := next((m for rx in _CANCEL if (m := rx.fullmatch(t))), None):
         return f"ยกเลิกนัด {_keep(m, raw, 'w')}"
-    for rx in _REMIND:
+    found = _split_remind(t, raw)  # ชื่อนัดก่อนวันเวลา ("remind me to … at 9")
+    for rx in () if found else _REMIND:  # วันเวลาก่อนชื่อนัด ("remind me at 9 to …")
         if (m := rx.fullmatch(t)) and (when := when_th(m.group("when"))):
-            what = _keep(m, raw, "what")
-            if _DAY_LEFT.search(what.lower()):
-                return None
-            if what and not re.search(r"\b(?:to|about)\s*$", what):
-                return f"เตือน {what} {when}"
+            found = _keep(m, raw, "what"), when
+            break
+    if found:
+        what, when = found
+        if _DAY_LEFT.search(what.lower()):
+            return None
+        if what and not re.search(r"\b(?:to|about)\s*$", what):
+            return f"เตือน {what} {when}"
     if m := _REMIND_NO_TIME.fullmatch(t):  # ไม่บอกเวลา = การ์ดถามเวลาเหมือนพิมพ์ไทย ("เตือนซื้อนม")
         what = _keep(m, raw, "what")
         return None if _DAY_LEFT.search(what.lower()) else f"เตือน {what}"
-    if (m := _OPEN.fullmatch(t)) and (site := SITES.get(m.group(1).strip())):
-        return f"เปิด{site}"
+    if m := _OPEN.fullmatch(t):
+        name = m.group(1).strip()
+        if site := SITES.get(name) or SITES.get(name.removeprefix("my ")):  # "open my gmail"
+            return f"เปิด{site}"
     return None

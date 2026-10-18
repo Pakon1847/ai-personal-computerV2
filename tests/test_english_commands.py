@@ -38,6 +38,22 @@ class ToThaiTest(unittest.TestCase):
             ("Volume 70", "ปรับเสียงเป็น 70"),
         ])  # fmt: skip
 
+    def test_round2_forms(self):
+        """รูปประโยคที่ชุด C1 รอบ 2 พลาด (ชุดพัฒนาแล้ว · ตัวเลขที่วัดไปแล้วไม่เปลี่ยน)."""
+        self.check([
+            ("pull up youtube", "เปิดยูทูบ"),
+            ("Can you open my Gmail please", "เปิดจีเมล"),
+            ("too loud, turn it down please", "ลดเสียง"),
+            ("anything planned for tomorrow", "พรุ่งนี้มีนัดอะไร"),
+            ("what's coming up next on my calendar", "นัดถัดไปคืออะไร"),
+            ("tell me the current time", "ตอนนี้กี่โมง"),
+            ("hey do you know what time it is", "ตอนนี้กี่โมง"),
+            ("remind me to call Mom on November third at 9am", "เตือน call Mom 3 พฤศจิกายน 09:00"),
+            ("remind me to buy a sun hat tomorrow", "เตือน buy a sun hat พรุ่งนี้"),
+        ])  # fmt: skip
+        for text in ("what's next", "anything else?", "it's too loud in here today"):
+            self.assertIsNone(english.to_thai(text), text)
+
     def test_round1_forms(self):
         """รูปประโยคที่ชุด C1 รอบ 1 พลาด · แก้ทั้งตระกูล ไม่ใช่เฉพาะประโยค."""
         self.check([
@@ -85,10 +101,15 @@ class ToThaiTest(unittest.TestCase):
         ])  # fmt: skip
 
     def test_day_words_left_in_title_are_not_guessed(self):
-        """C1 รอบ 2 ข้อ C17: วันเวลาที่ตัวแปลงตัดไม่ได้ ต้องไม่กลายเป็นนัด "วันนี้" · ส่งให้ AI แทน."""
-        for text in ("remind me to see the doctor thursday 4:15",
-                     "remind me to pay the bill monday",
-                     "remind me to call Ann tomorrow-ish",
+        """C1 รอบ 2 ข้อ C17: วันเวลาที่ตัวแปลงตัดไม่ได้ ต้องไม่กลายเป็นนัด "วันนี้" · ส่งให้ AI แทน ·
+        วันในสัปดาห์ไม่มี "on" นำหน้า = ตัดถูกแล้ว (ลองทุกจุดตัด)."""
+        self.assertEqual(english.to_thai("remind me to see the doctor thursday 4:15"),
+                         "เตือน see the doctor วันพฤหัสบดีนี้ 16:15")  # fmt: skip
+        self.assertEqual(english.to_thai("remind me to pay the bill monday"),
+                         "เตือน pay the bill วันจันทร์นี้")  # fmt: skip
+        self.assertEqual(english.to_thai("remind me to pay rent on the first"),
+                         "เตือน pay rent วันที่ 1")  # fmt: skip
+        for text in ("remind me to call Ann tomorrow-ish",
                      "remind me to email Bob 3pm sharp"):  # fmt: skip
             with self.subTest(text=text):
                 self.assertIsNone(english.to_thai(text))
