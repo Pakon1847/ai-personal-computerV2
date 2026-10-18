@@ -230,19 +230,29 @@ class BrowserController(QObject):
         return True
 
     def _work(self, cmds) -> None:
+        # try/finally: เกิดข้อผิดพลาดกลางทางก็ต้องส่ง _done เสมอ · เดิมไม่ส่ง → busy ค้าง ทุกคำสั่งเสียงตอบ
+        # "ยังทำคำสั่งก่อนหน้าอยู่" จนออกจากระบบ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.8)
         says, ok = [], True
-        for c in cmds:
-            r = self._ctl().run(c)
-            if c.kind == "search" and self._ledger is not None:
-                # คำค้นออกไป Google/Bing = ส่งออกนอกเครื่อง (แผงความเป็นส่วนตัวนับด้วย)
-                self._ledger.record("web", f"ค้นเว็บ: {c.query}", ok=r.ok,
-                                    note="เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง")  # fmt: skip
-            if r.say:
-                says.append(r.say)
-            if not r.ok:
-                ok = False
-                break
-        self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok)
+        try:
+            for c in cmds:
+                r = self._ctl().run(c)
+                if c.kind == "search" and self._ledger is not None:
+                    # คำค้นออกไป Google/Bing = ส่งออกนอกเครื่อง (แผงความเป็นส่วนตัวนับด้วย)
+                    try:
+                        self._ledger.record("web", f"ค้นเว็บ: {c.query}", ok=r.ok,
+                                            note="เบราว์เซอร์ของผู้ช่วย · สั่งด้วยเสียง")  # fmt: skip
+                    except OSError:  # ดิสก์เต็ม/อ่านอย่างเดียว: บอกตามจริงว่าออกไปแล้วแต่จดไม่ได้
+                        says.append("ค้นแล้ว แต่จดลงสมุดสิ่งที่ส่งออกไม่ได้ (พื้นที่อาจเต็ม)")
+                if r.say:
+                    says.append(r.say)
+                if not r.ok:
+                    ok = False
+                    break
+        except Exception as e:  # noqa: BLE001 · ทุกแบบต้องจบด้วยการบอกผู้ใช้ ไม่ค้างเงียบ
+            ok = False
+            says.append(f"ทำไม่สำเร็จ: {type(e).__name__}")
+        finally:
+            self._done.emit(" · ".join(says) or "ทำไม่สำเร็จ", ok)
 
     @Slot(str, bool)
     def _on_done(self, say: str, ok: bool) -> None:

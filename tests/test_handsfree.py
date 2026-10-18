@@ -126,6 +126,29 @@ class HandsFreeTest(unittest.TestCase):
         self.assertEqual(ledger.rows, [("web", "ค้นเว็บ: ราคาทอง", True)])
         self.assertTrue(b.handle("ย้อนกลับ"))  # เปิดเบราว์เซอร์แล้ว = งานของเรา
 
+    def test_error_mid_command_never_leaves_voice_stuck(self):
+        """ตรวจทั้งระบบ 2.8: จดสมุดไม่ได้ (ดิสก์เต็ม) หรือเบราว์เซอร์พังกลางทาง = บอกผู้ใช้ + รับคำสั่งถัดไปได้."""
+
+        class FullDisk(FakeLedger):
+            def record(self, *a, **kw):
+                raise OSError(28, "No space left on device")
+
+        class Broken(FakeControl):
+            def run(self, cmd):
+                raise RuntimeError("pipe closed")
+
+        for ctl, ledger, said in [(FakeControl(), FullDisk(), "จดลงสมุดสิ่งที่ส่งออกไม่ได้"),
+                                  (Broken(), FakeLedger(), "ทำไม่สำเร็จ")]:  # fmt: skip
+            b = BrowserController(control=ctl, ledger=ledger)
+            done = []
+            b.finished.connect(lambda say, ok, d=done: d.append((say, ok)))
+            self.assertTrue(b.handle("ค้นหาราคาทอง"))
+            self.assertTrue(pump(lambda d=done: d))
+            self.assertIn(said, done[0][0])
+            self.assertFalse(b.busy)  # ไม่ค้าง: รับคำสั่งถัดไปได้
+            self.assertTrue(b.handle("ค้นหาราคาข้าว"))
+            self.assertTrue(pump(lambda d=done: len(d) == 2))
+
     def test_login_screen_has_no_browser(self):
         b = BrowserController(active=False, control=FakeControl())
         self.assertFalse(b.handle("ค้นหาราคาทอง"))
