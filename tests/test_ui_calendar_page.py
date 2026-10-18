@@ -92,7 +92,9 @@ class CalendarPageQmlTest(unittest.TestCase):
         engine, win, warnings = self.open_shell("calendar")
         skills = engine._backends["skills"]
         tmp = Path(os.environ["XDG_DATA_HOME"])
-        skills._gcal = gcal.GoogleCalendar(tmp / "l.json", tmp / "e.json", fetcher=lambda link: ICS)
+        # ล็อกนาฬิกา: ดึงนัดได้แค่ตั้งแต่ "ตอนนี้ − 1 วัน" · ใช้นาฬิกาจริงแล้วนัด 16 ต.ค. หลุดเมื่อวันที่ผ่านไป
+        skills._gcal = gcal.GoogleCalendar(tmp / "l.json", tmp / "e.json", fetcher=lambda link: ICS,
+                                           clock=lambda: NOW)  # fmt: skip
         self.assertTrue(skills._gcal.connect(LINK).ok)
         skills.remindersChanged.emit()  # หน้าวาดใหม่
         qml.settle(80)
