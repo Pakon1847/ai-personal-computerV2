@@ -88,6 +88,17 @@ class SiteSearchParseTest(unittest.TestCase):
         self.assertEqual(browse.parse("หารูปแมวในเฟซบุ๊ก")[0].query, "รูปแมว")
         self.assertEqual(browse.parse("หารูปแมว"), [])
 
+    def test_round2_fix_story_after_service_is_not_a_query(self):
+        # ไม่มี "ว่า" + ขึ้นต้นด้วย แล้ว/แต่/ทีไร = เล่าเรื่อง (ประโยคต่างจากชุดวัด)
+        for t in ("ค้นในยูทูบแล้วเสียงไม่ออก", "หาในจีเมลแต่โหลดช้ามาก", "ค้นในแผนที่ทีไรก็หลงทุกที"):
+            with self.subTest(t=t):
+                self.assertFalse(any(c.kind == "site_search" for c in browse.parse(t)))
+        # มี "ว่า" = ตั้งใจค้น แม้คำค้นขึ้นต้นด้วยคำเชื่อม
+        then = BrowseCommand("site_search", query="แล้วไงต่อ", site="youtube")
+        self.assertEqual(browse.parse("ค้นในยูทูบว่าแล้วไงต่อ"), [then])
+        # คำค้นที่แค่มีคำเชื่อมอยู่กลางคำยังค้นได้
+        self.assertEqual(browse.parse("ค้นในยูทูบเพลงแล้วแต่ใจ")[0].query, "เพลงแล้วแต่ใจ")
+
     def test_then_open_first_link(self):
         self.assertEqual(browse.parse("ค้นในยูทูบว่าเพลงลูกทุ่งแล้วเข้าลิงก์แรก"),
                          [BrowseCommand("site_search", query="เพลงลูกทุ่ง", site="youtube"),

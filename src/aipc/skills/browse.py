@@ -95,7 +95,7 @@ _SVC = "(?:" + "|".join(f"(?P<{k}>{v})" for k, v in SEARCH_SITE_NAMES.items()) +
 # "หา" ที่เป็นต้นคำอื่นไม่นับ (เหมือน _FIND ข้างล่าง: หาย หาก หาด …)
 # พูดชื่อบริการชัดแล้ว จึงไม่ต้องกัน "หาร" (หารเลข) เหมือนค้นเว็บทั่วไป → "หารูป…" นับเป็นกริยา (พบในชุดวัดรอบ 1 · S20)
 _VERB = r"(?:ค้น\s*หา|ค้น|หา(?![กดยม]|ว(?!ิ))|เสิร์[ชด]|เซิร์ช)"
-_SAID = r"(?:คำว่า|ว่า)?"
+_SAID = r"(?P<said>คำว่า|ว่า)?"
 # "ค้นในยูทูบว่า X" · "ค้นหา X ในยูทูบ" · "เปิดยูทูบ(แล้ว)หา X" · คำค้น = กลุ่มชื่อ q
 _IN_FIRST = re.compile(rf"(?:ช่วย\s*)?{_VERB}\s*(?:ดู\s*)?ใน\s*{_SVC}\s*{_SAID}\s*(?P<q>.*)")
 _IN_LAST = re.compile(rf"(?:ช่วย\s*)?{_VERB}\s*{_SAID}\s*(?P<q>.+?)\s*ใน\s*{_SVC}")
@@ -104,6 +104,9 @@ MAX_QUERY = 200
 # เล่าว่าหาไม่เจอ = เล่าปัญหา ไม่ใช่สั่งค้น ("เปิดยูทูบแล้วหาปุ่มตั้งค่าไม่เจอ" · พบในชุดวัดรอบ 1 · N10) ·
 # ไม่ใช้ _LOST ทั้งก้อน: "อยู่ไหน" เป็นคำค้นแผนที่ได้ ("ค้นในแผนที่ว่าโรงพยาบาลอยู่ไหน")
 _NOT_FOUND = re.compile(r"ไม่เจอ|ไม่พบ")
+# ไม่มี "ว่า" และคำค้นขึ้นต้นด้วยคำเชื่อม = เล่าเรื่องต่อ ไม่ใช่คำค้น
+# ("ค้นในเฟซบุ๊กแล้วมันค้างทุกที" · พบในชุดวัดรอบ 2 · Q06) · มี "ว่า" = ค้นได้ ("ค้นในยูทูบว่าแล้วไง")
+_STORY = re.compile(r"(?:แล้ว|แต่|ทีไร)")
 
 
 def _site_search(t: str) -> BrowseCommand | None:
@@ -111,6 +114,8 @@ def _site_search(t: str) -> BrowseCommand | None:
         return None
     for pat in (_IN_FIRST, _IN_LAST, _OPEN_THEN):
         if m := pat.fullmatch(t):
+            if not m.group("said") and _STORY.match(m.group("q")):
+                return None
             site = next(k for k in SEARCH_SITE_NAMES if m.group(k))
             query = m.group("q").strip(" \"'“”")[:MAX_QUERY].strip()
             if not query:  # "ค้นในยูทูบ" เฉย ๆ = เปิดหน้าบริการ
