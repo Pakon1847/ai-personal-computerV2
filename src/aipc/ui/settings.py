@@ -34,7 +34,8 @@ def default_path() -> Path:
 
 @dataclass
 class UiPrefs:
-    theme: str = "light"
+    # การ์ด 0041: ผู้ใช้ใหม่ได้ธีมดำ · ผู้ใช้เดิมที่มีไฟล์ค่าตั้งแล้วคงค่าเดิม (ทาง ก · ไม่ทับสิ่งที่อาจเลือกเอง)
+    theme: str = "dark"
     font_scale: float = 1.0
     onboarded: bool = False  # เห็นหน้าแนะนำการใช้งานครั้งแรกแล้ว (ฟีเจอร์ข้อ 8)
     # อ่านคำตอบ AI ออกเสียงเองเมื่อตอบจบ (การ์ด 0019) · Pakon: ค่าเริ่มต้นเปิด ปิดได้จากปุ่มในหน้าแชท
@@ -61,7 +62,7 @@ class UiPrefs:
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
-        theme = self.theme if self.theme in THEMES else "light"
+        theme = self.theme if self.theme in THEMES else "dark"
         scale = self.font_scale if self.font_scale in FONT_SCALES else 1.0
         return UiPrefs(
             theme=theme,
@@ -97,7 +98,7 @@ def load(path: Path | None = None) -> UiPrefs:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         return UiPrefs(
-            theme=str(data.get("theme", "light")),
+            theme=str(data.get("theme", "dark")),
             font_scale=float(data.get("font_scale", 1.0)),
             onboarded=data.get("onboarded") is True,
             speak_answers=data.get("speak_answers", True) is not False,

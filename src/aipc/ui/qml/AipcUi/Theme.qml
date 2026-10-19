@@ -11,39 +11,40 @@ QtObject {
     readonly property string family: "IBM Plex Sans Thai"
     readonly property string mono: "IBM Plex Mono"
 
-    // --- สี: พื้นและเส้น ---
-    readonly property color bg: dark ? "#0F1115" : "#F6F7F9"
-    readonly property color surface: dark ? "#171A20" : "#FFFFFF"
-    readonly property color surface2: dark ? "#1F232B" : "#EEF0F4"
-    readonly property color line: dark ? "#2C313A" : "#E3E6EC"
-    readonly property color lineSoft: dark ? "#242830" : "#ECEEF2"
-    readonly property color lineStrong: dark ? "#454C58" : "#C9CDD6"
+    // --- สี: พื้นและเส้น · ธีมมืด = โทนดำ (การ์ด 0041 · สกิล ui-ux-pro-max: Dark Mode OLED) ·
+    // ตัวหนังสือทุกสีบนพื้นทุกชั้น contrast ≥ 4.5:1 (ตรวจโดย tests/test_theme_contrast.py) ---
+    readonly property color bg: dark ? "#050506" : "#F6F7F9"
+    readonly property color surface: dark ? "#111113" : "#FFFFFF"
+    readonly property color surface2: dark ? "#1A1A1E" : "#EEF0F4"
+    readonly property color line: dark ? "#26262C" : "#E3E6EC"
+    readonly property color lineSoft: dark ? "#1C1C21" : "#ECEEF2"
+    readonly property color lineStrong: dark ? "#3F3F48" : "#C9CDD6"
     // --- ตัวอักษร ---
-    readonly property color ink: dark ? "#ECEEF2" : "#15171C"
-    readonly property color inkMuted: dark ? "#B4BAC5" : "#4B5160"
-    readonly property color inkFaint: dark ? "#9AA1AD" : "#636978"
-    readonly property color inkFill: dark ? "#ECEEF2" : "#15171C"
-    readonly property color textOnInk: dark ? "#0F1115" : "#FFFFFF"
+    readonly property color ink: dark ? "#F2F2F4" : "#15171C"
+    readonly property color inkMuted: dark ? "#A1A1AA" : "#4B5160"
+    readonly property color inkFaint: dark ? "#8B8B94" : "#636978"
+    readonly property color inkFill: dark ? "#F2F2F4" : "#15171C"
+    readonly property color textOnInk: dark ? "#050506" : "#FFFFFF"
     // --- สีหลัก (คราม) · การ์ด 0002: teal เดิมใกล้สีเขียว "ในเครื่อง/ผ่าน" เกินไป จึงเปลี่ยนเป็นครามที่ไม่ชนสีความหมาย ---
     readonly property color accent: dark ? "#A5B4FC" : "#4338CA"
     readonly property color accentFill: accent
-    readonly property color textOnAccent: dark ? "#1E1B4B" : "#FFFFFF"
-    readonly property color accentSoft: dark ? "#25264A" : "#ECEBFB"
+    readonly property color textOnAccent: dark ? "#14123A" : "#FFFFFF"
+    readonly property color accentSoft: dark ? "#1C1D38" : "#ECEBFB"
     readonly property color accentInk: dark ? "#C7D2FE" : "#3730A3"
     readonly property color bubbleInk: dark ? "#E0E7FF" : "#1E1B4B"
     // --- ความหมาย: เขียว = ในเครื่อง/ผ่าน, ส้ม = ออกนอกเครื่อง/เตือน, แดง = อันตราย ---
     readonly property color ok: dark ? "#6CCB7E" : "#1F7A3A"
-    readonly property color okSoft: dark ? "#16291B" : "#E4F2E8"
+    readonly property color okSoft: dark ? "#12241A" : "#E4F2E8"
     readonly property color okInk: dark ? "#A7E0B2" : "#17602D"
     readonly property color warn: dark ? "#F0B45C" : "#8A5300"
     readonly property color warnFill: warn
     readonly property color textOnWarn: dark ? "#2B1A00" : "#FFFFFF"
-    readonly property color warnSoft: dark ? "#36290F" : "#FBF0DC"
+    readonly property color warnSoft: dark ? "#2E220C" : "#FBF0DC"
     readonly property color warnInk: dark ? "#F5D39B" : "#5C3800"
     readonly property color danger: dark ? "#F28B80" : "#B42318"
     readonly property color dangerFill: danger
     readonly property color textOnDanger: dark ? "#3A0B06" : "#FFFFFF"
-    readonly property color dangerSoft: dark ? "#3B1D1A" : "#FBE7E5"
+    readonly property color dangerSoft: dark ? "#33181A" : "#FBE7E5"
     readonly property color dangerInk: dark ? "#F6B8B0" : "#7A1810"
     // กรอบกล้องเป็นสีเข้มเสมอทั้งสองธีม เพื่อให้เห็นภาพชัด
     readonly property color camera: "#1D2027"
