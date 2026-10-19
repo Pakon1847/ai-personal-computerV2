@@ -611,7 +611,7 @@ Item {
         id: homeCol
         x: (homeFlick.width - width) / 2
         width: root.wideWidth
-        spacing: 18
+        spacing: 12   // การ์ด 0041: แผง 3 ช่องต้องพอดีจอ 1280×720 ที่ตัวอักษร 100%
 
         ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
@@ -664,7 +664,6 @@ Item {
             objectName: "homePanels"
             readonly property bool wide: homeCol.width >= 960 && Theme.fontScale <= 1.25
             Layout.fillWidth: true
-            Layout.topMargin: 6
             columns: wide ? 3 : 1
             columnSpacing: 16
             rowSpacing: 16
