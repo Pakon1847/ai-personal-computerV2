@@ -335,7 +335,8 @@ class ShellCardTest(unittest.TestCase):
                 self.assertEqual(warnings, [])
 
     def test_status_bar_machine_chip_names_each_problem(self):
-        """การ์ด 0041 U4: ปกติ = "เครื่องปกติ" ป้ายเดียว · มีปัญหา = ข้อความของปัญหานั้นเอง (+N) · ไมค์/กล้องข้อความเต็มเสมอ."""
+        """การ์ด 0041 U4: ปกติ = "เครื่องปกติ" ป้ายเดียว · มีปัญหา = ข้อความของปัญหานั้นเอง (+N) ·
+        ไมค์/กล้องข้อความเต็มเสมอ."""
         engine, win, warnings = self.open_shell("workspace")
         ctx = engine.rootContext()
         system, chat = ctx.contextProperty("system"), ctx.contextProperty("chat")

@@ -32,7 +32,8 @@ aipc = ["ui/qml/AipcUi/*", "i18n/*.json", "ui/fonts/*", "skills/builtin/*.md", "
 line-length = 100
 target-version = "py311"
 # สคริปต์ในโฟลเดอร์ผลวัดเป็นหลักฐาน: commit ก่อนวัดแล้วห้ามแก้ (H9) · ไม่จัดรูปแบบย้อนหลัง
-extend-exclude = ["docs/benchmarks"]
+# .claude/skills = สกิลของคนอื่นที่ติดตั้งมา (เช่น ui-ux-pro-max) ไม่จัดรูปแบบให้ต่างจากต้นฉบับ
+extend-exclude = ["docs/benchmarks", ".claude/skills"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]

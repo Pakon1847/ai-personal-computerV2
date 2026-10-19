@@ -17,7 +17,8 @@ TEXT_ON_PLAIN = ["ink", "inkMuted", "inkFaint", "accent", "accentInk", "ok", "wa
 PLAINS = ["bg", "surface", "surface2"]
 PAIRS = [
     ("okInk", "okSoft"), ("ok", "okSoft"), ("warnInk", "warnSoft"), ("warn", "warnSoft"),
-    ("dangerInk", "dangerSoft"), ("danger", "dangerSoft"), ("accentInk", "accentSoft"), ("accent", "accentSoft"),
+    ("dangerInk", "dangerSoft"), ("danger", "dangerSoft"),
+    ("accentInk", "accentSoft"), ("accent", "accentSoft"),
     ("bubbleInk", "accentSoft"), ("textOnAccent", "accentFill"), ("textOnWarn", "warnFill"),
     ("textOnDanger", "dangerFill"), ("textOnInk", "inkFill"),
 ]  # fmt: skip
