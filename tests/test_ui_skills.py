@@ -322,8 +322,9 @@ class StepSkillTest(unittest.TestCase):
         self.assertEqual(self.calls, [], "ต้องไม่ทำก่อนผู้ใช้ตอบ")
         done = s.confirm(card["confirmToken"], True)
         self.assertEqual(done["title"], "ทำครบ 3 ขั้นแล้ว")
-        self.assertEqual(self.calls, [["xdg-open", "https://mail.google.com"],
-                                      ["wpctl", "set-volume", actions.SINK, "30%"]])  # fmt: skip
+        # มี Chromium (Pi) = หน้าต่างบัญชี Google · ไม่มี = xdg-open
+        gmail = actions.command_for(actions.Plan("open_url", {"site": "gmail"}))
+        self.assertEqual(self.calls, [gmail, ["wpctl", "set-volume", actions.SINK, "30%"]])
         self.assertEqual(done["page"], "settings")
 
     def test_stops_at_the_failing_step(self):

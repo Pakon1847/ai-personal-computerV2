@@ -387,7 +387,8 @@ class WebAppsQmlTest(unittest.TestCase):
         tiles[1][0].clicked.emit()
         qml.settle(50)
         # เครื่องนี้จำลอง = บอกตามจริง
-        self.assertIn("xdg-open https://mail.google.com", note.property("text"))
+        # xdg-open หรือหน้าต่างบัญชี (เครื่องที่มี Chromium)
+        self.assertIn("https://mail.google.com", note.property("text"))
         browser.opened.emit("เปิดเบราว์เซอร์ไม่ได้: ไม่พบโปรแกรม", False)
         qml.settle(50)
         self.assertEqual(note.property("text"), "เปิดเบราว์เซอร์ไม่ได้: ไม่พบโปรแกรม")

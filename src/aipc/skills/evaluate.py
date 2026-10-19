@@ -41,6 +41,9 @@ def safe_args() -> set[str]:
     # path มาจากโฟลเดอร์ระบบ ไม่ใช่ข้อความผู้ใช้
     for _, desktop in actions.APPS.values():
         allowed |= set(actions._app_command(desktop))
+    # หน้าต่างบัญชี Google (การ์ด 0031 ข้อ 0): argument คงที่ + โปรไฟล์ของเรา ไม่ใช่ข้อความผู้ใช้
+    allowed |= {"chromium", f"--user-data-dir={actions.account_profile()}", "--no-first-run",
+                "--no-default-browser-check"}  # fmt: skip
     allowed |= {f"{n}%" for n in range(101)}
     allowed |= {f"{n}%{sign}" for n in range(101) for sign in "+-"}
     return allowed
