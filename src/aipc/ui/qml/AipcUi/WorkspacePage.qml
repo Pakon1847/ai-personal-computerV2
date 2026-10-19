@@ -23,6 +23,9 @@ Item {
     property int speakRow: -1     // คำตอบที่กดอ่านออกเสียงล่าสุด (แสดงข้อความผิดพลาดของตัวอ่านใต้แถวนี้)
     // สั่งด้วยคีย์ลัด F9 (การ์ด 0024): ผู้ใช้อาจไม่ได้มองจอ (เบราว์เซอร์เต็มจอ) → อ่านผลให้ฟังเสมอ
     property bool speakNext: false
+    // ผลของคำสั่งคีย์ลัด (Pakon 2026-10-20): เด้งเป็นหน้าต่างบนจอ ไม่ลงแชท (คำสั่งเสียงไม่ใช่การคุย) ·
+    // { heard: ข้อความที่ได้ยิน, card: การ์ดผล/ยืนยัน, text: คำบอก, busy: เบราว์เซอร์กำลังทำ }
+    property var vc: ({})
     readonly property bool home: items.length === 0
     readonly property int colWidth: Math.min(760, width - 48)
 
@@ -139,6 +142,11 @@ Item {
     Connections {
         target: browser
         function onFinished(say, ok) {
+            if (root.vc.busy) {   // ผลของคำสั่งเสียง (หน้าต่างเด้ง)
+                root.voiceShow(root.vc.heard, null, ok ? say : say + " · " + Tr.t("ทำไม่สำเร็จ"), false)
+                if (voice.available) voice.speak(-4, say)
+                return
+            }
             const i = root.items.slice()
             if (i.length > 0 && i[i.length - 1].ai && !i[i.length - 1].done)
                 i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: say, sys: true, note: ok ? "" : Tr.t("ทำไม่สำเร็จ"), done: true })
@@ -163,84 +171,103 @@ Item {
         }
         return ""
     }
+    // การ์ดยืนยันที่เด้งจากคำสั่งเสียงและยังไม่ตอบ (มาก่อนการ์ดในแชท)
+    function voiceToken() {
+        const c = vc.card
+        return voicePopup.opened && c && c.confirmToken && !answered[c.confirmToken] ? c.confirmToken : ""
+    }
+    function voiceShow(heard, card, text, busy) {
+        vc = { heard: heard, card: card || null, text: text || "", busy: !!busy }
+        if (card && card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
+        voicePopup.open()
+        voiceClose.restart()
+    }
+    function speakVoice() {
+        if (!voice.available) return
+        const c = vc.card
+        const say = c ? [c.title].concat((c.lines || []).slice(0, 2)).join(" · ") : vc.text
+        if (say) voice.speak(-4, say)
+    }
+    // การ์ดจากคำสั่งเสียง: คำตอบของ AI (สกิลที่ LLM ทำ) ยังไปแชท · อย่างอื่นเด้งบนจอ
+    function voiceDispatch(card, heard) {
+        if (card.llm === true) {
+            voicePopup.close()
+            dispatch(card, heard)
+            speakNext = true
+            return
+        }
+        voiceShow(heard, card, "", false)
+        speakVoice()
+    }
+    function answerVoice(token, yes, heard) {
+        const a = Object.assign({}, answered)
+        a[token] = true
+        answered = a
+        const card = skills.confirm(token, yes)
+        if (card.llm && card.llmText && chat.send(card.llmText, card.prompt || "")) {
+            voicePopup.close()
+            push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
+            return
+        }
+        voiceShow(heard, card, "", false)
+        speakVoice()
+    }
+    function voiceSay(heard, say) {
+        voiceShow(heard, null, say, false)
+        if (voice.available) voice.speak(-4, say)
+    }
     function voiceCommand(text) {
         const t = text.trim().replace(/[.!?。\s]+$/, "")
-        const tok = pendingConfirm()
+        const vt = voiceToken()
+        const tok = vt !== "" ? vt : pendingConfirm()
         // งานที่ลบ/แตะเครื่องยังต้องยืนยัน · พูด "ใช่" / "ไม่" แทนการกดปุ่ม · ตัดสินในโค้ด Python (handsfree.yes_no):
         // มีคำปฏิเสธ = ไม่ · "ใช่" ต้องไม่มีคำอื่นต่อ ("ตกลงไม่ลบแล้ว" เคยนับเป็นใช่ · ตรวจทั้งระบบ 2.1)
         const yn = tok !== "" ? browser.yesNo(t) : ""
-        if (yn === "yes" || yn === "no") { push({ user: true, text: t }); answer(tok, yn === "yes"); speakLastCard(); return }
+        if (yn === "yes" || yn === "no") {
+            if (vt !== "") answerVoice(tok, yn === "yes", t)
+            else { answer(tok, yn === "yes"); speakLastCard() }   // การ์ดในแชท (จากที่พิมพ์) ตอบในแชท
+            return
+        }
         if (yn === "unclear") {
             const again = Tr.t("ยังไม่ได้ทำ · ตอบว่า “ใช่” หรือ “ไม่” อย่างเดียว")
-            push({ user: true, text: t })
-            push({ ai: true, text: again, note: "", done: true, skill: Tr.t("สั่งงานด้วยเสียง") })
-            if (voice.available) voice.speak(items.length - 1, again)
+            if (vt !== "") { vc = Object.assign({}, vc, { heard: t }); voiceClose.restart() }
+            else voiceShow(t, null, again, false)
+            if (voice.available) voice.speak(-4, again)
             return
         }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
-        if (browser.busy) {
-            push({ user: true, text: t })
-            push({ ai: true, text: Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่"), note: "", done: true, skill: Tr.t("เบราว์เซอร์ของผู้ช่วย") })
-            if (voice.available) voice.speak(items.length - 1, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่"))
-            return
-        }
+        if (browser.busy) { voiceSay(t, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")); return }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
         const way = browser.route(t)
         if (way === "skill") {          // การ์ด 0028: ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด = การ์ดสกิลเดียวกับตอนพิมพ์ (ยืนยันตามกติกาเดิม)
-            push({ user: true, text: t })
-            dispatch(skills.handleAs(skills.voiceSkill(t), t), t)
-            speakLastCard()
+            voiceDispatch(skills.handleAs(skills.voiceSkill(t), t), t)
             return
         }
         if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
-            push({ user: true, text: t })
-            push({ ai: true, text: "", note: "", done: false, skill: Tr.t("เบราว์เซอร์ของผู้ช่วย") })
+            voiceShow(t, null, Tr.t("กำลังทำ…"), true)   // ผลมาทาง onFinished
             return
         }
         if (way === "command") {        // คำสั่งเครื่อง: ทางเดิมของแชททำคำสั่งก่อนถึง AI (ยืนยันตามกติกาเดิม)
             // ไม่ผ่าน send(): send() ส่งข้อความไปให้ Claude แก้สกิล (เมื่อกด "ไม่ใช่แบบนี้" ค้างไว้) หรือถามไฟล์ที่แนบ
             // และเขียนทับข้อความที่ผู้ใช้พิมพ์ค้างในช่อง (ตรวจทั้งระบบ 2.2 · 2.7)
-            const before = items.length
-            push({ user: true, text: t })
-            dispatch(skills.handle(t), t)
-            if (items.length > before + 1 && items[items.length - 1].ai)
-                speakNext = true        // รอ AI ตอบ แล้วอ่านใน onFinished
-            else
-                speakLastCard()
+            voiceDispatch(skills.handle(t), t)
             return
         }
         if (way === "unknown") {
             // การ์ด 0029: คำถามที่โค้ดตอบเองได้ (เวลา นัด ไฟล์ สุขภาพเครื่อง) = ตอบแล้วอ่านออกเสียง · ไม่ใช้ AI
-            const answer = skills.voiceAnswer(t)
-            if (answer.kind !== undefined) {
-                push({ user: true, text: t })
-                showCard(answer)
-                speakLastCard()
-                return
-            }
+            const answerCard = skills.voiceAnswer(t)
+            if (answerCard.kind !== undefined) { voiceDispatch(answerCard, t); return }
             // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
-            if (ask.confirmToken) {
-                push({ user: true, text: t })
-                showCard(ask)
-                speakLastCard()
-                return
-            }
+            if (ask.confirmToken) { voiceDispatch(ask, t); return }
             // การ์ด 0030: ขอโหมดใหม่ = การ์ดยืนยันข้อความก่อนส่ง Claude (ไม่มี Claude/ปิดสวิตช์ = การ์ดอธิบาย)
             const create = skills.voiceCreate(t)
-            if (create.kind !== undefined) {
-                push({ user: true, text: t })
-                showCard(create)
-                speakLastCard()
-                return
-            }
+            if (create.kind !== undefined) { voiceDispatch(create, t); return }
         }
         const say = way === "needs_browser"
             ? browser.hint(t)   // คุมเพลงก่อนเปิดเพลง = บอกให้เปิดเพลงก่อน (การ์ด 0035)
             : Tr.t("ไม่รู้จักคำสั่ง \"") + t + Tr.t("\" · คุยกับผู้ช่วยให้พิมพ์ หรือกดปุ่มไมค์ในหน้าแชท")
-        push({ user: true, text: t })
-        push({ ai: true, text: say, note: "", done: true, skill: Tr.t("สั่งงานด้วยเสียง") })
-        if (voice.available) voice.speak(items.length - 1, say)
+        voiceSay(t, say)
     }
     function speakLastCard() {
         const last = items[items.length - 1]
@@ -337,6 +364,57 @@ Item {
             onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
         }
     }
+    // ผลคำสั่งคีย์ลัด (Pakon 2026-10-20): เด้งด้านบนกลางจอ · ไม่มีการ์ดรอยืนยัน = ปิดเองใน 8 วิ ·
+    // รอยืนยัน = ค้างไว้จนตอบ (พูด "ใช่/ไม่" หรือกดปุ่ม) หรือครบ 30 วิ · Esc ปิดได้
+    Popup {
+        id: voicePopup
+        objectName: "voicePopup"
+        parent: Overlay.overlay
+        x: Math.round(((parent ? parent.width : root.width) - width) / 2)
+        y: 24
+        width: Math.min(560, (parent ? parent.width : root.width) - 32)
+        padding: 16
+        modal: false
+        closePolicy: Popup.CloseOnEscape
+        background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
+        contentItem: ColumnLayout {
+            spacing: 8
+            AppText {
+                objectName: "voiceHeard"
+                Layout.fillWidth: true
+                text: Tr.t("ได้ยิน: ") + "“" + (root.vc.heard || "") + "”"
+                size: Theme.fontSmall; color: Theme.inkMuted
+            }
+            AppText {
+                objectName: "voiceSay"
+                visible: !root.vc.card && (root.vc.text || "") !== ""
+                Layout.fillWidth: true
+                text: Tr.x(root.vc.text || "")
+            }
+            SkillCard {
+                objectName: "voiceCard"
+                visible: !!root.vc.card
+                Layout.fillWidth: true
+                info: root.vc.card || ({})
+                answered: !!root.answered[(root.vc.card || {}).confirmToken]
+                onAnswer: (yes) => root.answerVoice(root.vc.card.confirmToken, yes, root.vc.heard)
+                undone: !!root.answered[(root.vc.card || {}).undoToken]
+                onUndo: {
+                    const t = root.vc.card.undoToken
+                    const a = Object.assign({}, root.answered)
+                    a[t] = true
+                    root.answered = a
+                    root.voiceShow(root.vc.heard, skills.undo(t), "", false)
+                }
+            }
+        }
+    }
+    Timer {
+        id: voiceClose
+        interval: root.voiceToken() !== "" ? 30000 : 8000
+        onTriggered: voicePopup.close()
+    }
+
     Popup {
         id: historyPopup
         x: root.width - width - 24

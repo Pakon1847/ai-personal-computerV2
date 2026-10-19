@@ -119,11 +119,19 @@ class Listener:
                  transcribe_cmd: list[str] | None = None, max_s: float = MAX_S,
                  auto_stop: bool = True, endpointer=None, fast=None,
                  language: Callable[[], str] = lambda: "th",
-                 en_transcribe_cmd: list[str] | None = None):  # fmt: skip
+                 en_transcribe_cmd: list[str] | None = None,
+                 try_english: Callable[[str], bool] | None = None,
+                 use_english: Callable[[str], bool] | None = None):  # fmt: skip
         self._on_done = on_done
         # ภาษาของตัวถอด = ภาษาหน้าจอที่ผู้ใช้ตั้ง (การ์ด 0040 · โค้ดเลือก ไม่ให้โมเดลเดาภาษา · H6)
         self._language = language
         self._lang = "th"
+        # คีย์ลัดฟังสองภาษา (การ์ด 0040 หัวข้อ 13): หน้าจอไทยแต่ผู้ใช้พูดอังกฤษ → Zipformer ได้คำไทยมั่ว ·
+        # try_english(ข้อความไทย) = ไม่ตรงคำสั่งไหน → ถอดเสียงเดิมซ้ำเป็นอังกฤษ ·
+        # use_english(ข้อความอังกฤษ) = เป็นคำสั่งที่รู้จักแน่ (ตัวแปลงระยะ C / ใช่-ไม่) จึงใช้ ·
+        # ไม่ใช่ = ข้อความไทยเดิม (ไม่เดา)
+        self._try_english = try_english
+        self._use_english = use_english
         self._fast = fast
         self._use_fast = False
         self._voice_dir = voice_dir
@@ -265,11 +273,26 @@ class Listener:
         if path is not None:
             _remove(path)
 
+    def _maybe_english(self, path: Path, thai: str) -> str:
+        """ข้อความที่จะใช้: ภาษาไทยเดิม หรือภาษาอังกฤษเมื่อไทยไม่ตรงคำสั่งแต่อังกฤษตรง (คีย์ลัด · หน้าจอไทย)."""
+        if not (self._try_english and self._use_english and self.english_available):
+            return thai
+        try:
+            if not self._try_english(thai):
+                return thai
+            r = subprocess.run([*self._en_cmd, str(path)], capture_output=True, text=True,
+                               encoding="utf-8", timeout=30)  # fmt: skip
+            en = clean(r.stdout) if r.returncode == 0 else ""
+            return en if en and self._use_english(en) else thai
+        except (OSError, subprocess.TimeoutExpired, ValueError):
+            return thai  # ถอดอังกฤษไม่ได้ = ใช้ไทยตามเดิม (ไม่ทำให้คีย์ลัดเสีย)
+
     def _transcribe(self, path: Path) -> None:
         t0 = time.monotonic()
         if self._use_fast:
             text, err = self._fast.transcribe(path)
             if not err:  # ล่ม/ค้าง = ถอยไปใช้ whisper ข้างล่าง (ไม่ทิ้งสิ่งที่ผู้ใช้พูด · H2)
+                text = self._maybe_english(path, text)
                 _remove(path)
                 if not text:
                     err = "ไม่ได้ยินเสียงพูด ลองพูดใกล้ไมค์อีกครั้ง"

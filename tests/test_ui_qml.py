@@ -149,6 +149,12 @@ def items_of(page):
     return v.toVariant() if hasattr(v, "toVariant") else v
 
 
+def vc_of(page):
+    """ผลคำสั่งคีย์ลัดที่เด้งบนจอ (Pakon 2026-10-20 · ไม่ลงแชท): {heard, card, text, busy}."""
+    v = page.property("vc")
+    return v.toVariant() if hasattr(v, "toVariant") else v
+
+
 def find_all(root, name):
     return [o for o in root.findChildren(QObject) if o.objectName() == name]
 
@@ -425,17 +431,20 @@ class ShellCardTest(unittest.TestCase):
         n = len(items_of(page))
         page.voiceCommand("แต่งกลอนให้หน่อย")
         settle(100)
-        rows = items_of(page)
-        self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + คำบอก · ไม่มีคำตอบของ AI ตามมา
-        self.assertEqual(rows[n]["text"], "แต่งกลอนให้หน่อย")
-        self.assertIn("ไม่รู้จักคำสั่ง", rows[-1]["text"])
-        self.assertNotIn("card", rows[-1])
+        # Pakon 2026-10-20: ผลเด้งบนจอ ไม่ลงแชท (ทั้งข้อความที่ได้ยินและคำบอก) · ไม่มีคำตอบของ AI
+        self.assertEqual(len(items_of(page)), n)
+        vc = vc_of(page)
+        self.assertEqual(vc["heard"], "แต่งกลอนให้หน่อย")
+        self.assertIn("ไม่รู้จักคำสั่ง", vc["text"])
+        self.assertFalse(vc["card"])
+        self.assertTrue(find_all(win, "voicePopup")[0].property("opened"))
         # การ์ด 0029: คำถามที่โค้ดตอบเองได้ = การ์ดเวลาจากนาฬิกาเครื่อง (ไม่ใช่ AI · 0027 เดิมได้ "ไม่รู้จักคำสั่ง")
         page.voiceCommand("ตอนนี้กี่โมง")
         settle(100)
-        rows = items_of(page)
-        self.assertEqual(rows[-2]["text"], "ตอนนี้กี่โมง")
-        self.assertEqual(rows[-1]["card"]["kind"], "clock")
+        self.assertEqual(len(items_of(page)), n)
+        vc = vc_of(page)
+        self.assertEqual(vc["heard"], "ตอนนี้กี่โมง")
+        self.assertEqual(vc["card"]["kind"], "clock")
         self.assertEqual(warnings, [])
 
     def test_hands_free_command_mode_routes(self):
@@ -459,19 +468,21 @@ class ShellCardTest(unittest.TestCase):
         browser._control = Control()
         page.voiceCommand("เลื่อนลง")
         settle(50)
-        rows = items_of(page)
-        self.assertIn("เปิดเบราว์เซอร์", rows[-1]["text"])
+        self.assertIn("เปิดเบราว์เซอร์", vc_of(page)["text"])
         self.assertEqual(ran, [])
         page.voiceCommand("เปิดเบราว์เซอร์")
         settle(200)
         self.assertEqual(ran, [{"kind": "site", "site": "google"}])
-        self.assertEqual(items_of(page)[-2]["text"], "เปิดเบราว์เซอร์")
-        n = len(items_of(page))
+        vc = vc_of(page)
+        self.assertEqual(vc["heard"], "เปิดเบราว์เซอร์")
+        self.assertFalse(vc["busy"])  # ผลจากเบราว์เซอร์มาแทน "กำลังทำ…" แล้ว
+        self.assertIn("เปิดแล้ว", vc["text"])
         page.voiceCommand("เปิดหน้าตั้งค่า")
         settle(100)
-        rows = items_of(page)
-        self.assertEqual(rows[n]["text"], "เปิดหน้าตั้งค่า")
-        self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง ไม่ใช่คำตอบของ AI
+        vc = vc_of(page)
+        self.assertEqual(vc["heard"], "เปิดหน้าตั้งค่า")
+        self.assertTrue(vc["card"])  # การ์ดคำสั่งเครื่อง ไม่ใช่คำตอบของ AI
+        self.assertEqual(items_of(page), [])  # ไม่มีอะไรลงแชทเลย
         self.assertEqual(warnings, [])
 
     def test_hands_free_command_never_goes_to_claude_or_wipes_draft(self):
@@ -488,9 +499,8 @@ class ShellCardTest(unittest.TestCase):
         box.setProperty("text", "ร่างที่พิมพ์ค้างไว้")
         page.voiceCommand("เปิดหน้าตั้งค่า")
         settle(100)
-        rows = items_of(page)
-        self.assertEqual(rows[-2]["text"], "เปิดหน้าตั้งค่า")
-        self.assertIn("card", rows[-1])  # การ์ดคำสั่งเครื่อง
+        self.assertEqual(vc_of(page)["heard"], "เปิดหน้าตั้งค่า")
+        self.assertTrue(vc_of(page)["card"])  # การ์ดคำสั่งเครื่อง (เด้งบนจอ)
         self.assertEqual(sent, [])  # ไม่ถึง Claude
         self.assertEqual(box.property("text"), "ร่างที่พิมพ์ค้างไว้")
         base = {"chips": [], "lines": [], "page": "", "badge": {}, "kind": "command"}
@@ -516,11 +526,12 @@ class ShellCardTest(unittest.TestCase):
         skills._claude_on = lambda: True
         page.voiceCommand("ทำโหมดฟังเพลง: เปิดยูทูบแล้วปรับเสียง 60")
         settle(50)
-        card = items_of(page)[-1]["card"]
+        card = vc_of(page)["card"]
         self.assertEqual(card["title"], "ส่งให้ Claude สร้างสกิลนี้ ใช่ไหม")
-        page.voiceCommand("ไม่")
+        page.voiceCommand("ไม่")  # ตอบการ์ดที่เด้งด้วยเสียง
         settle(100)
-        self.assertEqual(items_of(page)[-1]["card"]["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
+        self.assertEqual(vc_of(page)["card"]["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
+        self.assertEqual(items_of(page), [])
         self.assertEqual(sent, [])
         self.assertEqual(warnings, [])
 
@@ -536,20 +547,19 @@ class ShellCardTest(unittest.TestCase):
         n = len(items_of(page))
         page.voiceCommand("เข้าโหมดประชุม")
         settle(100)
-        rows = items_of(page)
-        self.assertEqual(len(rows), n + 2)  # ข้อความที่ได้ยิน + การ์ดสกิล · ไม่มีคำตอบของ AI
-        self.assertEqual(rows[n]["text"], "เข้าโหมดประชุม")
-        self.assertEqual(rows[-1]["card"]["badge"]["name"], "โหมดประชุม")
+        self.assertEqual(len(items_of(page)), n)  # ไม่ลงแชท · ไม่มีคำตอบของ AI
+        self.assertEqual(vc_of(page)["heard"], "เข้าโหมดประชุม")
+        self.assertEqual(vc_of(page)["card"]["badge"]["name"], "โหมดประชุม")
         # ทาง ก: ได้ยินใกล้เคียง = การ์ด "หมายถึง … ใช่ไหม" · พูด "ไม่" = ไม่ทำ
         # (ไม่ทดสอบ "ใช่" ที่นี่: บน Pi ตัวสั่งเครื่องทำจริง · ทดสอบใน test_auto_skill ด้วยตัวจำลอง)
         page.voiceCommand("เข้าโหมดประชม")
         settle(50)
-        card = items_of(page)[-1]["card"]
+        card = vc_of(page)["card"]
         self.assertEqual(card["title"], "หมายถึง “โหมดประชุม” ใช่ไหม")
         self.assertNotEqual(card["confirmToken"], "")
         page.voiceCommand("ไม่")
         settle(50)
-        self.assertEqual(items_of(page)[-1]["card"]["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
+        self.assertEqual(vc_of(page)["card"]["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร")
         self.assertEqual(warnings, [])
 
     def test_hands_free_while_browser_busy_says_wait(self):
@@ -562,9 +572,8 @@ class ShellCardTest(unittest.TestCase):
         settle(50)
         page.voiceCommand("ย้อนกลับ")
         settle(50)
-        rows = items_of(page)
-        self.assertEqual(rows[-2]["text"], "ย้อนกลับ")
-        self.assertIn("รอสักครู่", rows[-1]["text"])
+        self.assertEqual(vc_of(page)["heard"], "ย้อนกลับ")
+        self.assertIn("รอสักครู่", vc_of(page)["text"])
         self.assertEqual(warnings, [])
 
     def test_claude_made_skill_cards_draw_with_undo_and_wrong_buttons(self):

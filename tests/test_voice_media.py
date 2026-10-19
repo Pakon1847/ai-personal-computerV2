@@ -192,9 +192,9 @@ class MediaQmlTest(unittest.TestCase):
         page = qml.find_all(win, "workspace")[0]
         page.voiceCommand("หยุดเพลง")
         qml.settle(50)
-        rows = qml.items_of(page)
-        self.assertEqual(rows[-2]["text"], "หยุดเพลง")
-        self.assertIn("ยังไม่ได้เปิดเพลง", rows[-1]["text"])
+        vc = qml.vc_of(page)  # ผลคำสั่งเสียงเด้งบนจอ ไม่ลงแชท (Pakon 2026-10-20)
+        self.assertEqual(vc["heard"], "หยุดเพลง")
+        self.assertIn("ยังไม่ได้เปิดเพลง", vc["text"])
         self.assertEqual(warnings, [])
 
 

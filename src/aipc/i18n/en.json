@@ -535,6 +535,8 @@
   "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)": "Camera permission for skills (ADR-015)",
   "อ่านรายการไดรฟ์ไม่ได้": "Cannot read the list of drives",
   "ใครตอบ": "Answered by",
+  "ได้ยิน: ": "Heard: ",
+  "กำลังทำ…": "Working…",
   "{0} ในหน้าต่างบัญชี Google (เข้าสู่ระบบได้ แต่คำสั่งเสียงคุมหน้านี้ไม่ได้)": "{0} in the Google account window (sign-in works, but voice commands can't control this page)",
   "{0} ในเบราว์เซอร์ของผู้ช่วย": "{0} in the assistant browser",
   "ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ": "Sign out of all websites every time you log out",

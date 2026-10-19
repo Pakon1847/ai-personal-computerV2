@@ -182,6 +182,43 @@ class EnglishSttTest(unittest.TestCase):
         self.assertEqual(self.run_once(lis, fast=True), ("เปิดยูทูบ", ""))
         self.assertEqual(ThaiFast.used, 1)
 
+    def test_thai_screen_hotkey_falls_back_to_english_command(self):
+        """การ์ด 0040 หัวข้อ 13: หน้าจอไทย · Zipformer ได้คำไทยมั่ว → ลองอังกฤษ · ใช้เมื่อเป็นคำสั่งที่รู้จักเท่านั้น."""
+
+        class Fast:
+            available = True
+
+            def __init__(self, text):
+                self.text = text
+
+            def warm(self):
+                pass
+
+            def transcribe(self, path):
+                return self.text, ""
+
+        self.lang = "th"
+        tried = []
+
+        def listener(thai, en_cmd):
+            return Listener(lambda t, e, s: (self.result.append((t, e)), self.done.set()),
+                            record_cmd=FAKE_REC, transcribe_cmd=FAKE_STT, en_transcribe_cmd=en_cmd,
+                            fast=Fast(thai), language=lambda: self.lang,
+                            try_english=lambda t: tried.append(t) or t == "วีเรียบร้อย",
+                            use_english=lambda e: e.lower().startswith("open"))  # fmt: skip
+
+        # ไทยมั่ว + อังกฤษเป็นคำสั่ง = ใช้อังกฤษ
+        self.assertEqual(self.run_once(listener("วีเรียบร้อย", self.FAKE_EN), fast=True),
+                         ("Open YouTube.", ""))  # fmt: skip
+        # ไทยตรงคำสั่งอยู่แล้ว = ไม่ลองอังกฤษ
+        self.assertEqual(self.run_once(listener("เปิดยูทูบ", self.FAKE_EN), fast=True),
+                         ("เปิดยูทูบ", ""))  # fmt: skip
+        # อังกฤษไม่ใช่คำสั่ง = ใช้ไทยเดิม (ไม่เดา)
+        not_cmd = [sys.executable, "-c", "print('hello there')", "-f"]
+        self.assertEqual(self.run_once(listener("วีเรียบร้อย", not_cmd), fast=True),
+                         ("วีเรียบร้อย", ""))  # fmt: skip
+        self.assertEqual(tried, ["วีเรียบร้อย", "เปิดยูทูบ", "วีเรียบร้อย"])
+
     def test_missing_english_model_says_so(self):
         lis = Listener(record_cmd=FAKE_REC, voice_dir=Path(self.tmp.name), language=lambda: "en",
                        transcribe_cmd=FAKE_STT)  # fmt: skip

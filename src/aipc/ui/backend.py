@@ -352,6 +352,21 @@ class BackupController(QObject):
             )
 
 
+def _thai_missed(text: str) -> bool:
+    """ข้อความไทยจากคีย์ลัดไม่ตรงคำสั่ง/เว็บ/ใช่-ไม่ → ลองฟังเป็นอังกฤษ (การ์ด 0040 หัวข้อ 13)."""
+    from aipc.ui import handsfree
+
+    return handsfree.route(text, False) == handsfree.UNKNOWN and handsfree.yes_no(text) == ""
+
+
+def _english_command(text: str) -> bool:
+    """ข้อความอังกฤษเป็นคำสั่งที่รู้จักแน่ (ตัวแปลงระยะ C) หรือคำตอบใช่/ไม่ → ใช้แทนข้อความไทย."""
+    from aipc.skills import english
+    from aipc.ui import handsfree
+
+    return english.to_thai(text) is not None or handsfree.yes_no(text) in ("yes", "no")
+
+
 class VoiceController(QObject):
     """ปุ่ม "อ่านออกเสียง" ที่คำตอบ AI (การ์ด 0019 · Pakon เลือกทำแค่อ่านออกเสียง 2026-10-01).
 
@@ -382,7 +397,8 @@ class VoiceController(QObject):
             from aipc import i18n
 
             listener = stt.Listener(self._weak("_heard"), fast=zipformer.Transcriber(),
-                                    language=i18n.lang)  # fmt: skip # การ์ด 0040
+                                    language=i18n.lang, try_english=_thai_missed,
+                                    use_english=_english_command)  # fmt: skip # การ์ด 0040
         self._listener = listener if active else None
         self._key, self._job, self._message = -1, -1, ""
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
