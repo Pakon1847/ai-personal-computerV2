@@ -18,6 +18,7 @@ from pathlib import Path
 
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
+from aipc import i18n
 from aipc.accounts import validation
 from aipc.bench import machine
 from aipc.doctor import hardware
@@ -2041,6 +2042,13 @@ class SkillsController(QObject):
     def available(self) -> set[str]:
         return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() else set())
 
+    @staticmethod
+    def _tile_examples(skill) -> list[str]:
+        """ตัวอย่างคำพูด 2 ข้อแรกสำหรับไทล์หน้า Skill (การ์ด 0041) · หน้าจออังกฤษ: แสดงเฉพาะที่มีคำแปล
+        (คำแปลที่ใส่ไว้ผ่านตัวแปลงคำสั่งอังกฤษแล้ว) · ไม่มีคำแปล = ไม่แสดงประโยคไทยปนในหน้าอังกฤษ"""
+        out = [tr(e) for e in skill.examples[:2]]
+        return [e for e in out if not i18n.THAI.search(e)] if i18n.lang() == "en" else out
+
     @Property("QVariantList", notify=skillsChanged)
     def skills(self) -> list:
         out = []
@@ -2053,6 +2061,7 @@ class SkillsController(QObject):
                 "permissions": [tr(p) for p in s.permission_labels()],
                 "ready": not missing, "missing": [tr(self.NEED_LABEL[n]) for n in missing],
                 "byClaude": self._is_user(s.id),
+                "examples": self._tile_examples(s),
             })  # fmt: skip
         return out
 

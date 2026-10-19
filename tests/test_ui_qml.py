@@ -1507,6 +1507,36 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(find_items(win, "machineCard"), [])  # ย้ายไปป้าย "เครื่องปกติ" บนแถบบนแล้ว
         self.assertEqual(warnings, [])
 
+    def test_skills_page_tiles_filter_and_detail(self):
+        """การ์ด 0041: หน้า Skill เป็นไทล์ · ตัวกรองนับตรงกับข้อมูลจริง · แตะไทล์ = เห็นรายละเอียดและสิทธิ์."""
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine._backends["skills"]
+        local = [x for x in skills.skills if not x["byClaude"]]
+        ready = sum(x["ready"] for x in local)
+
+        def tiles():
+            return [t for t in find_items(win, "skillTile") if t.isVisible()]
+
+        self.assertEqual(len(tiles()), len(local))
+        self.assertTrue(all(len(x["examples"]) >= 1 for x in local))  # ตัวอย่างจากไฟล์สกิลจริง
+        find_items(win, "skillFilter_ready")[0].clicked.emit()
+        settle(30)
+        self.assertEqual(len(tiles()), ready)
+        find_items(win, "skillFilter_notReady")[0].clicked.emit()
+        settle(30)
+        self.assertEqual(len(tiles()), len(local) - ready)
+        find_items(win, "skillFilter_all")[0].clicked.emit()
+        settle(30)
+        tile = tiles()[0]
+        self.assertFalse(any(d.isVisible() for d in find_items(win, "skillDetail")))
+        tile.clicked.emit()
+        settle(30)
+        self.assertEqual(sum(d.isVisible() for d in find_items(win, "skillDetail")), 1)
+        tile.clicked.emit()  # แตะอีกครั้ง = ปิด
+        settle(30)
+        self.assertFalse(any(d.isVisible() for d in find_items(win, "skillDetail")))
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")

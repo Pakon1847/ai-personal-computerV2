@@ -10,6 +10,14 @@ ColumnLayout {
     spacing: 16
     property string confirmDelete: ""   // id ที่กดลบไปหนึ่งครั้ง (กดอีกครั้ง = ลบจริง)
     property string message: ""
+    property string filter: "all"       // ตัวกรองสกิลในเครื่อง: all | ready | notReady (การ์ด 0041)
+    property string openId: ""          // ไทล์ที่แตะเปิดดูรายละเอียดอยู่
+    readonly property var localSkills: skills.skills.filter(s => !s.byClaude)
+    // ไอคอนของสกิลในเครื่อง (ไอคอนเส้นชุดเดิม) · สกิลอื่น = ประกาย
+    readonly property var icons: ({
+        "reminder": Icons.calendar, "system-command": Icons.terminal, "machine-status": Icons.activity,
+        "letter-writer": Icons.mail, "summarize-text": Icons.file, "translate": Icons.globe
+    })
 
     PageHeader {
         title: "Skill"
@@ -123,44 +131,107 @@ ColumnLayout {
         }
     }
 
-    // ---------- สกิลในเครื่อง ----------
-    AppText { text: Tr.t("สกิลในเครื่อง"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
-    GridLayout {
+    // ---------- สกิลในเครื่อง (การ์ด 0041): ไทล์ ไอคอน · ชื่อ · ตัวอย่างคำพูด · จุดพร้อม/ไม่พร้อม · แตะ = ดูรายละเอียดและสิทธิ์ ----------
+    RowLayout {
         Layout.fillWidth: true
-        columns: 2
-        columnSpacing: 12
-        rowSpacing: 12
+        spacing: 8
+        AppText { text: Tr.t("สกิลในเครื่อง"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
+        // ตัวกรองมีคำกำกับ (ไม่ใช้สีอย่างเดียวบอกสถานะ)
         Repeater {
-            model: skills.skills.filter(s => !s.byClaude)
-            Card {
+            model: [
+                { key: "all", label: Tr.t("ทั้งหมด") },
+                { key: "ready", label: Tr.t("ใช้ได้แล้ว") },
+                { key: "notReady", label: Tr.t("ยังไม่พร้อม") }
+            ]
+            AppButton {
+                required property var modelData
+                objectName: "skillFilter_" + modelData.key
+                readonly property int count: page.localSkills.filter(s => modelData.key === "all" || (modelData.key === "ready") === s.ready).length
+                kind: page.filter === modelData.key ? "primary" : "secondary"
+                text: modelData.label + " " + count
+                onClicked: { page.filter = modelData.key; page.openId = "" }
+            }
+        }
+    }
+    GridLayout {
+        objectName: "localSkillsGrid"
+        Layout.fillWidth: true
+        columns: Theme.fontScale > 1.25 ? 1 : page.width >= 900 ? 3 : 2
+        columnSpacing: 14
+        rowSpacing: 14
+        Repeater {
+            model: page.localSkills.filter(s => page.filter === "all" || (page.filter === "ready") === s.ready)
+            Button {
                 id: sc
                 required property var modelData
+                objectName: "skillTile"
+                readonly property bool open: page.openId === modelData.id
                 Layout.fillWidth: true
-                Layout.preferredHeight: col.implicitHeight + 28
+                Layout.preferredWidth: 1   // ทุกคอลัมน์กว้างเท่ากัน (ไม่ขึ้นกับความยาวข้อความ)
                 Layout.alignment: Qt.AlignTop
-                radius: Theme.radiusCard
-                ColumnLayout {
+                // แตะเปิดแล้วกินเต็มแถว (รายละเอียดอ่านง่าย ไม่เบียดไทล์ข้าง ๆ)
+                Layout.columnSpan: open ? parent.columns : 1
+                hoverEnabled: true
+                padding: 16
+                implicitHeight: col.implicitHeight + 2 * padding
+                Accessible.name: modelData.name + " · " + (modelData.ready ? Tr.t("ใช้ได้แล้ว") : Tr.t("ยังไม่พร้อม"))
+                Keys.onReturnPressed: (event) => { sc.clicked(); event.accepted = true }
+                onClicked: page.openId = open ? "" : modelData.id
+                background: Rectangle {
+                    radius: Theme.radiusLarge
+                    color: Theme.surface
+                    border.width: sc.visualFocus ? 2 : (sc.hovered || sc.open) ? 1 : 0
+                    border.color: Theme.accent
+                }
+                contentItem: ColumnLayout {
                     id: col
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: 14
-                    spacing: 6
+                    spacing: 8
                     RowLayout {
                         Layout.fillWidth: true
-                        AppText { text: sc.modelData.name; strong: true; size: Theme.px(17); oneLine: true; Layout.fillWidth: true }
-                        Chip { text: sc.modelData.ready ? Tr.t("ใช้ได้แล้ว") : Tr.t("ยังไม่พร้อม"); kind: sc.modelData.ready ? "ok" : "neutral"; dot: true }
+                        spacing: 10
+                        Rectangle {
+                            implicitWidth: 40; implicitHeight: 40; radius: 12
+                            color: sc.modelData.ready ? Theme.accentSoft : Theme.surface2
+                            Icon {
+                                anchors.centerIn: parent
+                                path: page.icons[sc.modelData.id] || Icons.sparkle
+                                color: sc.modelData.ready ? Theme.accentInk : Theme.inkFaint
+                                width: 20; height: 20
+                            }
+                        }
+                        Item { Layout.fillWidth: true }
+                        Chip {
+                            objectName: "skillReady"
+                            text: sc.modelData.ready ? Tr.t("ใช้ได้แล้ว") : Tr.t("ยังไม่พร้อม")
+                            kind: sc.modelData.ready ? "ok" : "neutral"; dot: true
+                        }
                     }
-                    AppText { text: sc.modelData.description; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
-                    Flow {
+                    AppText { text: sc.modelData.name; strong: true; size: Theme.px(17); Layout.fillWidth: true; maximumLineCount: 2; elide: Text.ElideRight }
+                    // ตัวอย่างคำพูดจากไฟล์สกิลจริง · ยังไม่พร้อม = บอกสิ่งที่ขาดแทน (H5)
+                    AppText {
                         Layout.fillWidth: true
-                        spacing: 6
-                        Chip { text: sc.modelData.worker }
-                        Repeater { model: sc.modelData.permissions; Chip { required property string modelData; text: modelData; kind: "warn" } }
+                        size: Theme.fontSmall
+                        color: sc.modelData.ready ? Theme.inkMuted : Theme.inkFaint
+                        maximumLineCount: sc.open ? 4 : 2; elide: Text.ElideRight
+                        text: !sc.modelData.ready ? Tr.t("ต้องมีก่อน: ") + sc.modelData.missing.join(", ")
+                              : sc.modelData.examples.length ? sc.modelData.examples.map(e => "“" + e + "”").join("  ")
+                              : Tr.t("แตะเพื่อดูรายละเอียด")
                     }
-                    Repeater {
-                        model: sc.modelData.missing
-                        AppText { required property string modelData; text: Tr.t("ต้องมีก่อน: ") + modelData; size: Theme.fontCaption; color: Theme.inkFaint; Layout.fillWidth: true }
+                    // รายละเอียด (แตะแล้วเปิด): ทำอะไร · ใครทำ (โค้ด/LLM) · สิทธิ์ที่ใช้
+                    ColumnLayout {
+                        objectName: "skillDetail"
+                        visible: sc.open
+                        Layout.fillWidth: true
+                        Layout.topMargin: 4
+                        spacing: 8
+                        Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.line }
+                        AppText { text: sc.modelData.description; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                        Flow {
+                            Layout.fillWidth: true
+                            spacing: 6
+                            Chip { text: sc.modelData.worker }
+                            Repeater { model: sc.modelData.permissions; Chip { required property string modelData; text: modelData; kind: "warn" } }
+                        }
                     }
                 }
             }
