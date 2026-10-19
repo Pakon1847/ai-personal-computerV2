@@ -394,6 +394,7 @@ Item {
         width: Math.min(560, Screen.width - 32)
         height: voiceCol.implicitHeight + 32
         Rectangle { anchors.fill: parent; color: "transparent"; border.width: 1; border.color: Theme.line }
+        Shortcut { sequence: "Esc"; onActivated: voicePopup.close() }  // labwc ให้กล่องรับคีย์บอร์ดตอนเปิด · กลับเบราว์เซอร์เมื่อปิด
         ColumnLayout {
             id: voiceCol
             x: 16; y: 16
