@@ -425,6 +425,21 @@ ColumnLayout {
                 Layout.fillWidth: true; size: Theme.fontSmall
                 text: Tr.x(webCard.result)
             }
+            // การ์ด 0031 รอบ 3: ล้างเองทุกครั้งที่ออกจากระบบ (ทุกทาง: กดออก · ไม่ใช้เครื่องนาน · กล้อง) · ค่าเริ่มต้นปิด
+            AppCheck {
+                objectName: "clearWebOnLogout"
+                Layout.fillWidth: true
+                text: Tr.t("ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ")
+                detail: Tr.t("เหมาะกับเครื่องที่ใช้บัญชีร่วมกัน · ทุกครั้งที่เข้าเครื่องต้องเข้าสู่ระบบ Gmail หรือเว็บดูหนังใหม่ · ไม่ลบเบราว์เซอร์ธรรมดาและไฟล์ดาวน์โหลด")
+                checked: uiSettings.clearWebOnLogout
+                onClicked: uiSettings.setClearWebOnLogout(checked)
+            }
+            AppText {
+                objectName: "webClearFailed"
+                visible: uiSettings.webClearFailed
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.warnInk
+                text: Tr.t("ออกจากระบบครั้งก่อน ล้างบัญชีเว็บไม่สำเร็จ · การเข้าสู่ระบบเว็บอาจยังอยู่ · กดปุ่มออกจากบัญชีเว็บทั้งหมดด้านบน")
+            }
         }
     }
 

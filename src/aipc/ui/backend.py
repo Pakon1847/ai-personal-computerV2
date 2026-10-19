@@ -107,6 +107,25 @@ class UiSettings(QObject):
             self.changed.emit()
 
     @Property(bool, notify=changed)
+    def clearWebOnLogout(self) -> bool:  # noqa: N802
+        """ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ (การ์ด 0031 รอบ 3) · สคริปต์เซสชันอ่านค่านี้จาก ui.json ตอนจบ."""
+        return self._prefs.clear_web_on_logout
+
+    @Property(bool, notify=changed)
+    def webClearFailed(self) -> bool:  # noqa: N802
+        """ล้างบัญชีเว็บตอนออกจากระบบครั้งก่อนไม่สำเร็จ (ไฟล์ธงของ logout_clear) · บอกผู้ใช้ (H2)."""
+        from aipc.browser import logout_clear
+
+        return (logout_clear.state_dir() / logout_clear.FAILED).exists()
+
+    @Slot(bool)
+    def setClearWebOnLogout(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.clear_web_on_logout:
+            self._prefs.clear_web_on_logout = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    @Property(bool, notify=changed)
     def useClaude(self) -> bool:  # noqa: N802
         return self._prefs.use_claude
 

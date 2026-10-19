@@ -22,4 +22,9 @@ if [ -f /etc/aipc/llm.conf ]; then
   systemctl --user --no-block start aipc-llm.service 2>/dev/null || true
 fi
 
-exec labwc -C "$HERE/labwc" -S "$HERE/aipc-shell-loop"
+# ไม่ใช้ exec: ต้องได้ทำงานต่อหลัง labwc จบ (การ์ด 0031 รอบ 3) · ทุกทางของการออกจากระบบจบที่ labwc
+labwc -C "$HERE/labwc" -S "$HERE/aipc-shell-loop"
+code=$?
+# ออกจากบัญชีเว็บถ้าผู้ใช้เปิดสวิตช์ · ยังอยู่ในเซสชัน (greetd รอสคริปต์นี้จบ) · จำกัด 20 วินาที ไม่ขวางการออก
+"$HERE/aipc-logout-clear"
+exit $code

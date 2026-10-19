@@ -1,0 +1,11 @@
+#!/bin/sh
+# ออกจากบัญชีเว็บเมื่อออกจากระบบ (การ์ด 0031 รอบ 3) · aipc-session เรียกหลัง labwc จบ ก่อน greetd ปิดเซสชัน
+# ผู้ใช้ไม่ได้เปิดสวิตช์ = ไม่แตะอะไร (ตัว python ตัดสินจาก ui.json ของผู้ใช้) · ไม่ว่าผลเป็นอะไร จบด้วย 0 (ไม่ขวางการออกจากระบบ)
+HERE="$(dirname "$(readlink -f "$0")")"
+APP="$(cd "$HERE/../../.." && pwd)"
+PY="$APP/.venv/bin/python"
+# รุ่นที่เซสชันนี้เริ่มถูกลบระหว่างใช้ (อัปเดตแอป) → ใช้รุ่นปัจจุบัน
+[ -x "$PY" ] || PY="/opt/aipc-v2/.venv/bin/python"
+[ -x "$PY" ] || exit 0
+timeout 20 "$PY" -m aipc.browser.logout_clear 2>&1 | logger -t aipc-session 2>/dev/null || true
+exit 0

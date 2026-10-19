@@ -56,6 +56,8 @@ class UiPrefs:
     # เตือนนัดจากปฏิทิน Google ก่อนเวลานัด (การ์ด 0032) · ค่าเริ่มต้น 10 นาที
     gcal_alert_min: int = 10
     language: str = "th"  # การ์ด 0039
+    # ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ (การ์ด 0031 รอบ 3) · ค่าเริ่มต้นปิด (ใช้เครื่องคนเดียวยังสะดวก)
+    clear_web_on_logout: bool = False
 
     def cleaned(self) -> UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
@@ -86,6 +88,7 @@ class UiPrefs:
             if self.gcal_alert_min in GCAL_ALERT_CHOICES and type(self.gcal_alert_min) is int
             else 10,
             language=self.language if self.language in LANGS else "th",
+            clear_web_on_logout=self.clear_web_on_logout is True,
         )
 
 
@@ -108,6 +111,7 @@ def load(path: Path | None = None) -> UiPrefs:
             presence_logout_s=data.get("presence_logout_s", 30),
             gcal_alert_min=data.get("gcal_alert_min", 10),
             language=str(data.get("language", "th")),
+            clear_web_on_logout=data.get("clear_web_on_logout") is True,
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):
         return UiPrefs()
