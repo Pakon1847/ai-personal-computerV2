@@ -91,9 +91,12 @@ class HandsFreeTest(unittest.TestCase):
         typed, heard = [], []
         v.transcribed.connect(typed.append)
         v.heardHandsFree.connect(heard.append)
+        self.assertFalse(v.handsFree)
         v.toggleHandsFree()
         self.assertTrue(lis.listening)
+        self.assertTrue(v.handsFree)  # หน้าจอแสดงกล่องคำสั่งเสียง (Pakon 2026-10-20)
         v._on_heard("ค้นหาราคาทอง", "", 1.9)
+        self.assertFalse(v.handsFree)
         self.assertEqual((typed, heard), ([], ["ค้นหาราคาทอง"]))
         # ปุ่มไมค์ในแอปคงเดิม (0019 ข้อ 9): ใส่ช่องพิมพ์ ไม่ทำเอง
         v.startListening()

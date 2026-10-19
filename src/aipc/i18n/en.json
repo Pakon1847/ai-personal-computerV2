@@ -535,6 +535,7 @@
   "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)": "Camera permission for skills (ADR-015)",
   "อ่านรายการไดรฟ์ไม่ได้": "Cannot read the list of drives",
   "ใครตอบ": "Answered by",
+  "กำลังฟัง… พูดคำสั่งได้เลย (กดคีย์ลัดอีกครั้ง = หยุด)": "Listening… say your command (press the shortcut again to stop)",
   "ได้ยิน: ": "Heard: ",
   "กำลังทำ…": "Working…",
   "{0} ในหน้าต่างบัญชี Google (เข้าสู่ระบบได้ แต่คำสั่งเสียงคุมหน้านี้ไม่ได้)": "{0} in the Google account window (sign-in works, but voice commands can't control this page)",

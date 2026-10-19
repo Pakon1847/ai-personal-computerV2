@@ -138,6 +138,15 @@ Item {
     Connections {
         target: voice
         function onHeardHandsFree(text) { root.voiceCommand(text) }
+        function onMicChanged() {
+            if (voice.handsFree && voice.listening) root.voicePhase("listening")
+            else if (voice.handsFree && voice.transcribing) root.voicePhase("transcribing")
+            else if (root.vc.phase === "listening" || root.vc.phase === "transcribing") {
+                // จบโดยไม่มีข้อความ (ไม่ได้ยินเสียงพูด · เปิดไมค์ไม่ได้) = บอกเหตุผลแล้วปิดเอง · มีข้อความ = voiceCommand แทนที่
+                root.vc = { heard: "", card: null, text: voice.micMessage, busy: false, phase: "" }
+                voiceClose.restart()
+            }
+        }
     }
     Connections {
         target: browser
@@ -176,8 +185,14 @@ Item {
         const c = vc.card
         return voicePopup.opened && c && c.confirmToken && !answered[c.confirmToken] ? c.confirmToken : ""
     }
+    // กล่องคำสั่งเสียงขึ้นตลอดที่กดคีย์ลัด ทุกหน้า (Pakon 2026-10-20) · ไม่ได้กด = ไม่แสดง
+    function voicePhase(phase) {
+        vc = { heard: "", card: null, text: "", busy: false, phase: phase }
+        voiceClose.stop()
+        voicePopup.open()
+    }
     function voiceShow(heard, card, text, busy) {
-        vc = { heard: heard, card: card || null, text: text || "", busy: !!busy }
+        vc = { heard: heard, card: card || null, text: text || "", busy: !!busy, phase: "" }
         if (card && card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
         voicePopup.open()
         voiceClose.restart()
@@ -379,15 +394,30 @@ Item {
         background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
         contentItem: ColumnLayout {
             spacing: 8
+            RowLayout {
+                objectName: "voiceListening"
+                visible: root.vc.phase === "listening" || root.vc.phase === "transcribing"
+                Layout.fillWidth: true
+                spacing: 10
+                Icon { path: Icons.mic; color: Theme.accent; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
+                AppText {
+                    Layout.fillWidth: true
+                    strong: true
+                    text: root.vc.phase === "listening"
+                          ? Tr.t("กำลังฟัง… พูดคำสั่งได้เลย (กดคีย์ลัดอีกครั้ง = หยุด)")
+                          : Tr.t("กำลังถอดเสียง…")
+                }
+            }
             AppText {
                 objectName: "voiceHeard"
+                visible: (root.vc.heard || "") !== ""
                 Layout.fillWidth: true
                 text: Tr.t("ได้ยิน: ") + "“" + (root.vc.heard || "") + "”"
                 size: Theme.fontSmall; color: Theme.inkMuted
             }
             AppText {
                 objectName: "voiceSay"
-                visible: !root.vc.card && (root.vc.text || "") !== ""
+                visible: !root.vc.card && (root.vc.text || "") !== "" && !root.vc.phase
                 Layout.fillWidth: true
                 text: Tr.x(root.vc.text || "")
             }

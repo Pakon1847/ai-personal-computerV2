@@ -447,6 +447,28 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(vc["card"]["kind"], "clock")
         self.assertEqual(warnings, [])
 
+    def test_voice_box_shows_while_listening_on_any_page_and_hides_otherwise(self):
+        """Pakon 2026-10-20: กดคีย์ลัด = กล่องคำสั่งเสียงขึ้นทุกหน้า (กำลังฟัง → กำลังถอด → ผล) ·
+        ไม่ได้กด = ไม่แสดง."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        box = find_all(win, "voicePopup")[0]
+        self.assertFalse(box.property("opened"))  # ยังไม่กด = ไม่มีกล่อง
+        page.voicePhase("listening")
+        settle(50)
+        self.assertTrue(box.property("opened"))
+        self.assertEqual(vc_of(page)["phase"], "listening")
+        self.assertTrue(find_all(win, "voiceListening")[0].property("visible"))
+        page.voicePhase("transcribing")
+        settle(20)
+        page.voiceCommand("ตอนนี้กี่โมง")  # ผลแทนที่สถานะ
+        settle(50)
+        self.assertEqual(vc_of(page)["phase"], "")
+        self.assertFalse(find_all(win, "voiceListening")[0].property("visible"))
+        self.assertEqual(vc_of(page)["card"]["kind"], "clock")
+        self.assertEqual(items_of(page), [])
+        self.assertEqual(warnings, [])
+
     def test_hands_free_command_mode_routes(self):
         """การ์ด 0027: "เลื่อนลง" ก่อนเปิดเบราว์เซอร์ = บอกให้เปิดก่อน · "เปิดเบราว์เซอร์" = เบราว์เซอร์ของผู้ช่วย ·
         คำสั่งเครื่อง = ทางเดิมของแชท (ทำคำสั่ง ไม่ถึง AI)."""

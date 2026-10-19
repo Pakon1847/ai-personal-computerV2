@@ -495,6 +495,11 @@ class VoiceController(QObject):
     def transcribing(self) -> bool:
         return self._transcribing
 
+    @Property(bool, notify=micChanged)
+    def handsFree(self) -> bool:  # noqa: N802
+        """กำลังฟัง/ถอดจากคีย์ลัด (ไม่ใช่ปุ่มไมค์ในแชท) · หน้าจอแสดงกล่องคำสั่งเสียงทุกหน้า (Pakon 2026-10-20)."""
+        return self._hands_free
+
     @Property(str, notify=micChanged)
     def micMessage(self) -> str:  # noqa: N802
         return self._mic_message
@@ -549,6 +554,7 @@ class VoiceController(QObject):
             beep(high=True)
         else:
             self._hands_free = False
+            self.micChanged.emit()  # เริ่มฟังไม่ได้ = หน้าจอบอกเหตุผล (micMessage) แล้วปิดกล่องเอง
 
     @Slot(str, str, float)
     def _on_heard(self, text: str, err: str, secs: float) -> None:
