@@ -24,7 +24,9 @@ from datetime import datetime
 from pathlib import Path
 
 OPEN_METEO = ("api.open-meteo.com", "geocoding-api.open-meteo.com")
-OURS = {"python", "python3", "llama-server"}  # โปรเซสของแอป (หน้าจอ · AI ในเครื่อง)
+OURS = {"python", "python3", "llama-server", "whisper-cli"}  # โปรเซสของแอป (หน้าจอ · AI · ถอดเสียง)
+# เบราว์เซอร์ของผู้ช่วย: รายงานปลายทางแยก ไม่ใช่เกณฑ์ข้อ 1 (เว็บที่ผู้ใช้เปิดเอง · THREAT_MODEL ทางที่ 5–6)
+BROWSER = {"chromium", "chrome"}
 CLAUDE = {"claude"}
 _PROC = re.compile(r'\("([^"]+)",pid=(\d+)')
 
@@ -118,6 +120,7 @@ def check(rows: list[dict], meta: dict, ledger: list[dict], canary: str = "") ->
         "2_claude_has_ledger": (not claude_seen) or any(k in ("ask", "skill") for k in kinds),
         "3_canary_not_sent": bool(canary) and not any(canary in s for s in sent),
         "claude_connected": claude_seen,
+        "browser_destinations": sorted({r["peer"] for r in rows if set(r["procs"]) & BROWSER}),
         "ledger_kinds": {k: kinds.count(k) for k in sorted(set(kinds))},
         "undeclared": bad[:20],
         "destinations": {k: sorted(v) for k, v in sorted(by_proc.items())},
