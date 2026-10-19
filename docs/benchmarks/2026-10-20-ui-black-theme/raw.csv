@@ -1,0 +1,11 @@
+round,version,peak_rss_kb,seconds,temp_before
+1,old,149936,1.90,temp=60.4'C
+1,new,151152,1.60,temp=62.0'C
+2,new,150144,1.65,temp=62.6'C
+2,old,151168,1.80,temp=62.0'C
+3,old,151184,1.75,temp=63.7'C
+3,new,150528,1.60,temp=64.2'C
+4,new,150544,1.65,temp=63.7'C
+4,old,151136,1.75,temp=64.8'C
+5,old,151168,1.80,temp=64.8'C
+5,new,150608,1.65,temp=64.8'C
