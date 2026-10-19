@@ -139,6 +139,24 @@ class SpeakerTest(unittest.TestCase):
         self.assertTrue(self.done.wait(10))
         self.assertEqual(self.states[-1][2], "")
 
+    def test_stuck_player_is_stopped(self):
+        """พบ 2026-10-20: อุปกรณ์เสียงค้าง (ไมค์ USB "Protocol error") ตัวเล่นไม่จบเอง →
+        หยุดเมื่อเกินความยาว + 5 วิ."""
+        import wave
+
+        wav = Path(self.tmp.name) / "short.wav"
+        with wave.open(str(wav), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(16000)
+            w.writeframes(b"\0\0" * 1600)  # 0.1 วิ
+        self.sp._play_cmd = [sys.executable, "-c", "import time; time.sleep(60)"]
+        self.sp._current = 7
+        t0 = time.monotonic()
+        self.sp._play(7, wav)
+        self.assertLess(time.monotonic() - t0, 15)
+        self.assertFalse(wav.exists())
+
     def test_not_available_without_player(self):
         sp = Speaker(play_cmd=None)
         sp._play_cmd = None

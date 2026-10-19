@@ -56,6 +56,17 @@ def sandboxed(cmd: list[str], env: dict[str, str], which=shutil.which) -> list[s
             *keep, *cmd]  # fmt: skip
 
 
+def _seconds(path: Path) -> float:
+    """ความยาวไฟล์ WAV (วินาที) · อ่านไม่ได้ = 30."""
+    import wave
+
+    try:
+        with wave.open(str(path), "rb") as w:
+            return w.getnframes() / float(w.getframerate() or 1)
+    except (OSError, EOFError, wave.Error):
+        return 30.0
+
+
 def installed(voice_dir: Path = VOICE_DIR) -> bool:
     return (voice_dir / "venv" / "bin" / "python").exists() and (voice_dir / MODEL).exists()
 
@@ -238,7 +249,10 @@ class Speaker:
                 self._playing = subprocess.Popen(
                     [*self._play_cmd, str(path)], stdout=quiet, stderr=quiet
                 )
-            self._playing.wait()
+            try:  # อุปกรณ์เสียงค้าง = ตัวเล่นไม่จบเอง → หยุดเมื่อเกินความยาวเสียง + 5 วิ (พบ 2026-10-20)
+                self._playing.wait(timeout=_seconds(path) + 5)
+            except subprocess.TimeoutExpired:
+                self._playing.kill()
         except OSError:
             pass
         finally:

@@ -99,9 +99,14 @@ def beep(high: bool = True) -> None:
                 w.writeframes(frames)
         except OSError:
             return
+    # จำกัดเวลา 3 วิ: อุปกรณ์เสียงเสีย (ไมค์ USB ค้าง "Protocol error") pw-play ค้างตลอดไป ·
+    # พบบน Pi 5 2026-10-20: กดคีย์ลัดซ้ำ ๆ แล้วมี pw-play ค้างสะสม 9 ตัว
+    cmd = ["pw-play", str(path)]
+    if shutil.which("timeout"):
+        cmd = ["timeout", "3", *cmd]
     try:
-        subprocess.Popen(["pw-play", str(path)], stdout=subprocess.DEVNULL,
-                         stderr=subprocess.DEVNULL, start_new_session=True)  # fmt: skip
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)  # fmt: skip
     except OSError:
         pass
 
