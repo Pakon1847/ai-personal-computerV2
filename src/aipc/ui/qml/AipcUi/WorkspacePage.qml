@@ -655,7 +655,9 @@ Item {
                             { key: "youtube", name: "YouTube", icon: Icons.play },
                             { key: "gmail", name: "Gmail", icon: Icons.mail },
                             { key: "calendar", name: Tr.t("ปฏิทิน Google"), icon: Icons.calendar },
-                            { key: "drive", name: Tr.t("ไดรฟ์ Google"), icon: Icons.folder }
+                            { key: "drive", name: Tr.t("ไดรฟ์ Google"), icon: Icons.folder },
+                            { key: "docs", name: Tr.t("เอกสาร Google"), icon: Icons.file },
+                            { key: "news", name: Tr.t("ข่าว Thai PBS"), icon: Icons.globe }
                         ]
                         AppButton {
                             required property var modelData

@@ -18,7 +18,9 @@ from aipc.skills.catalog import is_english
 SITES = {  # ชื่ออังกฤษ → คำไทยที่ command.parse รู้จัก (เปิดเว็บ/แอป/หน้าในระบบ)
     "youtube": "ยูทูบ", "gmail": "จีเมล", "my email": "จีเมล", "email": "จีเมล",
     "google": "กูเกิล", "wikipedia": "วิกิพีเดีย", "google maps": "กูเกิลแมพ", "maps": "กูเกิลแมพ",
-    "google calendar": "ปฏิทินกูเกิล", "facebook": "เฟซบุ๊ก", "instagram": "ไอจี", "line": "ไลน์",
+    "google docs": "กูเกิลด็อก", "docs": "กูเกิลด็อก", "the news": "ข่าว", "news": "ข่าว",
+    "thai pbs": "ไทยพีบีเอส", "google calendar": "ปฏิทินกูเกิล",
+    "facebook": "เฟซบุ๊ก", "instagram": "ไอจี", "line": "ไลน์",  # ไม่มีในระบบ → การ์ดบอกว่าไม่มี
     "google drive": "กูเกิลไดรฟ์", "browser": "เบราว์เซอร์", "web browser": "เบราว์เซอร์",
     "chromium": "เบราว์เซอร์", "terminal": "เทอร์มินัล", "file manager": "ตัวจัดการไฟล์",
     "files app": "ตัวจัดการไฟล์", "settings": "หน้าตั้งค่า", "calendar": "ปฏิทิน", "my calendar": "ปฏิทิน",

@@ -37,6 +37,18 @@ SITE_ALIASES = {
     "wikipedia": ("wikipedia", "วิกิพีเดีย", "วิกิ"),
     "maps": ("googlemaps", "maps", "แผนที่", "กูเกิลแมพ"),
     # การ์ด 0031 · "ปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง (การ์ด 0038) · ต้องมีคำว่ากูเกิลถึงเป็นเว็บ
+    "docs": (
+        "googledocs",
+        "googledoc",
+        "กูเกิลด็อก",
+        "กูเกิลด็อกส์",
+        "กูเกิ้ลด็อก",
+        "กูเกิลด็อค",
+        "กูเกิลเอกสาร",
+        "เอกสารกูเกิล",
+        "เอกสารกูเกิ้ล",
+    ),
+    "news": ("ข่าว", "เว็บข่าว", "ไทยพีบีเอส", "thaipbs", "ข่าวไทยพีบีเอส"),
     "calendar": ("googlecalendar", "ปฏิทินกูเกิล", "กูเกิลปฏิทิน", "ปฏิทินกูเกิ้ล", "ปฏิทินgoogle"),
     "drive": ("googledrive", "กูเกิลไดรฟ์", "กูเกิ้ลไดรฟ์", "กูเกิลไดร์ฟ", "กูเกิ้ลไดร์ฟ", "ไดรฟ์", "ไดร์ฟ"),
 }
@@ -276,6 +288,8 @@ def parse(text: str) -> Command | None:
     group, key, conf = hit
     if key == "drive" and any(w in raw for w in LOCAL_DRIVE_WORDS):
         return None  # "เปิดแฟลชไดรฟ์" · "เปิดไดรฟ์ USB" = ไดรฟ์ในเครื่อง ไม่ใช่เว็บ
+    if key == "news" and target not in SITE_ALIASES["news"]:
+        return None  # "ดูข่าวน้ำท่วม" = อยากรู้เรื่องนั้น ไม่ใช่เปิดหน้าแรกเว็บข่าว (หัวข้อหาย) → ทางเดิม
     if group == "page":
         plan = Plan("open_page", {"page": key}, f"เปิดหน้า{PAGES[key]}")
     elif group == "site":

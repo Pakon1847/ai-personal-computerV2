@@ -32,6 +32,9 @@ URL = {k: v[1] for k, v in actions.SITES.items()}
 
 # คำเรียกตามการ์ดหัวข้อ 5 (+ สะกดที่พบบ่อย) · "ปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง (การ์ด 0038)
 TYPED = {
+    # แทน Facebook/Instagram (Pakon 2026-10-19)
+    "docs": ["เปิดกูเกิลด็อก", "เปิดเอกสารกูเกิล", "เปิด Google Docs", "ช่วยเปิดกูเกิลด็อกส์หน่อย"],
+    "news": ["เปิดข่าว", "ดูข่าว", "ขอดูข่าวครับ", "เปิดไทยพีบีเอส", "เปิดเว็บข่าว"],
     "calendar": ["เปิดปฏิทินกูเกิล", "เปิดกูเกิลปฏิทิน", "เปิดปฏิทินกูเกิ้ล", "เปิด Google Calendar"],
     "drive": ["เปิดกูเกิลไดรฟ์", "เปิดกูเกิ้ลไดรฟ์", "เปิดกูเกิลไดร์ฟ", "เปิดไดรฟ์", "เปิดไดร์ฟ",
               "เปิด google drive"],
@@ -39,6 +42,8 @@ TYPED = {
     "youtube": ["เปิดยูทูบ"],
 }  # fmt: skip
 VOICE = {
+    "docs": ["เปิดกูเกิลด็อก", "เปิดเอกสารกูเกิล", "เปิด google docs"],
+    "news": ["เปิดข่าว", "เปิดไทยพีบีเอส", "เข้าเว็บข่าว"],
     "calendar": ["เปิดปฏิทินกูเกิล", "เปิดกูเกิลปฏิทิน"],
     "drive": ["เปิดกูเกิลไดรฟ์", "เปิดไดรฟ์", "เปิดไดร์ฟ"],
 }
@@ -96,6 +101,11 @@ class AliasTest(unittest.TestCase):
         for t in ("เปิดไฟล์", "ไลน์ใหม่ของโทรศัพท์ดีไหม", "เฟซบุ๊กล่มหรือเปล่า"):
             self.assertIsNone(command.unsupported(t), t)
         self.assertNotIn("facebook", actions.SITES)
+        # ข่าวต้องตรงทั้งคำ: บอกหัวข้อมาด้วย = อยากรู้เรื่องนั้น ไม่ใช่เปิดหน้าแรก ·
+        # "เอกสาร" เฉย ๆ = ไม่ใช่ Google Docs
+        for t in ("ดูข่าวน้ำท่วม", "ข่าววันนี้มีอะไร", "เปิดเอกสาร"):
+            cmd = command.parse(t)
+            self.assertFalse(cmd and cmd.plan.params.get("site") in ("news", "docs"), t)
         self.assertNotIn("instagram", actions.SITES)
 
     def test_skill_step_names_the_new_sites(self):
@@ -336,9 +346,9 @@ class WebAppsQmlTest(unittest.TestCase):
         engine, win, warnings = self.open_shell("workspace")
         skills, browser = engine._backends["skills"], engine._backends["browser"]
         skills._exec = actions.Executor(dry_run=True)  # ไม่เปิดเว็บจริงแม้รันบน Pi
-        keys = ["youtube", "gmail", "calendar", "drive"]
+        keys = ["youtube", "gmail", "calendar", "drive", "docs", "news"]
         tiles = [qml.find_items(win, "webApp_" + k) for k in keys]
-        self.assertEqual([len(t) for t in tiles], [1] * 4)
+        self.assertEqual([len(t) for t in tiles], [1] * 6)
         self.assertEqual(qml.find_items(win, "webApp_facebook"), [])  # เอาออกแล้ว (Pakon 2026-10-19)
         note = qml.find_items(win, "webAppsNote")[0]
         tiles[1][0].clicked.emit()
