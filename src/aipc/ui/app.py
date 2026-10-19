@@ -411,6 +411,8 @@ def build(opts: Options, argv: list[str] | None = None):
     engine._i18n_bridge = I18nBridge()  # เก็บอ้างอิงไว้ (Qt ไม่ถือเป็นเจ้าของ)
     ctx.setContextProperty("i18nBridge", engine._i18n_bridge)
     ctx.setContextProperty("startFullscreen", opts.fullscreen)
+    # คีย์ลัด F9 ใช้ได้จริงในเซสชันนี้ไหม (หน้าแรกบอกวิธีใช้เฉพาะเมื่อใช้ได้ · การ์ด 0041)
+    ctx.setContextProperty("hotkeyReady", engine._hotkey.available)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))
     return app, engine, warnings

@@ -1484,6 +1484,29 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(settings.load(ui._path).onboarded)
         self.assertEqual(warnings, [])
 
+    def test_home_panels_fill_input_without_sending(self):
+        """การ์ด 0041 U3: แผง "ลองถาม" และปุ่มเพิ่มนัด = ใส่ข้อความในช่องพิมพ์ให้แก้ก่อน · ไม่ส่งเอง ·
+        ไทล์เว็บครบ 8 · ป้ายคีย์ลัดขึ้นเฉพาะเมื่อคีย์ลัดใช้ได้จริง (เทสต์ไม่มีคีย์ลัด = ไม่ขึ้น)."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        chat_input = find_all(win, "chatInput")[0]
+        asks = [b for b in find_items(win, "askItem") if b.isVisible()]
+        self.assertGreaterEqual(len(asks), 4)
+        [b for b in asks if "ส่งรายงาน" in b.property("text")][0].clicked.emit()
+        settle(30)
+        self.assertEqual(chat_input.property("text"), "เตือนส่งรายงานพรุ่งนี้บ่ายสอง")
+        self.assertEqual(items_of(page), [], "แตะตัวอย่างต้องไม่ส่งเอง")
+        self.assertTrue(chat_input.property("activeFocus") or not win.isActive())
+        find_items(win, "addReminder")[0].clicked.emit()
+        settle(30)
+        self.assertEqual(chat_input.property("text"), "เตือน")
+        self.assertEqual(items_of(page), [])
+        keys = ["youtube", "gmail", "calendar", "drive", "docs", "news", "netflix", "spotify"]
+        self.assertEqual([len(find_items(win, "webApp_" + k)) for k in keys], [1] * 8)
+        self.assertFalse(find_items(win, "hotkeyHint")[0].isVisible())
+        self.assertEqual(find_items(win, "machineCard"), [])  # ย้ายไปป้าย "เครื่องปกติ" บนแถบบนแล้ว
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")
@@ -1497,8 +1520,10 @@ class ShellCardTest(unittest.TestCase):
         settle(100)
         self.assertEqual(what.property("text"), skills.upcoming[0]["what"])
         self.assertIn("ส่งรายงาน", what.property("text"))
-        self.assertTrue(when.property("visible"))
         self.assertEqual(when.property("text"), skills.upcoming[0]["when"])
+        # การ์ด 0041: แผงนัดถัดไปแสดงเป็นรายการ (สูงสุด 3)
+        shown = [i for i in find_items(win, "upcomingItem") if i.isVisible()]
+        self.assertEqual(len(shown), min(3, len(skills.upcoming)))
         self.assertEqual(warnings, [])
 
 

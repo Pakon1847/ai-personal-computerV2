@@ -28,14 +28,16 @@ Item {
     property var vc: ({})
     readonly property bool home: items.length === 0
     readonly property int colWidth: Math.min(760, width - 48)
+    readonly property int wideWidth: Math.min(1100, width - 48)   // หน้าแรก: แผง 3 ช่อง (การ์ด 0041)
 
     // ตัวอย่างประโยคของสกิลที่โค้ดทำงานได้แล้ว · สกิลที่ยังไม่พร้อมแสดงชื่อพร้อมคำว่า "ยังไม่พร้อม"
     // ตัวอย่างที่กดแล้วส่งเข้าแชท = ข้อความไทยต้นฉบับ (ตัวแปลคำสั่งยังเป็นภาษาไทย · การ์ด 0039 ระยะ C) · แปลแค่ตอนแสดง
-    readonly property var examples: ({
-        "system-command": "เปิดยูทูบ",
-        "machine-status": "ทำไมเครื่องช้า",
-        "reminder": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง"
-    })
+    // ใส่ข้อความในช่องพิมพ์ให้แก้ต่อได้ (แผง "ลองถาม" · ปุ่มเพิ่มนัด · การ์ด 0041) · ไม่ส่งเอง
+    function putInInput(text) {
+        input.text = text
+        input.cursorPosition = input.length
+        input.forceActiveFocus()
+    }
 
     // คำตอบของ AI แสดงเป็นข้อความธรรมดาเสมอ (ไม่เปิด markdown/HTML: แท็กรูปในคำตอบอาจทำให้ Qt ไปดึงรูปจากเว็บ = ข้อมูลรั่ว T6)
     // พบบนจอ Pi 2026-10-01: คำตอบของ Claude มี [ชื่อ](ลิงก์) และ **ตัวหนา** ดิบ ๆ → แปลงให้อ่านง่าย
@@ -80,8 +82,16 @@ Item {
             lines.push(Tr.t("มีนัด ") + up.length + Tr.t(" รายการ"))
             for (let i = 0; i < Math.min(3, up.length); i++) lines.push(up[i].when + " " + up[i].what)
         }
-        lines.push(Tr.t("เครื่อง") + machineCard.summary)
+        lines.push(Tr.t("เครื่อง") + machineSummary())
         return lines.join("\n")
+    }
+    // สถานะเครื่องแบบหนึ่งประโยค (จาก aipc.doctor จริง) · อ่านไม่ได้ต้องบอกว่าไม่รู้ ไม่ใช่บอกว่าปกติ (H5)
+    function machineSummary() {
+        const unknown = system.checks.filter(c => c.level === "neutral").length
+        const known = system.checks.length - unknown
+        return system.healthIssues > 0 ? Tr.t("มีเรื่องควรดู ") + system.healthIssues + Tr.t(" ข้อ")
+             : known === 0 ? Tr.t("ยังไม่รู้")
+             : unknown > 0 ? Tr.t("ไม่พบปัญหา · อ่านไม่ได้ ") + unknown + Tr.t(" ข้อ") : Tr.t("ปกติ")
     }
     function push(item) {
         items = items.concat([item])
@@ -600,7 +610,7 @@ Item {
     ColumnLayout {
         id: homeCol
         x: (homeFlick.width - width) / 2
-        width: root.colWidth
+        width: root.wideWidth
         spacing: 18
 
         ColumnLayout {
@@ -628,6 +638,211 @@ Item {
                 iconPath: Icons.chat
                 text: voice.speakingKey === -2 ? Tr.t("หยุดอ่าน") : Tr.t("อ่านสรุปวันนี้ให้ฟัง")
                 onClicked: voice.speakingKey === -2 ? voice.stop() : voice.speak(-2, root.briefingText())
+            }
+        }
+
+        // ที่ว่างให้ช่องพิมพ์วางทับ (ช่องพิมพ์ตัวจริงอยู่ข้างล่าง ตำแหน่งผูกกับ Item นี้)
+        Item { id: composerSlot; Layout.fillWidth: true; Layout.preferredHeight: composer.height + hint.height + 6 }
+
+        // คีย์ลัดพูดสั่งงาน (การ์ด 0024/0040) · แสดงเฉพาะเมื่อคีย์ลัดใช้ได้จริงในเซสชันนี้ (H5)
+        RowLayout {
+            objectName: "hotkeyHint"
+            visible: hotkeyReady
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 8
+            Rectangle {
+                implicitWidth: f9.implicitWidth + 16; implicitHeight: f9.implicitHeight + 6
+                radius: 6; color: Theme.surface2; border.width: 1; border.color: Theme.line
+                AppText { id: f9; anchors.centerIn: parent; text: "F9"; strong: true; size: Theme.fontCaption; oneLine: true }
+            }
+            AppText { text: Tr.t("กดแล้วพูดได้ทุกหน้า · ไทยหรืออังกฤษก็ได้"); size: Theme.fontSmall; color: Theme.inkFaint; oneLine: true }
+        }
+
+        // ---------- แผงหน้าแรก (การ์ด 0041): นัด · เปิดเว็บ · ลองถาม · จอกว้าง = 3 ช่องเรียงกัน · ตัวอักษรใหญ่/จอแคบ = เรียงลง ----------
+        GridLayout {
+            id: bento
+            objectName: "homePanels"
+            readonly property bool wide: homeCol.width >= 960 && Theme.fontScale <= 1.25
+            Layout.fillWidth: true
+            Layout.topMargin: 6
+            columns: wide ? 3 : 1
+            columnSpacing: 16
+            rowSpacing: 16
+
+            // นัดถัดไป (จาก skills.upcoming จริง · การ์ด 0001) · 3 รายการแรก · "ดูทั้งหมด" = หน้าปฏิทิน
+            Card {
+                objectName: "nextReminderCard"
+                Layout.fillWidth: !bento.wide
+                Layout.preferredWidth: bento.wide ? 300 : -1
+                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignTop
+                implicitHeight: remCol.implicitHeight + 36
+                ColumnLayout {
+                    id: remCol
+                    anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                    anchors.margins: 18
+                    spacing: 10
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        Icon { path: skills.reminderWarning !== "" ? Icons.alert : Icons.calendar; color: Theme.accent; width: 20; height: 20 }
+                        AppText { text: Tr.t("นัดถัดไป"); size: Theme.px(18); strong: true; oneLine: true; Layout.fillWidth: true }
+                        AppButton { objectName: "agendaAll"; text: Tr.t("ดูทั้งหมด"); kind: "ghost"; onClicked: AppState.open("calendar") }
+                    }
+                    AppText {
+                        visible: skills.reminderWarning !== ""
+                        Layout.fillWidth: true
+                        text: skills.reminderWarning; color: Theme.warnInk; size: Theme.fontSmall
+                    }
+                    AppText {
+                        visible: skills.reminderWarning === "" && skills.upcoming.length === 0
+                        Layout.fillWidth: true
+                        text: Tr.t("ยังไม่มีนัด") + " · " + Tr.t("ลองพิมพ์ “เตือน…” ในช่องด้านบน"); size: Theme.fontSmall; color: Theme.inkMuted
+                    }
+                    Repeater {
+                        model: skills.reminderWarning === "" ? skills.upcoming.slice(0, 3) : []
+                        Rectangle {
+                            required property var modelData
+                            required property int index
+                            objectName: "upcomingItem"
+                            Layout.fillWidth: true
+                            implicitHeight: upCol.implicitHeight + 20
+                            radius: Theme.radiusCard
+                            color: Theme.surface2
+                            Rectangle { x: 0; y: 10; width: 3; height: parent.height - 20; radius: 2; color: index === 0 ? Theme.accent : Theme.line }
+                            ColumnLayout {
+                                id: upCol
+                                anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                                anchors.leftMargin: 14; anchors.rightMargin: 10
+                                spacing: 2
+                                AppText { text: modelData.when; size: Theme.fontCaption; color: Theme.accentInk; oneLine: true }
+                                AppText { text: modelData.what; strong: index === 0; Layout.fillWidth: true; maximumLineCount: 2; elide: Text.ElideRight }
+                            }
+                        }
+                    }
+                    // นัดแรกแบบอ่านอย่างเดียว (เทสต์ของการ์ด 0001 อ่านจากสองชื่อนี้ · ไม่แสดงซ้ำบนจอ)
+                    AppText {
+                        objectName: "nextReminderWhat"
+                        visible: false
+                        text: skills.upcoming.length > 0 ? skills.upcoming[0].what : Tr.t("ยังไม่มีนัด")
+                    }
+                    Chip { objectName: "nextReminderWhen"; visible: false; text: skills.upcoming.length > 0 ? skills.upcoming[0].when : "" }
+                    AppButton {
+                        objectName: "addReminder"
+                        kind: "outline"; iconPath: Icons.plus
+                        text: Tr.t("เพิ่มนัด/เตือน")
+                        onClicked: root.putInInput(Tr.t("เตือน", "ช่องพิมพ์"))
+                    }
+                }
+            }
+
+            // แอปเว็บที่ใช้บ่อย (การ์ด 0031) · ไอคอนทั่วไป ไม่ใช้โลโก้ของบริษัท · กดแล้วไปทางเดียวกับพิมพ์ "เปิด…"
+            // (เบราว์เซอร์ของผู้ช่วย = เข้าสู่ระบบครั้งเดียว ใช้ได้ทั้งปุ่ม พิมพ์ และเสียง) · ผู้ใช้ใส่รหัสในหน้าเว็บของบริการเอง
+            Card {
+                objectName: "webAppsCard"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignTop
+                implicitHeight: appsCol.implicitHeight + 36
+                ColumnLayout {
+                    id: appsCol
+                    anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                    anchors.margins: 18
+                    spacing: 12
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        Icon { path: Icons.globe; color: Theme.accent; width: 20; height: 20 }
+                        AppText { text: Tr.t("เปิดเว็บและแอป"); size: Theme.px(18); strong: true; oneLine: true; Layout.fillWidth: true }
+                        AppText { visible: bento.wide; text: Tr.t("แตะเพื่อเปิด · หรือพูด “เปิด…”"); size: Theme.fontCaption; color: Theme.inkFaint; oneLine: true }
+                    }
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: Math.max(2, Math.min(4, Math.floor(appsCol.width / 116)))
+                        columnSpacing: 10
+                        rowSpacing: 10
+                        Repeater {
+                            model: [
+                                { key: "youtube", name: "YouTube", icon: Icons.play },
+                                { key: "gmail", name: "Gmail", icon: Icons.mail },
+                                { key: "calendar", name: Tr.t("ปฏิทิน Google"), glyph: "31" },
+                                { key: "drive", name: Tr.t("ไดรฟ์ Google"), icon: Icons.folder },
+                                { key: "docs", name: Tr.t("เอกสาร Google"), icon: Icons.file },
+                                { key: "news", name: Tr.t("ข่าว Thai PBS"), icon: Icons.globe },
+                                { key: "netflix", name: "Netflix", icon: Icons.play },
+                                { key: "spotify", name: "Spotify", icon: Icons.speaker }
+                            ]
+                            AppTile {
+                                required property var modelData
+                                objectName: "webApp_" + modelData.key
+                                Layout.fillWidth: true
+                                // สูงเท่ากันทุกไทล์ (ชื่อยาวขึ้น 2 บรรทัดได้): ไอคอน 44 + ระยะ 8 + ชื่อ 2 บรรทัด + ขอบ
+                                Layout.preferredHeight: Math.ceil(72 + 2 * Theme.fontSmall * 1.62)
+                                iconPath: modelData.icon || ""
+                                glyph: modelData.glyph || ""
+                                text: modelData.name
+                                onClicked: appsNote.text = skills.openSite(modelData.key)
+                            }
+                        }
+                    }
+                    // ผลการเปิด: เปิดด้วยเบราว์เซอร์ปกติแทน / จำลอง (เครื่องพัฒนา) / ไม่สำเร็จ · สำเร็จ = เบราว์เซอร์ขึ้นจอแล้ว ล้างข้อความ
+                    AppText {
+                        id: appsNote
+                        objectName: "webAppsNote"
+                        visible: text !== ""
+                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                    }
+                }
+            }
+
+            // ลองถาม · แตะ = ใส่ข้อความในช่องพิมพ์ (แก้ได้ก่อนส่ง · ไม่ส่งเอง · การ์ด 0041)
+            Card {
+                objectName: "askPanel"
+                Layout.fillWidth: !bento.wide
+                Layout.preferredWidth: bento.wide ? 260 : -1
+                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignTop
+                implicitHeight: askCol.implicitHeight + 36
+                ColumnLayout {
+                    id: askCol
+                    anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                    anchors.margins: 18
+                    spacing: 10
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        Icon { path: Icons.sparkle; color: Theme.accent; width: 20; height: 20 }
+                        AppText { text: Tr.t("ลองถาม"); size: Theme.px(18); strong: true; oneLine: true; Layout.fillWidth: true }
+                    }
+                    Repeater {
+                        model: [
+                            "วันนี้ต้องทำอะไรบ้าง",
+                            "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+                            "ทำไมเครื่องช้า",
+                            "สรุปข้อความนี้ให้หน่อย: ",
+                        ].concat(skills.canForge ? ["เปิดโหมดทำงานให้หน่อย"] : [])
+                        Button {
+                            id: ask
+                            required property string modelData
+                            objectName: "askItem"
+                            Layout.fillWidth: true
+                            hoverEnabled: true
+                            padding: 12
+                            implicitHeight: Math.max(Theme.touch, askText.implicitHeight + 2 * padding)
+                            text: "“" + Tr.t(modelData).replace(/: $/, "") + "”"
+                            Accessible.name: text
+                            Keys.onReturnPressed: (event) => { ask.clicked(); event.accepted = true }
+                            onClicked: root.putInInput(Tr.t(modelData))
+                            background: Rectangle {
+                                radius: Theme.radiusCard
+                                color: ask.down ? Theme.accentSoft : Theme.surface2
+                                border.width: ask.visualFocus ? 2 : ask.hovered ? 1 : 0
+                                border.color: Theme.accent
+                            }
+                            contentItem: AppText { id: askText; text: ask.text; size: Theme.px(15); maximumLineCount: 2; elide: Text.ElideRight }
+                        }
+                    }
+                }
             }
         }
 
@@ -679,7 +894,7 @@ Item {
             }
         }
 
-        // แนะนำการใช้งานครั้งแรก (ฟีเจอร์ข้อ 8) · กดตัวอย่าง = ส่งจริง · "เข้าใจแล้ว" = ไม่ขึ้นอีก (จำในไฟล์ตั้งค่า)
+        // แนะนำการใช้งานครั้งแรก (ฟีเจอร์ข้อ 8) · ตัวอย่างอยู่ในแผง "ลองถาม" (การ์ด 0041) · "เข้าใจแล้ว" = ไม่ขึ้นอีก (จำในไฟล์ตั้งค่า)
         Card {
             objectName: "onboarding"
             visible: !uiSettings.onboarded
@@ -692,26 +907,7 @@ Item {
                 anchors.top: parent.top
                 anchors.margins: 16
                 spacing: 10
-                AppText { text: Tr.t("ยินดีต้อนรับ · ลองพิมพ์แบบนี้ได้เลย"); strong: true; Layout.fillWidth: true }
-                Flow {
-                    Layout.fillWidth: true
-                    spacing: 8
-                    Repeater {
-                        model: [
-                            "วันนี้ต้องทำอะไรบ้าง",
-                            "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
-                            "ทำไมเครื่องช้า",
-                            "สรุปข้อความนี้ให้หน่อย: ",
-                        ].concat(skills.canForge ? ["เปิดโหมดทำงานให้หน่อย"] : [])
-                        AppButton {
-                            required property string modelData
-                            kind: "secondary"; iconPath: Icons.sparkle
-                            text: "“" + Tr.t(modelData).replace(/: $/, "") + "”"
-                            onClicked: modelData.endsWith(": ") ? (input.text = modelData, input.forceActiveFocus())
-                                                                : root.sendText(modelData)
-                        }
-                    }
-                }
+                AppText { text: Tr.t("ยินดีต้อนรับ · เริ่มจากแผงด้านบนได้เลย"); strong: true; Layout.fillWidth: true }
                 AppText {
                     Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                     text: Tr.t("แชท นัด และไฟล์เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · คำสั่งเครื่องกับคำถามทั่วไป AI ในเครื่องทำเอง")
@@ -726,159 +922,6 @@ Item {
             }
         }
 
-        // ที่ว่างให้ช่องพิมพ์วางทับ (ช่องพิมพ์ตัวจริงอยู่ข้างล่าง ตำแหน่งผูกกับ Item นี้)
-        Item { id: composerSlot; Layout.fillWidth: true; Layout.preferredHeight: composer.height + hint.height + 6 }
-
-        Flow {
-            Layout.fillWidth: true
-            spacing: 8
-            Repeater {
-                model: skills.skills
-                delegate: AppButton {
-                    required property var modelData
-                    readonly property string example: root.examples[modelData.id] || ""
-                    visible: !modelData.ready || example !== ""
-                    enabled: modelData.ready && example !== ""
-                    kind: "secondary"
-                    iconPath: Icons.sparkle
-                    text: enabled ? "“" + Tr.t(example) + "”" : modelData.name + Tr.t(" · ยังไม่พร้อม")
-                    ToolTip.visible: hovered
-                    ToolTip.text: enabled ? Tr.t("สกิล: ") + modelData.name : Tr.t("ต้องมีก่อน: ") + modelData.missing.join(", ")
-                    onClicked: root.sendText(example)
-                }
-            }
-        }
-
-        // แอปเว็บที่ใช้บ่อย (การ์ด 0031) · ไอคอนทั่วไป ไม่ใช้โลโก้ของบริษัท · กดแล้วไปทางเดียวกับพิมพ์ "เปิด…"
-        // (เบราว์เซอร์ของผู้ช่วย = เข้าสู่ระบบครั้งเดียว ใช้ได้ทั้งปุ่ม พิมพ์ และเสียง) · ผู้ใช้ใส่รหัสในหน้าเว็บของบริการเอง
-        Card {
-            objectName: "webAppsCard"
-            Layout.fillWidth: true
-            implicitHeight: appsCol.implicitHeight + 32
-            ColumnLayout {
-                id: appsCol
-                anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                anchors.margins: 16
-                spacing: 10
-                AppText { text: Tr.t("แอปที่ใช้บ่อย"); size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
-                Flow {
-                    Layout.fillWidth: true
-                    spacing: 8
-                    Repeater {
-                        model: [
-                            { key: "youtube", name: "YouTube", icon: Icons.play },
-                            { key: "gmail", name: "Gmail", icon: Icons.mail },
-                            { key: "calendar", name: Tr.t("ปฏิทิน Google"), icon: Icons.calendar },
-                            { key: "drive", name: Tr.t("ไดรฟ์ Google"), icon: Icons.folder },
-                            { key: "docs", name: Tr.t("เอกสาร Google"), icon: Icons.file },
-                            { key: "news", name: Tr.t("ข่าว Thai PBS"), icon: Icons.globe }
-                        ]
-                        AppButton {
-                            required property var modelData
-                            objectName: "webApp_" + modelData.key
-                            kind: "secondary"
-                            iconPath: modelData.icon
-                            text: modelData.name
-                            onClicked: appsNote.text = skills.openSite(modelData.key)
-                        }
-                    }
-                }
-                // ผลการเปิด: เปิดด้วยเบราว์เซอร์ปกติแทน / จำลอง (เครื่องพัฒนา) / ไม่สำเร็จ · สำเร็จ = เบราว์เซอร์ขึ้นจอแล้ว ล้างข้อความ
-                AppText {
-                    id: appsNote
-                    objectName: "webAppsNote"
-                    visible: text !== ""
-                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                }
-            }
-        }
-
-        GridLayout {
-            Layout.fillWidth: true
-            columns: 2
-            columnSpacing: 16
-            Layout.alignment: Qt.AlignTop
-
-            // นัดถัดไป (จาก skills.upcoming จริง · การ์ด 0001)
-            Card {
-                objectName: "nextReminderCard"
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                implicitHeight: remCol.implicitHeight + 32
-                ColumnLayout {
-                    id: remCol
-                    anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                    anchors.margins: 16
-                    spacing: 6
-                    RowLayout {
-                        spacing: 8
-                        Icon { path: Icons.alert; color: Theme.accent; width: 18; height: 18; visible: skills.reminderWarning !== "" }
-                        AppText { text: Tr.t("นัดถัดไป"); size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
-                    }
-                    AppText {
-                        visible: skills.reminderWarning !== ""
-                        Layout.fillWidth: true
-                        text: skills.reminderWarning; color: Theme.warnInk; size: Theme.fontSmall
-                    }
-                    AppText {
-                        objectName: "nextReminderWhat"
-                        visible: skills.reminderWarning === ""
-                        Layout.fillWidth: true
-                        text: skills.upcoming.length > 0 ? skills.upcoming[0].what : Tr.t("ยังไม่มีนัด")
-                        size: Theme.fontHeading; strong: true
-                        elide: Text.ElideRight; maximumLineCount: 2
-                    }
-                    RowLayout {
-                        visible: skills.reminderWarning === ""
-                        spacing: 8
-                        Chip { objectName: "nextReminderWhen"; visible: skills.upcoming.length > 0; text: skills.upcoming.length > 0 ? skills.upcoming[0].when : ""; kind: "accent" }
-                        AppText {
-                            text: skills.upcoming.length > 1 ? Tr.t("และอีก ") + (skills.upcoming.length - 1) + Tr.t(" นัด")
-                                : skills.upcoming.length === 0 ? Tr.t("ลองพิมพ์ “เตือน…” ในช่องด้านบน") : ""
-                            size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true
-                        }
-                    }
-                }
-            }
-
-            // สถานะเครื่อง (จาก aipc.doctor จริง) · อ่านไม่ได้ต้องบอกว่าไม่รู้ ไม่ใช่บอกว่าปกติ (H5)
-            Card {
-                objectName: "machineCard"
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                Layout.fillHeight: true
-                implicitHeight: macCol.implicitHeight + 32
-                readonly property int unknown: system.checks.filter(c => c.level === "neutral").length
-                readonly property int known: system.checks.length - unknown
-                readonly property string summary: system.healthIssues > 0 ? Tr.t("มีเรื่องควรดู ") + system.healthIssues + Tr.t(" ข้อ")
-                    : known === 0 ? Tr.t("ยังไม่รู้") : unknown > 0 ? Tr.t("ไม่พบปัญหา · อ่านไม่ได้ ") + unknown + Tr.t(" ข้อ") : Tr.t("ปกติ")
-                id: machineCard
-                ColumnLayout {
-                    id: macCol
-                    anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                    anchors.margins: 16
-                    spacing: 6
-                    AppText { text: Tr.t("เครื่อง"); size: Theme.fontSmall; strong: true; color: Theme.inkMuted; oneLine: true }
-                    RowLayout {
-                        spacing: 8
-                        Rectangle {
-                            width: 10; height: 10; radius: 5
-                            // เขียวเฉพาะตอนอ่านได้ครบและไม่มีปัญหา · อ่านไม่ได้บางข้อ = เทา (ไม่รู้ ≠ ปกติ)
-                            color: system.healthIssues > 0 ? Theme.warn
-                                 : (machineCard.known > 0 && machineCard.unknown === 0) ? Theme.ok : Theme.inkFaint
-                        }
-                        AppText { text: machineCard.summary; size: Theme.fontHeading; strong: true; oneLine: true }
-                    }
-                    RowLayout {
-                        spacing: 8
-                        AppText { text: Tr.t("อุณหภูมิ ") + system.tempText + " · " + system.storageText; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true }
-                        Item { Layout.fillWidth: true }
-                        AppButton { text: Tr.t("ดูรายละเอียด"); kind: "ghost"; onClicked: AppState.page = "health" }
-                    }
-                }
-            }
-        }
     }
 
     }
