@@ -37,10 +37,15 @@ SITE_ALIASES = {
     "wikipedia": ("wikipedia", "วิกิพีเดีย", "วิกิ"),
     "maps": ("googlemaps", "maps", "แผนที่", "กูเกิลแมพ"),
     # การ์ด 0031 · "ปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง (การ์ด 0038) · ต้องมีคำว่ากูเกิลถึงเป็นเว็บ
-    "facebook": ("facebook", "เฟซบุ๊ก", "เฟสบุ๊ก", "เฟสบุ๊ค", "เฟซบุ๊ค", "เฟซบุค", "เฟสบุค"),
-    "instagram": ("instagram", "อินสตาแกรม", "อินสตา", "ไอจี"),
     "calendar": ("googlecalendar", "ปฏิทินกูเกิล", "กูเกิลปฏิทิน", "ปฏิทินกูเกิ้ล", "ปฏิทินgoogle"),
     "drive": ("googledrive", "กูเกิลไดรฟ์", "กูเกิ้ลไดรฟ์", "กูเกิลไดร์ฟ", "กูเกิ้ลไดร์ฟ", "ไดรฟ์", "ไดร์ฟ"),
+}
+# ตั้งใจไม่มีในระบบ (Pakon ตัดสิน 2026-10-19: เอา Facebook/Instagram ออก · LINE ไม่มีบน Linux) ·
+# ตรงคำเรียก = บอกตรง ๆ ว่าไม่มี ไม่เดาเป็นเป้าหมายอื่น (เดิม "เปิดไลน์" ใกล้ "ไฟล์" → ถามว่าเปิดหน้าไฟล์ไหม)
+UNSUPPORTED = {
+    "Facebook": ("facebook", "เฟซบุ๊ก", "เฟสบุ๊ก", "เฟสบุ๊ค", "เฟซบุ๊ค", "เฟซบุค", "เฟสบุค", "เฟซ", "เฟส"),
+    "Instagram": ("instagram", "อินสตาแกรม", "อินสตา", "ไอจี", "ig"),
+    "LINE": ("line", "ไลน์"),
 }
 # "ไดรฟ์" ในเครื่องนี้ยังหมายถึงไดรฟ์ USB (หน้าสำรองข้อมูล) · มีคำพวกนี้ = ไม่ใช่ Google Drive (การ์ด 0031)
 LOCAL_DRIVE_WORDS = ("usb", "ยูเอสบี", "แฟลช", "ฮาร์ด", "สำรอง")
@@ -217,6 +222,16 @@ def _discovered_aliases() -> dict[str, tuple[str, ...]]:
     return {f"desk:{a.desktop}": a.aliases for a in apps.REGISTRY.apps().values()}
 
 
+def unsupported(text: str) -> str | None:
+    """ "เปิดเฟซบุ๊ก" · "เปิดไลน์ให้หน่อย" → ชื่อบริการที่ระบบตั้งใจไม่มี · อื่น ๆ = None."""
+    t = normalize(text)
+    verb = next((v for v in OPEN_VERBS if t.startswith(v)), None)
+    if verb is None:
+        return None
+    target = t[len(verb) :].removeprefix("แอป").removeprefix("เว็บ").removeprefix("โปรแกรม")
+    return next((name for name, words in UNSUPPORTED.items() if target in words), None)
+
+
 def parse(text: str) -> Command | None:
     """แปลงประโยคเป็นคำสั่ง · None = ไม่ใช่คำสั่งเครื่อง (ส่งต่อให้สกิลอื่น)."""
     heard = text.strip()
@@ -227,6 +242,9 @@ def parse(text: str) -> Command | None:
         or when.mentions_time(heard)
     ):
         return None  # ให้ทำทีหลัง / สั่งไม่ให้ทำ → ไม่ใช่คำสั่งตอนนี้ (ส่งต่อให้สกิลนัดหมายหรือแชท)
+
+    if unsupported(heard):
+        return None  # ไม่ให้คำเรียกที่ใกล้เคียงชนะ ("ไลน์" ≈ "ไฟล์") · หน้าจอบอกว่าไม่มี
 
     if _several_actions(t):
         return None  # สั่งหลายอย่างในประโยคเดียว = ไม่ใช่คำสั่งเดี่ยว → AI (สร้างสกิล/ตอบ) · เดิมทำแค่บางส่วน

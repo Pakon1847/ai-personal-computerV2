@@ -50,8 +50,6 @@ SITES = {
     "wikipedia": ("วิกิพีเดีย", "https://th.wikipedia.org"),
     "maps": ("Google Maps", "https://maps.google.com"),
     # แอปเว็บที่ใช้บ่อย (การ์ด 0031) · เปิดอย่างเดียว ผู้ใช้เข้าสู่ระบบในหน้าเว็บเอง · ระบบไม่เก็บรหัส
-    "facebook": ("Facebook", "https://www.facebook.com"),
-    "instagram": ("Instagram", "https://www.instagram.com"),
     "calendar": ("Google Calendar", "https://calendar.google.com"),
     "drive": ("Google Drive", "https://drive.google.com"),
 }

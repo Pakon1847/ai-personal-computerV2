@@ -57,7 +57,6 @@ SITE_SEARCH = {
     "youtube": "https://www.youtube.com/results?search_query=",
     "maps": "https://www.google.com/maps/search/",
     "wikipedia": "https://th.wikipedia.org/w/index.php?search=",
-    "facebook": "https://www.facebook.com/search/top/?q=",
     "drive": "https://drive.google.com/drive/search?q=",
     "gmail": "https://mail.google.com/mail/u/0/#search/",
 }
@@ -165,8 +164,7 @@ TYPE_JS = r"""((n, text) => {
 # เปิดเว็บตามชื่อที่พูด (open · 0025) · ไม่รู้จักและไม่ใช่ที่อยู่เว็บ = ค้นแล้วเปิดผลแรก
 KNOWN_SITES = {
     "youtube": "https://www.youtube.com", "ยูทูบ": "https://www.youtube.com",
-    "facebook": "https://www.facebook.com", "เฟซบุ๊ก": "https://www.facebook.com",
-    "เฟสบุ๊ค": "https://www.facebook.com", "pantip": "https://pantip.com",
+    "pantip": "https://pantip.com",
     "พันทิป": "https://pantip.com", "wikipedia": "https://th.wikipedia.org",
     "วิกิพีเดีย": "https://th.wikipedia.org", "วิกิ": "https://th.wikipedia.org",
     "พีเดีย": "https://th.wikipedia.org",  # ถอดเสียงเพี้ยน "วิกฤติพีเดีย" (ชุดพัฒนา 0025)

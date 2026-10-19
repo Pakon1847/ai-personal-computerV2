@@ -2481,7 +2481,7 @@ class SkillsController(QObject):
 
     @Slot(str, result=str)
     def openSite(self, key: str) -> str:  # noqa: N802
-        """ปุ่มแอปที่ใช้บ่อยในหน้าแรก (การ์ด 0031) · ทางเดียวกับพิมพ์ "เปิดเฟซบุ๊ก" (ตัวสั่งงาน → เบราว์เซอร์ของผู้ช่วย).
+        """ปุ่มแอปที่ใช้บ่อยในหน้าแรก (การ์ด 0031) · ทางเดียวกับพิมพ์ "เปิดยูทูบ" (ตัวสั่งงาน → เบราว์เซอร์ของผู้ช่วย).
 
         หน้าจอส่งมาได้แค่ชื่อเว็บในรายการ ไม่ใช่ URL (H7) · คืนข้อความผล (บอกเมื่อเปิดด้วยเบราว์เซอร์ปกติแทน)
         """
@@ -2805,6 +2805,8 @@ class SkillsController(QObject):
 
         t0 = time.monotonic()
         text = english.to_thai(text) or text  # คำถามอังกฤษทางคีย์ลัด (การ์ด 0040) · ไทยไม่แตะ
+        if card := self._unsupported_card(text):
+            return self._why(card, t0)
         asks = (self._agenda_card, self._clock_card, self._until_card, self._holiday_card,
                 self._cancel_card, self._next_card, self._move_card, self._title_card)  # fmt: skip
         for ask in asks:
@@ -2952,8 +2954,21 @@ class SkillsController(QObject):
         card.setdefault("why", []).insert(1, {"k": "แปลงคำสั่งอังกฤษ", "v": th})
         return card
 
+    def _unsupported_card(self, text: str) -> dict | None:
+        """ "เปิดเฟซบุ๊ก" · "เปิดไลน์" = บริการที่ตั้งใจไม่มี → บอกตรง ๆ (H5) · None = ไม่ใช่."""
+        from aipc.skills import command
+
+        name = command.unsupported(text)
+        if name is None:
+            return None
+        return self._plain("command", f"ระบบนี้ไม่มี {name}",
+                           ["ตั้งใจไม่รวมไว้ในผู้ช่วย · เปิดเองได้จากเบราว์เซอร์"])  # fmt: skip
+
     def _handle(self, text: str) -> dict:
         from aipc.skills import router
+
+        if card := self._unsupported_card(text):
+            return card
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
             return card

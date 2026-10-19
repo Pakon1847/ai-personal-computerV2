@@ -29,7 +29,6 @@ NAMES = {
     "youtube": ["ยูทูบ", "ยูทูป", "youtube"],
     "maps": ["แผนที่", "กูเกิลแมพ", "แผนที่กูเกิล", "google maps"],
     "wikipedia": ["วิกิพีเดีย", "วิกิ", "wikipedia"],
-    "facebook": ["เฟซบุ๊ก", "เฟสบุ๊ค", "facebook"],
     "drive": ["กูเกิลไดรฟ์", "กูเกิ้ลไดร์ฟ", "google drive"],
     "gmail": ["จีเมล", "จีเมล์", "อีเมล", "gmail"],
 }
@@ -76,7 +75,7 @@ class SiteSearchParseTest(unittest.TestCase):
 
     def test_round1_fixes_are_general_rules(self):
         # เล่าว่าหาไม่เจอ/ไม่พบ = ไม่ใช่สั่งค้น (ประโยคต่างจากชุดวัด)
-        for t in ("เปิดยูทูบแล้วหาคลิปที่เคยดูไม่เจอ", "หาโพสต์ของแม่ในเฟซบุ๊กไม่พบ"):
+        for t in ("เปิดยูทูบแล้วหาคลิปที่เคยดูไม่เจอ", "หาอีเมลของแม่ในจีเมลไม่พบ"):
             with self.subTest(t=t):
                 self.assertFalse(any(c.kind == "site_search" for c in browse.parse(t)))
         # "อยู่ไหน" ยังเป็นคำค้นแผนที่ได้
@@ -85,7 +84,10 @@ class SiteSearchParseTest(unittest.TestCase):
         # "หารูป…" กับบริการที่พูดชื่อ = ค้นในบริการ · ไม่มีชื่อบริการ = ทางเดิม (ไม่ใช่ค้นเว็บ)
         trip = BrowseCommand("site_search", query="รูปทริปเชียงใหม่", site="drive")
         self.assertEqual(browse.parse("เปิดกูเกิลไดรฟ์แล้วหารูปทริปเชียงใหม่"), [trip])
-        self.assertEqual(browse.parse("หารูปแมวในเฟซบุ๊ก")[0].query, "รูปแมว")
+        self.assertEqual(browse.parse("หารูปแมวในกูเกิลไดรฟ์")[0].query, "รูปแมว")
+        # Facebook/Instagram เอาออกแล้ว (Pakon 2026-10-19) = ไม่ใช่คำสั่งเว็บ ไม่ค้น Google แทน
+        for t in ("หารูปแมวในเฟซบุ๊ก", "ค้นในเฟสบุ๊คว่าร้านกาแฟ", "ค้นในไอจีว่าร้านกาแฟ"):
+            self.assertEqual(browse.parse(t), [], t)
         self.assertEqual(browse.parse("หารูปแมว"), [])
 
     def test_round2_fix_story_after_service_is_not_a_query(self):
@@ -103,7 +105,7 @@ class SiteSearchParseTest(unittest.TestCase):
         # ตรวจทั้งระบบ 2026-10-18 ข้อ 3.1–3.3 · ประโยคไม่ซ้ำกับชุดวัด
         # 3.1 "แต่ง…" เป็นคำค้น ไม่ใช่คำเชื่อม "แต่"
         for text, site, query in [("ค้นในยูทูบแต่งตัวไปงานบวช", "youtube", "แต่งตัวไปงานบวช"),
-                                  ("หาในเฟซบุ๊กแต่งเพลงวันแม่", "facebook", "แต่งเพลงวันแม่")]:  # fmt: skip
+                                  ("หาในวิกิแต่งกลอน", "wikipedia", "แต่งกลอน")]:  # fmt: skip
             self.assertEqual(
                 browse.parse(text), [BrowseCommand("site_search", query=query, site=site)]
             )

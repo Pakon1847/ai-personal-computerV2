@@ -653,8 +653,6 @@ Item {
                     Repeater {
                         model: [
                             { key: "youtube", name: "YouTube", icon: Icons.play },
-                            { key: "facebook", name: "Facebook", icon: Icons.chat },
-                            { key: "instagram", name: "Instagram", icon: Icons.camera },
                             { key: "gmail", name: "Gmail", icon: Icons.mail },
                             { key: "calendar", name: Tr.t("ปฏิทิน Google"), icon: Icons.calendar },
                             { key: "drive", name: Tr.t("ไดรฟ์ Google"), icon: Icons.folder }

@@ -32,9 +32,6 @@ URL = {k: v[1] for k, v in actions.SITES.items()}
 
 # คำเรียกตามการ์ดหัวข้อ 5 (+ สะกดที่พบบ่อย) · "ปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง (การ์ด 0038)
 TYPED = {
-    "facebook": ["เปิดเฟซบุ๊ก", "เปิดเฟสบุ๊ก", "เปิดเฟสบุ๊ค", "เปิดเฟซบุ๊ค", "เปิดเฟซบุค", "เปิด Facebook",
-                 "ช่วยเปิดเฟซบุ๊กหน่อย"],
-    "instagram": ["เปิดอินสตาแกรม", "เปิดอินสตา", "เปิดไอจี", "เปิด instagram"],
     "calendar": ["เปิดปฏิทินกูเกิล", "เปิดกูเกิลปฏิทิน", "เปิดปฏิทินกูเกิ้ล", "เปิด Google Calendar"],
     "drive": ["เปิดกูเกิลไดรฟ์", "เปิดกูเกิ้ลไดรฟ์", "เปิดกูเกิลไดร์ฟ", "เปิดไดรฟ์", "เปิดไดร์ฟ",
               "เปิด google drive"],
@@ -42,8 +39,6 @@ TYPED = {
     "youtube": ["เปิดยูทูบ"],
 }  # fmt: skip
 VOICE = {
-    "facebook": ["เปิดเฟซบุ๊ก", "เปิดเฟสบุ๊ค", "เข้าเฟซบุ๊ก", "เปิด facebook"],
-    "instagram": ["เปิดไอจี", "เปิดอินสตาแกรม", "เปิดอินสตา"],
     "calendar": ["เปิดปฏิทินกูเกิล", "เปิดกูเกิลปฏิทิน"],
     "drive": ["เปิดกูเกิลไดรฟ์", "เปิดไดรฟ์", "เปิดไดร์ฟ"],
 }
@@ -85,13 +80,26 @@ class AliasTest(unittest.TestCase):
         self.assertIsNone(command.parse("เพิ่มนัดในปฏิทินพรุ่งนี้บ่ายสอง"))
         self.assertIsNone(command.parse("หาไฟล์ในไดรฟ์"))
         self.assertEqual(browse.parse("หาไฟล์ในไดรฟ์"), [])
-        fes = command.parse("เปิดเฟส")  # "เฟส" เดี่ยว ๆ ไม่ใช่ชื่อเว็บ (การ์ดหัวข้อ 5)
-        self.assertFalse(fes and fes.plan.params.get("site") == "facebook")
         # สองเว็บในประโยคเดียว = ไม่ใช่คำสั่งเดี่ยว (เดิม · การ์ด 0017)
-        self.assertIsNone(command.parse("เปิดเฟซบุ๊กกับไอจี"))
+        self.assertIsNone(command.parse("เปิดจีเมลกับกูเกิลไดรฟ์"))
+
+    def test_removed_and_missing_services_are_said_plainly(self):
+        """Pakon 2026-10-19: เอา Facebook/Instagram ออก · LINE ไม่มี → ไม่เปิด ไม่เดาเป็นอย่างอื่น
+        (เดิม "เปิดไลน์" ใกล้ "ไฟล์" → การ์ดถามว่าเปิดหน้าไฟล์ไหม)."""
+        for t, name in [("เปิดเฟซบุ๊ก", "Facebook"), ("ช่วยเปิดเฟสบุ๊คหน่อย", "Facebook"),
+                        ("เปิดไอจี", "Instagram"), ("เปิด instagram", "Instagram"),
+                        ("เปิดไลน์", "LINE"), ("เข้าไลน์ให้หน่อย", "LINE")]:  # fmt: skip
+            with self.subTest(t=t):
+                self.assertEqual(command.unsupported(t), name)
+                self.assertIsNone(command.parse(t))
+                self.assertEqual(browse.parse(t), [])
+        for t in ("เปิดไฟล์", "ไลน์ใหม่ของโทรศัพท์ดีไหม", "เฟซบุ๊กล่มหรือเปล่า"):
+            self.assertIsNone(command.unsupported(t), t)
+        self.assertNotIn("facebook", actions.SITES)
+        self.assertNotIn("instagram", actions.SITES)
 
     def test_skill_step_names_the_new_sites(self):
-        for key in ("facebook", "instagram", "calendar", "drive"):
+        for key in ("calendar", "drive"):
             step, err = mdskill.parse_step(f"เปิดเว็บ {key}")
             self.assertEqual(err, "")
             self.assertEqual(step.plan.params, {"site": key})
@@ -109,16 +117,16 @@ class ExecutorTest(unittest.TestCase):
                                 browser=hook)  # fmt: skip
 
     def test_open_goes_to_assistant_browser(self):
-        out = self.make(True).execute(command.parse("เปิดเฟซบุ๊ก").plan)
+        out = self.make(True).execute(command.parse("เปิดยูทูบ").plan)
         self.assertTrue(out.ok)
-        self.assertEqual(self.hooked, [("facebook", URL["facebook"])])
+        self.assertEqual(self.hooked, [("youtube", URL["youtube"])])
         self.assertEqual(self.ran, [])  # ไม่เปิดเบราว์เซอร์ปกติซ้อน
-        self.assertEqual(out.message, "เปิด Facebook ในเบราว์เซอร์ของผู้ช่วย")
+        self.assertEqual(out.message, "เปิด YouTube ในเบราว์เซอร์ของผู้ช่วย")
 
     def test_busy_assistant_browser_falls_back_and_says_so(self):
-        out = self.make(False).execute(command.parse("เปิดไอจี").plan)
+        out = self.make(False).execute(command.parse("เปิดกูเกิลไดรฟ์").plan)
         self.assertTrue(out.ok)
-        self.assertEqual(self.ran, [["xdg-open", URL["instagram"]]])
+        self.assertEqual(self.ran, [["xdg-open", URL["drive"]]])
         self.assertIn("เปิดด้วยเบราว์เซอร์ปกติแทน", out.message)  # H2 ไม่เงียบ
 
     def test_sites_blocked_in_criterion_0_use_system_browser(self):
@@ -136,7 +144,7 @@ class ExecutorTest(unittest.TestCase):
         self.assertEqual(self.hooked, [("youtube", URL["youtube"]), ("", "https://example.org/a")])
 
     def test_dry_run_and_other_actions_never_touch_the_browser(self):
-        out = self.make(True, dry_run=True).execute(command.parse("เปิดเฟซบุ๊ก").plan)
+        out = self.make(True, dry_run=True).execute(command.parse("เปิดยูทูบ").plan)
         self.assertTrue(out.simulated)
         self.assertEqual(self.hooked, [])
         out = self.make(True).execute(actions.Plan("open_page", {"page": "settings"}))
@@ -224,10 +232,10 @@ class BrowserControllerWebTest(unittest.TestCase):
 
     def test_open_web_is_quiet_and_uses_assistant_browser(self):
         b = self.make()
-        self.assertTrue(b.open_web("facebook", URL["facebook"]))
+        self.assertTrue(b.open_web("youtube", URL["youtube"]))
         self.assertTrue(pump(lambda: self.opened))
-        self.assertEqual(self.ctl.ran, [{"kind": "site", "site": "facebook"}])
-        self.assertEqual(self.opened, [("เปิด facebook แล้ว", True)])
+        self.assertEqual(self.ctl.ran, [{"kind": "site", "site": "youtube"}])
+        self.assertEqual(self.opened, [("เปิด youtube แล้ว", True)])
         self.assertEqual(self.finished, [])  # ไม่แก้ข้อความล่าสุดในแชทแบบคำสั่งเสียง
         self.assertTrue(b.open_web("", "https://example.org/a"))
         self.assertTrue(pump(lambda: len(self.opened) == 2))
@@ -236,8 +244,8 @@ class BrowserControllerWebTest(unittest.TestCase):
     def test_open_web_refuses_when_it_cannot_take_the_job(self):
         b = self.make()
         b._busy = True  # กำลังทำคำสั่งเสียงอยู่
-        self.assertFalse(b.open_web("facebook", URL["facebook"]))
-        self.assertFalse(self.make(active=False).open_web("facebook", URL["facebook"]))  # หน้า Login
+        self.assertFalse(b.open_web("youtube", URL["youtube"]))
+        self.assertFalse(self.make(active=False).open_web("youtube", URL["youtube"]))  # หน้า Login
         no_chromium = self.make(control=FakeControl(available=False))
         self.assertFalse(no_chromium.open_web("drive", URL["drive"]))
         self.assertEqual(self.ctl.ran, [])
@@ -269,7 +277,7 @@ class BrowserControllerWebTest(unittest.TestCase):
         self.assertTrue((self.prof / "Default" / "Cookies").exists())
 
     def test_voice_routes(self):
-        self.assertEqual(route("เปิดเฟซบุ๊ก", False), BROWSER)
+        self.assertEqual(route("เปิดยูทูบ", False), BROWSER)
         self.assertEqual(route("เปิดกูเกิลไดรฟ์", False), BROWSER)
         self.assertEqual(route("เปิดปฏิทิน", False), COMMAND)  # หน้าปฏิทินของเครื่อง
 
@@ -292,12 +300,14 @@ class OpenSiteBackendTest(unittest.TestCase):
     def test_button_takes_only_names_from_the_list(self):
         self.assertEqual(self.s.openSite("https://evil.example"), "ไม่มีเว็บนี้ในรายการ")  # H7
         self.assertEqual((self.ran, self.hooked), ([], []))
-        self.assertEqual(self.s.openSite("instagram"), "เปิด Instagram ในเบราว์เซอร์ของผู้ช่วย")
-        self.assertEqual(self.hooked, [("instagram", URL["instagram"])])
+        self.assertEqual(self.s.openSite("instagram"), "ไม่มีเว็บนี้ในรายการ")  # เอาออกแล้ว
+        self.assertEqual(self.s.openSite("gmail"), "เปิด Gmail ในเบราว์เซอร์ของผู้ช่วย")
+        self.assertEqual(self.hooked, [("gmail", URL["gmail"])])
 
     def test_typed_open_says_which_browser(self):
-        card = self.s.handle("เปิดเฟซบุ๊ก")
-        self.assertIn("เปิด Facebook ในเบราว์เซอร์ของผู้ช่วย", card["lines"])
+        card = self.s.handle("เปิดยูทูบ")
+        self.assertIn("เปิด YouTube ในเบราว์เซอร์ของผู้ช่วย", card["lines"])
+        self.assertEqual(self.s.handle("เปิดเฟซบุ๊ก")["title"], "ระบบนี้ไม่มี Facebook")
         self.free = False
         card = self.s.handle("เปิดกูเกิลไดรฟ์")
         self.assertTrue(any("เบราว์เซอร์ปกติ" in x for x in card["lines"]))
@@ -326,18 +336,19 @@ class WebAppsQmlTest(unittest.TestCase):
         engine, win, warnings = self.open_shell("workspace")
         skills, browser = engine._backends["skills"], engine._backends["browser"]
         skills._exec = actions.Executor(dry_run=True)  # ไม่เปิดเว็บจริงแม้รันบน Pi
-        keys = ["youtube", "facebook", "instagram", "gmail", "calendar", "drive"]
+        keys = ["youtube", "gmail", "calendar", "drive"]
         tiles = [qml.find_items(win, "webApp_" + k) for k in keys]
-        self.assertEqual([len(t) for t in tiles], [1] * 6)
+        self.assertEqual([len(t) for t in tiles], [1] * 4)
+        self.assertEqual(qml.find_items(win, "webApp_facebook"), [])  # เอาออกแล้ว (Pakon 2026-10-19)
         note = qml.find_items(win, "webAppsNote")[0]
         tiles[1][0].clicked.emit()
         qml.settle(50)
         # เครื่องนี้จำลอง = บอกตามจริง
-        self.assertIn("xdg-open https://www.facebook.com", note.property("text"))
+        self.assertIn("xdg-open https://mail.google.com", note.property("text"))
         browser.opened.emit("เปิดเบราว์เซอร์ไม่ได้: ไม่พบโปรแกรม", False)
         qml.settle(50)
         self.assertEqual(note.property("text"), "เปิดเบราว์เซอร์ไม่ได้: ไม่พบโปรแกรม")
-        browser.opened.emit("เปิด Facebook แล้ว", True)
+        browser.opened.emit("เปิด Gmail แล้ว", True)
         qml.settle(50)
         self.assertEqual(note.property("text"), "")
         self.assertEqual(warnings, [])

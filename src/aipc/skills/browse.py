@@ -97,8 +97,6 @@ SITE_NAMES = {
     "wikipedia": r"วิกิพีเดีย|wikipedia",
     "gmail": r"จีเมล|gmail",
     # การ์ด 0031 · ปฏิทินต้องมีคำว่ากูเกิล ("เปิดปฏิทิน" เฉย ๆ = หน้าปฏิทินของเครื่อง ทางคำสั่งเครื่อง)
-    "facebook": r"เฟ[ซส]\s*บุ[๊]?[กค]|facebook",
-    "instagram": r"อินสตา(?:แกรม)?|ไอจี|instagram",
     "calendar": r"ปฏิทิน\s*กูเกิ้?ล|กูเกิ้?ล\s*ปฏิทิน|google\s*calendar",
     "drive": r"กูเกิ้?ล\s*ไดร์?[ฟบ]์?|ไดร์?[ฟบ]์?|google\s*drive",
 }
@@ -109,7 +107,6 @@ SEARCH_SITE_NAMES = {
     "youtube": SITE_NAMES["youtube"],
     "maps": SITE_NAMES["maps"] + r"|แผนที่",
     "wikipedia": SITE_NAMES["wikipedia"] + r"|วิกิ",
-    "facebook": SITE_NAMES["facebook"],
     "drive": r"กูเกิ้?ล\s*ไดร์?[ฟบ]์?|google\s*drive",
     "gmail": r"จีเมล์?|อีเมล์?|gmail",
 }
@@ -292,11 +289,17 @@ def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
     return None
 
 
+# Facebook/Instagram เอาออกจากระบบแล้ว (Pakon 2026-10-19) · ประโยคที่พูดถึง = ไม่ใช่คำสั่งเว็บ
+_REMOVED = re.compile(r"เฟ[ซส]บุ[๊]?[กค]|facebook|อินสตา|ไอจี|instagram")
+
+
 def parse(text: str) -> list[BrowseCommand]:
     raw = re.sub(r"(?<=[ก-๙])\s+(?=[ก-๙])", "", text.strip().lower())
     asked = bool(_ASKED_FIND.search(raw))
     t, back = _clean(text)
     if not t or _site_story(t):  # เล่าเรื่องที่มีชื่อบริการ = ไม่ใช่คำสั่งเว็บ (ไม่ไหลไปค้น Google)
+        return []
+    if _REMOVED.search(raw):  # บริการที่เอาออกแล้ว: ไม่ค้นแทนด้วยคำค้นแปลก ๆ ("ในเฟซบุ๊กว่า…")
         return []
     # ค้นหาแล้วเข้าลิงก์ในประโยคเดียว (ดูก่อน: ไม่งั้นคำค้นกินท่อน "เข้าลิงก์แรก" ไปด้วย)
     if m := _COMPOUND.fullmatch(t):
