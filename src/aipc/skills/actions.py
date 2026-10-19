@@ -56,6 +56,15 @@ SITES = {
     # ข่าวจากสื่อสาธารณะ (AI ในเครื่องไม่รู้ข่าววันนี้)
     "docs": ("Google Docs", "https://docs.google.com/document/"),
     "news": ("ข่าว Thai PBS", "https://www.thaipbs.or.th"),
+    # ดูหนัง/ฟังเพลง (Pakon เลือก 2026-10-19 · มีบัญชีเอง) ·
+    # ที่อยู่ตรวจ 2026-10-19 (hotstar.com/th → disneyplus.com)
+    # ต้องใช้ Widevine · ปุ่มหน้าแรกเพิ่มเมื่อลองบน Pi แล้วเล่นได้จริง (การ์ด 0031 รอบ 2 เกณฑ์ R2)
+    "netflix": ("Netflix", "https://www.netflix.com/th/"),
+    "viu": ("Viu", "https://www.viu.com/ott/th"),
+    "iqiyi": ("iQIYI", "https://www.iq.com"),
+    "wetv": ("WeTV", "https://wetv.vip"),
+    "disney": ("Disney+ Hotstar", "https://www.disneyplus.com/th-th"),
+    "spotify": ("Spotify", "https://open.spotify.com"),
 }
 # เว็บที่ต้องเปิดด้วยเบราว์เซอร์ปกติแทนเบราว์เซอร์ของผู้ช่วย (การ์ด 0031 ข้อ 0: บริการที่ไม่ยอมให้เข้าสู่ระบบ
 # ในเบราว์เซอร์ที่ถูกโปรแกรมควบคุม) · ยังไม่มีผลทดสอบ = ว่าง · ได้ผลแล้วใส่ชื่อเว็บที่โดนบล็อกที่นี่ที่เดียว

@@ -19,7 +19,10 @@ SITES = {  # ชื่ออังกฤษ → คำไทยที่ command
     "youtube": "ยูทูบ", "gmail": "จีเมล", "my email": "จีเมล", "email": "จีเมล",
     "google": "กูเกิล", "wikipedia": "วิกิพีเดีย", "google maps": "กูเกิลแมพ", "maps": "กูเกิลแมพ",
     "google docs": "กูเกิลด็อก", "docs": "กูเกิลด็อก", "the news": "ข่าว", "news": "ข่าว",
-    "thai pbs": "ไทยพีบีเอส", "google calendar": "ปฏิทินกูเกิล",
+    "thai pbs": "ไทยพีบีเอส", "netflix": "เน็ตฟลิกซ์", "viu": "วีไอยู", "iqiyi": "ไอฉีอี้",
+    "wetv": "วีทีวี", "disney plus": "ดิสนีย์พลัส", "disney+": "ดิสนีย์พลัส", "disney": "ดิสนีย์พลัส",
+    "hotstar": "ดิสนีย์พลัส", "disney+ hotstar": "ดิสนีย์พลัส", "spotify": "สปอติฟาย",
+    "google calendar": "ปฏิทินกูเกิล",
     "facebook": "เฟซบุ๊ก", "instagram": "ไอจี", "line": "ไลน์",  # ไม่มีในระบบ → การ์ดบอกว่าไม่มี
     "google drive": "กูเกิลไดรฟ์", "browser": "เบราว์เซอร์", "web browser": "เบราว์เซอร์",
     "chromium": "เบราว์เซอร์", "terminal": "เทอร์มินัล", "file manager": "ตัวจัดการไฟล์",

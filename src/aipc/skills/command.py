@@ -49,6 +49,23 @@ SITE_ALIASES = {
         "เอกสารกูเกิ้ล",
     ),
     "news": ("ข่าว", "เว็บข่าว", "ไทยพีบีเอส", "thaipbs", "ข่าวไทยพีบีเอส"),
+    # การ์ด 0031 รอบ 2 (Pakon เลือก 2026-10-19)
+    "netflix": ("netflix", "เน็ตฟลิกซ์", "เน็ตฟลิก", "เน็ตฟิก", "เน็ตฟลิกส์", "เนตฟลิกซ์", "เน็ตฟลิค"),
+    "viu": ("viu", "วิว", "วีไอยู"),
+    "iqiyi": ("iqiyi", "ไอฉีอี้", "อ้ายฉีอี้", "ไอคิวยี่", "ไอคิวอี้", "ไอฉีอี่"),
+    "wetv": ("wetv", "วีทีวี"),
+    "disney": (
+        "disneyplus",
+        "disney+",
+        "disney",
+        "disneyhotstar",
+        "ดิสนีย์พลัส",
+        "ดิสนีย์",
+        "ดิสนีย์พลัสฮอตสตาร์",
+        "hotstar",
+        "ฮอตสตาร์",
+    ),
+    "spotify": ("spotify", "สปอติฟาย", "สปอตติฟาย", "สปอทิฟาย", "สปอติฟาย์"),
     "calendar": ("googlecalendar", "ปฏิทินกูเกิล", "กูเกิลปฏิทิน", "ปฏิทินกูเกิ้ล", "ปฏิทินgoogle"),
     "drive": ("googledrive", "กูเกิลไดรฟ์", "กูเกิ้ลไดรฟ์", "กูเกิลไดร์ฟ", "กูเกิ้ลไดร์ฟ", "ไดรฟ์", "ไดร์ฟ"),
 }
@@ -59,6 +76,8 @@ UNSUPPORTED = {
     "Instagram": ("instagram", "อินสตาแกรม", "อินสตา", "ไอจี", "ig"),
     "LINE": ("line", "ไลน์"),
 }
+# คำเรียกสั้น/เป็นคำทั่วไป ต้องตรงทั้งคำ: "ดูข่าวน้ำท่วม" (หัวข้อหาย) · "เปิดรีวิวหนัง" มีคำว่า "วิว" ไม่ใช่ Viu
+EXACT_ONLY = ("news", "viu", "iqiyi", "wetv")
 # "ไดรฟ์" ในเครื่องนี้ยังหมายถึงไดรฟ์ USB (หน้าสำรองข้อมูล) · มีคำพวกนี้ = ไม่ใช่ Google Drive (การ์ด 0031)
 LOCAL_DRIVE_WORDS = ("usb", "ยูเอสบี", "แฟลช", "ฮาร์ด", "สำรอง")
 APP_ALIASES = {
@@ -288,7 +307,7 @@ def parse(text: str) -> Command | None:
     group, key, conf = hit
     if key == "drive" and any(w in raw for w in LOCAL_DRIVE_WORDS):
         return None  # "เปิดแฟลชไดรฟ์" · "เปิดไดรฟ์ USB" = ไดรฟ์ในเครื่อง ไม่ใช่เว็บ
-    if key == "news" and target not in SITE_ALIASES["news"]:
+    if key in EXACT_ONLY and target not in SITE_ALIASES[key]:
         return None  # "ดูข่าวน้ำท่วม" = อยากรู้เรื่องนั้น ไม่ใช่เปิดหน้าแรกเว็บข่าว (หัวข้อหาย) → ทางเดิม
     if group == "page":
         plan = Plan("open_page", {"page": key}, f"เปิดหน้า{PAGES[key]}")
