@@ -26,7 +26,9 @@ PAIRS = [
 def palette(dark: bool) -> dict[str, str]:
     text = THEME.read_text(encoding="utf-8")
     out: dict[str, str] = {}
-    for name, d, light in re.findall(r'property color (\w+): dark \? "(#\w{6})" : "(#\w{6})"', text):
+    for name, d, light in re.findall(
+        r'property color (\w+): dark \? "(#\w{6})" : "(#\w{6})"', text
+    ):
         out[name] = d if dark else light
     for name, ref in re.findall(r"property color (\w+): (\w+)\s*$", text, re.M):
         out[name] = out[ref]
@@ -51,7 +53,9 @@ class ThemeContrastTest(unittest.TestCase):
             pairs = [(t, b) for t in TEXT_ON_PLAIN for b in PLAINS] + PAIRS
             for fg, bg in pairs:
                 with self.subTest(dark=dark, fg=fg, bg=bg):
-                    self.assertGreaterEqual(round(contrast(p[fg], p[bg]), 2), MIN, f"{p[fg]} บน {p[bg]}")
+                    self.assertGreaterEqual(
+                        round(contrast(p[fg], p[bg]), 2), MIN, f"{p[fg]} บน {p[bg]}"
+                    )
 
     def test_dark_theme_is_black(self):
         """การ์ด 0041: พื้นธีมมืดเป็นโทนดำ (ไม่ใช่เทาอมน้ำเงินแบบเดิม)."""

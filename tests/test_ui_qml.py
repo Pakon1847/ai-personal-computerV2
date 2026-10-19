@@ -334,6 +334,45 @@ class ShellCardTest(unittest.TestCase):
                     self.assertTrue(found[0].property("text"), name)
                 self.assertEqual(warnings, [])
 
+    def test_status_bar_machine_chip_names_each_problem(self):
+        """การ์ด 0041 U4: ปกติ = "เครื่องปกติ" ป้ายเดียว · มีปัญหา = ข้อความของปัญหานั้นเอง (+N) · ไมค์/กล้องข้อความเต็มเสมอ."""
+        engine, win, warnings = self.open_shell("workspace")
+        ctx = engine.rootContext()
+        system, chat = ctx.contextProperty("system"), ctx.contextProperty("chat")
+        chip = find_all(win, "machineIndicator")[0]
+
+        def show(network, temp, checks, model_ready=True):
+            system._network, system._temp, system._checks = network, temp, checks
+            chat._status = "ready" if model_ready else "down"
+            chat.statusChanged.emit()
+            system.changed.emit()
+            settle(30)
+            return chip.property("text"), chip.property("kind")
+
+        ok = [
+            {"id": "storage", "level": "ok"},
+            {"id": "power", "level": "ok"},
+            {"id": "board", "level": "danger"},
+        ]
+        self.assertEqual(
+            show(True, 50.0, ok), ("เครื่องปกติ", "neutral")
+        )  # check อื่น (board) ไม่ขึ้นแถบบน
+        self.assertEqual(show(None, None, ok), ("เครื่องปกติ", "neutral"))  # อ่านไม่ได้ = ไม่เดาว่าเป็นปัญหา
+        self.assertEqual(show(False, 50.0, ok), ("ออฟไลน์", "warn"))
+        text, kind = show(True, 83.0, ok)
+        self.assertEqual((text, kind), ("ร้อน 83°C", "danger"))
+        self.assertTrue(
+            show(True, 50.0, [{"id": "storage", "level": "warn"}])[0].startswith("พื้นที่ใกล้เต็ม")
+        )
+        self.assertEqual(show(True, 50.0, [{"id": "power", "level": "warn"}])[0], "ไฟเลี้ยงไม่พอ")
+        text, _ = show(True, 50.0, ok, model_ready=False)
+        self.assertNotEqual(text, "เครื่องปกติ")  # โมเดลไม่พร้อม = บอก
+        text, _ = show(False, 85.0, [{"id": "power", "level": "danger"}], model_ready=False)
+        self.assertEqual(text, "ออฟไลน์  +3")
+        for name in ("cameraIndicator", "micIndicator"):
+            self.assertTrue(find_all(win, name)[0].property("text"))
+        self.assertEqual(warnings, [])
+
     def test_face_panel_and_camera_in_use(self):
         engine, win, warnings = self.open_shell("settings")
         face = engine.rootContext().contextProperty("face")

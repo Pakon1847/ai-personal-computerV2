@@ -851,7 +851,7 @@ class SystemStatus(QObject):
         self._camera = any(c.id == "camera" and c.status == hardware.PASS for c in checks)
         level = {hardware.PASS: "ok", hardware.WARN: "warn", hardware.FAIL: "danger"}
         self._checks = [
-            {"title": c.title, "status": c.status, "detail": c.detail, "fix": c.fix,
+            {"id": c.id, "title": c.title, "status": c.status, "detail": c.detail, "fix": c.fix,
              "level": level.get(c.status, "neutral")}
             for c in checks
         ]  # fmt: skip
@@ -894,6 +894,27 @@ class SystemStatus(QObject):
     @Property(bool, notify=changed)
     def cameraPresent(self) -> bool:  # noqa: N802
         return self._camera
+
+    @Property("QVariantList", notify=changed)
+    def alerts(self) -> list:
+        """ปัญหาเครื่องที่แถบบนต้องบอก (BRIEF 5.7 ข้อ 3 · การ์ด 0041) · ว่าง = "เครื่องปกติ".
+
+        โค้ดตัดสินจากเกณฑ์เดียวกับหน้าเครื่อง (H6): ออฟไลน์ · ร้อน ≥ HOT_C · พื้นที่เกิน 80% · ไฟเลี้ยงไม่พอ ·
+        ค่าที่อ่านไม่ได้ ("ไม่รู้") ไม่นับเป็นปัญหา (ไม่เดา)
+        """
+        out = []
+        if self._network is False:
+            out.append({"text": tr("ออฟไลน์"), "level": "warn"})
+        if self._temp is not None and self._temp >= hardware.HOT_C:
+            out.append({"text": tr("ร้อน {t}°C", t=f"{self._temp:.0f}"), "level": "danger"})
+        bad = {c["id"]: c["level"] for c in self._checks if c["level"] in ("warn", "danger")}
+        if "storage" in bad:
+            out.append(
+                {"text": tr("พื้นที่ใกล้เต็ม · {free}", free=self.storageText), "level": bad["storage"]}
+            )
+        if "power" in bad:
+            out.append({"text": tr("ไฟเลี้ยงไม่พอ"), "level": bad["power"]})
+        return out
 
     @Property("QVariantList", notify=healthChanged)
     def checks(self) -> list:
