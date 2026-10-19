@@ -19,13 +19,13 @@ T10 ไฟดับ และ T13 ดิสก์เต็ม **ต้องท�
 
 | # | ทำที่ | ทำอะไร | ผ่านเมื่อ |
 |---|---|---|---|
-| 1 | SSH | จดรุ่น: `readlink /opt/aipc-v2` · `cd ~/aipc && git log --oneline -1` · `uname -r` | จดลงหัวข้อ "ผล" ข้างล่าง |
+| 1 | SSH | จดรุ่น: `readlink /opt/aipc-v2` · `cd ~/aipc-0026 && git log --oneline -1` · `uname -r` | จดลงหัวข้อ "ผล" ข้างล่าง · **ทำแล้ว 2026-10-19:** `1b546813` · `1b54681` · `6.18.50+rpt-rpi-2712` · การ์ด 62,537,072,640 ไบต์ · D: ว่าง 71 GB |
 | 2 | หน้าเครื่อง | ออกจากระบบทุกบัญชี → SSH `sudo poweroff` → รอไฟเขียวดับ → ถอดปลั๊ก → ถอดการ์ด | ไม่มีใครใช้อยู่ตอนปิด (ไฟล์ข้อมูลปิดครบ) |
 | 3 | วินโดวส์ | Win32 Disk Imager → เลือกไดรฟ์ของการ์ด (`boot`) → ไฟล์ `D:\aipc-images\pi5-YYYYMMDD.img` → **Read** · ถ้าวินโดวส์ถามให้ฟอร์แมตไดรฟ์ใด ๆ กด **ยกเลิก** เสมอ | ได้ไฟล์ ~58.2 GB · ติ๊ก "Read Only Allocated Partitions" ได้ถ้ามี (ไฟล์เล็กลง) |
 | 4 | วินโดวส์ | PowerShell: `Get-FileHash D:\aipc-images\pi5-YYYYMMDD.img -Algorithm SHA256` → จดค่า · ใส่การ์ดสำรอง → `Get-Disk` ดูขนาด (Size) | ขนาดการ์ดสำรอง ≥ ขนาดไฟล์ .img |
 | 5 | วินโดวส์ | ใส่การ์ดจริงกลับเข้า Pi ก่อน (เครื่องจริงพร้อมใช้ต่อทันที) → Raspberry Pi Imager → Choose OS › **Use custom** › ไฟล์ .img → Choose Storage › การ์ดสำรอง → **ไม่ตั้งค่า OS customisation** (กด No) → Write | Imager แจ้ง "Write Successful" (ตรวจซ้ำแล้ว) |
-| 6 | Pi | ปิด Pi → สลับเป็นการ์ดสำรอง → เปิด | ขึ้นหน้า Login ของ V2 · เข้า pakon1 ได้ · ถามแชทได้ 1 ข้อ |
-| 7 | SSH | `readlink /opt/aipc-v2` ตรงกับขั้น 1 · `cd ~/aipc && .venv/bin/python -m aipc.doctor` · `vcgencmd get_throttled` | รุ่นตรง · doctor ไม่มีข้อ "ไม่ผ่าน" ด้านไฟเลี้ยง |
+| 6 | Pi | ปิด Pi → สลับเป็นการ์ดสำรอง → เปิด | ขึ้นหน้า Login ของ V2 · เข้า pakon ได้ · ถามแชทได้ 1 ข้อ |
+| 7 | SSH | `readlink /opt/aipc-v2` ตรงกับขั้น 1 · `/opt/aipc-v2/.venv/bin/python -m aipc.doctor` · `vcgencmd get_throttled` | รุ่นตรง · doctor ไม่มีข้อ "ไม่ผ่าน" ด้านไฟเลี้ยง |
 | 8 | — | ติดป้ายการ์ด: **"จริง"** และ **"สำรอง · ทดสอบ T10/T13"** · ปิดเครื่อง สลับการ์ดจริงกลับ | การ์ดจริงอยู่ในเครื่อง |
 
 ถ้าขั้น 5 บอกว่าการ์ดเล็กไป: ใช้การ์ดที่ใหญ่กว่า (128GB) หรือย่อ image ด้วย PiShrink บน Linux (ยังไม่ได้ลองในโปรเจกต์นี้)
