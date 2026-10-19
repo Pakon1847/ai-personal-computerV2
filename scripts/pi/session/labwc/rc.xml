@@ -62,4 +62,13 @@
       <mousebind button="Left" action="Click"><action name="Close" /></mousebind>
     </context>
   </mouse>
+  <!-- กล่องคำสั่งเสียง (Pakon 2026-10-20): ลอยบนสุดเหนือเบราว์เซอร์เต็มจอ · ไม่มีกรอบ · ขอบบนกลางจอ ·
+       จับจากชื่อหน้าต่าง (WorkspacePage.qml) · ทุกครั้งที่กล่องเปิดคือหน้าต่างใหม่ กฎจึงทำงานทุกครั้ง -->
+  <windowRules>
+    <windowRule title="aipc-voice-box" serverDecoration="no" skipTaskbar="yes" skipWindowSwitcher="yes">
+      <action name="ToggleAlwaysOnTop" />
+      <action name="AutoPlace" policy="center" />
+      <action name="MoveToEdge" direction="up" snapWindows="no" />
+    </windowRule>
+  </windowRules>
 </openbox_config>

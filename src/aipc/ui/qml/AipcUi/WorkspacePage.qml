@@ -379,20 +379,25 @@ Item {
             onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
         }
     }
-    // ผลคำสั่งคีย์ลัด (Pakon 2026-10-20): เด้งด้านบนกลางจอ · ไม่มีการ์ดรอยืนยัน = ปิดเองใน 8 วิ ·
-    // รอยืนยัน = ค้างไว้จนตอบ (พูด "ใช่/ไม่" หรือกดปุ่ม) หรือครบ 30 วิ · Esc ปิดได้
-    Popup {
+    // กล่องคำสั่งเสียง (Pakon 2026-10-20): หน้าต่างแยกของตัวเอง ลอยบนสุดเหนือทุกหน้าต่าง รวมเบราว์เซอร์เต็มจอ
+    // (กฎ labwc ใน scripts/pi/session/labwc/rc.xml จับจากชื่อหน้าต่าง "aipc-voice-box": บนสุด · ไม่มีกรอบ · ขอบบนกลางจอ) ·
+    // ไม่มีการ์ดรอยืนยัน = ปิดเองใน 8 วิ · รอยืนยัน = ค้างจนตอบ (พูด "ใช่/ไม่" หรือกดปุ่ม) หรือครบ 30 วิ
+    Window {
         id: voicePopup
         objectName: "voicePopup"
-        parent: Overlay.overlay
-        x: Math.round(((parent ? parent.width : root.width) - width) / 2)
-        y: 24
-        width: Math.min(560, (parent ? parent.width : root.width) - 32)
-        padding: 16
-        modal: false
-        closePolicy: Popup.CloseOnEscape
-        background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
-        contentItem: ColumnLayout {
+        readonly property bool opened: visible
+        function open() { visible = true }
+        title: "aipc-voice-box"
+        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
+        visible: false
+        color: Theme.surface
+        width: Math.min(560, Screen.width - 32)
+        height: voiceCol.implicitHeight + 32
+        Rectangle { anchors.fill: parent; color: "transparent"; border.width: 1; border.color: Theme.line }
+        ColumnLayout {
+            id: voiceCol
+            x: 16; y: 16
+            width: parent.width - 32
             spacing: 8
             RowLayout {
                 objectName: "voiceListening"
