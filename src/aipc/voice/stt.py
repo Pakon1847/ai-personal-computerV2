@@ -24,6 +24,9 @@ WHISPER = "whisper/bin/whisper-cli"
 MODEL = "thonburian-distill-small-f16.bin"
 # หน้าจอภาษาอังกฤษ (การ์ด 0040 · D1 เลือกบน Pi 5: ถอด ~0.8 วิ · RAM ~257 MB · MIT)
 EN_MODEL = "ggml-base.en.bin"
+# คำที่บอกตัวถอดอังกฤษล่วงหน้า (ชื่อเว็บ/คำสั่งของระบบ) · ลองบน Pi 2026-10-20: ไม่บอก "YouTube" → "you too/U2"
+EN_PROMPT = ("Open YouTube, Gmail, Google Maps, Netflix, Spotify, Viu, WeTV, iQIYI, Disney Plus, "
+             "Google Docs, Google Drive. Mute, volume up, remind me, what time is it.")  # fmt: skip
 MAX_S = 15
 MIN_S = 0.4  # กดแล้วปล่อยทันที = ไม่ถอด
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
@@ -143,7 +146,7 @@ class Listener:
             "-ac", "512", "-f"]  # fmt: skip
         self._en_cmd = en_transcribe_cmd or [
             str(voice_dir / WHISPER), "-m", str(voice_dir / EN_MODEL), "-l", "en", "-t", "4", "-nt",
-            "-ac", "512", "-f"]  # fmt: skip
+            "-ac", "512", "--prompt", EN_PROMPT, "-f"]  # fmt: skip
         self._custom = transcribe_cmd is not None
         self._custom_en = en_transcribe_cmd is not None
         self._max_s = max_s
@@ -185,11 +188,11 @@ class Listener:
             if not self.available:
                 return "ยังไม่ได้ติดตั้งตัวถอดเสียง หรือไม่มีไมค์"
             self._lang = "en" if self._language() == "en" else "th"
-            if self._lang == "en" and not self.english_available:
+            # คีย์ลัดฟังสองภาษาเสมอ ไม่ขึ้นกับภาษาหน้าจอ (Pakon 2026-10-20 "ใช้ได้ทั้งไทยและอังกฤษรวมกัน"):
+            # Zipformer ไทยก่อน · ไม่ตรงคำสั่ง → ลองอังกฤษ (_maybe_english) · ปุ่มไมค์ยังใช้ภาษาหน้าจอ
+            self._use_fast = fast and self._fast is not None and self._fast.available
+            if self._lang == "en" and not self.english_available and not self._use_fast:
                 return "ยังไม่ได้ติดตั้งตัวถอดเสียงภาษาอังกฤษ"
-            # ตัวถอดของคีย์ลัด (Zipformer) เป็นภาษาไทยล้วน → หน้าจออังกฤษใช้ whisper อังกฤษเสมอ
-            self._use_fast = (fast and self._lang == "th" and self._fast is not None
-                              and self._fast.available)  # fmt: skip
             if self._use_fast:
                 self._fast.warm()  # โหลดโมเดล 3.7 วิ ระหว่างผู้ใช้พูด
             self._dir.mkdir(mode=0o700, exist_ok=True)

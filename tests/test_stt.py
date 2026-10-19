@@ -164,7 +164,9 @@ class EnglishSttTest(unittest.TestCase):
         self.lang = "th"
         self.assertEqual(self.run_once(lis), ("เปิด ยูทูบ", ""))
 
-    def test_hotkey_in_english_skips_thai_zipformer(self):
+    def test_hotkey_is_bilingual_whatever_the_screen_language(self):
+        """Pakon 2026-10-20: คีย์ลัดใช้ได้ทั้งไทยและอังกฤษ ไม่แยกตามภาษาหน้าจอ · ปุ่มไมค์ยังตามภาษาหน้าจอ."""
+
         class ThaiFast:
             available, used = True, 0
 
@@ -175,12 +177,15 @@ class EnglishSttTest(unittest.TestCase):
                 ThaiFast.used += 1
                 return "เปิดยูทูบ", ""
 
+        for lang in ("en", "th"):
+            self.lang = lang
+            lis = self.listener(self.FAKE_EN, fast=ThaiFast())
+            # พูดไทยได้ทั้งหน้าจอไทยและอังกฤษ
+            self.assertEqual(self.run_once(lis, fast=True), ("เปิดยูทูบ", ""), lang)
+        self.assertEqual(ThaiFast.used, 2)
+        self.lang = "en"
         lis = self.listener(self.FAKE_EN, fast=ThaiFast())
-        self.assertEqual(self.run_once(lis, fast=True), ("Open YouTube.", ""))
-        self.assertEqual(ThaiFast.used, 0)
-        self.lang = "th"
-        self.assertEqual(self.run_once(lis, fast=True), ("เปิดยูทูบ", ""))
-        self.assertEqual(ThaiFast.used, 1)
+        self.assertEqual(self.run_once(lis), ("Open YouTube.", ""))  # ปุ่มไมค์ = ภาษาหน้าจอ
 
     def test_thai_screen_hotkey_falls_back_to_english_command(self):
         """การ์ด 0040 หัวข้อ 13: หน้าจอไทย · Zipformer ได้คำไทยมั่ว → ลองอังกฤษ · ใช้เมื่อเป็นคำสั่งที่รู้จักเท่านั้น."""
