@@ -129,6 +129,12 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
     # คำสั่งอังกฤษ (หน้าจอภาษาอังกฤษ · การ์ด 0040) → รูปไทยของตัวแปลงระยะ C · ไทย = to_thai คืน None ไม่แตะ
     text = english.to_thai(text) or text
     cmds = browse.parse(text)
+    # เว็บที่ต้องเข้าบัญชี Google (การ์ด 0031 ข้อ 0): Google ไม่ให้เข้าสู่ระบบในเบราว์เซอร์ที่ถูกคุม →
+    # ทางคำสั่งเครื่อง (เปิดหน้าต่างบัญชีแยก) แทนเบราว์เซอร์ของผู้ช่วย
+    from aipc.skills.actions import SYSTEM_BROWSER_SITES
+
+    if cmds and all(c.kind == "site" and c.site in SYSTEM_BROWSER_SITES for c in cmds):
+        return COMMAND if command.parse(text) else UNKNOWN
     if cmds and (browser_running or not all(c.kind in NEEDS_PAGE for c in cmds)):
         return BROWSER
     cmd = command.parse(text)
@@ -287,11 +293,16 @@ class BrowserController(QObject):
             return "เบราว์เซอร์ของผู้ช่วยกำลังทำงาน · รอสักครู่แล้วกดใหม่"
         if self._control is not None:
             self._control.close()
+        from aipc.skills.actions import account_profile
+
         profile = self._profile or control.default_profile()
-        if control.profile_in_use(profile):
+        # หน้าต่างบัญชี Google (การ์ด 0031 ข้อ 0) อยู่ข้างโปรไฟล์ของผู้ช่วย
+        accounts = profile.with_name(account_profile().name)
+        if control.profile_in_use(profile) or control.profile_in_use(accounts):
             return "ยังมีหน้าต่างเบราว์เซอร์ของผู้ช่วยเปิดค้างอยู่ · ปิดหน้าต่างนั้นก่อนแล้วกดใหม่"
         try:
             control.remove_profile(profile)
+            control.remove_profile(accounts)
         except OSError as e:
             return f"ลบไม่สำเร็จ: {e.strerror or e} · การเข้าสู่ระบบเว็บยังอยู่"
         # บอกตามจริง (ตรวจทั้งระบบ 3.4): ลบทั้งโปรไฟล์ = บุ๊กมาร์ก/รหัสที่บันทึกหายด้วย · เบราว์เซอร์ธรรมดาไม่ถูกลบ

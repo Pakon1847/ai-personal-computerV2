@@ -13,12 +13,15 @@
 
 from __future__ import annotations
 
+import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -68,7 +71,17 @@ SITES = {
 }
 # เว็บที่ต้องเปิดด้วยเบราว์เซอร์ปกติแทนเบราว์เซอร์ของผู้ช่วย (การ์ด 0031 ข้อ 0: บริการที่ไม่ยอมให้เข้าสู่ระบบ
 # ในเบราว์เซอร์ที่ถูกโปรแกรมควบคุม) · ยังไม่มีผลทดสอบ = ว่าง · ได้ผลแล้วใส่ชื่อเว็บที่โดนบล็อกที่นี่ที่เดียว
-SYSTEM_BROWSER_SITES: frozenset[str] = frozenset()
+# ผลข้อ 0 (Pakon ลองที่จอ Pi 5 2026-10-19): Google ขึ้น "Couldn't sign you in" ในเบราว์เซอร์ของผู้ช่วย
+# (ถูกโปรแกรมคุมทาง pipe) → เว็บที่ต้องเข้าบัญชี Google เปิดในหน้าต่างบัญชีแยก (ไม่ถูกคุม · โปรไฟล์ของเรา)
+SYSTEM_BROWSER_SITES: frozenset[str] = frozenset({"gmail", "calendar", "drive", "docs"})
+
+
+def account_profile() -> Path:
+    """โปรไฟล์ของหน้าต่างบัญชี (การ์ด 0031) · แยกจากเบราว์เซอร์ธรรมดา → ปุ่ม/สวิตช์ออกจากบัญชีเว็บลบได้."""
+    base = os.environ.get("XDG_DATA_HOME") or str(Path.home() / ".local" / "share")
+    return Path(base) / "aipc" / "browser-accounts"
+
+
 FALLBACK_NOTE = (" · เปิดด้วยเบราว์เซอร์ปกติแทน"
                  " (เบราว์เซอร์ของผู้ช่วยไม่ว่างหรือใช้ไม่ได้ · ต้องเข้าสู่ระบบแยกกัน)")  # fmt: skip
 
@@ -166,7 +179,8 @@ def undo_plans(before: tuple[int, bool]) -> tuple[Plan, ...]:
 
 
 # โปรแกรมที่เปิดแอปอื่น · แอปที่เปิดขึ้นมาทำงานต่อหลังคำสั่งจบ จึงห้ามรอ output ของมัน
-LAUNCHERS = ("xdg-open", "gtk-launch", "gio")
+ACCOUNT_NOTE = " ในหน้าต่างบัญชี Google (เข้าสู่ระบบได้ แต่คำสั่งเสียงคุมหน้านี้ไม่ได้)"
+LAUNCHERS = ("xdg-open", "gtk-launch", "gio", "chromium")
 LAUNCH_SETTLE_S = 1.5  # รอดูแค่ว่าตัวเปิดล้มทันทีไหม (เช่น ไม่พบแอป) · ยังทำงานอยู่ = กำลังเปิดแอป
 
 
@@ -209,9 +223,6 @@ def _app_command(desktop: str) -> list[str]:
     พบบน Pi 5 (2026-10-01): Raspberry Pi OS ของเครื่องนี้ไม่มี gtk-launch
     → "เปิดเทอร์มินัล" และคำสั่งเปิดแอปทุกตัวเปิดไม่ขึ้น
     """
-    import shutil
-    from pathlib import Path
-
     if shutil.which("gtk-launch") is None and shutil.which("gio") is not None:
         for d in DESKTOP_DIRS:
             f = Path(d).expanduser() / desktop
@@ -224,7 +235,11 @@ def command_for(plan: Plan) -> list[str] | None:
     """แปลง Plan เป็นคำสั่งแบบ list · None = ไม่ต้องรันโปรแกรม (เช่น เปลี่ยนหน้าในระบบ)."""
     p = plan.params
     if plan.action == "open_url":
-        return ["xdg-open", p["url"] if "url" in p else SITES[p["site"]][1]]
+        url = p["url"] if "url" in p else SITES[p["site"]][1]
+        if p.get("site") in SYSTEM_BROWSER_SITES and shutil.which("chromium"):
+            return ["chromium", f"--user-data-dir={account_profile()}", "--no-first-run",
+                    "--no-default-browser-check", url]  # fmt: skip
+        return ["xdg-open", url]
     if plan.action == "open_app":
         return _app_command(app_table()[p["app"]][1])  # KeyError = แอปถูกถอนไปแล้ว
     if plan.action == "set_volume":
@@ -269,7 +284,9 @@ class Executor:
         if plan.action == "open_url" and self._browser is not None:
             site = plan.params.get("site", "")
             url = plan.params.get("url") or SITES[site][1]
-            if site not in SYSTEM_BROWSER_SITES:
+            if site in SYSTEM_BROWSER_SITES:
+                note = ACCOUNT_NOTE
+            else:
                 if self._browser(site, url):
                     return Outcome(True, f"{plan.summary or 'เปิดเว็บ'} ในเบราว์เซอร์ของผู้ช่วย")
                 note = FALLBACK_NOTE

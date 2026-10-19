@@ -150,17 +150,28 @@ class ExecutorTest(unittest.TestCase):
         self.assertEqual(out.message, "เปิด YouTube ในเบราว์เซอร์ของผู้ช่วย")
 
     def test_busy_assistant_browser_falls_back_and_says_so(self):
-        out = self.make(False).execute(command.parse("เปิดกูเกิลไดรฟ์").plan)
+        out = self.make(False).execute(command.parse("เปิดวิกิพีเดีย").plan)
         self.assertTrue(out.ok)
-        self.assertEqual(self.ran, [["xdg-open", URL["drive"]]])
+        self.assertEqual(self.ran, [["xdg-open", URL["wikipedia"]]])
         self.assertIn("เปิดด้วยเบราว์เซอร์ปกติแทน", out.message)  # H2 ไม่เงียบ
 
-    def test_sites_blocked_in_criterion_0_use_system_browser(self):
-        with mock.patch.object(actions, "SYSTEM_BROWSER_SITES", frozenset({"gmail"})):
+    def test_google_account_sites_open_in_account_window(self):
+        """ข้อ 0 (Pakon ที่จอ Pi 5 2026-10-19): Google ไม่ให้เข้าสู่ระบบในเบราว์เซอร์ที่ถูกคุม →
+        Gmail/ปฏิทิน/ไดรฟ์/เอกสาร เปิดในหน้าต่างบัญชีแยก (โปรไฟล์ของเรา · ไม่ถูกคุม) และบอกผู้ใช้."""
+        self.assertEqual(actions.SYSTEM_BROWSER_SITES, {"gmail", "calendar", "drive", "docs"})
+        with mock.patch.object(actions.shutil, "which", lambda n: "/usr/bin/chromium"):
             out = self.make(True).execute(command.parse("เปิดจีเมล").plan)
-        self.assertEqual(self.hooked, [])
+        self.assertEqual(self.hooked, [])  # ไม่ใช้เบราว์เซอร์ของผู้ช่วย
+        args = self.ran[0]
+        self.assertEqual(args[0], "chromium")
+        self.assertIn(f"--user-data-dir={actions.account_profile()}", args)
+        self.assertNotIn("--remote-debugging-pipe", args)
+        self.assertEqual(args[-1], URL["gmail"])
+        self.assertEqual(out.message, "เปิด Gmail" + actions.ACCOUNT_NOTE)
+        self.ran.clear()
+        with mock.patch.object(actions.shutil, "which", lambda n: None):  # ไม่มี Chromium = ทางเดิม
+            self.make(True).execute(command.parse("เปิดจีเมล").plan)
         self.assertEqual(self.ran, [["xdg-open", URL["gmail"]]])
-        self.assertEqual(out.message, "เปิด Gmail")
 
     def test_skill_steps_use_the_same_browser(self):
         ex = self.make(True)
@@ -279,6 +290,9 @@ class BrowserControllerWebTest(unittest.TestCase):
     def test_sign_out_removes_only_the_profile(self):
         left = self.prof.with_name("browser" + control.REMOVING + "1")  # ของค้างจากไฟดับรอบก่อน
         left.mkdir()
+        accounts = self.prof.with_name("browser-accounts") / "Default"  # หน้าต่างบัญชี Google (ข้อ 0)
+        accounts.mkdir(parents=True)
+        (accounts / "Cookies").write_text("google", encoding="utf-8")
         b = self.make()
         msg = b.signOutAll()
         self.assertIn("ออกจากบัญชีเว็บในเบราว์เซอร์ของผู้ช่วยแล้ว", msg)
@@ -304,7 +318,10 @@ class BrowserControllerWebTest(unittest.TestCase):
 
     def test_voice_routes(self):
         self.assertEqual(route("เปิดยูทูบ", False), BROWSER)
-        self.assertEqual(route("เปิดกูเกิลไดรฟ์", False), BROWSER)
+        self.assertEqual(route("เปิดวิกิพีเดีย", False), BROWSER)
+        # บัญชี Google (ข้อ 0 · 2026-10-19): ทางคำสั่งเครื่อง → หน้าต่างบัญชี ไม่ใช่เบราว์เซอร์ของผู้ช่วย
+        for t in ("เปิดจีเมล", "เปิดกูเกิลไดรฟ์", "เปิดปฏิทินกูเกิล", "เปิดกูเกิลด็อก"):
+            self.assertEqual(route(t, False), COMMAND, t)
         self.assertEqual(route("เปิดปฏิทิน", False), COMMAND)  # หน้าปฏิทินของเครื่อง
 
 
@@ -327,17 +344,17 @@ class OpenSiteBackendTest(unittest.TestCase):
         self.assertEqual(self.s.openSite("https://evil.example"), "ไม่มีเว็บนี้ในรายการ")  # H7
         self.assertEqual((self.ran, self.hooked), ([], []))
         self.assertEqual(self.s.openSite("instagram"), "ไม่มีเว็บนี้ในรายการ")  # เอาออกแล้ว
-        self.assertEqual(self.s.openSite("gmail"), "เปิด Gmail ในเบราว์เซอร์ของผู้ช่วย")
-        self.assertEqual(self.hooked, [("gmail", URL["gmail"])])
+        self.assertEqual(self.s.openSite("youtube"), "เปิด YouTube ในเบราว์เซอร์ของผู้ช่วย")
+        self.assertEqual(self.hooked, [("youtube", URL["youtube"])])
 
     def test_typed_open_says_which_browser(self):
         card = self.s.handle("เปิดยูทูบ")
         self.assertIn("เปิด YouTube ในเบราว์เซอร์ของผู้ช่วย", card["lines"])
         self.assertEqual(self.s.handle("เปิดเฟซบุ๊ก")["title"], "ระบบนี้ไม่มี Facebook")
         self.free = False
-        card = self.s.handle("เปิดกูเกิลไดรฟ์")
+        card = self.s.handle("เปิดวิกิพีเดีย")
         self.assertTrue(any("เบราว์เซอร์ปกติ" in x for x in card["lines"]))
-        self.assertEqual(self.ran, [["xdg-open", URL["drive"]]])
+        self.assertEqual(self.ran, [["xdg-open", URL["wikipedia"]]])
 
 
 try:

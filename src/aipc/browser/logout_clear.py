@@ -83,8 +83,12 @@ def main() -> int:
     from aipc.ui import settings
 
     prefs = settings.load()
-    result = clear(control.default_profile(), prefs.clear_web_on_logout, state_dir())
-    print(f"aipc-logout-clear: {result}", file=sys.stderr)
+    from aipc.skills.actions import account_profile
+
+    on = prefs.clear_web_on_logout
+    for profile in (control.default_profile(), account_profile()):  # ผู้ช่วย + หน้าต่างบัญชี Google
+        result = clear(profile, on, state_dir())
+        print(f"aipc-logout-clear {profile.name}: {result}", file=sys.stderr)
     return 0  # ไม่ขวางการออกจากระบบไม่ว่าผลเป็นอะไร
 
 

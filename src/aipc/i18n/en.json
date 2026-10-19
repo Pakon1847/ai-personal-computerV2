@@ -535,6 +535,8 @@
   "สิทธิ์ใช้กล้องสำหรับสกิล (ADR-015)": "Camera permission for skills (ADR-015)",
   "อ่านรายการไดรฟ์ไม่ได้": "Cannot read the list of drives",
   "ใครตอบ": "Answered by",
+  "{0} ในหน้าต่างบัญชี Google (เข้าสู่ระบบได้ แต่คำสั่งเสียงคุมหน้านี้ไม่ได้)": "{0} in the Google account window (sign-in works, but voice commands can't control this page)",
+  "{0} ในเบราว์เซอร์ของผู้ช่วย": "{0} in the assistant browser",
   "ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ": "Sign out of all websites every time you log out",
   "เหมาะกับเครื่องที่ใช้บัญชีร่วมกัน · ทุกครั้งที่เข้าเครื่องต้องเข้าสู่ระบบ Gmail หรือเว็บดูหนังใหม่ · ไม่ลบเบราว์เซอร์ธรรมดาและไฟล์ดาวน์โหลด": "For shared accounts · you'll need to sign in to Gmail or streaming sites again each time · the regular browser and downloads are not touched",
   "ออกจากระบบครั้งก่อน ล้างบัญชีเว็บไม่สำเร็จ · การเข้าสู่ระบบเว็บอาจยังอยู่ · กดปุ่มออกจากบัญชีเว็บทั้งหมดด้านบน": "Clearing website sign-ins failed at your last log out · you may still be signed in · press Sign out of all websites above",
