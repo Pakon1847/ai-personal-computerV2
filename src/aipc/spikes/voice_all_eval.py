@@ -63,6 +63,8 @@ def label(text: str, skills) -> str:
         return "reminder" if skills.voiceReminder(text).get("kind") == "reminder" else "reminder?"
     if way == handsfree.LLM_SKILL:
         return "llm:" + skills.voiceIntent(text)[4:]
+    if way == handsfree.APP:
+        return "app:" + handsfree.app_command(text)["kind"]
     if way == handsfree.UNKNOWN:
         if skills.voiceAnswer(text).get("kind") is not None:
             return "answer"
@@ -70,14 +72,16 @@ def label(text: str, skills) -> str:
             return "near"
         if skills.voiceCreate(text).get("kind") is not None:
             return "create"
+        if skills.voiceAsk(text).get("confirmToken"):  # รอบ 3: ถามว่าส่งไปแชทไหม
+            return "ask"
     return "none" if way == handsfree.UNKNOWN else way
 
 
 def score(name: str, skills) -> dict:
     items = json.loads((DATA / f"voice_all_{name}.json").read_text(encoding="utf-8"))["items"]
     rows = [{**i, "got": label(i["text"], skills)} for i in items]
-    cmd = [r for r in rows if r["expect"] != "none"]
-    non = [r for r in rows if r["expect"] == "none"]
+    cmd = [r for r in rows if r["expect"] not in ("none", "ask")]
+    non = [r for r in rows if r["expect"] in ("none", "ask")]
     return {
         "set": name,
         "commands_correct": sum(r["got"] == r["expect"] for r in cmd),

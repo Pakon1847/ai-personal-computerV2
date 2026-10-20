@@ -2870,6 +2870,8 @@ class SkillsController(QObject):
     # สุขภาพเครื่องทางเสียง: คำสำคัญของสกิลมี "เครื่อง" เดี่ยว ๆ ("เปิดแอปเครื่องคิดเลข" จะตรง) → ใช้กฎที่เข้มกว่า
     MACHINE_SYMPTOMS = ("ช้า", "อืด", "ค้าง", "ร้อน")
     MACHINE_WORDS = ("อุณหภูมิ", "แรม", "ram", "หน่วยความจำ", "พื้นที่เหลือ", "พัดลม")
+    _NET = re.compile(r"(?:อินเทอร์)?เน็ต(?!ฟ)|ไวไฟ|wi-?fi")
+    NET_ASK = ("หลุด", "ช้า", "ต่อ", "ล่ม", "ไหม", "มั้ย", "ใช้ได้", "ใช้ไม่ได้")
 
     @Slot(str, result="QVariantMap")
     def voiceAnswer(self, text: str) -> dict:  # noqa: N802
@@ -2898,6 +2900,9 @@ class SkillsController(QObject):
         about_machine = ("เครื่อง" in t and any(w in t for w in self.MACHINE_SYMPTOMS)) or any(
             w in t for w in self.MACHINE_WORDS
         )
+        # เน็ต (การ์ด 0042 รอบ 3): "เน็ตหลุดไหม" "ต่อเน็ตอยู่ไหม" · ไม่ใช่ "เน็ตฟลิกซ์" · ต้องเป็นคำถาม/อาการ
+        if self._NET.search(t) and any(w in t for w in self.NET_ASK):
+            about_machine = True
         if machine is not None and about_machine:
             route = router.Route("skill", machine, "ถามสุขภาพเครื่องด้วยเสียง")
             return self._why(self._card(route, text), t0)
@@ -2906,7 +2911,7 @@ class SkillsController(QObject):
     # ---------- คีย์ลัดใช้ได้กับทุกสกิล (การ์ด 0042) ----------
     # ตั้งเตือนต้องขึ้นต้นด้วยคำสั่ง ("เตือน…" "ช่วยเตือน…" "อย่าลืมเตือน…" "นัด…") หรือบอกเวลา + คำของสกิลนัด ·
     # เล่าเรื่อง ("แม่ชอบเตือนให้กินข้าว") ไม่ขึ้นต้นด้วยคำสั่งและไม่มีเวลา = ไม่ใช่
-    _REMIND_START = re.compile(r"^(?:ช่วย|อย่าลืม|ขอ|รบกวน)*(?:เตือน|นัด|จดนัด)")
+    _REMIND_START = re.compile(r"^(?:(?:ช่วย|อย่าลืม|ขอ|รบกวน)*(?:เตือน|นัด|จดนัด|ปลุก)|อย่าลืม)")
     # เลื่อน/ย้าย/ลบ/ยกเลิกนัด = แก้นัดเดิม ไม่ใช่ตั้งใหม่ (ได้ยินเพี้ยน "เลื่อนนักประชุม…" ก็ไม่สร้างนัดใหม่ · เกณฑ์ V3)
     _EDIT_START = re.compile(r"^(?:ช่วย|ขอ|รบกวน)*(?:เลื่อน|ย้าย|ลบ|ยกเลิก|เปลี่ยน|แก้)")
     _LETTER = re.compile(r"^(?:ช่วย|ขอ|รบกวน)*(?:ร่าง|เขียน)(?:อีเมล์?|จดหมาย|ข้อความ|หนังสือ)")
@@ -2974,6 +2979,24 @@ class SkillsController(QObject):
                 "lines": [f"ได้ยินว่า “{text}”",
                           "งานที่ AI ต้องคิด (แปล สรุป ร่างจดหมาย) ทำในหน้าแชท · “ใช่” = ส่งไปที่แชท"],
                 "page": ""}  # fmt: skip
+        return self._why(card, t0)
+
+    @Slot(str, result="QVariantMap")
+    def voiceAsk(self, text: str) -> dict:  # noqa: N802
+        """ไม่ใช่คำสั่งทันที (คำถาม ข้อมูลสด คุยเล่น) → การ์ด "ส่งไปถามในแชทไหม" (การ์ด 0042 รอบ 3) ·
+        "ใช่" = หน้าจอส่งข้อความเดิมเข้าแชทเหมือนพิมพ์ (สกิลทุกตัว + AI + การยืนยันก่อนส่งออกของแชทเดิม) ·
+        คีย์ลัดไม่ส่งเอง (BRIEF 5.6 ข้อ 1) · สั้นเกินไป = {} (เสียงรบกวน)."""
+        t0 = time.monotonic()
+        if len(re.sub(r"\s+", "", text)) < 3:
+            return {}
+        self._counter += 1
+        token = f"a{self._counter}"
+        self._pending[token] = ("ask", text)
+        card = {"kind": "steps", "badge": {}, "title": "ส่งไปถามผู้ช่วยในแชทไหม", "chips": [],
+                "confirmToken": token, "page": "",
+                "lines": [f"ได้ยินว่า “{text}”",
+                          "ไม่ใช่คำสั่งที่ทำได้ทันที · คำถามและงานอื่น ๆ ตอบในหน้าแชท · "
+                          "“ใช่” = ส่งไปที่แชท"]}  # fmt: skip
         return self._why(card, t0)
 
     # ---------- พูดสั่งให้ Claude สร้างสกิล (การ์ด 0030) ----------
@@ -3350,6 +3373,8 @@ class SkillsController(QObject):
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
             return self._run_steps(skill, text, card)
+        elif isinstance(plan, tuple) and plan[0] == "ask":  # การ์ด 0042 รอบ 3: หน้าจอส่งเข้าแชทเหมือนพิมพ์
+            card.update(kind="to-chat", title="ส่งไปที่แชทแล้ว", chatText=plan[1])
         elif isinstance(plan, tuple) and plan[0] == "forge":  # การ์ด 0030: ยืนยันแล้วจึงส่ง Claude
             self._voice_forges.add(plan[1])
             return self._start_forge(plan[1])

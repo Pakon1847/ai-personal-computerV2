@@ -229,6 +229,12 @@ Item {
         a[token] = true
         answered = a
         const card = skills.confirm(token, yes)
+        if (card.chatText) {   // การ์ด 0042 รอบ 3: ถามในแชท = เหมือนพิมพ์เอง
+            voicePopup.close()
+            AppState.page = "workspace"
+            sendText(card.chatText)
+            return
+        }
         if (card.llm && card.llmText && chat.send(card.llmText, card.prompt || "")) {
             // งานที่ใช้ AI จากคีย์ลัด (การ์ด 0042): ไปหน้าแชท · เห็นข้อความที่ส่ง + คำตอบที่กำลังมา
             voicePopup.close()
@@ -239,6 +245,32 @@ Item {
         }
         voiceShow(heard, card, "", false)
         speakVoice()
+    }
+    // ค่าตั้งของแอปจากคีย์ลัด (การ์ด 0042 รอบ 3) · คืนข้อความผล
+    function appCommand(cmd) {
+        if (cmd.kind === "theme") {
+            uiSettings.setTheme(cmd.value)
+            return cmd.value === "dark" ? Tr.t("เปลี่ยนเป็นโหมดมืดแล้ว") : Tr.t("เปลี่ยนเป็นโหมดสว่างแล้ว")
+        }
+        if (cmd.kind === "font") {
+            const steps = [1.0, 1.25, 1.5, 1.75, 2.0]
+            const i = Math.max(0, steps.indexOf(uiSettings.fontScale))
+            const j = Math.min(steps.length - 1, Math.max(0, i + (cmd.value === "up" ? 1 : -1)))
+            if (j === i)
+                return cmd.value === "up" ? Tr.t("ตัวอักษรใหญ่สุดแล้ว (200%)") : Tr.t("ตัวอักษรเล็กสุดแล้ว (100%)")
+            uiSettings.setFontScale(steps[j])
+            return Tr.t("ขนาดตัวอักษร ") + Math.round(steps[j] * 100) + "%"
+        }
+        if (cmd.kind === "lang") {
+            uiSettings.setLanguage(cmd.value)
+            return cmd.value === "en" ? "Switched to English" : "เปลี่ยนเป็นภาษาไทยแล้ว"
+        }
+        if (cmd.kind === "newchat") {
+            voice.stop(); chat.newChat(false); root.items = []; root.answered = ({})
+            AppState.page = "workspace"
+            return Tr.t("เริ่มแชทใหม่แล้ว")
+        }
+        return ""
     }
     function voiceSay(heard, say) {   // บอกว่าทำไม่ได้/ไม่รู้จัก (กล่องสีส้ม)
         voiceShow(heard, null, say, false, false)
@@ -275,6 +307,10 @@ Item {
             voiceShow(t, null, Tr.t("กำลังทำ…"), true)   // ผลมาทาง onFinished
             return
         }
+        if (way === "app") {            // การ์ด 0042 รอบ 3: ค่าตั้งของแอป (กลับคืนได้ทันที)
+            voiceShow(t, null, appCommand(browser.appCommand(t)), false, true)
+            return
+        }
         if (way === "reminder") {       // การ์ด 0042: ตั้งเตือนด้วยเสียง = การ์ดสกิลนัดเดิม (ยืนยันก่อนบันทึก)
             voiceDispatch(skills.voiceReminder(t), t)
             return
@@ -299,6 +335,9 @@ Item {
             // การ์ด 0030: ขอโหมดใหม่ = การ์ดยืนยันข้อความก่อนส่ง Claude (ไม่มี Claude/ปิดสวิตช์ = การ์ดอธิบาย)
             const create = skills.voiceCreate(t)
             if (create.kind !== undefined) { voiceDispatch(create, t); return }
+            // การ์ด 0042 รอบ 3: ไม่ใช่คำสั่งทันที = ถามว่าส่งไปถามในแชทไหม (แทน "ไม่รู้จักคำสั่ง")
+            const toChat = skills.voiceAsk(t)
+            if (toChat.confirmToken) { voiceDispatch(toChat, t); return }
         }
         const say = way === "needs_browser"
             ? browser.hint(t)   // คุมเพลงก่อนเปิดเพลง = บอกให้เปิดเพลงก่อน (การ์ด 0035)

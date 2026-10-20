@@ -6,7 +6,7 @@
 
 import os
 import unittest
-from urllib.parse import parse_qs, quote_plus, urlsplit
+from urllib.parse import parse_qs, quote, quote_plus, urlsplit
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
@@ -140,7 +140,8 @@ class SiteSearchControlTest(unittest.TestCase):
                 bc, cdp = opened_at("")
                 r = bc.run(BrowseCommand("site_search", query=q, site=site))
                 self.assertTrue(r.ok)
-                self.assertEqual(cdp.cur.url, base + quote_plus(q))
+                path = site in control.PATH_QUERY  # Spotify: คำค้นอยู่ในเส้นทาง (การ์ด 0042 รอบ 3)
+                self.assertEqual(cdp.cur.url, base + (quote(q, safe="") if path else quote_plus(q)))
                 self.assertIn(f"ค้นหา {q} ใน ", r.say)
         url = urlsplit(control.SITE_SEARCH["youtube"] + quote_plus(q))
         self.assertEqual(parse_qs(url.query)["search_query"], [q])  # "&" ไม่ตัดคำค้นเป็นสองพารามิเตอร์

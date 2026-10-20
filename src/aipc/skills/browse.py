@@ -104,6 +104,11 @@ _FULL = re.compile(
 )
 # ข้ามโฆษณา (การ์ด 0042) · YouTube: กดปุ่มข้ามของตัวเล่นเมื่อปุ่มขึ้นแล้ว
 _SKIP_AD = re.compile(r"(?:กด\s*)?ข้าม\s*(?:โฆษณา|แอด|ad|ads)(?:\s*(?:ไป|นี้))?|skip\s*ads?")
+# เพลงก่อนหน้า (การ์ด 0042 รอบ 3)
+_PREV = re.compile(
+    rf"(?:(?:ย้อน|ถอย)\s*(?:กลับ\s*)?(?:ไป\s*)?|(?:เปิด|เล่น|ไป)\s*)?{_MEDIA}\s*ก่อน\s*หน้า(?:\s*นี้)?"
+    rf"|(?:ย้อน|ถอย)\s*{_MEDIA}(?:\s*กลับ)?"
+)
 _NEXT = re.compile(rf"(?:(?:ไป|เปิด|เล่น)\s*)?{_MEDIA}\s*(?:ถัด|ต่อ)\s*ไป|ข้าม\s*{_MEDIA}(?:\s*นี้)?")
 _CLOSE = re.compile(r"ปิด\s*(?:แท็บ|แทบ|tab|หน้า\s*(?:นี้|เว็บ)|เว็บ)\s*(?:นี้|ที่\s*เปิด\s*อยู่)?\s*(?:ไป)?")
 _APP = re.compile(
@@ -140,6 +145,9 @@ SEARCH_SITE_NAMES = {
     "wikipedia": SITE_NAMES["wikipedia"] + r"|วิกิ",
     "drive": r"กูเกิ้?ล\s*ไดร์?[ฟบ]์?|google\s*drive",
     "gmail": r"จีเมล์?|อีเมล์?|gmail",
+    # การ์ด 0042 รอบ 3 · ลิงก์ค้นหาตรวจรูปแบบแล้ว (control.SITE_SEARCH) · เว็บดูหนังอื่นยังไม่ได้ตรวจ = ไม่รับ
+    "spotify": SITE_NAMES["spotify"],
+    "netflix": SITE_NAMES["netflix"],
 }
 _SVC = "(?:" + "|".join(f"(?P<{k}>{v})" for k, v in SEARCH_SITE_NAMES.items()) + ")"
 # "หา" ที่เป็นต้นคำอื่นไม่นับ (เหมือน _FIND ข้างล่าง: หาย หาก หาด …)
@@ -297,7 +305,7 @@ def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
         return BrowseCommand("reload")
     if m := _SCROLL.fullmatch(t):
         return BrowseCommand("scroll", direction="down" if m.group(1) == "ลง" else "up")
-    for direction, pat in (("pause", _PAUSE), ("play", _PLAY), ("next", _NEXT)):
+    for direction, pat in (("pause", _PAUSE), ("play", _PLAY), ("next", _NEXT), ("prev", _PREV)):
         if pat.fullmatch(t):
             return BrowseCommand("media", direction=direction)
     if _CLOSE.fullmatch(t):

@@ -898,5 +898,16 @@
   "ตอนนี้ไม่มีโฆษณาให้ข้าม": "There's no ad to skip right now",
   "ข้ามโฆษณาได้เฉพาะใน YouTube": "Ads can only be skipped on YouTube",
   "หน้านี้ไม่มีคลิปให้เลือก": "This page has no clips to choose from",
-  "กำลังดูคลิปอยู่ · พูด “คลิปถัดไป” เพื่อเปลี่ยนคลิป หรือ “ย้อนกลับ” ไปหน้ารายการ": "You're already watching a clip · say “next clip” to change it, or “go back” to the list"
+  "กำลังดูคลิปอยู่ · พูด “คลิปถัดไป” เพื่อเปลี่ยนคลิป หรือ “ย้อนกลับ” ไปหน้ารายการ": "You're already watching a clip · say “next clip” to change it, or “go back” to the list",
+  "ส่งไปถามผู้ช่วยในแชทไหม": "Ask the assistant in the chat?",
+  "ไม่ใช่คำสั่งที่ทำได้ทันที · คำถามและงานอื่น ๆ ตอบในหน้าแชท · “ใช่” = ส่งไปที่แชท": "Not an instant command · questions and other tasks are answered in the chat · “yes” = send to chat",
+  "ส่งไปที่แชทแล้ว": "Sent to the chat",
+  "เปลี่ยนเป็นโหมดมืดแล้ว": "Switched to dark mode",
+  "เปลี่ยนเป็นโหมดสว่างแล้ว": "Switched to light mode",
+  "ตัวอักษรใหญ่สุดแล้ว (200%)": "Text is already at the largest size (200%)",
+  "ตัวอักษรเล็กสุดแล้ว (100%)": "Text is already at the smallest size (100%)",
+  "ขนาดตัวอักษร ": "Text size ",
+  "เริ่มแชทใหม่แล้ว": "Started a new chat",
+  "เปิดเพลงก่อนหน้าแล้ว": "Playing the previous track",
+  "ไม่มีเพลงก่อนหน้าในรายการ · เริ่มเพลงนี้ใหม่แล้ว": "No previous track in the list · restarted this one"
 }

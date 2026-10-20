@@ -119,6 +119,7 @@ NEEDS_BROWSER = "needs_browser"  # คำสั่งที่ต้องมี
 UNKNOWN = "unknown"  # ไม่ใช่คำสั่ง → บอกตรง ๆ ไม่ส่งให้ AI
 SKILL = "skill"  # การ์ด 0028: ตรงเป๊ะกับประโยคของสกิลที่ทำด้วยโค้ด (เช่น สกิลที่ Claude สร้าง) → ทำสกิลนั้น
 REMINDER = "reminder"  # การ์ด 0042: ตั้งเตือน/นัด → สกิลนัดตรง ๆ (การ์ดยืนยันเดิม · ไม่ผ่าน AI)
+APP = "app"  # การ์ด 0042 รอบ 3: ค่าตั้งของแอป (ธีม ตัวอักษร ภาษา แชทใหม่) · กลับคืนได้ทันที = ไม่ต้องยืนยัน
 LLM_SKILL = "llm_skill"  # การ์ด 0042: สกิลที่ใช้ AI (แปล สรุป ร่างจดหมาย) → ถามก่อนส่งไปแชท (BRIEF 5.6 ข้อ 1)
 
 
@@ -155,9 +156,48 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
         return COMMAND
     if skill is not None and skill(text):
         return SKILL
+    if app_command(text):
+        return APP
     if intent is not None and (want := intent(text)):
         return REMINDER if want == "reminder" else LLM_SKILL
     return NEEDS_BROWSER if cmds else UNKNOWN
+
+
+# ค่าตั้งของแอปด้วยเสียง (การ์ด 0042 รอบ 3) · ทั้งประโยคต้องตรง (ไม่ใช่แค่มีคำ) · "จอสว่างไปหน่อย" ไม่ใช่คำสั่ง
+_THEME = re.compile(
+    r"(?:(?:เปลี่ยน|เปิด|ใช้|ตั้ง|สลับ)\s*(?:เป็น\s*)?)?(?:โหมด|ธีม)\s*(มืด|ดำ|กลางคืน|สว่าง|ขาว|กลางวัน)"
+)
+_FONT = re.compile(
+    r"(?:(ขยาย|เพิ่ม|ลด|ย่อ)\s*)?(?:ขนาด\s*)?(?:ตัว\s*(?:หนังสือ|อักษร)|ฟอนต์)\s*(?:ให้\s*)?(ใหญ่|โต|เล็ก)?"
+    r"\s*(?:ขึ้น|ลง)?(?:\s*(?:อีก|นิด|หน่อย))*"
+)
+_LANG = re.compile(
+    r"(?:เปลี่ยน|ตั้ง|ใช้|สลับ)\s*(?:หน้าจอ\s*)?(?:เป็น\s*)?(?:ภาษา\s*)?(?:เป็น\s*)?(?:ภาษา\s*)?(อังกฤษ|ไทย)"
+)
+_NEWCHAT = re.compile(
+    r"(?:เริ่ม|เปิด|ขึ้น)?\s*แชท\s*ใหม่|(?:ล้าง|ลบ)\s*แชท(?:\s*(?:แล้ว)?\s*เริ่ม\s*ใหม่)?|เริ่ม\s*คุย\s*ใหม่"
+)
+
+
+def app_command(text: str) -> dict:
+    """{"kind": theme|font|lang|newchat, "value": …} · {} = ไม่ใช่ค่าตั้งของแอป."""
+    from aipc.skills import browse
+
+    t = browse._clean(text)[0]
+    t = re.sub(r"^(?:ช่วย|ขอ|รบกวน)\s*", "", t)
+    if m := _THEME.fullmatch(t):
+        return {
+            "kind": "theme",
+            "value": "dark" if m.group(1) in ("มืด", "ดำ", "กลางคืน") else "light",
+        }
+    if (m := _FONT.fullmatch(t)) and (m.group(1) or m.group(2)):
+        up = m.group(1) in ("ขยาย", "เพิ่ม") or m.group(2) in ("ใหญ่", "โต")
+        return {"kind": "font", "value": "up" if up else "down"}
+    if m := _LANG.fullmatch(t):
+        return {"kind": "lang", "value": "en" if m.group(1) == "อังกฤษ" else "th"}
+    if _NEWCHAT.fullmatch(t):
+        return {"kind": "newchat", "value": ""}
+    return {}
 
 
 # ตอบการ์ดที่รอยืนยันด้วยเสียง (การ์ด 0024) · ตรวจทั้งระบบ 2026-10-18 ข้อ 2.1: เดิมดูแค่คำแรก →
@@ -256,6 +296,11 @@ class BrowserController(QObject):
         if not self._active:  # หน้าเข้าสู่ระบบไม่มีเบราว์เซอร์และไม่มีแชท
             return UNKNOWN
         return route(text, self._ctl().running, self._skill_match, self._intent)
+
+    @Slot(str, result="QVariantMap")
+    def appCommand(self, text: str) -> dict:  # noqa: N802
+        """ค่าตั้งของแอปจากคีย์ลัด (การ์ด 0042 รอบ 3) · หน้าจอเป็นคนเปลี่ยนค่าผ่าน uiSettings."""
+        return app_command(text)
 
     @Slot(str, result=str)
     def hint(self, text: str) -> str:

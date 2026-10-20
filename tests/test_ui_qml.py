@@ -455,7 +455,8 @@ class ShellCardTest(unittest.TestCase):
 
     def test_hands_free_voice_answers_pending_card_and_never_chats(self):
         """การ์ด 0024: พูด "ใช่" ตอบการ์ดที่รอยืนยัน (ไม่ต้องกดปุ่ม) ·
-        การ์ด 0027: ประโยคที่ไม่ใช่คำสั่ง = บอกว่าไม่รู้จัก ไม่ส่งเข้าแชท (เดิมได้การ์ดเวลา/คำตอบของ AI)."""
+        การ์ด 0027: ประโยคที่ไม่ใช่คำสั่ง ไม่ส่งเข้าแชทเอง · การ์ด 0042 รอบ 3: ได้การ์ดถาม "ส่งไปถามในแชทไหม"
+        แทนคำว่าไม่รู้จัก (ยังไม่ส่งจนกว่าจะตอบ "ใช่")."""
         _, win, warnings = self.open_shell()
         page = find_all(win, "workspace")[0]
         base = {"chips": [], "lines": [], "page": "", "badge": {}, "kind": "command"}
@@ -475,8 +476,8 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(len(items_of(page)), n)
         vc = vc_of(page)
         self.assertEqual(vc["heard"], "แต่งกลอนให้หน่อย")
-        self.assertIn("ไม่รู้จักคำสั่ง", vc["text"])
-        self.assertFalse(vc["card"])
+        self.assertEqual(vc["card"]["title"], "ส่งไปถามผู้ช่วยในแชทไหม")
+        self.assertTrue(vc["card"]["confirmToken"])
         self.assertTrue(find_all(win, "voicePopup")[0].property("opened"))
         # การ์ด 0029: คำถามที่โค้ดตอบเองได้ = การ์ดเวลาจากนาฬิกาเครื่อง (ไม่ใช่ AI · 0027 เดิมได้ "ไม่รู้จักคำสั่ง")
         page.voiceCommand("ตอนนี้กี่โมง")
@@ -1567,6 +1568,27 @@ class ShellCardTest(unittest.TestCase):
         """แถบบนรวมเครือข่าย/โมเดล/พื้นที่/ความร้อนเป็นป้ายเดียว → หน้าเครื่องแสดงค่าจริงครบ 4 ช่อง."""
         _, win, warnings = self.open_shell("health")
         self.assertTrue(find_items(win, "healthSummary")[0].isVisible())
+        self.assertEqual(warnings, [])
+
+    def test_voice_hotkey_settings_and_ask_in_chat(self):
+        """การ์ด 0042 รอบ 3: "เปิดโหมดมืด" = เปลี่ยนค่าทันที · คำถามทั่วไป = การ์ดถามก่อน ·
+        "ใช่" = ส่งเข้าแชทเหมือนพิมพ์."""
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        ui = engine.rootContext().contextProperty("uiSettings")
+        ui.setTheme("light")
+        page.voiceCommand("เปิดโหมดมืด")
+        settle(30)
+        self.assertEqual(ui.property("theme"), "dark")
+        page.voiceCommand("แชทเมื่อกี้หายไปไหน")
+        settle(30)
+        card = vc_of(page)["card"]
+        self.assertTrue(card["confirmToken"])
+        self.assertEqual(items_of(page), [])  # ยังไม่ส่งจนกว่าจะตอบ "ใช่"
+        page.answerVoice(card["confirmToken"], True, "แชทเมื่อกี้หายไปไหน")
+        settle(50)
+        self.assertEqual(items_of(page)[0]["text"], "แชทเมื่อกี้หายไปไหน")
+        self.assertTrue(items_of(page)[0]["user"])
         self.assertEqual(warnings, [])
 
     def test_next_reminder_card_empty_then_real(self):

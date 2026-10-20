@@ -143,3 +143,50 @@ class DevSetTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Round3Test(unittest.TestCase):
+    """การ์ด 0042 รอบ 3: ทุกความสามารถ ไม่ใช่แค่ YouTube."""
+
+    def test_search_in_spotify_and_netflix(self):
+        spotify = BrowseCommand("site_search", query="เพลงรัก", site="spotify")
+        netflix = BrowseCommand("site_search", query="สควิดเกม", site="netflix")
+        self.assertEqual(browse.parse("หาเพลงรักในสปอติฟาย"), [spotify])
+        self.assertEqual(browse.parse("ค้นในเน็ตฟลิกซ์ว่าสควิดเกม"), [netflix])
+
+    def test_spotify_query_goes_in_the_path(self):
+        bc, cdp = opened_at("https://open.spotify.com/")
+        r = bc.run(BrowseCommand("site_search", query="บอดี้ สแลม", site="spotify"))
+        self.assertTrue(r.ok)
+        self.assertIn("/search/", r.url)
+        self.assertNotIn("+", r.url)  # ช่องว่าง = %20 ไม่ใช่ +
+
+    def test_previous_track(self):
+        for text in ("เพลงก่อนหน้า", "ย้อนเพลง", "ย้อนกลับไปเพลงก่อนหน้า"):
+            with self.subTest(text=text):
+                self.assertEqual(browse.parse(text), [BrowseCommand("media", direction="prev")])
+        # เว็บที่ไม่ใช่ YouTube = เริ่มเพลงนี้ใหม่ และบอกตามจริง
+        bc, _ = opened_at("https://example.org/radio")
+        bc._eval = lambda js, **kw: "ok" if js == control.RESTART_JS else None
+        r = bc.run(BrowseCommand("media", direction="prev"))
+        self.assertTrue(r.ok)
+        self.assertIn("เริ่มเพลงนี้ใหม่", r.say)
+
+    def test_app_settings_by_voice(self):
+        from aipc.ui.handsfree import app_command
+
+        self.assertEqual(app_command("เปิดโหมดมืด"), {"kind": "theme", "value": "dark"})
+        self.assertEqual(app_command("ตัวหนังสือใหญ่ขึ้น"), {"kind": "font", "value": "up"})
+        self.assertEqual(app_command("เปลี่ยนภาษาเป็นอังกฤษ"), {"kind": "lang", "value": "en"})
+        self.assertEqual(app_command("แชทใหม่"), {"kind": "newchat", "value": ""})
+        for text in ("จอสว่างไปหน่อย", "ภาษาอังกฤษยากจัง", "แชทเมื่อกี้หายไปไหน", "ตัวหนังสือ"):
+            with self.subTest(text=text):
+                self.assertEqual(app_command(text), {})
+
+    def test_dev3_set(self):
+        from aipc.spikes import voice_all_eval
+
+        _engine, skills = voice_all_eval.backend()
+        res = voice_all_eval.score("dev3", skills)
+        self.assertEqual(res["wrong"], [])
+        self.assertEqual(res["noncommands_acted"], 0)

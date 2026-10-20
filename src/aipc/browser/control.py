@@ -15,7 +15,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import quote_plus, urlsplit
+from urllib.parse import quote, quote_plus, urlsplit
 
 from aipc.browser import cdp
 from aipc.skills.actions import SITES
@@ -53,6 +53,14 @@ NEXT_BUTTON_JS = r"""(() => {
   b.click();
   return true;
 })()"""
+# เริ่มเพลง/วิดีโอนี้ใหม่ (ทางสำรองของ "เพลงก่อนหน้า" · การ์ด 0042 รอบ 3) · ok = มีตัวเล่น · none = ไม่มี
+RESTART_JS = r"""(() => {
+  const m = [...document.querySelectorAll('video, audio')];
+  if (!m.length) return 'none';
+  const e = m.find(x => !x.paused) || m.find(x => x.currentTime > 0) || m[0];
+  e.currentTime = 0;
+  return 'ok';
+})()"""
 # เต็มจอ (การ์ด 0042) · เว็บทั่วไป: ตัวเล่นวิดีโอของหน้าเต็มจอ / ออก · YouTube ใช้คีย์ลัด f ของตัวเล่นแทน
 # (ปุ่มควบคุมของ YouTube ยังอยู่) · คืน on/off = สถานะหลังสั่ง · none = หน้านี้ไม่มีวิดีโอ
 FULLSCREEN_JS = r"""(async () => {
@@ -82,7 +90,11 @@ SITE_SEARCH = {
     "wikipedia": "https://th.wikipedia.org/w/index.php?search=",
     "drive": "https://drive.google.com/drive/search?q=",
     "gmail": "https://mail.google.com/mail/u/0/#search/",
+    # การ์ด 0042 รอบ 3 · Spotify ใส่คำค้นในเส้นทาง (เข้ารหัสแบบ path ไม่ใช่ +) · Netflix ต้องเข้าบัญชีก่อนจึงเห็นผล
+    "spotify": "https://open.spotify.com/search/",
+    "netflix": "https://www.netflix.com/search?q=",
 }
+PATH_QUERY = {"spotify"}  # คำค้นอยู่ในเส้นทาง → quote (ช่องว่าง = %20)
 MEDIA_SAY = {
     ("pause", "ok"): (True, "หยุดแล้ว"),
     ("pause", "idle"): (True, "ไม่มีเพลงหรือวิดีโอที่กำลังเล่นอยู่"),
@@ -423,7 +435,8 @@ class BrowserControl:
             return Result(True, "เปิดเว็บแล้ว", url=self._go(cmd.query))
         if cmd.kind == "site_search":  # การ์ด 0036
             name = SITES[cmd.site][0]
-            url = self._open_search(SITE_SEARCH[cmd.site] + quote_plus(cmd.query))
+            enc = quote(cmd.query, safe="") if cmd.site in PATH_QUERY else quote_plus(cmd.query)
+            url = self._open_search(SITE_SEARCH[cmd.site] + enc)
             return Result(True, f"ค้นหา {cmd.query} ใน {name} แล้ว", url=url)
         if cmd.kind in ("search", "site"):
             url = self._go(
@@ -508,9 +521,11 @@ class BrowserControl:
         return Result(True, "เลื่อนลงแล้ว" if sign > 0 else "เลื่อนขึ้นแล้ว")
 
     def _do_media(self, cmd: BrowseCommand) -> Result:
-        """หยุด / เล่นต่อ / เพลงถัดไป (การ์ด 0035)."""
+        """หยุด / เล่นต่อ / เพลงถัดไป (การ์ด 0035) · เพลงก่อนหน้า (การ์ด 0042 รอบ 3)."""
         if cmd.direction == "next":
             return self._media_next()
+        if cmd.direction == "prev":
+            return self._media_prev()
         # userGesture: นับเป็นการกดของผู้ใช้ (Chromium ไม่ยอมให้เล่นเสียงเองถ้าไม่มีคนสั่ง)
         state = self._eval(PAUSE_JS if cmd.direction == "pause" else PLAY_JS,
                            awaitPromise=True, userGesture=True)  # fmt: skip
@@ -569,6 +584,28 @@ class BrowserControl:
             return Result(False, "ข้ามโฆษณาได้เฉพาะใน YouTube")
         state = self._eval(SKIP_AD_JS, userGesture=True)
         return Result(*SKIP_AD_SAY.get(state, SKIP_AD_SAY["none"]))
+
+    def _media_prev(self) -> Result:
+        """YouTube: Shift+P (เพลงก่อนหน้าในเพลย์ลิสต์) ·
+        ไม่มีเพลงก่อนหน้า/เว็บอื่น = เริ่มเพลงนี้ใหม่ และบอกตามจริง."""
+        if self._youtube():
+            before, token = self._marked()
+            for kind in ("rawKeyDown", "keyUp"):
+                key = {
+                    "type": kind,
+                    "key": "P",
+                    "code": "KeyP",
+                    "windowsVirtualKeyCode": 80,
+                    "modifiers": 8,
+                }
+                self._cdp.call("Input.dispatchKeyEvent", key, session=self._page())
+            url, moved = self._wait_change(before, token)
+            if moved:
+                return Result(True, "เปิดเพลงก่อนหน้าแล้ว", url=url)
+        state = self._eval(RESTART_JS, userGesture=True)
+        if state != "ok":
+            return Result(False, "หน้านี้ไม่มีเพลงหรือวิดีโอ")
+        return Result(True, "ไม่มีเพลงก่อนหน้าในรายการ · เริ่มเพลงนี้ใหม่แล้ว")
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
         pages = [
