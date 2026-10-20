@@ -1,0 +1,158 @@
+{
+ "summary": {
+  "command_median_s": null,
+  "question_median_s": null,
+  "english_median_s": 1.827,
+  "english_ok": 9,
+  "english_n": 18,
+  "cut": 0,
+  "with_pause": 0,
+  "n": 18
+ },
+ "rows": [
+  {
+   "said": "Open YouTube",
+   "kind": "english",
+   "heard": "Open YouTube.",
+   "err": "",
+   "latency_s": 1.906,
+   "cut": false
+  },
+  {
+   "said": "Volume up",
+   "kind": "english",
+   "heard": "Volume up.",
+   "err": "",
+   "latency_s": 1.884,
+   "cut": false
+  },
+  {
+   "said": "Go back",
+   "kind": "english",
+   "heard": "เข้าแบ็ค",
+   "err": "",
+   "latency_s": 1.698,
+   "cut": true
+  },
+  {
+   "said": "Scroll down",
+   "kind": "english",
+   "heard": "สักครู่เดียว",
+   "err": "",
+   "latency_s": 1.876,
+   "cut": true
+  },
+  {
+   "said": "Next song",
+   "kind": "english",
+   "heard": "คอร์ม",
+   "err": "",
+   "latency_s": 1.756,
+   "cut": true
+  },
+  {
+   "said": "What time is it",
+   "kind": "english",
+   "heard": "What time is it?",
+   "err": "",
+   "latency_s": 1.826,
+   "cut": false
+  },
+  {
+   "said": "Open YouTube",
+   "kind": "english",
+   "heard": "Open YouTube.",
+   "err": "",
+   "latency_s": 1.8,
+   "cut": false
+  },
+  {
+   "said": "Volume up",
+   "kind": "english",
+   "heard": "Volume up,",
+   "err": "",
+   "latency_s": 1.828,
+   "cut": false
+  },
+  {
+   "said": "Go back",
+   "kind": "english",
+   "heard": "เกิลแบ็ค",
+   "err": "",
+   "latency_s": 1.824,
+   "cut": true
+  },
+  {
+   "said": "Scroll down",
+   "kind": "english",
+   "heard": "สโครงแจม",
+   "err": "",
+   "latency_s": 1.787,
+   "cut": true
+  },
+  {
+   "said": "Next song",
+   "kind": "english",
+   "heard": "เม็กซ์ซอล",
+   "err": "",
+   "latency_s": 1.779,
+   "cut": true
+  },
+  {
+   "said": "What time is it",
+   "kind": "english",
+   "heard": "What time is it.",
+   "err": "",
+   "latency_s": 1.984,
+   "cut": false
+  },
+  {
+   "said": "Open YouTube",
+   "kind": "english",
+   "heard": "Open YouTube.",
+   "err": "",
+   "latency_s": 1.821,
+   "cut": false
+  },
+  {
+   "said": "Volume up",
+   "kind": "english",
+   "heard": "Volume up.",
+   "err": "",
+   "latency_s": 1.836,
+   "cut": false
+  },
+  {
+   "said": "Go back",
+   "kind": "english",
+   "heard": "เกิลแบ็ค",
+   "err": "",
+   "latency_s": 1.79,
+   "cut": true
+  },
+  {
+   "said": "Scroll down",
+   "kind": "english",
+   "heard": "สโปรแจว",
+   "err": "",
+   "latency_s": 1.893,
+   "cut": true
+  },
+  {
+   "said": "Next song",
+   "kind": "english",
+   "heard": "แน็กซ์สอง",
+   "err": "",
+   "latency_s": 1.833,
+   "cut": true
+  },
+  {
+   "said": "What time is it",
+   "kind": "english",
+   "heard": "What time is it.",
+   "err": "",
+   "latency_s": 1.917,
+   "cut": false
+  }
+ ]
+}

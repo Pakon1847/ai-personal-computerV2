@@ -39,5 +39,35 @@ class EnglishGateTest(unittest.TestCase):
         self.assertFalse(backend._command_complete("เตือนประชุม", intent=reminder))  # อาจพูดต่อ
 
 
+@unittest.skipIf(backend is None, "ไม่มี PySide6")
+class PreloadTest(unittest.TestCase):
+    """L3: เซสชันจริงโหลดตัวถอดของคีย์ลัดไว้ก่อน · ไม่ปิดเองเมื่อไม่ได้ใช้."""
+
+    def test_preload_warms_the_hotkey_transcriber(self):
+        warmed = []
+
+        class Fast:
+            available = True
+
+            def warm(self):
+                warmed.append(1)
+
+        class Lis:
+            _fast = Fast()
+
+        vc = backend.VoiceController(speaker=None, active=False)
+        vc._listener = Lis()
+        vc.preload()
+        self.assertEqual(warmed, [1])
+
+    def test_app_transcriber_never_unloads_itself(self):
+        from aipc.voice import zipformer
+
+        t = zipformer.Transcriber(worker_cmd=["x"], idle_s=float("inf"))
+        t._proc = object()  # ทำเหมือนเปิดอยู่
+        t._last_used = 0.0
+        self.assertFalse(t.idle_check())
+
+
 if __name__ == "__main__":
     unittest.main()

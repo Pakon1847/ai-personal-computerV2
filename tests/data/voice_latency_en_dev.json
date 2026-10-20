@@ -1,0 +1,24 @@
+{
+ "_about": "การ์ด 0044 ชุดพัฒนาย่อย: คำสั่งภาษาอังกฤษ (เสียง ljspeech) × 3 รอบ · ใช้เทียบรุ่นก่อน/หลังแก้ว่าฟังสองภาษาไม่แย่ลง (ตัวอย่าง 6 ข้อแกว่งระหว่างรอบ)",
+ "pause_s": 0.45,
+ "items": [
+  {"parts": ["Open YouTube"], "kind": "english", "voice": "en", "must": "youtube"},
+  {"parts": ["Volume up"], "kind": "english", "voice": "en", "must": "volume"},
+  {"parts": ["Go back"], "kind": "english", "voice": "en", "must": "back"},
+  {"parts": ["Scroll down"], "kind": "english", "voice": "en", "must": "scroll"},
+  {"parts": ["Next song"], "kind": "english", "voice": "en", "must": "next"},
+  {"parts": ["What time is it"], "kind": "english", "voice": "en", "must": "time"},
+  {"parts": ["Open YouTube"], "kind": "english", "voice": "en", "must": "youtube"},
+  {"parts": ["Volume up"], "kind": "english", "voice": "en", "must": "volume"},
+  {"parts": ["Go back"], "kind": "english", "voice": "en", "must": "back"},
+  {"parts": ["Scroll down"], "kind": "english", "voice": "en", "must": "scroll"},
+  {"parts": ["Next song"], "kind": "english", "voice": "en", "must": "next"},
+  {"parts": ["What time is it"], "kind": "english", "voice": "en", "must": "time"},
+  {"parts": ["Open YouTube"], "kind": "english", "voice": "en", "must": "youtube"},
+  {"parts": ["Volume up"], "kind": "english", "voice": "en", "must": "volume"},
+  {"parts": ["Go back"], "kind": "english", "voice": "en", "must": "back"},
+  {"parts": ["Scroll down"], "kind": "english", "voice": "en", "must": "scroll"},
+  {"parts": ["Next song"], "kind": "english", "voice": "en", "must": "next"},
+  {"parts": ["What time is it"], "kind": "english", "voice": "en", "must": "time"}
+ ]
+}

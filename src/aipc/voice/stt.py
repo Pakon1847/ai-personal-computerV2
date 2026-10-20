@@ -299,8 +299,10 @@ class Listener:
 
         def run() -> None:
             try:
+                # ถอดล่วงหน้าเฉพาะภาษาไทย · ลองอังกฤษทำบนไฟล์เต็มตอนจบ (_transcribe) เหมือนเดิม:
+                # ไฟล์ล่วงหน้าเงียบท้ายสั้น whisper อ่านคำสั่งอังกฤษหลุด (ชุดพัฒนา: 3/6 → 2/6)
                 text, err = self._fast.transcribe(snap)
-                spec["text"] = self._maybe_english(snap, text) if not err else ""
+                spec["text"] = text if not err else ""
                 spec["err"] = err
             finally:
                 _remove(snap)
@@ -368,8 +370,8 @@ class Listener:
             and spec["done"].wait(DECODE_WAIT_S)
             and not spec["err"]
         ):
+            text = self._maybe_english(path, spec["text"])  # ไทยไม่ตรงอะไร = ลองอังกฤษบนไฟล์เต็ม
             _remove(path)
-            text = spec["text"]
             err = "" if text else "ไม่ได้ยินเสียงพูด ลองพูดใกล้ไมค์อีกครั้ง"
             self._on_done(text, err, round(time.monotonic() - t0, 2))
             return
