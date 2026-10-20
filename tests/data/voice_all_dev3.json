@@ -1,0 +1,28 @@
+{
+  "_about": "การ์ด 0042 รอบ 3 ชุดพัฒนา (ใช้ปรับกฎได้) · จากการสำรวจทุกความสามารถ 2026-10-20 · รูปแบบเดียวกับ voice_all_test3.json",
+  "items": [
+    {"text": "หาเพลงในสปอติฟาย", "expect": "browser:site_search"},
+    {"text": "หาหนังในเน็ตฟลิกซ์", "expect": "browser:site_search"},
+    {"text": "เพลงก่อนหน้า", "expect": "browser:media:prev"},
+    {"text": "ย้อนเพลง", "expect": "browser:media:prev"},
+    {"text": "อย่าลืมจ่ายค่าเน็ตวันที่ห้า", "expect": "reminder"},
+    {"text": "เน็ตหลุดไหม", "expect": "answer"},
+    {"text": "แชทใหม่", "expect": "app:newchat"},
+    {"text": "เปลี่ยนเป็นภาษาอังกฤษ", "expect": "app:lang"},
+    {"text": "เปิดโหมดมืด", "expect": "app:theme"},
+    {"text": "ตัวหนังสือใหญ่ขึ้น", "expect": "app:font"},
+    {"text": "อากาศวันนี้เป็นยังไง", "expect": "ask"},
+    {"text": "เปิดจีเมล", "expect": "command"},
+    {"text": "เปิดสปอติฟาย", "expect": "browser:site"},
+    {"text": "ค้นในจีเมลว่าใบเสร็จ", "expect": "browser:site_search"},
+    {"text": "เปิดเทอร์มินัล", "expect": "command"},
+    {"text": "เบาเสียงลง", "expect": "command"},
+    {"text": "ปลุกตอนหกโมงเช้า", "expect": "reminder"},
+    {"text": "เลื่อนนัดประชุมเป็นบ่ายสาม", "expect": "answer"},
+    {"text": "หาไฟล์รายงาน", "expect": "answer"},
+    {"text": "แรมเหลือเท่าไหร่", "expect": "answer"},
+    {"text": "ช่วยเขียนจดหมายขอบคุณ", "expect": "llm:letter-writer"},
+    {"text": "วันนี้อากาศร้อนมาก", "expect": "ask"},
+    {"text": "ทำอะไรอยู่", "expect": "ask"}
+  ]
+}

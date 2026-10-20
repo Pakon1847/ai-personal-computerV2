@@ -105,7 +105,7 @@ def routes(path: Path) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--set", choices=("dev", "test", "test2"))
+    ap.add_argument("--set", choices=("dev", "test", "test2", "dev3", "test3"))
     ap.add_argument("--routes", type=Path, help="routes.json ของ 0027 หรือไฟล์ก่อนแก้ที่มีช่อง before")
     ap.add_argument("--snapshot", type=Path, help="เขียนเส้นทางตอนนี้ลงไฟล์ (ช่อง before) ไว้เทียบหลังแก้")
     ap.add_argument("--out", type=Path)
