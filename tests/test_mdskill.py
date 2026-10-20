@@ -144,7 +144,10 @@ class LoadTest(unittest.TestCase):
                 "system-command.md", "translate.md"]  # fmt: skip
         self.assertEqual(files, want)
         tr = next(s for s in manifest.load_builtin() if s.id == "translate")
-        self.assertTrue(tr.prompt.startswith("แปลข้อความต่อไปนี้"))
+        # การ์ด 0043: Claude เขียน prompt เอง · ตรวจว่ามี prompt และพูดถึงทั้งสองภาษา (ไม่ผูกถ้อยคำ)
+        self.assertIn("ไทย", tr.prompt)
+        self.assertIn("อังกฤษ", tr.prompt)
+        self.assertIn("Claude", tr.author)
         self.assertEqual(tr.needs, ("llm",))
 
 

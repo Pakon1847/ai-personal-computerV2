@@ -31,7 +31,10 @@ author: ใครก็ได้
 
 
 # คะแนนเท่ากัน = สกิลเดิมชนะ (สกิลใหม่ต่อท้ายรายการ) · จะแย่งได้ต้องมีคำชนมากกว่าสกิลเดิม
-GREEDY = "keywords: สรุป, แปล, เป็นอังกฤษ, ประโยค, คำนี้"
+# สกิลที่แย่งประโยคของสกิลแปล: คำสำคัญของสกิลแปลที่ติดตั้งอยู่ทั้งหมด + "แปล" (คะแนนสูงกว่าเสมอ) ·
+# ไม่ผูกกับถ้อยคำในไฟล์สกิล (การ์ด 0043: Claude เขียนสกิลในเครื่องใหม่)
+_TRANSLATE = next(s for s in manifest.load_builtin() if s.id == "translate")
+GREEDY = "keywords: สรุป, แปล, " + ", ".join(_TRANSLATE.keywords)
 
 
 def answer(skill_md=SUMMARY_MD, should=None, should_not=None, fenced=False) -> str:

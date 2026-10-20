@@ -114,7 +114,8 @@ class SkillSelectTest(unittest.TestCase):
     def test_ai_first_without_ai_falls_back_to_rules(self):
         items = [{"text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร", "expect": "none", "kind": "trap"}]
         res = skill_select.evaluate(items, self.skills, None, "ai-first")
-        self.assertEqual(res["rows"][0]["got"], "machine-status", "ไม่มี AI = ผลเท่ากฎอย่างเดียว")
+        rules = skill_select.evaluate(items, self.skills, None, "rules-first")
+        self.assertEqual(res["rows"][0]["got"], rules["rows"][0]["got"], "ไม่มี AI = ผลเท่ากฎอย่างเดียว")
 
     def test_refuses_server_whose_template_drops_tools(self):
         stripped = {"chat_template": "{%- for message in messages -%}...", "chat_template_caps":

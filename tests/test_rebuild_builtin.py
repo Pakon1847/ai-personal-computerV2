@@ -60,5 +60,26 @@ class PinTest(unittest.TestCase):
         self.assertIn("reminder", runner.prompts[0])
 
 
+class InstalledTest(unittest.TestCase):
+    def test_every_builtin_skill_is_written_by_claude(self):
+        """การ์ด 0043 S6: สกิลในเครื่องทั้ง 6 ไฟล์ Claude เขียน · มีที่มา (รุ่น วันที่ คำขอ)."""
+        skills = manifest.load_builtin()
+        self.assertEqual(len(skills), 6)
+        for s in skills:
+            with self.subTest(skill=s.id):
+                self.assertIn("Claude", s.author)
+                self.assertTrue(s.extra.get("created"))
+                self.assertTrue(s.extra.get("request"))
+
+    def test_permission_header_matches_what_the_system_allows(self):
+        """S2: สิทธิ์ของสกิลในเครื่อง = ค่าที่ระบบกำหนด (ไม่ใช่ที่ Claude ขอ)."""
+        want = {"reminder": ("write_reminders",), "system-command": ("run_actions",),
+                "machine-status": ("read_machine_status",), "translate": (), "summarize-text": (),
+                "letter-writer": ()}  # fmt: skip
+        for s in manifest.load_builtin():
+            with self.subTest(skill=s.id):
+                self.assertEqual(s.permissions, want[s.id])
+
+
 if __name__ == "__main__":
     unittest.main()

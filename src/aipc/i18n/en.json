@@ -909,5 +909,16 @@
   "ขนาดตัวอักษร ": "Text size ",
   "เริ่มแชทใหม่แล้ว": "Started a new chat",
   "เปิดเพลงก่อนหน้าแล้ว": "Playing the previous track",
-  "ไม่มีเพลงก่อนหน้าในรายการ · เริ่มเพลงนี้ใหม่แล้ว": "No previous track in the list · restarted this one"
+  "ไม่มีเพลงก่อนหน้าในรายการ · เริ่มเพลงนี้ใหม่แล้ว": "No previous track in the list · restarted this one",
+  "ร่างจดหมายสุภาพ": "Draft a polite letter",
+  "ร่างจดหมาย/อีเมลภาษาไทยแบบสุภาพ เช่น ลาป่วย ลากิจ ขอเลื่อนส่งงาน ขอบคุณ ถึงอาจารย์ หัวหน้า ลูกค้า ไม่ส่งอีเมลให้ ไม่ใช้เมื่อจะจดนัด สรุป หรือแปลข้อความ": "Draft polite Thai letters/emails such as sick leave, personal leave, deadline extensions or thank-you notes to teachers, bosses or customers · does not send email · not for reminders, summaries or translation",
+  "ตรวจอาการเครื่อง": "Check the computer",
+  "อ่านค่าจริงของเครื่อง (อุณหภูมิ แรม พื้นที่เก็บข้อมูล ไฟเลี้ยง พัดลม เครือข่าย) แล้วบอกเป็นภาษาคนพร้อมวิธีแก้ · ไม่ใช่การเปิดหน้าสุขภาพเครื่อง ไม่แก้ให้เอง ไม่ตรวจอุปกรณ์อื่น": "Read the computer's real values (temperature, RAM, storage, power, fan, network) and explain them in plain language with fixes · does not open the health page or fix things itself",
+  "บันทึกนัดหรือตั้งเตือนจากประโยคไทย เช่น พรุ่งนี้บ่ายสอง วันศุกร์ อีก 10 นาที ถามยืนยันก่อนบันทึก แล้วเตือนเมื่อถึงเวลา · ไม่ใช้ร่างจดหมาย ไม่ใช่ดูสรุปนัดที่มีอยู่ ไม่เปิดปฏิทินบนเว็บ": "Save an appointment or reminder from a Thai sentence (e.g. tomorrow 2 pm, Friday, in 10 minutes), confirm before saving, then remind when due · not for letters, agenda summaries or web calendars",
+  "สรุปข้อความ": "Summarize text",
+  "สรุปข้อความยาวที่ผู้ใช้วางมา (ข่าว ประกาศ อีเมล บทความ) ให้เหลือใจความสำคัญเป็นข้อ ๆ ภาษาไทย · ไม่ใช้เมื่อไม่มีข้อความให้สรุป ไม่ใช้แปลภาษา และไม่ใช้ร่างจดหมาย": "Summarize long pasted text (news, announcements, emails, articles) into key Thai bullet points · not without text to summarize, not for translating or letters",
+  "เปิดแอปและปรับเสียง": "Open apps & adjust volume",
+  "เปิดเว็บ แอป หรือหน้าในระบบที่อยู่ในรายการ และปรับ เพิ่ม ลด ปิด เปิดเสียง · ไม่ใช้ตอบคำถาม ค้นข้อมูล ดูสถานะเครื่อง หรือเปิดสิ่งที่ไม่อยู่ในรายการ": "Open listed websites, apps or system pages and set, raise, lower, mute or unmute the volume · not for answering questions, searching, checking the computer or opening unlisted things",
+  "แปลไทย–อังกฤษ": "Translate Thai–English",
+  "แปลคำ ประโยค หรือย่อหน้า ไทย↔อังกฤษ ตอบเฉพาะคำแปล · ไม่ใช้สรุปความ ไม่ร่างจดหมาย ไม่สอนไวยากรณ์ และไม่แปลภาษาอื่น": "Translate words, sentences or paragraphs between Thai and English, answering with the translation only · not for summarizing, letters, grammar lessons or other languages"
 }

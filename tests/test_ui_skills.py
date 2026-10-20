@@ -407,7 +407,7 @@ class TieTest(unittest.TestCase):
         self.addCleanup(tmp.cleanup)
         d = Path(tmp.name)
         # สกิลที่บอกข้อความอย่างเดียว = ไม่ต้องมี AI จึงชนกับสกิลถามเครื่องได้ตอนไม่มี AI
-        text = SAY_AI_SKILL.replace("keywords: จดไอเดีย", "keywords: จดไอเดีย, ค้าง")
+        text = SAY_AI_SKILL.replace("keywords: จดไอเดีย", "keywords: จดไอเดีย, จอค้าง")
         text = text.replace("2. ถาม AI: เรียบเรียงไอเดียนี้เป็นข้อ ๆ\n", "")
         (d / "idea.md").write_text(text, encoding="utf-8")
         self.s = SkillsController(
@@ -418,16 +418,16 @@ class TieTest(unittest.TestCase):
     def test_tie_asks_then_runs_the_confirmed_skill(self):
         from aipc.skills import router
 
-        r = router.route("งานค้างเยอะ", self.s._skills, set())
+        r = router.route("จอค้างอีกแล้ว", self.s._skills, set())
         self.assertEqual(sorted(r.tied), ["idea-note", "machine-status"])
-        card = self.s.handle("งานค้างเยอะ")
+        card = self.s.handle("จอค้างอีกแล้ว")
         self.assertTrue(card["confirmToken"])
         self.assertIn("ใช่ไหม", card["title"])
         self.assertEqual(len(card["chips"]), 2)
         self.assertEqual(
             self.s.confirm(card["confirmToken"], False)["title"], "ยกเลิกแล้ว ไม่ได้ทำอะไร"
         )
-        card = self.s.handle("งานค้างเยอะ")
+        card = self.s.handle("จอค้างอีกแล้ว")
         done = self.s.confirm(card["confirmToken"], True)
         self.assertNotIn("ใช่ไหม", done["title"], "ยืนยันแล้ว = ทำเลย ไม่ถามซ้ำ")
 
@@ -457,7 +457,9 @@ class HybridRouteTest(unittest.TestCase):
         self.assertEqual(card["kind"], "chat")
         self.assertTrue(card["llm"])
         self.assertNotEqual(card.get("tools"), False, "ต้องส่งรายการสกิลให้ AI เลือก")
-        self.assertEqual(self.make(llm=False).handle(text)["kind"], "skill", "ไม่มี AI = กฎก่อน")
+        # ไม่มี AI = กฎก่อน · การ์ด 0043: คำสำคัญที่ Claude เขียนให้สกิลถามเครื่อง ("เครื่องช้า" ไม่ใช่ "เครื่อง")
+        # ไม่ชนประโยคหลอกนี้แล้ว (เดิมกฎเลือกสกิลถามเครื่องผิด) → ไปแชท
+        self.assertEqual(self.make(llm=False).handle(text)["kind"], "chat", "ไม่มี AI = กฎก่อน")
 
     def test_skill_sentence_goes_to_ai_with_the_catalog(self):
         card = self.make(llm=True).handle("เตือนส่งรายงานพรุ่งนี้บ่ายสอง")
@@ -504,7 +506,8 @@ class VoiceAnswerTest(unittest.TestCase):
             if kind:
                 self.assertEqual(card["kind"], kind, text)
         self.assertIn("รายงานประจำเดือน.txt", str(self.s.voiceAnswer("หาไฟล์รายงาน")))
-        self.assertEqual(self.s.voiceAnswer("เครื่องร้อนไหม")["badge"]["name"], "ถามเครื่องว่าเป็นอะไร")
+        machine = next(s.name for s in self.s._skills if s.id == "machine-status")
+        self.assertEqual(self.s.voiceAnswer("เครื่องร้อนไหม")["badge"]["name"], machine)
         self.assertEqual(self.calls, [])  # ถามอย่างเดียว ไม่สั่งเครื่อง
 
     def test_cancel_by_voice_still_asks_first(self):
