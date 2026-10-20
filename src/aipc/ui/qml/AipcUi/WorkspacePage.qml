@@ -229,6 +229,10 @@ Item {
         a[token] = true
         answered = a
         const card = skills.confirm(token, yes)
+        if (card.redo) {       // การ์ด 0045: "หมายถึง … ใช่ไหม" ตอบใช่ = สั่งประโยคคำสั่งที่ถูกต้อง
+            voiceCommand(card.redo)
+            return
+        }
         if (card.chatText) {   // การ์ด 0042 รอบ 3: ถามในแชท = เหมือนพิมพ์เอง
             voicePopup.close()
             AppState.page = "workspace"

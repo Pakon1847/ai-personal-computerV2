@@ -1,0 +1,432 @@
+{
+ "summary": {
+  "commands": 37,
+  "exact": 25,
+  "via_confirm": 0,
+  "non_commands": 5,
+  "non_command_acted": 0,
+  "hotwords": 77
+ },
+ "rows": [
+  {
+   "said": "เปิดยูทูบ",
+   "heard": "เปิดยูทูบ",
+   "want": "browser:site",
+   "got": "browser:site",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 4.799
+  },
+  {
+   "said": "ปิดเสียง",
+   "heard": "ปิดเสียง",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.115
+  },
+  {
+   "said": "เพิ่มเสียง",
+   "heard": "เพิ่มเสียง",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.101
+  },
+  {
+   "said": "ลดเสียง",
+   "heard": "ลดเสียง",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.125
+  },
+  {
+   "said": "ปรับเสียงห้าสิบ",
+   "heard": "ปรับเสี่ยงห้าสิบ",
+   "want": "command",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.131
+  },
+  {
+   "said": "เปิดหน้าตั้งค่า",
+   "heard": "เปิดหน้าตั้งค่า",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.133
+  },
+  {
+   "said": "ไปหน้าปฏิทิน",
+   "heard": "ไปหน้าปฏิทิน",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.159
+  },
+  {
+   "said": "เปิดหน้าไฟล์",
+   "heard": "เปิดหน้าไฟ",
+   "want": "command",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.139
+  },
+  {
+   "said": "เปิดจีเมล",
+   "heard": "เปิดจี",
+   "want": "command",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.13
+  },
+  {
+   "said": "เปิดเน็ตฟลิกซ์",
+   "heard": "เปิดเน็ตฟลิก",
+   "want": "browser:site",
+   "got": "browser:site",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.118
+  },
+  {
+   "said": "เปิดสปอติฟาย",
+   "heard": "เปิดสปอร์ติไฟล์",
+   "want": "browser:site",
+   "got": "command",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.131
+  },
+  {
+   "said": "หยุดเพลง",
+   "heard": "หยุดเพลง",
+   "want": "browser:media:pause",
+   "got": "browser:media:pause",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.104
+  },
+  {
+   "said": "เล่นต่อ",
+   "heard": "เล่นต่อ",
+   "want": "browser:media:play",
+   "got": "browser:media:play",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.101
+  },
+  {
+   "said": "เพลงถัดไป",
+   "heard": "เพลงถัดไป",
+   "want": "browser:media:next",
+   "got": "browser:media:next",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.106
+  },
+  {
+   "said": "เพลงก่อนหน้า",
+   "heard": "เพลงก่อนหน้าค่ะ",
+   "want": "browser:media:prev",
+   "got": "browser:media:prev",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.148
+  },
+  {
+   "said": "เต็มจอ",
+   "heard": "เตรียมจะ",
+   "want": "browser:fullscreen",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.113
+  },
+  {
+   "said": "ข้ามโฆษณา",
+   "heard": "โฆษณา",
+   "want": "browser:skip_ad",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.137
+  },
+  {
+   "said": "รีเฟรช",
+   "heard": "ตีเฟรด",
+   "want": "browser:reload",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.109
+  },
+  {
+   "said": "ย้อนกลับ",
+   "heard": "ยานกลับ",
+   "want": "browser:back",
+   "got": "browser:back",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.083
+  },
+  {
+   "said": "เลื่อนลง",
+   "heard": "เลื่อนลง",
+   "want": "browser:scroll",
+   "got": "browser:scroll",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.089
+  },
+  {
+   "said": "เลื่อนขึ้น",
+   "heard": "เลื่อนขึ้น",
+   "want": "browser:scroll",
+   "got": "browser:scroll",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.088
+  },
+  {
+   "said": "ปิดแท็บ",
+   "heard": "เป้เยอะ",
+   "want": "browser:close",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.091
+  },
+  {
+   "said": "เข้าคลิปแรก",
+   "heard": "เข้าพีปแรก",
+   "want": "browser:open:1",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.134
+  },
+  {
+   "said": "ดูคลิปที่สอง",
+   "heard": "ดูคลิปที่สอง",
+   "want": "browser:open:2",
+   "got": "browser:open:2",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.145
+  },
+  {
+   "said": "ค้นหาราคาทอง",
+   "heard": "ค้นหาราคาทอง",
+   "want": "browser:search",
+   "got": "browser:search",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.186
+  },
+  {
+   "said": "หาเพลงในยูทูบ",
+   "heard": "หาเพลงในยูทูป",
+   "want": "browser:site_search",
+   "got": "browser:site_search",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.16
+  },
+  {
+   "said": "เตือนกินยาสองทุ่ม",
+   "heard": "เตือนกินยา2ทุ่ม",
+   "want": "reminder",
+   "got": "reminder",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.166
+  },
+  {
+   "said": "เตือนประชุมพรุ่งนี้สิบโมง",
+   "heard": "เตือนประชุมพรุ่งนี้10โมง",
+   "want": "reminder",
+   "got": "reminder",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.207
+  },
+  {
+   "said": "ตอนนี้กี่โมง",
+   "heard": "ตอนนี้กี่โมง",
+   "want": "answer",
+   "got": "answer",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.159
+  },
+  {
+   "said": "พรุ่งนี้มีนัดอะไร",
+   "heard": "พรุ่งนี้มีนัดอะไร",
+   "want": "answer",
+   "got": "answer",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.166
+  },
+  {
+   "said": "ทำไมเครื่องช้า",
+   "heard": "ทำไมเครื่องช้า",
+   "want": "answer",
+   "got": "answer",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.143
+  },
+  {
+   "said": "เปิดโหมดมืด",
+   "heard": "เปิดหมดมืด",
+   "want": "app:theme",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.124
+  },
+  {
+   "said": "เปิดโหมดสว่าง",
+   "heard": "เปิดโหมดสว่าง",
+   "want": "app:theme",
+   "got": "app:theme",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.133
+  },
+  {
+   "said": "ตัวหนังสือใหญ่ขึ้น",
+   "heard": "ตัวหนังสือใหญ่ขึ้น",
+   "want": "app:font",
+   "got": "app:font",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.186
+  },
+  {
+   "said": "แชทใหม่",
+   "heard": "ชาติใหม่",
+   "want": "app:newchat",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.109
+  },
+  {
+   "said": "แปลคำว่าแมว",
+   "heard": "แปลคำว่าแมว",
+   "want": "llm:translate",
+   "got": "llm:translate",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.137
+  },
+  {
+   "said": "ร่างอีเมลลาป่วย",
+   "heard": "ร่างอีเมนลาป่วย",
+   "want": "llm:letter-writer",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.156
+  },
+  {
+   "said": "สวัสดีครับ",
+   "heard": "สวัสดีครับ",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.171
+  },
+  {
+   "said": "วันนี้อากาศดีจัง",
+   "heard": "วันนี้อากาศดีจัง",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.195
+  },
+  {
+   "said": "ฉันหิวข้าว",
+   "heard": "ฉันหิวข้าว",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.156
+  },
+  {
+   "said": "ขอบคุณมาก",
+   "heard": "ขอบคุณมาก",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.123
+  },
+  {
+   "said": "เมื่อวานไปเที่ยวมา",
+   "heard": "เมื่อวานไปเที่ยวมา",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.156
+  }
+ ]
+}

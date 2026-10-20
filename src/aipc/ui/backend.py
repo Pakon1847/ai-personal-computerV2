@@ -3085,6 +3085,8 @@ class SkillsController(QObject):
         """
         t0 = time.monotonic()
         skill, example = self._nearest_voice(text)
+        if skill is None and not self.voiceSkill(text):
+            return self._near_command_card(text, t0)  # การ์ด 0045: ใกล้เคียงคำสั่งของระบบ
         if skill is None or self.voiceSkill(text):
             return {}
         self._counter += 1
@@ -3095,6 +3097,23 @@ class SkillsController(QObject):
         card = {"kind": "steps", "badge": self._badge(skill, "ได้ยินใกล้เคียง · ยืนยันก่อนทำ"),
                 "title": f"หมายถึง “{skill.name}” ใช่ไหม", "chips": [], "confirmToken": token,
                 "lines": [f"ได้ยินว่า “{text}” · ใกล้กับ “{example}”", *steps], "page": ""}  # fmt: skip
+        return self._why(card, t0)
+
+    def _near_command_card(self, text: str, t0: float) -> dict:
+        """ได้ยินใกล้เคียงคำสั่งของระบบ (การ์ด 0045) → "หมายถึง … ใช่ไหม" ·
+        ใช่ = ทำประโยคคำสั่งนั้น · ไม่ใกล้ = {}."""
+        from aipc.skills.voice_phrases import near_command
+
+        phrase = near_command(text)
+        if not phrase:
+            return {}
+        self._counter += 1
+        token = f"n{self._counter}"
+        self._pending[token] = ("redo", phrase)
+        card = {"kind": "steps", "badge": {}, "title": f"หมายถึง “{phrase}” ใช่ไหม", "chips": [],
+                "confirmToken": token, "page": "", "suggest": phrase,
+                "lines": [f"ได้ยินว่า “{text}” · ใกล้กับคำสั่ง “{phrase}”",
+                          "ตอบ “ใช่” = ทำคำสั่งนี้ · “ไม่” = ไม่ทำอะไร"]}  # fmt: skip
         return self._why(card, t0)
 
     @Slot(str, str, result="QVariantMap")
@@ -3424,6 +3443,8 @@ class SkillsController(QObject):
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
             return self._run_steps(skill, text, card)
+        elif isinstance(plan, tuple) and plan[0] == "redo":  # การ์ด 0045: ใช่ = หน้าจอสั่งประโยคคำสั่งนั้น
+            card.update(kind="redo", title=f"ทำ “{plan[1]}”", redo=plan[1])
         elif isinstance(plan, tuple) and plan[0] == "ask":  # การ์ด 0042 รอบ 3: หน้าจอส่งเข้าแชทเหมือนพิมพ์
             card.update(kind="to-chat", title="ส่งไปที่แชทแล้ว", chatText=plan[1])
         elif isinstance(plan, tuple) and plan[0] == "forge":  # การ์ด 0030: ยืนยันแล้วจึงส่ง Claude

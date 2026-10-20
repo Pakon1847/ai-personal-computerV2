@@ -54,12 +54,17 @@ class TidyTest(unittest.TestCase):
 
     def test_hotwords_are_the_measured_list(self):
         """รายการต้องเท่ากับที่วัดบน Pi (spike ใช้ชุดเดียวกัน) · เปลี่ยน = ต้องวัดใหม่."""
+        from aipc.skills import voice_phrases
         from aipc.spikes import voice_cands
 
-        self.assertEqual(zipformer.HOTWORDS, voice_cands.SEARCH_STEMS + voice_cands.FIXED)
+        later = [p for p in (*voice_phrases.COMMANDS, *voice_phrases.STEMS)
+                 if p not in voice_cands.FIXED and p not in voice_cands.SEARCH_STEMS]  # fmt: skip
+        self.assertEqual(zipformer.HOTWORDS, voice_cands.SEARCH_STEMS + voice_cands.FIXED + later)
         # +7 = การ์ด 0031 (เปิดเฟซบุ๊ก ไอจี … เปิดปฏิทิน) · +5 = การ์ด 0035 (หยุดเพลง … ข้ามเพลง) ·
-        # +6 = การ์ด 0036 (ค้นในยูทูบ …) · วัดใหม่ด้วยชุด H บน Pi = เกณฑ์ของการ์ด 0031/0035/0036
-        self.assertEqual(len(zipformer.HOTWORDS), 7 + 24 + 15 + 3 + 10 + 7 + 5 + 6)
+        # +6 = การ์ด 0036 (ค้นในยูทูบ …) · วัดใหม่ด้วยชุด H บน Pi = เกณฑ์ของการ์ด 0031/0035/0036 ·
+        # + later = การ์ด 0045 (คำสั่งที่เพิ่มหลัง 0026 · วัดชุด H + voice_cmd_test = เกณฑ์ A1–A3)
+        self.assertEqual(len(zipformer.HOTWORDS) - len(later), 7 + 24 + 15 + 3 + 10 + 7 + 5 + 6)
+        self.assertEqual(len(later), len(set(later)))
         self.assertEqual((zipformer.SCORE, zipformer.THREADS), (5.0, 4))
 
 

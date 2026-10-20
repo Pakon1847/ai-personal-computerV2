@@ -68,8 +68,9 @@ def label(text: str, skills) -> str:
     if way == handsfree.UNKNOWN:
         if skills.voiceAnswer(text).get("kind") is not None:
             return "answer"
-        if skills.voiceConfirm(text).get("confirmToken"):
-            return "near"
+        near = skills.voiceConfirm(text)
+        if near.get("confirmToken"):
+            return "near:" + near["suggest"] if near.get("suggest") else "near"
         if skills.voiceCreate(text).get("kind") is not None:
             return "create"
         if skills.voiceAsk(text).get("confirmToken"):  # รอบ 3: ถามว่าส่งไปแชทไหม

@@ -23,6 +23,7 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
+from aipc.skills import voice_phrases
 from aipc.voice.tts import VOICE_DIR, sandboxed
 
 BASE = VOICE_DIR / "zipformer"  # venv/ + model/ (scripts/pi/install-voice.sh --zipformer)
@@ -85,7 +86,13 @@ FIXED = [
     *(f"เข้าลิงก์ที่{n}" for n in ("หนึ่ง", "สี่", "ห้า")),
     *(f"เข้า{w}{n}" for w in ("เว็บ", "ผลลัพธ์") for n in ("แรก", "ที่สอง", "ที่สาม", "ที่สี่", "ที่ห้า")),
 ]
-HOTWORDS = SEARCH_STEMS + FIXED
+# การ์ด 0045: คำสั่งที่เพิ่มหลังการ์ด 0026 (ตั้งเตือน ค่าตั้ง หน้าในระบบ เสียง เต็มจอ ฯลฯ) · รายการเดียวกับที่เทียบใกล้เคียง
+_LATER = [
+    p
+    for p in (*voice_phrases.COMMANDS, *voice_phrases.STEMS)
+    if p not in FIXED and p not in SEARCH_STEMS
+]
+HOTWORDS = SEARCH_STEMS + FIXED + _LATER
 
 _REPEAT = re.compile(r"^(.{4,}?)(?:\s*\1)+$")  # ทั้งประโยคคือข้อความเดิมซ้ำ (เช่น ค้นหาX ค้นหาX)
 
