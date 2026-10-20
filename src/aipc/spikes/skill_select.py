@@ -140,11 +140,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--mode", choices=MODES, default="rules-first")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--dataset", type=Path, default=DATASET, help="ชุดประโยค (ค่าเริ่มต้น = ชุด 58)")
+    # การ์ด 0047 K6: วัดซ้ำเมื่อมีสกิลของผู้ใช้เพิ่ม (เช่น สกิลความรู้ที่สอนแล้ว) · โฟลเดอร์สกิล .md
+    ap.add_argument("--extra-skills", type=Path, default=None)
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     data = json.loads(a.dataset.read_text(encoding="utf-8"))
-    skills = manifest.load_builtin()
+    extra = sorted(a.extra_skills.glob("*.md")) if a.extra_skills else []  # ไม่รวม index.json ของที่เก็บ
+    skills = manifest.load_builtin() + [manifest.load(p) for p in extra]
     ai = None
     info = {}
     if a.server:
