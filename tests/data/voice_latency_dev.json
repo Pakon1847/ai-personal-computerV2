@@ -1,0 +1,208 @@
+{
+ "_about": "การ์ด 0044 ชุดพัฒนา (วัดเวลา · ปรับค่าได้) · parts = ท่อนที่พูด · หลายท่อน = เว้น pause_s วินาทีระหว่างท่อน (ทดสอบว่าไม่ตัดกลางประโยค) · kind: command | question · must = คำที่ต้องอยู่ในข้อความที่ได้ (ไม่ถูกตัด) · voice: en = เสียงภาษาอังกฤษ (ljspeech) · ทางฟังสองภาษาต้องได้ข้อความอังกฤษ (must)",
+ "pause_s": 0.45,
+ "items": [
+  {
+   "parts": [
+    "เปิดยูทูบ"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "ย้อนกลับ"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เลื่อนลง"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เพิ่มเสียง"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "ปิดเสียง"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เปิดหน้าตั้งค่า"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "หยุดเพลง"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เพลงถัดไป"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เข้าลิงก์ที่สอง"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "ค้นหาราคาทองวันนี้"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เตือนกินยาสองทุ่ม"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "ตอนนี้กี่โมง"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "ทำไมเครื่องช้า"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "เปิดโหมดมืด"
+   ],
+   "kind": "command"
+  },
+  {
+   "parts": [
+    "อากาศพรุ่งนี้เป็นยังไง"
+   ],
+   "kind": "question"
+  },
+  {
+   "parts": [
+    "ช่วยคิดเมนูอาหารเย็นให้หน่อย"
+   ],
+   "kind": "question"
+  },
+  {
+   "parts": [
+    "ใครแต่งเพลงนี้"
+   ],
+   "kind": "question"
+  },
+  {
+   "parts": [
+    "วันนี้เหนื่อยมาก"
+   ],
+   "kind": "question"
+  },
+  {
+   "parts": [
+    "เล่าเรื่องตลกให้ฟังหน่อย"
+   ],
+   "kind": "question"
+  },
+  {
+   "parts": [
+    "เปิดยูทูบ",
+    "แล้วหาเพลงลูกทุ่ง"
+   ],
+   "kind": "command",
+   "must": "เพลง"
+  },
+  {
+   "parts": [
+    "ค้นหาร้านอาหาร",
+    "แถวสยาม"
+   ],
+   "kind": "command",
+   "must": "สยาม"
+  },
+  {
+   "parts": [
+    "เตือนประชุม",
+    "พรุ่งนี้สิบโมง"
+   ],
+   "kind": "command",
+   "must": "พรุ่งนี้"
+  },
+  {
+   "parts": [
+    "ย้อนกลับ",
+    "แล้วเลื่อนลง"
+   ],
+   "kind": "command",
+   "must": "เลื่อน"
+  },
+  {
+   "parts": [
+    "ปิดเสียง",
+    "ตอนสามทุ่ม"
+   ],
+   "kind": "command",
+   "must": "ตอน"
+  },
+  {
+   "parts": [
+    "Open YouTube"
+   ],
+   "kind": "english",
+   "voice": "en",
+   "must": "youtube"
+  },
+  {
+   "parts": [
+    "Volume up"
+   ],
+   "kind": "english",
+   "voice": "en",
+   "must": "volume"
+  },
+  {
+   "parts": [
+    "Go back"
+   ],
+   "kind": "english",
+   "voice": "en",
+   "must": "back"
+  },
+  {
+   "parts": [
+    "Scroll down"
+   ],
+   "kind": "english",
+   "voice": "en",
+   "must": "scroll"
+  },
+  {
+   "parts": [
+    "Next song"
+   ],
+   "kind": "english",
+   "voice": "en",
+   "must": "next"
+  },
+  {
+   "parts": [
+    "What time is it"
+   ],
+   "kind": "english",
+   "voice": "en",
+   "must": "time"
+  }
+ ]
+}
