@@ -1537,6 +1537,38 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(any(d.isVisible() for d in find_items(win, "skillDetail")))
         self.assertEqual(warnings, [])
 
+    def test_calendar_cells_share_the_width(self):
+        """การ์ด 0041 ระยะ 2: เดิมช่องคำนวณจากความกว้างของตารางเอง (วนผูกค่ากัน) →
+        ตารางหดเหลือช่องละ ~20 px."""
+        _, win, warnings = self.open_shell("calendar")
+        cells = [c for c in find_items(win, "calendarCell") if c.isVisible()]
+        self.assertGreaterEqual(len(cells), 28)
+        widths = {round(c.width()) for c in cells}
+        self.assertGreater(min(widths), 60)
+        self.assertLessEqual(max(widths) - min(widths), 2)  # กว้างเท่ากันทุกช่อง
+        self.assertEqual(warnings, [])
+
+    def test_voice_box_shows_done_and_failed_differently(self):
+        """กล่องคำสั่งเสียง: ทำแล้ว = ผลเป็นหัวเรื่อง · ทำไม่ได้ = "ยังทำไม่ได้" + เหตุผล."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        status, say = find_all(win, "voiceStatus")[0], find_all(win, "voiceSay")[0]
+        page.voiceShow("เปิดยูทูบ", None, "เปิด YouTube แล้ว", False, True)
+        settle(30)
+        self.assertEqual(status.property("text"), "เปิด YouTube แล้ว")
+        self.assertFalse(say.property("visible"))
+        page.voiceSay("รีเซ็ตเว็บนี้", "ไม่รู้จักคำสั่ง")
+        settle(30)
+        self.assertEqual(status.property("text"), "ยังทำไม่ได้")
+        self.assertTrue(say.property("visible"))
+        self.assertEqual(warnings, [])
+
+    def test_health_page_summarises_what_the_status_bar_folded(self):
+        """แถบบนรวมเครือข่าย/โมเดล/พื้นที่/ความร้อนเป็นป้ายเดียว → หน้าเครื่องแสดงค่าจริงครบ 4 ช่อง."""
+        _, win, warnings = self.open_shell("health")
+        self.assertTrue(find_items(win, "healthSummary")[0].isVisible())
+        self.assertEqual(warnings, [])
+
     def test_next_reminder_card_empty_then_real(self):
         engine, win, warnings = self.open_shell()
         skills = engine.rootContext().contextProperty("skills")

@@ -153,7 +153,7 @@ Item {
             else if (voice.handsFree && voice.transcribing) root.voicePhase("transcribing")
             else if (root.vc.phase === "listening" || root.vc.phase === "transcribing") {
                 // จบโดยไม่มีข้อความ (ไม่ได้ยินเสียงพูด · เปิดไมค์ไม่ได้) = บอกเหตุผลแล้วปิดเอง · มีข้อความ = voiceCommand แทนที่
-                root.vc = { heard: "", card: null, text: voice.micMessage, busy: false, phase: "" }
+                root.vc = { heard: "", card: null, text: voice.micMessage, busy: false, phase: "", ok: false }
                 voiceClose.restart()
             }
         }
@@ -162,7 +162,7 @@ Item {
         target: browser
         function onFinished(say, ok) {
             if (root.vc.busy) {   // ผลของคำสั่งเสียง (หน้าต่างเด้ง)
-                root.voiceShow(root.vc.heard, null, ok ? say : say + " · " + Tr.t("ทำไม่สำเร็จ"), false)
+                root.voiceShow(root.vc.heard, null, say, false, ok)
                 if (voice.available) voice.speak(-4, say)
                 return
             }
@@ -201,8 +201,8 @@ Item {
         voiceClose.stop()
         voicePopup.open()
     }
-    function voiceShow(heard, card, text, busy) {
-        vc = { heard: heard, card: card || null, text: text || "", busy: !!busy, phase: "" }
+    function voiceShow(heard, card, text, busy, ok) {
+        vc = { heard: heard, card: card || null, text: text || "", busy: !!busy, phase: "", ok: ok !== false }
         if (card && card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
         voicePopup.open()
         voiceClose.restart()
@@ -240,8 +240,8 @@ Item {
         voiceShow(heard, card, "", false)
         speakVoice()
     }
-    function voiceSay(heard, say) {
-        voiceShow(heard, null, say, false)
+    function voiceSay(heard, say) {   // บอกว่าทำไม่ได้/ไม่รู้จัก (กล่องสีส้ม)
+        voiceShow(heard, null, say, false, false)
         if (voice.available) voice.speak(-4, say)
     }
     function voiceCommand(text) {
@@ -402,7 +402,9 @@ Item {
     }
     // กล่องคำสั่งเสียง (Pakon 2026-10-20): หน้าต่างแยกของตัวเอง ลอยบนสุดเหนือทุกหน้าต่าง รวมเบราว์เซอร์เต็มจอ
     // (กฎ labwc ใน scripts/pi/session/labwc/rc.xml จับจากชื่อหน้าต่าง "aipc-voice-box": บนสุด · ไม่มีกรอบ · ขอบบนกลางจอ) ·
-    // ไม่มีการ์ดรอยืนยัน = ปิดเองใน 8 วิ · รอยืนยัน = ค้างจนตอบ (พูด "ใช่/ไม่" หรือกดปุ่ม) หรือครบ 30 วิ
+    // ไม่มีการ์ดรอยืนยัน = ปิดเองใน 8 วิ · รอยืนยัน = ค้างจนตอบ (พูด "ใช่/ไม่" หรือกดปุ่ม) หรือครบ 30 วิ ·
+    // หน้าตา (การ์ด 0041 ระยะ 2 · Pakon: "ขึ้นแล้วแต่ยังไม่สวย"): มุมมน · แถบสีบอกสถานะ (คราม = กำลังทำ · เขียว = ทำแล้ว ·
+    // ส้ม = ทำไม่ได้) · ตอนฟังมีแท่งเสียงขยับ (ภาพเคลื่อนไหวเฉพาะตอนฟัง/ถอดเสียง = บอกว่ากำลังทำงาน) · คำที่ได้ยินตัวใหญ่
     Window {
         id: voicePopup
         objectName: "voicePopup"
@@ -411,42 +413,168 @@ Item {
         title: "aipc-voice-box"
         flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
         visible: false
-        color: Theme.surface
-        width: Math.min(560, Screen.width - 32)
-        height: voiceCol.implicitHeight + 32
-        Rectangle { anchors.fill: parent; color: "transparent"; border.width: 1; border.color: Theme.line }
+        color: "transparent"   // มุมมน: พื้นหน้าต่างโปร่ง วาดกล่องเองข้างใน (labwc รองรับหน้าต่างโปร่ง)
+        width: Math.min(600, Screen.width - 32)
+        height: voiceCol.implicitHeight + 44
+        readonly property bool listening: root.vc.phase === "listening"
+        readonly property bool working: root.vc.phase === "transcribing" || !!root.vc.busy
+        readonly property bool failed: !listening && !working && !root.vc.card && root.vc.ok === false
+        readonly property color tone: listening || working || !!root.vc.card ? Theme.accent : failed ? Theme.warn : Theme.ok
         Shortcut { sequence: "Esc"; onActivated: voicePopup.close() }  // labwc ให้กล่องรับคีย์บอร์ดตอนเปิด · กลับเบราว์เซอร์เมื่อปิด
+        Rectangle {
+            anchors.fill: parent
+            radius: 22
+            color: Theme.surface
+            border.width: 1
+            border.color: Theme.lineStrong
+            Rectangle {   // แถบสีสถานะด้านบน
+                anchors.top: parent.top
+                anchors.topMargin: 0
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width - 44
+                height: 3
+                radius: 2
+                color: voicePopup.tone
+            }
+        }
         ColumnLayout {
             id: voiceCol
-            x: 16; y: 16
-            width: parent.width - 32
-            spacing: 8
+            x: 22; y: 22
+            width: parent.width - 44
+            spacing: 14
             RowLayout {
-                objectName: "voiceListening"
-                visible: root.vc.phase === "listening" || root.vc.phase === "transcribing"
                 Layout.fillWidth: true
-                spacing: 10
-                Icon { path: Icons.mic; color: Theme.accent; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
-                AppText {
+                spacing: 14
+                Item {   // วงไมค์ · ตอนฟังมีวงกระเพื่อม
+                    implicitWidth: 48; implicitHeight: 48
+                    Rectangle {
+                        id: ripple
+                        anchors.centerIn: parent
+                        width: 48; height: 48; radius: 24
+                        color: Theme.accent
+                        opacity: 0
+                        visible: voicePopup.listening
+                        SequentialAnimation on scale {
+                            running: voicePopup.listening && voicePopup.visible
+                            loops: Animation.Infinite
+                            NumberAnimation { from: 0.85; to: 1.35; duration: 900; easing.type: Easing.OutCubic }
+                        }
+                        SequentialAnimation on opacity {
+                            running: voicePopup.listening && voicePopup.visible
+                            loops: Animation.Infinite
+                            NumberAnimation { from: 0.35; to: 0; duration: 900; easing.type: Easing.OutCubic }
+                        }
+                    }
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 44; height: 44; radius: 22
+                        color: voicePopup.listening ? Theme.accentFill : Theme.surface2
+                        Icon {
+                            anchors.centerIn: parent
+                            width: 22; height: 22
+                            path: voicePopup.listening || voicePopup.working ? Icons.mic
+                                  : root.vc.card ? Icons.sparkle : voicePopup.failed ? Icons.alert : Icons.check
+                            color: voicePopup.listening ? Theme.textOnAccent : voicePopup.tone
+                        }
+                    }
+                }
+                ColumnLayout {
+                    objectName: "voiceListening"
+                    visible: voicePopup.listening || root.vc.phase === "transcribing"
                     Layout.fillWidth: true
-                    strong: true
-                    text: root.vc.phase === "listening"
-                          ? Tr.t("กำลังฟัง… พูดคำสั่งได้เลย (กดคีย์ลัดอีกครั้ง = หยุด)")
-                          : Tr.t("กำลังถอดเสียง…")
+                    spacing: 2
+                    AppText {
+                        Layout.fillWidth: true
+                        strong: true
+                        size: Theme.fontHeading
+                        text: voicePopup.listening ? Tr.t("กำลังฟัง…") : Tr.t("กำลังถอดเสียง…")
+                    }
+                    AppText {
+                        Layout.fillWidth: true
+                        size: Theme.fontSmall; color: Theme.inkMuted
+                        text: voicePopup.listening ? Tr.t("พูดคำสั่งได้เลย · ไทยหรืออังกฤษ · กดคีย์ลัดอีกครั้ง = หยุด")
+                                                   : Tr.t("รอสักครู่")
+                    }
+                }
+                ColumnLayout {   // ผล: หัวสั้น ๆ บอกสถานะ
+                    visible: !voicePopup.listening && root.vc.phase !== "transcribing"
+                    Layout.fillWidth: true
+                    spacing: 2
+                    // ทำแล้ว = ผลเป็นหัวเรื่อง ("เปิด YouTube แล้ว") · ทำไม่ได้ = "ยังทำไม่ได้" + เหตุผลข้างล่าง
+                    AppText {
+                        objectName: "voiceStatus"
+                        Layout.fillWidth: true
+                        strong: true
+                        size: Theme.fontHeading
+                        maximumLineCount: 2; elide: Text.ElideRight
+                        text: root.vc.busy ? Tr.t("กำลังทำ…") : root.vc.card ? Tr.t("รอยืนยันก่อนทำ")
+                              : voicePopup.failed ? Tr.t("ยังทำไม่ได้") : (Tr.x(root.vc.text || "") || Tr.t("เรียบร้อย"))
+                    }
+                    AppText {
+                        Layout.fillWidth: true
+                        size: Theme.fontSmall; color: Theme.inkMuted
+                        text: root.vc.card ? Tr.t("กดปุ่ม หรือกด F9 แล้วพูดว่า “ใช่” / “ไม่”")
+                              : Tr.t("คำสั่งเสียง · Esc = ปิด")
+                    }
+                }
+                Row {   // แท่งเสียง (ตอนฟัง) · จุดรอ (ตอนถอดเสียง/กำลังทำ)
+                    Layout.alignment: Qt.AlignVCenter
+                    spacing: 4
+                    visible: voicePopup.listening || voicePopup.working
+                    Repeater {
+                        model: 4
+                        Rectangle {
+                            required property int index
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 5; radius: 3
+                            height: voicePopup.listening ? 10 : 6
+                            color: Theme.accent
+                            opacity: voicePopup.listening ? 1 : 0.5
+                            SequentialAnimation on height {
+                                running: voicePopup.listening && voicePopup.visible
+                                loops: Animation.Infinite
+                                NumberAnimation { to: 26 - index * 3; duration: 260 + index * 90; easing.type: Easing.InOutSine }
+                                NumberAnimation { to: 8; duration: 260 + index * 90; easing.type: Easing.InOutSine }
+                            }
+                            SequentialAnimation on opacity {
+                                running: voicePopup.working && voicePopup.visible
+                                loops: Animation.Infinite
+                                PauseAnimation { duration: index * 150 }
+                                NumberAnimation { to: 1; duration: 300 }
+                                NumberAnimation { to: 0.3; duration: 300 }
+                            }
+                        }
+                    }
+                }
+            }
+            // คำที่ได้ยิน: ตัวใหญ่ในกล่องรอง (ผู้ใช้ตรวจได้ทันทีว่าระบบได้ยินถูกไหม)
+            Rectangle {
+                visible: (root.vc.heard || "") !== ""
+                Layout.fillWidth: true
+                implicitHeight: heardCol.implicitHeight + 20
+                radius: 14
+                color: Theme.surface2
+                ColumnLayout {
+                    id: heardCol
+                    anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 14; anchors.rightMargin: 14
+                    spacing: 2
+                    AppText { text: Tr.t("ได้ยินว่า"); size: Theme.fontCaption; color: Theme.inkFaint; oneLine: true }
+                    AppText {
+                        objectName: "voiceHeard"
+                        Layout.fillWidth: true
+                        text: "“" + (root.vc.heard || "") + "”"
+                        size: Theme.px(18); strong: true
+                        maximumLineCount: 3; elide: Text.ElideRight
+                    }
                 }
             }
             AppText {
-                objectName: "voiceHeard"
-                visible: (root.vc.heard || "") !== ""
-                Layout.fillWidth: true
-                text: Tr.t("ได้ยิน: ") + "“" + (root.vc.heard || "") + "”"
-                size: Theme.fontSmall; color: Theme.inkMuted
-            }
-            AppText {
                 objectName: "voiceSay"
-                visible: !root.vc.card && (root.vc.text || "") !== "" && !root.vc.phase
+                visible: voicePopup.failed && (root.vc.text || "") !== ""   // ทำแล้ว: ผลอยู่ในหัวเรื่องแล้ว
                 Layout.fillWidth: true
                 text: Tr.x(root.vc.text || "")
+                color: Theme.warnInk
             }
             SkillCard {
                 objectName: "voiceCard"

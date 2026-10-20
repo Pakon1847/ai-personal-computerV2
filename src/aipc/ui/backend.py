@@ -905,16 +905,22 @@ class SystemStatus(QObject):
         """
         out = []
         if self._network is False:
-            out.append({"text": tr("ออฟไลน์"), "level": "warn"})
+            out.append({"id": "network", "text": tr("ออฟไลน์"), "level": "warn"})
         if self._temp is not None and self._temp >= hardware.HOT_C:
-            out.append({"text": tr("ร้อน {t}°C", t=f"{self._temp:.0f}"), "level": "danger"})
+            out.append(
+                {"id": "temp", "text": tr("ร้อน {t}°C", t=f"{self._temp:.0f}"), "level": "danger"}
+            )
         bad = {c["id"]: c["level"] for c in self._checks if c["level"] in ("warn", "danger")}
         if "storage" in bad:
             out.append(
-                {"text": tr("พื้นที่ใกล้เต็ม · {free}", free=self.storageText), "level": bad["storage"]}
+                {
+                    "id": "storage",
+                    "text": tr("พื้นที่ใกล้เต็ม · {free}", free=self.storageText),
+                    "level": bad["storage"],
+                }
             )
         if "power" in bad:
-            out.append({"text": tr("ไฟเลี้ยงไม่พอ"), "level": bad["power"]})
+            out.append({"id": "power", "text": tr("ไฟเลี้ยงไม่พอ"), "level": bad["power"]})
         return out
 
     @Property("QVariantList", notify=healthChanged)
@@ -2943,7 +2949,10 @@ class SkillsController(QObject):
         if card := self.voiceAnswer(text):
             return card
         t0 = time.monotonic()
-        return self._why(self._handle_as("reminder", english.to_thai(text) or text), t0)
+        card = self._handle_as("reminder", english.to_thai(text) or text)
+        if card.get("badge"):  # _handle_as เขียนว่า "AI ในเครื่องเลือก" · ทางนี้กฎเป็นคนเลือก (H5)
+            card["badge"] = {**card["badge"], "reason": "คำสั่งเสียง · กฎตรวจว่าเป็นการตั้งเตือน"}
+        return self._why(card, t0)
 
     @Slot(str, result="QVariantMap")
     def voiceToChat(self, text: str) -> dict:  # noqa: N802
@@ -2962,9 +2971,9 @@ class SkillsController(QObject):
         self._pending[token] = ("tie", router.Route("skill", skill, "สั่งด้วยคีย์ลัด · ยืนยันแล้ว"), thai)
         card = {"kind": "steps", "badge": self._badge(skill, "งานที่ใช้ AI · ยืนยันก่อนส่งไปแชท"),
                 "title": "ส่งไปที่แชทให้ AI ทำ ใช่ไหม", "chips": [], "confirmToken": token,
-                "lines": [f"ได้ยินว่า “{text}”", f"สกิล: {tr(skill.name)}",
-                          "คีย์ลัดใช้สั่งงาน · งานที่ AI ต้องคิด (แปล สรุป ร่างจดหมาย) ทำในหน้าแชท",
-                          "ตอบ “ใช่” = ส่งข้อความนี้ไปหน้าแชท · “ไม่” = ยกเลิก"], "page": ""}  # fmt: skip
+                "lines": [f"ได้ยินว่า “{text}”",
+                          "งานที่ AI ต้องคิด (แปล สรุป ร่างจดหมาย) ทำในหน้าแชท · “ใช่” = ส่งไปที่แชท"],
+                "page": ""}  # fmt: skip
         return self._why(card, t0)
 
     # ---------- พูดสั่งให้ Claude สร้างสกิล (การ์ด 0030) ----------

@@ -19,6 +19,59 @@ ColumnLayout {
         }
     }
 
+    // สรุปค่าหลักของเครื่อง (การ์ด 0041 ระยะ 2) · แถบบนรวมค่าเหล่านี้เป็นป้าย "เครื่องปกติ" แล้ว →
+    // หน้านี้ต้องเห็นตัวเลขจริงครบในแวบเดียว · ค่าที่อ่านไม่ได้แสดง "—" (H5) · มีปัญหา = กรอบสีตามระดับ
+    GridLayout {
+        objectName: "healthSummary"
+        Layout.fillWidth: true
+        columns: Theme.fontScale > 1.25 ? 2 : 4
+        columnSpacing: 12
+        rowSpacing: 12
+        Repeater {
+            model: [
+                { label: Tr.t("อุณหภูมิ"), value: system.tempText, icon: Icons.thermo,
+                  level: system.alerts.some(a => a.id === "temp") ? "danger" : "" },
+                { label: Tr.t("พื้นที่ว่าง"), value: system.storageText, icon: Icons.hdd,
+                  level: system.alerts.some(a => a.id === "storage") ? "warn" : "" },
+                { label: Tr.t("เครือข่าย"), icon: Icons.globe,
+                  value: ({ on: Tr.t("ต่ออยู่"), off: Tr.t("ออฟไลน์"), unknown: Tr.t("ไม่รู้") })[system.networkState],
+                  level: system.networkState === "off" ? "warn" : "" },
+                { label: Tr.t("โมเดลภาษา"), value: chat.statusText.replace(Tr.t("โมเดล: "), ""), icon: Icons.cpu,
+                  level: chat.ready || chat.status === "off" ? "" : "warn" }
+            ]
+            Card {
+                required property var modelData
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                implicitHeight: tileCol.implicitHeight + 32
+                border.width: modelData.level !== "" ? 1 : 0
+                border.color: modelData.level === "danger" ? Theme.danger : Theme.warn
+                ColumnLayout {
+                    id: tileCol
+                    anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                    anchors.margins: 16
+                    spacing: 6
+                    RowLayout {
+                        spacing: 8
+                        Rectangle {
+                            implicitWidth: 32; implicitHeight: 32; radius: 10
+                            color: Theme.accentSoft
+                            Icon { anchors.centerIn: parent; path: modelData.icon; color: Theme.accentInk; width: 18; height: 18 }
+                        }
+                        AppText { text: modelData.label; size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true }
+                    }
+                    AppText {
+                        Layout.fillWidth: true
+                        text: modelData.value
+                        size: Theme.fontHeading; strong: true
+                        color: modelData.level === "danger" ? Theme.danger : modelData.level === "warn" ? Theme.warnInk : Theme.ink
+                        maximumLineCount: 2; elide: Text.ElideRight
+                    }
+                }
+            }
+        }
+    }
+
     // ผลตรวจความพร้อมก่อนสาธิต: เรื่องที่เจอจริง (ไฟเลี้ยง เน็ต นาฬิกา ความร้อน) พร้อมวิธีแก้
     Card {
         objectName: "readyCard"
