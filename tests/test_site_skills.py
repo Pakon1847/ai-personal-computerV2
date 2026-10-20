@@ -190,7 +190,7 @@ class FakeCdp:
 
     def __init__(self, url, buttons=()):
         self.url, self.buttons, self.closed = url, set(buttons), False
-        self.keys, self.clicked, self.blurred = [], [], 0
+        self.keys, self.clicked, self.blurred, self.exited = [], [], 0, 0
 
     def call(self, method, params=None, session="", timeout=15.0):
         params = params or {}
@@ -213,6 +213,9 @@ class FakeCdp:
         if js == control.BLUR_JS:
             self.blurred += 1
             return None
+        if js == control.EXIT_FULLSCREEN_JS:
+            self.exited += 1
+            return "off"
         if js.startswith(control.SELECTOR_CLICK_JS):
             sel = json.loads(js[len(control.SELECTOR_CLICK_JS) + 1 : -1])
             if sel.startswith("[["):
@@ -243,6 +246,11 @@ class BrowserTest(unittest.TestCase):
         self.assertTrue(r.ok, r.say)
         self.assertEqual(cdp.keys, [("rawKeyDown", "N", 8, False), ("keyUp", "N", 8, False)])
         self.assertEqual(cdp.blurred, 1)  # ช่องค้นหาที่ค้างโฟกัสไม่กินคีย์ลัด
+        self.assertEqual(cdp.exited, 0)
+        bc.run(BrowseCommand("key", query="Escape", site="youtube"))
+        self.assertEqual(
+            cdp.exited, 1
+        )  # Esc ผ่าน CDP ไม่ถึงตัว Chromium → ออกจากเต็มจอแทน (วัดบน Pi รอบ 1)
 
     def test_nothing_happens_on_another_site(self):
         """W3: หน้าที่เปิดอยู่ไม่ใช่เว็บของสกิล = ไม่กด ไม่คลิก."""

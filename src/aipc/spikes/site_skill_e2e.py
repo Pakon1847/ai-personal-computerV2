@@ -68,7 +68,7 @@ CHECKS = {
     ("click", LIKE): ("ปุ่มไลก์เปลี่ยนสถานะ (ต้องล็อกอิน)", _flip("like")),
 }
 # ลำดับให้แต่ละข้อวัดได้: เดินหน้าก่อนถอย · เต็มจอก่อนออก · เปลี่ยนคลิป/มินิเพลเยอร์ไว้ท้าย (ออกจากหน้าคลิปเดิม)
-ORDER = ["l", "j", "0", "k", "m", ">", "<", "t", "c", "f", "Escape", LIKE, "Shift+P", "Shift+N",
+ORDER = ["l", "j", "0", "k", "m", ">", "<", "t", "c", LIKE, "f", "Escape", "Shift+P", "Shift+N",
          "i"]  # fmt: skip
 
 
@@ -95,7 +95,7 @@ def run_site(b: BrowserControl, skill) -> list[dict]:
     rows = []
     cmds = sorted(skill.commands, key=lambda c: ORDER.index(c.arg) if c.arg in ORDER else 99)
     for c in cmds:
-        wait_video(b, 30)  # คลิปเล่นอยู่และไม่มีโฆษณา (โฆษณาห้ามกรอ)
+        wait_video(b, 120)  # คลิปเล่นอยู่และไม่มีโฆษณา (ระหว่างโฆษณา YouTube ห้ามกรอ/เปลี่ยนความเร็ว)
         before = state(b)
         t0 = time.monotonic()
         r = b.run(BrowseCommand(c.kind, query=c.arg, site=skill.site))
@@ -107,6 +107,8 @@ def run_site(b: BrowserControl, skill) -> list[dict]:
             ok = bool(r.ok and check(before, after))
         except (KeyError, TypeError):
             ok = False
+        if before.get("ad"):
+            name += " · วัดระหว่างโฆษณา"
         rows.append({"phrase": c.phrases[0], "kind": c.kind, "arg": c.arg, "expect": name,
                      "result_ok": r.ok, "say": r.say, "ok": ok, "seconds": took,
                      "before": before, "after": after})  # fmt: skip

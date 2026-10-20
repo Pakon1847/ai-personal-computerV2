@@ -46,6 +46,9 @@ BLUR_JS = r"""(() => {
   const typing = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]';
   if (a && a.matches(typing)) a.blur();
 })()"""
+EXIT_FULLSCREEN_JS = (
+    "document.fullscreenElement ? document.exitFullscreen().then(() => 'off') : 'none'"
+)
 # คีย์ลัด: ชื่อคีย์ → (key, code, windowsVirtualKeyCode) ของ CDP · ตัวอักษร/ตัวเลขสร้างเอง
 _KEYS = {
     "ArrowUp": ("ArrowUp", "ArrowUp", 38), "ArrowDown": ("ArrowDown", "ArrowDown", 40),
@@ -680,6 +683,10 @@ class BrowserControl:
         self._eval(BLUR_JS)
         for kind in ("rawKeyDown", "keyUp"):
             self._cdp.call("Input.dispatchKeyEvent", {"type": kind, **event}, session=self._page())
+        if event["key"] == "Escape":
+            # Esc ออกจากเต็มจอเป็นงานของตัว Chromium ไม่ใช่ของหน้าเว็บ · คีย์ที่ส่งผ่าน CDP ไปไม่ถึง
+            # (วัดบน Pi รอบ 1: กด Escape แล้วยังเต็มจอ) → ทำแทนให้เหมือนกดจริง
+            self._eval(EXIT_FULLSCREEN_JS, awaitPromise=True)
         time.sleep(0.2)
         return Result(True, "ทำแล้ว")
 
