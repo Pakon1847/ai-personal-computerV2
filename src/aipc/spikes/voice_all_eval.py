@@ -5,7 +5,8 @@
 
 จำลองทางเดินเดียวกับ WorkspacePage.voiceCommand ด้วย backend จริง (คำสั่งเครื่อง = จำลอง ไม่ทำจริง ·
 เบราว์เซอร์ = แค่แปลคำสั่ง ไม่เปิดเว็บ) · ตัดสินแบบกำหนดแน่นอน (กฎล้วน ไม่มี LLM) · ผลเหมือนกันทุกเครื่อง
-ป้าย: browser:<kind>[:n|direction] · command · reminder · answer · llm:<id> · skill:<id> · near · create · none
+ป้าย: browser:<kind>[:n|direction] · command · reminder · answer · llm:<id> · skill:<id> ·
+near · create · none
 """
 
 from __future__ import annotations
@@ -42,18 +43,26 @@ def label(text: str, skills) -> str:
     from aipc.skills import browse
     from aipc.ui import handsfree
 
-    way = handsfree.route(text, True, skills.voiceSkill)
+    way = handsfree.route(text, True, skills.voiceSkill, skills.voiceIntent)
     if way == handsfree.BROWSER:
         c = browse.parse(text)[0]
-        extra = f":{c.n}" if c.kind == "open" and c.n else f":{c.direction}" if c.kind == "media" else ""
+        extra = (
+            f":{c.n}"
+            if c.kind == "open" and c.n
+            else f":{c.direction}"
+            if c.kind == "media"
+            else ""
+        )
         return f"browser:{c.kind}{extra}"
     if way == handsfree.COMMAND:
         card = skills.handle(text)
         return "reminder" if card.get("kind") == "reminder" else "command"
     if way == handsfree.SKILL:
         return "skill:" + skills.voiceSkill(text)
-    if way == getattr(handsfree, "LLM_SKILL", None):
-        return "llm:" + handsfree.llm_skill(text)
+    if way == handsfree.REMINDER:
+        return "reminder" if skills.voiceReminder(text).get("kind") == "reminder" else "reminder?"
+    if way == handsfree.LLM_SKILL:
+        return "llm:" + skills.voiceIntent(text)[4:]
     if way == handsfree.UNKNOWN:
         if skills.voiceAnswer(text).get("kind") is not None:
             return "answer"
@@ -84,15 +93,19 @@ def routes(path: Path) -> dict:
     """V3: เส้นทางของชุด 0027 (routes.json) ตอนนี้ เทียบกับไฟล์ก่อนแก้."""
     from aipc.ui import handsfree
 
+    _engine, skills = backend()  # ทางเดียวกับแอป: ส่ง voiceSkill + voiceIntent ด้วย
     old = json.loads(path.read_text(encoding="utf-8"))
-    now = [{**r, "now": handsfree.route(r["text"], r["browser_running"])} for r in old]
-    changed = [r for r in now if r["now"] != r.get("before", r["new"])]
+    now = [{**r, "now": handsfree.route(r["text"], r["browser_running"], skills.voiceSkill,
+                                        skills.voiceIntent)} for r in old]  # fmt: skip
+    for r in now:  # ไปทางนัดแล้ว แต่โค้ดตอบเดิม (เลื่อน/ลบ/ถามนัด) ยังเป็นคนตอบ = ผลเหมือนเดิม
+        r["same_card"] = r["now"] == handsfree.REMINDER and bool(skills.voiceAnswer(r["text"]))
+    changed = [r for r in now if r["now"] != (r.get("before") or r.get("new"))]
     return {"total": len(now), "changed": changed}
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--set", choices=("dev", "test"))
+    ap.add_argument("--set", choices=("dev", "test", "test2"))
     ap.add_argument("--routes", type=Path, help="routes.json ของ 0027 หรือไฟล์ก่อนแก้ที่มีช่อง before")
     ap.add_argument("--snapshot", type=Path, help="เขียนเส้นทางตอนนี้ลงไฟล์ (ช่อง before) ไว้เทียบหลังแก้")
     ap.add_argument("--out", type=Path)
@@ -100,18 +113,29 @@ def main() -> int:
     if a.snapshot:
         from aipc.ui import handsfree
 
-        src = Path(__file__).resolve().parents[3] / "docs/benchmarks/2026-10-14-voice-command-mode/routes.json"
+        src = (
+            Path(__file__).resolve().parents[3]
+            / "docs/benchmarks/2026-10-14-voice-command-mode/routes.json"
+        )
         rows = json.loads(src.read_text(encoding="utf-8"))
         snap = [{"set": r["set"], "text": r["text"], "browser_running": r["browser_running"],
-                 "before": handsfree.route(r["text"], r["browser_running"])} for r in rows]  # fmt: skip
-        a.snapshot.write_text(json.dumps(snap, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+                 "before": handsfree.route(r["text"], r["browser_running"])}
+                for r in rows]  # fmt: skip
+        a.snapshot.write_text(
+            json.dumps(snap, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
+        )
         print(f"snapshot {len(snap)} rows → {a.snapshot}")
         return 0
     if a.routes:
         res = routes(a.routes)
-        print(f"V3: {len(res['changed'])}/{res['total']} เปลี่ยน")
+        print(
+            f"V3: {len(res['changed'])}/{res['total']} เปลี่ยนเส้นทาง · "
+            f"ผลยังเหมือนเดิม (การ์ดที่โค้ดตอบ) {sum(r['same_card'] for r in res['changed'])}"
+        )
         for r in res["changed"]:
-            print(f"  {r['text']} (เปิดเบราว์เซอร์={r['browser_running']}): {r.get('before', r['new'])} → {r['now']}")
+            same = " (ผลเหมือนเดิม)" if r["same_card"] else ""
+            was = r.get("before") or r.get("new")
+            print(f"  {r['text']} (เปิดเบราว์เซอร์={r['browser_running']}): {was} → {r['now']}{same}")
         out = res
     else:
         _engine, skills = backend()

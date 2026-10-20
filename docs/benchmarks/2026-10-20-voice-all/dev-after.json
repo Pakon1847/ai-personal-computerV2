@@ -1,0 +1,175 @@
+{
+ "set": "dev",
+ "commands_correct": 30,
+ "commands_total": 30,
+ "noncommands_acted": 0,
+ "noncommands_total": 3,
+ "wrong": [],
+ "rows": [
+  {
+   "text": "รีเซ็ตหน้า",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "รีเซ็ตหน้าเว็บ",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "รีโหลด",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "เข้าวีดีโอ",
+   "expect": "browser:open:1",
+   "got": "browser:open:1"
+  },
+  {
+   "text": "เข้าวิดีโอ",
+   "expect": "browser:open:1",
+   "got": "browser:open:1"
+  },
+  {
+   "text": "เปิดวิดีโอแรก",
+   "expect": "browser:open:1",
+   "got": "browser:open:1"
+  },
+  {
+   "text": "ดูคลิปที่สอง",
+   "expect": "browser:open:2",
+   "got": "browser:open:2"
+  },
+  {
+   "text": "เล่นวิดีโอ",
+   "expect": "browser:media:play",
+   "got": "browser:media:play"
+  },
+  {
+   "text": "เล่นคลิป",
+   "expect": "browser:media:play",
+   "got": "browser:media:play"
+  },
+  {
+   "text": "หยุดวิดีโอ",
+   "expect": "browser:media:pause",
+   "got": "browser:media:pause"
+  },
+  {
+   "text": "เต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "browser:fullscreen"
+  },
+  {
+   "text": "ขยายเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "browser:fullscreen"
+  },
+  {
+   "text": "ข้ามโฆษณา",
+   "expect": "browser:skip_ad",
+   "got": "browser:skip_ad"
+  },
+  {
+   "text": "คลิปถัดไป",
+   "expect": "browser:media:next",
+   "got": "browser:media:next"
+  },
+  {
+   "text": "เตือนกินยาสองทุ่ม",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "เตือนส่งรายงานวันศุกร์บ่ายสอง",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "พรุ่งนี้สามโมงนัดอาจารย์",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "พรุ่งนี้มีนัดอะไร",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ตอนนี้กี่โมง",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ทำไมเครื่องช้า",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เพิ่มเสียง",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ปรับเสียงสี่สิบ",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "แปลคำว่าแมว",
+   "expect": "llm:translate",
+   "got": "llm:translate"
+  },
+  {
+   "text": "แปลประโยคนี้เป็นอังกฤษ",
+   "expect": "llm:translate",
+   "got": "llm:translate"
+  },
+  {
+   "text": "สรุปข้อความนี้",
+   "expect": "llm:summarize-text",
+   "got": "llm:summarize-text"
+  },
+  {
+   "text": "ช่วยสรุปอีเมลนี้เป็นข้อ ๆ",
+   "expect": "llm:summarize-text",
+   "got": "llm:summarize-text"
+  },
+  {
+   "text": "ร่างอีเมลลาป่วย",
+   "expect": "llm:letter-writer",
+   "got": "llm:letter-writer"
+  },
+  {
+   "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้า เป็นไข้ไม่สบาย",
+   "expect": "llm:letter-writer",
+   "got": "llm:letter-writer"
+  },
+  {
+   "text": "เขียนจดหมายขอเลื่อนส่งงาน",
+   "expect": "llm:letter-writer",
+   "got": "llm:letter-writer"
+  },
+  {
+   "text": "จำได้ไหมที่เตือนไว้",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "หน้าจอมืดไปหน่อย",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "โฆษณานี้น่ารำคาญ",
+   "expect": "none",
+   "got": "none"
+  }
+ ]
+}

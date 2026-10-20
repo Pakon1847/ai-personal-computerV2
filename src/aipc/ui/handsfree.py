@@ -118,12 +118,17 @@ COMMAND = "command"  # คำสั่งเครื่อง (เปิดแ�
 NEEDS_BROWSER = "needs_browser"  # คำสั่งที่ต้องมีหน้าเว็บ แต่ยังไม่ได้เปิดเบราว์เซอร์ของผู้ช่วย
 UNKNOWN = "unknown"  # ไม่ใช่คำสั่ง → บอกตรง ๆ ไม่ส่งให้ AI
 SKILL = "skill"  # การ์ด 0028: ตรงเป๊ะกับประโยคของสกิลที่ทำด้วยโค้ด (เช่น สกิลที่ Claude สร้าง) → ทำสกิลนั้น
+REMINDER = "reminder"  # การ์ด 0042: ตั้งเตือน/นัด → สกิลนัดตรง ๆ (การ์ดยืนยันเดิม · ไม่ผ่าน AI)
+LLM_SKILL = "llm_skill"  # การ์ด 0042: สกิลที่ใช้ AI (แปล สรุป ร่างจดหมาย) → ถามก่อนส่งไปแชท (BRIEF 5.6 ข้อ 1)
 
 
-def route(text: str, browser_running: bool, skill: Callable[[str], str] | None = None) -> str:
+def route(text: str, browser_running: bool, skill: Callable[[str], str] | None = None,
+          intent: Callable[[str], str] | None = None) -> str:  # fmt: skip
     """ใช้ตัวแปลแบบกฎล้วน ไม่มี LLM (H6).
 
-    ลำดับ: เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → สกิลของผู้ใช้ (ตรงเป๊ะ) → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก ·
+    ลำดับ: เว็บ → เปิดเบราว์เซอร์ → คำสั่งเครื่อง → สกิลของผู้ใช้ (ตรงเป๊ะ) →
+    ตั้งเตือน / สกิลที่ใช้ AI (การ์ด 0042) → ต้องเปิดเบราว์เซอร์ก่อน → ไม่รู้จัก ·
+    intent(text) คืน "reminder" / "llm:<id>" / "" (SkillsController.voiceIntent) ·
     skill(text) คืน id ของสกิล ("" = ไม่ตรง) · สกิลมาหลังคำสั่งเดิม = ตรงกับตอนพิมพ์ (แชทตรวจคำสั่งเครื่องก่อน
     router.repeat_of) และสกิลเปลี่ยนคำสั่งเดิมไม่ได้ · ประตูของการ์ด 0017 ไม่ได้กันประโยคสกิลชนคำสั่ง
     (พบ 2026-10-15: สกิล "เปิดแผนที่" ของ Claude มีตัวอย่าง "เปิดแผนที่ให้หน่อย" = คำสั่งเปิด Google Maps)
@@ -150,6 +155,8 @@ def route(text: str, browser_running: bool, skill: Callable[[str], str] | None =
         return COMMAND
     if skill is not None and skill(text):
         return SKILL
+    if intent is not None and (want := intent(text)):
+        return REMINDER if want == "reminder" else LLM_SKILL
     return NEEDS_BROWSER if cmds else UNKNOWN
 
 
@@ -208,6 +215,7 @@ class BrowserController(QObject):
         self._profile = profile
         self._ledger = ledger
         self._skill_match = skill_match  # การ์ด 0028: SkillsController.voiceSkill (app.py ต่อให้)
+        self._intent = None  # การ์ด 0042: SkillsController.voiceIntent (app.py ต่อให้)
         self._busy = False
         self._done.connect(self._on_done)
 
@@ -247,7 +255,7 @@ class BrowserController(QObject):
     def route(self, text: str) -> str:
         if not self._active:  # หน้าเข้าสู่ระบบไม่มีเบราว์เซอร์และไม่มีแชท
             return UNKNOWN
-        return route(text, self._ctl().running, self._skill_match)
+        return route(text, self._ctl().running, self._skill_match, self._intent)
 
     @Slot(str, result=str)
     def hint(self, text: str) -> str:

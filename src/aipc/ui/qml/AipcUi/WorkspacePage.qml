@@ -230,8 +230,11 @@ Item {
         answered = a
         const card = skills.confirm(token, yes)
         if (card.llm && card.llmText && chat.send(card.llmText, card.prompt || "")) {
+            // งานที่ใช้ AI จากคีย์ลัด (การ์ด 0042): ไปหน้าแชท · เห็นข้อความที่ส่ง + คำตอบที่กำลังมา
             voicePopup.close()
-            push({ ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" })
+            AppState.page = "workspace"
+            items = items.concat([{ user: true, text: card.llmText },
+                                  { ai: true, text: "", note: "", done: false, skill: (card.badge || {}).name || "" }])
             return
         }
         voiceShow(heard, card, "", false)
@@ -270,6 +273,14 @@ Item {
         }
         if ((way === "browser" && browser.handle(t)) || (way === "open_browser" && browser.openHome())) {
             voiceShow(t, null, Tr.t("กำลังทำ…"), true)   // ผลมาทาง onFinished
+            return
+        }
+        if (way === "reminder") {       // การ์ด 0042: ตั้งเตือนด้วยเสียง = การ์ดสกิลนัดเดิม (ยืนยันก่อนบันทึก)
+            voiceDispatch(skills.voiceReminder(t), t)
+            return
+        }
+        if (way === "llm_skill") {      // การ์ด 0042: งานที่ใช้ AI = ถามก่อนส่งไปแชท (คีย์ลัดไม่คุยกับ AI เอง)
+            voiceDispatch(skills.voiceToChat(t), t)
             return
         }
         if (way === "command") {        // คำสั่งเครื่อง: ทางเดิมของแชททำคำสั่งก่อนถึง AI (ยืนยันตามกติกาเดิม)

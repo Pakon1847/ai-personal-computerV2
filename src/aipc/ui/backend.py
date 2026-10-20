@@ -2897,6 +2897,82 @@ class SkillsController(QObject):
             return self._why(self._card(route, text), t0)
         return {}
 
+    # ---------- คีย์ลัดใช้ได้กับทุกสกิล (การ์ด 0042) ----------
+    # ตั้งเตือนต้องขึ้นต้นด้วยคำสั่ง ("เตือน…" "ช่วยเตือน…" "อย่าลืมเตือน…" "นัด…") หรือบอกเวลา + คำของสกิลนัด ·
+    # เล่าเรื่อง ("แม่ชอบเตือนให้กินข้าว") ไม่ขึ้นต้นด้วยคำสั่งและไม่มีเวลา = ไม่ใช่
+    _REMIND_START = re.compile(r"^(?:ช่วย|อย่าลืม|ขอ|รบกวน)*(?:เตือน|นัด|จดนัด)")
+    # เลื่อน/ย้าย/ลบ/ยกเลิกนัด = แก้นัดเดิม ไม่ใช่ตั้งใหม่ (ได้ยินเพี้ยน "เลื่อนนักประชุม…" ก็ไม่สร้างนัดใหม่ · เกณฑ์ V3)
+    _EDIT_START = re.compile(r"^(?:ช่วย|ขอ|รบกวน)*(?:เลื่อน|ย้าย|ลบ|ยกเลิก|เปลี่ยน|แก้)")
+    _LETTER = re.compile(r"^(?:ช่วย|ขอ|รบกวน)*(?:ร่าง|เขียน)(?:อีเมล์?|จดหมาย|ข้อความ|หนังสือ)")
+    # สั่งสรุปด้วยเสียงไม่มีเนื้อความต่อท้าย (พูดแปะข้อความไม่ได้) · กฎแปล/สรุปของแชทต้องมีเนื้อความ →
+    # ส่งไปแชทแล้วผู้ใช้วางข้อความต่อเอง · "สรุปแล้ว…" (คำเชื่อม) ไม่เข้า
+    _SUMMARY = re.compile(r"^(?:ช่วย|ขอ|รบกวน)*สรุป(?:ข้อความ|อีเมล์?|ข่าว|บทความ|เนื้อหา|เอกสาร|รายงาน)")
+
+    def voiceIntent(self, text: str) -> str:  # noqa: N802
+        """ประโยคจากคีย์ลัดเป็นงานของสกิลไหน (กฎล้วน · H6) · "reminder" · "llm:<id>" · "" = ไม่ใช่."""
+        from aipc.skills import english, router, when
+        from aipc.skills.langintent import lang_intent
+
+        text = english.to_thai(text) or text
+        t = re.sub(r"\s+", "", text.strip())
+        by_id = {s.id: s for s in self._skills}
+        rem = by_id.get("reminder")
+        timed = when.mentions_time(text, part_of_day=False) and bool(
+            rem and router.reminder_reason(text, rem)
+        )
+        editing = bool(self._EDIT_START.match(t))
+        if (
+            rem is not None
+            and not router.is_question(t)
+            and not editing
+            and (self._REMIND_START.match(t) or timed)
+        ):
+            return "reminder"
+        lang = {"translate": "translate", "summarize": "summarize-text"}.get(
+            lang_intent(text) or "", ""
+        )
+        if lang in by_id:
+            return "llm:" + lang
+        if self._LETTER.match(t) and "letter-writer" in by_id:
+            return "llm:letter-writer"
+        if self._SUMMARY.match(t) and "summarize-text" in by_id:
+            return "llm:summarize-text"
+        return ""
+
+    @Slot(str, result="QVariantMap")
+    def voiceReminder(self, text: str) -> dict:  # noqa: N802
+        """ตั้งเตือนด้วยคีย์ลัด = การ์ดของสกิลนัดเดิม (ยืนยันก่อนบันทึก · เวลาไม่ชัด = ถามกลับ) · ไม่ผ่าน AI ·
+        เลื่อน/ลบ/ถามนัด ("เลื่อนนัดประชุมไปพรุ่งนี้") = การ์ดที่โค้ดตอบเดิม (การ์ด 0029) ก่อน ไม่สร้างนัดใหม่
+        (พบจากเกณฑ์ V3 ของการ์ด 0042)."""
+        from aipc.skills import english
+
+        if card := self.voiceAnswer(text):
+            return card
+        t0 = time.monotonic()
+        return self._why(self._handle_as("reminder", english.to_thai(text) or text), t0)
+
+    @Slot(str, result="QVariantMap")
+    def voiceToChat(self, text: str) -> dict:  # noqa: N802
+        """สกิลที่ใช้ AI ทางคีย์ลัด → การ์ด "ส่งไปที่แชทให้ AI ทำ ใช่ไหม" (BRIEF 5.6 ข้อ 1: คีย์ลัดไม่คุยกับ AI เอง) ·
+        "ใช่" = ทางเดียวกับการ์ดเลือกสกิล (pending "tie") → หน้าจอส่งข้อความเดิมเข้าแชทพร้อม prompt ของสกิล."""
+        from aipc.skills import english, router
+
+        t0 = time.monotonic()
+        want = self.voiceIntent(text)
+        skill = next((s for s in self._skills if "llm:" + s.id == want), None)
+        if skill is None:
+            return {}
+        thai = english.to_thai(text) or text
+        self._counter += 1
+        token = f"c{self._counter}"
+        self._pending[token] = ("tie", router.Route("skill", skill, "สั่งด้วยคีย์ลัด · ยืนยันแล้ว"), thai)
+        card = {"kind": "steps", "badge": self._badge(skill, "งานที่ใช้ AI · ยืนยันก่อนส่งไปแชท"),
+                "title": "ส่งไปที่แชทให้ AI ทำ ใช่ไหม", "chips": [], "confirmToken": token,
+                "lines": [f"ได้ยินว่า “{text}”", f"สกิล: {tr(skill.name)}",
+                          "คีย์ลัดใช้สั่งงาน · งานที่ AI ต้องคิด (แปล สรุป ร่างจดหมาย) ทำในหน้าแชท",
+                          "ตอบ “ใช่” = ส่งข้อความนี้ไปหน้าแชท · “ไม่” = ยกเลิก"], "page": ""}  # fmt: skip
+        return self._why(card, t0)
+
     # ---------- พูดสั่งให้ Claude สร้างสกิล (การ์ด 0030) ----------
     @Slot(str, result="QVariantMap")
     def voiceCreate(self, text: str) -> dict:  # noqa: N802

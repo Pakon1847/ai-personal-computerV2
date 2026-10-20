@@ -1,0 +1,21 @@
+{
+ "total": 308,
+ "changed": [
+  {
+   "set": "live-22",
+   "text": "เตือนกินยาพรุ่งนี้แปดโมง",
+   "browser_running": false,
+   "before": "unknown",
+   "now": "reminder",
+   "same_card": false
+  },
+  {
+   "set": "live-22",
+   "text": "เตือนกินยาพรุ่งนี้แปดโมง",
+   "browser_running": true,
+   "before": "unknown",
+   "now": "reminder",
+   "same_card": false
+  }
+ ]
+}

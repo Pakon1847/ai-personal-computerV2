@@ -15,7 +15,8 @@ from aipc.skills import fileintent
 @dataclass(frozen=True)
 class BrowseCommand:
     # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031) ·
-    # media (การ์ด 0035 · direction = pause | play | next) · site_search (การ์ด 0036 · site + query)
+    # media (การ์ด 0035 · direction = pause | play | next) · site_search (การ์ด 0036 · site + query) ·
+    # fullscreen · skip_ad (การ์ด 0042) · open + direction="clip" = เลือกคลิป/วิดีโอ (การ์ด 0042)
     kind: str
     query: str = ""
     n: int = 0
@@ -29,10 +30,16 @@ class BrowseCommand:
 
 NUMBERS = {"แรก": 1, "หนึ่ง": 1, "สอง": 2, "สาม": 3, "สี่": 4, "ห้า": 5,
            "หก": 6, "เจ็ด": 7, "แปด": 8, "เก้า": 9, "สิบ": 10}  # fmt: skip
-_LINK = r"(?:ลิ้?ง(?:[กค]์)?|link|เว็บ|ผล(?:ลัพธ์|การค้นหา)?|อัน)"
+# คลิป/วิดีโอ = ลิงก์ของคลิปในหน้าผลค้นหา (การ์ด 0042 · Pakon: "เข้าวีดีโอ" ไม่รู้จัก)
+_CLIP = r"(?:คลิป|ว[ิี]ด[ิี]โอ|video)"
+_LINK = rf"(?:ลิ้?ง(?:[กค]์)?|link|เว็บ|ผล(?:ลัพธ์|การค้นหา)?|อัน|{_CLIP})"
 _ORD = r"(?:อัน|ลำดับ)?\s*(?:ที่\s*)?(แรก|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ|\d{1,2})"
-_OPEN = rf"(?:กด\s*)?(?:เข้า|เปิด|กด|คลิก|ไป|ดู)\s*(?:ไป\s*)?(?:ใน\s*|ดู\s*)?(?:ที่\s*)?{_LINK}\s*{_ORD}"
+_OPEN = (
+    rf"(?:กด\s*)?(?:เข้า|เปิด|กด|คลิก|ไป|ดู|เลือก)\s*(?:ไป\s*)?(?:ใน\s*|ดู\s*)?(?:ที่\s*)?{_LINK}\s*{_ORD}"
+)
 _OPEN_RE = re.compile(rf"{_OPEN}")
+# "เข้าวีดีโอ" ไม่บอกลำดับ = คลิปแรก (การ์ด 0042 หัวข้อ 6)
+_OPEN_CLIP = re.compile(rf"(?:กด\s*)?(?:เข้า|เปิด|กด|คลิก|ดู|เลือก)\s*(?:ไป\s*)?(?:ดู\s*)?{_CLIP}")
 _COMPOUND = re.compile(rf"^(.+?)\s*(?:แล้ว\s*)?({_OPEN})$")
 # "A แล้ว B" ทั่วไป (ปิดแท็บแล้วกลับไปหน้าผู้ช่วย · ค้นหา X แล้วเลื่อนลง · ชุด H2 = ชุดพัฒนารอบ 3)
 _THEN = re.compile(r"(.+?)\s*แล้ว\s*(.+)")
@@ -72,8 +79,9 @@ _BACK = re.compile(
 )
 _FORWARD = re.compile(r"ไป\s*(?:หน้า\s*)?ข้างหน้า|ไป\s*(?:ที่\s*)?หน้า\s*(?:ถัด|ต่อ)\s*ไป|เดินหน้า|forward")
 _RELOAD = re.compile(
-    r"โหลด\s*(?:หน้า\s*(?:นี้|เว็บ)?\s*)?ใหม่|รี\s*(?:เฟรช|เฟรซ|โหลด)(?:\s*หน้า\s*(?:นี้|เว็บ)?)?|refresh|reload"
-)
+    r"โหลด\s*(?:หน้า\s*(?:นี้|เว็บ)?\s*)?ใหม่|รี\s*(?:เฟรช|เฟรซ|โหลด|เซ็[ตท])(?:\s*หน้า\s*(?:นี้|เว็บ)?)?"
+    r"|refresh|reload"
+)  # "รีเซ็ตหน้า" (Pakon 2026-10-20 · การ์ด 0042) = โหลดหน้าใหม่
 _SCROLL = re.compile(
     r"(?:เลื่อน|สกรอ(?:ลล์|ล)?)\s*(?:หน้า\s*(?:จอ|เว็บ)?\s*)?(?:กลับ\s*)?(ลง|ขึ้น)\s*(?:ไป|มา)?\s*(?:ดู\s*)?"
     r"(?:ข้าง\s*(?:ล่าง|บน))?\s*(?:ดู\s*ต่อ|อีก)?"
@@ -84,7 +92,16 @@ _MEDIA = r"(?:เพลง|ว[ิี]ด[ิี]โอ|คลิป)"
 _PAUSE = re.compile(
     rf"(?:หยุด|พัก|ปิด)\s*(?:เล่น\s*)?{_MEDIA}(?:\s*(?:นี้|ก่อน|ชั่วคราว|แป๊บ|แปบ))*|หยุด\s*ชั่วคราว"
 )
-_PLAY = re.compile(rf"(?:เล่น\s*(?:{_MEDIA}\s*)?|เปิด\s*{_MEDIA}\s*)ต่อ(?:\s*เลย)?")
+_PLAY = re.compile(
+    rf"(?:เล่น\s*(?:{_MEDIA}\s*)?|เปิด\s*{_MEDIA}\s*)ต่อ(?:\s*เลย)?|(?:กด\s*)?เล่น\s*{_MEDIA}(?:\s*ต่อ)?"
+)  # "เล่นวิดีโอ" (การ์ด 0042) · "เล่นเพลงลูกทุ่ง" มีคำต่อท้าย = ไม่ตรงทั้งประโยค
+# เต็มจอ / ออกจากเต็มจอ (การ์ด 0042) · สลับสถานะ
+_FULL = re.compile(
+    rf"(?:(?:ขยาย|ดู|เปิด|ทำ)\s*)?(?:{_MEDIA}\s*)?(?:(?:แบบ|ให้|เป็น)\s*)?(?:โหมด\s*)?เต็ม\s*จอ"
+    r"|(?:ออก|ปิด)\s*(?:จาก\s*)?(?:โหมด\s*)?เต็ม\s*จอ|full\s*screen"
+)
+# ข้ามโฆษณา (การ์ด 0042) · YouTube: กดปุ่มข้ามของตัวเล่นเมื่อปุ่มขึ้นแล้ว
+_SKIP_AD = re.compile(r"(?:กด\s*)?ข้าม\s*(?:โฆษณา|แอด|ad|ads)(?:\s*(?:ไป|นี้))?|skip\s*ads?")
 _NEXT = re.compile(rf"(?:(?:ไป|เปิด|เล่น)\s*)?{_MEDIA}\s*(?:ถัด|ต่อ)\s*ไป|ข้าม\s*{_MEDIA}(?:\s*นี้)?")
 _CLOSE = re.compile(r"ปิด\s*(?:แท็บ|แทบ|tab|หน้า\s*(?:นี้|เว็บ)|เว็บ)\s*(?:นี้|ที่\s*เปิด\s*อยู่)?\s*(?:ไป)?")
 _APP = re.compile(
@@ -262,7 +279,14 @@ _VERB_ONLY = re.compile(
 
 def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
     if m := _OPEN_RE.fullmatch(t):
-        return BrowseCommand("open", n=_ordinal(m.group(1)))
+        clip = "clip" if re.search(_CLIP, t) else ""
+        return BrowseCommand("open", n=_ordinal(m.group(1)), direction=clip)
+    if _OPEN_CLIP.fullmatch(t):
+        return BrowseCommand("open", n=1, direction="clip")
+    if _FULL.fullmatch(t):
+        return BrowseCommand("fullscreen")
+    if _SKIP_AD.fullmatch(t):
+        return BrowseCommand("skip_ad")
     if _BACK.fullmatch(t):
         return BrowseCommand("back")
     if _FORWARD.fullmatch(t):

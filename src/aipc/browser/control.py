@@ -27,7 +27,8 @@ GOOGLE = "https://www.google.com/search?hl=th&q="
 # DuckDuckGo ตรง 8/8 และลิงก์ชี้เว็บปลายทางตรง ๆ (Bing ผ่านตัวพาไป bing.com/ck/a)
 DDG = "https://duckduckgo.com/?kl=th-th&q="
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
-NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media"}
+NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media", "fullscreen",
+              "skip_ad"}  # fmt: skip
 
 # คุมเพลง/วิดีโอ (การ์ด 0035): สั่งตัวเล่น <video>/<audio> ของหน้าโดยตรง (ใช้ได้ทุกเว็บ รวมโฆษณา YouTube) ·
 # ไม่อ่านเนื้อหาหน้า · คืนแค่สถานะ: none = หน้านี้ไม่มีตัวเล่น · idle = อยู่ในสภาพที่สั่งอยู่แล้ว
@@ -52,6 +53,28 @@ NEXT_BUTTON_JS = r"""(() => {
   b.click();
   return true;
 })()"""
+# เต็มจอ (การ์ด 0042) · เว็บทั่วไป: ตัวเล่นวิดีโอของหน้าเต็มจอ / ออก · YouTube ใช้คีย์ลัด f ของตัวเล่นแทน
+# (ปุ่มควบคุมของ YouTube ยังอยู่) · คืน on/off = สถานะหลังสั่ง · none = หน้านี้ไม่มีวิดีโอ
+FULLSCREEN_JS = r"""(async () => {
+  if (document.fullscreenElement) { await document.exitFullscreen(); return 'off'; }
+  const v = document.querySelector('video');
+  if (!v) return 'none';
+  try { await v.requestFullscreen(); return 'on'; } catch (err) { return 'blocked'; }
+})()"""
+# ข้ามโฆษณา YouTube (การ์ด 0042) · ตัวเลือกปุ่มเขียนตายตัว (H8: ไม่หาปุ่มจากข้อความในหน้า) ·
+# ok = กดแล้ว · wait = มีโฆษณาแต่ปุ่มข้ามยังไม่ขึ้น · none = ไม่มีโฆษณา
+SKIP_AD_JS = r"""(() => {
+  const sel = '.ytp-skip-ad-button, .ytp-ad-skip-button, .ytp-ad-skip-button-modern, ' +
+              '.ytp-ad-skip-button-slot button';
+  const b = [...document.querySelectorAll(sel)].find(x => x.offsetParent !== null);
+  if (b) { b.click(); return 'ok'; }
+  return document.querySelector('.ad-showing, .ad-interrupting') ? 'wait' : 'none';
+})()"""
+SKIP_AD_SAY = {
+    "ok": (True, "ข้ามโฆษณาแล้ว"),
+    "wait": (False, "ยังข้ามโฆษณาไม่ได้ · รอปุ่มข้ามขึ้นก่อน (ประมาณ 5 วินาที) แล้วสั่งใหม่"),
+    "none": (False, "ตอนนี้ไม่มีโฆษณาให้ข้าม"),
+}
 # หน้าค้นของแต่ละบริการ (การ์ด 0036 หัวข้อ 3 · ตรวจลิงก์แล้ว 2026-10-15) · เขียนตายตัว คำค้นเข้ารหัส URL เสมอ
 SITE_SEARCH = {
     "youtube": "https://www.youtube.com/results?search_query=",
@@ -78,8 +101,8 @@ LINKS_JS = r"""(() => {
           '#bottomads a [role=heading]';
   else if (/(^|\.)bing\.com$/.test(host) && location.pathname === '/search')
     sel = 'li.b_algo h2 a, li.b_ad h2 a, .b_adTop h2 a';
-  else if (/(^|\.)youtube\.com$/.test(host) && location.pathname === '/results')
-    sel = 'a#video-title, a.yt-lockup-metadata-view-model__title, ' +
+  else if (/(^|\.)youtube\.com$/.test(host) && location.pathname !== '/watch')
+    sel = 'a#video-title-link, a#video-title, a.yt-lockup-metadata-view-model__title, ' +
           'a.yt-lockup-metadata-view-model-wiz__title';  // คลิป ไม่ใช่โลโก้/เมนู (0025)
   else if (/duckduckgo\.com$/.test(host))
     sel = 'a.result__a, a[data-testid=result-title-a]';
@@ -435,10 +458,19 @@ class BrowserControl:
     def links(self) -> list[dict]:
         return self._eval(LINKS_JS) or []
 
+    def _youtube(self) -> bool:
+        host = urlsplit(self._url()).hostname or ""
+        return host == "youtube.com" or host.endswith(".youtube.com")
+
     def _do_open(self, cmd: BrowseCommand) -> Result:
+        # "เข้าวีดีโอ" ขณะดูคลิปอยู่ = ไม่กดลิงก์ข้าง ๆ เอง (การ์ด 0042 หัวข้อ 6)
+        if cmd.direction == "clip" and self._youtube() and urlsplit(self._url()).path == "/watch":
+            return Result(False, "กำลังดูคลิปอยู่ · พูด “คลิปถัดไป” เพื่อเปลี่ยนคลิป หรือ “ย้อนกลับ” ไปหน้ารายการ")
         links = self.links()
         if not links:
-            return Result(False, "หน้านี้ไม่มีลิงก์ให้เลือก")
+            return Result(
+                False, "หน้านี้ไม่มีคลิปให้เลือก" if cmd.direction == "clip" else "หน้านี้ไม่มีลิงก์ให้เลือก"
+            )
         if cmd.n > len(links):
             return Result(False, f"หน้านี้มีลิงก์ให้เลือก {len(links)} ลิงก์")
         link = links[cmd.n - 1]
@@ -510,6 +542,33 @@ class BrowserControl:
             if moved:
                 return Result(True, "กดปุ่มถัดไปให้แล้ว", url=url)
         return Result(False, "ข้ามไม่ได้ · หน้านี้ไม่มีเพลงถัดไป")
+
+    def _key(self, key: str, code: str, vk: int) -> None:
+        """กดปุ่มหนึ่งครั้งในหน้า (ไม่พิมพ์ตัวอักษรลงช่องใด) · ใช้คีย์ลัดของตัวเล่น YouTube."""
+        for kind in ("rawKeyDown", "keyUp"):
+            event = {"type": kind, "key": key, "code": code, "windowsVirtualKeyCode": vk}
+            self._cdp.call("Input.dispatchKeyEvent", event, session=self._page())
+
+    def _do_fullscreen(self, cmd: BrowseCommand) -> Result:
+        """เต็มจอ / ออกจากเต็มจอ (การ์ด 0042) · ตรวจผลจากหน้า (document.fullscreenElement)."""
+        if self._youtube() and urlsplit(self._url()).path == "/watch":
+            was = bool(self._eval("!!document.fullscreenElement"))
+            self._key("f", "KeyF", 70)
+            time.sleep(0.4)
+            now = bool(self._eval("!!document.fullscreenElement"))
+            if now != was:
+                return Result(True, "เต็มจอแล้ว" if now else "ออกจากเต็มจอแล้ว")
+        state = self._eval(FULLSCREEN_JS, awaitPromise=True, userGesture=True)
+        say = {"on": (True, "เต็มจอแล้ว"), "off": (True, "ออกจากเต็มจอแล้ว"),
+               "blocked": (False, "เว็บไม่ยอมให้เต็มจอ · กดปุ่มเต็มจอที่ตัวเล่นเอง")}  # fmt: skip
+        return Result(*say.get(state, (False, "หน้านี้ไม่มีวิดีโอให้เต็มจอ")))
+
+    def _do_skip_ad(self, cmd: BrowseCommand) -> Result:
+        """ข้ามโฆษณา YouTube (การ์ด 0042) · ปุ่มยังไม่ขึ้น = บอกให้รอ ไม่กดอย่างอื่นแทน (H5)."""
+        if not self._youtube():
+            return Result(False, "ข้ามโฆษณาได้เฉพาะใน YouTube")
+        state = self._eval(SKIP_AD_JS, userGesture=True)
+        return Result(*SKIP_AD_SAY.get(state, SKIP_AD_SAY["none"]))
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
         pages = [
