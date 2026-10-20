@@ -297,6 +297,27 @@ class BrowserController(QObject):
             return UNKNOWN
         return route(text, self._ctl().running, self._skill_match, self._intent)
 
+    @Slot(result=str)
+    def currentUrl(self) -> str:  # noqa: N802
+        """ที่อยู่ของหน้าที่เปิดในเบราว์เซอร์ของผู้ช่วย ("" = ยังไม่เปิด) · ใช้เลือกสกิลประจำเว็บ (การ์ด 0046)."""
+        if not self._active or self._busy or self._control is None or not self._control.running:
+            return ""
+        try:
+            return str(self._control.current().get("url", ""))
+        except Exception:  # noqa: BLE001 · อ่านไม่ได้ = ไม่มีสกิลประจำเว็บ (ไม่ทำให้คีย์ลัดพัง)
+            return ""
+
+    @Slot(str, str, str, result=bool)
+    def runSite(self, kind: str, arg: str, site: str) -> bool:  # noqa: N802
+        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก) · ผลมาทางสัญญาณ finished เหมือนคำสั่งเว็บอื่น."""
+        from aipc.skills.browse import BrowseCommand
+
+        if not self._active or self._busy or kind not in ("key", "click"):
+            return False
+        if self._control is None or not self._control.running:
+            return False
+        return self._start([BrowseCommand(kind, query=arg, site=site)])
+
     @Slot(str, result="QVariantMap")
     def appCommand(self, text: str) -> dict:  # noqa: N802
         """ค่าตั้งของแอปจากคีย์ลัด (การ์ด 0042 รอบ 3) · หน้าจอเป็นคนเปลี่ยนค่าผ่าน uiSettings."""

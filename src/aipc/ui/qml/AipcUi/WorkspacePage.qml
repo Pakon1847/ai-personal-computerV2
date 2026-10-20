@@ -233,6 +233,10 @@ Item {
             voiceCommand(card.redo)
             return
         }
+        if (card.siteRun) {    // การ์ด 0046: ยืนยันคำสั่งของสกิลประจำเว็บแล้ว
+            siteRun(card, heard)
+            return
+        }
         if (card.chatText) {   // การ์ด 0042 รอบ 3: ถามในแชท = เหมือนพิมพ์เอง
             voicePopup.close()
             AppState.page = "workspace"
@@ -276,6 +280,12 @@ Item {
         }
         return ""
     }
+    // คำสั่งของสกิลประจำเว็บ (การ์ด 0046): กดคีย์/คลิกในเบราว์เซอร์ของผู้ช่วย · ผลมาทาง onFinished
+    function siteRun(card, heard) {
+        const r = card.siteRun
+        if (browser.runSite(r.kind, r.arg, r.site)) voiceShow(heard, null, Tr.t("กำลังทำ…"), true)
+        else voiceSay(heard, Tr.t("ยังสั่งในเว็บไม่ได้ · เปิดเว็บนั้นในเบราว์เซอร์ของผู้ช่วยก่อน"))
+    }
     function voiceSay(heard, say) {   // บอกว่าทำไม่ได้/ไม่รู้จัก (กล่องสีส้ม)
         voiceShow(heard, null, say, false, false)
         if (voice.available) voice.speak(-4, say)
@@ -301,6 +311,13 @@ Item {
         }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
         if (browser.busy) { voiceSay(t, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")); return }
+        // การ์ด 0046: หน้าเว็บที่เปิดอยู่มีสกิลประจำเว็บ → คำพูดที่ตรงกับคำสั่งของสกิลมาก่อน (คีย์ลัด/ปุ่มของเว็บนั้น)
+        const url = browser.currentUrl()
+        if (url !== "") {
+            const own = skills.siteCommand(t, url)
+            if (own.siteRun) { siteRun(own, t); return }
+            if (own.confirmToken) { voiceDispatch(own, t); return }   // คำสั่งที่มี "ยืนยันก่อน"
+        }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
         const way = browser.route(t)
         if (way === "skill") {          // การ์ด 0028: ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด = การ์ดสกิลเดียวกับตอนพิมพ์ (ยืนยันตามกติกาเดิม)
@@ -333,12 +350,18 @@ Item {
             // การ์ด 0029: คำถามที่โค้ดตอบเองได้ (เวลา นัด ไฟล์ สุขภาพเครื่อง) = ตอบแล้วอ่านออกเสียง · ไม่ใช้ AI
             const answerCard = skills.voiceAnswer(t)
             if (answerCard.kind !== undefined) { voiceDispatch(answerCard, t); return }
+            // การ์ด 0046: ได้ยินใกล้คำสั่งของเว็บที่เปิดอยู่ = "หมายถึง … ใช่ไหม"
+            const near = url !== "" ? skills.siteNear(t, url) : ({})
+            if (near.confirmToken) { voiceDispatch(near, t); return }
             // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
             if (ask.confirmToken) { voiceDispatch(ask, t); return }
             // การ์ด 0030: ขอโหมดใหม่ = การ์ดยืนยันข้อความก่อนส่ง Claude (ไม่มี Claude/ปิดสวิตช์ = การ์ดอธิบาย)
             const create = skills.voiceCreate(t)
             if (create.kind !== undefined) { voiceDispatch(create, t); return }
+            // การ์ด 0046: อยู่ในเว็บที่คุมได้ + ยังไม่มีคำสั่งนี้ = ถามว่าให้ Claude เพิ่มเข้าสกิลของเว็บนั้นไหม
+            const learn = url !== "" ? skills.siteLearn(t, url) : ({})
+            if (learn.confirmToken) { voiceDispatch(learn, t); return }
             // การ์ด 0042 รอบ 3: ไม่ใช่คำสั่งทันที = ถามว่าส่งไปถามในแชทไหม (แทน "ไม่รู้จักคำสั่ง")
             const toChat = skills.voiceAsk(t)
             if (toChat.confirmToken) { voiceDispatch(toChat, t); return }

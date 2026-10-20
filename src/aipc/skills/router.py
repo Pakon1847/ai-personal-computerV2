@@ -60,6 +60,8 @@ def has_keyword(text: str, keyword: str) -> bool:
 
 
 def score(text: str, m: Manifest) -> int:
+    if m.site:  # สกิลประจำเว็บ (การ์ด 0046) ใช้ทางเสียงในเว็บนั้นเท่านั้น
+        return 0
     return sum(1 for k in m.keywords if has_keyword(text, k))
 
 
@@ -137,7 +139,7 @@ def repeat_of(text: str, manifests: list[Manifest]) -> Manifest | None:
     if not key:
         return None
     for m in manifests:
-        if m.id == "system-command":
+        if m.id == "system-command" or m.site:
             continue
         pool = [*m.examples, str(m.extra.get("request", ""))]
         if any(command.normalize(p) == key for p in pool if p):

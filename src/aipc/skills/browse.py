@@ -16,7 +16,8 @@ from aipc.skills import fileintent
 class BrowseCommand:
     # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031) ·
     # media (การ์ด 0035 · direction = pause | play | next) · site_search (การ์ด 0036 · site + query) ·
-    # fullscreen · skip_ad (การ์ด 0042) · open + direction="clip" = เลือกคลิป/วิดีโอ (การ์ด 0042)
+    # fullscreen · skip_ad (การ์ด 0042) · open + direction="clip" = เลือกคลิป/วิดีโอ (การ์ด 0042) ·
+    # key / click (การ์ด 0046 · สกิลประจำเว็บ · query = คีย์หรือตัวเลือก · site = เว็บของสกิล)
     kind: str
     query: str = ""
     n: int = 0

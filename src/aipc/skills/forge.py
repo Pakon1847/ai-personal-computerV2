@@ -153,6 +153,8 @@ def trial(new: manifest.Manifest, skills: list[manifest.Manifest], should: list[
 
     pool = [*skills, new]
     t = Trial()
+    if new.site:  # สกิลประจำเว็บ (การ์ด 0046) ไม่เข้าตัวคัดสกิล (ทางเข้า = คำพูดในเว็บนั้น) จึงไม่แย่งและไม่ถูกเรียก
+        return t
     t.trigger_fail = [s for s in [*new.examples, *should] if pick(s, pool) != new.id]
     t.not_trigger_fail = [s for s in should_not if pick(s, pool) == new.id]
     for s in [*(e for k in skills for e in k.examples), *extra]:

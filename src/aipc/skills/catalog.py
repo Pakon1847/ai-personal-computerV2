@@ -113,7 +113,7 @@ def tools(skills: list[Manifest], available: set[str], cloud: bool = False,
         fn = {"name": CREATE_SKILL, "description": CREATE_SKILL_DESC, "parameters": empty}
         out.append({"type": "function", "function": fn})
     for s in skills:
-        if s.id in NOT_FOR_AI or any(n not in available for n in s.needs):
+        if s.id in NOT_FOR_AI or s.site or any(n not in available for n in s.needs):
             continue
         desc = f"{s.name}: {s.description} (ตัวอย่าง: {' · '.join(s.examples[:3])})"
         fn = {"name": s.id, "description": desc, "parameters": {"type": "object", "properties": {}}}

@@ -33,8 +33,9 @@ def auto_policy(m: manifest.Manifest) -> list[str]:
     errors = []
     # สกิลของผู้ใช้ไม่มีโค้ดของตัวเอง (ADR-011 ข้อ 1) · ไม่มีทั้งขั้นตอนและคำสั่งให้ AI = ทำอะไรไม่ได้เลย
     # (ชุดสกิลเสีย b13 ผ่านตัวตรวจทั่วไปได้ เพราะสกิลในตัวแบบ worker code มีโค้ดรองรับ)
-    if not m.steps and not m.prompt.strip():
-        errors.append("สกิลต้องมี “## ขั้นตอน” หรือ “## คำสั่งให้ AI” อย่างใดอย่างหนึ่ง")
+    # สกิลประจำเว็บ (การ์ด 0046) มี "## คำสั่ง" แทน
+    if not m.steps and not m.prompt.strip() and not m.commands:
+        errors.append("สกิลต้องมี “## ขั้นตอน” “## คำสั่งให้ AI” หรือ “## คำสั่ง” (สกิลประจำเว็บ) อย่างใดอย่างหนึ่ง")
     for s in m.steps:
         plan = s.plan
         if plan is None:
@@ -81,7 +82,12 @@ def gate(
     # ...มาช้า" ไม่ใช่งานเช็กเครื่องช้า) ·
     # คำสั่งตรงของระบบ (เปิดแผนที่) ทำก่อนถึง AI เสมอ จึงไม่นับว่าแย่ง (สกิลดีของ Claude 3/10
     # เคยถูกปฏิเสธผิดด้วยสองเหตุนี้)
-    overlap = [(e, k) for e in m.examples if (k := _pick(e.split(":")[0].split("：")[0], others))]
+    # สกิลประจำเว็บ (การ์ด 0046) ไม่เข้าตัวคัดสกิล จึงไม่แย่งงานใคร (ตัวอย่างของมันคือคำพูดในหน้าเว็บ)
+    overlap = [
+        (e, k)
+        for e in m.examples
+        if not m.site and (k := _pick(e.split(":")[0].split("：")[0], others))
+    ]
     if overlap:
         return None, [f"ตัวอย่าง “{e}” เป็นงานของสกิลเดิม ({k})" for e, k in overlap]
     t = forge.trial(m, others, [], [])

@@ -2730,6 +2730,20 @@ class SkillsController(QObject):
             self.forgeDone.emit(card, text)
             return
         self._reload()
+        if new.site:  # การ์ด 0046: สกิลประจำเว็บ = บอกว่าพูดอะไรได้ · ทำเมื่อพูดในเว็บนั้น
+            v = self._user.info(new.id)["version"]
+            what = (
+                f"แก้สกิล “{new.name}” แล้ว (รุ่น {v})"
+                if revise_id
+                else f"สร้างสกิล “{new.name}” แล้ว (Claude สร้าง)"
+            )
+            says = [c.phrases[0] for c in new.commands][:8]
+            say = "พูดในเว็บนี้ได้: " + " · ".join(f"“{p}”" for p in says)
+            card = self._plain("command", what, [say], [{"text": "สกิลประจำเว็บ", "kind": "ok"}])
+            if by_voice:
+                card["voice"] = True
+            self.forgeDone.emit(card, text)
+            return
         card = dict(self.handleAs(new.id, text))
         v = self._user.info(new.id)["version"]
         note = (f"แก้สกิล “{new.name}” แล้ว (รุ่น {v})" if revise_id
@@ -2883,7 +2897,10 @@ class SkillsController(QObject):
 
         เรียกจากเธรดของตัวอัดเสียง · อ่านรายการอย่างเดียว
         """
-        return [e for s in self._voice_skills() for e in s.examples]
+        site = [
+            p for s in self._skills if s.site for c in s.commands for p in c.phrases
+        ]  # การ์ด 0046
+        return [e for s in self._voice_skills() for e in s.examples] + site
 
     @Slot(str, result=str)
     def voiceExample(self, skill_id: str) -> str:  # noqa: N802
@@ -3098,6 +3115,90 @@ class SkillsController(QObject):
                 "title": f"หมายถึง “{skill.name}” ใช่ไหม", "chips": [], "confirmToken": token,
                 "lines": [f"ได้ยินว่า “{text}” · ใกล้กับ “{example}”", *steps], "page": ""}  # fmt: skip
         return self._why(card, t0)
+
+    # ---------- สกิลประจำเว็บ (การ์ด 0046) ----------
+    @Slot(str, str, result="QVariantMap")
+    def siteCommand(self, text: str, url: str) -> dict:  # noqa: N802
+        """คำพูดตรงกับคำสั่งของสกิลประจำเว็บที่เปิดอยู่ → {"siteRun": …} (ทำเลย) · มี "ยืนยันก่อน" = การ์ดยืนยัน ·
+        ไม่ตรง = {} · หน้าจอเรียกก่อนทางเสียงอื่น (คำสั่งของเว็บที่เปิดอยู่มาก่อน · การ์ด 0046)."""
+        return self._site_card(text, url, near=False)
+
+    @Slot(str, str, result="QVariantMap")
+    def siteNear(self, text: str, url: str) -> dict:  # noqa: N802
+        """ได้ยินใกล้คำสั่งของสกิลประจำเว็บ → "หมายถึง … ใช่ไหม" (BRIEF 5.6 ข้อ 2 · การ์ด 0045) · ไม่ใกล้ = {} ·
+        หน้าจอเรียกเมื่อทางเดิมไม่รู้จักเท่านั้น (ไม่ให้ความคล้ายเสียงแย่งคำสั่งที่ถูกอยู่แล้ว)."""
+        return self._site_card(text, url, near=True)
+
+    def _site_card(self, text: str, url: str, near: bool) -> dict:
+        from aipc.skills import sitecmd
+
+        t0 = time.monotonic()
+        skill, cmd, exact = sitecmd.match(text, self._skills, url)
+        if skill is None or exact == near:
+            return {}
+        run = {"kind": cmd.kind, "arg": cmd.arg, "site": skill.site}
+        phrase = cmd.phrases[0]
+        if exact and not cmd.confirm:
+            return {
+                "kind": "site-run",
+                "siteRun": run,
+                "title": phrase,
+                "badge": self._badge(skill, "คำสั่งของสกิลประจำเว็บ"),
+            }
+        self._counter += 1
+        token = f"w{self._counter}"
+        self._pending[token] = ("site", run, phrase)
+        title = f"ทำ “{phrase}” ใช่ไหม" if exact else f"หมายถึง “{phrase}” ใช่ไหม"
+        why = f"ได้ยินว่า “{text}” · ใกล้กับ “{phrase}”"
+        if exact:
+            why = "คำสั่งนี้ย้อนไม่ได้หรือแตะบัญชี · ยืนยันก่อน"
+        card = {"kind": "steps", "badge": self._badge(skill, "สกิลประจำเว็บ"), "title": title,
+                "chips": [], "confirmToken": token, "page": "",
+                "lines": [why, "ตอบ “ใช่” = ทำ · “ไม่” = ไม่ทำอะไร"]}  # fmt: skip
+        return self._why(card, t0)
+
+    @Slot(str, str, result="QVariantMap")
+    def siteLearn(self, text: str, url: str) -> dict:  # noqa: N802
+        """อยู่ในเว็บที่คุมได้ + พูดคำสั่งที่ยังไม่มี → "เพิ่มคำสั่ง … ให้สกิล … ไหม" (ส่งให้ Claude เมื่อตอบใช่) ·
+        คำถาม / ไม่มี Claude / เว็บที่ไม่ได้คุม = {} (หน้าจอใช้ทางเดิม)."""
+        from aipc.skills import router, sitecmd
+        from aipc.skills.actions import SITES, SYSTEM_BROWSER_SITES
+
+        t0 = time.monotonic()
+        site = next(
+            (k for k in SITES if k not in SYSTEM_BROWSER_SITES and sitecmd.on_site(k, url)), ""
+        )
+        if not site or not self.canForge or self._forging or router.is_question(text):
+            return {}
+        if len(re.sub(r"\s+", "", text)) < 3:
+            return {}
+        mine = next((s for s in self._skills if s.site == site and self._is_user(s.id)), None)
+        self._counter += 1
+        token = f"l{self._counter}"
+        self._pending[token] = ("site-learn", site, mine.id if mine else "", text)
+        name = SITES[site][0]
+        card = {"kind": "forge-ask", "badge": {}, "confirmToken": token, "page": "",
+                "chips": [{"text": "ส่งออกนอกเครื่อง", "kind": "warn"}],
+                "title": f"เพิ่มคำสั่ง “{text}” ให้สกิลของ {name} ไหม",
+                "lines": [f"ยังไม่มีคำสั่งนี้ใน {name} · "
+                          "ส่งประโยคนี้ให้ Claude (นอกเครื่อง) เขียนเพิ่มในสกิล",
+                          "ตอบ “ใช่” = ให้ Claude เพิ่ม · ครั้งหน้าพูดแล้วทำได้เลย · “ไม่” = ไม่ส่งอะไร"],
+                "_outbound": "ยังไม่มี · จะส่งประโยคนี้ + ชื่อเว็บ ไป Claude เมื่อตอบ “ใช่”"}  # fmt: skip
+        return self._why(card, t0)
+
+    def _site_request(self, site: str, text: str, sid: str) -> str:
+        """คำขอที่ส่ง Claude: ประโยคนี้ + ชื่อเว็บ + คำสั่งที่สกิลอื่นของเว็บนี้มีแล้ว (ไม่ให้ซ้ำ) · ไม่มีข้อมูลผู้ใช้."""
+        from aipc.skills.actions import SITES
+
+        ask = (f"ผู้ใช้เปิดเว็บ {SITES[site][0]} อยู่ แล้วสั่งด้วยเสียงว่า “{text}” · "
+               f"ทำเป็นสกิลประจำเว็บ (site: {site} · หัวข้อ ## คำสั่ง) ที่มีคำสั่งนี้ "
+               "(ใส่คำพูดแบบอื่นที่คนไทยพูดบ่อยด้วย) "
+               "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง")  # fmt: skip
+        others = [s for s in self._skills if s.site == site and s.id != sid]
+        have = [c.phrases[0] for s in others for c in s.commands][:40]
+        if have:
+            ask += " · สกิลอื่นของเว็บนี้มีคำสั่งเหล่านี้แล้ว (ไม่ต้องใส่ซ้ำ): " + ", ".join(have)
+        return ask
 
     def _near_command_card(self, text: str, t0: float) -> dict:
         """ได้ยินใกล้เคียงคำสั่งของระบบ (การ์ด 0045) → "หมายถึง … ใช่ไหม" ·
@@ -3443,6 +3544,15 @@ class SkillsController(QObject):
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
             return self._run_steps(skill, text, card)
+        elif isinstance(plan, tuple) and plan[0] == "site":  # การ์ด 0046: หน้าจอสั่งเบราว์เซอร์
+            card.update(kind="site-run", title=plan[2], siteRun=plan[1])
+        elif isinstance(plan, tuple) and plan[0] == "site-learn":  # การ์ด 0046: ส่งให้ Claude เพิ่มคำสั่ง
+            _, site, sid, text = plan
+            request = self._site_request(site, text, sid)
+            self._voice_forges.add(request)
+            if sid:
+                return self._start_forge(request, revise_id=sid, feedback=f"เพิ่มคำสั่งเสียง “{text}”")
+            return self._start_forge(request)
         elif isinstance(plan, tuple) and plan[0] == "redo":  # การ์ด 0045: ใช่ = หน้าจอสั่งประโยคคำสั่งนั้น
             card.update(kind="redo", title=f"ทำ “{plan[1]}”", redo=plan[1])
         elif isinstance(plan, tuple) and plan[0] == "ask":  # การ์ด 0042 รอบ 3: หน้าจอส่งเข้าแชทเหมือนพิมพ์

@@ -6,6 +6,7 @@
 - คำขอ = คำอธิบายงาน/เครื่องมือโค้ดของสกิลนั้น (BRIEFS) · **ไม่ส่งไฟล์เดิมให้ Claude ดู** (Claude เขียนเอง ไม่ลอก)
 - ส่วนหัวเรื่องสิทธิ์ (id worker needs permissions actions) = ค่าเดิมของระบบเสมอ (forge.pin_header · H7)
 - --apply = เขียนทับไฟล์ใน builtin/ เมื่อผ่านตัวตรวจและไม่แย่งประโยคของสกิลอื่น · ไฟล์เดิมอยู่ใน git (ย้อนได้)
+- สกิลประจำเว็บ (การ์ด 0046 · youtube-voice spotify-voice) สร้างใหม่ได้ด้วยคำสั่งเดียวกัน (ยังไม่มีไฟล์เดิม)
 """
 
 from __future__ import annotations
@@ -30,6 +31,14 @@ _LLM = " · ".join([
     "AI ในเครื่องเป็นโมเดลเล็ก (ราว 4B) จึงต้องสั้นและชัด",
     "ส่วนหัว id worker needs ระบบกำหนดเอง",
 ])  # fmt: skip
+# สกิลประจำเว็บ (การ์ด 0046): Claude เขียนคำพูด + คีย์ลัด/ตัวเลือกปุ่มเอง · ระบบกำหนด id สิทธิ์ และเว็บ
+_SITE = " · ".join([
+    "เป็นสกิลประจำเว็บ (หัวข้อ ## คำสั่ง ตามแบบในคำแนะนำ) · ไม่มี ## ขั้นตอน และไม่มี ## คำสั่งให้ AI",
+    "อย่างน้อย 12 คำสั่งที่ใช้บ่อย · ใช้คีย์ลัดที่เว็บมีจริงก่อน · คลิกเฉพาะปุ่มที่ไม่มีคีย์ลัด",
+    "แต่ละคำสั่งใส่คำพูดภาษาไทยที่คนพูดจริง 2–3 แบบ",
+    "ส่วนหัว id permissions site ระบบกำหนดเอง",
+])  # fmt: skip
+SITE_SKILLS = {"youtube-voice": "youtube", "spotify-voice": "spotify"}
 BRIEFS = {
     "translate": " · ".join([
         "สร้างสกิลแปลข้อความระหว่างภาษาไทยกับภาษาอังกฤษ (ทั้งสองทาง) ที่ผู้ใช้พิมพ์หรือพูด",
@@ -64,7 +73,21 @@ BRIEFS = {
         "แล้วอธิบายเป็นภาษาคนพร้อมวิธีแก้",
         "ใช้เมื่อผู้ใช้บอกอาการ (ช้า ค้าง ร้อน) หรือถามค่าของเครื่อง", _TOOL,
     ]),
+    "youtube-voice": " · ".join([
+        "สร้างสกิลสั่ง YouTube ด้วยเสียงขณะดูวิดีโอในเบราว์เซอร์ (site: youtube)",
+        "เช่น หยุด/เล่น ถอย/ข้ามสิบวิ ปิดเสียง เต็มจอ คำบรรยาย ความเร็ว วิดีโอถัดไป โหมดโรงภาพยนตร์ กดไลก์", _SITE,
+    ]),
+    "spotify-voice": " · ".join([
+        "สร้างสกิลสั่ง Spotify ด้วยเสียงในเว็บเพลเยอร์ open.spotify.com (site: spotify)",
+        "เช่น หยุด/เล่น เพลงถัดไป/ก่อนหน้า สุ่มเพลง เล่นซ้ำ ปิดเสียง ถูกใจเพลงนี้ ดูคิว ดูเนื้อเพลง", _SITE,
+    ]),
 }  # fmt: skip
+
+
+def site_header(skill_id: str) -> dict[str, str]:
+    """ส่วนหัวที่ระบบกำหนดของสกิลประจำเว็บในเครื่อง (ไม่ขึ้นกับไฟล์เดิม · มีหรือยังไม่มีก็ได้)."""
+    return {"id": skill_id, "worker": "", "needs": "", "permissions": "page_actions", "actions": "",
+            "site": SITE_SKILLS[skill_id]}  # fmt: skip
 
 
 def fixed_header(path: Path) -> dict[str, str]:
@@ -83,8 +106,9 @@ def rebuild(skill_id: str, *, claude: str, version: str, model: str | None = Non
             runner: forge.Runner = forge.run_process) -> forge.Proposal:  # fmt: skip
     path = manifest.BUILTIN_DIR / f"{skill_id}.md"
     others = [s for s in manifest.load_builtin() if s.id != skill_id]
+    pin = site_header(skill_id) if skill_id in SITE_SKILLS else fixed_header(path)
     return forge.forge(BRIEFS[skill_id], skills=others, claude=claude, model=model,
-                       claude_version=version, runner=runner, pin=fixed_header(path))  # fmt: skip
+                       claude_version=version, runner=runner, pin=pin)  # fmt: skip
 
 
 def apply(p: forge.Proposal) -> Path:

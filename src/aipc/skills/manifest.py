@@ -27,6 +27,8 @@ PERMISSIONS = {
     "camera_capture": "ใช้กล้องเมื่อคุณกดถ่าย",
     # ขั้น "บอกนัด…" ในสกิล (การ์ด 0034) · โค้ดอ่านนัดในเครื่องเอง · Claude ที่สร้างสกิลไม่เห็นนัด
     "read_agenda": "อ่านนัดและปฏิทินของคุณ (ในเครื่อง)",
+    # สกิลประจำเว็บ (การ์ด 0046) · กดคีย์ลัด/ปุ่มที่เขียนตายตัวในไฟล์ · เฉพาะเว็บของสกิลในเบราว์เซอร์ของผู้ช่วย
+    "page_actions": "กดคีย์ลัด/ปุ่มในเว็บที่สกิลระบุ (เฉพาะเว็บนั้น)",
 }
 # สิ่งที่สกิลต้องมีจากระบบก่อนใช้งานได้
 NEEDS = {"llm", "stt", "vlm", "camera"}
@@ -51,6 +53,8 @@ class Manifest:
     prompt: str = ""
     author: str = "ระบบ"
     steps: tuple = ()  # ขั้นตอนของสกิล .md (mdskill.Step) · โค้ดทำตามทีละข้อ
+    site: str = ""  # สกิลประจำเว็บ (การ์ด 0046) · เว็บที่คำสั่งใช้ได้
+    commands: tuple = ()  # คำสั่งในหน้าเว็บ (sitecmd.SiteCommand)
     extra: dict = field(default_factory=dict, compare=False)
 
     def permission_labels(self) -> list[str]:
@@ -95,12 +99,15 @@ def validate(data: dict) -> list[str]:
         errors.append(f"worker ต้องเป็นหนึ่งใน {sorted(WORKERS)}")
 
     examples = data.get("examples", [])
+    # ตัวอย่างใช้ให้ตัวคัดสกิลรู้จักสกิล · สกิลประจำเว็บ (การ์ด 0046) ไม่เข้าตัวคัด ตัวอย่างจึงแค่ให้คนอ่าน
+    # (เพิ่มคำสั่งด้วยเสียงทีละคำสั่ง = สกิลแรกของผู้ใช้อาจมีคำสั่งเดียว)
+    least = 1 if data.get("commands") else 3
     if (
         not isinstance(examples, list)
-        or len(examples) < 3
+        or len(examples) < least
         or not all(isinstance(e, str) for e in examples)
     ):
-        errors.append("ต้องมีตัวอย่างคำขอ (examples) อย่างน้อย 3 ข้อ")
+        errors.append(f"ต้องมีตัวอย่างคำขอ (examples) อย่างน้อย {least} ข้อ")
 
     for key, allowed, label in (
         ("actions", ACTIONS, "Action"),

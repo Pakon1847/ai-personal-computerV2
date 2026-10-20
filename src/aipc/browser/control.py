@@ -28,7 +28,64 @@ GOOGLE = "https://www.google.com/search?hl=th&q="
 DDG = "https://duckduckgo.com/?kl=th-th&q="
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
 NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media", "fullscreen",
-              "skip_ad"}  # fmt: skip
+              "skip_ad", "key", "click"}  # fmt: skip
+# คลิกตามตัวเลือกที่เขียนตายตัวในสกิลประจำเว็บ (การ์ด 0046) · เลือกตัวแรกที่มองเห็น · ไม่อ่านข้อความในหน้า ·
+# ok = กดแล้ว · none = หาไม่เจอ · bad = ตัวเลือกผิดรูป
+SELECTOR_CLICK_JS = r"""((sel) => {
+  let all;
+  try { all = [...document.querySelectorAll(sel)]; } catch (e) { return 'bad'; }
+  const el = all.find(e => e.getClientRects().length > 0);
+  if (!el) return 'none';
+  el.scrollIntoView({block: 'center'});
+  el.click();
+  return 'ok';
+})"""
+# ก่อนกดคีย์ลัด: ช่องพิมพ์ที่ค้างโฟกัส (เช่น ช่องค้นหาหลังค้นด้วยเสียง) ทำให้เว็บไม่รับคีย์ลัด → เอาโฟกัสออก
+BLUR_JS = r"""(() => {
+  const a = document.activeElement;
+  const typing = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]';
+  if (a && a.matches(typing)) a.blur();
+})()"""
+# คีย์ลัด: ชื่อคีย์ → (key, code, windowsVirtualKeyCode) ของ CDP · ตัวอักษร/ตัวเลขสร้างเอง
+_KEYS = {
+    "ArrowUp": ("ArrowUp", "ArrowUp", 38), "ArrowDown": ("ArrowDown", "ArrowDown", 40),
+    "ArrowLeft": ("ArrowLeft", "ArrowLeft", 37), "ArrowRight": ("ArrowRight", "ArrowRight", 39),
+    "Space": (" ", "Space", 32), "Enter": ("Enter", "Enter", 13),
+    "Escape": ("Escape", "Escape", 27), "Tab": ("Tab", "Tab", 9),
+    "PageUp": ("PageUp", "PageUp", 33), "PageDown": ("PageDown", "PageDown", 34),
+    "Home": ("Home", "Home", 36), "End": ("End", "End", 35),
+    ",": (",", "Comma", 188), ".": (".", "Period", 190), "/": ("/", "Slash", 191),
+    ";": (";", "Semicolon", 186),
+    "'": ("'", "Quote", 222), "[": ("[", "BracketLeft", 219), "]": ("]", "BracketRight", 221),
+    "=": ("=", "Equal", 187), "-": ("-", "Minus", 189),
+    "<": ("<", "Comma", 188), ">": (">", "Period", 190), "?": ("?", "Slash", 191),
+}  # fmt: skip
+_MODS = {"Alt": 1, "Ctrl": 2, "Shift": 8}
+
+
+def key_event(spec: str) -> dict:
+    """คีย์ในสกิล เช่น "Shift+N" → ค่าของ Input.dispatchKeyEvent ·
+    ไม่ใส่ text = ไม่พิมพ์ตัวอักษรลงช่องใด (กดคีย์ลัดอย่างเดียว)."""
+    *mods, name = spec.split("+") if spec != "+" else ["+"]
+    bits = sum(_MODS[m] for m in mods)
+    if name in ("<", ">", "?"):
+        bits |= 8
+    if len(name) == 1 and name.isalpha():
+        if name.isupper():
+            bits |= 8
+        key = name.upper() if bits & 8 else name.lower()
+        up = name.upper()
+        return {"key": key, "code": "Key" + up, "windowsVirtualKeyCode": ord(up), "modifiers": bits}
+    if len(name) == 1 and name.isdigit():
+        return {
+            "key": name,
+            "code": "Digit" + name,
+            "windowsVirtualKeyCode": ord(name),
+            "modifiers": bits,
+        }
+    key, code, vk = _KEYS[name]
+    return {"key": key, "code": code, "windowsVirtualKeyCode": vk, "modifiers": bits}
+
 
 # คุมเพลง/วิดีโอ (การ์ด 0035): สั่งตัวเล่น <video>/<audio> ของหน้าโดยตรง (ใช้ได้ทุกเว็บ รวมโฆษณา YouTube) ·
 # ไม่อ่านเนื้อหาหน้า · คืนแค่สถานะ: none = หน้านี้ไม่มีตัวเล่น · idle = อยู่ในสภาพที่สั่งอยู่แล้ว
@@ -606,6 +663,39 @@ class BrowserControl:
         if state != "ok":
             return Result(False, "หน้านี้ไม่มีเพลงหรือวิดีโอ")
         return Result(True, "ไม่มีเพลงก่อนหน้าในรายการ · เริ่มเพลงนี้ใหม่แล้ว")
+
+    def _site_check(self, cmd: BrowseCommand) -> Result | None:
+        """คำสั่งของสกิลประจำเว็บทำได้เฉพาะในเว็บของสกิล (การ์ด 0046) · ไม่ใช่ = บอก ไม่ทำ."""
+        from aipc.skills import sitecmd
+
+        if not sitecmd.on_site(cmd.site, self._url()):
+            return Result(False, "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น")
+        return None
+
+    def _do_key(self, cmd: BrowseCommand) -> Result:
+        """กดคีย์ลัดของเว็บ (การ์ด 0046) · rawKeyDown + keyUp = ไม่พิมพ์ตัวอักษรลงช่องใด."""
+        if bad := self._site_check(cmd):
+            return bad
+        event = key_event(cmd.query)
+        self._eval(BLUR_JS)
+        for kind in ("rawKeyDown", "keyUp"):
+            self._cdp.call("Input.dispatchKeyEvent", {"type": kind, **event}, session=self._page())
+        time.sleep(0.2)
+        return Result(True, "ทำแล้ว")
+
+    def _do_click(self, cmd: BrowseCommand) -> Result:
+        """คลิกปุ่มตามตัวเลือกที่เขียนตายตัวในสกิล (การ์ด 0046) · หาไม่เจอ = บอกตามจริง ไม่กดอย่างอื่นแทน."""
+        import json
+
+        if bad := self._site_check(cmd):
+            return bad
+        state = self._eval(f"{SELECTOR_CLICK_JS}({json.dumps(cmd.query)})", userGesture=True)
+        if state == "ok":
+            time.sleep(0.3)
+            return Result(True, "ทำแล้ว")
+        if state == "bad":
+            return Result(False, "สกิลเขียนตัวเลือกปุ่มผิดรูป · ให้ Claude แก้สกิล")
+        return Result(False, "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร")
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
         pages = [

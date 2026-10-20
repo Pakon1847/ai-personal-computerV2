@@ -244,4 +244,24 @@ def parse(text: str) -> tuple[dict, list[str]]:
         if agenda_steps > 1:
             errors.append("ขั้น “บอกนัด…” ใช้ได้ครั้งเดียวต่อสกิล")
     data["steps"] = steps
+    # สกิลประจำเว็บ (การ์ด 0046): หัวข้อ "## คำสั่ง" + ช่อง site · คำพูด → กดคีย์ / คลิก ในเว็บนั้น
+    from aipc.skills import sitecmd
+
+    if sitecmd.SECTION in sections:
+        commands, errs = sitecmd.parse_section(sections[sitecmd.SECTION])
+        errors += errs
+        data["commands"] = commands
+        if steps or data.get("prompt"):
+            errors.append("สกิลประจำเว็บใช้หัวข้อ “## คำสั่ง” อย่างเดียว (ไม่มีขั้นตอน/คำสั่งให้ AI)")
+        if not data.get("site"):
+            errors.append("สกิลที่มีหัวข้อ “## คำสั่ง” ต้องมีช่อง site: <เว็บ>")
+        else:
+            errors += sitecmd.check_site(data["site"])
+        if sitecmd.PERMISSION not in data.get("permissions", []):
+            errors.append("สกิลประจำเว็บต้องขอสิทธิ์ page_actions (permissions: page_actions)")
+        data.setdefault("worker", "code")
+        if not data.get("examples"):  # ตัวอย่าง = คำพูดแรกของคำสั่ง (คนอ่านเห็นว่าพูดอะไรได้)
+            data["examples"] = [c.phrases[0] for c in commands][:6]
+    elif data.get("site"):
+        errors.append("ช่อง site ใช้คู่กับหัวข้อ “## คำสั่ง”")
     return data, errors

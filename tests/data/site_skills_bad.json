@@ -1,0 +1,137 @@
+{
+ "about": "การ์ด 0046 เกณฑ์ W4: ไฟล์สกิลประจำเว็บอันตราย ต้องไม่ผ่านตัวตรวจทุกไฟล์ · w01–w10 = คำสั่งเสี่ยงไม่มี “ยืนยันก่อน” (เกณฑ์ W4 ตรง ๆ) · x01–x12 = อันตรายอื่น · เขียน 2026-10-21 ก่อนรันตัวตรวจกับชุดนี้ · ห้ามแก้ให้ผ่าน",
+ "items": [
+  {
+   "id": "w01",
+   "why": "คำสั่งเสี่ยง (ลบ) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w01\nname: สั่งเว็บด้วยเสียง w01\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ลบวิดีโอนี้ → คลิก button.delete\n"
+  },
+  {
+   "id": "w02",
+   "why": "คำสั่งเสี่ยง (ยกเลิก) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w02\nname: สั่งเว็บด้วยเสียง w02\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ยกเลิกการติดตาม → คลิก #subscribe-button button\n"
+  },
+  {
+   "id": "w03",
+   "why": "คำสั่งเสี่ยง (ซื้อ) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w03\nname: สั่งเว็บด้วยเสียง w03\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ซื้อเลย → คลิก button.buy-now\n"
+  },
+  {
+   "id": "w04",
+   "why": "คำสั่งเสี่ยง (โพสต์) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w04\nname: สั่งเว็บด้วยเสียง w04\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- โพสต์ความเห็น → กดคีย์ Enter\n"
+  },
+  {
+   "id": "w05",
+   "why": "คำสั่งเสี่ยง (ออกจากระบบ) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w05\nname: สั่งเว็บด้วยเสียง w05\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ออกจากระบบ → คลิก a.sign-out\n"
+  },
+  {
+   "id": "w06",
+   "why": "คำสั่งเสี่ยง (แชร์) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w06\nname: สั่งเว็บด้วยเสียง w06\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- แชร์คลิปนี้ → คลิก button[aria-label=\"Share\"]\n"
+  },
+  {
+   "id": "w07",
+   "why": "คำสั่งเสี่ยง (จ่าย) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w07\nname: สั่งเว็บด้วยเสียง w07\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- จ่ายค่าสมาชิก → คลิก button.join\n"
+  },
+  {
+   "id": "w08",
+   "why": "คำสั่งเสี่ยง (subscribe) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w08\nname: สั่งเว็บด้วยเสียง w08\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- กด subscribe → คลิก #subscribe-button button\n"
+  },
+  {
+   "id": "w09",
+   "why": "คำสั่งเสี่ยง (ส่ง) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w09\nname: สั่งเว็บด้วยเสียง w09\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ส่งข้อความ → กดคีย์ Enter\n"
+  },
+  {
+   "id": "w10",
+   "why": "คำสั่งเสี่ยง (รายงาน) ไม่มี “ยืนยันก่อน”",
+   "risky": true,
+   "skill_md": "---\nid: w10\nname: สั่งเว็บด้วยเสียง w10\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- รายงานคลิปนี้ → คลิก button.report\n"
+  },
+  {
+   "id": "x01",
+   "why": "ตัวเลือกเป็นสคริปต์",
+   "risky": false,
+   "skill_md": "---\nid: x01\nname: สั่งเว็บด้วยเสียง x01\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- เล่นต่อ → คลิก javascript:alert(1)\n"
+  },
+  {
+   "id": "x02",
+   "why": "ตัวเลือกแตะช่องรหัสผ่าน",
+   "risky": false,
+   "skill_md": "---\nid: x02\nname: สั่งเว็บด้วยเสียง x02\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ไปช่องรหัส → คลิก input[type=password]\n"
+  },
+  {
+   "id": "x03",
+   "why": "ตัวเลือกแตะหน้าชำระเงิน",
+   "risky": false,
+   "skill_md": "---\nid: x03\nname: สั่งเว็บด้วยเสียง x03\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ไปหน้าถัดไป → คลิก a[href*=checkout]\n"
+  },
+  {
+   "id": "x04",
+   "why": "คีย์ของตัวเบราว์เซอร์ (ปิดแท็บ)",
+   "risky": false,
+   "skill_md": "---\nid: x04\nname: สั่งเว็บด้วยเสียง x04\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ปิดแท็บนี้ → กดคีย์ Ctrl+W\n"
+  },
+  {
+   "id": "x05",
+   "why": "คีย์นอกรายการ",
+   "risky": false,
+   "skill_md": "---\nid: x05\nname: สั่งเว็บด้วยเสียง x05\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- รีโหลด → กดคีย์ F5\n"
+  },
+  {
+   "id": "x06",
+   "why": "พิมพ์ข้อความ (ไม่มีในรอบนี้)",
+   "risky": false,
+   "skill_md": "---\nid: x06\nname: สั่งเว็บด้วยเสียง x06\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- ทักทาย → พิมพ์ สวัสดี\n"
+  },
+  {
+   "id": "x07",
+   "why": "เว็บ Google ที่ระบบไม่ได้คุม",
+   "risky": false,
+   "skill_md": "---\nid: x07\nname: สั่งเว็บด้วยเสียง x07\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: gmail\npermissions: page_actions\n---\n## คำสั่ง\n- เปิดอีเมลแรก → กดคีย์ o\n"
+  },
+  {
+   "id": "x08",
+   "why": "ไม่ขอสิทธิ์ page_actions",
+   "risky": false,
+   "skill_md": "---\nid: x08\nname: สั่งเว็บด้วยเสียง x08\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n"
+  },
+  {
+   "id": "x09",
+   "why": "ลิงก์ไม่ใช่ https",
+   "risky": false,
+   "skill_md": "---\nid: x09\nname: สั่งเว็บด้วยเสียง x09\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: http://evil.example\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n"
+  },
+  {
+   "id": "x10",
+   "why": "ปนขั้นตอนกับคำสั่ง",
+   "risky": false,
+   "skill_md": "---\nid: x10\nname: สั่งเว็บด้วยเสียง x10\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## ขั้นตอน\n1. เปิดเว็บ youtube\n\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n"
+  },
+  {
+   "id": "x11",
+   "why": "ตัวเลือกมีวงเล็บปีกกา/อัฒภาค",
+   "risky": false,
+   "skill_md": "---\nid: x11\nname: สั่งเว็บด้วยเสียง x11\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: youtube\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n- กดเล่น → คลิก button; alert(1)\n"
+  },
+  {
+   "id": "x12",
+   "why": "เว็บนอกรายการที่ไม่ใช่ลิงก์",
+   "risky": false,
+   "skill_md": "---\nid: x12\nname: สั่งเว็บด้วยเสียง x12\ndescription: ไฟล์ทดสอบตัวตรวจ (ต้องไม่ผ่าน)\nsite: evilsite\npermissions: page_actions\n---\n## คำสั่ง\n- หยุดวิดีโอ | หยุด → กดคีย์ k\n"
+  }
+ ]
+}

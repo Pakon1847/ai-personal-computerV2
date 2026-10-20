@@ -920,5 +920,22 @@
   "เปิดแอปและปรับเสียง": "Open apps & adjust volume",
   "เปิดเว็บ แอป หรือหน้าในระบบที่อยู่ในรายการ และปรับ เพิ่ม ลด ปิด เปิดเสียง · ไม่ใช้ตอบคำถาม ค้นข้อมูล ดูสถานะเครื่อง หรือเปิดสิ่งที่ไม่อยู่ในรายการ": "Open listed websites, apps or system pages and set, raise, lower, mute or unmute the volume · not for answering questions, searching, checking the computer or opening unlisted things",
   "แปลไทย–อังกฤษ": "Translate Thai–English",
-  "แปลคำ ประโยค หรือย่อหน้า ไทย↔อังกฤษ ตอบเฉพาะคำแปล · ไม่ใช้สรุปความ ไม่ร่างจดหมาย ไม่สอนไวยากรณ์ และไม่แปลภาษาอื่น": "Translate words, sentences or paragraphs between Thai and English, answering with the translation only · not for summarizing, letters, grammar lessons or other languages"
+  "แปลคำ ประโยค หรือย่อหน้า ไทย↔อังกฤษ ตอบเฉพาะคำแปล · ไม่ใช้สรุปความ ไม่ร่างจดหมาย ไม่สอนไวยากรณ์ และไม่แปลภาษาอื่น": "Translate words, sentences or paragraphs between Thai and English, answering with the translation only · not for summarizing, letters, grammar lessons or other languages",
+  "ยังสั่งในเว็บไม่ได้ · เปิดเว็บนั้นในเบราว์เซอร์ของผู้ช่วยก่อน": "Can't control the site yet · open it in the assistant's browser first",
+  "ทำ “{0}” ใช่ไหม": "Do “{0}”?",
+  "เพิ่มคำสั่ง “{0}” ให้สกิลของ {1} ไหม": "Add the command “{0}” to the {1} skill?",
+  "คำสั่งนี้ย้อนไม่ได้หรือแตะบัญชี · ยืนยันก่อน": "This command can't be undone or touches your account · confirm first",
+  "ตอบ “ใช่” = ทำ · “ไม่” = ไม่ทำอะไร": "Answer “ใช่” to do it · “ไม่” to do nothing",
+  "ได้ยินว่า “{0}” · ใกล้กับ “{1}”": "Heard “{0}” · close to “{1}”",
+  "ยังไม่มีคำสั่งนี้ใน {0} · ส่งประโยคนี้ให้ Claude (นอกเครื่อง) เขียนเพิ่มในสกิล": "{0} doesn't have this command yet · this sentence goes to Claude (off this computer) to add it to the skill",
+  "ตอบ “ใช่” = ให้ Claude เพิ่ม · ครั้งหน้าพูดแล้วทำได้เลย · “ไม่” = ไม่ส่งอะไร": "Answer “ใช่” to let Claude add it · next time just say it · “ไม่” sends nothing",
+  "สร้างสกิล “{0}” แล้ว (Claude สร้าง)": "Created the skill “{0}” (made by Claude)",
+  "แก้สกิล “{0}” แล้ว (รุ่น {1})": "Updated the skill “{0}” (version {1})",
+  "พูดในเว็บนี้ได้: {0}": "You can say on this site: {0}",
+  "สกิลประจำเว็บ": "Site skill",
+  "คำสั่งของสกิลประจำเว็บ": "Site skill command",
+  "ส่งออกนอกเครื่อง": "Sent off this computer",
+  "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น": "This command only works on the skill's site · the open page is a different site",
+  "สกิลเขียนตัวเลือกปุ่มผิดรูป · ให้ Claude แก้สกิล": "The skill's button selector is malformed · ask Claude to fix the skill",
+  "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร": "This page has no such button (the site may have changed) · nothing was clicked"
 }
