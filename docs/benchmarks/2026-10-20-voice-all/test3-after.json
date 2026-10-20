@@ -1,0 +1,361 @@
+{
+ "set": "test3",
+ "commands_correct": 46,
+ "commands_total": 51,
+ "noncommands_acted": 0,
+ "noncommands_total": 14,
+ "wrong": [
+  {
+   "text": "ข้ามไปเพลงถัดไป",
+   "expect": "browser:media:next",
+   "got": "ask"
+  },
+  {
+   "text": "กลับไปหน้าแชท",
+   "expect": "command",
+   "got": "browser:app"
+  },
+  {
+   "text": "อีกกี่วันจะถึงวันเกิดฉันวันที่สิบห้าธันวา",
+   "expect": "answer",
+   "got": "ask"
+  },
+  {
+   "text": "พื้นที่ดิสก์เหลือเท่าไหร่",
+   "expect": "answer",
+   "got": "ask"
+  },
+  {
+   "text": "พรุ่งนี้ว่างไหมนะ",
+   "expect": "answer",
+   "got": "ask"
+  }
+ ],
+ "rows": [
+  {
+   "text": "เปิดจีเมลหน่อย",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เข้ากูเกิลไดรฟ์",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เปิดกูเกิลแมพให้ที",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "เปิดเว็บข่าว",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "เปิดดิสนีย์พลัสฮอตสตาร์",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "เปิดเว็บวีทีวี",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "ค้นหาเพลงรักในสปอติฟาย",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "หาหนังผีในเน็ตฟลิกซ์",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "ค้นในสปอติฟายว่าบอดี้สแลม",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "ค้นในเน็ตฟลิกซ์ว่าสควิดเกม",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "หาร้านกาแฟในแผนที่",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "ค้นในวิกิพีเดียว่าดาวอังคาร",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "ย้อนกลับไปเพลงก่อนหน้า",
+   "expect": "browser:media:prev",
+   "got": "browser:media:prev"
+  },
+  {
+   "text": "เปิดเพลงก่อนหน้า",
+   "expect": "browser:media:prev",
+   "got": "browser:media:prev"
+  },
+  {
+   "text": "ถอยเพลงกลับ",
+   "expect": "browser:media:prev",
+   "got": "browser:media:prev"
+  },
+  {
+   "text": "หยุดเพลงก่อนนะ",
+   "expect": "browser:media:pause",
+   "got": "browser:media:pause"
+  },
+  {
+   "text": "ข้ามไปเพลงถัดไป",
+   "expect": "browser:media:next",
+   "got": "ask"
+  },
+  {
+   "text": "เปิดเทอร์มินัลให้หน่อย",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เปิดโปรแกรมจัดการไฟล์",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ไปหน้าปฏิทิน",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เปิดหน้าความเป็นส่วนตัว",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "กลับไปหน้าแชท",
+   "expect": "command",
+   "got": "browser:app"
+  },
+  {
+   "text": "เพิ่มเสียงหน่อย",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ลดเสียงลงอีก",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ปรับเสียงเหลือยี่สิบ",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "อย่าลืมโทรหาพ่อพรุ่งนี้",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "อย่าลืมกินยาก่อนนอนสี่ทุ่ม",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "ปลุกพรุ่งนี้เจ็ดโมง",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "ช่วยเตือนประชุมวันพุธบ่ายสอง",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "นัดถัดไปเมื่อไหร่",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "พรุ่งนี้ต้องทำอะไร",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ลบนัดกินยา",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "อีกกี่วันจะถึงวันเกิดฉันวันที่สิบห้าธันวา",
+   "expect": "answer",
+   "got": "ask"
+  },
+  {
+   "text": "หาไฟล์ใบเสร็จ",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "วันนี้แก้ไฟล์อะไรไปบ้าง",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เครื่องช้ามาก",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เน็ตช้าไหม",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ต่อเน็ตอยู่ไหม",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "พื้นที่ดิสก์เหลือเท่าไหร่",
+   "expect": "answer",
+   "got": "ask"
+  },
+  {
+   "text": "แปลคำว่ารถไฟเป็นอังกฤษ",
+   "expect": "llm:translate",
+   "got": "llm:translate"
+  },
+  {
+   "text": "ช่วยสรุปข้อความให้หน่อย",
+   "expect": "llm:summarize-text",
+   "got": "llm:summarize-text"
+  },
+  {
+   "text": "ร่างอีเมลขอบคุณลูกค้า",
+   "expect": "llm:letter-writer",
+   "got": "llm:letter-writer"
+  },
+  {
+   "text": "เปลี่ยนเป็นโหมดมืด",
+   "expect": "app:theme",
+   "got": "app:theme"
+  },
+  {
+   "text": "เปิดธีมสว่าง",
+   "expect": "app:theme",
+   "got": "app:theme"
+  },
+  {
+   "text": "ขยายตัวหนังสือ",
+   "expect": "app:font",
+   "got": "app:font"
+  },
+  {
+   "text": "ตัวอักษรเล็กลงหน่อย",
+   "expect": "app:font",
+   "got": "app:font"
+  },
+  {
+   "text": "เปลี่ยนภาษาเป็นอังกฤษ",
+   "expect": "app:lang",
+   "got": "app:lang"
+  },
+  {
+   "text": "เปลี่ยนเป็นภาษาไทย",
+   "expect": "app:lang",
+   "got": "app:lang"
+  },
+  {
+   "text": "เริ่มแชทใหม่",
+   "expect": "app:newchat",
+   "got": "app:newchat"
+  },
+  {
+   "text": "ล้างแชทเริ่มใหม่",
+   "expect": "app:newchat",
+   "got": "app:newchat"
+  },
+  {
+   "text": "อากาศพรุ่งนี้เป็นยังไง",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ข่าววันนี้มีอะไรบ้าง",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ใครเป็นนายกคนปัจจุบัน",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ช่วยคิดเมนูอาหารเย็นให้หน่อย",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "วิธีทำไข่เจียวให้ฟู",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ฉันเหนื่อยจัง",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "เมื่อวานดูหนังมา",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "สวัสดีครับ",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ขอบคุณนะ",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "เพลงนี้เพราะดี",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "จอสว่างไปหน่อย",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "ภาษาอังกฤษยากจัง",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "แชทเมื่อกี้หายไปไหน",
+   "expect": "ask",
+   "got": "ask"
+  },
+  {
+   "text": "พรุ่งนี้ว่างไหมนะ",
+   "expect": "answer",
+   "got": "ask"
+  }
+ ]
+}
