@@ -2916,28 +2916,22 @@ class SkillsController(QObject):
         text = english.to_thai(text) or text
         t = re.sub(r"\s+", "", text.strip())
         by_id = {s.id: s for s in self._skills}
-        rem = by_id.get("reminder")
-        timed = when.mentions_time(text, part_of_day=False) and bool(
-            rem and router.reminder_reason(text, rem)
-        )
-        editing = bool(self._EDIT_START.match(t))
-        if (
-            rem is not None
-            and not router.is_question(t)
-            and not editing
-            and (self._REMIND_START.match(t) or timed)
-        ):
-            return "reminder"
-        lang = {"translate": "translate", "summarize": "summarize-text"}.get(
-            lang_intent(text) or "", ""
-        )
+        # งานที่ใช้ AI ก่อน: ประโยคร่างจดหมายมักมีวันที่ ("ร่างอีเมลขอลางานพรุ่งนี้" เคยไปทางตั้งเตือน · รอบ 1)
+        want = {"translate": "translate", "summarize": "summarize-text"}
+        lang = want.get(lang_intent(text) or "", "")
         if lang in by_id:
             return "llm:" + lang
         if self._LETTER.match(t) and "letter-writer" in by_id:
             return "llm:letter-writer"
         if self._SUMMARY.match(t) and "summarize-text" in by_id:
             return "llm:summarize-text"
-        return ""
+        rem = by_id.get("reminder")
+        if rem is None or router.is_question(t) or self._EDIT_START.match(t):
+            return ""
+        # บอกวัน/เวลาต้องมีคำของสกิลนัดด้วย (เตือน นัด อย่าลืม ปลุก) · "วันนี้อากาศร้อนมาก" = คุยเล่น (รอบ 1)
+        keyword = any(router.has_keyword(text, k) for k in rem.keywords)
+        timed = keyword and when.mentions_time(text, part_of_day=False)
+        return "reminder" if self._REMIND_START.match(t) or timed else ""
 
     @Slot(str, result="QVariantMap")
     def voiceReminder(self, text: str) -> dict:  # noqa: N802

@@ -109,7 +109,8 @@ class PlayerTest(unittest.TestCase):
         bc, _ = opened_at(WATCH, skip="none")
         self.assertEqual(bc.run(BrowseCommand("skip_ad")), Result(False, "ตอนนี้ไม่มีโฆษณาให้ข้าม"))
         bc, _ = opened_at("https://example.org/clip", skip="ok")
-        self.assertEqual(bc.run(BrowseCommand("skip_ad")), Result(False, "ข้ามโฆษณาได้เฉพาะใน YouTube"))
+        r = bc.run(BrowseCommand("skip_ad"))
+        self.assertEqual(r, Result(False, "ข้ามโฆษณาได้เฉพาะใน YouTube"))
 
     def test_open_clip_while_watching_does_not_click_side_links(self):
         bc, _ = opened_at(WATCH)
