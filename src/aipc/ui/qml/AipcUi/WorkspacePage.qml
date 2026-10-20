@@ -392,8 +392,15 @@ Item {
         function onFinished(text, note) {
             const i = root.items.slice()
             if (i.length === 0 || !i[i.length - 1].ai) return
-            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace })
+            // การ์ด 0047: คำตอบของ Claude = มีปุ่ม "สอนเครื่องให้ตอบเอง" (เก็บคำถาม/คำตอบไว้กับแถวนั้น)
+            const lc = chat.lastCloud
+            const teach = lc.question ? { teachQ: lc.question, teachA: lc.answer } : {}
+            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace }, teach)
             root.items = i
+            if (lc.repeat) {   // ถามเรื่องที่เคยถาม Claude แล้ว = เสนอให้สอน (ยังไม่ส่งอะไรจนกดใช่)
+                const hint = skills.teachHint(lc.question, lc.answer)
+                if (hint.confirmToken) root.showCard(hint)
+            }
             // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
             const spoken = root.speakNext
             root.speakNext = false
@@ -1216,6 +1223,14 @@ Item {
                             text: root.copiedRow === row.index ? Tr.t("คัดลอกแล้ว") : Tr.t("คัดลอก")
                             kind: "ghost"
                             onClicked: { chat.copyText(row.modelData.text); root.copiedRow = row.index }
+                        }
+                        // การ์ด 0047: ให้ Claude เขียนเรื่องนี้เป็นความรู้ในเครื่อง · ครั้งหน้า AI ในเครื่องตอบเอง
+                        AppButton {
+                            objectName: "teachLocal"
+                            visible: !!row.modelData.teachQ && skills.canForge
+                            text: Tr.t("สอนเครื่องให้ตอบเอง")
+                            kind: "ghost"
+                            onClicked: root.dispatch(skills.teach(row.modelData.teachQ, row.modelData.teachA), row.modelData.teachQ)
                         }
                         // อ่านออกเสียงในเครื่อง (การ์ด 0019) · ไม่ได้ติดตั้งตัวอ่าน = ไม่มีปุ่ม
                         AppButton {

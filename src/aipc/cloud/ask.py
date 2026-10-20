@@ -16,7 +16,7 @@ import time
 from dataclasses import dataclass
 from datetime import date
 
-from aipc.skills import forge
+from aipc.skills import forge, knowledge
 from aipc.skills.catalog import ABOUT, is_english
 
 MODEL = "sonnet"
@@ -48,6 +48,7 @@ class CloudReply:
     seconds: float = 0.0
     cost_usd: float = 0.0
     model: str = ""
+    topic: str = ""  # ป้ายหัวข้อที่ Claude ติดท้ายคำตอบ (การ์ด 0047 · ตัดออกจาก text แล้ว)
 
 
 def instructions(today: date | None = None, english: bool = False) -> str:
@@ -153,11 +154,15 @@ def ask(
         # ถาม "ทำอะไรได้บ้าง" แล้ว Claude เล่าความสามารถของตัวเอง (Claude Docs, PDF)
         # แทนของเครื่อง (ชุดสอบจบ H07)
         "--system-prompt",
-        instructions(today, english=is_english(question)),
+        # การ์ด 0047: ป้ายหัวข้อท้ายคำตอบ = ใช้รู้ว่าถามเรื่องเดิมซ้ำ โดยไม่ต้องส่งคำถามเก่าออกไปเทียบ
+        instructions(today, english=is_english(question)) + " · " + knowledge.TOPIC_HINT,
         "--strict-mcp-config",
         "--disable-slash-commands",
     ]
-    return _call(args, build_input(question, history or []), runner)
+    r = _call(args, build_input(question, history or []), runner)
+    if r.ok:
+        r.text, r.topic = knowledge.split_topic(r.text)
+    return r
 
 
 def _call(args: list[str], text: str, runner) -> CloudReply:

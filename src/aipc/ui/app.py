@@ -85,7 +85,8 @@ def _cloud_client(budget=None, ledger=None):
         if budget is not None:
             budget.record(r.cost_usd, "ask")
         if ledger is not None:
-            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok)
+            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok,
+                          topic=r.topic)  # fmt: skip
         return r
 
     return run
@@ -275,7 +276,8 @@ def build(opts: Options, argv: list[str] | None = None):
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client(budget, ledger) if in_session else None,
                           model_name=_local_model_name(),
-                          forge=skill_forge is not None, claude_on=claude_on)  # fmt: skip
+                          forge=skill_forge is not None, claude_on=claude_on,
+                          ledger=ledger)  # fmt: skip
     engine._backends = {
         "uiSettings": ui_settings,
         "system": SystemStatus(),

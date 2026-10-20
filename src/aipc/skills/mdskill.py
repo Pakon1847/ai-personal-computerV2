@@ -244,6 +244,21 @@ def parse(text: str) -> tuple[dict, list[str]]:
         if agenda_steps > 1:
             errors.append("ขั้น “บอกนัด…” ใช้ได้ครั้งเดียวต่อสกิล")
     data["steps"] = steps
+    # สกิลความรู้ (การ์ด 0047): ระบบเติมหัวคงที่หน้าคำสั่งให้ AI (Claude เขียนแทนไม่ได้) ·
+    # จำกัดความยาวที่ Claude เขียน (Pi อ่าน prompt ช้า) · ใช้หัวนี้บอกที่มาของคำตอบในแชท (H5)
+    from aipc.skills import knowledge
+
+    if data.get("kind") == knowledge.KIND:
+        body = str(data.get("prompt", "")).strip()
+        if not body:
+            errors.append("สกิลความรู้ต้องมีหัวข้อ “## คำสั่งให้ AI” ที่เขียนความรู้ไว้")
+        elif len(body) > knowledge.MAX_KNOWLEDGE:
+            errors.append(
+                f"ความรู้ยาวเกิน {knowledge.MAX_KNOWLEDGE} ตัวอักษร (AI ในเครื่องอ่านช้า) · ย่อให้เหลือใจความ"
+            )
+        if steps:
+            errors.append("สกิลความรู้ไม่มีขั้นตอนสั่งเครื่อง")
+        data["prompt"] = knowledge.header(str(data.get("learned", ""))) + body
     # สกิลประจำเว็บ (การ์ด 0046): หัวข้อ "## คำสั่ง" + ช่อง site · คำพูด → กดคีย์ / คลิก ในเว็บนั้น
     from aipc.skills import sitecmd
 

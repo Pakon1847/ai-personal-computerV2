@@ -23,6 +23,7 @@ from aipc.accounts import validation
 from aipc.bench import machine
 from aipc.doctor import hardware
 from aipc.i18n import tr
+from aipc.skills import knowledge
 from aipc.skills import machine as skill_machine
 from aipc.ui import files, privacy, settings, thaidate
 
@@ -1799,6 +1800,7 @@ class SkillsController(QObject):
         self._forge = forge
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า (ผู้ใช้ปิดเองได้)
         self._forging = False
+        self._teach_forges: set[str] = set()  # การ์ด 0047: คำขอที่เป็นการสอนความรู้
         self._voice_forges: set[str] = set()  # การ์ด 0030: คำขอที่เริ่มจากเสียง (ไม่สำเร็จ = ไม่ส่งต่อ)
         self._user = user_skills
         self._builtin = manifest.load_builtin()
@@ -2674,7 +2676,7 @@ class SkillsController(QObject):
                 "lines": list(lines),
                 "confirmToken": "", "page": ""}  # fmt: skip
 
-    def _start_forge(self, text: str, revise_id: str = "", feedback: str = "") -> dict:
+    def _start_forge(self, text: str, revise_id: str = "", feedback: str = "", pin=None) -> dict:
         import threading
 
         from aipc.skills import userskills
@@ -2700,7 +2702,8 @@ class SkillsController(QObject):
                 def check(md):
                     return userskills.gate(md, others, revise_id)[1]
 
-                p = self._forge(text, skills=others, revise=revise, check=check)
+                extra = {"pin": pin} if pin else {}  # การ์ด 0047: ส่วนหัวของสกิลความรู้ = ระบบกำหนด
+                p = self._forge(text, skills=others, revise=revise, check=check, **extra)
             except Exception as e:  # noqa: BLE001 · ทุกความผิดพลาด = บอกผู้ใช้ ไม่ให้หน้าจอรอค้าง
                 p = e
             self._forged.emit((p, text, revise_id))
@@ -2728,6 +2731,14 @@ class SkillsController(QObject):
                 errors = list(e.errors)
             except OSError as e:
                 errors = [f"บันทึกไม่ได้: {e}"]
+        teach = text in self._teach_forges  # การ์ด 0047
+        self._teach_forges.discard(text)
+        if new is None and teach:
+            volatile = getattr(p, "volatile", False)
+            title = "ไม่จำเรื่องนี้ไว้ในเครื่อง" if volatile else "สอนเครื่องไม่สำเร็จ"
+            lines = [*errors[:2], "ไม่ได้ติดตั้งอะไร · ถามเรื่องนี้ครั้งหน้ายังส่งให้ Claude ตามเดิม"]
+            self.forgeDone.emit(self._plain("forge-failed", title, lines), text)
+            return
         if new is None:
             title = "แก้สกิลไม่สำเร็จ" if revise_id else "สร้างสกิลไม่สำเร็จ"
             card = self._plain("forge-failed", title, [*errors[:2], "ไม่ได้ติดตั้งอะไร"])
@@ -2738,6 +2749,24 @@ class SkillsController(QObject):
             self.forgeDone.emit(card, text)
             return
         self._reload()
+        if new.extra.get("kind") == knowledge.KIND:  # การ์ด 0047: จำแล้ว · บอกว่าถามแบบไหนได้ ไม่ทำงานซ้ำ
+            say = (
+                f"ครั้งหน้าถาม เช่น “{new.examples[0]}” AI ในเครื่องตอบเองได้ ไม่ใช้เน็ต"
+                if new.examples
+                else ""
+            )
+            lines = [
+                x
+                for x in (
+                    say,
+                    f"ความรู้จาก Claude เมื่อ {new.extra.get('learned', '')} · ลบได้ที่หน้า Skill",
+                )
+                if x
+            ]
+            card = self._plain("command", f"เครื่องจำเรื่อง “{new.name}” แล้ว", lines,
+                               [{"text": "ความรู้ในเครื่อง", "kind": "ok"}])  # fmt: skip
+            self.forgeDone.emit(card, text)
+            return
         if new.site:  # การ์ด 0046: สกิลประจำเว็บ = บอกว่าพูดอะไรได้ · ทำเมื่อพูดในเว็บนั้น
             v = self._user.info(new.id)["version"]
             what = (
@@ -3122,6 +3151,45 @@ class SkillsController(QObject):
         card = {"kind": "steps", "badge": self._badge(skill, "ได้ยินใกล้เคียง · ยืนยันก่อนทำ"),
                 "title": f"หมายถึง “{skill.name}” ใช่ไหม", "chips": [], "confirmToken": token,
                 "lines": [f"ได้ยินว่า “{text}” · ใกล้กับ “{example}”", *steps], "page": ""}  # fmt: skip
+        return self._why(card, t0)
+
+    # ---------- Claude สอน AI ในเครื่อง (การ์ด 0047) ----------
+    @Slot(str, str, result="QVariantMap")
+    def teach(self, question: str, answer: str) -> dict:  # noqa: N802
+        """ปุ่ม "สอนเครื่องให้ตอบเอง" ใต้คำตอบของ Claude → การ์ดยืนยัน (ยังไม่ส่งอะไร)."""
+        return self._teach_card(question, answer, hint=False)
+
+    @Slot(str, str, result="QVariantMap")
+    def teachHint(self, question: str, answer: str) -> dict:  # noqa: N802
+        """ถามเรื่องที่เคยถาม Claude แล้ว → เสนอให้สอน · ทำไม่ได้ (เรื่องสด/ไม่มี Claude) = {} (ไม่รบกวน)."""
+        card = self._teach_card(question, answer, hint=True)
+        return card if card.get("confirmToken") else {}
+
+    def _teach_card(self, question: str, answer: str, hint: bool) -> dict:
+        t0 = time.monotonic()
+        question, answer = question.strip(), answer.strip()
+        if not question or not answer:
+            return {}
+        if knowledge.is_volatile(question):
+            return self._plain("needs", "ไม่จำเรื่องนี้ไว้ในเครื่อง",
+                               ["คำตอบเปลี่ยนตามเวลา (ข่าว ราคา อากาศ ผลกีฬา หรือถามถึงวันนี้/ตอนนี้)",
+                                "ถามครั้งหน้าให้ Claude หาข้อมูลล่าสุดดีกว่า"])  # fmt: skip
+        if not self.canForge:
+            return self._plain("needs", "ยังสอนเครื่องไม่ได้",
+                               ["ต้องเปิดใช้ Claude ในหน้าตั้งค่า และเครื่องต้องต่อเน็ต"])  # fmt: skip
+        if self._forging:
+            return self._plain("forging", "กำลังให้ Claude ทำงานอื่นอยู่ รอสักครู่แล้วกดใหม่")
+        self._counter += 1
+        token = f"k{self._counter}"
+        self._pending[token] = ("teach", question, answer)
+        short = question if len(question) <= 60 else question[:57] + "…"
+        title = (f"ถามเรื่อง “{short}” กับ Claude ซ้ำแล้ว · สอนเครื่องไว้ไหม" if hint
+                 else f"สอนเครื่องเรื่อง “{short}” ไหม")  # fmt: skip
+        card = {"kind": "forge-ask", "badge": {}, "confirmToken": token, "page": "", "title": title,
+                "chips": [{"text": "ส่งออกนอกเครื่อง", "kind": "warn"}],
+                "lines": ["ส่งคำถาม + คำตอบนี้ให้ Claude เขียนเป็นความรู้สั้น ๆ ในเครื่อง (ไม่มีข้อมูลอื่นของคุณ)",
+                          "ครั้งหน้าถามเรื่องนี้ AI ในเครื่องตอบเอง ไม่ใช้เน็ต · ลบได้ที่หน้า Skill"],
+                "_outbound": "ยังไม่มี · จะส่งคำถาม + คำตอบนี้ไป Claude เมื่อตอบ “ใช่”"}  # fmt: skip
         return self._why(card, t0)
 
     # ---------- สกิลประจำเว็บ (การ์ด 0046) ----------
@@ -3552,6 +3620,14 @@ class SkillsController(QObject):
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
             return self._run_steps(skill, text, card)
+        elif isinstance(plan, tuple) and plan[0] == "teach":  # การ์ด 0047: ให้ Claude เขียนความรู้
+            _, question, answer = plan
+            today = self._now().date().isoformat()
+            request = knowledge.request(question, answer, today)
+            self._teach_forges.add(request)
+            pin = {"kind": knowledge.KIND, "worker": "llm", "needs": "llm", "permissions": "",
+                   "actions": "", "learned": today}  # fmt: skip
+            return self._start_forge(request, pin=pin)
         elif isinstance(plan, tuple) and plan[0] == "site":  # การ์ด 0046: หน้าจอสั่งเบราว์เซอร์
             card.update(kind="site-run", title=plan[2], siteRun=plan[1])
         elif isinstance(plan, tuple) and plan[0] == "site-learn":  # การ์ด 0046: ส่งให้ Claude เพิ่มคำสั่ง
@@ -3612,8 +3688,12 @@ class ChatController(QObject):
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
-                 claude_on=None, meter=None):  # fmt: skip
+                 claude_on=None, meter=None, ledger=None):  # fmt: skip
         super().__init__()
+        # การ์ด 0047: บันทึกส่งออก = คำถามที่เคยถาม Claude + ป้ายหัวข้อ (ใช้รู้ว่าถามเรื่องเดิมซ้ำ · อยู่ในเครื่อง)
+        self._ledger = ledger
+        self._last_cloud: dict = {}  # คำถาม/คำตอบล่าสุดของ Claude ให้หน้าจอมีปุ่ม "สอนเครื่องให้ตอบเอง"
+        self._skill_note = ""  # หมายเหตุใต้คำตอบของสกิลความรู้ (ที่มา · H5)
         # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
@@ -3826,6 +3906,9 @@ class ChatController(QObject):
         if self._conv["messages"][-1].get("file"):
             why = (f"ถามเกี่ยวกับไฟล์ “{self._file[0]}” · ตอบในเครื่องเท่านั้น "
                    "(เนื้อหาไฟล์ห้ามออกนอกเครื่อง)")  # fmt: skip
+        elif prompt and (learned := knowledge.learned_of(prompt)) is not None:  # การ์ด 0047
+            when = f"เมื่อ {learned}" if learned else ""
+            why = f"ตอบจากความรู้ที่ Claude สอนไว้{when} · ตอบในเครื่อง ไม่ใช้เน็ต"
         elif prompt:
             why = "ทำตามสกิลที่เลือกไว้ (งานภาษา เช่น แปล สรุป)"
         else:
@@ -3833,6 +3916,7 @@ class ChatController(QObject):
                 f" · เลือกใช้สกิลเองได้ {len(tools)} ตัว แต่เลือกตอบเอง" if tools else ""
             )
         self._trace = {"t0": time.monotonic(), "why": why}
+        self._skill_note = why if why.startswith("ตอบจากความรู้") else ""
         self._meter = self._meter_factory()
         if self._meter is not None:
             self._meter.start()
@@ -3919,10 +4003,15 @@ class ChatController(QObject):
             self.refresh()
             return
         note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
+        self._last_cloud = {}
         if getattr(reply, "cloud", False):
             note = self.CLOUD_NOTE
+            self._last_cloud = self._cloud_teach(reply)
         elif self._switched_off_gave_up(reply, with_file):
             note = self.CLAUDE_OFF_NOTE
+        elif self._skill_note and not reply.reason:  # การ์ด 0047: ตอบจากความรู้ที่ Claude สอนไว้
+            note = self._skill_note
+        self._skill_note = ""
         if reply.text:
             msg = {"role": "assistant", "content": reply.text}
             if getattr(reply, "cloud", False):
@@ -3944,6 +4033,36 @@ class ChatController(QObject):
         self.refresh()
 
     CLOUD_NOTE = "ตอบโดย Claude (cloud) · ค้นเว็บได้ · คำถามนี้ถูกส่งออกนอกเครื่อง"
+
+    def _cloud_teach(self, reply) -> dict:
+        """การ์ด 0047: คำถาม + คำตอบของ Claude รอบนี้ ·
+        repeat = เคยถาม Claude เรื่องเดียวกันแล้ว (ดูจากบันทึกส่งออกในเครื่อง)."""
+        users = [m["content"] for m in self._conv["messages"] if m.get("role") == "user"]
+        question = users[-1] if users else ""
+        earlier = []
+        if self._ledger is not None:
+            try:
+                rows = [e for e in self._ledger.entries() if e.get("kind") == "ask" and e.get("ok")]
+            except (OSError, ValueError):
+                rows = []
+            # แถวแรก (ใหม่สุด) = คำถามนี้เอง (บันทึกก่อนคำตอบกลับมา) · เรียงเก่า → ใหม่
+            sent = [
+                (knowledge.question_of(e.get("sent", "")), e.get("topic", "")) for e in rows[1:]
+            ]
+            earlier = sent[::-1]
+        topic = getattr(reply, "topic", "")
+        repeat = (
+            bool(question)
+            and not knowledge.is_volatile(question)
+            and bool(knowledge.repeat_of(question, topic, earlier))
+        )
+        return {"question": question, "answer": reply.text, "topic": topic, "repeat": repeat}
+
+    @Property("QVariantMap", notify=changed)
+    def lastCloud(self) -> dict:  # noqa: N802
+        """คำถาม/คำตอบล่าสุดที่ Claude ตอบ (ปุ่ม "สอนเครื่องให้ตอบเอง") · {} = รอบล่าสุดไม่ใช่ Claude."""
+        return self._last_cloud
+
     # มี Claude แต่ผู้ใช้ปิดสวิตช์ แล้ว AI ในเครื่องตอบว่าไม่รู้ (พบบน Pi 5 2026-10-12: "ไม่มีข้อมูลสด" เฉย ๆ
     # ผู้ใช้ไม่รู้ว่าเปิด Claude ได้) · บอกเท่านั้น ไม่ส่งอะไรออก
     CLAUDE_OFF_NOTE = "ปิด Claude ไว้ · ข้อนี้ Claude ช่วยค้นจากเว็บได้ เปิดได้ที่หน้าตั้งค่า"
@@ -4015,6 +4134,7 @@ class ChatController(QObject):
             reply = client.Reply(text=c.text if c.ok else "", reason="" if c.ok else "error",
                                  detail="" if c.ok else c.error)  # fmt: skip
             reply.cloud = c.ok  # type: ignore[attr-defined]
+            reply.topic = getattr(c, "topic", "")  # type: ignore[attr-defined] · การ์ด 0047
             self._done.emit(reply)
 
         threading.Thread(target=work, daemon=True).start()

@@ -43,10 +43,12 @@ class Ledger:
         return list(reversed(items)) if isinstance(items, list) else []
 
     def record(self, kind: str, sent: str, cost_usd: float = 0.0, ok: bool = True,
-               note: str = "") -> None:  # fmt: skip
+               note: str = "", topic: str = "") -> None:  # fmt: skip
         entry = {"time": self._now().isoformat(timespec="seconds"), "kind": kind, "sent": sent,
                  "chars": len(sent), "cost_usd": round(max(0.0, float(cost_usd or 0)), 6), "ok": ok,
                  "note": note}  # fmt: skip
+        if topic:  # ป้ายหัวข้อของคำตอบ Claude (การ์ด 0047) · อยู่ในเครื่อง · ล้างพร้อมบันทึกนี้
+            entry["topic"] = topic
         with self._lock:
             items = list(reversed(self.entries()))
             items.append(entry)

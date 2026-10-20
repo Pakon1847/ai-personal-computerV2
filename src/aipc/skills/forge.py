@@ -219,6 +219,7 @@ class Proposal:
     model: str = ""
     claude_version: str = ""
     pinned_changed: list[str] = field(default_factory=list)  # คีย์สิทธิ์ที่ Claude ใส่ต่างไป (ระบบแทนแล้ว)
+    volatile: bool = False  # Claude บอกว่าเรื่องนี้เปลี่ยนตามเวลา จึงไม่สร้างสกิลความรู้ (การ์ด 0047)
 
 
 def _validate(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
@@ -261,6 +262,11 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
             p.errors = [reply.error]
             return p
         data = extract_json(reply.text)
+        # การ์ด 0047: Claude บอกว่าเรื่องนี้เปลี่ยนตามเวลา = ไม่สร้างสกิลความรู้ · ไม่ให้แก้ซ้ำ
+        if data is not None and data.get("volatile") is True:
+            p.volatile = True
+            p.errors = ["เรื่องนี้เปลี่ยนตามเวลา จึงไม่จำไว้ในเครื่อง · " + str(data.get("note", ""))[:200]]
+            return p
         if data is None or not isinstance(data.get("skill_md"), str):
             fix, previous = ["ตอบกลับต้องเป็น JSON object ที่มี skill_md เป็นข้อความ"], reply.text[:2000]
             p.errors = fix
