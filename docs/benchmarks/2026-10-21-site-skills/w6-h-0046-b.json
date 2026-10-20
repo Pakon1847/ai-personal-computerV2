@@ -1,0 +1,2478 @@
+{
+ "zipformer": {
+  "n": 120,
+  "n_cmd": 80,
+  "n_neg": 40,
+  "ok": 68,
+  "ok_pct": 85.0,
+  "wrong": 2,
+  "wrong_query_only": 1,
+  "miss": 10,
+  "neg_do": 0,
+  "median_s": 0.211,
+  "p90_s": 0.278,
+  "max_s": 0.392
+ },
+ "extra_hotwords": [
+  "หยุดเพลง",
+  "หยุดก่อน",
+  "พักเพลง",
+  "เล่นต่อ",
+  "เล่นเพลงต่อ",
+  "ต่อเลย",
+  "เพลงถัดไป",
+  "ข้ามเพลง",
+  "เพลงต่อไป",
+  "เพลงก่อนหน้า",
+  "ย้อนเพลง",
+  "เพลงที่แล้ว",
+  "กรอไปข้างหน้า",
+  "กรอเพลง",
+  "เลื่อนไปหน่อย",
+  "กรอกลับ",
+  "ถอยหลังหน่อย",
+  "ย้อนกลับนิดนึง",
+  "สุ่มเพลง",
+  "เปิดสุ่ม",
+  "ปิดสุ่ม",
+  "เล่นซ้ำ",
+  "วนเพลง",
+  "วนซ้ำ",
+  "ถูกใจเพลงนี้",
+  "กดหัวใจ",
+  "เก็บเพลงนี้",
+  "เอาหัวใจออก",
+  "ลบออกจากเพลงที่ชอบ",
+  "มิวต์เพลง",
+  "เงียบก่อน",
+  "เลิกมิวต์",
+  "เพลงดังขึ้น",
+  "ดังอีกนิด",
+  "เร่งเสียงเพลง",
+  "เพลงเบาลง",
+  "เบาอีกนิด",
+  "หรี่เสียงเพลง",
+  "ดูคิว",
+  "คิวเพลง",
+  "ปิดคิว",
+  "ดูเนื้อเพลง",
+  "เปิดเนื้อเพลง",
+  "ขอเนื้อร้อง",
+  "ไปเพลงที่ชอบ",
+  "รายการเพลงที่ชอบ",
+  "กลับหน้าแรก",
+  "ไปหน้าหลัก",
+  "หยุดก่อน",
+  "หยุดคลิป",
+  "เล่นต่อ",
+  "ถอยหลัง",
+  "ย้อนสิบวิ",
+  "ถอยหน่อย",
+  "ข้ามไปข้างหน้า",
+  "ข้ามสิบวิ",
+  "เดินหน้าหน่อย",
+  "เริ่มคลิปใหม่",
+  "ดูตั้งแต่ต้น",
+  "กลับไปต้นคลิป",
+  "เงียบก่อน",
+  "คลิปเงียบ",
+  "เอาเสียงคืน",
+  "เต็มจอ",
+  "ขยายเต็มจอ",
+  "ดูเต็มจอ",
+  "ย่อจอ",
+  "กลับจอปกติ",
+  "โหมดโรงหนัง",
+  "โหมดโรงภาพยนตร์",
+  "จอกว้าง",
+  "จอเล็ก",
+  "มินิเพลเยอร์",
+  "เปิดซับ",
+  "ปิดซับ",
+  "คำบรรยาย",
+  "เร็วขึ้น",
+  "เร่งสปีด",
+  "เพิ่มความเร็ว",
+  "ช้าลง",
+  "ลดสปีด",
+  "ลดความเร็ว",
+  "คลิปถัดไป",
+  "วิดีโอต่อไป",
+  "ข้ามคลิปนี้",
+  "คลิปก่อนหน้า",
+  "วิดีโอก่อนหน้า",
+  "กดไลก์",
+  "ถูกใจคลิปนี้",
+  "ไลก์คลิป"
+ ],
+ "rows": [
+  {
+   "id": "h001",
+   "mode": "say",
+   "text": "ค้นหาตารางรถไฟไปเชียงใหม่",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "รถไฟ"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาตารางรถไฟไปเชียงใหม่",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ตารางรถไฟไปเชียงใหม่"
+     }
+    ],
+    "seconds": 0.211,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h002",
+   "mode": "say",
+   "text": "หาที่เที่ยวใกล้กรุงเทพ",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "เที่ยว"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาที่เที่ยวใกล้กรุงเทพ",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ที่เที่ยวใกล้กรุงเทพ"
+     }
+    ],
+    "seconds": 0.195,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h003",
+   "mode": "say",
+   "text": "ค้นหาโปรโมชั่นมือถือเดือนนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "มือถือ"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาโปรโมชั่นมือถือเดือนนี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "โปรโมชั่นมือถือเดือนนี้"
+     }
+    ],
+    "seconds": 0.258,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h004",
+   "mode": "say",
+   "text": "เข้าลิงก์ที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "zip": {
+    "heard": "เข้าลิงก์ที่สอง",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "seconds": 0.186,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h005",
+   "mode": "say",
+   "text": "เปิดลิงก์แรกให้หน่อย",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "zip": {
+    "heard": "เปิดลิงก์แรกให้หน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "seconds": 0.192,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h006",
+   "mode": "say",
+   "text": "คลิกลิงก์ที่สี่",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "zip": {
+    "heard": "คลิกลิงก์ที่สาม",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 3
+     }
+    ],
+    "seconds": 0.178,
+    "verdict": "wrong"
+   }
+  },
+  {
+   "id": "h007",
+   "mode": "say",
+   "text": "ย้อนกลับหน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "zip": {
+    "heard": "ย้อนกลับหน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "back"
+     }
+    ],
+    "seconds": 0.186,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h008",
+   "mode": "say",
+   "text": "ไปข้างหน้าอีกที",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "zip": {
+    "heard": "ไปข้างหน้าอีกที",
+    "err": "",
+    "got": [
+     {
+      "kind": "forward"
+     }
+    ],
+    "seconds": 0.205,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h009",
+   "mode": "say",
+   "text": "โหลดหน้านี้ใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "zip": {
+    "heard": "โหลดหน้านี้ใหม่",
+    "err": "",
+    "got": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "seconds": 0.162,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h010",
+   "mode": "say",
+   "text": "เลื่อนลงไปอีก",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนลงไปอีก",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "seconds": 0.188,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h011",
+   "mode": "say",
+   "text": "เลื่อนขึ้นหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนขึ้นหน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "up"
+     }
+    ],
+    "seconds": 0.156,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h012",
+   "mode": "say",
+   "text": "ปิดแท็บนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "zip": {
+    "heard": "ปีนี้",
+    "err": "",
+    "got": [],
+    "seconds": 0.168,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h013",
+   "mode": "say",
+   "text": "กลับไปที่แอป",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "zip": {
+    "heard": "กลับไปที่แอร์",
+    "err": "",
+    "got": [],
+    "seconds": 0.161,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h014",
+   "mode": "say",
+   "text": "เปิดเว็บยูทูบ",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "zip": {
+    "heard": "เปิดเว็บยูทูป",
+    "err": "",
+    "got": [
+     {
+      "kind": "site",
+      "site": "youtube"
+     }
+    ],
+    "seconds": 0.195,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h015",
+   "mode": "say",
+   "text": "เปิดกูเกิลให้หน่อย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "zip": {
+    "heard": "เปิดกูเกิลให้หน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "site",
+      "site": "google"
+     }
+    ],
+    "seconds": 0.21,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h016",
+   "mode": "say",
+   "text": "ค้นหาสูตรขนมปังแล้วเข้าลิงก์ที่สอง",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ขนมปัง"
+     ]
+    },
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาสูตรขนมปังแล้วเข้าลิงที่สอง",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "สูตรขนมปัง"
+     },
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "seconds": 0.301,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h017",
+   "mode": "say",
+   "text": "รีเฟรช",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "zip": {
+    "heard": "รีเฟรด",
+    "err": "",
+    "got": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "seconds": 0.148,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h018",
+   "mode": "say",
+   "text": "ถอยกลับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "zip": {
+    "heard": "ถอยกลับ",
+    "err": "",
+    "got": [
+     {
+      "kind": "back"
+     }
+    ],
+    "seconds": 0.147,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h019",
+   "mode": "say",
+   "text": "ปิดหน้าเว็บนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "zip": {
+    "heard": "ปิดหน้าเว็บนี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "close"
+     }
+    ],
+    "seconds": 0.186,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h020",
+   "mode": "say",
+   "text": "เปิดจีเมล",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "gmail"
+    }
+   ],
+   "zip": {
+    "heard": "เปิดจีเมน",
+    "err": "",
+    "got": [],
+    "seconds": 0.197,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h021",
+   "mode": "task",
+   "text": "ช่วยหาราคาไอโฟนรุ่นล่าสุดให้หน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ไอโฟน"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ช่วยหาราคาไอโฟนรุ่นล่าสุดให้หน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ราคาไอโฟนรุ่นล่าสุด"
+     }
+    ],
+    "seconds": 0.305,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h022",
+   "mode": "task",
+   "text": "ค้นหาวิธีปลูกมะนาว",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "มะนาว"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาวิธีปลูกมะนาว",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "วิธีปลูกมะนาว"
+     }
+    ],
+    "seconds": 0.23,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h023",
+   "mode": "task",
+   "text": "หาร้านส้มตำแถวนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ส้มตำ"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาร้านส้มตำแถวนี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ร้านส้มตำแถวนี้"
+     }
+    ],
+    "seconds": 0.197,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h024",
+   "mode": "task",
+   "text": "ช่วยค้นผลหวยงวดล่าสุดให้หน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "หวย"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ช่วยค้นผลหวยงวดล่าสุดให้หน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ผลหวยงวดล่าสุด"
+     }
+    ],
+    "seconds": 0.306,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h025",
+   "mode": "task",
+   "text": "เสิร์ชตารางฟุตบอลคืนนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ฟุตบอล"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "เสิร์ชตารางฟุตบอลคืนนี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ตารางฟุตบอลคืนนี้"
+     }
+    ],
+    "seconds": 0.248,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h026",
+   "mode": "task",
+   "text": "หาข้อมูลอาการไข้หวัดใหญ่",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ไข้หวัด"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาข้อมูลอาการไข้หวัดใหญ่",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ข้อมูลอาการไข้หวัดใหญ่"
+     }
+    ],
+    "seconds": 0.219,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h027",
+   "mode": "task",
+   "text": "ค้นหาที่พักหัวหินหน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "หัวหิน"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาที่พักหัวหินหน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ที่พักหัวหิน"
+     }
+    ],
+    "seconds": 0.207,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h028",
+   "mode": "task",
+   "text": "หาวิธีทำไข่ตุ๋น",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ไข่ตุ๋น"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาวิธีทำไข่ตุ๋น",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "วิธีทำไข่ตุ๋น"
+     }
+    ],
+    "seconds": 0.226,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h029",
+   "mode": "task",
+   "text": "ช่วยค้นหาข่าวการเมืองวันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "การเมือง"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ช่วยค้นหาข่าวการเมืองวันนี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ข่าวการเมืองวันนี้"
+     }
+    ],
+    "seconds": 0.244,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h030",
+   "mode": "task",
+   "text": "ราคาน้ำมันดีเซลวันนี้ ค้นให้หน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ดีเซล"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ราคาน้ำมันดีเซลวันนี้ค้นให้หน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ราคาน้ำมันดีเซลวันนี้"
+     }
+    ],
+    "seconds": 0.288,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h031",
+   "mode": "task",
+   "text": "หาเพลงลูกทุ่งใหม่ ๆ",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ลูกทุ่ง"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาเพลงลูกทุ่งใหม่",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "เพลงลูกทุ่งใหม่"
+     }
+    ],
+    "seconds": 0.18,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h032",
+   "mode": "task",
+   "text": "ค้นหาร้านซ่อมคอมพิวเตอร์ใกล้ ๆ",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ซ่อม"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาร้านซ่อมคอมพิวเตอร์ใกล้",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ร้านซ่อมคอมพิวเตอร์ใกล้"
+     }
+    ],
+    "seconds": 0.289,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h033",
+   "mode": "task",
+   "text": "หาสภาพอากาศเชียงราย",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "เชียงราย"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาสภาพอากาศเชียงราย",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "สภาพอากาศเชียงราย"
+     }
+    ],
+    "seconds": 0.238,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h034",
+   "mode": "task",
+   "text": "ช่วยหาหนังการ์ตูนเข้าใหม่",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "การ์ตูน"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ช่วยหาหนังการ์ตูนเข้าใหม่",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "หนังการ์ตูนเข้าใหม่"
+     }
+    ],
+    "seconds": 0.246,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h035",
+   "mode": "task",
+   "text": "ค้นวิธีลดความอ้วน",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "อ้วน"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นวิธีลดความอ้วน",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "วิธีลดความอ้วน"
+     }
+    ],
+    "seconds": 0.221,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h036",
+   "mode": "task",
+   "text": "ค้นหาราคาทองคำแล้วเปิดผลแรก",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ทอง"
+     ]
+    },
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาราคาทองคำแล้วเปิดผลแรก",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ราคาทองคำ"
+     },
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "seconds": 0.275,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h037",
+   "mode": "task",
+   "text": "หาสูตรผัดกะเพราแล้วเข้าลิงก์ที่สาม",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "กะเพรา"
+     ]
+    },
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "zip": {
+    "heard": "หาสูตรผัดกะเพราแล้วเข้าลิงที่สาม",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "สูตรผัดกะเพรา"
+     },
+     {
+      "kind": "open",
+      "n": 3
+     }
+    ],
+    "seconds": 0.392,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h038",
+   "mode": "task",
+   "text": "เปิดอันแรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "zip": {
+    "heard": "เปิดอันแรก",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "seconds": 0.161,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h039",
+   "mode": "task",
+   "text": "เข้าผลที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "zip": {
+    "heard": "เข้าผลที่สอง",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "seconds": 0.206,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h040",
+   "mode": "task",
+   "text": "กดลิงก์ที่สาม",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 3
+    }
+   ],
+   "zip": {
+    "heard": "กดลิงก์ที่สาม",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 3
+     }
+    ],
+    "seconds": 0.175,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h041",
+   "mode": "task",
+   "text": "เปิดลิงก์ที่หก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 6
+    }
+   ],
+   "zip": {
+    "heard": "เปิดลิงก์ที่6",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 6
+     }
+    ],
+    "seconds": 0.187,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h042",
+   "mode": "task",
+   "text": "เข้าอันที่สี่",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 4
+    }
+   ],
+   "zip": {
+    "heard": "เข้าอันที่สี่",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 4
+     }
+    ],
+    "seconds": 0.211,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h043",
+   "mode": "task",
+   "text": "เปิดผลลัพธ์ที่ห้า",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 5
+    }
+   ],
+   "zip": {
+    "heard": "เปิดผลลัพธ์ที่ห้า",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 5
+     }
+    ],
+    "seconds": 0.178,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h044",
+   "mode": "task",
+   "text": "กลับไปหน้าที่แล้ว",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "zip": {
+    "heard": "กลับไปหน้าที่แล้ว",
+    "err": "",
+    "got": [
+     {
+      "kind": "back"
+     }
+    ],
+    "seconds": 0.2,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h045",
+   "mode": "task",
+   "text": "ถอยกลับหน่อย",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "zip": {
+    "heard": "ถอยกลับหน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "back"
+     }
+    ],
+    "seconds": 0.176,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h046",
+   "mode": "task",
+   "text": "ไปหน้าถัดไป",
+   "expect": [
+    {
+     "kind": "forward"
+    }
+   ],
+   "zip": {
+    "heard": "ไปหน้าถัดไป",
+    "err": "",
+    "got": [
+     {
+      "kind": "forward"
+     }
+    ],
+    "seconds": 0.206,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h047",
+   "mode": "task",
+   "text": "รีเฟรชหน้านี้",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "zip": {
+    "heard": "รีเฟรชหน้านี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "seconds": 0.235,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h048",
+   "mode": "task",
+   "text": "โหลดหน้านี้ใหม่อีกที",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "zip": {
+    "heard": "หลอดหน้านี้ใหม่อีกที",
+    "err": "",
+    "got": [],
+    "seconds": 0.216,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h049",
+   "mode": "task",
+   "text": "เลื่อนลงหน่อย",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนลงหน่อย",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "seconds": 0.206,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h050",
+   "mode": "task",
+   "text": "เลื่อนลงไปข้างล่าง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนลงไปข้างล่าง",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "seconds": 0.213,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h051",
+   "mode": "task",
+   "text": "เลื่อนขึ้น",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนขึ้น",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "up"
+     }
+    ],
+    "seconds": 0.172,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h052",
+   "mode": "task",
+   "text": "เลื่อนกลับขึ้นไปข้างบน",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "up"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนกลับขึ้นไปข้างบน",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "up"
+     }
+    ],
+    "seconds": 0.215,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h053",
+   "mode": "task",
+   "text": "ปิดแท็บนี้",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "zip": {
+    "heard": "ปีนี้",
+    "err": "",
+    "got": [],
+    "seconds": 0.144,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h054",
+   "mode": "task",
+   "text": "ปิดหน้านี้เลย",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "zip": {
+    "heard": "ปิดหน้านี้เลย",
+    "err": "",
+    "got": [
+     {
+      "kind": "close"
+     }
+    ],
+    "seconds": 0.225,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h055",
+   "mode": "task",
+   "text": "กลับไปหน้าผู้ช่วย",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "zip": {
+    "heard": "กลับไปหน้าผู้ช่วย",
+    "err": "",
+    "got": [
+     {
+      "kind": "app"
+     }
+    ],
+    "seconds": 0.231,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h056",
+   "mode": "task",
+   "text": "กลับไปที่แอป",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "zip": {
+    "heard": "กลับไปที่แอส",
+    "err": "",
+    "got": [],
+    "seconds": 0.178,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h057",
+   "mode": "task",
+   "text": "เปิดยูทูบ",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "youtube"
+    }
+   ],
+   "zip": {
+    "heard": "เปิดยูทูบ",
+    "err": "",
+    "got": [
+     {
+      "kind": "site",
+      "site": "youtube"
+     }
+    ],
+    "seconds": 0.156,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h058",
+   "mode": "task",
+   "text": "เข้าเว็บกูเกิล",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "google"
+    }
+   ],
+   "zip": {
+    "heard": "เข้าเว็บกูเกิน",
+    "err": "",
+    "got": [
+     {
+      "kind": "site",
+      "site": "google"
+     }
+    ],
+    "seconds": 0.215,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h059",
+   "mode": "task",
+   "text": "เปิดวิกิพีเดีย",
+   "expect": [
+    {
+     "kind": "site",
+     "site": "wikipedia"
+    }
+   ],
+   "zip": {
+    "heard": "เปิดวิกิพีเดีย",
+    "err": "",
+    "got": [
+     {
+      "kind": "site",
+      "site": "wikipedia"
+     }
+    ],
+    "seconds": 0.244,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h060",
+   "mode": "task",
+   "text": "ค้นหาค่าเงินดอลลาร์วันนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ดอลลาร์"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาค่าเงินดอนเราวันนี้",
+    "err": "",
+    "got": [],
+    "seconds": 0.276,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h061",
+   "mode": "task",
+   "text": "หาวิธีเปลี่ยนยางรถยนต์",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ยาง"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาวิธีเปลี่ยนยางรถยนต์",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "วิธีเปลี่ยนยางรถยนต์"
+     }
+    ],
+    "seconds": 0.287,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h062",
+   "mode": "task",
+   "text": "ช่วยหาโรงพยาบาลใกล้ที่สุด",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "โรงพยาบาล"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ช่วยหาโรงพยาบาลใกล้ที่สุด",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "โรงพยาบาลใกล้ที่สุด"
+     }
+    ],
+    "seconds": 0.274,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h063",
+   "mode": "task",
+   "text": "ค้นหาคอร์สเรียนภาษาอังกฤษฟรี",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "อังกฤษ"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาคลอดเรียนภาษาอังกฤษฟรี",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "คลอดเรียนภาษาอังกฤษฟรี"
+     }
+    ],
+    "seconds": 0.279,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h064",
+   "mode": "task",
+   "text": "หารีวิวหูฟังไร้สายหน่อย",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "หูฟัง"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "คารี่วิวาหูฟังไร้สายหน่อย",
+    "err": "",
+    "got": [],
+    "seconds": 0.264,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h065",
+   "mode": "task",
+   "text": "เสิร์ชเลขเด็ดงวดนี้",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "เลขเด็ด"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "เสิร์ชเลขเด็ดงวดนี้",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "เลขเด็ดงวดนี้"
+     }
+    ],
+    "seconds": 0.207,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h066",
+   "mode": "task",
+   "text": "หาร้านอาหารญี่ปุ่น",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ญี่ปุ่น"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาร้านอาหารญี่ปุ่น",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ร้านอาหารญี่ปุ่น"
+     }
+    ],
+    "seconds": 0.209,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h067",
+   "mode": "task",
+   "text": "ค้นวิธีล้างแอร์เอง",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "แอร์"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นวิธีล้างแอร์เอง",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "วิธีล้างแอร์เอง"
+     }
+    ],
+    "seconds": 0.221,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h068",
+   "mode": "task",
+   "text": "หาตั๋วเครื่องบินไปภูเก็ต",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ภูเก็ต"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาตัวเครื่องบินไปภูเก็ต",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ตัวเครื่องบินไปภูเก็ต"
+     }
+    ],
+    "seconds": 0.232,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h069",
+   "mode": "task",
+   "text": "ค้นหาข่าวกีฬาล่าสุด",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "กีฬา"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหาข่าวกีฬาล่าสุด",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ข่าวกีฬาล่าสุด"
+     }
+    ],
+    "seconds": 0.214,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h070",
+   "mode": "task",
+   "text": "หาเพลงฟังสบายตอนทำงาน",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "เพลง"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาเพลงฟังสบายตอนทำงาน",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "เพลงฟังสบายตอนทำงาน"
+     }
+    ],
+    "seconds": 0.255,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h071",
+   "mode": "task",
+   "text": "เข้าลิงก์แรก",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 1
+    }
+   ],
+   "zip": {
+    "heard": "เข้าลิงก์แรก",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 1
+     }
+    ],
+    "seconds": 0.174,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h072",
+   "mode": "task",
+   "text": "เปิดอันที่สอง",
+   "expect": [
+    {
+     "kind": "open",
+     "n": 2
+    }
+   ],
+   "zip": {
+    "heard": "เปิดอันที่สอง",
+    "err": "",
+    "got": [
+     {
+      "kind": "open",
+      "n": 2
+     }
+    ],
+    "seconds": 0.182,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h073",
+   "mode": "task",
+   "text": "ย้อนกลับ",
+   "expect": [
+    {
+     "kind": "back"
+    }
+   ],
+   "zip": {
+    "heard": "ย้อนกลับ",
+    "err": "",
+    "got": [
+     {
+      "kind": "back"
+     }
+    ],
+    "seconds": 0.15,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h074",
+   "mode": "task",
+   "text": "ปิดแท็บ",
+   "expect": [
+    {
+     "kind": "close"
+    }
+   ],
+   "zip": {
+    "heard": "เป้ใช่ไหม",
+    "err": "",
+    "got": [],
+    "seconds": 0.116,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h075",
+   "mode": "task",
+   "text": "เลื่อนลง",
+   "expect": [
+    {
+     "kind": "scroll",
+     "direction": "down"
+    }
+   ],
+   "zip": {
+    "heard": "เลื่อนลง",
+    "err": "",
+    "got": [
+     {
+      "kind": "scroll",
+      "direction": "down"
+     }
+    ],
+    "seconds": 0.18,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h076",
+   "mode": "task",
+   "text": "กลับไปแอป",
+   "expect": [
+    {
+     "kind": "app"
+    }
+   ],
+   "zip": {
+    "heard": "กลับไปแอป",
+    "err": "",
+    "got": [
+     {
+      "kind": "app"
+     }
+    ],
+    "seconds": 0.213,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h077",
+   "mode": "task",
+   "text": "โหลดใหม่",
+   "expect": [
+    {
+     "kind": "reload"
+    }
+   ],
+   "zip": {
+    "heard": "โหลดใหม่",
+    "err": "",
+    "got": [
+     {
+      "kind": "reload"
+     }
+    ],
+    "seconds": 0.153,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h078",
+   "mode": "task",
+   "text": "ช่วยค้นวิธีชงกาแฟเย็น",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "กาแฟ"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ช่วยคนวิธีชงกาแฟเย็น",
+    "err": "",
+    "got": [],
+    "seconds": 0.244,
+    "verdict": "miss"
+   }
+  },
+  {
+   "id": "h079",
+   "mode": "task",
+   "text": "หาราคารถมือสอง",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "มือสอง"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "หาราคารถมือสอง",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "ราคารถมือสอง"
+     }
+    ],
+    "seconds": 0.215,
+    "verdict": "ok"
+   }
+  },
+  {
+   "id": "h080",
+   "mode": "task",
+   "text": "ค้นหางานพาร์ทไทม์",
+   "expect": [
+    {
+     "kind": "search",
+     "has": [
+      "ไทม์"
+     ]
+    }
+   ],
+   "zip": {
+    "heard": "ค้นหางานผ้าไทย",
+    "err": "",
+    "got": [
+     {
+      "kind": "search",
+      "query": "งานผ้าไทย"
+     }
+    ],
+    "seconds": 0.221,
+    "verdict": "wrong"
+   }
+  },
+  {
+   "id": "h081",
+   "mode": "say",
+   "text": "ตอนนี้กี่โมง",
+   "expect": [],
+   "zip": {
+    "heard": "ตอนนี้กี่โมง",
+    "err": "",
+    "got": [],
+    "seconds": 0.206,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h082",
+   "mode": "say",
+   "text": "วันนี้วันที่เท่าไหร่",
+   "expect": [],
+   "zip": {
+    "heard": "วันนี้วันที่เท่าไหร่",
+    "err": "",
+    "got": [],
+    "seconds": 0.195,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h083",
+   "mode": "say",
+   "text": "พรุ่งนี้มีนัดอะไรไหม",
+   "expect": [],
+   "zip": {
+    "heard": "พรุ่งนี้มีนัดอะไรไหม",
+    "err": "",
+    "got": [],
+    "seconds": 0.253,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h084",
+   "mode": "say",
+   "text": "ตั้งนัดไปหาหมอวันจันทร์บ่ายสองโมง",
+   "expect": [],
+   "zip": {
+    "heard": "ตั้งนัดไปหาหมอวันจันทร์บ่าย2โมง",
+    "err": "",
+    "got": [],
+    "seconds": 0.317,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h085",
+   "mode": "say",
+   "text": "ยกเลิกนัดประชุมพรุ่งนี้",
+   "expect": [],
+   "zip": {
+    "heard": "ยกเลิกนัดประชุมพรุ่งนี้",
+    "err": "",
+    "got": [],
+    "seconds": 0.23,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h086",
+   "mode": "say",
+   "text": "เลื่อนนัดกินข้าวไปวันเสาร์",
+   "expect": [],
+   "zip": {
+    "heard": "เพื่อนนัดกินข้าวไปวันเสาร์",
+    "err": "",
+    "got": [],
+    "seconds": 0.233,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h087",
+   "mode": "say",
+   "text": "ปิดเสียง",
+   "expect": [],
+   "zip": {
+    "heard": "ปิดเสียง",
+    "err": "",
+    "got": [],
+    "seconds": 0.189,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h088",
+   "mode": "say",
+   "text": "เปิดเสียงดังขึ้น",
+   "expect": [],
+   "zip": {
+    "heard": "เปิดเสียงดังขึ้น",
+    "err": "",
+    "got": [],
+    "seconds": 0.171,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h089",
+   "mode": "say",
+   "text": "ลดเสียงลงหน่อย",
+   "expect": [],
+   "zip": {
+    "heard": "ลดเสียงลงหน่อย",
+    "err": "",
+    "got": [],
+    "seconds": 0.191,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h090",
+   "mode": "say",
+   "text": "ปรับเสียงเจ็ดสิบ",
+   "expect": [],
+   "zip": {
+    "heard": "ปรับเสียง7สิทธิ์",
+    "err": "",
+    "got": [],
+    "seconds": 0.179,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h091",
+   "mode": "say",
+   "text": "เปิดโหมดโฟกัส",
+   "expect": [],
+   "zip": {
+    "heard": "เปิดโพรมกัด",
+    "err": "",
+    "got": [],
+    "seconds": 0.175,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h092",
+   "mode": "say",
+   "text": "ปิดเครื่องได้เลย",
+   "expect": [],
+   "zip": {
+    "heard": "ปิดเครื่องได้เลย",
+    "err": "",
+    "got": [],
+    "seconds": 0.182,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h093",
+   "mode": "say",
+   "text": "ค้นหาไฟล์รูปเมื่อวาน",
+   "expect": [],
+   "zip": {
+    "heard": "ค้นหาไฟรูปเมื่อวาน",
+    "err": "",
+    "got": [],
+    "seconds": 0.23,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h094",
+   "mode": "say",
+   "text": "หาไฟล์งานนำเสนอ",
+   "expect": [],
+   "zip": {
+    "heard": "หาไฟงานนำเสนอ",
+    "err": "",
+    "got": [],
+    "seconds": 0.203,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h095",
+   "mode": "say",
+   "text": "กลับบ้านกี่โมงดี",
+   "expect": [],
+   "zip": {
+    "heard": "กลับบ้านกี่โมงดี",
+    "err": "",
+    "got": [],
+    "seconds": 0.208,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h096",
+   "mode": "say",
+   "text": "เปิดแอปเครื่องคิดเลข",
+   "expect": [],
+   "zip": {
+    "heard": "เปิดแอบเครื่องคิดเลข",
+    "err": "",
+    "got": [],
+    "seconds": 0.223,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h097",
+   "mode": "say",
+   "text": "เปิดโปรแกรมเขียนโน้ต",
+   "expect": [],
+   "zip": {
+    "heard": "เปิดโปรแกรมเขียนโน้ต",
+    "err": "",
+    "got": [],
+    "seconds": 0.226,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h098",
+   "mode": "say",
+   "text": "ลิงก์นี้ส่งให้ใครดี",
+   "expect": [],
+   "zip": {
+    "heard": "ลิ้งนี้ส่งให้ใครดี",
+    "err": "",
+    "got": [],
+    "seconds": 0.223,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h099",
+   "mode": "say",
+   "text": "อากาศพรุ่งนี้จะร้อนไหม",
+   "expect": [],
+   "zip": {
+    "heard": "อากาศพรุ่งนี้จะร้อนไหม",
+    "err": "",
+    "got": [],
+    "seconds": 0.265,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h100",
+   "mode": "say",
+   "text": "ข่าวเด่นวันนี้มีอะไรบ้าง",
+   "expect": [],
+   "zip": {
+    "heard": "เด่นวันนี้มีอะไรบ้าง",
+    "err": "",
+    "got": [],
+    "seconds": 0.246,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h101",
+   "mode": "say",
+   "text": "ช่วยแปลประโยคนี้เป็นภาษาอังกฤษ",
+   "expect": [],
+   "zip": {
+    "heard": "ช่วยแปลประโยคนี้เป็นภาษาอังกฤษ",
+    "err": "",
+    "got": [],
+    "seconds": 0.312,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h102",
+   "mode": "say",
+   "text": "เขียนจดหมายขอบคุณให้หน่อย",
+   "expect": [],
+   "zip": {
+    "heard": "จดหมายขอบคุณให้หน่อย",
+    "err": "",
+    "got": [],
+    "seconds": 0.218,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h103",
+   "mode": "say",
+   "text": "สรุปเนื้อหาในหน้านี้ให้หน่อย",
+   "expect": [],
+   "zip": {
+    "heard": "สรุปเนื้อหาในหน้านี้ให้หน่อย",
+    "err": "",
+    "got": [],
+    "seconds": 0.264,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h104",
+   "mode": "say",
+   "text": "ขอบคุณครับ",
+   "expect": [],
+   "zip": {
+    "heard": "ขอบคุณครับ",
+    "err": "",
+    "got": [],
+    "seconds": 0.17,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h105",
+   "mode": "say",
+   "text": "สวัสดีครับ",
+   "expect": [],
+   "zip": {
+    "heard": "สวัสดีครับ",
+    "err": "",
+    "got": [],
+    "seconds": 0.184,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h106",
+   "mode": "say",
+   "text": "เครื่องร้อนไหม",
+   "expect": [],
+   "zip": {
+    "heard": "เครื่องร้อนไหม",
+    "err": "",
+    "got": [],
+    "seconds": 0.159,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h107",
+   "mode": "say",
+   "text": "พื้นที่ดิสก์เหลือเท่าไหร่",
+   "expect": [],
+   "zip": {
+    "heard": "พื้นที่ติดเหลือเท่าไหร่",
+    "err": "",
+    "got": [],
+    "seconds": 0.253,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h108",
+   "mode": "say",
+   "text": "หาค่าเฉลี่ยของสามสิบกับห้าสิบ",
+   "expect": [],
+   "zip": {
+    "heard": "หาค่าเฉลี่ยของสามสิบกับห้าสิบ",
+    "err": "",
+    "got": [],
+    "seconds": 0.25,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h109",
+   "mode": "say",
+   "text": "ห้าคูณเจ็ดเท่ากับเท่าไหร่",
+   "expect": [],
+   "zip": {
+    "heard": "คูเท่ากับเท่าไหร่",
+    "err": "",
+    "got": [],
+    "seconds": 0.235,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h110",
+   "mode": "say",
+   "text": "เตือนให้กินยาตอนสองทุ่ม",
+   "expect": [],
+   "zip": {
+    "heard": "เตือนให้กินยาตอน2ทุ่ม",
+    "err": "",
+    "got": [],
+    "seconds": 0.25,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h111",
+   "mode": "say",
+   "text": "เลื่อนเวลาเตือนออกไปสิบนาที",
+   "expect": [],
+   "zip": {
+    "heard": "เลื่อนเวลาเตือนออกไป10นาที",
+    "err": "",
+    "got": [],
+    "seconds": 0.278,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h112",
+   "mode": "say",
+   "text": "โหลดไฟล์นี้เก็บไว้ในเครื่อง",
+   "expect": [],
+   "zip": {
+    "heard": "โหลดไฟมีเก็บไว้ในเครื่อง",
+    "err": "",
+    "got": [],
+    "seconds": 0.237,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h113",
+   "mode": "say",
+   "text": "รีสตาร์ทเครื่อง",
+   "expect": [],
+   "zip": {
+    "heard": "ปรีสตาร์ทเครื่อง",
+    "err": "",
+    "got": [],
+    "seconds": 0.185,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h114",
+   "mode": "say",
+   "text": "ปิดไฟห้องนอน",
+   "expect": [],
+   "zip": {
+    "heard": "ปิดไฟห้องนอน",
+    "err": "",
+    "got": [],
+    "seconds": 0.209,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h115",
+   "mode": "say",
+   "text": "ไปกินข้าวกันไหม",
+   "expect": [],
+   "zip": {
+    "heard": "ไปกินข้าวกันไหม",
+    "err": "",
+    "got": [],
+    "seconds": 0.171,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h116",
+   "mode": "say",
+   "text": "กดไลก์ให้หน่อย",
+   "expect": [],
+   "zip": {
+    "heard": "กดไล",
+    "err": "",
+    "got": [],
+    "seconds": 0.198,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h117",
+   "mode": "say",
+   "text": "เข้านอนกี่โมงดี",
+   "expect": [],
+   "zip": {
+    "heard": "เข้านอนกี่โมงดี",
+    "err": "",
+    "got": [],
+    "seconds": 0.17,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h118",
+   "mode": "say",
+   "text": "ย้อนกลับไปเรื่องที่คุยกันเมื่อเช้า",
+   "expect": [],
+   "zip": {
+    "heard": "ย้อนกลับไปเรื่องที่คุยกันเมื่อเช้า",
+    "err": "",
+    "got": [],
+    "seconds": 0.291,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h119",
+   "mode": "say",
+   "text": "เปิดรูปที่ถ่ายเมื่อวาน",
+   "expect": [],
+   "zip": {
+    "heard": "เปิดรูปที่ถ่ายเมื่อวาน",
+    "err": "",
+    "got": [],
+    "seconds": 0.222,
+    "verdict": "neg_ok"
+   }
+  },
+  {
+   "id": "h120",
+   "mode": "say",
+   "text": "ปิดการแจ้งเตือนวันนี้",
+   "expect": [],
+   "zip": {
+    "heard": "ปิดการแจ้งเตือนวันนี้",
+    "err": "",
+    "got": [],
+    "seconds": 0.221,
+    "verdict": "neg_ok"
+   }
+  }
+ ]
+}

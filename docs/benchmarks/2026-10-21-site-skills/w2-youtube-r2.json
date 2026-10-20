@@ -1,0 +1,645 @@
+{
+ "summary": {
+  "site": "youtube",
+  "commands": 15,
+  "ok": 13,
+  "rate": 0.867,
+  "wrong_site_runs": 0,
+  "wrong_site_tries": 15,
+  "query": "ข่าวเช้า"
+ },
+ "rows": [
+  {
+   "phrase": "ข้ามไปข้างหน้า",
+   "kind": "key",
+   "arg": "l",
+   "expect": "เวลาเดินหน้า ≥ 5 วิ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.27,
+   "before": {
+    "t": 1.8,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 13.4,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "ถอยหลัง",
+   "kind": "key",
+   "arg": "j",
+   "expect": "เวลาถอยหลัง ≥ 5 วิ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.23,
+   "before": {
+    "t": 13.4,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 4.9,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "เริ่มคลิปใหม่",
+   "kind": "key",
+   "arg": "0",
+   "expect": "กลับต้นคลิป (< 3 วิ)",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.23,
+   "before": {
+    "t": 5,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "หยุดก่อน",
+   "kind": "key",
+   "arg": "k",
+   "expect": "หยุด/เล่นสลับ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.22,
+   "before": {
+    "t": 1.6,
+    "paused": false,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "เงียบก่อน",
+   "kind": "key",
+   "arg": "m",
+   "expect": "ปิด/เปิดเสียงสลับ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.21,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": false,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "เร็วขึ้น",
+   "kind": "key",
+   "arg": ">",
+   "expect": "เร็วขึ้น",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.21,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1.25,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "ช้าลง",
+   "kind": "key",
+   "arg": "<",
+   "expect": "ช้าลง",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.21,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1.25,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "โหมดโรงหนัง",
+   "kind": "key",
+   "arg": "t",
+   "expect": "โหมดโรงหนังสลับ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.32,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": false,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "เปิดซับ",
+   "kind": "key",
+   "arg": "c",
+   "expect": "คำบรรยายสลับ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.22,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "true",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "กดไลก์",
+   "kind": "click",
+   "arg": "ytd-watch-metadata like-button-view-model button",
+   "expect": "ปุ่มไลก์เปลี่ยนสถานะ (ต้องล็อกอิน)",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": false,
+   "seconds": 0.32,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "เต็มจอ",
+   "kind": "key",
+   "arg": "f",
+   "expect": "เต็มจอ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.23,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": true,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "ย่อจอ",
+   "kind": "key",
+   "arg": "Escape",
+   "expect": "ออกจากเต็มจอ",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.3,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": true,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "คลิปก่อนหน้า",
+   "kind": "key",
+   "arg": "Shift+P",
+   "expect": "ไปคลิปก่อนหน้า (ที่อยู่เปลี่ยน)",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": false,
+   "seconds": 0.23,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   }
+  },
+  {
+   "phrase": "คลิปถัดไป",
+   "kind": "key",
+   "arg": "Shift+N",
+   "expect": "ไปคลิปถัดไป (ที่อยู่เปลี่ยน)",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.21,
+   "before": {
+    "t": 1.6,
+    "paused": true,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=f2kE6F9SQ1I"
+   },
+   "after": {
+    "t": 1.2,
+    "paused": false,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=z1x2p_DsXMo"
+   }
+  },
+  {
+   "phrase": "จอเล็ก",
+   "kind": "key",
+   "arg": "i",
+   "expect": "มินิเพลเยอร์",
+   "result_ok": true,
+   "say": "ทำแล้ว",
+   "ok": true,
+   "seconds": 0.43,
+   "before": {
+    "t": 1.5,
+    "paused": false,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": false,
+    "cc": "false",
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/watch?v=z1x2p_DsXMo"
+   },
+   "after": {
+    "t": 4.2,
+    "paused": false,
+    "muted": true,
+    "rate": 1,
+    "fs": false,
+    "theater": true,
+    "mini": true,
+    "cc": null,
+    "like": "false",
+    "ad": false,
+    "url": "https://www.youtube.com/"
+   }
+  }
+ ],
+ "wrong_site": [
+  {
+   "phrase": "หยุดก่อน",
+   "arg": "k",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "ถอยหลัง",
+   "arg": "j",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "ข้ามไปข้างหน้า",
+   "arg": "l",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "เริ่มคลิปใหม่",
+   "arg": "0",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "เงียบก่อน",
+   "arg": "m",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "เต็มจอ",
+   "arg": "f",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "ย่อจอ",
+   "arg": "Escape",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "โหมดโรงหนัง",
+   "arg": "t",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "จอเล็ก",
+   "arg": "i",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "เปิดซับ",
+   "arg": "c",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "เร็วขึ้น",
+   "arg": ">",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "ช้าลง",
+   "arg": "<",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "คลิปถัดไป",
+   "arg": "Shift+N",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "คลิปก่อนหน้า",
+   "arg": "Shift+P",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  },
+  {
+   "phrase": "กดไลก์",
+   "arg": "ytd-watch-metadata like-button-view-model button",
+   "ran": false,
+   "say": "คำสั่งนี้ใช้ได้เฉพาะในเว็บของสกิล · หน้าที่เปิดอยู่ไม่ใช่เว็บนั้น"
+  }
+ ]
+}

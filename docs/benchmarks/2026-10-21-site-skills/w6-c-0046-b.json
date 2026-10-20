@@ -1,0 +1,412 @@
+{
+ "summary": {
+  "commands": 34,
+  "exact": 31,
+  "via_confirm": 1,
+  "non_commands": 6,
+  "non_command_acted": 0,
+  "hotwords": 199
+ },
+ "rows": [
+  {
+   "said": "เปิดยูทูบให้หน่อย",
+   "heard": "เปิดยูทูบให้หน่อย",
+   "want": "browser:site",
+   "got": "browser:site",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 2.771
+  },
+  {
+   "said": "ปิดเสียงที",
+   "heard": "ปิดเสียงที",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.117
+  },
+  {
+   "said": "เพิ่มเสียงอีกนิด",
+   "heard": "เพิ่มเสียงอีกนิด",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.123
+  },
+  {
+   "said": "ลดเสียงลงหน่อย",
+   "heard": "ลดเสียงลงหน่อย",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.172
+  },
+  {
+   "said": "ปรับเสียงสามสิบ",
+   "heard": "ปรับเสียงสามสิบ",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.124
+  },
+  {
+   "said": "ไปหน้าตั้งค่า",
+   "heard": "ไปหน้าตังคา",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.136
+  },
+  {
+   "said": "เปิดหน้าปฏิทิน",
+   "heard": "เปิดหน้าปฏิทิน",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.153
+  },
+  {
+   "said": "เปิดหน้าสกิล",
+   "heard": "เปิดหน้าสกิล",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.137
+  },
+  {
+   "said": "เปิดกูเกิลไดรฟ์",
+   "heard": "เปิดกูเกิลไร",
+   "want": "command",
+   "got": "command",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.138
+  },
+  {
+   "said": "เปิดข่าว",
+   "heard": "เปิดข่าว",
+   "want": "browser:site",
+   "got": "browser:site",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.114
+  },
+  {
+   "said": "เปิดดิสนีย์พลัส",
+   "heard": "เปิดดิสนีพัฒน์",
+   "want": "browser:site",
+   "got": "near:เปิดดิสนีย์พลัส",
+   "verdict": "confirm",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.127
+  },
+  {
+   "said": "หยุดวิดีโอ",
+   "heard": "หยุดวิดีโอ",
+   "want": "browser:media:pause",
+   "got": "browser:media:pause",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.106
+  },
+  {
+   "said": "เล่นเพลงต่อ",
+   "heard": "เล่นเพลงต่อ",
+   "want": "browser:media:play",
+   "got": "browser:media:play",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.141
+  },
+  {
+   "said": "ข้ามเพลง",
+   "heard": "ข้ามเพลง",
+   "want": "browser:media:next",
+   "got": "browser:media:next",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.109
+  },
+  {
+   "said": "ย้อนเพลง",
+   "heard": "ย้อนเพลง",
+   "want": "browser:media:prev",
+   "got": "browser:media:prev",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.12
+  },
+  {
+   "said": "ขยายเต็มจอ",
+   "heard": "ขยายเต็มจอ",
+   "want": "browser:fullscreen",
+   "got": "browser:fullscreen",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.136
+  },
+  {
+   "said": "กดข้ามโฆษณา",
+   "heard": "กดข้ามโฆษณา",
+   "want": "browser:skip_ad",
+   "got": "browser:skip_ad",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.152
+  },
+  {
+   "said": "โหลดหน้าใหม่",
+   "heard": "โหลดหน้าใหม่",
+   "want": "browser:reload",
+   "got": "browser:reload",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.123
+  },
+  {
+   "said": "ถอยกลับ",
+   "heard": "ถอยกลับ",
+   "want": "browser:back",
+   "got": "browser:back",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.115
+  },
+  {
+   "said": "เลื่อนลงอีก",
+   "heard": "เลื่อนลงอีก",
+   "want": "browser:scroll",
+   "got": "browser:scroll",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.135
+  },
+  {
+   "said": "ปิดหน้านี้",
+   "heard": "ปิดหน้านี้",
+   "want": "browser:close",
+   "got": "browser:close",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.127
+  },
+  {
+   "said": "เปิดวิดีโอแรก",
+   "heard": "เปิดวีดีโอแรก",
+   "want": "browser:open:1",
+   "got": "browser:open:1",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.151
+  },
+  {
+   "said": "เข้าลิงก์ที่สาม",
+   "heard": "เข้าลิงก์ที่สาม",
+   "want": "browser:open:3",
+   "got": "browser:open:3",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.156
+  },
+  {
+   "said": "ค้นหาร้านกาแฟ",
+   "heard": "ค้นหาร้านกาแฟ",
+   "want": "browser:search",
+   "got": "browser:search",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.15
+  },
+  {
+   "said": "ค้นในสปอติฟายว่าเพลงรัก",
+   "heard": "ค้นในสปอร์ติไฟล์ว่าเพลงรัก",
+   "want": "browser:site_search",
+   "got": "browser:search",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.241
+  },
+  {
+   "said": "เตือนโทรหาแม่หกโมงเย็น",
+   "heard": "เตือนโทรหาแม่ก็โมงเย็น",
+   "want": "reminder",
+   "got": "reminder",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.201
+  },
+  {
+   "said": "อย่าลืมจ่ายค่าไฟพรุ่งนี้",
+   "heard": "อย่าลืมจ่ายค่าไฟพรุ่งนี้",
+   "want": "reminder",
+   "got": "reminder",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.211
+  },
+  {
+   "said": "กี่โมงแล้ว",
+   "heard": "กี่โมงแล้ว",
+   "want": "answer",
+   "got": "answer",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.126
+  },
+  {
+   "said": "วันนี้มีนัดไหม",
+   "heard": "วันนี้มีนัดไหม",
+   "want": "answer",
+   "got": "answer",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.171
+  },
+  {
+   "said": "เครื่องร้อนไหม",
+   "heard": "เครื่องร้อนไหม",
+   "want": "answer",
+   "got": "answer",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.129
+  },
+  {
+   "said": "เปลี่ยนเป็นโหมดมืด",
+   "heard": "เปลี่ยนเป็นโหมดมืด",
+   "want": "app:theme",
+   "got": "app:theme",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.131
+  },
+  {
+   "said": "ขยายตัวหนังสือ",
+   "heard": "ขยายตัวหนังสือ",
+   "want": "app:font",
+   "got": "app:font",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.167
+  },
+  {
+   "said": "เริ่มแชทใหม่",
+   "heard": "เริ่มชาติใหม่",
+   "want": "app:newchat",
+   "got": "ask",
+   "verdict": "wrong",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.129
+  },
+  {
+   "said": "แปลว่าขอบคุณ",
+   "heard": "แปลว่าขอบคุณ",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.125
+  },
+  {
+   "said": "ช่วยสรุปข่าวนี้",
+   "heard": "ช่วยสรุปข่าวนี้",
+   "want": "llm:summarize-text",
+   "got": "llm:summarize-text",
+   "verdict": "exact",
+   "non_command": false,
+   "acted": false,
+   "seconds": 0.158
+  },
+  {
+   "said": "ฉันชอบกินส้มตำ",
+   "heard": "ฉันชอบกินส้มตำ",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.143
+  },
+  {
+   "said": "พรุ่งนี้ฝนจะตกไหม",
+   "heard": "พรุ่งนี้ฝนจะตกไหม",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.201
+  },
+  {
+   "said": "เพลงนี้เพราะจัง",
+   "heard": "เพลงนี้เพราะจัง",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.16
+  },
+  {
+   "said": "ไปทำงานก่อนนะ",
+   "heard": "ไปทำงานก่อนนะ",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.146
+  },
+  {
+   "said": "ง่วงนอนแล้ว",
+   "heard": "อ้วงนอนแล้ว",
+   "want": "ask",
+   "got": "ask",
+   "verdict": "exact",
+   "non_command": true,
+   "acted": false,
+   "seconds": 0.121
+  }
+ ]
+}
