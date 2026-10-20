@@ -1,0 +1,226 @@
+{
+ "set": "test2",
+ "commands_correct": 27,
+ "commands_total": 30,
+ "noncommands_acted": 0,
+ "noncommands_total": 10,
+ "wrong": [
+  {
+   "text": "รีเซ็ตเว็บนี้",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "วันจันทร์บ่ายสามมีประชุมทีม",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "แปลคำว่าสวัสดีเป็นภาษาญี่ปุ่น",
+   "expect": "llm:translate",
+   "got": "none"
+  }
+ ],
+ "rows": [
+  {
+   "text": "รีเฟรชให้ที",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "รีเซ็ตเว็บนี้",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "เปิดคลิปที่หก",
+   "expect": "browser:open:6",
+   "got": "browser:open:6"
+  },
+  {
+   "text": "ดูวีดีโอแรกให้หน่อย",
+   "expect": "browser:open:1",
+   "got": "browser:open:1"
+  },
+  {
+   "text": "กดคลิปอันแรก",
+   "expect": "browser:open:1",
+   "got": "browser:open:1"
+  },
+  {
+   "text": "เล่นเพลงต่อเลย",
+   "expect": "browser:media:play",
+   "got": "browser:media:play"
+  },
+  {
+   "text": "หยุดวิดีโอแป๊บนึง",
+   "expect": "browser:media:pause",
+   "got": "browser:media:pause"
+  },
+  {
+   "text": "พักเพลงไว้ก่อน",
+   "expect": "browser:media:pause",
+   "got": "browser:media:pause"
+  },
+  {
+   "text": "ขอดูเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "browser:fullscreen"
+  },
+  {
+   "text": "ทำให้เต็มจอหน่อย",
+   "expect": "browser:fullscreen",
+   "got": "browser:fullscreen"
+  },
+  {
+   "text": "ข้ามโฆษณานี้",
+   "expect": "browser:skip_ad",
+   "got": "browser:skip_ad"
+  },
+  {
+   "text": "ไปหน้าต่อไป",
+   "expect": "browser:forward",
+   "got": "browser:forward"
+  },
+  {
+   "text": "เลื่อนลงไปล่างสุด",
+   "expect": "browser:scroll",
+   "got": "browser:scroll"
+  },
+  {
+   "text": "เปิดวิกิพีเดีย",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "ค้นในยูทูบว่าสอนทำอาหาร",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "เตือนรดน้ำต้นไม้ห้าโมงเย็น",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "ช่วยเตือนกินข้าวเที่ยงตรง",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "นัดเพื่อนกินข้าววันเสาร์หกโมง",
+   "expect": "reminder",
+   "got": "reminder"
+  },
+  {
+   "text": "วันจันทร์บ่ายสามมีประชุมทีม",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "ตอนนี้กี่โมงแล้วนะ",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "สัปดาห์นี้มีนัดอะไรบ้าง",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เครื่องร้อนไปไหม",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เพิ่มเสียงอีกนิด",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ปิดเสียงไปก่อน",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ไปหน้าไฟล์ของฉัน",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "แปลคำว่าสวัสดีเป็นภาษาญี่ปุ่น",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "คำว่า apple แปลว่าอะไร",
+   "expect": "llm:translate",
+   "got": "llm:translate"
+  },
+  {
+   "text": "ช่วยสรุปเอกสารนี้ให้หน่อย",
+   "expect": "llm:summarize-text",
+   "got": "llm:summarize-text"
+  },
+  {
+   "text": "ร่างจดหมายสมัครงานพรุ่งนี้",
+   "expect": "llm:letter-writer",
+   "got": "llm:letter-writer"
+  },
+  {
+   "text": "เขียนข้อความอวยพรวันเกิดแม่",
+   "expect": "llm:letter-writer",
+   "got": "llm:letter-writer"
+  },
+  {
+   "text": "พรุ่งนี้ฝนจะตกไหม",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "เมื่อคืนนอนดึกมาก",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "พรุ่งนี้ฉันว่างทั้งวัน",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ตอนเย็นอากาศดีจัง",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "คลิปตลกเมื่อวานยังจำได้",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "เต็มจอแล้วสวยกว่า",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ชอบดูเน็ตฟลิกซ์ตอนดึก",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "งานนี้สรุปว่าผ่าน",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ร่างกายเหนื่อยมาก",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "สองทุ่มแล้วยังไม่ได้กินข้าว",
+   "expect": "none",
+   "got": "none"
+  }
+ ]
+}
