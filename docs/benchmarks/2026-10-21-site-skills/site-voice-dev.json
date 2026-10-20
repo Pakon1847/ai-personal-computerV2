@@ -1,0 +1,920 @@
+{
+ "base": {
+  "hotwords": 118,
+  "n": 90,
+  "exact": 58,
+  "confirm": 16,
+  "wrong": 2,
+  "rows": [
+   {
+    "phrase": "หยุดเพลง",
+    "heard": "หยุดเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หยุดก่อน",
+    "heard": "หยุดก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "พักเพลง",
+    "heard": "ภาคเพลง",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "เล่นต่อ",
+    "heard": "เล่นต่อ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เล่นเพลงต่อ",
+    "heard": "เล่นเพลงต่อ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ต่อเลย",
+    "heard": "ต่อเลย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงถัดไป",
+    "heard": "เพลงถัดไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามเพลง",
+    "heard": "ข้ามเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงต่อไป",
+    "heard": "เพลงต่อไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงก่อนหน้า",
+    "heard": "เพลงก่อนหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย้อนเพลง",
+    "heard": "ย้อนเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงที่แล้ว",
+    "heard": "เพลงที่แล้ว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กรอไปข้างหน้า",
+    "heard": "กรอบไปข้างหน้า",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "กรอเพลง",
+    "heard": "กรอเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เลื่อนไปหน่อย",
+    "heard": "เลื่อนไปหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กรอกลับ",
+    "heard": "กรอกลับ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ถอยหลังหน่อย",
+    "heard": "ถอยหลังหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย้อนกลับนิดนึง",
+    "heard": "ย้อนกลับนิดดาหนึ่ง",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "สุ่มเพลง",
+    "heard": "สุ่มเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เปิดสุ่ม",
+    "heard": "เปิดสุ่ม",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ปิดสุ่ม",
+    "heard": "ปิดสุ่ม",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เล่นซ้ำ",
+    "heard": "แลนด์ซ้ำ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "วนเพลง",
+    "heard": "เพราะว่าหน้าเพลง",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "วนซ้ำ",
+    "heard": "วรรณซ้ำ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "ถูกใจเพลงนี้",
+    "heard": "ถูกใจเพลงนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กดหัวใจ",
+    "heard": "กดหัวใจ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เก็บเพลงนี้",
+    "heard": "เก็บเพลงนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เอาหัวใจออก",
+    "heard": "เอาหัวใจออก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ลบออกจากเพลงที่ชอบ",
+    "heard": "ลบออกจากเพลงที่ชาหอบ",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "มิวต์เพลง",
+    "heard": "นิวเพลง",
+    "verdict": "wrong"
+   },
+   {
+    "phrase": "เงียบก่อน",
+    "heard": "เงียบก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เลิกมิวต์",
+    "heard": "รักมีอยู่",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "เพลงดังขึ้น",
+    "heard": "เพลงดังขึ้น",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดังอีกนิด",
+    "heard": "ดังอีกนิด",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เร่งเสียงเพลง",
+    "heard": "เร่งเสียงเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงเบาลง",
+    "heard": "เพลงเบาลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เบาอีกนิด",
+    "heard": "บอกอีกนิด",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "หรี่เสียงเพลง",
+    "heard": "ปรีเสียงเพลง",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "ดูคิว",
+    "heard": "ดูที่อยู่",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "คิวเพลง",
+    "heard": "คิวเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ปิดคิว",
+    "heard": "ปิดคิว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดูเนื้อเพลง",
+    "heard": "ก็ดูเนื้อเพลง",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "เปิดเนื้อเพลง",
+    "heard": "เปิดเนื้อเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ขอเนื้อร้อง",
+    "heard": "ขอเนื้อร้อง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ไปเพลงที่ชอบ",
+    "heard": "ไปเพลงที่ชอบ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "รายการเพลงที่ชอบ",
+    "heard": "เป็นรายการเพลงที่ชอบ",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "กลับหน้าแรก",
+    "heard": "กลับหน้าแรก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ไปหน้าหลัก",
+    "heard": "ไปหน้าหลัก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หยุดก่อน",
+    "heard": "หยุดก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หยุดคลิป",
+    "heard": "หยุดคลิก",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "เล่นต่อ",
+    "heard": "เล่นต่อ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ถอยหลัง",
+    "heard": "ถอยหลัง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย้อนสิบวิ",
+    "heard": "ย้อน10วิ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "ถอยหน่อย",
+    "heard": "ถอยหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามไปข้างหน้า",
+    "heard": "ข้ามไปทั้งหน้าห้า",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "ข้ามสิบวิ",
+    "heard": "ข้าม10อุ้ย",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "เดินหน้าหน่อย",
+    "heard": "เดินหน้าหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เริ่มคลิปใหม่",
+    "heard": "ก็เริ่มคลิปใหม่",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "ดูตั้งแต่ต้น",
+    "heard": "ดูตั้งแต่ต้น",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กลับไปต้นคลิป",
+    "heard": "กลับไปต้นคลิป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เงียบก่อน",
+    "heard": "เงียบก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "คลิปเงียบ",
+    "heard": "คลิปเงียบ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เอาเสียงคืน",
+    "heard": "เอาเสียงคืน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เต็มจอ",
+    "heard": "เต็มจอ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ขยายเต็มจอ",
+    "heard": "เต็มจอ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดูเต็มจอ",
+    "heard": "ก็ดูเต็มจอ",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "ย่อจอ",
+    "heard": "หน้าจอ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "กลับจอปกติ",
+    "heard": "กลับจอปกติ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "โหมดโรงหนัง",
+    "heard": "หมดโรงหนัง",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "โหมดโรงภาพยนตร์",
+    "heard": "หมดโรงภาพยนตร์",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "จอกว้าง",
+    "heard": "จอกว้าง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "จอเล็ก",
+    "heard": "จ้อเล็ก",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "มินิเพลเยอร์",
+    "heard": "ไม่มีเพลงเยอะ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "เปิดซับ",
+    "heard": "เปิดทรัพย์",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "ปิดซับ",
+    "heard": "เป๊ะทราบ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "คำบรรยาย",
+    "heard": "คำบรรยาย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เร็วขึ้น",
+    "heard": "มันเร็วขึ้น",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "เร่งสปีด",
+    "heard": "เร่งสปีด",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพิ่มความเร็ว",
+    "heard": "เพิ่มความเร็ว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ช้าลง",
+    "heard": "ช้าลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ลดสปีด",
+    "heard": "รถสปีด",
+    "verdict": "wrong"
+   },
+   {
+    "phrase": "ลดความเร็ว",
+    "heard": "ลดความเร็ว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "คลิปถัดไป",
+    "heard": "คลิปถัดไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "วิดีโอต่อไป",
+    "heard": "วิดีโอต่อไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามคลิปนี้",
+    "heard": "ข้ามคลิปนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "คลิปก่อนหน้า",
+    "heard": "คลิปก่อนหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "วิดีโอก่อนหน้า",
+    "heard": "วีดีโอก่อนหน้า",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "กดไลก์",
+    "heard": "กด์",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "ถูกใจคลิปนี้",
+    "heard": "ถูกใจคลิปนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ไลก์คลิป",
+    "heard": "ไหล่เล็ก",
+    "verdict": "miss"
+   }
+  ]
+ },
+ "site": {
+  "hotwords": 199,
+  "n": 90,
+  "exact": 77,
+  "confirm": 4,
+  "wrong": 0,
+  "rows": [
+   {
+    "phrase": "หยุดเพลง",
+    "heard": "หยุดเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หยุดก่อน",
+    "heard": "หยุดก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "พักเพลง",
+    "heard": "พักเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เล่นต่อ",
+    "heard": "เล่นต่อ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เล่นเพลงต่อ",
+    "heard": "เล่นเพลงต่อ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ต่อเลย",
+    "heard": "ต่อเลย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงถัดไป",
+    "heard": "เพลงถัดไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามเพลง",
+    "heard": "ข้ามเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงต่อไป",
+    "heard": "เพลงต่อไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงก่อนหน้า",
+    "heard": "เพลงก่อนหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย้อนเพลง",
+    "heard": "ย้อนเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงที่แล้ว",
+    "heard": "เพลงที่แล้ว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กรอไปข้างหน้า",
+    "heard": "กรอไปข้างหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กรอเพลง",
+    "heard": "กรอเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เลื่อนไปหน่อย",
+    "heard": "เลื่อนไปหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กรอกลับ",
+    "heard": "กรอกลับ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ถอยหลังหน่อย",
+    "heard": "ถอยหลังหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย้อนกลับนิดนึง",
+    "heard": "ย้อนกลับนิดดาหนึ่ง",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "สุ่มเพลง",
+    "heard": "สุ่มเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เปิดสุ่ม",
+    "heard": "เปิดสุ่ม",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ปิดสุ่ม",
+    "heard": "ปิดสุ่ม",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เล่นซ้ำ",
+    "heard": "แลนด์ซ้ำ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "วนเพลง",
+    "heard": "เพราะว่าหน้าเพลง",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "วนซ้ำ",
+    "heard": "วรรณซ้ำ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "ถูกใจเพลงนี้",
+    "heard": "ถูกใจเพลงนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กดหัวใจ",
+    "heard": "กดหัวใจ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เก็บเพลงนี้",
+    "heard": "เก็บเพลงนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เอาหัวใจออก",
+    "heard": "เอาหัวใจออก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ลบออกจากเพลงที่ชอบ",
+    "heard": "ลบออกจากเพลงที่ชอบ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "มิวต์เพลง",
+    "heard": "มิวต์เพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เงียบก่อน",
+    "heard": "เงียบก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เลิกมิวต์",
+    "heard": "รักมีอยู่",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "เพลงดังขึ้น",
+    "heard": "เพลงดังขึ้น",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดังอีกนิด",
+    "heard": "ดังอีกนิด",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เร่งเสียงเพลง",
+    "heard": "เร่งเสียงเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพลงเบาลง",
+    "heard": "เพลงเบาลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เบาอีกนิด",
+    "heard": "เบาอีกนิด",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หรี่เสียงเพลง",
+    "heard": "หรี่เสียงเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดูคิว",
+    "heard": "ดูที่อยู่",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "คิวเพลง",
+    "heard": "คิวเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ปิดคิว",
+    "heard": "ปิดคิว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดูเนื้อเพลง",
+    "heard": "ดูเนื้อเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เปิดเนื้อเพลง",
+    "heard": "เปิดเนื้อเพลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ขอเนื้อร้อง",
+    "heard": "ขอเนื้อร้อง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ไปเพลงที่ชอบ",
+    "heard": "ไปเพลงที่ชอบ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "รายการเพลงที่ชอบ",
+    "heard": "รายการเพลงที่ชอบ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กลับหน้าแรก",
+    "heard": "กลับหน้าแรก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ไปหน้าหลัก",
+    "heard": "ไปหน้าหลัก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หยุดก่อน",
+    "heard": "หยุดก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "หยุดคลิป",
+    "heard": "หยุดคลิป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เล่นต่อ",
+    "heard": "เล่นต่อ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ถอยหลัง",
+    "heard": "ถอยหลัง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย้อนสิบวิ",
+    "heard": "ย้อนสิบวิ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ถอยหน่อย",
+    "heard": "ถอยหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามไปข้างหน้า",
+    "heard": "ข้ามไปข้างหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามสิบวิ",
+    "heard": "ข้ามสิบวิ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เดินหน้าหน่อย",
+    "heard": "เดินหน้าหน่อย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เริ่มคลิปใหม่",
+    "heard": "เริ่มคลิปใหม่",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดูตั้งแต่ต้น",
+    "heard": "ดูตั้งแต่ต้น",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กลับไปต้นคลิป",
+    "heard": "กลับไปต้นคลิป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เงียบก่อน",
+    "heard": "เงียบก่อน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "คลิปเงียบ",
+    "heard": "คลิปเงียบ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เอาเสียงคืน",
+    "heard": "เอาเสียงคืน",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เต็มจอ",
+    "heard": "เต็มจอ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ขยายเต็มจอ",
+    "heard": "ขยายเต็มจอ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ดูเต็มจอ",
+    "heard": "ดูเต็มจอ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ย่อจอ",
+    "heard": "หน้าจอ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "กลับจอปกติ",
+    "heard": "กลับจอปกติ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "โหมดโรงหนัง",
+    "heard": "หมดโรงหนัง",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "โหมดโรงภาพยนตร์",
+    "heard": "หมดโรงภาพยนตร์",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "จอกว้าง",
+    "heard": "จอกว้าง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "จอเล็ก",
+    "heard": "จอเล็ก",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "มินิเพลเยอร์",
+    "heard": "ไม่มีเพลงเยอะ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "เปิดซับ",
+    "heard": "เปิดซับ",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ปิดซับ",
+    "heard": "เป๊ะทราบ",
+    "verdict": "miss"
+   },
+   {
+    "phrase": "คำบรรยาย",
+    "heard": "คำบรรยาย",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เร็วขึ้น",
+    "heard": "เร็วขึ้น",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เร่งสปีด",
+    "heard": "เร่งสปีด",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "เพิ่มความเร็ว",
+    "heard": "เพิ่มความเร็ว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ช้าลง",
+    "heard": "ช้าลง",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ลดสปีด",
+    "heard": "ลดสปีด",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ลดความเร็ว",
+    "heard": "ลดความเร็ว",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "คลิปถัดไป",
+    "heard": "คลิปถัดไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "วิดีโอต่อไป",
+    "heard": "วิดีโอต่อไป",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ข้ามคลิปนี้",
+    "heard": "ข้ามคลิปนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "คลิปก่อนหน้า",
+    "heard": "คลิปก่อนหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "วิดีโอก่อนหน้า",
+    "heard": "วิดีโอก่อนหน้า",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "กดไลก์",
+    "heard": "กดไล",
+    "verdict": "confirm"
+   },
+   {
+    "phrase": "ถูกใจคลิปนี้",
+    "heard": "ถูกใจคลิปนี้",
+    "verdict": "exact"
+   },
+   {
+    "phrase": "ไลก์คลิป",
+    "heard": "ไหล่เล็ก",
+    "verdict": "miss"
+   }
+  ]
+ }
+}
