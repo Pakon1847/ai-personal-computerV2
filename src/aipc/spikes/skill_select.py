@@ -146,7 +146,8 @@ def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     data = json.loads(a.dataset.read_text(encoding="utf-8"))
-    extra = sorted(a.extra_skills.glob("*.md")) if a.extra_skills else []  # ไม่รวม index.json ของที่เก็บ
+    # ไม่รวม index.json ของที่เก็บสกิลของผู้ใช้
+    extra = sorted(a.extra_skills.glob("*.md")) if a.extra_skills else []
     skills = manifest.load_builtin() + [manifest.load(p) for p in extra]
     ai = None
     info = {}
