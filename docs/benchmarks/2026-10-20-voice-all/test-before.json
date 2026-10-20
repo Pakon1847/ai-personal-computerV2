@@ -1,0 +1,571 @@
+{
+ "set": "test",
+ "commands_correct": 28,
+ "commands_total": 60,
+ "noncommands_acted": 0,
+ "noncommands_total": 20,
+ "wrong": [
+  {
+   "text": "รีเซ็ตหน้านี้หน่อย",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "เข้าคลิปแรก",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เปิดวีดีโอที่สอง",
+   "expect": "browser:open:2",
+   "got": "none"
+  },
+  {
+   "text": "ดูวิดีโอที่สามหน่อย",
+   "expect": "browser:open:3",
+   "got": "none"
+  },
+  {
+   "text": "กดเข้าคลิปที่สี่",
+   "expect": "browser:open:4",
+   "got": "none"
+  },
+  {
+   "text": "เลือกวิดีโอแรก",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "ขอดูคลิปอันที่ห้า",
+   "expect": "browser:open:5",
+   "got": "none"
+  },
+  {
+   "text": "เข้าไปดูวีดีโอ",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เปิดคลิปให้หน่อย",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "กดเล่นวิดีโอ",
+   "expect": "browser:media:play",
+   "got": "none"
+  },
+  {
+   "text": "พักวิดีโอไว้",
+   "expect": "browser:media:pause",
+   "got": "none"
+  },
+  {
+   "text": "ขยายวิดีโอเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ดูแบบเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ออกจากโหมดเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "กดข้ามโฆษณาให้หน่อย",
+   "expect": "browser:skip_ad",
+   "got": "none"
+  },
+  {
+   "text": "ข้ามแอดไป",
+   "expect": "browser:skip_ad",
+   "got": "none"
+  },
+  {
+   "text": "เตือนโทรหาแม่ตอนหกโมงเย็น",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยเตือนประชุมพรุ่งนี้บ่ายโมง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "เตือนให้ไปรับลูกสี่โมงครึ่ง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "นัดหมอฟันวันศุกร์สิบโมง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "อย่าลืมเตือนจ่ายค่าไฟพรุ่งนี้เช้า",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "แปลคำว่าขอบคุณเป็นภาษาอังกฤษ",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยแปลประโยคนี้เป็นไทย",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "แปลว่า see you tomorrow",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยสรุปบทความนี้หน่อย",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "สรุปข่าวให้ฟังหน่อย",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "ร่างอีเมลขอลางานพรุ่งนี้",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "เขียนจดหมายขอบคุณอาจารย์",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยร่างข้อความขอโทษลูกค้า",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "ไปหน้าถัดไปของเว็บ",
+   "expect": "browser:forward",
+   "got": "none"
+  },
+  {
+   "text": "เลื่อนขึ้นไปบนสุด",
+   "expect": "browser:scroll",
+   "got": "none"
+  },
+  {
+   "text": "หยุดเพลงแป๊บนึง",
+   "expect": "browser:media:pause",
+   "got": "none"
+  }
+ ],
+ "rows": [
+  {
+   "text": "รีเซ็ตหน้านี้หน่อย",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยรีโหลดหน้าเว็บ",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "รีเฟรชหน้านี้ที",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "โหลดหน้าเว็บใหม่อีกที",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "เข้าคลิปแรก",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เปิดวีดีโอที่สอง",
+   "expect": "browser:open:2",
+   "got": "none"
+  },
+  {
+   "text": "ดูวิดีโอที่สามหน่อย",
+   "expect": "browser:open:3",
+   "got": "none"
+  },
+  {
+   "text": "กดเข้าคลิปที่สี่",
+   "expect": "browser:open:4",
+   "got": "none"
+  },
+  {
+   "text": "เลือกวิดีโอแรก",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "ขอดูคลิปอันที่ห้า",
+   "expect": "browser:open:5",
+   "got": "none"
+  },
+  {
+   "text": "เข้าไปดูวีดีโอ",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เปิดคลิปให้หน่อย",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เล่นคลิปต่อ",
+   "expect": "browser:media:play",
+   "got": "browser:media:play"
+  },
+  {
+   "text": "กดเล่นวิดีโอ",
+   "expect": "browser:media:play",
+   "got": "none"
+  },
+  {
+   "text": "หยุดคลิปก่อน",
+   "expect": "browser:media:pause",
+   "got": "browser:media:pause"
+  },
+  {
+   "text": "พักวิดีโอไว้",
+   "expect": "browser:media:pause",
+   "got": "none"
+  },
+  {
+   "text": "ขยายวิดีโอเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ดูแบบเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ออกจากโหมดเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "กดข้ามโฆษณาให้หน่อย",
+   "expect": "browser:skip_ad",
+   "got": "none"
+  },
+  {
+   "text": "ข้ามแอดไป",
+   "expect": "browser:skip_ad",
+   "got": "none"
+  },
+  {
+   "text": "คลิปต่อไป",
+   "expect": "browser:media:next",
+   "got": "browser:media:next"
+  },
+  {
+   "text": "ย้อนกลับไปหน้าที่แล้ว",
+   "expect": "browser:back",
+   "got": "browser:back"
+  },
+  {
+   "text": "เลื่อนลงอีกหน่อย",
+   "expect": "browser:scroll",
+   "got": "browser:scroll"
+  },
+  {
+   "text": "ปิดแท็บนี้ไปเลย",
+   "expect": "browser:close",
+   "got": "browser:close"
+  },
+  {
+   "text": "เปิดเน็ตฟลิกซ์",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "เปิดสปอติฟาย",
+   "expect": "browser:site",
+   "got": "browser:site"
+  },
+  {
+   "text": "หาเพลงลูกทุ่งในยูทูบ",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "เตือนโทรหาแม่ตอนหกโมงเย็น",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยเตือนประชุมพรุ่งนี้บ่ายโมง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "เตือนให้ไปรับลูกสี่โมงครึ่ง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "นัดหมอฟันวันศุกร์สิบโมง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "อย่าลืมเตือนจ่ายค่าไฟพรุ่งนี้เช้า",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "พรุ่งนี้ต้องทำอะไรบ้าง",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "วันนี้มีนัดอะไรบ้าง",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "กี่โมงแล้ว",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เครื่องช้ามากเป็นอะไร",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "อีกกี่วันถึงวันปีใหม่",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ลดเสียงหน่อย",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ปรับเสียงห้าสิบ",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เปิดเสียงด้วย",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ไปหน้าตั้งค่า",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เปิดหน้าสกิล",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ไปหน้าสุขภาพเครื่อง",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "แปลคำว่าขอบคุณเป็นภาษาอังกฤษ",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยแปลประโยคนี้เป็นไทย",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "แปลว่า see you tomorrow",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยสรุปบทความนี้หน่อย",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "สรุปข่าวให้ฟังหน่อย",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "ร่างอีเมลขอลางานพรุ่งนี้",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "เขียนจดหมายขอบคุณอาจารย์",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยร่างข้อความขอโทษลูกค้า",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "เปิดยูทูบแล้วหาเพลงสากล",
+   "expect": "browser:site_search",
+   "got": "browser:site_search"
+  },
+  {
+   "text": "ค้นหาร้านข้าวมันไก่ใกล้ฉัน",
+   "expect": "browser:search",
+   "got": "browser:search"
+  },
+  {
+   "text": "ไปหน้าถัดไปของเว็บ",
+   "expect": "browser:forward",
+   "got": "none"
+  },
+  {
+   "text": "เลื่อนขึ้นไปบนสุด",
+   "expect": "browser:scroll",
+   "got": "none"
+  },
+  {
+   "text": "หยุดเพลงแป๊บนึง",
+   "expect": "browser:media:pause",
+   "got": "none"
+  },
+  {
+   "text": "ข้ามเพลงนี้",
+   "expect": "browser:media:next",
+   "got": "browser:media:next"
+  },
+  {
+   "text": "เข้าลิงก์ที่สอง",
+   "expect": "browser:open:2",
+   "got": "browser:open:2"
+  },
+  {
+   "text": "เปิดจีเมลให้หน่อย",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "เมื่อวานดูวิดีโอตลกมาก",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "แม่ชอบเตือนให้กินข้าว",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "คลิปนั้นสนุกดีนะ",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "จอนี้สวยดี",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "โฆษณาเยอะจังเลย",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ฉันเหนื่อยจัง",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "วันนี้อากาศร้อนมาก",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "หน้าเว็บนี้สวยดี",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "เพื่อนส่งคลิปมาให้",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ขอบคุณมากนะ",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "สวัสดีครับ",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "เธอชื่ออะไร",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ทำไมท้องฟ้าเป็นสีฟ้า",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "ไม่เป็นไรแล้ว",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "เดี๋ยวค่อยทำ",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "วีดีโอนี้ใครทำ",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "การแปลเป็นงานยาก",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "สรุปแล้วไปไหนดี",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "เต็มที่เลยวันนี้",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "รีเซ็ตชีวิตใหม่ดีไหม",
+   "expect": "none",
+   "got": "none"
+  }
+ ]
+}

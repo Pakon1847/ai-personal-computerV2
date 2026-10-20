@@ -1,0 +1,137 @@
+{
+ "_about": "การ์ด 0042 ชุดพัฒนา (ใช้ปรับกฎได้) · ประโยคที่ Pakon พูดจริง 2026-10-20 + ตัวอย่างจากไฟล์สกิล · รูปแบบเดียวกับ voice_all_test.json",
+ "items": [
+  {
+   "text": "รีเซ็ตหน้า",
+   "expect": "browser:reload"
+  },
+  {
+   "text": "รีเซ็ตหน้าเว็บ",
+   "expect": "browser:reload"
+  },
+  {
+   "text": "รีโหลด",
+   "expect": "browser:reload"
+  },
+  {
+   "text": "เข้าวีดีโอ",
+   "expect": "browser:open:1"
+  },
+  {
+   "text": "เข้าวิดีโอ",
+   "expect": "browser:open:1"
+  },
+  {
+   "text": "เปิดวิดีโอแรก",
+   "expect": "browser:open:1"
+  },
+  {
+   "text": "ดูคลิปที่สอง",
+   "expect": "browser:open:2"
+  },
+  {
+   "text": "เล่นวิดีโอ",
+   "expect": "browser:media:play"
+  },
+  {
+   "text": "เล่นคลิป",
+   "expect": "browser:media:play"
+  },
+  {
+   "text": "หยุดวิดีโอ",
+   "expect": "browser:media:pause"
+  },
+  {
+   "text": "เต็มจอ",
+   "expect": "browser:fullscreen"
+  },
+  {
+   "text": "ขยายเต็มจอ",
+   "expect": "browser:fullscreen"
+  },
+  {
+   "text": "ข้ามโฆษณา",
+   "expect": "browser:skip_ad"
+  },
+  {
+   "text": "คลิปถัดไป",
+   "expect": "browser:media:next"
+  },
+  {
+   "text": "เตือนกินยาสองทุ่ม",
+   "expect": "reminder"
+  },
+  {
+   "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+   "expect": "reminder"
+  },
+  {
+   "text": "เตือนส่งรายงานวันศุกร์บ่ายสอง",
+   "expect": "reminder"
+  },
+  {
+   "text": "พรุ่งนี้สามโมงนัดอาจารย์",
+   "expect": "reminder"
+  },
+  {
+   "text": "พรุ่งนี้มีนัดอะไร",
+   "expect": "answer"
+  },
+  {
+   "text": "ตอนนี้กี่โมง",
+   "expect": "answer"
+  },
+  {
+   "text": "ทำไมเครื่องช้า",
+   "expect": "answer"
+  },
+  {
+   "text": "เพิ่มเสียง",
+   "expect": "command"
+  },
+  {
+   "text": "ปรับเสียงสี่สิบ",
+   "expect": "command"
+  },
+  {
+   "text": "แปลคำว่าแมว",
+   "expect": "llm:translate"
+  },
+  {
+   "text": "แปลประโยคนี้เป็นอังกฤษ",
+   "expect": "llm:translate"
+  },
+  {
+   "text": "สรุปข้อความนี้",
+   "expect": "llm:summarize-text"
+  },
+  {
+   "text": "ช่วยสรุปอีเมลนี้เป็นข้อ ๆ",
+   "expect": "llm:summarize-text"
+  },
+  {
+   "text": "ร่างอีเมลลาป่วย",
+   "expect": "llm:letter-writer"
+  },
+  {
+   "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้า เป็นไข้ไม่สบาย",
+   "expect": "llm:letter-writer"
+  },
+  {
+   "text": "เขียนจดหมายขอเลื่อนส่งงาน",
+   "expect": "llm:letter-writer"
+  },
+  {
+   "text": "จำได้ไหมที่เตือนไว้",
+   "expect": "none"
+  },
+  {
+   "text": "หน้าจอมืดไปหน่อย",
+   "expect": "none"
+  },
+  {
+   "text": "โฆษณานี้น่ารำคาญ",
+   "expect": "none"
+  }
+ ]
+}

@@ -1,0 +1,1850 @@
+[
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหาราคาทองหน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหาราคาทองหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหาราคาทองหน่อยเข้าลิงก์แรก",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหาราคาทองหน่อยเข้าลิงก์แรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหา ร้านอาหารใกล้ฉัน",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหา ร้านอาหารใกล้ฉัน",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เสิร์ชข่าวฟุตบอลวันนี้",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เสิร์ชข่าวฟุตบอลวันนี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กูเกิลวิธีทำไข่เจียว",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กูเกิลวิธีทำไข่เจียว",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "หาสูตรแกงเขียวหวานหน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "หาสูตรแกงเขียวหวานหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เข้าลิงก์แรก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เข้าลิงก์แรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เข้าลิ้งค์แรกให้หน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เข้าลิ้งค์แรกให้หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กดลิงก์ที่สอง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กดลิงก์ที่สอง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดลิงก์ที่ 3",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดลิงก์ที่ 3",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เข้าเว็บแรก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เข้าเว็บแรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "คลิกอันที่สี่",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "คลิกอันที่สี่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ย้อนกลับ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ย้อนกลับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ย้อนกลับหน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ย้อนกลับหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กลับไปหน้าก่อนหน้า",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กลับไปหน้าก่อนหน้า",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ไปข้างหน้า",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ไปข้างหน้า",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "โหลดใหม่",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "โหลดใหม่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "รีเฟรชหน้านี้",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "รีเฟรชหน้านี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนลง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนลง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนลงอีก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนลงอีก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนขึ้น",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนขึ้น",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปิดแท็บ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปิดแท็บ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปิดหน้านี้",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปิดหน้านี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กลับไปแอป",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กลับไปแอป",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กลับไปหน้าผู้ช่วย",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "กลับไปหน้าผู้ช่วย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดกูเกิล",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดกูเกิล",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิด google",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิด google",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดยูทูบ",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดยูทูบ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหาไฟล์รายงาน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ค้นหาไฟล์รายงาน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "หาไฟล์ที่แก้เมื่อวาน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "หาไฟล์ที่แก้เมื่อวาน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนนัดประชุมไปพรุ่งนี้",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เลื่อนนัดประชุมไปพรุ่งนี้",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปิดเสียง",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปิดเสียง",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดเสียง",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดเสียง",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปรับเสียงเป็น 40",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ปรับเสียงเป็น 40",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ตอนนี้กี่โมง",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ตอนนี้กี่โมง",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ยกเลิกนัดกินยา",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ยกเลิกนัดกินยา",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "หาค่าเฉลี่ยของ 4 6 8",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "หาค่าเฉลี่ยของ 4 6 8",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ราคาทองวันนี้เท่าไหร่",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "ราคาทองวันนี้เท่าไหร่",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดแอปเครื่องคิดเลข",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_v1.json",
+  "text": "เปิดแอปเครื่องคิดเลข",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาราคาทองหน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาราคาทองหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาราคาทองหน่อยเข้าลิงแร่",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาราคาทองหน่อยเข้าลิงแร่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหารานอาหารใกล้ฉัน",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหารานอาหารใกล้ฉัน",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เสิร์จ ข่าว ฟุตบอล วันนี้",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เสิร์จ ข่าว ฟุตบอล วันนี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กูเกินวิธีทำไข่เจียว",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กูเกินวิธีทำไข่เจียว",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ช่วยค้นหาเพลงใหม่ให้หน่อยครับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ขาสุดแกงเขียวหวานหน่อย",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ขาสุดแกงเขียวหวานหน่อย",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ข้าวลิงแรก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ข้าวลิงแรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงแรกให้หน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงแรกให้หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กดลิง ที่ สอง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กดลิง ที่ สอง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด ลิง ที่ สาม",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด ลิง ที่ สาม",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เท่า เวทย์แรก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เท่า เวทย์แรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คลึกอันที่สี่",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คลึกอันที่สี่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อนกลับ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อนกลับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อน กลับ หน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อน กลับ หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับไปหน้าก่อนหน้า",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับไปหน้าก่อนหน้า",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ไปข้างมาฮะ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ไปข้างมาฮะ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "โหลดใหม่",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "โหลดใหม่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "รีเฟลดหน้านี้",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "รีเฟลดหน้านี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน ลง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน ลง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน ลง อี",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน ลง อี",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน คืน",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน คืน",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปก",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปก",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด หน้า หนี",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด หน้า หนี",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับ ไป แอ๊ก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับ ไป แอ๊ก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ตลับไปหน้าผู้ช่วย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ตลับไปหน้าผู้ช่วย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปาดกูการ",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปาดกูการ",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดยูทูล",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดยูทูล",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาไฟรายงาน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาไฟรายงาน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาไฟที่แก้เมื่อวาน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาไฟที่แก้เมื่อวาน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนนักประชุมไปพรุ่งนี้",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนนักประชุมไปพรุ่งนี้",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด เสียง",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด เสียง",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดเสียง",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดเสียง",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปรับ เสียง เป็น สี่ สิบ",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปรับ เสียง เป็น สี่ สิบ",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ตอนนี้ขี่โมง",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ตอนนี้ขี่โมง",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "นกเลิกนัดคินยา",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "นกเลิกนัดคินยา",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาค่าเฉลี่ยของสี่หกแปด",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาค่าเฉลี่ยของสี่หกแปด",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ราคาทองวันนี้เท่าไหร่",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ราคาทองวันนี้เท่าไหร่",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดแอบเครื่องคิดเลข",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดแอบเครื่องคิดเลข",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาราคาน้ำบันวันนี้",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาราคาน้ำบันวันนี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาโรงหนังแถวนี้ให้หน่อยค่ะ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ช่วยเสิร์ฟตารางรถไฟไปเชียงใหม่",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ช่วยเสิร์ฟตารางรถไฟไปเชียงใหม่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนในกูเกินว่าวันหยุดเดือนน่ามีวันไหน",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนในกูเกินว่าวันหยุดเดือนน่ามีวันไหน",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาวิธีปลูกมะนาวในกระถาง",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาวิธีปลูกมะนาวในกระถาง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาคำว่า ปัญญาประดิษฐ์",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาคำว่า ปัญญาประดิษฐ์",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาสิบห้าครับ",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาสิบห้าครับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาผลบอลเมื่อคืนแล้วเข้าลิงแรก",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "คนหาผลบอลเมื่อคืนแล้วเข้าลิงแรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงแรกเลย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงแรกเลย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงอันแรกครับ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงอันแรกครับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กด เข้า ลิง ที่ หนึ่ง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กด เข้า ลิง ที่ หนึ่ง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด ลิง ที่ สอง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด ลิง ที่ สอง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงที่สอง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าลิงที่สอง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ขลิกกลิงที่สามให้หน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ขลิกกลิงที่สามให้หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าผลลับที่ห้า",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เข้าผลลับที่ห้า",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด เว็บ ที่ สอง ครับ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด เว็บ ที่ สอง ครับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อนกลับครับ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อนกลับครับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ถอยกลับไปหน้าเดิม",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ถอยกลับไปหน้าเดิม",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับหน้าที่แล้ว",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับหน้าที่แล้ว",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ยอน กลับ ไป หน้า ที่ แล้ว หน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ยอน กลับ ไป หน้า ที่ แล้ว หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ไปหน้าค้างนะฮะ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ไปหน้าค้างนะฮะ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เดินหน้า",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เดินหน้า",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ตีโหลด",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ตีโหลด",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "โหลดหน้ามีใหม่",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "โหลดหน้ามีใหม่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนลงหน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนลงหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อด น่า ลง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อด น่า ลง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนขึ้นไปหน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนขึ้นไปหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน กลับ ขึ้น ไป",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อน กลับ ขึ้น ไป",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิงมี",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิงมี",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด เว็บ นี้",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด เว็บ นี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับ ไป ที่ แอ๊ก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับ ไป ที่ แอ๊ก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับ ไป หน้า แฉด",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "กลับ ไป หน้า แฉด",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด กู เกิ้ล หน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด กู เกิ้ล หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดเวฟยูทูก",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดเวฟยูทูก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด วิกฤติพีเดีย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิด วิกฤติพีเดีย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาใส่ที่ทำเมื่อวาน",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ค้นหาใส่ที่ทำเมื่อวาน",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาไฟใบเสร็จ",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หาไฟใบเสร็จ",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ถ้าเอกสารรายงานประจำเดือน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ถ้าเอกสารรายงานประจำเดือน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนัดหมอฟันเป็นวันศุกร์",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนัดหมอฟันเป็นวันศุกร์",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนเตือนกินยาไปสองทุ่ม",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เลื่อนเตือนกินยาไปสองทุ่ม",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด เสียง หน่อย",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ปิด เสียง หน่อย",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เพิ่ม เสียง",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เพิ่ม เสียง",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "รถเสียงลงหน่อย",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "รถเสียงลงหน่อย",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "วันนี้วันที่เท่าไหร่",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "วันนี้วันที่เท่าไหร่",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ลบนัดประชุมพรุ่งนี้",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ลบนัดประชุมพรุ่งนี้",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หา ผล รวม ของ สิบ สอง กับ สาม สิบ",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "หา ผล รวม ของ สิบ สอง กับ สาม สิบ",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เขา วันนี้ มี อะไร บ้าง",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เขา วันนี้ มี อะไร บ้าง",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เครื่องช้าเพราะอะไร",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เครื่องช้าเพราะอะไร",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดโหมดประชุม",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เปิดโหมดประชุม",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อนกลับเมื่อกี้ทีปรับเสียง",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "ย้อนกลับเมื่อกี้ทีปรับเสียง",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "พรุ่งนี้เชียงใหม่ฝนตกไหม",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เขียน กลอน สั้น เขียน กลอน สั้น เรื่อง ฝน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "browse_heard_dev.json",
+  "text": "เขียน กลอน สั้น เขียน กลอน สั้น เรื่อง ฝน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "ค้นหาราคาทองวันนี้",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ค้นหาราคาทองวันนี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เข้าลิงก์แรก",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เข้าลิงก์แรก",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ย้อนกลับ",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ย้อนกลับ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เปิดผลลัพธ์ที่สาม",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เปิดผลลัพธ์ที่สาม",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เลื่อนลง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เลื่อนลง",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เลื่อนขึ้นหน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เลื่อนขึ้นหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "โหลดหน้านี้ใหม่",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "โหลดหน้านี้ใหม่",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ไปข้างหน้า",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ไปข้างหน้า",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ช่วยหาร้านกาแฟแถวนี้ให้หน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ช่วยหาร้านกาแฟแถวนี้ให้หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เปิดยูทูบ",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เปิดยูทูบ",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ปิดแท็บนี้",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ปิดแท็บนี้",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "กลับไปหน้าผู้ช่วย",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "live-22",
+  "text": "กลับไปหน้าผู้ช่วย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ขอดูอันที่สองหน่อย",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ขอดูอันที่สองหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เข้ากูเกิลหน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เข้ากูเกิลหน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "สภาพอากาศเชียงใหม่ ค้นให้หน่อย",
+  "browser_running": false,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "สภาพอากาศเชียงใหม่ ค้นให้หน่อย",
+  "browser_running": true,
+  "before": "browser"
+ },
+ {
+  "set": "live-22",
+  "text": "ตอนนี้กี่โมงแล้ว",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "ตอนนี้กี่โมงแล้ว",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "เตือนกินยาพรุ่งนี้แปดโมง",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "เตือนกินยาพรุ่งนี้แปดโมง",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "หาแว่นไม่เจอ วางไว้ไหนนะ",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "หาแว่นไม่เจอ วางไว้ไหนนะ",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "ปิดเสียงหน่อย",
+  "browser_running": false,
+  "before": "command"
+ },
+ {
+  "set": "live-22",
+  "text": "ปิดเสียงหน่อย",
+  "browser_running": true,
+  "before": "command"
+ },
+ {
+  "set": "live-22",
+  "text": "ย้อนกลับไปเรื่องเมื่อกี้ที่คุยกัน",
+  "browser_running": false,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "ย้อนกลับไปเรื่องเมื่อกี้ที่คุยกัน",
+  "browser_running": true,
+  "before": "unknown"
+ },
+ {
+  "set": "live-22",
+  "text": "เปิดเบราว์เซอร์",
+  "browser_running": false,
+  "before": "open_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เปิดเบราว์เซอร์",
+  "browser_running": true,
+  "before": "open_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เลื่อนลง",
+  "browser_running": false,
+  "before": "needs_browser"
+ },
+ {
+  "set": "live-22",
+  "text": "เลื่อนลง",
+  "browser_running": true,
+  "before": "browser"
+ }
+]

@@ -1,0 +1,286 @@
+{
+ "set": "dev",
+ "commands_correct": 8,
+ "commands_total": 30,
+ "noncommands_acted": 0,
+ "noncommands_total": 3,
+ "wrong": [
+  {
+   "text": "รีเซ็ตหน้า",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "รีเซ็ตหน้าเว็บ",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "เข้าวีดีโอ",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เข้าวิดีโอ",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เปิดวิดีโอแรก",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "ดูคลิปที่สอง",
+   "expect": "browser:open:2",
+   "got": "none"
+  },
+  {
+   "text": "เล่นวิดีโอ",
+   "expect": "browser:media:play",
+   "got": "none"
+  },
+  {
+   "text": "เล่นคลิป",
+   "expect": "browser:media:play",
+   "got": "none"
+  },
+  {
+   "text": "เต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ขยายเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ข้ามโฆษณา",
+   "expect": "browser:skip_ad",
+   "got": "none"
+  },
+  {
+   "text": "เตือนกินยาสองทุ่ม",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "เตือนส่งรายงานวันศุกร์บ่ายสอง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "พรุ่งนี้สามโมงนัดอาจารย์",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "แปลคำว่าแมว",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "แปลประโยคนี้เป็นอังกฤษ",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "สรุปข้อความนี้",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยสรุปอีเมลนี้เป็นข้อ ๆ",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "ร่างอีเมลลาป่วย",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้า เป็นไข้ไม่สบาย",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "เขียนจดหมายขอเลื่อนส่งงาน",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  }
+ ],
+ "rows": [
+  {
+   "text": "รีเซ็ตหน้า",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "รีเซ็ตหน้าเว็บ",
+   "expect": "browser:reload",
+   "got": "none"
+  },
+  {
+   "text": "รีโหลด",
+   "expect": "browser:reload",
+   "got": "browser:reload"
+  },
+  {
+   "text": "เข้าวีดีโอ",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เข้าวิดีโอ",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "เปิดวิดีโอแรก",
+   "expect": "browser:open:1",
+   "got": "none"
+  },
+  {
+   "text": "ดูคลิปที่สอง",
+   "expect": "browser:open:2",
+   "got": "none"
+  },
+  {
+   "text": "เล่นวิดีโอ",
+   "expect": "browser:media:play",
+   "got": "none"
+  },
+  {
+   "text": "เล่นคลิป",
+   "expect": "browser:media:play",
+   "got": "none"
+  },
+  {
+   "text": "หยุดวิดีโอ",
+   "expect": "browser:media:pause",
+   "got": "browser:media:pause"
+  },
+  {
+   "text": "เต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ขยายเต็มจอ",
+   "expect": "browser:fullscreen",
+   "got": "none"
+  },
+  {
+   "text": "ข้ามโฆษณา",
+   "expect": "browser:skip_ad",
+   "got": "none"
+  },
+  {
+   "text": "คลิปถัดไป",
+   "expect": "browser:media:next",
+   "got": "browser:media:next"
+  },
+  {
+   "text": "เตือนกินยาสองทุ่ม",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "เตือนส่งรายงานวันศุกร์บ่ายสอง",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "พรุ่งนี้สามโมงนัดอาจารย์",
+   "expect": "reminder",
+   "got": "none"
+  },
+  {
+   "text": "พรุ่งนี้มีนัดอะไร",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ตอนนี้กี่โมง",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "ทำไมเครื่องช้า",
+   "expect": "answer",
+   "got": "answer"
+  },
+  {
+   "text": "เพิ่มเสียง",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "ปรับเสียงสี่สิบ",
+   "expect": "command",
+   "got": "command"
+  },
+  {
+   "text": "แปลคำว่าแมว",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "แปลประโยคนี้เป็นอังกฤษ",
+   "expect": "llm:translate",
+   "got": "none"
+  },
+  {
+   "text": "สรุปข้อความนี้",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยสรุปอีเมลนี้เป็นข้อ ๆ",
+   "expect": "llm:summarize-text",
+   "got": "none"
+  },
+  {
+   "text": "ร่างอีเมลลาป่วย",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้า เป็นไข้ไม่สบาย",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "เขียนจดหมายขอเลื่อนส่งงาน",
+   "expect": "llm:letter-writer",
+   "got": "none"
+  },
+  {
+   "text": "จำได้ไหมที่เตือนไว้",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "หน้าจอมืดไปหน่อย",
+   "expect": "none",
+   "got": "none"
+  },
+  {
+   "text": "โฆษณานี้น่ารำคาญ",
+   "expect": "none",
+   "got": "none"
+  }
+ ]
+}
