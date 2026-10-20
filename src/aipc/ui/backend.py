@@ -354,7 +354,7 @@ class BackupController(QObject):
 
 
 # การ์ด 0044: ลองฟังเป็นอังกฤษเฉพาะข้อความไทยที่สั้น (คำสั่งอังกฤษที่ Zipformer ถอดเป็นไทยเพี้ยนจะสั้น)
-ENGLISH_TRY_MAX = 16
+ENGLISH_TRY_MAX = 24  # Pakon 2026-10-20: 16 ตัด "What time is it" (ถอดเป็นไทย 17 ตัวอักษร) · การ์ด 0044 L5
 
 
 def _thai_missed(text: str, skill=None, intent=None) -> bool:
