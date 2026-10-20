@@ -179,6 +179,30 @@ def stamp(skill_md: str, *, request: str, claude_version: str, model: str, today
     return "\n".join(["---", *keep, *meta, *lines[end:]]) + "\n"
 
 
+# ส่วนหัวเรื่องสิทธิ์ (การ์ด 0043): ระบบเป็นคนกำหนด ไม่ใช่ Claude (H7) · สกิลในเครื่องที่ Claude เขียนใหม่ใช้ค่าเดิมเสมอ
+PINNED_KEYS = ("id", "worker", "needs", "permissions", "actions")
+
+
+def pin_header(skill_md: str, fixed: dict[str, str]) -> tuple[str, list[str]]:
+    """แทนส่วนหัวตาม fixed (ค่า "" = ลบบรรทัดนั้น) · คืน (ไฟล์ใหม่, คีย์ที่ Claude ใส่ต่างจากระบบ)."""
+    lines = skill_md.strip("\n").split("\n")
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), -1)
+    if not lines or lines[0].strip() != "---" or end == -1:
+        return skill_md, []
+    head = lines[1:end]
+    changed = []
+    for key, value in fixed.items():
+        rows = [i for i, x in enumerate(head) if re.match(rf"{key}\s*:", x)]
+        got = head[rows[0]].split(":", 1)[1].strip() if rows else ""
+        if got != value:
+            changed.append(key)
+        for i in reversed(rows):
+            del head[i]
+        if value:
+            head.insert(0 if key == "id" else len(head), f"{key}: {value}")
+    return "\n".join(["---", *head, *lines[end:]]) + "\n", changed
+
+
 @dataclass
 class Proposal:
     ok: bool
@@ -192,6 +216,7 @@ class Proposal:
     cost_usd: float = 0.0
     model: str = ""
     claude_version: str = ""
+    pinned_changed: list[str] = field(default_factory=list)  # คีย์สิทธิ์ที่ Claude ใส่ต่างไป (ระบบแทนแล้ว)
 
 
 def _validate(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
@@ -210,7 +235,8 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
           claude: str = "claude", model: str | None = None, claude_version: str = "",
           today: date | None = None, extra_sentences: list[str] = (),
           revise: tuple[str, str] | None = None,
-          check: Callable[[str], list[str]] | None = None) -> Proposal:  # fmt: skip
+          check: Callable[[str], list[str]] | None = None,
+          pin: dict[str, str] | None = None) -> Proposal:  # fmt: skip
     """revise = (ไฟล์รุ่นที่ใช้อยู่, คำติของผู้ใช้) → รุ่นใหม่ id เดิม (การ์ด 0017 ชั้นที่ 2) · skills ต้องไม่มีสกิลตัวที่แก้."""
     p = Proposal(False, request, claude_version=claude_version)
     fix: list[str] = []
@@ -238,6 +264,9 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
             p.errors = fix
             continue
         previous = data["skill_md"]
+        if pin is not None:  # การ์ด 0043: ส่วนหัวเรื่องสิทธิ์ = ค่าของระบบ
+            previous, changed = pin_header(previous, pin)
+            p.pinned_changed = sorted(set(p.pinned_changed) | set(changed))
         new, errors = _validate(previous)
         if new is not None and revise_id and new.id != revise_id:
             # รุ่นแก้ต้องเป็นสกิลเดิม: Claude ตั้ง id ใหม่เอง (พบบน Pi 5
