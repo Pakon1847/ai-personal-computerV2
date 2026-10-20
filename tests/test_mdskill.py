@@ -140,8 +140,16 @@ class LoadTest(unittest.TestCase):
 
     def test_builtins_are_md_and_keep_their_prompt(self):
         files = sorted(p.name for p in manifest.BUILTIN_DIR.iterdir() if p.is_file())
-        want = ["letter-writer.md", "machine-status.md", "reminder.md", "summarize-text.md",
-                "system-command.md", "translate.md"]  # fmt: skip
+        want = [
+            "letter-writer.md",
+            "machine-status.md",
+            "reminder.md",
+            "spotify-voice.md",
+            "summarize-text.md",
+            "system-command.md",
+            "translate.md",
+            "youtube-voice.md",
+        ]  # สกิลประจำเว็บ 2 ไฟล์ (การ์ด 0046)
         self.assertEqual(files, want)
         tr = next(s for s in manifest.load_builtin() if s.id == "translate")
         # การ์ด 0043: Claude เขียน prompt เอง · ตรวจว่ามี prompt และพูดถึงทั้งสองภาษา (ไม่ผูกถ้อยคำ)

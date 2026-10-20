@@ -226,6 +226,16 @@ ColumnLayout {
                         spacing: 8
                         Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.line }
                         AppText { text: sc.modelData.description; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                        // สกิลประจำเว็บ (การ์ด 0046): คำพูดทั้งหมดในไฟล์ → คีย์/ปุ่มที่กด (ใช้ได้เฉพาะเมื่อเปิดเว็บนั้นอยู่)
+                        AppText {
+                            visible: (sc.modelData.commands || []).length > 0
+                            text: Tr.t("พูดได้เมื่อเปิดเว็บนี้ในเบราว์เซอร์ของผู้ช่วย:")
+                            size: Theme.fontSmall; strong: true; Layout.fillWidth: true
+                        }
+                        Repeater {
+                            model: sc.modelData.commands || []
+                            AppText { required property string modelData; text: modelData; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                        }
                         Flow {
                             Layout.fillWidth: true
                             spacing: 6

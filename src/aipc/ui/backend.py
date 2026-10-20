@@ -2106,6 +2106,13 @@ class SkillsController(QObject):
         out = [tr(e) for e in skill.examples[:2]]
         return [e for e in out if not i18n.THAI.search(e)] if i18n.lang() == "en" else out
 
+    @staticmethod
+    def _command_text(c) -> str:
+        """คำสั่งของสกิลประจำเว็บสำหรับหน้า Skill: คำพูด → ทำอะไร (เห็นคีย์/ตัวเลือกจริงที่ไฟล์เขียน · H5)."""
+        what = f"กดคีย์ {c.arg}" if c.kind == "key" else f"คลิกปุ่ม {c.arg}"
+        ask = " · ยืนยันก่อน" if c.confirm else ""
+        return " / ".join(f"“{p}”" for p in c.phrases) + f" → {what}{ask}"
+
     @Property("QVariantList", notify=skillsChanged)
     def skills(self) -> list:
         out = []
@@ -2119,6 +2126,7 @@ class SkillsController(QObject):
                 "ready": not missing, "missing": [tr(self.NEED_LABEL[n]) for n in missing],
                 "byClaude": self._is_user(s.id),
                 "examples": self._tile_examples(s),
+                "commands": [self._command_text(c) for c in s.commands],  # สกิลประจำเว็บ (การ์ด 0046)
             })  # fmt: skip
         return out
 

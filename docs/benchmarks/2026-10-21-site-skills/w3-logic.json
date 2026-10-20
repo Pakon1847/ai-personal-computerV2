@@ -1,0 +1,557 @@
+{
+ "summary": {
+  "noncommand_texts": 56,
+  "noncommand_acted": 0,
+  "noncommand_asked_near": 0,
+  "wrong_site_tries": 630,
+  "wrong_site_hits": 0,
+  "phrases": 90,
+  "phrases_reach_site_skill": 68,
+  "phrases_taken_by_system": 22
+ },
+ "acted": [],
+ "asked_near": [],
+ "wrong_site": [],
+ "reach": [
+  {
+   "skill": "spotify-voice",
+   "phrase": "หยุดเพลง",
+   "arg": "Space",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "หยุดก่อน",
+   "arg": "Space",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "พักเพลง",
+   "arg": "Space",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เล่นต่อ",
+   "arg": "Space",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เล่นเพลงต่อ",
+   "arg": "Space",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ต่อเลย",
+   "arg": "Space",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เพลงถัดไป",
+   "arg": "button[data-testid=\"control-button-skip-forward\"]",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ข้ามเพลง",
+   "arg": "button[data-testid=\"control-button-skip-forward\"]",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เพลงต่อไป",
+   "arg": "button[data-testid=\"control-button-skip-forward\"]",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เพลงก่อนหน้า",
+   "arg": "button[data-testid=\"control-button-skip-back\"]",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ย้อนเพลง",
+   "arg": "button[data-testid=\"control-button-skip-back\"]",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เพลงที่แล้ว",
+   "arg": "button[data-testid=\"control-button-skip-back\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "กรอไปข้างหน้า",
+   "arg": "Shift+ArrowRight",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "กรอเพลง",
+   "arg": "Shift+ArrowRight",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เลื่อนไปหน่อย",
+   "arg": "Shift+ArrowRight",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "กรอกลับ",
+   "arg": "Shift+ArrowLeft",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ถอยหลังหน่อย",
+   "arg": "Shift+ArrowLeft",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ย้อนกลับนิดนึง",
+   "arg": "Shift+ArrowLeft",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "สุ่มเพลง",
+   "arg": "Alt+S",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เปิดสุ่ม",
+   "arg": "Alt+S",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ปิดสุ่ม",
+   "arg": "Alt+S",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เล่นซ้ำ",
+   "arg": "Alt+R",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "วนเพลง",
+   "arg": "Alt+R",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "วนซ้ำ",
+   "arg": "Alt+R",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ถูกใจเพลงนี้",
+   "arg": "Alt+Shift+B",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "กดหัวใจ",
+   "arg": "Alt+Shift+B",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เก็บเพลงนี้",
+   "arg": "Alt+Shift+B",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เอาหัวใจออก",
+   "arg": "Alt+Shift+B",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ลบออกจากเพลงที่ชอบ",
+   "arg": "Alt+Shift+B",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "มิวต์เพลง",
+   "arg": "button[data-testid=\"volume-bar-toggle-mute-button\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เงียบก่อน",
+   "arg": "button[data-testid=\"volume-bar-toggle-mute-button\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เลิกมิวต์",
+   "arg": "button[data-testid=\"volume-bar-toggle-mute-button\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เพลงดังขึ้น",
+   "arg": "Alt+ArrowUp",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ดังอีกนิด",
+   "arg": "Alt+ArrowUp",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เร่งเสียงเพลง",
+   "arg": "Alt+ArrowUp",
+   "goes_to": "system:command"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เพลงเบาลง",
+   "arg": "Alt+ArrowDown",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เบาอีกนิด",
+   "arg": "Alt+ArrowDown",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "หรี่เสียงเพลง",
+   "arg": "Alt+ArrowDown",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ดูคิว",
+   "arg": "Alt+Shift+Q",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "คิวเพลง",
+   "arg": "Alt+Shift+Q",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ปิดคิว",
+   "arg": "Alt+Shift+Q",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ดูเนื้อเพลง",
+   "arg": "button[data-testid=\"lyrics-button\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "เปิดเนื้อเพลง",
+   "arg": "button[data-testid=\"lyrics-button\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ขอเนื้อร้อง",
+   "arg": "button[data-testid=\"lyrics-button\"]",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ไปเพลงที่ชอบ",
+   "arg": "Alt+Shift+S",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "รายการเพลงที่ชอบ",
+   "arg": "Alt+Shift+S",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "กลับหน้าแรก",
+   "arg": "Alt+Shift+H",
+   "goes_to": "site"
+  },
+  {
+   "skill": "spotify-voice",
+   "phrase": "ไปหน้าหลัก",
+   "arg": "Alt+Shift+H",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "หยุดก่อน",
+   "arg": "k",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "หยุดคลิป",
+   "arg": "k",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เล่นต่อ",
+   "arg": "k",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ถอยหลัง",
+   "arg": "j",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ย้อนสิบวิ",
+   "arg": "j",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ถอยหน่อย",
+   "arg": "j",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ข้ามไปข้างหน้า",
+   "arg": "l",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ข้ามสิบวิ",
+   "arg": "l",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เดินหน้าหน่อย",
+   "arg": "l",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เริ่มคลิปใหม่",
+   "arg": "0",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ดูตั้งแต่ต้น",
+   "arg": "0",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "กลับไปต้นคลิป",
+   "arg": "0",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เงียบก่อน",
+   "arg": "m",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "คลิปเงียบ",
+   "arg": "m",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เอาเสียงคืน",
+   "arg": "m",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เต็มจอ",
+   "arg": "f",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ขยายเต็มจอ",
+   "arg": "f",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ดูเต็มจอ",
+   "arg": "f",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ย่อจอ",
+   "arg": "Escape",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "กลับจอปกติ",
+   "arg": "Escape",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "โหมดโรงหนัง",
+   "arg": "t",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "โหมดโรงภาพยนตร์",
+   "arg": "t",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "จอกว้าง",
+   "arg": "t",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "จอเล็ก",
+   "arg": "i",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "มินิเพลเยอร์",
+   "arg": "i",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เปิดซับ",
+   "arg": "c",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ปิดซับ",
+   "arg": "c",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "คำบรรยาย",
+   "arg": "c",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เร็วขึ้น",
+   "arg": ">",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เร่งสปีด",
+   "arg": ">",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "เพิ่มความเร็ว",
+   "arg": ">",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ช้าลง",
+   "arg": "<",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ลดสปีด",
+   "arg": "<",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ลดความเร็ว",
+   "arg": "<",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "คลิปถัดไป",
+   "arg": "Shift+N",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "วิดีโอต่อไป",
+   "arg": "Shift+N",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ข้ามคลิปนี้",
+   "arg": "Shift+N",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "คลิปก่อนหน้า",
+   "arg": "Shift+P",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "วิดีโอก่อนหน้า",
+   "arg": "Shift+P",
+   "goes_to": "system:browser"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "กดไลก์",
+   "arg": "ytd-watch-metadata like-button-view-model button",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ถูกใจคลิปนี้",
+   "arg": "ytd-watch-metadata like-button-view-model button",
+   "goes_to": "site"
+  },
+  {
+   "skill": "youtube-voice",
+   "phrase": "ไลก์คลิป",
+   "arg": "ytd-watch-metadata like-button-view-model button",
+   "goes_to": "site"
+  }
+ ]
+}

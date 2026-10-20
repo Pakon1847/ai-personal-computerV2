@@ -100,6 +100,19 @@ class FormatTest(unittest.TestCase):
         self.assertTrue(any("มากเกิน" in e for e in sitecmd.parse_section(rows)[1]))
 
 
+class BuiltinSiteSkillsTest(unittest.TestCase):
+    def test_w1_claude_wrote_youtube_and_spotify(self):
+        """W1: สกิลประจำเว็บของ YouTube และ Spotify (Claude เขียน) ผ่านตัวตรวจ · คำสั่ง ≥ 10 ต่อเว็บ."""
+        got = {s.site: s for s in manifest.load_builtin() if s.site}
+        self.assertEqual(sorted(got), ["spotify", "youtube"])
+        for site, s in got.items():
+            with self.subTest(site=site):
+                self.assertGreaterEqual(len(s.commands), 10)
+                self.assertIn("Claude", s.author)
+                md = (manifest.BUILTIN_DIR / f"{s.id}.md").read_text(encoding="utf-8")
+                self.assertEqual(userskills.check_md(md)[1], [])
+
+
 class SiteMatchTest(unittest.TestCase):
     def test_domain(self):
         self.assertTrue(sitecmd.on_site("youtube", WATCH))
@@ -313,21 +326,22 @@ class VoiceFlowTest(unittest.TestCase):
 
     def test_unknown_on_site_asks_to_add_then_works(self):
         """W5 (Claude ปลอม): ไม่รู้จัก → ถาม → ใช่ → Claude เพิ่ม → พูดซ้ำแล้วทำได้ · ครั้งต่อไปแก้สกิลเดิม."""
-        mine = YT.replace("id: yt-test", "id: yt-mine") + "- โหมดโรงหนัง → กดคีย์ t\n"
+        mine = YT.replace("id: yt-test", "id: yt-mine") + "- เปิดหน้าช่อง → คลิก ytd-channel-name a\n"
         s, done = self.make(mine)
-        self.assertEqual(s.siteCommand("โหมดโรงหนัง", WATCH), {})
-        ask = s.siteLearn("โหมดโรงหนัง", WATCH)
-        self.assertIn("เพิ่มคำสั่ง “โหมดโรงหนัง”", ask["title"])
+        self.assertEqual(s.siteCommand("เปิดหน้าช่อง", WATCH), {})
+        ask = s.siteLearn("เปิดหน้าช่อง", WATCH)
+        self.assertIn("เพิ่มคำสั่ง “เปิดหน้าช่อง”", ask["title"])
         self.assertEqual(self.seen, [])  # ยังไม่ส่งอะไรจนกว่าจะตอบใช่
         card = s.confirm(ask["confirmToken"], True)
         self.assertEqual(card["kind"], "forging")
         pump(lambda: done)
-        self.assertIn("โหมดโรงหนัง", self.seen[0][0])
+        self.assertIn("เปิดหน้าช่อง", self.seen[0][0])
+        self.assertIn("ไม่ต้องใส่ซ้ำ", self.seen[0][0])  # บอก Claude ว่าสกิลในเครื่องมีคำสั่งอะไรแล้ว
         self.assertIn("สร้างสกิล", done[0]["title"])
         self.assertTrue(done[0]["voice"])
-        self.assertEqual(s.siteCommand("โหมดโรงหนัง", WATCH)["siteRun"]["arg"], "t")
+        self.assertEqual(s.siteCommand("เปิดหน้าช่อง", WATCH)["siteRun"]["arg"], "ytd-channel-name a")
         # ครั้งต่อไป: แก้สกิลของผู้ใช้ตัวเดิม (ไม่สร้างใหม่ทุกครั้ง)
-        ask = s.siteLearn("เปิดมินิเพลเยอร์", WATCH)
+        ask = s.siteLearn("ซ่อนแชทสด", WATCH)
         s.confirm(ask["confirmToken"], True)
         pump(lambda: len(done) > 1)
         self.assertIsNotNone(self.seen[1][1]["revise"])
@@ -335,11 +349,11 @@ class VoiceFlowTest(unittest.TestCase):
 
     def test_learn_only_where_it_can(self):
         s, _ = self.make()
-        self.assertEqual(s.siteLearn("โหมดโรงหนัง", ""), {})  # ไม่มีหน้าเว็บ
-        self.assertEqual(s.siteLearn("โหมดโรงหนัง", "https://unknown.example/"), {})  # เว็บนอกรายการ
+        self.assertEqual(s.siteLearn("ซ่อนแชทสด", ""), {})  # ไม่มีหน้าเว็บ
+        self.assertEqual(s.siteLearn("ซ่อนแชทสด", "https://unknown.example/"), {})  # เว็บนอกรายการ
         self.assertEqual(s.siteLearn("ทำไมวิดีโอกระตุก", WATCH), {})  # คำถาม = ทางเดิม (ส่งไปถามในแชท)
         s._claude_on = lambda: False
-        self.assertEqual(s.siteLearn("โหมดโรงหนัง", WATCH), {})  # ปิด Claude = ไม่ถาม
+        self.assertEqual(s.siteLearn("ซ่อนแชทสด", WATCH), {})  # ปิด Claude = ไม่ถาม
 
 
 if __name__ == "__main__":

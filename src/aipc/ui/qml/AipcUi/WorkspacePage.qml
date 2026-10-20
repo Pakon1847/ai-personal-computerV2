@@ -311,13 +311,6 @@ Item {
         }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
         if (browser.busy) { voiceSay(t, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")); return }
-        // การ์ด 0046: หน้าเว็บที่เปิดอยู่มีสกิลประจำเว็บ → คำพูดที่ตรงกับคำสั่งของสกิลมาก่อน (คีย์ลัด/ปุ่มของเว็บนั้น)
-        const url = browser.currentUrl()
-        if (url !== "") {
-            const own = skills.siteCommand(t, url)
-            if (own.siteRun) { siteRun(own, t); return }
-            if (own.confirmToken) { voiceDispatch(own, t); return }   // คำสั่งที่มี "ยืนยันก่อน"
-        }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
         const way = browser.route(t)
         if (way === "skill") {          // การ์ด 0028: ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด = การ์ดสกิลเดียวกับตอนพิมพ์ (ยืนยันตามกติกาเดิม)
@@ -331,6 +324,15 @@ Item {
         if (way === "app") {            // การ์ด 0042 รอบ 3: ค่าตั้งของแอป (กลับคืนได้ทันที)
             voiceShow(t, null, appCommand(browser.appCommand(t)), false, true)
             return
+        }
+        // การ์ด 0046: คำสั่งของสกิลประจำเว็บที่เปิดอยู่ (คีย์ลัด/ปุ่มของเว็บนั้น) · มาหลังคำสั่งของระบบ:
+        // คำเดียวกันทำแบบเดิมทุกเว็บ และ "หยุด"/"เล่นต่อ" ของระบบไม่สลับไปมาเหมือนคีย์ k/Space ·
+        // มาก่อนทางที่ AI เดา (นัด · งานภาษา) เช่น "ย้อนสิบวิ" ไม่กลายเป็นนัด
+        const url = browser.currentUrl()
+        if (url !== "" && way !== "command") {
+            const own = skills.siteCommand(t, url)
+            if (own.siteRun) { siteRun(own, t); return }
+            if (own.confirmToken) { voiceDispatch(own, t); return }   // คำสั่งที่มี "ยืนยันก่อน"
         }
         if (way === "reminder") {       // การ์ด 0042: ตั้งเตือนด้วยเสียง = การ์ดสกิลนัดเดิม (ยืนยันก่อนบันทึก)
             voiceDispatch(skills.voiceReminder(t), t)

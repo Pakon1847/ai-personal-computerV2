@@ -1,6 +1,7 @@
 """การ์ด 0045: ถอดเสียงคำสั่งแม่นแค่ไหน (Piper พูด → Zipformer ของแอปถอด → ป้ายเดียวกับตอนพิมพ์ไหม) · บน Pi 5.
 
     python -m aipc.spikes.voice_cmd_eval tests/data/voice_cmd_test.json --out ผล.json
+    (--app-hotwords = คำใบ้แบบแอปจริง: + คำพูดของสกิล · การ์ด 0046)
 
 ป้าย = aipc.spikes.voice_all_eval.label (ทางเดียวกับคีย์ลัดในแอป) ของข้อความที่ถอดได้ เทียบกับของประโยคต้นฉบับ ·
 ถูกตรง = ป้ายเท่ากัน · ถูกผ่านการยืนยัน = ได้การ์ด "หมายถึง … ใช่ไหม" ที่ชี้คำสั่งถูก
@@ -37,6 +38,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("dataset", type=Path)
     ap.add_argument("--out", type=Path, required=True)
+    # การ์ด 0046 W6: คำใบ้แบบแอปจริงของบัญชีใหม่ = รายการเดิม + คำพูดของสกิล (SkillsController.voicePhrases)
+    ap.add_argument("--app-hotwords", action="store_true")
     a = ap.parse_args(argv)
     items = json.loads(a.dataset.read_text(encoding="utf-8"))["items"]
     work = Path(tempfile.mkdtemp(prefix="vcmd-"))
@@ -45,7 +48,7 @@ def main(argv: list[str] | None = None) -> int:
     subprocess.run([str(py), "-c", SYNTH, str(stt.VOICE_DIR / tts.MODEL), str(work / "texts.json"),
                     str(work)], check=True)  # fmt: skip
     _engine, skills = ev.backend()
-    fast = zipformer.Transcriber(extra_hotwords=None)
+    fast = zipformer.Transcriber(extra_hotwords=skills.voicePhrases if a.app_hotwords else None)
     rows = []
     for i, text in enumerate(items):
         src, wav = work / f"{i:03d}.wav", work / f"{i:03d}-16k.wav"
@@ -75,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         "via_confirm": sum(r["verdict"] == "confirm" for r in cmd),
         "non_commands": len(rows) - len(cmd),
         "non_command_acted": sum(r["acted"] for r in rows),
-        "hotwords": len(zipformer.HOTWORDS),
+        "hotwords": len(fast.hotwords()),
     }
     a.out.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1),
                      encoding="utf-8")  # fmt: skip
