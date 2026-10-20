@@ -353,11 +353,43 @@ class BackupController(QObject):
             )
 
 
-def _thai_missed(text: str) -> bool:
-    """ข้อความไทยจากคีย์ลัดไม่ตรงคำสั่ง/เว็บ/ใช่-ไม่ → ลองฟังเป็นอังกฤษ (การ์ด 0040 หัวข้อ 13)."""
+# การ์ด 0044: ลองฟังเป็นอังกฤษเฉพาะข้อความไทยที่สั้น (คำสั่งอังกฤษที่ Zipformer ถอดเป็นไทยเพี้ยนจะสั้น)
+ENGLISH_TRY_MAX = 16
+
+
+def _thai_missed(text: str, skill=None, intent=None) -> bool:
+    """ข้อความไทยจากคีย์ลัดไม่ตรงอะไรเลย → ลองฟังเป็นอังกฤษ (การ์ด 0040 หัวข้อ 13).
+
+    การ์ด 0044: ใช้เส้นทางเต็มของแอป (ตั้งเตือน สกิล ค่าตั้ง · skill/intent จาก SkillsController) ·
+    คำถามภาษาไทย (มีคำถาม ไหม อะไร กี่ ใคร …) และประโยคยาว = ภาษาไทยแน่ ไม่ต้องลอง
+    (เดิมเสีย 1.3–2.0 วิทุกประโยค)
+    """
+    from aipc.skills import router
     from aipc.ui import handsfree
 
-    return handsfree.route(text, False) == handsfree.UNKNOWN and handsfree.yes_no(text) == ""
+    if handsfree.route(text, False, skill, intent) != handsfree.UNKNOWN or handsfree.yes_no(text):
+        return False
+    return not router.is_question(text) and len(re.sub(r"\s+", "", text)) <= ENGLISH_TRY_MAX
+
+
+def _command_complete(text: str, skill=None, intent=None) -> bool:
+    """คำสั่งครบแล้ว (เว็บ เครื่อง ค่าตั้ง สกิลตรงเป๊ะ) → จบการฟังเร็ว (การ์ด 0044) ·
+    ตั้งเตือน/งาน AI/คำถาม ไม่นับ (อาจพูดต่อ เช่น "เตือนประชุม … พรุ่งนี้สิบโมง")."""
+    from aipc.ui import handsfree
+
+    done = (
+        handsfree.BROWSER,
+        handsfree.COMMAND,
+        handsfree.APP,
+        handsfree.OPEN_BROWSER,
+        handsfree.SKILL,
+    )
+    return handsfree.route(text, True, skill, intent) in done
+
+
+def listener_extras() -> dict:
+    """ค่าที่ตัวอัดของแอปใช้ (เครื่องมือวัด aipc.spikes.voice_e2e_latency ใช้ชุดเดียวกัน)."""
+    return {"complete": _command_complete}
 
 
 def _english_command(text: str) -> bool:
@@ -397,7 +429,9 @@ class VoiceController(QObject):
         if active and listener is None:
             from aipc import i18n
 
-            listener = stt.Listener(self._weak("_heard"), fast=zipformer.Transcriber(),
+            # การ์ด 0044: Zipformer ไม่ปิดตัวเองเมื่อไม่ได้ใช้ (เดิม 10 นาที → กดครั้งถัดไปรอโหลด 4.6 วิ)
+            fast = zipformer.Transcriber(idle_s=float("inf"))
+            listener = stt.Listener(self._weak("_heard"), fast=fast, complete=_command_complete,
                                     language=i18n.lang, try_english=_thai_missed,
                                     use_english=_english_command)  # fmt: skip # การ์ด 0040
         self._listener = listener if active else None
@@ -476,6 +510,22 @@ class VoiceController(QObject):
         return emit
 
     @Slot()
+    def set_route_hooks(self, skill, intent) -> None:
+        """การ์ด 0044: ตัวอัดใช้เส้นทางเต็มของแอป (SkillsController.voiceSkill / voiceIntent) ตัดสินว่า
+        จะลองฟังอังกฤษไหม และคำสั่งครบหรือยัง · app.py ต่อให้หลังสร้าง SkillsController."""
+        lis = self._listener
+        if lis is None:
+            return
+        lis._try_english = lambda t: _thai_missed(t, skill, intent)
+        lis._complete = lambda t: _command_complete(t, skill, intent)
+
+    @Slot()
+    def preload(self) -> None:
+        """โหลดตัวถอดของคีย์ลัดไว้ก่อน (การ์ด 0044 · เดิมโหลดตอนกดครั้งแรก 4.6 วิ) · เบื้องหลัง ไม่ค้างหน้าจอ."""
+        fast = getattr(self._listener, "_fast", None) if self._listener is not None else None
+        if fast is not None and fast.available:
+            fast.warm()
+
     def _idle_check(self) -> None:
         if self._speaker is not None:
             self._speaker.idle_check()

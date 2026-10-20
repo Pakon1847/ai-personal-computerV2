@@ -233,3 +233,62 @@ class EnglishSttTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# การ์ด 0044: พูด 0.6 วิ → เงียบ (ถอดล่วงหน้า + จบเร็ว) · TALK_AGAIN = พูด เงียบ 0.4 วิ แล้วพูดต่อ
+TALK_AGAIN = TALKER.replace("loud = 4 <= k < 10", "loud = 4 <= k < 10 or 14 <= k < 20")
+
+
+class SpeculativeTest(unittest.TestCase):
+    """การ์ด 0044: ถอดล่วงหน้าระหว่างรอเงียบ · คำสั่งครบ = จบเร็ว · พูดต่อ = ทิ้งผลล่วงหน้า."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        self.done = threading.Event()
+        self.result: list = []
+
+    def listen(self, script, complete):
+        calls = []
+
+        class Fast:
+            available = True
+
+            def warm(self):
+                pass
+
+            def transcribe(self, path):
+                import wave
+
+                with wave.open(str(path)) as w:
+                    calls.append(w.getnframes() / 16000)
+                return "เปิดยูทูบ", ""
+
+        talker = Path(self.tmp.name) / "talker.py"
+        talker.write_text(script, encoding="utf-8")
+
+        def on_done(t, e, s):
+            self.result.append((t, e, time.monotonic()))
+            self.done.set()
+
+        lis = Listener(on_done, record_cmd=[sys.executable, str(talker)], transcribe_cmd=FAKE_STT,
+                       fast=Fast(), complete=complete)  # fmt: skip
+        t0 = time.monotonic()
+        self.assertEqual(lis.start(fast=True), "")
+        self.assertTrue(self.done.wait(15))
+        return calls, self.result[-1][2] - t0
+
+    def test_complete_command_ends_early_and_reuses_the_early_result(self):
+        calls, early = self.listen(TALKER, complete=lambda t: True)
+        self.assertEqual(self.result[-1][:2], ("เปิดยูทูบ", ""))
+        self.assertEqual(len(calls), 1, "ใช้ผลที่ถอดล่วงหน้า ไม่ถอดซ้ำ")
+        self.done.clear()
+        _, normal = self.listen(TALKER, complete=lambda t: False)
+        self.assertLess(early, normal - 0.2, "คำสั่งครบ = ไม่ต้องรอเงียบครบ 1 วิ")
+        self.assertEqual(list(Path(self.tmp.name, "aipc-stt").iterdir()), [])  # ไม่เก็บไฟล์เสียง
+
+    def test_speaking_again_discards_the_early_result(self):
+        calls, _ = self.listen(TALK_AGAIN, complete=lambda t: False)
+        self.assertGreaterEqual(len(calls), 2)
+        self.assertGreater(calls[-1], calls[0] + 0.5, "ผลสุดท้ายต้องรวมเสียงที่พูดต่อ")

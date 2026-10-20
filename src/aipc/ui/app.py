@@ -353,6 +353,12 @@ def build(opts: Options, argv: list[str] | None = None):
     # การ์ด 0028: คำพูดจากคีย์ลัดที่ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด (เช่น ที่ Claude สร้าง) = ทำสกิลนั้น
     engine._backends["browser"]._skill_match = engine._backends["skills"].voiceSkill
     engine._backends["browser"]._intent = engine._backends["skills"].voiceIntent  # การ์ด 0042
+    # การ์ด 0044: ตัวอัดใช้เส้นทางเต็ม (ลองอังกฤษเฉพาะที่ควร · จบเร็วเมื่อคำสั่งครบ) · เซสชันจริง = โหลดตัวถอดไว้ก่อน
+    voice.set_route_hooks(
+        engine._backends["skills"].voiceSkill, engine._backends["skills"].voiceIntent
+    )
+    if engine._hotkey.available:
+        QTimer.singleShot(5000, voice.preload)
     voice.use_skill_phrases(engine._backends["skills"].voicePhrases)  # ทาง ข: hotwords ของสกิล
 
     def ready_inputs() -> dict:

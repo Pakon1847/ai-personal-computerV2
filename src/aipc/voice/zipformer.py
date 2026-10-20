@@ -90,6 +90,10 @@ HOTWORDS = SEARCH_STEMS + FIXED
 _REPEAT = re.compile(r"^(.{4,}?)(?:\s*\1)+$")  # ทั้งประโยคคือข้อความเดิมซ้ำ (เช่น ค้นหาX ค้นหาX)
 
 
+_THAI_DIGITS = str.maketrans("๐๑๒๓๔๕๖๗๘๙", "0123456789")
+_VERBS = "(?:เปิด|ปิด|เพิ่ม|ลด|เตือน|หยุด|เล่น|ค้น|หา|ย้อน|เลื่อน|ไป|กลับ|ปรับ|ตั้ง|ข้าม|เข้า)"
+
+
 def tidy(text: str) -> str:
     """แก้ลักษณะเฉพาะของ Zipformer ก่อนส่งให้ตัวแปลคำสั่ง (พบบนเสียงสังเคราะห์ V4 2026-10-14).
 
@@ -98,7 +102,12 @@ def tidy(text: str) -> str:
     """
     text = re.sub(r"\s+", " ", text.replace("ํา", "ำ")).strip()
     m = _REPEAT.match(text)
-    return m.group(1).strip() if m else text
+    text = m.group(1).strip() if m else text
+    # การ์ด 0044 (ชุดพัฒนา voice_latency_dev): เลขไทย "๒ทุ่ม" ตัวแปลนัดไม่รู้จัก → เลขอารบิก ·
+    # "เอ่อ" / "อ่า" ที่นำหน้าประโยค และ "ก็" ที่นำหน้าคำสั่ง (ได้ยินลมหายใจ/เสียงพื้นหลัง) ตัดออก
+    text = text.translate(_THAI_DIGITS)
+    text = re.sub(r"^(?:เอ่อ|อ่า|อืม)\s*(?=\S{2})", "", text)
+    return re.sub(rf"^ก็\s*(?={_VERBS})", "", text)  # "ก็" + คำสั่ง เท่านั้น (ไม่แตะ "ก็อปปี้")
 
 
 def installed(base: Path = BASE) -> bool:

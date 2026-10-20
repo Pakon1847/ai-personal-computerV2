@@ -28,6 +28,11 @@ EN_MODEL = "ggml-base.en.bin"
 EN_PROMPT = ("Open YouTube, Gmail, Google Maps, Netflix, Spotify, Viu, WeTV, iQIYI, Disney Plus, "
              "Google Docs, Google Drive. Mute, volume up, remind me, what time is it.")  # fmt: skip
 MAX_S = 15
+# การ์ด 0044 (คีย์ลัด): เงียบ 0.3 วิ = เริ่มถอดล่วงหน้า · คำสั่งครบแล้ว + เงียบ 0.6 วิ = จบเลย (ปกติรอ 1.0 วิ) ·
+# ตั้งจากชุดพัฒนา voice_latency_dev (ประโยคเว้นช่วง 0.45 วิ ต้องไม่ถูกตัด)
+SPEC_AT_S = 0.3
+EARLY_S = 0.6
+DECODE_WAIT_S = 20.0
 MIN_S = 0.4  # กดแล้วปล่อยทันที = ไม่ถอด
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
 TAGS = re.compile(r"\[[^\]]*\]|\([^)]*\)")
@@ -56,6 +61,12 @@ class Endpointer:
         self.speaking = False
         self._loud = 0
         self._quiet = 0
+        self.voiced = 0  # ช่องที่มีเสียงพูดหลังเริ่มพูด · เปลี่ยน = ผู้ใช้พูดต่อ (การ์ด 0044)
+
+    @property
+    def quiet_s(self) -> float:
+        """เงียบต่อกันมานานเท่าไรหลังเริ่มพูด (วินาที) · ยังไม่เริ่มพูด = 0."""
+        return self._quiet * self.frame_s if self.speaking else 0.0
 
     def feed(self, data: bytes) -> str | None:
         import array
@@ -89,7 +100,11 @@ class Endpointer:
             if not self.speaking and self.frames >= self.no_speech_frames:
                 return "no_speech"
         else:
-            self._quiet = self._quiet + 1 if level < 0.7 * threshold else 0
+            if level < 0.7 * threshold:
+                self._quiet += 1
+            else:
+                self._quiet = 0
+                self.voiced += 1
             if self._quiet >= self.silence_frames:
                 return "end"
         return "max" if self.frames >= self.max_frames else None
@@ -124,8 +139,12 @@ class Listener:
                  language: Callable[[], str] = lambda: "th",
                  en_transcribe_cmd: list[str] | None = None,
                  try_english: Callable[[str], bool] | None = None,
-                 use_english: Callable[[str], bool] | None = None):  # fmt: skip
+                 use_english: Callable[[str], bool] | None = None,
+                 complete: Callable[[str], bool] | None = None):  # fmt: skip
         self._on_done = on_done
+        # การ์ด 0044: complete(ข้อความไทย) = เป็นคำสั่งครบแล้ว (เว็บ/เครื่อง/ค่าตั้ง) → จบเร็วไม่ต้องรอเงียบ 1 วิ
+        self._complete = complete
+        self._spec_next: dict | None = None  # ผลถอดล่วงหน้าที่ใช้ได้ ส่งต่อให้ stop() → _transcribe
         # ภาษาของตัวถอด = ภาษาหน้าจอที่ผู้ใช้ตั้ง (การ์ด 0040 · โค้ดเลือก ไม่ให้โมเดลเดาภาษา · H6)
         self._language = language
         self._lang = "th"
@@ -215,8 +234,14 @@ class Listener:
             return ""
 
     def _watch(self, proc: subprocess.Popen, path: Path) -> None:
-        """อ่านเสียงที่อัดเพิ่มทุก 0.1 วิ · Endpointer บอกจบ = หยุดเอง."""
+        """อ่านเสียงที่อัดเพิ่มทุก 0.1 วิ · Endpointer บอกจบ = หยุดเอง.
+
+        การ์ด 0044 (คีย์ลัด · fast): เงียบ SPEC_AT_S = ถอดเสียงที่ได้ถึงตอนนั้นล่วงหน้า (ระหว่างรอเงียบครบ) ·
+        พูดต่อ = ทิ้งผลล่วงหน้า · ผลเป็นคำสั่งครบ + เงียบ EARLY_S = จบเลย · จบตามปกติ = ใช้ผลที่ถอดไว้แล้ว
+        """
         ep, offset = self._make_endpointer(), None
+        pcm = bytearray()
+        spec: dict | None = None
         while self._proc is proc:
             time.sleep(0.1)
             try:
@@ -232,19 +257,63 @@ class Listener:
             except OSError:
                 continue
             offset += len(chunk) - len(chunk) % 2
-            result = ep.feed(chunk[: len(chunk) - len(chunk) % 2]) if chunk else None
+            data = chunk[: len(chunk) - len(chunk) % 2]
+            pcm += data
+            result = ep.feed(data) if data else None
             if result == "no_speech":
                 self.cancel()
                 self._on_done("", "ไม่ได้ยินเสียงพูด ลองแตะแล้วพูดใกล้ไมค์อีกครั้ง", 0.0)
                 return
+            if spec is not None and spec["voiced"] != ep.voiced:
+                spec = None  # พูดต่อ = ผลล่วงหน้าไม่ครบประโยค ทิ้ง (เธรดลบไฟล์ของมันเอง)
             if result is not None:
+                self._spec_next = spec
                 self.stop()
                 return
+            if not (self._use_fast and ep.speaking):
+                continue
+            if spec is None and ep.quiet_s >= SPEC_AT_S:
+                spec = self._speculate(bytes(pcm), ep.voiced)
+            done = spec is not None and spec["done"].is_set() and not spec["err"] and spec["text"]
+            if done and ep.quiet_s >= EARLY_S and self._complete and self._complete(spec["text"]):
+                self._spec_next = spec
+                self.stop()
+                return
+
+    def _speculate(self, pcm: bytes, voiced: int) -> dict:
+        """ถอดเสียงที่ได้ถึงตอนนี้ในเธรดแยก (รวมลองอังกฤษถ้าต้อง) · ไฟล์ชั่วคราวลบทันทีหลังถอด."""
+        import wave
+
+        spec = {"voiced": voiced, "done": threading.Event(), "text": "", "err": ""}
+        snap = self._dir / f"spec-{os.getpid()}-{int(time.time() * 1000)}.wav"
+        try:
+            with wave.open(str(snap), "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(16000)
+                w.writeframes(pcm)
+        except OSError as e:
+            spec["err"] = str(e)
+            spec["done"].set()
+            return spec
+
+        def run() -> None:
+            try:
+                text, err = self._fast.transcribe(snap)
+                spec["text"] = self._maybe_english(snap, text) if not err else ""
+                spec["err"] = err
+            finally:
+                _remove(snap)
+                spec["done"].set()
+
+        threading.Thread(target=run, daemon=True).start()
+        return spec
 
     def stop(self) -> None:
         """หยุดอัด แล้วถอดในเธรดแยก · กดสั้นเกิน = ทิ้ง."""
         with self._lock:
             proc, path, held = self._proc, self._path, time.monotonic() - self._started
+            spec, self._spec_next = self._spec_next, None
             self._proc = None
             if self._timer:
                 self._timer.cancel()
@@ -262,7 +331,7 @@ class Listener:
             _remove(path)
             self._on_done("", "กดค้างไว้ระหว่างพูด แล้วปล่อยเมื่อพูดจบ", 0.0)
             return
-        threading.Thread(target=self._transcribe, args=(path,), daemon=True).start()
+        threading.Thread(target=self._transcribe, args=(path, spec), daemon=True).start()
 
     def cancel(self) -> None:
         with self._lock:
@@ -290,8 +359,20 @@ class Listener:
         except (OSError, subprocess.TimeoutExpired, ValueError):
             return thai  # ถอดอังกฤษไม่ได้ = ใช้ไทยตามเดิม (ไม่ทำให้คีย์ลัดเสีย)
 
-    def _transcribe(self, path: Path) -> None:
+    def _transcribe(self, path: Path, spec: dict | None = None) -> None:
         t0 = time.monotonic()
+        # การ์ด 0044: ถอดล่วงหน้าไว้แล้ว (ไม่มีเสียงพูดเพิ่มหลังจากนั้น) = ใช้ผลนั้น ไม่ต้องถอดซ้ำ
+        if (
+            self._use_fast
+            and spec is not None
+            and spec["done"].wait(DECODE_WAIT_S)
+            and not spec["err"]
+        ):
+            _remove(path)
+            text = spec["text"]
+            err = "" if text else "ไม่ได้ยินเสียงพูด ลองพูดใกล้ไมค์อีกครั้ง"
+            self._on_done(text, err, round(time.monotonic() - t0, 2))
+            return
         if self._use_fast:
             text, err = self._fast.transcribe(path)
             if not err:  # ล่ม/ค้าง = ถอยไปใช้ whisper ข้างล่าง (ไม่ทิ้งสิ่งที่ผู้ใช้พูด · H2)
