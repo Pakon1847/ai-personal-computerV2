@@ -76,7 +76,8 @@ def main(argv: list[str] | None = None) -> int:
     summary = {"D1_site_skills_ok": len(made), "D1_n": len(d1),
                "D1_min_commands": min(made, default=0),
                "D4_site_skills_made": sum(r["is_site_skill"] for r in d4), "D4_n": len(d4),
-               "cost_usd": round(sum(r["cost_usd"] for r in rows), 3), "claude": version}  # fmt: skip
+               "cost_usd": round(sum(r["cost_usd"] for r in rows), 3),
+               "claude": version}  # fmt: skip
     out = json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1)
     a.out.write_text(out + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False))
