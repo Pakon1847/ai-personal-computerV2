@@ -1,9 +1,11 @@
-"""แปลงร่างเล่ม (Markdown ใน docs/thesis/draft/) เป็น .docx โดยยืมหน้ากระดาษ/หัว-ท้ายกระดาษจากไฟล์ตัวอย่างของคณะ (word/).
+"""แปลงร่างเล่ม (Markdown ใน docs/thesis/draft/) เป็น .docx ·
+ยืมหน้ากระดาษ/หัว-ท้ายกระดาษจากไฟล์ตัวอย่างของคณะ (word/).
 
     python docs/thesis/tools/md2docx.py
 
 - ไม่แก้ไฟล์ใน word/ (ของกลุ่มอื่น) · เขียนผลที่ word/ai-pc/ · ใช้ไลบรารีมาตรฐานเท่านั้น (zipfile + XML)
-- รูปแบบตามตัวอย่าง: TH Sarabun New · เนื้อความ 16pt จัดกระจายไทย เยื้องบรรทัดแรก · หัวข้อหนา 16pt · หัวบทหนา 20pt กลาง
+- รูปแบบตามตัวอย่าง: TH Sarabun New · เนื้อความ 16pt จัดกระจายไทย เยื้องบรรทัดแรก ·
+  หัวข้อหนา 16pt · หัวบทหนา 20pt กลาง
 - คอมเมนต์ <!-- ที่มา … --> ถูกตัด (หลักฐานอยู่ในไฟล์ร่าง) · ```mermaid = ที่ว่างสำหรับภาพ (ต้องแปลงเป็นรูปเอง)
 """
 
@@ -31,13 +33,14 @@ JOBS = [
     ("references.md", "10-References.docx", "10-References.docx"),
     ("cover.md", "01-Cover.docx", "01-Cover.docx"),
 ]
-FONT = '<w:rFonts w:ascii="TH Sarabun New" w:eastAsia="Sarabun" w:hAnsi="TH Sarabun New" w:cs="TH Sarabun New"/>'
+_F = "TH Sarabun New"
+FONT = f'<w:rFonts w:ascii="{_F}" w:eastAsia="Sarabun" w:hAnsi="{_F}" w:cs="{_F}"/>'
 
 
 def rpr(size: int = 32, bold: bool = False, italic: bool = False) -> str:
     b = "<w:b/><w:bCs/>" if bold else ""
     i = "<w:i/><w:iCs/>" if italic else ""
-    return f"<w:rPr>{FONT}{b}{i}<w:sz w:val=\"{size}\"/><w:szCs w:val=\"{size}\"/></w:rPr>"
+    return f'<w:rPr>{FONT}{b}{i}<w:sz w:val="{size}"/><w:szCs w:val="{size}"/></w:rPr>'
 
 
 def para(text: str, *, size=32, bold=False, italic=False, jc="", first=0, left=0, hanging=0,
@@ -55,10 +58,10 @@ def para(text: str, *, size=32, bold=False, italic=False, jc="", first=0, left=0
     if jc:
         ppr += f'<w:jc w:val="{jc}"/>'
     r = rpr(size, bold, italic)
-    runs = "".join(
-        f'<w:r>{r}<w:t xml:space="preserve">{escape(part)}</w:t></w:r>' + ("<w:r><w:tab/></w:r>" if i < n - 1 else "")
-        for parts in [text.split("\t")] for n in [len(parts)] for i, part in enumerate(parts)
-    )  # fmt: skip
+    tab = "<w:r><w:tab/></w:r>"  # \t ในข้อความ = แท็บ (หลังหัวรายการ)
+    runs = tab.join(
+        f'<w:r>{r}<w:t xml:space="preserve">{escape(x)}</w:t></w:r>' for x in text.split("\t")
+    )
     return f"<w:p><w:pPr>{ppr}{r}</w:pPr>{runs}</w:p>"
 
 
@@ -68,13 +71,13 @@ def table(rows: list[list[str]]) -> str:
     border = "".join(f'<w:{s} w:val="single" w:sz="4" w:space="0" w:color="000000"/>'
                      for s in ("top", "left", "bottom", "right", "insideH", "insideV"))  # fmt: skip
     grid = "".join(f'<w:gridCol w:w="{width}"/>' for _ in range(cols))
-    out = [f'<w:tbl><w:tblPr><w:tblW w:w="{width * cols}" w:type="dxa"/><w:jc w:val="center"/>'
-           f"<w:tblBorders>{border}</w:tblBorders></w:tblPr><w:tblGrid>{grid}</w:tblGrid>"]  # fmt: skip
+    head = f'<w:tbl><w:tblPr><w:tblW w:w="{width * cols}" w:type="dxa"/><w:jc w:val="center"/>'
+    out = [head + f"<w:tblBorders>{border}</w:tblBorders></w:tblPr><w:tblGrid>{grid}</w:tblGrid>"]
+    tcpr = f'<w:tcPr><w:tcW w:w="{width}" w:type="dxa"/></w:tcPr>'
     for n, r in enumerate(rows):
         cells = r + [""] * (cols - len(r))
-        out.append("<w:tr>" + "".join(
-            f'<w:tc><w:tcPr><w:tcW w:w="{width}" w:type="dxa"/></w:tcPr>{para(c, size=28, bold=n == 0)}</w:tc>'
-            for c in cells) + "</w:tr>")  # fmt: skip
+        tcs = "".join(f"<w:tc>{tcpr}{para(c, size=28, bold=n == 0)}</w:tc>" for c in cells)
+        out.append(f"<w:tr>{tcs}</w:tr>")
     out.append("</w:tbl>")
     return "".join(out) + para("", size=16)
 
@@ -126,11 +129,18 @@ def convert(md: str) -> str:
             out.append(para(clean(m.group(1)), bold=True, left=360, before=120, keep=True))
         elif m := re.match(r"(\s*)[-*]\s+(.+)", line):
             depth = len(m.group(1)) // 2
-            out.append(para("•\t" + clean(m.group(2)), left=1080 + 360 * depth, hanging=360, jc="thaiDistribute"))
+            out.append(
+                para(
+                    "•\t" + clean(m.group(2)),
+                    left=1080 + 360 * depth,
+                    hanging=360,
+                    jc="thaiDistribute",
+                )
+            )
         elif m := re.match(r"(\s*)(\d+[.)])\s+(.+)", line):
             depth = len(m.group(1)) // 2
-            out.append(para(f"{m.group(2)}\t{clean(m.group(3))}", left=1080 + 360 * depth, hanging=360,
-                            jc="thaiDistribute"))  # fmt: skip
+            item = f"{m.group(2)}\t{clean(m.group(3))}"
+            out.append(para(item, left=1080 + 360 * depth, hanging=360, jc="thaiDistribute"))
         elif re.match(r"(ตารางที่|ภาพที่)\s*\d", line):
             out.append(para(clean(line), bold=True, keep=True, before=120))
         elif line.startswith("[ภาพที่"):
@@ -153,9 +163,15 @@ def build(draft: Path, template: Path, target: Path) -> None:
     tmp = target.with_suffix(".tmp")
     with zipfile.ZipFile(template) as zin, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
         for item in zin.infolist():
-            data = new.encode("utf-8") if item.filename == "word/document.xml" else zin.read(item.filename)
+            data = (
+                new.encode("utf-8")
+                if item.filename == "word/document.xml"
+                else zin.read(item.filename)
+            )
             if item.filename == "docProps/core.xml":  # ชื่อผู้เขียน/ผู้แก้ล่าสุดของเล่มตัวอย่าง = ล้างออก
-                data = re.sub(rb"(<(?:dc:creator|cp:lastModifiedBy|dc:title)>)[^<]*", rb"\g<1>", data)
+                data = re.sub(
+                    rb"(<(?:dc:creator|cp:lastModifiedBy|dc:title)>)[^<]*", rb"\g<1>", data
+                )
             if item.filename.startswith("word/header"):  # เลขที่โครงงานของกลุ่มอื่นบนหัวกระดาษปก
                 data = data.decode("utf-8").replace("C03 /2568", "[ต้องเติม]").encode("utf-8")
             zout.writestr(item, data)
