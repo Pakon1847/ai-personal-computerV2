@@ -63,9 +63,9 @@ class PinTest(unittest.TestCase):
 class InstalledTest(unittest.TestCase):
     def test_every_builtin_skill_is_written_by_claude(self):
         """การ์ด 0043 S6: สกิลในเครื่องทุกไฟล์ Claude เขียน · มีที่มา (รุ่น วันที่ คำขอ) ·
-        6 ไฟล์เดิม + สกิลประจำเว็บ 2 ไฟล์ (การ์ด 0046)."""
+        สกิลประจำเว็บไม่ติดมากับระบบ (การ์ด 0050)."""
         skills = manifest.load_builtin()
-        self.assertEqual(len(skills), 8)
+        self.assertEqual(len(skills), 6)  # การ์ด 0050: สกิลประจำเว็บไม่ติดมากับระบบ
         for s in skills:
             with self.subTest(skill=s.id):
                 self.assertIn("Claude", s.author)
@@ -76,8 +76,7 @@ class InstalledTest(unittest.TestCase):
         """S2: สิทธิ์ของสกิลในเครื่อง = ค่าที่ระบบกำหนด (ไม่ใช่ที่ Claude ขอ)."""
         want = {"reminder": ("write_reminders",), "system-command": ("run_actions",),
                 "machine-status": ("read_machine_status",), "translate": (), "summarize-text": (),
-                "letter-writer": (), "youtube-voice": ("page_actions",),
-                "spotify-voice": ("page_actions",)}  # fmt: skip
+                "letter-writer": ()}  # fmt: skip
         for s in manifest.load_builtin():
             with self.subTest(skill=s.id):
                 self.assertEqual(s.permissions, want[s.id])

@@ -962,5 +962,8 @@
   "ไม่ได้ติดตั้งอะไร · ถามเรื่องนี้ครั้งหน้ายังส่งให้ Claude ตามเดิม": "Nothing installed · this question still goes to Claude next time",
   "ตอบจากความรู้ที่ Claude สอนไว้เมื่อ {0} · ตอบในเครื่อง ไม่ใช้เน็ต": "Answered from knowledge Claude taught on {0} · local, offline",
   "ตอบจากความรู้ที่ Claude สอนไว้ · ตอบในเครื่อง ไม่ใช้เน็ต": "Answered from knowledge Claude taught · local, offline",
-  "เรื่องนี้เปลี่ยนตามเวลา จึงไม่จำไว้ในเครื่อง · {0}": "This changes over time, so it isn't saved on this computer · {0}"
+  "เรื่องนี้เปลี่ยนตามเวลา จึงไม่จำไว้ในเครื่อง · {0}": "This changes over time, so it isn't saved on this computer · {0}",
+  "ยังไม่มีคำสั่งเสียงของ {0} · ให้ Claude สร้างไหม": "No voice commands for {0} yet · let Claude create them?",
+  "ส่งเฉพาะชื่อเว็บ ({0}) ให้ Claude (นอกเครื่อง) เขียนคำสั่งที่ใช้บ่อยของเว็บนี้": "Sends only the site name ({0}) to Claude (off this computer) to write its common commands",
+  "ตอบ “ใช่” = สร้าง แล้วสั่งด้วยเสียงได้เลย · “ไม่” = ไม่ถามอีก": "Answer “ใช่” to create them and use voice right away · “ไม่” and you won't be asked again"
 }

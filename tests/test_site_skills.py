@@ -102,15 +102,15 @@ class FormatTest(unittest.TestCase):
 
 class BuiltinSiteSkillsTest(unittest.TestCase):
     def test_w1_claude_wrote_youtube_and_spotify(self):
-        """W1: สกิลประจำเว็บของ YouTube และ Spotify (Claude เขียน) ผ่านตัวตรวจ · คำสั่ง ≥ 10 ต่อเว็บ."""
-        got = {s.site: s for s in manifest.load_builtin() if s.site}
-        self.assertEqual(sorted(got), ["spotify", "youtube"])
-        for site, s in got.items():
-            with self.subTest(site=site):
-                self.assertGreaterEqual(len(s.commands), 10)
-                self.assertIn("Claude", s.author)
-                md = (manifest.BUILTIN_DIR / f"{s.id}.md").read_text(encoding="utf-8")
-                self.assertEqual(userskills.check_md(md)[1], [])
+        """W1: สกิลประจำเว็บของ YouTube และ Spotify (Claude เขียน) ผ่านตัวตรวจ · คำสั่ง ≥ 10 ต่อเว็บ ·
+        การ์ด 0050: ไม่ติดมากับระบบแล้ว (ผู้ใช้ให้ Claude ในเครื่องสร้าง) · ไฟล์ที่วัด W1 เก็บเป็นหลักฐาน."""
+        self.assertFalse([s.id for s in manifest.load_builtin() if s.site])
+        ev = ROOT / "docs/benchmarks/2026-10-21-site-skills/claude"
+        for name in ("youtube-voice.md", "spotify-voice.md"):
+            with self.subTest(name=name):
+                m, errors = userskills.check_md((ev / name).read_text(encoding="utf-8"))
+                self.assertEqual(errors, [])
+                self.assertGreaterEqual(len(m.commands), 10)
 
 
 class SiteMatchTest(unittest.TestCase):
@@ -344,7 +344,6 @@ class VoiceFlowTest(unittest.TestCase):
         self.assertEqual(card["kind"], "forging")
         pump(lambda: done)
         self.assertIn("เปิดหน้าช่อง", self.seen[0][0])
-        self.assertIn("ไม่ต้องใส่ซ้ำ", self.seen[0][0])  # บอก Claude ว่าสกิลในเครื่องมีคำสั่งอะไรแล้ว
         self.assertIn("สร้างสกิล", done[0]["title"])
         self.assertTrue(done[0]["voice"])
         self.assertEqual(s.siteCommand("เปิดหน้าช่อง", WATCH)["siteRun"]["arg"], "ytd-channel-name a")
@@ -366,3 +365,34 @@ class VoiceFlowTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class OfferTest(unittest.TestCase):
+    """การ์ด 0050: เปิดเว็บที่ยังไม่มีสกิลประจำเว็บ → ถามให้ Claude ในเครื่องสร้าง (ครั้งเดียวต่อเว็บ)."""
+
+    setUpClass = VoiceFlowTest.setUpClass
+    make = VoiceFlowTest.make
+
+    def test_offer_create_and_decline(self):
+        s, done = self.make(YT.replace("id: yt-test", "id: yt-made"))
+        card = s.siteOffer(WATCH)
+        self.assertIn("ให้ Claude สร้างไหม", card["title"])
+        self.assertEqual(self.seen, [])  # ยังไม่ส่งอะไรจนตอบใช่
+        s.confirm(card["confirmToken"], True)
+        pump(lambda: done)
+        self.assertIn("site: youtube", self.seen[0][0])
+        self.assertEqual(s.siteOffer(WATCH), {})  # มีสกิลแล้ว = ไม่ถาม
+        self.assertEqual(s.siteCommand("ถอยหลังสิบวิ", WATCH)["siteRun"]["arg"], "j")
+        spot = "https://open.spotify.com/"
+        s.confirm(s.siteOffer(spot)["confirmToken"], False)
+        self.assertEqual(s.siteOffer(spot), {})  # ตอบไม่ = ไม่ถามอีก
+
+    def test_no_offer_where_it_cannot(self):
+        s, _ = self.make()
+        for url in ("https://mail.google.com/mail/u/0/", "https://docs.google.com/document/d/x",
+                    "https://unknown.example/", ""):  # fmt: skip
+            with self.subTest(url=url):
+                self.assertEqual(s.siteOffer(url), {})  # D4: เว็บ Google ไม่ได้คุม = ไม่เสนอ
+        s._claude_on = lambda: False
+        self.assertEqual(s.siteOffer(WATCH), {})

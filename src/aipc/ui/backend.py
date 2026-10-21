@@ -3236,6 +3236,74 @@ class SkillsController(QObject):
                 "lines": [why, "ตอบ “ใช่” = ทำ · “ไม่” = ไม่ทำอะไร"]}  # fmt: skip
         return self._why(card, t0)
 
+    @Slot(str, result="QVariantMap")
+    def siteOffer(self, url: str) -> dict:  # noqa: N802
+        """การ์ด 0050: เปิดเว็บที่คุมได้แต่บัญชีนี้ยังไม่มีสกิลประจำเว็บ → "ให้ Claude สร้างไหม" (ครั้งเดียวต่อเว็บ) ·
+        ไม่มี Claude / เว็บที่ไม่ได้คุม (Google) / เคยตอบไม่ / มีสกิลแล้ว = {}."""
+        from aipc.skills.actions import SITES
+
+        t0 = time.monotonic()
+        site = self._controlled_site(url)
+        if not site or not self.canForge or self._forging or site in self._declined_sites():
+            return {}
+        if any(s.site == site for s in self._skills):
+            return {}
+        self._counter += 1
+        token = f"o{self._counter}"
+        self._pending[token] = ("site-create", site)
+        name = SITES[site][0]
+        card = {"kind": "forge-ask", "badge": {}, "confirmToken": token, "page": "",
+                "chips": [{"text": "ส่งออกนอกเครื่อง", "kind": "warn"}],
+                "title": f"ยังไม่มีคำสั่งเสียงของ {name} · ให้ Claude สร้างไหม",
+                "lines": [f"ส่งเฉพาะชื่อเว็บ ({name}) ให้ Claude (นอกเครื่อง) เขียนคำสั่งที่ใช้บ่อยของเว็บนี้",
+                          "ตอบ “ใช่” = สร้าง แล้วสั่งด้วยเสียงได้เลย · “ไม่” = ไม่ถามอีก"],
+                "_outbound": "ยังไม่มี · จะส่งชื่อเว็บไป Claude เมื่อตอบ “ใช่”"}  # fmt: skip
+        return self._why(card, t0)
+
+    @staticmethod
+    def _controlled_site(url: str) -> str:
+        """ชื่อเว็บในรายการที่เปิดในเบราว์เซอร์ของผู้ช่วย (คุมได้) ของหน้านี้ · ไม่ใช่ = ""."""
+        from aipc.skills import sitecmd
+        from aipc.skills.actions import SITES, SYSTEM_BROWSER_SITES
+
+        # mail.google.com เป็นโดเมนย่อยของ google (ค้นหา) · เว็บบัญชี Google ที่ไม่ได้คุมตัดออกก่อน
+        if any(sitecmd.on_site(k, url) for k in SYSTEM_BROWSER_SITES):
+            return ""
+        return next(
+            (k for k in SITES if k not in SYSTEM_BROWSER_SITES and sitecmd.on_site(k, url)), ""
+        )
+
+    def _declined_path(self):
+        return self._user.folder / ".site-offers-declined.json" if self._user is not None else None
+
+    def _declined_sites(self) -> set[str]:
+        import json
+
+        path = self._declined_path()
+        try:
+            return set(json.loads(path.read_text(encoding="utf-8"))) if path else set()
+        except (OSError, ValueError, TypeError):
+            return set()
+
+    def _decline_site(self, site: str) -> None:
+        import json
+
+        path = self._declined_path()
+        if path is None:
+            return
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(sorted(self._declined_sites() | {site})), encoding="utf-8")
+        except OSError:
+            pass  # จำไม่ได้ = ถามอีกครั้งคราวหน้า (ไม่ทำให้ใช้งานพัง)
+
+    def _site_create_request(self, site: str) -> str:
+        from aipc.skills.actions import SITES
+
+        return (f"สร้างสกิลประจำเว็บ (site: {site} · หัวข้อ ## คำสั่ง) สำหรับสั่ง {SITES[site][0]} ด้วยเสียง · "
+                "อย่างน้อย 10 คำสั่งที่คนใช้บ่อยในเว็บนี้ · ใช้คีย์ลัดที่เว็บมีจริงก่อน · คลิกเฉพาะปุ่มที่ไม่มีคีย์ลัด · "
+                "แต่ละคำสั่งมีคำพูดภาษาไทยที่คนพูดจริง 2–3 แบบ")  # fmt: skip
+
     @Slot(str, str, result="QVariantMap")
     def siteLearn(self, text: str, url: str) -> dict:  # noqa: N802
         """อยู่ในเว็บที่คุมได้ + พูดคำสั่งที่ยังไม่มี → "เพิ่มคำสั่ง … ให้สกิล … ไหม" (ส่งให้ Claude เมื่อตอบใช่) ·
@@ -3600,6 +3668,8 @@ class SkillsController(QObject):
         }
         from aipc.skills import reminders
 
+        if not yes and isinstance(plan, tuple) and plan[0] == "site-create":
+            self._decline_site(plan[1])  # การ์ด 0050: ตอบไม่ = ไม่ถามเว็บนี้อีก
         if plan is None:
             card["title"] = "คำสั่งนี้หมดอายุแล้ว"
         elif not yes:
@@ -3633,6 +3703,10 @@ class SkillsController(QObject):
             return self._start_forge(request, pin=pin)
         elif isinstance(plan, tuple) and plan[0] == "site":  # การ์ด 0046: หน้าจอสั่งเบราว์เซอร์
             card.update(kind="site-run", title=plan[2], siteRun=plan[1])
+        elif isinstance(plan, tuple) and plan[0] == "site-create":  # การ์ด 0050
+            request = self._site_create_request(plan[1])
+            self._voice_forges.add(request)
+            return self._start_forge(request)
         elif isinstance(plan, tuple) and plan[0] == "site-learn":  # การ์ด 0046: ส่งให้ Claude เพิ่มคำสั่ง
             _, site, sid, text = plan
             request = self._site_request(site, text, sid)

@@ -164,6 +164,7 @@ Item {
             if (root.vc.busy) {   // ผลของคำสั่งเสียง (หน้าต่างเด้ง)
                 root.voiceShow(root.vc.heard, null, say, false, ok)
                 if (voice.available) voice.speak(-4, say)
+                if (ok) siteOfferTimer.restart()
                 return
             }
             const i = root.items.slice()
@@ -178,8 +179,23 @@ Item {
     Connections {
         target: browser
         function onOpened(say, ok) {
+            if (ok) siteOfferTimer.restart()
             if (root.home) appsNote.text = ok ? "" : say
             else if (!ok) root.push({ ai: true, text: say, sys: true, note: Tr.t("ทำไม่สำเร็จ"), done: true })
+        }
+    }
+    // การ์ด 0050: เปิดเว็บที่ยังไม่มีคำสั่งเสียงของบัญชีนี้ → ถามว่าให้ Claude สร้างไหม (ครั้งเดียวต่อเว็บ)
+    // รอหลังผลคำสั่งเดิมแสดงแล้ว ไม่ทับกัน
+    Timer {
+        id: siteOfferTimer
+        interval: 2500
+        onTriggered: {
+            const url = browser.currentUrl()
+            if (url === "") return
+            const c = skills.siteOffer(url)
+            if (!c.confirmToken) return
+            if (voicePopup.opened) root.voiceDispatch(c, root.vc.heard)
+            else root.showCard(c)
         }
     }
     function pendingConfirm() {

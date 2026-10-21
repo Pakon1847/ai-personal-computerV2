@@ -31,11 +31,9 @@ class ManifestTest(unittest.TestCase):
                 "letter-writer",
                 "machine-status",
                 "reminder",
-                "spotify-voice",  # สกิลประจำเว็บ (การ์ด 0046) · Claude เขียน
                 "summarize-text",
                 "system-command",
                 "translate",
-                "youtube-voice",
             ],
         )
 
