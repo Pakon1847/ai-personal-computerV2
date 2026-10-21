@@ -1,0 +1,543 @@
+{
+ "summary": {
+  "user_skills": 30,
+  "p1_ttft_median": 40.63,
+  "p1_n": 20,
+  "p3_hit": 5,
+  "p3_n": 20
+ },
+ "p1": [
+  {
+   "text": "สวัสดีตอนเช้า",
+   "route": "local",
+   "ttft": 40.73,
+   "seconds": 43.55,
+   "prompt_n": [
+    659
+   ],
+   "cache_n": [
+    1075
+   ]
+  },
+  {
+   "text": "วันนี้เหนื่อยมากเลย",
+   "route": "local",
+   "ttft": 40.43,
+   "seconds": 46.9,
+   "prompt_n": [
+    661
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "เล่าเรื่องสั้น ๆ ให้ฟังหน่อย",
+   "route": "local",
+   "ttft": 39.3,
+   "seconds": 45.69,
+   "prompt_n": [
+    641
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ทำไมทะเลถึงเค็ม",
+   "route": "local",
+   "ttft": 39.19,
+   "seconds": 51.03,
+   "prompt_n": [
+    641
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "แนะนำเพลงฟังสบาย ๆ หน่อย",
+   "route": "local",
+   "ttft": 39.73,
+   "seconds": 45.86,
+   "prompt_n": [
+    649
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ช่วยคิดคำคมให้กำลังใจ",
+   "route": "local",
+   "ttft": 40.53,
+   "seconds": 49.31,
+   "prompt_n": [
+    662
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ผีเสื้อกินอะไรเป็นอาหาร",
+   "route": "local",
+   "ttft": 44.23,
+   "seconds": 46.58,
+   "prompt_n": [
+    718
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ทำไมเราต้องดื่มน้ำ",
+   "route": "local",
+   "ttft": 39.39,
+   "seconds": 54.19,
+   "prompt_n": [
+    646
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "อธิบายว่ารุ้งเกิดจากอะไร",
+   "route": "local",
+   "ttft": 41.82,
+   "seconds": 67.39,
+   "prompt_n": [
+    685
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ขอบคุณที่ช่วยนะ",
+   "route": "local",
+   "ttft": 42.26,
+   "seconds": 44.16,
+   "prompt_n": [
+    692
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "แมวกับหมาอะไรฉลาดกว่า",
+   "route": "local",
+   "ttft": 38.25,
+   "seconds": 53.81,
+   "prompt_n": [
+    626
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "วันหยุดนี้ไปเที่ยวไหนดี",
+   "route": "local",
+   "ttft": 41.39,
+   "seconds": 49.16,
+   "prompt_n": [
+    693
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ช่วยตั้งชื่อแมวให้หน่อย",
+   "route": "local",
+   "ttft": 43.31,
+   "seconds": 48.21,
+   "prompt_n": [
+    705
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ทำไมกลางคืนถึงหนาว",
+   "route": "local",
+   "ttft": 37.0,
+   "seconds": 80.11,
+   "prompt_n": [
+    608
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ช่วยเขียนคำอวยพรปีใหม่สั้น ๆ",
+   "route": "local",
+   "ttft": 41.53,
+   "seconds": 47.47,
+   "prompt_n": [
+    675
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "กาแฟดีต่อสุขภาพไหม",
+   "route": "local",
+   "ttft": 33.68,
+   "seconds": 48.95,
+   "prompt_n": [
+    550
+   ],
+   "cache_n": [
+    1196
+   ]
+  },
+  {
+   "text": "ทำไมเครื่องบินถึงบินได้",
+   "route": "local",
+   "ttft": 40.8,
+   "seconds": 56.65,
+   "prompt_n": [
+    665
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "เล่ามุกตลกหน่อย",
+   "route": "local",
+   "ttft": 39.61,
+   "seconds": 44.96,
+   "prompt_n": [
+    651
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ฝันว่าฟันหลุดหมายความว่าอะไร",
+   "route": "local",
+   "ttft": 41.31,
+   "seconds": 93.89,
+   "prompt_n": [
+    687
+   ],
+   "cache_n": [
+    1078
+   ]
+  },
+  {
+   "text": "ช่วยแนะนำวิธีนอนให้หลับง่าย",
+   "route": "local",
+   "ttft": 43.21,
+   "seconds": 90.04,
+   "prompt_n": [
+    708
+   ],
+   "cache_n": [
+    1078
+   ]
+  }
+ ],
+ "p3": [
+  {
+   "text": "ลูกโดนหมากัดที่ขา ควรล้างแผลยังไงดี",
+   "route": "local",
+   "ttft": 45.29,
+   "seconds": 59.16,
+   "prompt_n": [
+    730
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "dog-bite-knowledge",
+   "hit": false
+  },
+  {
+   "text": "ไฟลุกในกระทะทอดไข่ ทำยังไงดี",
+   "route": "local",
+   "ttft": 39.74,
+   "seconds": 50.94,
+   "prompt_n": [
+    649
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "kitchen-oil-fire-knowledge",
+   "hit": false
+  },
+  {
+   "text": "อยากรู้ว่าเลือดกรุ๊ปโอบริจาคให้ใครได้บ้าง",
+   "route": "skill:blood-type-o-knowledge",
+   "ttft": 41.65,
+   "seconds": 47.7,
+   "prompt_n": [
+    639,
+    1
+   ],
+   "cache_n": [
+    1078,
+    234
+   ],
+   "expect": "blood-type-o-knowledge",
+   "hit": true
+  },
+  {
+   "text": "ราสเบอร์รี่พาย 5 ใช้ที่ชาร์จกี่วัตต์ถึงพอ",
+   "route": "skill:pi5-power-adapter-knowledge",
+   "ttft": 112.17,
+   "seconds": 115.92,
+   "prompt_n": [
+    1731,
+    240
+   ],
+   "cache_n": [
+    0,
+    4
+   ],
+   "expect": "pi5-power-adapter-knowledge",
+   "hit": true
+  },
+  {
+   "text": "แบตสำรอง 10000 mAh เอาขึ้นเครื่องได้ไหม",
+   "route": "local",
+   "ttft": 99.68,
+   "seconds": 110.03,
+   "prompt_n": [
+    1765
+   ],
+   "cache_n": [
+    0
+   ],
+   "expect": "powerbank-flight-knowledge",
+   "hit": false
+  },
+  {
+   "text": "กุญแจ SSH ดีกว่าการใช้รหัสผ่านยังไง",
+   "route": "local",
+   "ttft": 40.82,
+   "seconds": 60.32,
+   "prompt_n": [
+    668
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "ssh-key-knowledge",
+   "hit": false
+  },
+  {
+   "text": "บัตรประชาชนเลขตัวแรกเป็น 1 หมายถึงอะไร",
+   "route": "local",
+   "ttft": 39.54,
+   "seconds": 45.76,
+   "prompt_n": [
+    646
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "thai-id-first-digit-knowledge",
+   "hit": false
+  },
+  {
+   "text": "ภาษาไทยมีเสียงวรรณยุกต์ทั้งหมดกี่เสียง",
+   "route": "local",
+   "ttft": 38.36,
+   "seconds": 43.07,
+   "prompt_n": [
+    627
+   ],
+   "cache_n": [
+    1080
+   ],
+   "expect": "thai-tones-knowledge",
+   "hit": false
+  },
+  {
+   "text": "ตามกฎหมาย PDPA ฉันขอดูข้อมูลของฉันที่บริษัทเก็บได้ไหม",
+   "route": "local",
+   "ttft": 39.12,
+   "seconds": 66.3,
+   "prompt_n": [
+    639
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "pdpa-rights-knowledge",
+   "hit": false
+  },
+  {
+   "text": "พาวเวอร์แบงก์ใหญ่แค่ไหนถึงห้ามเอาขึ้นเครื่อง",
+   "route": "local",
+   "ttft": 40.14,
+   "seconds": 46.48,
+   "prompt_n": [
+    650
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "powerbank-flight-knowledge",
+   "hit": false
+  },
+  {
+   "text": "แต่งนิทานก่อนนอนให้หลานฟังหน่อย",
+   "route": "local",
+   "ttft": 38.14,
+   "seconds": 43.18,
+   "prompt_n": [
+    625
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "bedtime-story-grandchild",
+   "hit": false
+  },
+  {
+   "text": "ช่วยแต่งกลอนอวยพรวันเกิดแม่",
+   "route": "local",
+   "ttft": 40.85,
+   "seconds": 51.37,
+   "prompt_n": [
+    665
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "birthday-poem",
+   "hit": false
+  },
+  {
+   "text": "ลูกค้าถามราคาสินค้า ช่วยร่างคำตอบให้หน่อย",
+   "route": "local",
+   "ttft": 41.13,
+   "seconds": 47.35,
+   "prompt_n": [
+    667
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "customer-price-reply",
+   "hit": false
+  },
+  {
+   "text": "ช่วยตรวจแกรมม่าประโยคภาษาอังกฤษนี้: she go to school",
+   "route": "local",
+   "ttft": 41.04,
+   "seconds": 56.86,
+   "prompt_n": [
+    669
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "english-grammar-check",
+   "hit": false
+  },
+  {
+   "text": "ช่วยจัดตารางอ่านหนังสือก่อนสอบปลายภาค",
+   "route": "local",
+   "ttft": 42.44,
+   "seconds": 47.32,
+   "prompt_n": [
+    690
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "exam-study-plan",
+   "hit": false
+  },
+  {
+   "text": "เขียนแคปชั่นโปรโมทร้านลงเฟซบุ๊กให้หน่อย",
+   "route": "local",
+   "ttft": 43.41,
+   "seconds": 51.58,
+   "prompt_n": [
+    706
+   ],
+   "cache_n": [
+    1078
+   ],
+   "expect": "facebook-promo-caption",
+   "hit": false
+  },
+  {
+   "text": "ในตู้เย็นมีไข่กับหมูสับ ทำอะไรกินดี",
+   "route": "skill:fridge-menu-ideas",
+   "ttft": 55.83,
+   "seconds": 104.14,
+   "prompt_n": [
+    682,
+    189
+   ],
+   "cache_n": [
+    1078,
+    5
+   ],
+   "expect": "fridge-menu-ideas",
+   "hit": true
+  },
+  {
+   "text": "พรุ่งนี้มีสัมภาษณ์งาน ช่วยเตรียมคำถามที่น่าจะโดนถาม",
+   "route": "skill:interview-prep",
+   "ttft": 116.38,
+   "seconds": 118.77,
+   "prompt_n": [
+    1762,
+    225
+   ],
+   "cache_n": [
+    0,
+    4
+   ],
+   "expect": "interview-prep",
+   "hit": true
+  },
+  {
+   "text": "สอนทำโจทย์สมการนี้ทีละขั้น 2x + 3 = 11",
+   "route": "skill:math-step-by-step",
+   "ttft": 114.02,
+   "seconds": 142.82,
+   "prompt_n": [
+    1745,
+    216
+   ],
+   "cache_n": [
+    0,
+    5
+   ],
+   "expect": "math-step-by-step",
+   "hit": true
+  },
+  {
+   "text": "อธิบายวิธีกินยาตัวนี้ให้ยายเข้าใจง่าย ๆ",
+   "route": "local",
+   "ttft": 100.01,
+   "seconds": 102.46,
+   "prompt_n": [
+    1766
+   ],
+   "cache_n": [
+    0
+   ],
+   "expect": "medicine-explain-elder",
+   "hit": false
+  }
+ ]
+}
