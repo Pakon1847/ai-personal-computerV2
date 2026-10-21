@@ -1,0 +1,103 @@
+{
+ "summary": {
+  "D1_site_skills_ok": 4,
+  "D1_n": 4,
+  "D1_min_commands": 10,
+  "D4_site_skills_made": 0,
+  "D4_n": 4,
+  "cost_usd": 0.755,
+  "claude": ""
+ },
+ "rows": [
+  {
+   "site": "youtube",
+   "ok": true,
+   "is_site_skill": true,
+   "commands": 13,
+   "kind": "site",
+   "errors": [],
+   "attempts": 1,
+   "cost_usd": 0.0668
+  },
+  {
+   "site": "spotify",
+   "ok": true,
+   "is_site_skill": true,
+   "commands": 12,
+   "kind": "site",
+   "errors": [],
+   "attempts": 2,
+   "cost_usd": 0.1284
+  },
+  {
+   "site": "netflix",
+   "ok": true,
+   "is_site_skill": true,
+   "commands": 10,
+   "kind": "site",
+   "errors": [],
+   "attempts": 1,
+   "cost_usd": 0.0659
+  },
+  {
+   "site": "news",
+   "ok": true,
+   "is_site_skill": true,
+   "commands": 13,
+   "kind": "site",
+   "errors": [],
+   "attempts": 1,
+   "cost_usd": 0.0587
+  },
+  {
+   "site": "gmail",
+   "ok": false,
+   "is_site_skill": false,
+   "commands": 0,
+   "kind": "",
+   "errors": [
+    "บรรทัด 1: ไฟล์สกิลต้องขึ้นต้นด้วยส่วนหัวระหว่าง --- สองเส้น"
+   ],
+   "attempts": 2,
+   "cost_usd": 0.1114
+  },
+  {
+   "site": "calendar",
+   "ok": false,
+   "is_site_skill": false,
+   "commands": 0,
+   "kind": "",
+   "errors": [
+    "บรรทัด 1: ไฟล์สกิลต้องขึ้นต้นด้วยส่วนหัวระหว่าง --- สองเส้น"
+   ],
+   "attempts": 2,
+   "cost_usd": 0.1098
+  },
+  {
+   "site": "drive",
+   "ok": false,
+   "is_site_skill": false,
+   "commands": 0,
+   "kind": "",
+   "errors": [
+    "ไม่มี worker"
+   ],
+   "attempts": 2,
+   "cost_usd": 0.1034
+  },
+  {
+   "site": "docs",
+   "ok": false,
+   "is_site_skill": false,
+   "commands": 0,
+   "kind": "",
+   "errors": [
+    "บรรทัด 12: คีย์ “Ctrl+U” เป็นคีย์ของตัวเบราว์เซอร์ ไม่ใช่คีย์ลัดของเว็บ",
+    "บรรทัด 13: คำสั่ง “เลิกทำ” ย้อนไม่ได้หรือแตะบัญชี ต้องลงท้ายด้วย “· ยืนยันก่อน”",
+    "บรรทัด 21: คีย์ “Ctrl+L” เป็นคีย์ของตัวเบราว์เซอร์ ไม่ใช่คีย์ลัดของเว็บ"
+   ],
+   "attempts": 2,
+   "cost_usd": 0.1111
+  }
+ ]
+}

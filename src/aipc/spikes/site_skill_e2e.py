@@ -25,19 +25,22 @@ from aipc.browser.control import BrowserControl
 from aipc.skills import manifest
 from aipc.skills.browse import BrowseCommand
 
-STATE_JS = r"""((LIKE) => {
+STATE_JS = r"""((LIKE, DISLIKE) => {
   const v = document.querySelector('video');
   const flexy = document.querySelector('ytd-watch-flexy');
   const cc = document.querySelector('.ytp-subtitles-button');
   const like = document.querySelector(LIKE);
+  const dislike = document.querySelector(DISLIKE);
   const player = document.querySelector('#movie_player');
   return {
     t: v ? Math.round(v.currentTime * 10) / 10 : null, paused: v ? v.paused : null,
+    dur: v && isFinite(v.duration) ? v.duration : null,
     muted: v ? v.muted : null, rate: v ? v.playbackRate : null,
     fs: !!document.fullscreenElement, theater: flexy ? flexy.hasAttribute('theater') : null,
     mini: !!document.querySelector('ytd-miniplayer[active], ytd-app[miniplayer-is-active]'),
     cc: cc && cc.offsetParent !== null ? cc.getAttribute('aria-pressed') : null,
     like: like ? like.getAttribute('aria-pressed') : null,
+    dislike: dislike ? dislike.getAttribute('aria-pressed') : null,
     ad: !!(player && player.classList.contains('ad-showing')),
     url: location.href,
   };
@@ -49,6 +52,14 @@ def _flip(key):
 
 
 LIKE = "ytd-watch-metadata like-button-view-model button"
+DISLIKE = "ytd-watch-metadata dislike-button-view-model button"
+
+
+def _near(frac):
+    """เวลาอยู่ที่ราว frac ของความยาวคลิป (±10%) · กดคีย์ตัวเลขของ YouTube."""
+    return lambda a, b: bool(b["dur"]) and abs(b["t"] - b["dur"] * frac) <= b["dur"] * 0.1
+
+
 # ผลที่ควรเห็นต่อคีย์/ปุ่ม (ตามความหมายของคำสั่งในไฟล์) · a = ก่อน · b = หลัง
 CHECKS = {
     ("key", "l"): ("เวลาเดินหน้า ≥ 5 วิ", lambda a, b: b["t"] - a["t"] >= 5),
@@ -66,15 +77,31 @@ CHECKS = {
     ("key", "Shift+P"): ("ไปคลิปก่อนหน้า (ที่อยู่เปลี่ยน)", lambda a, b: a["url"] != b["url"]),
     ("key", "i"): ("มินิเพลเยอร์", _flip("mini")),
     ("click", LIKE): ("ปุ่มไลก์เปลี่ยนสถานะ (ต้องล็อกอิน)", _flip("like")),
+    # การ์ด 0050 (เขียนก่อนรันสกิลที่ Claude ในเครื่องสร้าง): คีย์/ปุ่มที่ไฟล์ใหม่ใช้
+    ("key", "Shift+."): ("เร็วขึ้น", lambda a, b: b["rate"] > a["rate"]),
+    ("key", "Shift+,"): ("ช้าลง", lambda a, b: b["rate"] < a["rate"]),
+    ("key", "Home"): ("กลับต้นคลิป (< 3 วิ)", lambda a, b: b["t"] is not None and b["t"] < 3),
+    ("key", "5"): ("ไปราวครึ่งคลิป", _near(0.5)),
+    ("key", "9"): ("ไปราว 90% ของคลิป", _near(0.9)),
+    ("click", "like-button-view-model button"): ("ปุ่มไลก์เปลี่ยนสถานะ (ต้องล็อกอิน)", _flip("like")),
+    ("click", "dislike-button-view-model button"): (
+        "ปุ่มไม่ชอบเปลี่ยนสถานะ (ต้องล็อกอิน)",
+        _flip("dislike"),
+    ),
+    ("click", "#subscribe-button-shape button"): (
+        "ติดตามช่อง (ต้องล็อกอิน · วัดไม่ได้)",
+        lambda a, b: False,
+    ),
 }
 # ลำดับให้แต่ละข้อวัดได้: เดินหน้าก่อนถอย · เต็มจอก่อนออก · เปลี่ยนคลิป/มินิเพลเยอร์ไว้ท้าย (ออกจากหน้าคลิปเดิม)
-ORDER = ["l", "j", "0", "k", "m", ">", "<", "t", "c", LIKE, "f", "Escape", "Shift+P", "Shift+N",
-         "i"]  # fmt: skip
+ORDER = ["5", "l", "j", "9", "Home", "0", "k", "m", ">", "<", "Shift+.", "Shift+,", "t", "c", LIKE,
+         "like-button-view-model button", "dislike-button-view-model button",
+         "#subscribe-button-shape button", "f", "Escape", "Shift+P", "Shift+N", "i"]  # fmt: skip
 
 
 def state(b: BrowserControl) -> dict:
     with b._lock:
-        return b._eval(f"{STATE_JS}({json.dumps(LIKE)})") or {}
+        return b._eval(f"{STATE_JS}({json.dumps(LIKE)}, {json.dumps(DISLIKE)})") or {}
 
 
 def wait_video(b: BrowserControl, timeout: float = 60.0) -> dict:
@@ -140,10 +167,12 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("out", type=Path)
     ap.add_argument("--query", default="ข่าวเช้า")
+    # การ์ด 0050: สกิลไม่ติดมากับระบบแล้ว → ระบุไฟล์สกิลที่จะวัด
+    ap.add_argument("--skill", type=Path, required=True)
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    skill = next(s for s in manifest.load_builtin() if s.id == "youtube-voice")
+    skill = manifest.load(a.skill)
     profile = Path(tempfile.mkdtemp(prefix="aipc-site-e2e-"))
     b = BrowserControl(profile=profile, extra_args=["--autoplay-policy=no-user-gesture-required"])
     try:
