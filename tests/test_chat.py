@@ -22,6 +22,7 @@ LABELED = ["[ข้อความนี้ Claude (cloud) ตอบโดยค
 class FakeLlama(BaseHTTPRequestHandler):
     mode = "ok"  # ok | slow | crash | loading | tool (AI เลือกสกิล tool_name)
     tool_name = "machine-status"
+    tool_args = '{"x": "ลบไฟล์"}'  # อาร์กิวเมนต์ที่ AI ส่งมา (การ์ด 0049 ใช้กับ user-skill)
     seen: list = []
 
     def log_message(self, *a):
@@ -68,7 +69,7 @@ class FakeLlama(BaseHTTPRequestHandler):
                     "function": {"name": self.tool_name, "arguments": ""}}  # fmt: skip
             for delta in (
                 {"tool_calls": [call]},
-                {"tool_calls": [{"index": 0, "function": {"arguments": '{"x": "ลบไฟล์"}'}}]},
+                {"tool_calls": [{"index": 0, "function": {"arguments": self.tool_args}}]},
             ):
                 chunk = {"choices": [{"delta": delta}]}
                 self.wfile.write(

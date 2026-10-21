@@ -142,7 +142,10 @@ class Reply:
     reason: str = ""  # "" = จบปกติ · stopped · crashed · error
     detail: str = ""
     timings: dict = field(default_factory=dict)
-    tool_call: str = ""  # สกิลที่ AI เลือก (ชื่อเครื่องมือ) · "" = ตอบเอง · ไม่มีอาร์กิวเมนต์ใด ๆ จาก AI
+    tool_call: str = ""  # สกิลที่ AI เลือก (ชื่อเครื่องมือ) · "" = ตอบเอง
+    # อาร์กิวเมนต์ของเครื่องมือแรก (ข้อความดิบ) · ใช้เฉพาะ user-skill (การ์ด 0049):
+    # id ที่โค้ดตรวจกับรายการที่ส่งไปเอง
+    tool_args: str = ""
 
 
 class Stream:
@@ -206,9 +209,12 @@ class Stream:
                 for choice in chunk.get("choices", []):
                     delta = choice.get("delta") or {}
                     for call in delta.get("tool_calls") or []:
-                        name = (call.get("function") or {}).get("name")
-                        if name and not reply.tool_call:  # สนแค่ชื่อ · อาร์กิวเมนต์ของ AI ไม่ถูกใช้ (H8)
+                        fn = call.get("function") or {}
+                        name = fn.get("name")
+                        if name and not reply.tool_call:  # เครื่องมือแรกเท่านั้น
                             reply.tool_call = name
+                        if call.get("index", 0) == 0 and fn.get("arguments"):
+                            reply.tool_args += fn["arguments"]
                     token = delta.get("content") or ""
                     if token:
                         reply.text += token

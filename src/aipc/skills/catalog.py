@@ -22,6 +22,10 @@ ASK_CLOUD_DESC = ("ถามผู้ช่วยบน cloud ที่ค้น
                   "หรือคุณไม่แน่ใจคำตอบ")  # fmt: skip
 # สกิลอัตโนมัติ (การ์ด 0017): ให้ Claude สร้างสกิลใหม่ แล้วติดตั้งและทำงานนั้นทันที
 # ข้อความนี้เขียนก่อนวัดด้วย tests/data/create_skill_calls.json (H9) · ห้ามปรับโดยดูผลของชุดนั้น
+# การ์ด 0049: สกิลของผู้ใช้ทุกตัวรวมเป็นเครื่องมือเดียว (รายการสั้น id — ชื่อ เรียงคงที่) เมื่อมีเกิน 5 ตัว ·
+# รายการเครื่องมือจึงไม่เปลี่ยนตามข้อความ → แคชของ llama-server ใช้ได้ (เดิม: เลือก 5 ตัวตามข้อความ = อ่านใหม่ทุกครั้ง)
+USER_SKILL = "user-skill"
+USER_SKILL_MAX = 40
 CREATE_SKILL = "create-skill"
 CREATE_SKILL_DESC = (
     "สร้างสกิลใหม่ให้เครื่องนี้ (Claude เขียนให้แล้วติดตั้งเอง): "
@@ -100,6 +104,24 @@ def system_prompt(
 
 # ข้อความคงที่ทุกครั้ง = ส่วนต้นของ prompt ซ้ำเดิม llama-server จึงจำส่วนที่อ่านแล้วไว้ได้ (cache_prompt)
 TOOLS_HINT = " · ถ้าคำขอตรงกับเครื่องมือที่มี ให้เรียกเครื่องมือนั้นโดยไม่ต้องตอบเอง ถ้าไม่ตรงให้ตอบเองตามปกติ"
+
+
+def user_tool(skills: list[Manifest], available: set[str]) -> dict | None:
+    """เครื่องมือ user-skill: เลือกสกิลของผู้ใช้ด้วย id · ไม่มีสกิลที่ใช้ได้ = None."""
+    usable = sorted((s for s in skills if not s.site and all(n in available for n in s.needs)),
+                    key=lambda s: s.id)[:USER_SKILL_MAX]  # fmt: skip
+    if not usable:
+        return None
+    listing = " · ".join(f"{s.id} = {s.name}" for s in usable)
+    desc = ("ใช้สกิลที่ผู้ใช้สร้าง/สอนไว้ เมื่อคำขอตรงกับสกิลใดสกิลหนึ่ง ใส่ id ของสกิลนั้น · "
+            f"สกิลที่มี: {listing}")  # fmt: skip
+    prop = {"id": {"type": "string", "description": "id ของสกิล"}}
+    params = {"type": "object", "properties": prop,
+              "required": ["id"]}  # fmt: skip
+    return {
+        "type": "function",
+        "function": {"name": USER_SKILL, "description": desc, "parameters": params},
+    }
 
 
 def tools(skills: list[Manifest], available: set[str], cloud: bool = False,

@@ -2656,12 +2656,15 @@ class SkillsController(QObject):
         """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog."""
         from aipc.skills import catalog, retrieval
 
-        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง (ส่วนต้นคงที่ แคชใช้ได้) · สกิลของผู้ใช้เกิน 5 ตัว = ส่งเฉพาะที่ใกล้ข้อความ
+        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง · สกิลของผู้ใช้ ≤ 5 ตัว = เครื่องมือละตัวแบบเดิม (รายการคงที่อยู่แล้ว) ·
+        # การ์ด 0049: เกิน 5 ตัว = เครื่องมือเดียว user-skill (รายการสั้นเรียงคงที่) · ไม่เลือกตามข้อความอีก
+        # (เลือก 5 ตัวตามข้อความทำให้ส่วนต้นของ prompt เปลี่ยนทุกครั้ง → อ่านใหม่ 30–38 วิ บน Pi 5)
         user = [s for s in self._skills if self._is_user(s.id)]
         base = [s for s in self._skills if not self._is_user(s.id)]
-        return catalog.tools(
-            base + retrieval.pick(user, text), self.available(), forge=self.canForge
-        )
+        if len(user) <= retrieval.TOP_K:
+            return catalog.tools(base + user, self.available(), forge=self.canForge)
+        one = catalog.user_tool(user, self.available())
+        return catalog.tools(base, self.available(), forge=self.canForge) + ([one] if one else [])
 
     # ---------- สกิลอัตโนมัติ (การ์ด 0017) ----------
     @Property(bool, notify=skillsChanged)
@@ -3694,6 +3697,7 @@ class ChatController(QObject):
         self._ledger = ledger
         self._last_cloud: dict = {}  # คำถาม/คำตอบล่าสุดของ Claude ให้หน้าจอมีปุ่ม "สอนเครื่องให้ตอบเอง"
         self._skill_note = ""  # หมายเหตุใต้คำตอบของสกิลความรู้ (ที่มา · H5)
+        self._sent_tools: list = []
         # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
@@ -3903,6 +3907,7 @@ class ChatController(QObject):
             self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
         tools = self._all_tools(text) if (use_tools and not prompt) else []
+        self._sent_tools = tools  # การ์ด 0049: ตรวจ id ที่ AI เลือกกับรายการรอบนี้
         if self._conv["messages"][-1].get("file"):
             why = (f"ถามเกี่ยวกับไฟล์ “{self._file[0]}” · ตอบในเครื่องเท่านั้น "
                    "(เนื้อหาไฟล์ห้ามออกนอกเครื่อง)")  # fmt: skip
@@ -3993,6 +3998,13 @@ class ChatController(QObject):
                 return
         if parroted:  # ส่งต่อไม่ได้ (ปิด Claude / ถามเกี่ยวกับไฟล์) · ไม่แสดงคำตอบว่าง
             reply.text = self.NEEDS_CLAUDE
+        if reply.tool_call == catalog.USER_SKILL and not reply.reason:  # การ์ด 0049
+            picked = self._user_skill_id(reply.tool_args)
+            if not picked:  # id ไม่อยู่ในรายการที่ส่งไป = ไม่ทำ (H7 H8) · บอกตามจริง
+                reply.tool_call = ""
+                reply.text = reply.text or "AI ในเครื่องเลือกสกิลที่ไม่มีอยู่ จึงไม่ได้ทำอะไร · ลองพิมพ์ใหม่ให้ชัดขึ้น"
+            else:
+                reply.tool_call = picked
         if reply.tool_call and not reply.reason:
             # AI เลือกสกิล: เอาข้อความของผู้ใช้ออกจากบทสนทนา (ทางของสกิลจะส่งข้อความนี้เองอีกครั้ง) · ไม่บันทึก
             text = self._conv["messages"].pop()["content"]
@@ -4033,6 +4045,24 @@ class ChatController(QObject):
         self.refresh()
 
     CLOUD_NOTE = "ตอบโดย Claude (cloud) · ค้นเว็บได้ · คำถามนี้ถูกส่งออกนอกเครื่อง"
+
+    def _user_skill_id(self, args: str) -> str:
+        """อาร์กิวเมนต์ของ user-skill → id ที่อยู่ในรายการที่ส่งให้ AI รอบนี้จริง · ไม่ใช่ = ""."""
+        import json
+
+        from aipc.skills import catalog
+
+        try:
+            sid = str(json.loads(args or "{}").get("id", "")).strip()
+        except (ValueError, AttributeError):
+            return ""
+        for t in self._sent_tools:
+            fn = t.get("function", {})
+            if fn.get("name") == catalog.USER_SKILL and re.search(
+                rf"(^|[ :·]){re.escape(sid)} =", fn.get("description", "")
+            ):
+                return sid
+        return ""
 
     def _cloud_teach(self, reply) -> dict:
         """การ์ด 0047: คำถาม + คำตอบของ Claude รอบนี้ ·

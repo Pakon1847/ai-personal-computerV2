@@ -49,11 +49,14 @@ class PickTest(unittest.TestCase):
             except manifest.InvalidSkill:
                 pass
         s = SkillsController(run_timer=False, llm_ready=lambda: True, user_skills=store)
-        names = [t["function"]["name"] for t in s.tool_catalog("คิดเมนูจากของในตู้เย็นหน่อย")]
-        self.assertIn("fridge-menu", names)
+        tools = s.tool_catalog("คิดเมนูจากของในตู้เย็นหน่อย")
+        names = [t["function"]["name"] for t in tools]
         self.assertIn("translate", names)  # สกิลในตัวส่งเสมอ
-        user_names = [n for n in names if n in {m.id for m in store.load()}]
-        self.assertEqual(len(user_names), retrieval.TOP_K)
+        # การ์ด 0049: เกิน TOP_K ตัว = เครื่องมือเดียว user-skill (รายการสั้นคงที่) แทนการเลือก 5 ตัวตามข้อความ
+        self.assertGreater(len(store.load()), retrieval.TOP_K)
+        self.assertNotIn("fridge-menu", names)
+        one = next(t for t in tools if t["function"]["name"] == "user-skill")
+        self.assertIn("fridge-menu = ", one["function"]["description"])
 
 
 if __name__ == "__main__":
