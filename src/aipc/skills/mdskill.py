@@ -44,12 +44,15 @@ MAX_URL = 300
 STEP_HELP = " · ".join([
     "เปิดเว็บ <ชื่อในรายการ หรือ https://…>", "เปิดแอป <ชื่อ>", "เปิดหน้า <ชื่อ>", "ปรับเสียง <0–100>",
     "เพิ่มเสียง/ลดเสียง <1–100>", "ปิดเสียง", "เปิดเสียง", "ถาม AI: <คำสั่ง>", "บอก: <ข้อความ>",
+    "บอกนัดวันนี้ / บอกนัดพรุ่งนี้ / บอกนัดสัปดาห์นี้",
 ])  # fmt: skip
+# ขั้น "บอกนัด…" (การ์ด 0034): โค้ดอ่านนัดในเครื่อง + ปฏิทิน Google · ต้องขอสิทธิ์ read_agenda · สกิลละไม่เกิน 1 ขั้น
+AGENDA_STEP = re.compile(r"บอกนัด(วันนี้|พรุ่งนี้|สัปดาห์นี้)")
 
 
 @dataclass(frozen=True)
 class Step:
-    kind: str  # action | say | llm
+    kind: str  # action | say | llm | agenda (บอกนัด · การ์ด 0034)
     text: str  # สิ่งที่ผู้ใช้เห็นในการ์ด (หรือคำสั่งให้ AI / ข้อความที่จะบอก)
     plan: Plan | None = None
 
@@ -128,6 +131,8 @@ def parse_step(t: str) -> tuple[Step | None, str]:
         return Step("llm", m.group(1).strip()), ""
     if m := re.fullmatch(r"บอก\s*[:：]\s*(.+)", t):
         return Step("say", m.group(1).strip()), ""
+    if m := AGENDA_STEP.fullmatch(re.sub(r"\s+", "", t)):
+        return Step("agenda", f"บอกนัด{m.group(1)}"), ""
     return None, f"ไม่รู้จักขั้นตอน “{t}” · เขียนได้: {STEP_HELP}"
 
 
@@ -233,5 +238,10 @@ def parse(text: str) -> tuple[dict, list[str]]:
         data["actions"] = sorted({*data.get("actions", []), *acts})
         if acts and "run_actions" not in data.get("permissions", []):
             errors.append("ขั้นตอนที่สั่งเครื่องต้องขอสิทธิ์ run_actions (permissions: run_actions)")
+        agenda_steps = sum(s.kind == "agenda" for s in steps)
+        if agenda_steps and "read_agenda" not in data.get("permissions", []):
+            errors.append("ขั้น “บอกนัด…” ต้องขอสิทธิ์ read_agenda (permissions: read_agenda)")
+        if agenda_steps > 1:
+            errors.append("ขั้น “บอกนัด…” ใช้ได้ครั้งเดียวต่อสกิล")
     data["steps"] = steps
     return data, errors
