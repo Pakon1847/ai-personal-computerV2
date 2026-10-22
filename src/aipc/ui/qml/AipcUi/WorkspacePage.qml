@@ -444,72 +444,97 @@ Item {
     }
 
     // ---------- ปุ่มมุมขวาบน ----------
-    // Flow ขวาไปซ้าย: ตัวอักษรใหญ่ (200%) แล้วปุ่มไม่พอแถวเดียว = ขึ้นแถวใหม่ ไม่ล้นจอ (การ์ด 0053 · เพิ่มปุ่มแชท 2 แบบ)
-    // ลำดับในไฟล์จึงกลับด้านกับที่เห็น: ตัวแรกในไฟล์อยู่ขวาสุด
-    Flow {
+    // แถว 1: ปุ่มเปิด-ปิด/คำสั่ง ชิดขวา (Flow ขวาไปซ้าย · ตัวอักษรใหญ่แล้วขึ้นแถวใหม่ · ตัวแรกในไฟล์อยู่ขวาสุด)
+    // แถว 2: เลือกโหมดแชท/โมเดล/ระดับความคิด เป็นแถบแบ่งช่อง (การ์ด 0053)
+    ColumnLayout {
         id: tools
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.leftMargin: 24
         anchors.rightMargin: 24
-        layoutDirection: Qt.RightToLeft
-        spacing: 8
-        AppButton {
-            text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
-            ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
-            onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
-        }
-        AppButton {
-            visible: !root.home
-            text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
-            onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
-        }
-        AppButton {
-            id: historyButton
-            text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
-            onClicked: historyPopup.open()
-        }
-        // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
-        AppButton {
-            objectName: "speakSwitch"
-            visible: voice.available
-            kind: uiSettings.speakAnswers ? "primary" : "secondary"
-            iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
-            text: Tr.t("อ่านคำตอบออกเสียง: ") + (uiSettings.speakAnswers ? Tr.t("เปิด") : Tr.t("ปิด"))
-            Accessible.name: text + Tr.t(" · แตะเพื่อ") + (uiSettings.speakAnswers ? Tr.t("ปิด") : Tr.t("เปิด"))
-            onClicked: {
-                const on = !uiSettings.speakAnswers
-                uiSettings.setSpeakAnswers(on)
-                if (!on) voice.stop()
-            }
-        }
-        // แชท 2 แบบ (การ์ด 0053): ทั่วไป = ไฮบริดเดิม · งาน = Claude ทุกข้อความ (เลือกโมเดลได้) · บอกเป็นคำ ไม่ใช่แค่สี
-        // เห็นเป็น: [แชททั่วไป] [แชทงาน] [Haiku] [Sonnet] [Opus] (โมเดลขึ้นเฉพาะตอนอยู่แชทงาน)
-        Repeater {
-            model: chat.mode === "work" ? uiSettings.cloudModels.slice().reverse() : []
+        spacing: 10
+        Flow {
+            Layout.fillWidth: true
+            layoutDirection: Qt.RightToLeft
+            spacing: 8
             AppButton {
-                required property string modelData
-                objectName: "model_" + modelData
-                text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                kind: uiSettings.cloudModel === modelData ? "primary" : "secondary"
-                Accessible.name: Tr.t("โมเดลของแชทงาน: ") + text
-                onClicked: uiSettings.setCloudModel(modelData)
+                text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
+                ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
+                onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
+            }
+            AppButton {
+                visible: !root.home
+                text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
+                onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
+            }
+            AppButton {
+                id: historyButton
+                text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
+                onClicked: historyPopup.open()
+            }
+            // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
+            AppButton {
+                objectName: "speakSwitch"
+                visible: voice.available
+                kind: uiSettings.speakAnswers ? "primary" : "secondary"
+                iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
+                text: Tr.t("อ่านคำตอบออกเสียง: ") + (uiSettings.speakAnswers ? Tr.t("เปิด") : Tr.t("ปิด"))
+                Accessible.name: text + Tr.t(" · แตะเพื่อ") + (uiSettings.speakAnswers ? Tr.t("ปิด") : Tr.t("เปิด"))
+                onClicked: {
+                    const on = !uiSettings.speakAnswers
+                    uiSettings.setSpeakAnswers(on)
+                    if (!on) voice.stop()
+                }
             }
         }
-        AppButton {
-            objectName: "modeWork"
-            text: Tr.t("แชทงาน (Claude)")
-            kind: chat.mode === "work" ? "primary" : "secondary"
-            enabled: chat.workReady || chat.mode === "work"
-            ToolTip.visible: hovered && !chat.workReady; ToolTip.text: chat.workBlocked
-            onClicked: chat.setMode("work")
-        }
-        AppButton {
-            objectName: "modeGeneral"
-            text: Tr.t("แชททั่วไป")
-            kind: chat.mode === "general" ? "primary" : "secondary"
-            onClicked: chat.setMode("general")
+        // แชท 2 แบบ (การ์ด 0053) · แถวของตัวเอง แยกจากปุ่มเปิด-ปิดด้านบน (Pakon 2026-10-22: เดิมหน้าตาเหมือนปุ่มเสียงอ่าน)
+        // ทั่วไป = AI ในเครื่องก่อน (ไม่รู้ = ส่ง Claude เอง) · งาน = Claude ทุกข้อความ เลือกโมเดลและระดับความคิดได้
+        Flow {
+            objectName: "chatSetup"
+            Layout.fillWidth: true
+            spacing: 16
+            Segmented {
+                objectName: "modeSwitch"
+                label: Tr.t("โหมดแชท")
+                current: chat.mode
+                options: [
+                    { value: "general", text: Tr.t("แชททั่วไป"), hint: Tr.t("ในเครื่องก่อน") },
+                    { value: "work", text: Tr.t("แชทงาน"), hint: Tr.t("Claude ทุกข้อความ") }
+                ]
+                onPicked: (v) => { if (!chat.setMode(v)) modeNote.text = Tr.t("แชทงานใช้ไม่ได้: ") + chat.workBlocked }
+            }
+            Segmented {
+                objectName: "modelSwitch"
+                visible: chat.mode === "work"
+                label: Tr.t("โมเดล")
+                current: uiSettings.cloudModel
+                options: [
+                    { value: "haiku", text: "Haiku", hint: Tr.t("เร็ว") },
+                    { value: "sonnet", text: "Sonnet", hint: Tr.t("สมดุล") },
+                    { value: "opus", text: "Opus", hint: Tr.t("ละเอียดสุด") }
+                ]
+                onPicked: (v) => uiSettings.setCloudModel(v)
+            }
+            Segmented {
+                objectName: "effortSwitch"
+                visible: chat.mode === "work"
+                label: Tr.t("ระดับความคิด")
+                current: uiSettings.cloudEffort
+                options: [
+                    { value: "low", text: "Low" }, { value: "medium", text: "Medium" },
+                    { value: "high", text: "High" }, { value: "xhigh", text: "Extra" }, { value: "max", text: "Max" }
+                ]
+                onPicked: (v) => uiSettings.setCloudEffort(v)
+            }
+            AppText {
+                id: modeNote
+                objectName: "modeNote"
+                visible: text !== "" && chat.mode === "general"
+                text: ""
+                color: Theme.warnInk; size: Theme.fontSmall
+                height: Theme.touch; verticalAlignment: Text.AlignVCenter
+            }
         }
     }
     // กล่องคำสั่งเสียง (Pakon 2026-10-20): หน้าต่างแยกของตัวเอง ลอยบนสุดเหนือทุกหน้าต่าง รวมเบราว์เซอร์เต็มจอ
@@ -935,7 +960,9 @@ Item {
                 // แชทงานส่งออกนอกเครื่อง → ห้ามเขียนว่า "ทำในเครื่อง" (H5 · การ์ด 0053)
                 text: chat.mode === "work"
                       ? Tr.t("แชทงาน · ข้อความที่พิมพ์ส่งให้ Claude (") + uiSettings.cloudModel + Tr.t(") นอกเครื่อง")
-                      : Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
+                      : chat.workReady   // ไฮบริด: ถามยาก/ข้อมูลสดจะส่ง Claude (H5 · ห้ามบอกว่าทำในเครื่องทั้งหมด)
+                        ? Tr.t("วันนี้ให้ช่วยอะไรดี · AI ในเครื่องตอบก่อน ถ้าต้องใช้ข้อมูลสดจะถาม Claude")
+                        : Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
                 color: Theme.inkMuted; oneLine: true
             }
             // อ่านสรุปวันนี้ให้ฟัง (การ์ด 0019) · สำหรับคนที่ไม่สะดวกอ่านจอ · ใช้ข้อมูลเดียวกับการ์ดข้างล่าง

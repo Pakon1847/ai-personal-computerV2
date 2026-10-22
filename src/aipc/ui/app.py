@@ -79,16 +79,17 @@ def _cloud_client(budget=None, ledger=None):
     if os.environ.get("AIPC_CLOUD", "1") == "0" or ask.find_claude() is None:
         return None
 
-    def run(question, history, model=ask.MODEL):
+    def run(question, history, model=ask.MODEL, effort=None):
         if budget is not None and not budget.allow():
             return ask.CloudReply(False, error=budget.blocked_message())
-        r = ask.ask(question, history, model=model)
+        r = ask.ask(question, history, model=model, effort=effort)
         if budget is not None:
             budget.record(r.cost_usd, "ask")
         if ledger is not None:
             # โมเดลที่ตอบจริง (จากผลของ claude) ไม่ใช่แค่ที่เลือก (การ์ด 0053 เกณฑ์ M2 · H5)
             ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok,
-                          note=f"เลือก {model} · ตอบโดย {r.model or 'ไม่ทราบ'}")  # fmt: skip
+                          note=f"เลือก {model}" + (f" · ความคิด {effort}" if effort else "")
+                          + f" · ตอบโดย {r.model or 'ไม่ทราบ'}")  # fmt: skip
         return r
 
     return run
@@ -311,6 +312,7 @@ def build(opts: Options, argv: list[str] | None = None):
                           model_name=_local_model_name(),
                           forge=skill_forge is not None, claude_on=claude_on,
                           cloud_model=lambda: ui_settings.cloudModel,
+                          cloud_effort=lambda: ui_settings.cloudEffort,
                           auto_cloud=True)  # fmt: skip
     engine._backends = {
         "uiSettings": ui_settings,

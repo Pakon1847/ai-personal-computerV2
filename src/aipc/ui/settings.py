@@ -17,6 +17,8 @@ from pathlib import Path
 THEMES = ("light", "dark")
 LANGS = ("th", "en")  # ภาษาของหน้าจอ (การ์ด 0039) · ค่าเริ่มต้นไทย
 CLOUD_MODELS = ("haiku", "sonnet", "opus")  # โมเดลของแชทงาน (การ์ด 0053) · ชุดเดียวกับ ask.MODELS
+# ระดับความคิดของแชทงาน · ชุดเดียวกับ ask.EFFORTS
+CLOUD_EFFORTS = ("low", "medium", "high", "xhigh", "max")
 FONT_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0)  # BRIEF 5.7: 100–200%
 # ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด)
 # และนาทีหลังล็อกก่อนออกจากระบบเอง (0 = ไม่ออกเอง · ค่าเริ่มต้นตั้งแต่การ์ด 0051)
@@ -64,6 +66,7 @@ class UiPrefs:
     gcal_alert_min: int = 10
     language: str = "th"  # การ์ด 0039
     cloud_model: str = "sonnet"  # แชทงาน (การ์ด 0053) · จำตัวที่เลือกล่าสุด
+    cloud_effort: str = "medium"  # ระดับความคิดของแชทงาน (Pakon 2026-10-22) · จำตัวที่เลือกล่าสุด
     # ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ (การ์ด 0031 รอบ 3) · ค่าเริ่มต้นปิด (ใช้เครื่องคนเดียวยังสะดวก)
     clear_web_on_logout: bool = False
     lock_policy: int = LOCK_POLICY
@@ -99,6 +102,7 @@ class UiPrefs:
             else 10,
             language=self.language if self.language in LANGS else "th",
             cloud_model=self.cloud_model if self.cloud_model in CLOUD_MODELS else "sonnet",
+            cloud_effort=self.cloud_effort if self.cloud_effort in CLOUD_EFFORTS else "medium",
             clear_web_on_logout=self.clear_web_on_logout is True,
             lock_policy=LOCK_POLICY,
         )
@@ -127,6 +131,7 @@ def load(path: Path | None = None) -> UiPrefs:
             gcal_alert_min=data.get("gcal_alert_min", 10),
             language=str(data.get("language", "th")),
             cloud_model=str(data.get("cloud_model", "sonnet")),
+            cloud_effort=str(data.get("cloud_effort", "medium")),
             clear_web_on_logout=data.get("clear_web_on_logout") is True,
         ).cleaned()
     except (OSError, ValueError, TypeError, AttributeError):

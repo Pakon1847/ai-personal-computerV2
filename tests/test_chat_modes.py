@@ -27,20 +27,22 @@ class ChatModesTest(ServerCase):
     def setUpClass(cls):
         cls.app = QGuiApplication.instance() or QGuiApplication([])
 
-    def make(self, claude_on=True, cloud=True, model="sonnet", auto=False):
+    def make(self, claude_on=True, cloud=True, model="sonnet", auto=False, effort=None):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
-        self.asked, self.model = [], [model]
+        self.asked, self.model, self.effort, self.efforts = [], [model], [effort], []
         on = [claude_on]
         self.on = on
 
-        def fake(question, history, model=None):
+        def fake(question, history, model=None, **kw):
             self.asked.append((question, model))
+            self.efforts.append(kw.get("effort"))
             return CloudReply(True, f"Claude ตอบ: {question}", model=f"claude-{model}-x")
 
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
                            cloud=fake if cloud else None, claude_on=lambda: on[0],
-                           cloud_model=lambda: self.model[0], auto_cloud=auto)  # fmt: skip
+                           cloud_model=lambda: self.model[0], auto_cloud=auto,
+                           cloud_effort=lambda: self.effort[0])  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
         done = []
@@ -80,6 +82,33 @@ class ChatModesTest(ServerCase):
         self.assertIn("claude-opus-x", done[-1][1])  # ป้ายบอกโมเดลที่ตอบจริง
         rows = {r["k"]: r["v"] for r in c.lastTrace}
         self.assertIn("claude-opus-x", rows["ใครตอบ"])
+
+    def test_effort_is_sent_only_when_valid(self):
+        # Pakon 2026-10-22: เลือกระดับความคิด low/medium/high/xhigh/max ได้ในแชทงาน
+        c, done = self.make(effort="max")
+        c.setMode("work")
+        self.ask_all(c, done, ["ข้อ 1"])
+        self.effort[0] = "ultra; rm"  # ค่าแปลก = ไม่ส่ง effort เลย
+        self.ask_all(c, done, ["ข้อ 2"])
+        self.assertEqual(self.efforts, ["max", None])
+        rows = {r["k"]: r["v"] for r in c.lastTrace}
+        self.assertNotIn("ultra", str(rows))
+
+    def test_ask_builds_effort_flag_and_refuses_unknown(self):
+        seen = []
+
+        def runner(args, text, cwd, timeout):
+            seen.append(args)
+            return 0, '{"result": "ok", "modelUsage": {"claude-x": {}}}', ""
+
+        r = ask.ask("x", model="haiku", effort="xhigh", claude="claude", runner=runner)
+        self.assertTrue(r.ok)
+        i = seen[0].index("--effort")
+        self.assertEqual(seen[0][i : i + 2], ["--effort", "xhigh"])
+        self.assertFalse(ask.ask("x", effort="extreme", claude="claude", runner=runner).ok)
+        ask.ask("x", claude="claude", runner=runner)
+        self.assertNotIn("--effort", seen[-1])  # ไม่เลือก = ไม่ส่ง (แชททั่วไป/ไฮบริดเดิม)
+        self.assertEqual(len(seen), 2)
 
     def test_work_does_not_need_local_ai(self):
         c, done = self.make()
@@ -157,7 +186,34 @@ class CloudModelSettingTest(unittest.TestCase):
             self.assertTrue(s.setCloudModel("opus"))
             self.assertFalse(s.setCloudModel("gpt"))
             self.assertEqual(UiSettings(p).cloudModel, "opus")
+            self.assertEqual(s.cloudEffort, "medium")
+            self.assertTrue(s.setCloudEffort("xhigh"))
+            self.assertFalse(s.setCloudEffort("extra"))
+            self.assertEqual(UiSettings(p).cloudEffort, "xhigh")
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ใช้ตัวเปิดหน้าจอเดียวกัน · import ทั้งโมดูล ไม่ให้เทสต์ของมันถูกรันซ้ำที่นี่
+from tests import test_ui_qml as uiq  # noqa: E402
+
+
+@unittest.skipIf(UiSettings is None or uiq.uiapp is None, "ไม่มี PySide6")
+class SegmentedQmlTest(unittest.TestCase):
+    open_shell = uiq.ShellCardTest.open_shell
+
+    def test_effort_switch_shows_only_in_work_and_saves(self):
+        engine, win, warnings = self.open_shell("workspace")
+        chat, ui = engine._backends["chat"], engine._backends["uiSettings"]
+        effort = uiq.find_all(win, "effortSwitch")[0]
+        self.assertFalse(effort.property("visible"))  # แชททั่วไป = ไม่มีตัวเลือกของ Claude
+        chat._cloud = lambda q, h, model=None, effort=None: None
+        chat.modeChanged.emit()
+        self.assertTrue(chat.setMode("work"))
+        uiq.settle()
+        self.assertTrue(effort.property("visible"))
+        effort.picked.emit("max")
+        self.assertEqual(ui.cloudEffort, "max")
+        self.assertEqual(warnings, [])

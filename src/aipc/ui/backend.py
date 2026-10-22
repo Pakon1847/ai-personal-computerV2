@@ -139,6 +139,24 @@ class UiSettings(QObject):
     def cloudModels(self) -> list:  # noqa: N802
         return list(settings.CLOUD_MODELS)
 
+    @Property(str, notify=changed)
+    def cloudEffort(self) -> str:  # noqa: N802
+        return self._prefs.cloud_effort
+
+    @Property("QVariantList", constant=True)
+    def cloudEfforts(self) -> list:  # noqa: N802
+        return list(settings.CLOUD_EFFORTS)
+
+    @Slot(str, result=bool)
+    def setCloudEffort(self, effort: str) -> bool:  # noqa: N802
+        if effort not in settings.CLOUD_EFFORTS:
+            return False
+        if effort != self._prefs.cloud_effort:
+            self._prefs.cloud_effort = effort
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+        return True
+
     @Slot(str, result=bool)
     def setCloudModel(self, model: str) -> bool:  # noqa: N802
         if model not in settings.CLOUD_MODELS:
@@ -3976,13 +3994,15 @@ class ChatController(QObject):
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
-                 claude_on=None, meter=None, auto_cloud=False, cloud_model=None):  # fmt: skip
+                 claude_on=None, meter=None, auto_cloud=False, cloud_model=None,
+                 cloud_effort=None):  # fmt: skip
         super().__init__()
         # cloud(คำถาม, บทสนทนา[, model=]) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
         self._auto_cloud = auto_cloud
         self._mode = "general"
         self._cloud_model = cloud_model or (lambda: "sonnet")  # โมเดลของแชทงานที่ผู้ใช้เลือก (ค่าตั้ง)
+        self._cloud_effort = cloud_effort or (lambda: None)  # ระดับความคิดของแชทงาน · None = ไม่ส่ง
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
         self._forge = forge  # มีเครื่องมือ create-skill (การ์ด 0017) → บอก AI ใน system prompt
         self._model_name = model_name
@@ -4271,8 +4291,16 @@ class ChatController(QObject):
             return False
         self._conv["messages"].append({"role": "user", "content": text})
         self._trace = {"t0": time.monotonic(), "why": "แชทงาน: ทุกข้อความส่งให้ Claude"}
-        self._ask_cloud(f"โมเดลที่เลือก: {self._work_model()}")
+        effort = self._work_effort()
+        why = f"โมเดลที่เลือก: {self._work_model()}" + (f" · ความคิด {effort}" if effort else "")
+        self._ask_cloud(why)
         return True
+
+    def _work_effort(self) -> str | None:
+        from aipc.cloud.ask import EFFORTS
+
+        e = self._cloud_effort()
+        return e if e in EFFORTS else None
 
     def _work_model(self) -> str:
         from aipc.cloud.ask import MODELS
@@ -4445,12 +4473,15 @@ class ChatController(QObject):
         self.streamChanged.emit()
 
         work_model = self._work_model() if self._mode == "work" else None
+        effort = self._work_effort() if work_model else None
         if work_model:
-            self._stream_text = f"กำลังถาม Claude ({work_model}) · แชทงาน…"
+            how = work_model + (f" · ความคิด {effort}" if effort else "")
+            self._stream_text = f"กำลังถาม Claude ({how}) · แชทงาน…"
 
         def work():
             if work_model:
-                c = self._cloud(question, history, model=work_model)
+                extra = {"effort": effort} if effort else {}
+                c = self._cloud(question, history, model=work_model, **extra)
             else:
                 c = self._cloud(question, history)
             reply = client.Reply(text=c.text if c.ok else "", reason="" if c.ok else "error",
