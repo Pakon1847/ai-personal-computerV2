@@ -459,8 +459,10 @@ ColumnLayout {
                 Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                 text: uiSettings.lockMin === 0
                       ? Tr.t("ปิดอยู่: ถ้าลืมกดออกแล้วลุกไป คนต่อไปจะเห็นงาน แชท และบัญชีเว็บที่เข้าไว้")
-                      : Tr.t("ไม่ได้แตะคีย์บอร์ดหรือเมาส์ ") + uiSettings.lockMin + Tr.t(" นาที → ล็อกทุกหน้าต่าง (ปลดด้วยรหัสผ่าน) · ล็อกค้างอีก ")
-                        + uiSettings.logoutMin + Tr.t(" นาที → ออกจากระบบเอง งานที่ยังไม่บันทึกจะหาย")
+                      : Tr.t("ไม่ได้แตะคีย์บอร์ดหรือเมาส์ ") + uiSettings.lockMin + Tr.t(" นาที → ล็อกทุกหน้าต่าง (ปลดด้วยรหัสผ่าน) · ")
+                        + (uiSettings.logoutMin === 0
+                           ? Tr.t("ไม่ออกจากระบบเอง แอปและงานที่เปิดไว้ยังอยู่")
+                           : Tr.t("ล็อกค้างอีก ") + uiSettings.logoutMin + Tr.t(" นาที → ออกจากระบบเอง งานที่ยังไม่บันทึกจะหาย"))
             }
             Flow {
                 Layout.fillWidth: true
@@ -487,7 +489,7 @@ ColumnLayout {
                     AppButton {
                         required property int modelData
                         objectName: "logoutMin" + modelData
-                        text: modelData + Tr.t(" นาที")
+                        text: modelData === 0 ? Tr.t("ไม่ออกเอง") : modelData + Tr.t(" นาที")
                         kind: uiSettings.logoutMin === modelData ? "primary" : "secondary"
                         onClicked: uiSettings.setLogoutMin(modelData)
                     }
@@ -501,8 +503,11 @@ ColumnLayout {
                 detail: face.state !== "enrolled" && !uiSettings.presence
                         ? Tr.t("ต้องลงทะเบียน \"ใบหน้าของฉัน\" ด้านบนก่อน")
                         : Tr.t("ไม่ได้แตะเครื่อง 10 วินาที → กล้องเปิด · ไม่เห็นหน้าคุณ ") + uiSettings.presenceLockS
-                          + Tr.t(" วินาที หรือเห็นคนอื่นแทน → ล็อก · ล็อกแล้วไม่มีใครอยู่อีก ") + uiSettings.presenceLogoutS
-                          + Tr.t(" วินาที → ออกจากระบบ · ไม่บันทึกภาพ · ไฟกล้องติดเฉพาะตอนกล้องเปิด")
+                          + Tr.t(" วินาที หรือเห็นคนอื่นแทน → ล็อก · ")
+                          + (uiSettings.presenceLogoutS === 0
+                             ? Tr.t("ไม่ออกจากระบบเอง")
+                             : Tr.t("ล็อกแล้วไม่มีใครอยู่อีก ") + uiSettings.presenceLogoutS + Tr.t(" วินาที → ออกจากระบบ"))
+                          + Tr.t(" · ไม่บันทึกภาพ · ไฟกล้องติดเฉพาะตอนกล้องเปิด")
                 checked: uiSettings.presence
                 onClicked: uiSettings.setPresence(checked)
             }
@@ -528,11 +533,11 @@ ColumnLayout {
                 spacing: 8
                 AppText { text: Tr.t("ออกหลังล็อกถ้าไม่มีใคร"); size: Theme.fontSmall; color: Theme.inkMuted; height: 44; verticalAlignment: Text.AlignVCenter }
                 Repeater {
-                    model: uiSettings.presenceChoices
+                    model: uiSettings.presenceLogoutChoices
                     AppButton {
                         required property int modelData
                         objectName: "presenceLogout" + modelData
-                        text: modelData + Tr.t(" วินาที")
+                        text: modelData === 0 ? Tr.t("ไม่ออกเอง") : modelData + Tr.t(" วินาที")
                         kind: uiSettings.presenceLogoutS === modelData ? "primary" : "secondary"
                         onClicked: uiSettings.setPresenceLogoutS(modelData)
                     }

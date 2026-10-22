@@ -135,7 +135,9 @@ class Decider:
         # เห็นคนอื่นแล้วยังอยู่หน้าจอ = ไม่ออก (ขั้น B M3 ไม่ผ่าน) · คนอื่นเดินไปแล้วไม่มีใครอีก 30 วิ = ออก (M1/M2 ผ่าน)
         if seen.faces > 0:
             self.last_face = now
-        if idle and now - max(self.locked_at, self.last_face) >= self.logout_after:
+        # logout_after ≤ 0 = ล็อกอย่างเดียว ไม่ออก (การ์ด 0051 · ค่าเริ่มต้น)
+        quiet = now - max(self.locked_at, self.last_face)
+        if self.logout_after > 0 and idle and quiet >= self.logout_after:
             self._to("logout", now)
             return "logout"
         return None

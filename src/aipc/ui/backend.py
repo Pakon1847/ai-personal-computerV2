@@ -215,6 +215,10 @@ class UiSettings(QObject):
     def presenceChoices(self) -> list:  # noqa: N802
         return list(settings.PRESENCE_CHOICES)
 
+    @Property("QVariantList", constant=True)
+    def presenceLogoutChoices(self) -> list:  # noqa: N802
+        return list(settings.PRESENCE_LOGOUT_CHOICES)
+
     @Slot(bool)
     def setPresence(self, on: bool) -> None:  # noqa: N802
         if bool(on) != self._prefs.presence:
@@ -231,7 +235,7 @@ class UiSettings(QObject):
 
     @Slot(int)
     def setPresenceLogoutS(self, s: int) -> None:  # noqa: N802
-        if s in settings.PRESENCE_CHOICES and s != self._prefs.presence_logout_s:
+        if s in settings.PRESENCE_LOGOUT_CHOICES and s != self._prefs.presence_logout_s:
             self._prefs.presence_logout_s = int(s)
             settings.save(self._prefs, self._path)
             self.changed.emit()

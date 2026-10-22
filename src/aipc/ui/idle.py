@@ -5,6 +5,7 @@
   ครบ lock_min นาที  → swaylock (ext-session-lock: บังทุกหน้าต่างรวม Chromium ·
                        ปลดด้วยรหัสผ่านผ่าน PAM ของระบบ)
   ครบอีก logout_min → labwc --exit (คำสั่งเดียวกับปุ่ม "ออก" · KillUserProcesses ปิดทุกโปรเซสของผู้ใช้)
+                       logout_min = 0 (ค่าเริ่มต้นตั้งแต่การ์ด 0051) = ล็อกอย่างเดียว ไม่ออกเอง แอปที่เปิดไว้ยังอยู่
 ทั้งสองโปรแกรมมากับ Raspberry Pi OS อยู่แล้ว
 (ตรวจบน Pi 5 2026-10-06: swaylock 1.8.2 · swayidle 1.8.0 · labwc 0.20.1)
 ใช้กล้องตรวจว่ามีคนอยู่ (ขั้น C) ทำหลังผลวัดขั้น B ผ่านเกณฑ์เท่านั้น
@@ -38,7 +39,8 @@ def swayidle_args(
 ) -> list[str] | None:
     """ไม่ใช้เครื่อง lock_s วินาที → ล็อก · ไม่ใช้ต่ออีก logout_s วินาที (นับจากครั้งสุดท้ายที่ใช้) → ออกจากระบบ.
 
-    lock_s ≤ 0 = ไม่ล็อกด้วยเวลา · idle_flag (ขั้น C) = ไม่แตะ flag_after_s วิ → สร้างไฟล์ธง · แตะ → ลบ
+    lock_s ≤ 0 = ไม่ล็อกด้วยเวลา · logout_s ≤ 0 = ล็อกอย่างเดียว ไม่ออก (การ์ด 0051)
+    idle_flag (ขั้น C) = ไม่แตะ flag_after_s วิ → สร้างไฟล์ธง · แตะ → ลบ
     (ตัวตรวจด้วยกล้องเปิดกล้องเฉพาะตอนมีธง) · ไม่มีทั้งสองอย่าง = คืน None · -w = รอคำสั่งจบก่อนรับเหตุการณ์ถัดไป
     """
     args = ["swayidle", "-w"]
@@ -46,26 +48,37 @@ def swayidle_args(
         f = shlex.quote(str(idle_flag))
         args += ["timeout", str(flag_after_s), f"touch {f}", "resume", f"rm -f {f}"]
     if lock_s > 0:
-        args += ["timeout", str(lock_s), shlex.join(lock_cmd),
-                 "timeout", str(lock_s + max(logout_s, 1)), EXIT_CMD]  # fmt: skip
+        args += ["timeout", str(lock_s), shlex.join(lock_cmd)]
+        if logout_s > 0:
+            args += ["timeout", str(lock_s + logout_s), EXIT_CMD]
     return args if len(args) > 2 else None
 
 
-def lock_lines(name: str, lock_min: int, logout_min: int, presence_logout_s: int = 0) -> list[str]:
+def lock_lines(
+    name: str, lock_min: int, logout_min: int, presence_logout_s: int | None = None
+) -> list[str]:
     """ข้อความบนจอล็อก (ผู้ใช้ทั่วไป/ผู้สูงอายุต้องรู้ว่าต้องทำอะไร ไม่ใช่เห็นจอสีดำเฉย ๆ).
 
-    presence_logout_s > 0 = เปิดขั้น C (ล็อกได้ทั้งเพราะไม่ได้ใช้ และเพราะกล้องไม่เห็นเจ้าของ)
+    presence_logout_s ไม่ใช่ None = เปิดขั้น C (ล็อกได้ทั้งเพราะไม่ได้ใช้ และเพราะกล้องไม่เห็นเจ้าของ) ·
+    ค่าออก = 0 = ล็อกอย่างเดียว (การ์ด 0051) → บอกว่างานยังอยู่ ไม่ขู่ว่าจะหาย
     """
     who = f"{name} · " if name else ""
-    if presence_logout_s:
+    keep = "ระบบจะไม่ออกจากระบบเอง · แอปและงานที่เปิดไว้ยังอยู่ครบหลังปลดล็อก"
+    if presence_logout_s is not None:
         why = f"{who}ไม่ได้ใช้เครื่อง หรือกล้องไม่เห็นเจ้าของบัญชี"
         out = (
             f"ถ้าไม่มีใครอยู่หน้าเครื่อง ระบบจะออกจากระบบให้เองใน {presence_logout_s} วินาที · "
             "งานที่ยังไม่บันทึกจะหาย"
+            if presence_logout_s > 0
+            else keep
         )
     else:
         why = f"{who}ไม่ได้ใช้เครื่องเกิน {lock_min} นาที"
-        out = f"ถ้าไม่ปลดล็อกภายใน {logout_min} นาที ระบบจะออกจากระบบให้เอง · งานที่ยังไม่บันทึกจะหาย"
+        out = (
+            f"ถ้าไม่ปลดล็อกภายใน {logout_min} นาที ระบบจะออกจากระบบให้เอง · งานที่ยังไม่บันทึกจะหาย"
+            if logout_min > 0
+            else keep
+        )
     return [
         "หน้าจอล็อกอยู่",
         why,
@@ -158,7 +171,7 @@ class IdleLock:
         rdir = self._dir or runtime_dir()
         image = None
         try:
-            lines = lock_lines(name, lock_min, logout_min, presence[1] if presence else 0)
+            lines = lock_lines(name, lock_min, logout_min, presence[1] if presence else None)
             image = self._render(rdir / "lock.png", lines, size)
         except Exception:  # noqa: BLE001 · วาดภาพไม่ได้ ยังล็อกได้ (จอสีพื้น) · ความปลอดภัยสำคัญกว่าหน้าตา
             image = None

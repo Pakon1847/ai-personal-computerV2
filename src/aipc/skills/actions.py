@@ -42,6 +42,7 @@ ACTIONS: dict[str, ActionSpec] = {
         ActionSpec("change_volume", "medium", "เพิ่ม/ลดเสียง"),
         ActionSpec("mute", "low", "ปิดเสียง"),
         ActionSpec("unmute", "low", "เปิดเสียง"),
+        ActionSpec("lock_screen", "low", "ล็อกหน้าจอ"),  # การ์ด 0051 · ปลดด้วยรหัสผ่าน · ไม่ออกจากระบบ
     ]
 }
 
@@ -250,6 +251,15 @@ def command_for(plan: Plan) -> list[str] | None:
         return ["wpctl", "set-volume", "-l", "1.0", SINK, f"{abs(step)}%{'+' if step > 0 else '-'}"]
     if plan.action in ("mute", "unmute"):
         return ["wpctl", "set-mute", SINK, "1" if plan.action == "mute" else "0"]
+    if plan.action == "lock_screen":
+        # swaylock ตัวเดียวกับล็อกเมื่อไม่ได้ใช้ (aipc.ui.idle) · ใช้ภาพข้อความจอล็อกที่วาดไว้แล้วถ้ามี
+        from aipc.ui import idle
+
+        try:
+            image = idle.runtime_dir() / "lock.png"
+        except AttributeError:  # วินโดวส์ไม่มี os.getuid · ล็อกจอสีพื้นแทน
+            image = None
+        return idle.lock_command(image if image is not None and image.is_file() else None)
     return None
 
 

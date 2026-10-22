@@ -41,6 +41,17 @@ class IdleArgsTest(unittest.TestCase):
         self.assertIn("-i /run/user/1/aipc/lock.png -s fill", args[4])
         self.assertEqual(args[5:], ["timeout", "900", "labwc --exit"])  # ล็อก 5 นาที + ออกอีก 10 นาที
 
+    def test_logout_zero_locks_only(self):
+        # การ์ด 0051: ค่าออก 0 = ล็อกอย่างเดียว · ไม่มีคำสั่งออกจากระบบใน swayidle เลย
+        args = idle.swayidle_args(300, 0, ["swaylock"])
+        self.assertEqual(args, ["swayidle", "-w", "timeout", "300", "swaylock"])
+        self.assertNotIn(idle.EXIT_CMD, args)
+
+    def test_lock_only_text_says_work_is_kept(self):
+        lines = idle.lock_lines("น้ำฝน", 5, 0)
+        self.assertIn("ไม่ออกจากระบบเอง", lines[3])
+        self.assertFalse(any("จะหาย" in x for x in lines))
+
     def test_lock_text_tells_what_to_do(self):
         lines = idle.lock_lines("น้ำฝน", 5, 10)
         self.assertEqual(lines[0], "หน้าจอล็อกอยู่")
@@ -97,7 +108,8 @@ class IdleLockTest(unittest.TestCase):
 
 class LockPrefsTest(unittest.TestCase):
     def test_defaults_round_trip_and_bad_values(self):
-        self.assertEqual((settings.UiPrefs().lock_min, settings.UiPrefs().logout_min), (5, 10))
+        # การ์ด 0051: ค่าเริ่มต้น = ล็อก 5 นาที · ไม่ออกจากระบบเอง
+        self.assertEqual((settings.UiPrefs().lock_min, settings.UiPrefs().logout_min), (5, 0))
         self.assertEqual(settings.UiPrefs().gcal_alert_min, 10)  # การ์ด 0032
         self.assertEqual(settings.UiPrefs(gcal_alert_min=7).cleaned().gcal_alert_min, 10)
         self.assertEqual(settings.UiPrefs(gcal_alert_min=True).cleaned().gcal_alert_min, 10)
@@ -108,7 +120,21 @@ class LockPrefsTest(unittest.TestCase):
             self.assertEqual((got.lock_min, got.logout_min), (0, 30))
             p.write_text(json.dumps({"lock_min": 7, "logout_min": True}), encoding="utf-8")
             got = settings.load(p)
-            self.assertEqual((got.lock_min, got.logout_min), (5, 10))
+            self.assertEqual((got.lock_min, got.logout_min), (5, 0))
+
+    def test_old_file_moves_to_lock_only_once(self):
+        # ไฟล์ก่อนการ์ด 0051 (ไม่มี lock_policy) ที่มีค่าออกเดิม → ไม่ออกเอง · ค่าล็อกและค่าอื่นคงเดิม
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "ui.json"
+            old = {"lock_min": 10, "logout_min": 30, "presence_logout_s": 60, "theme": "light"}
+            p.write_text(json.dumps(old), encoding="utf-8")
+            got = settings.load(p)
+            self.assertEqual((got.lock_min, got.logout_min, got.presence_logout_s), (10, 0, 0))
+            self.assertEqual(got.theme, "light")
+            # ผู้ใช้เลือกออกเองหลังย้ายแล้ว → จำไว้ ไม่ถูกย้ายซ้ำ
+            got.logout_min = 30
+            settings.save(got, p)
+            self.assertEqual(settings.load(p).logout_min, 30)
 
 
 @unittest.skipIf(QGuiApplication is None, "ไม่มี PySide6")
