@@ -1,0 +1,158 @@
+/* จอล็อกรุ่น 2 (การ์ด 0055) · ตามภาพร่างที่ Pakon อนุมัติ 2026-10-23
+   ธีมดำของแอป (Theme.qml) · คอลัมน์เดียว · นาฬิกาใหญ่กลางจอ · การ์ดผู้ใช้ · เส้นเน้นสีเดียว (คราม)
+   ชื่อ #… มาจากไฟล์ layout ของเรา (gtklock.ui) และโมดูล userinfo / playerctl ของ gtklock */
+
+* {
+    font-family: "IBM Plex Sans Thai", sans-serif;
+}
+
+window {
+    background-color: #050506;
+    background-image: radial-gradient(circle at 50% 40%, #16171e 0%, #050506 70%);
+}
+
+#clock-label {
+    font-size: 132pt;
+    font-weight: 300;
+    color: #f2f2f4;
+}
+
+#date-label {
+    font-size: 21pt;
+    color: #a1a1aa;
+    margin-bottom: 28px;
+}
+
+#card {
+    background-color: rgba(17, 17, 19, 0.92);
+    border: 1px solid #26262c;
+    border-radius: 28px;
+    padding: 28px 44px 30px 44px;
+}
+
+#user-name {
+    font-size: 20pt;
+    font-weight: 600;
+    color: #f2f2f4;
+}
+
+/* รูปบัญชี = วงกลมอักษรแรก (วาดเองใน layout · โมดูล userinfo ของ gtklock ล้มเมื่อใช้ฟอนต์ไทยของแอป · ตรวจบน Pi 5) */
+#avatar {
+    min-width: 92px;
+    min-height: 92px;
+    border-radius: 50%;
+    background-color: #1c1d38;
+    border: 3px solid #a5b4fc;
+    color: #c7d2fe;
+    font-size: 30pt;
+    font-weight: 600;
+}
+
+#face-hint {
+    font-size: 14pt;
+    color: #c7d2fe;
+    margin-bottom: 6px;
+}
+
+#input-label {
+    font-size: 1pt;
+    color: transparent;
+}
+
+#input-field {
+    min-height: 54px;
+    border-radius: 27px;
+    background-color: #1a1a1e;
+    background-image: none;
+    color: #f2f2f4;
+    border: 1px solid #3f3f48;
+    box-shadow: none;
+    padding: 0 22px;
+    font-size: 15pt;
+    caret-color: #a5b4fc;
+}
+
+#input-field:focus {
+    border-color: #a5b4fc;
+}
+
+#unlock-button {
+    min-height: 54px;
+    border-radius: 27px;
+    padding: 0 26px;
+    background-color: #a5b4fc;
+    background-image: none;
+    color: #14123a;
+    border: none;
+    box-shadow: none;
+    font-size: 14pt;
+    font-weight: 600;
+}
+
+#unlock-button:disabled {
+    background-color: #3f3f48;
+    color: #a1a1aa;
+}
+
+#error-label {
+    color: #f28b80;
+    font-size: 13pt;
+}
+
+#warning-label {
+    color: #f0b45c;
+    font-size: 13pt;
+}
+
+#keep-label {
+    font-size: 14pt;
+    margin-top: 22px;
+}
+
+#keep-label.keep {
+    color: #6ccb7e;
+}
+
+#keep-label.warn {
+    color: #f0b45c;
+}
+
+#hint-label {
+    font-size: 12pt;
+    color: #636978;
+    margin-top: 10px;
+}
+
+#playerctl-box {
+    background-color: #111113;
+    border: 1px solid #26262c;
+    border-radius: 24px;
+    padding: 10px 18px;
+    margin: 18px;
+}
+
+#title-label,
+#album-label,
+#artist-label {
+    color: #a1a1aa;
+    font-size: 12pt;
+}
+
+#previous-button,
+#play-pause-button,
+#next-button {
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 22px;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    color: #f2f2f4;
+}
+
+#previous-button:hover,
+#play-pause-button:hover,
+#next-button:hover {
+    background-color: #1a1a1e;
+}

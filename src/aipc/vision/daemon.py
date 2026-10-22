@@ -9,6 +9,7 @@ socket 2 ตัว · ข้อความ JSON บรรทัดละ 1 ก�
     remove {username, password}               เหมือน enroll
     enabled {username}                        เจ้าของบัญชีหรือหน้า Login · บอกว่าเปิดเข้าด้วยใบหน้าไหม
     watch {username, seconds}                 เจ้าของบัญชีเท่านั้น (ไม่ใช่หน้า Login) · ดูว่าเจ้าของยังนั่งอยู่
+    unlock {username}                         เจ้าของบัญชีเท่านั้น · ปลดจอล็อกด้วยใบหน้า (การ์ด 0055)
                                               (การ์ด 0051 ก) ทุก 2 วิ: กี่หน้า/ใช่เจ้าของไหม · ไม่ส่งภาพ
 - `/run/aipc-vision/visiond-root.sock` (0600 · เฉพาะ uid 0 = `aipc-face-pass` ที่ PAM เรียก):
     consume {username}    ใช้ตั๋ว → {"ok": true} = เข้าระบบได้เลย
@@ -39,6 +40,7 @@ HELPER = ["sudo", "-n", "/usr/local/sbin/aipc-accounts"]
 ENROLL_SECONDS = 40.0  # เท่าการลงทะเบียนในหน้าตั้งค่า (การ์ด 0010)
 IDENTIFY_MAX_S = 15.0
 WATCH_MAX_S = 60.0  # ตัวตรวจขอใหม่ทุก ≤ 60 วิ (กล้องไม่ค้างถ้าตัวตรวจตาย)
+UNLOCK_SECONDS = 5.0  # ปลดจอล็อกด้วยใบหน้า (การ์ด 0055) · สั้นกว่าหน้า Login (คนนั่งหน้าจออยู่แล้ว)
 
 
 def peer_uid(conn: socket.socket) -> int:
@@ -158,11 +160,16 @@ class Handler:
             return self._with_camera(
                 lambda: vars(self.face.identify(_tap(self.frames(secs), last), progress))
             )
-        if op == "watch":
-            # เจ้าของบัญชีเท่านั้น · หน้า Login/root ขอไม่ได้ (ไม่มีเหตุให้ดูว่าใครนั่งอยู่หน้าเครื่อง)
+        if op in ("watch", "unlock"):
+            # เจ้าของบัญชีเท่านั้น · หน้า Login/root ขอไม่ได้ (ไม่มีเหตุให้ดูว่าใครนั่งอยู่หน้าเครื่อง ·
+            # ปลดจอล็อกของคนอื่นไม่ได้)
             owner = isinstance(user, str) and uid not in (0, self.greeter_uid)
             if not owner or uid != self._uid_of(user):
                 return {"ok": False, "state": "error", "message": "ทำได้เฉพาะบัญชีของตัวเอง"}
+            if op == "unlock":
+                return self._with_camera(
+                    lambda: vars(self.face.unlock(user, self.frames(UNLOCK_SECONDS)))
+                )
             try:
                 secs = max(1.0, min(float(req.get("seconds", WATCH_MAX_S)), WATCH_MAX_S))
             except (TypeError, ValueError):

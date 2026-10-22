@@ -296,19 +296,21 @@ def pick_eyes(user: str, enabled=None, local=None):
     return Eyes(stored.vector) if stored is not None else None
 
 
-def lock_now(image: str | None) -> subprocess.Popen:
-    """swaylock แบบไม่ -f (ไม่แยกตัว) · ปลดล็อกแล้วโปรเซสจบเอง."""
+def lock_now(image: str | None = None) -> subprocess.Popen:
+    """ตัวล็อกเดียวกับล็อกเมื่อไม่ได้ใช้ (gtklock รุ่น 2 / swaylock รุ่น 1) แบบไม่แยกตัว (ไม่ -d/-f) ·
+    ปลดล็อกแล้วโปรเซสจบเอง."""
     from aipc.ui import idle
 
-    cmd = [a for a in idle.lock_command(Path(image) if image else None) if a != "-f"]
+    cmd = [a for a in idle.current_lock_command() if a not in ("-f", "-d")]
     return subprocess.Popen(
         cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
 
 
 def any_lock(run=subprocess.run) -> bool:
-    """มี swaylock ของผู้ใช้คนนี้อยู่ไหม (ของขั้น A หรือที่ตัวนี้สั่ง)."""
-    r = run(["pgrep", "-u", str(os.getuid()), "-x", "swaylock"], capture_output=True, check=False)
+    """มีตัวล็อก (swaylock/gtklock) ของผู้ใช้คนนี้อยู่ไหม (ของขั้น A หรือที่ตัวนี้สั่ง)."""
+    r = run(["pgrep", "-u", str(os.getuid()), "-x", "swaylock|gtklock"],
+            capture_output=True, check=False)  # fmt: skip
     return r.returncode == 0
 
 

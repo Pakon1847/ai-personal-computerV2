@@ -48,6 +48,24 @@ def lock_command(image: Path | None) -> list[str]:
     return cmd
 
 
+def current_command_file() -> Path:
+    return runtime_dir() / "lock-command.json"
+
+
+def current_lock_command() -> list[str]:
+    """คำสั่งล็อกที่ตั้งไว้ล่าสุด (gtklock รุ่น 2 หรือ swaylock รุ่น 1) · ใช้ร่วมกันทั้งล็อกเมื่อไม่ได้ใช้ ·
+    สั่งเสียง "ล็อกหน้าจอ" · ตัวตรวจด้วยกล้อง · ยังไม่ได้ตั้ง/อ่านไม่ได้ = swaylock สีพื้น (ล็อกได้เสมอ · H1)."""
+    import json
+
+    try:
+        cmd = json.loads(current_command_file().read_text(encoding="utf-8"))
+        if isinstance(cmd, list) and cmd and all(isinstance(a, str) for a in cmd):
+            return cmd
+    except (OSError, ValueError, AttributeError):
+        pass
+    return lock_command(None)
+
+
 def swayidle_args(
     lock_s: int,
     logout_s: int,
@@ -226,6 +244,8 @@ class IdleLock:
         which=shutil.which,
         image_dir: Path | None = None,
         render=render_lock_image,
+        gtklock=None,
+        prepare=None,
     ):
         self._spawn = spawn or (
             lambda args: subprocess.Popen(  # noqa: S603 · list args ไม่ผ่าน shell
@@ -235,6 +255,11 @@ class IdleLock:
         self._which = which
         self._dir = image_dir
         self._render = render
+        from aipc.ui import lockscreen
+
+        self._gtklock = gtklock or (lambda: lockscreen.available(self._which))
+        self._prepare = prepare or (lambda folder, keep, warn, name: lockscreen.prepare(
+            folder, keep, warn, name))  # fmt: skip
         self._proc = None
         self._monitor = None  # ตัวตรวจด้วยกล้อง (ขั้น C)
         self._applied: tuple | None = None
@@ -255,19 +280,32 @@ class IdleLock:
         if lock_min <= 0 and presence is None:
             self.status = "ปิดอยู่"
             return None
-        missing = [t for t in ("swayidle", "swaylock") if self._which(t) is None]
+        missing = [t for t in ("swayidle",) if self._which(t) is None]
+        if self._which("swaylock") is None and not self._gtklock():
+            missing.append("swaylock")
         if missing:
             self.status = "เครื่องนี้ไม่มี " + " ".join(missing)
             return None
         rdir = self._dir or runtime_dir()
-        image = None
-        try:
-            lines = lock_lines(name, lock_min, logout_min, presence[1] if presence else None)
-            image = self._render(rdir / "lock.png", lines, size)
-        except Exception:  # noqa: BLE001 · วาดภาพไม่ได้ ยังล็อกได้ (จอสีพื้น) · ความปลอดภัยสำคัญกว่าหน้าตา
+        lines = lock_lines(name, lock_min, logout_min, presence[1] if presence else None)
+        cmd = None
+        if self._gtklock():  # การ์ด 0055: จอล็อกรุ่น 2 (นาฬิกา · ปลดด้วยใบหน้า) · ไม่มี = รุ่น 1
+            try:
+                keep = lines[-1]
+                warn = "จะหาย" in keep
+                cmd = self._prepare(rdir / "gtklock", keep, warn, name)
+            except Exception:  # noqa: BLE001 · เตรียมรุ่น 2 ไม่ได้ = ใช้รุ่น 1 (ล็อกได้เสมอ)
+                cmd = None
+        if cmd is None:
             image = None
+            try:
+                image = self._render(rdir / "lock.png", lines, size)
+            except Exception:  # noqa: BLE001 · วาดภาพไม่ได้ ยังล็อกได้ (จอสีพื้น) · ความปลอดภัยสำคัญกว่าหน้าตา
+                image = None
+            cmd = lock_command(image)
+        _remember_command(rdir / "lock-command.json", cmd)
         flag = rdir / "input-idle" if presence else None
-        args = swayidle_args(lock_min * 60, logout_min * 60, lock_command(image), idle_flag=flag)
+        args = swayidle_args(lock_min * 60, logout_min * 60, cmd, idle_flag=flag)
         self._proc = self._spawn(args)
         if presence:
             import sys
@@ -284,8 +322,6 @@ class IdleLock:
                 "--logout-after",
                 str(presence[1]),
             ]
-            if image is not None:
-                mon += ["--image", str(image)]
             self._monitor = self._spawn(mon)
         self.status = ""
         return args
@@ -300,6 +336,18 @@ class IdleLock:
                     proc.kill()
         self._proc = self._monitor = None
         self._applied = None
+
+
+def _remember_command(path: Path, cmd: list[str]) -> None:
+    import json
+
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(cmd, ensure_ascii=False), encoding="utf-8")
+        os.replace(tmp, path)
+    except OSError:
+        pass
 
 
 def clear_orphans(run=subprocess.run) -> None:

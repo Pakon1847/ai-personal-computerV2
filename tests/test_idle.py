@@ -70,7 +70,9 @@ class IdleArgsTest(unittest.TestCase):
 
 
 class IdleLockTest(unittest.TestCase):
-    def make(self, which=lambda t: f"/usr/bin/{t}", render=None):
+    def make(self, which=lambda t: None if t == "gtklock" else f"/usr/bin/{t}", render=None,
+             prepare=None):  # fmt: skip
+        # ค่าเริ่มต้น = เครื่องไม่มี gtklock → จอล็อกรุ่น 1 (swaylock) แบบเดิม
         self.spawned = []
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
@@ -84,9 +86,9 @@ class IdleLockTest(unittest.TestCase):
             path.write_text("png", encoding="utf-8")
             return path
 
-        return idle.IdleLock(
-            spawn=spawn, which=which, image_dir=Path(d.name), render=render or fake_render
-        )
+        self.dir = Path(d.name)
+        return idle.IdleLock(spawn=spawn, which=which, image_dir=self.dir,
+                             render=render or fake_render, prepare=prepare)  # fmt: skip
 
     def test_start_once_restart_on_change_stop_when_off(self):
         lock = self.make()
@@ -100,8 +102,33 @@ class IdleLockTest(unittest.TestCase):
         self.assertTrue(self.spawned[1].terminated)
         self.assertEqual(lock.status, "ปิดอยู่")
 
+    def test_gtklock_when_installed_and_remembered_for_other_locks(self):
+        # การ์ด 0055: มี gtklock = จอล็อกรุ่น 2 · คำสั่งถูกจำไว้ให้สั่งเสียง/ตัวตรวจด้วยกล้องใช้ตัวเดียวกัน
+        seen = []
+
+        def prepare(folder, keep, warn, name):
+            seen.append((keep, warn, name))
+            return ["env", "X=1", "gtklock", "-d"]
+
+        lock = self.make(which=lambda t: f"/usr/bin/{t}", prepare=prepare)
+        args = lock.apply(5, 0, "น้ำฝน")
+        self.assertEqual(args[4], "env X=1 gtklock -d")
+        self.assertEqual(seen, [(idle.lock_lines("น้ำฝน", 5, 0)[-1], False, "น้ำฝน")])
+        saved = json.loads((self.dir / "lock-command.json").read_text(encoding="utf-8"))
+        self.assertEqual(saved, ["env", "X=1", "gtklock", "-d"])
+        lock.apply(5, 10, "น้ำฝน")
+        self.assertTrue(seen[-1][1])  # ตั้งให้ออกเอง = บรรทัดเตือนสีส้ม
+
+    def test_gtklock_failure_falls_back_to_swaylock(self):
+        def broken(folder, keep, warn, name):
+            raise OSError("no gtklock assets")
+
+        lock = self.make(which=lambda t: f"/usr/bin/{t}", prepare=broken)
+        args = lock.apply(5, 0)
+        self.assertTrue(args[4].startswith("swaylock -f"))
+
     def test_missing_tools_is_reported_not_silent(self):
-        lock = self.make(which=lambda t: None if t == "swaylock" else "/usr/bin/x")
+        lock = self.make(which=lambda t: None if t in ("swaylock", "gtklock") else "/usr/bin/x")
         self.assertIsNone(lock.apply(5, 10))
         self.assertEqual(self.spawned, [])
         self.assertIn("swaylock", lock.status)

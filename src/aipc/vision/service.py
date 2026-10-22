@@ -29,6 +29,7 @@ USER_RE = re.compile(r"^[a-z_][a-z0-9_-]{0,31}$")  # ชื่อบัญชี
 # ตัวตรวจว่าเจ้าของยังอยู่ (การ์ด 0051 ทาง ก) · ค่าเดียวกับขั้น C (aipc.ui.presence.THRESHOLD) และสแกนเข้าเครื่อง
 WATCH_THRESHOLD = 0.363
 WATCH_EVERY_S = 2.0
+UNLOCK_RETRY_S = 600.0  # ปลดจอล็อกด้วยใบหน้าผิดครบ = พัก 10 นาที (การ์ด 0055)
 PURPOSE = "เข้าเครื่องด้วยใบหน้าที่หน้า Login (เจ้าของบัญชีเปิดเอง · ปิดหรือลบได้ในหน้าตั้งค่า)"
 
 
@@ -144,6 +145,8 @@ class FaceLogin:
         self.scanner, self.gallery, self.check_password = scanner, gallery, check_password
         self.tickets = tickets or Tickets()
         self.lockout = lockout or Lockout()
+        self.unlock_lockouts: dict[str, Lockout] = {}  # ปลดจอล็อกด้วยใบหน้า · นับแยกต่อบัญชี (การ์ด 0055)
+        self.unlock_failed_at: dict[str, float] = {}
         self.log = log
 
     def _out(self, state: str, user: str = "") -> Outcome:
@@ -195,6 +198,33 @@ class FaceLogin:
                   "owner": best is not None and best >= WATCH_THRESHOLD,
                   "best": None if best is None else round(float(best), 3)})  # fmt: skip
         return Outcome(True, "done", user)
+
+    def unlock(self, user: str, frames: Iterable, progress=None) -> Outcome:
+        """ปลดจอล็อกด้วยใบหน้า (การ์ด 0055) · เทียบเฉพาะแม่แบบของบัญชีนั้น · ใช้ตัวสแกนเดียวกับหน้า Login
+        (มี liveness: รูปบนมือถือไม่ผ่าน) · ผิดหลายครั้ง = ต้องใช้รหัสผ่าน · ไม่มีภาพ/คะแนนใน log."""
+        lock = self.unlock_lockouts.setdefault(user, Lockout())
+        # ผิดครบ = พักใบหน้า 10 นาที (ใช้รหัสผ่านระหว่างนั้น) · ปลดด้วยรหัสผ่านไม่ผ่าน visiond จึงนับเวลาแทน
+        if lock.locked and time.monotonic() - self.unlock_failed_at.get(user, 0.0) > UNLOCK_RETRY_S:
+            lock.reset()
+        if lock.locked:
+            return self._out("locked", user)
+        try:
+            stored = self.gallery.store(user).load()
+        except ValueError:
+            stored = None
+        if stored is None:
+            return self._out("no-templates", user)
+        res = self.scanner.scan(frames, {user: stored.vector}, progress)
+        if res.account == user:
+            lock.reset()
+            self.log(f"ปลดจอล็อกด้วยใบหน้า: {user}")
+            return self._out("found", user)
+        state = {"spoof": "spoof", "not_enough_frames": "no-face"}.get(res.reason, "unknown")
+        if state != "no-face":
+            lock.fail()
+            self.unlock_failed_at[user] = time.monotonic()
+        self.log(f"ปลดจอล็อกด้วยใบหน้าไม่ผ่าน: {user} ({state})")
+        return self._out(state, user)
 
     def password_login(self) -> None:
         """เข้าระบบสำเร็จ (ด้วยรหัสผ่านหรือใบหน้า) · ปลดล็อกการสแกน."""

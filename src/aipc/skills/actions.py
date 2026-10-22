@@ -269,14 +269,13 @@ def command_for(plan: Plan) -> list[str] | None:
     if plan.action in POWER_CMDS:
         return list(POWER_CMDS[plan.action])
     if plan.action == "lock_screen":
-        # swaylock ตัวเดียวกับล็อกเมื่อไม่ได้ใช้ (aipc.ui.idle) · ใช้ภาพข้อความจอล็อกที่วาดไว้แล้วถ้ามี
+        # ตัวล็อกเดียวกับล็อกเมื่อไม่ได้ใช้ (aipc.ui.idle): gtklock รุ่น 2 (การ์ด 0055) หรือ swaylock รุ่น 1
         from aipc.ui import idle
 
         try:
-            image = idle.runtime_dir() / "lock.png"
+            return idle.current_lock_command()
         except AttributeError:  # วินโดวส์ไม่มี os.getuid · ล็อกจอสีพื้นแทน
-            image = None
-        return idle.lock_command(image if image is not None and image.is_file() else None)
+            return idle.lock_command(None)
     return None
 
 
