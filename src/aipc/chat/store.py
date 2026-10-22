@@ -24,6 +24,7 @@ def new_conversation() -> dict:
         "created": now,
         "updated": now,
         "messages": [],
+        "mode": "general",  # การ์ด 0053: "general" ในเครื่อง · "work" Claude
     }
 
 
@@ -60,6 +61,7 @@ class ChatStore:
                         "id": conv["id"],
                         "title": conv.get("title", ""),
                         "updated": conv.get("updated", ""),
+                        "mode": conv.get("mode", "general"),  # การ์ด 0053 · แชทเก่า = ทั่วไป
                     }
                 )
         return sorted(out, key=lambda c: c["updated"], reverse=True)

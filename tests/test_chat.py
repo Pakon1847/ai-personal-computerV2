@@ -368,7 +368,7 @@ class ControllerTest(ServerCase):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
-                           cloud=cloud)  # fmt: skip
+                           cloud=cloud, auto_cloud=True)  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
         done, picked = [], []
@@ -391,6 +391,7 @@ class ControllerTest(ServerCase):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           auto_cloud=True,
                            cloud=lambda q, h: CloudReply(True, "ข่าวเด่นวันนี้ …"))  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
@@ -420,6 +421,7 @@ class ControllerTest(ServerCase):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           auto_cloud=True,
                            cloud=lambda q, h: CloudReply(True, "ข่าวเด่นวันนี้ …"))  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
@@ -451,6 +453,7 @@ class ControllerTest(ServerCase):
         self.addCleanup(d.cleanup)
         on = [False]
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           auto_cloud=True,
                            cloud=lambda q, h: asked.append(q) or CloudReply(True, "จาก Claude"),
                            claude_on=lambda: on[0])  # fmt: skip
         self.addCleanup(c.shutdown)
@@ -511,6 +514,7 @@ class ControllerTest(ServerCase):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           auto_cloud=True,
                            cloud=lambda q, h: asked.append((q, h)) or CloudReply(True, "95 ราคา …"),
                            claude_on=lambda: cloud_on)  # fmt: skip
         self.addCleanup(c.shutdown)
@@ -547,6 +551,7 @@ class ControllerTest(ServerCase):
         self.addCleanup(d.cleanup)
         offline = CloudReply(False, error="ติดต่อ Claude ไม่ได้ (ไม่มีอินเทอร์เน็ต?)")
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
+                           auto_cloud=True,
                            cloud=lambda q, h: offline)  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)

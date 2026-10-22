@@ -85,7 +85,7 @@ class ChatEnergyTest(ServerCase):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
-                           cloud=cloud, meter=meter)  # fmt: skip
+                           cloud=cloud, meter=meter, auto_cloud=True)  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
         rows = []

@@ -121,8 +121,8 @@ Item {
     // การ์ดจากสกิล → แสดง และ/หรือส่งให้ AI ในเครื่อง · ใช้ทั้งตอนผู้ใช้พิมพ์ และตอน AI เลือกสกิลให้ (skillRequested)
     function dispatch(card, text) {
         const toAi = card.llm === true && chat.send(text, card.prompt || "", card.tools !== false)
-        if (card.llm && !toAi)
-            card.title = Tr.t("ยังตอบไม่ได้: ") + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
+        if (card.llm && !toAi)   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง (แชทงาน = เหตุที่ Claude ใช้ไม่ได้ · การ์ด 0053)
+            card.title = Tr.t("ยังตอบไม่ได้: ") + (chat.mode === "work" ? chat.workBlocked : chat.statusText)
         // สกิลแบบขั้นตอนเห็นการ์ดขั้นตอนเสมอ แม้ขั้นสุดท้ายจะส่งต่อให้ AI
         if (!toAi || card.kind === "steps")
             showCard(card)
@@ -136,6 +136,11 @@ Item {
         answered = ({})
     }
     // ข้อความจากเสียง: ใส่ช่องพิมพ์ให้ตรวจ/แก้แล้วกดส่งเอง (ทดลองแล้ว: ถอดผิดทำให้ทำคำสั่งผิดโดยไม่ถาม)
+    // แชท 2 แบบ (การ์ด 0053): สลับแบบ = บทสนทนาใหม่ของแบบนั้น · ล้างฟองข้อความของแบบเดิม
+    Connections {
+        target: chat
+        function onModeChanged() { voice.stop(); root.items = []; root.answered = ({}) }
+    }
     Connections {
         target: voice
         function onTranscribed(text) {
@@ -432,12 +437,32 @@ Item {
     }
 
     // ---------- ปุ่มมุมขวาบน ----------
-    RowLayout {
+    // Flow ขวาไปซ้าย: ตัวอักษรใหญ่ (200%) แล้วปุ่มไม่พอแถวเดียว = ขึ้นแถวใหม่ ไม่ล้นจอ (การ์ด 0053 · เพิ่มปุ่มแชท 2 แบบ)
+    // ลำดับในไฟล์จึงกลับด้านกับที่เห็น: ตัวแรกในไฟล์อยู่ขวาสุด
+    Flow {
         id: tools
+        anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        anchors.leftMargin: 24
         anchors.rightMargin: 24
+        layoutDirection: Qt.RightToLeft
         spacing: 8
+        AppButton {
+            text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
+            ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
+            onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
+        }
+        AppButton {
+            visible: !root.home
+            text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
+            onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
+        }
+        AppButton {
+            id: historyButton
+            text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
+            onClicked: historyPopup.open()
+        }
         // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
         AppButton {
             objectName: "speakSwitch"
@@ -452,20 +477,32 @@ Item {
                 if (!on) voice.stop()
             }
         }
-        AppButton {
-            id: historyButton
-            text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
-            onClicked: historyPopup.open()
+        // แชท 2 แบบ (การ์ด 0053): ทั่วไป = ในเครื่องเท่านั้น · งาน = Claude (เลือกโมเดลได้) · บอกเป็นคำ ไม่ใช่แค่สี
+        // เห็นเป็น: [แชททั่วไป] [แชทงาน] [Haiku] [Sonnet] [Opus] (โมเดลขึ้นเฉพาะตอนอยู่แชทงาน)
+        Repeater {
+            model: chat.mode === "work" ? uiSettings.cloudModels.slice().reverse() : []
+            AppButton {
+                required property string modelData
+                objectName: "model_" + modelData
+                text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
+                kind: uiSettings.cloudModel === modelData ? "primary" : "secondary"
+                Accessible.name: Tr.t("โมเดลของแชทงาน: ") + text
+                onClicked: uiSettings.setCloudModel(modelData)
+            }
         }
         AppButton {
-            visible: !root.home
-            text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
-            onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
+            objectName: "modeWork"
+            text: Tr.t("แชทงาน (Claude)")
+            kind: chat.mode === "work" ? "primary" : "secondary"
+            enabled: chat.workReady || chat.mode === "work"
+            ToolTip.visible: hovered && !chat.workReady; ToolTip.text: chat.workBlocked
+            onClicked: chat.setMode("work")
         }
         AppButton {
-            text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
-            ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
-            onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
+            objectName: "modeGeneral"
+            text: Tr.t("แชททั่วไป (ในเครื่อง)")
+            kind: chat.mode === "general" ? "primary" : "secondary"
+            onClicked: chat.setMode("general")
         }
     }
     // กล่องคำสั่งเสียง (Pakon 2026-10-20): หน้าต่างแยกของตัวเอง ลอยบนสุดเหนือทุกหน้าต่าง รวมเบราว์เซอร์เต็มจอ
@@ -833,7 +870,10 @@ Item {
             }
             AppText {
                 Layout.alignment: Qt.AlignHCenter
-                text: Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
+                // แชทงานส่งออกนอกเครื่อง → ห้ามเขียนว่า "ทำในเครื่อง" (H5 · การ์ด 0053)
+                text: chat.mode === "work"
+                      ? Tr.t("แชทงาน · ข้อความที่พิมพ์ส่งให้ Claude (") + uiSettings.cloudModel + Tr.t(") นอกเครื่อง")
+                      : Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
                 color: Theme.inkMuted; oneLine: true
             }
             // อ่านสรุปวันนี้ให้ฟัง (การ์ด 0019) · สำหรับคนที่ไม่สะดวกอ่านจอ · ใช้ข้อมูลเดียวกับการ์ดข้างล่าง
@@ -1305,6 +1345,7 @@ Item {
                     objectName: "chatInput"
                     placeholderText: !!root.feedbackFor
                                      ? Tr.t("บอกว่าสกิล “") + root.feedbackFor.name + Tr.t("” ผิดตรงไหน เช่น ให้เปิด Gmail แทน · Esc = ยกเลิก")
+                                     : chat.mode === "work" ? Tr.t("พิมพ์ข้อความถึง Claude (แชทงาน · ส่งออกนอกเครื่อง)")
                                      : Tr.t("พิมพ์ข้อความถึงผู้ช่วย AI")
                     placeholderTextColor: Theme.inkFaint
                     color: Theme.ink

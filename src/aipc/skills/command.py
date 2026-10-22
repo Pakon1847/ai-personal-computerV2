@@ -122,6 +122,18 @@ NEGATIONS = ("อย่า", "ไม่ต้อง", "ห้าม")
 # มีคำว่า "เสียง" แต่ไม่ใช่เสียงลำโพง · ตัวเลขที่ตามด้วยหน่วยเวลาไม่ใช่ระดับเสียง ("อัดเสียง 10 นาที" เคยได้ 10%)
 NOT_VOLUME = ("อัดเสียง", "ข้อความเสียง", "ไฟล์เสียง", "ส่งเสียง")
 DURATION = re.compile(r"นาที|ชั่วโมง|ชม\.|วินาที")
+# แชท 2 แบบ (การ์ด 0053) · ทั้งประโยค ("แชทงานคืออะไร" = คำถาม ไม่ใช่คำสั่ง)
+CHAT_MODE = re.compile(r"^(สลับ|เปลี่ยน|กลับ|เปิด|ใช้|ไป)(ไป|เป็น|มา)?(ที่)?(หน้า)?แชท(งาน|ทั่วไป)$")
+CHAT_MODE_EN = re.compile(r"^(switch|go|change)(back)?to(the)?(work|general)chat$")
+# เลือกโมเดลของแชทงาน · ต้องมีคำกริยา ใช้/เปลี่ยน ("ช่วยเขียนกลอนไฮกุ" ≠ เลือกโมเดล)
+MODEL_NAMES = {
+    "haiku": ("haiku", "ไฮกุ", "ไฮคุ"),
+    "sonnet": ("sonnet", "ซอนเน็ต", "ซอนเนต", "ซอนเน็ท"),
+    "opus": ("opus", "โอปัส", "โอปุส"),
+}
+MODEL_CMD = re.compile(
+    r"^(ใช้|เปลี่ยน|สลับ|use|switchto)(โมเดล|model)?(เป็น|ไป)?(โมเดล|model)?(?P<name>[a-zก-๙]+)$"
+)
 
 SURE = 1.0
 FUZZY_CUTOFF = 0.72  # ต่ำกว่านี้ถือว่าไม่ใช่คำสั่ง · สูงกว่านี้แต่ไม่ตรงเป๊ะ = ถามก่อน
@@ -283,6 +295,16 @@ def parse(text: str) -> Command | None:
     vol = _volume(t, heard)
     if vol:
         return vol
+
+    if (m := CHAT_MODE.match(t)) or (m := CHAT_MODE_EN.match(t)):
+        mode = "work" if m.group(m.lastindex) in ("งาน", "work") else "general"
+        say = "สลับไปแชทงาน" if mode == "work" else "กลับแชททั่วไป"
+        return Command(Plan("chat_mode", {"mode": mode}, say), SURE, heard)
+    if m := MODEL_CMD.match(t):
+        model = next((k for k, names in MODEL_NAMES.items() if m["name"] in names), None)
+        if model:
+            plan = Plan("cloud_model", {"model": model}, f"แชทงานใช้โมเดล {model}")
+            return Command(plan, SURE, heard)
 
     verb = next((v for v in OPEN_VERBS if t.startswith(v)), None)
     if verb is None:
