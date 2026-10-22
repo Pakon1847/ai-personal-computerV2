@@ -84,6 +84,7 @@
   "ตรวจจริงทุก 10 วินาที · อ่านอย่างเดียว ไม่แก้อะไรบนเครื่อง": "Checked live every 10 seconds · read-only, changes nothing",
   "ตรวจตอนนี้": "Check now",
   "กำลังตรวจ…": "Checking…",
+  " · ใช้อยู่": " · in use",
   "อุปกรณ์ที่ต่ออยู่": "Connected devices",
   "ตรวจใหม่": "Check again",
   "เจอ": "Found",

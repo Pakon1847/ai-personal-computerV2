@@ -146,7 +146,8 @@ ColumnLayout {
                     }
                     AppText { text: Tr.t(dv.modelData.label); strong: true; Layout.alignment: Qt.AlignTop }
                     AppText {
-                        text: dv.modelData.items.join(" · ")
+                        // " · ใช้อยู่" มาจาก Python เป็นไทย · แปลที่นี่ให้สลับภาษาแล้วเปลี่ยนตาม (การ์ด 0039)
+                        text: dv.modelData.items.map(x => x.replace(" · ใช้อยู่", Tr.t(" · ใช้อยู่"))).join(" · ")
                         size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true
                     }
                 }
