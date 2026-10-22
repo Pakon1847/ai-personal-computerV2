@@ -8,6 +8,8 @@ socket 2 ตัว · ข้อความ JSON บรรทัดละ 1 ก�
     enroll {username, password, consent_at}   หน้า Login (ตอนสมัคร) หรือเจ้าของบัญชีเอง (หน้าตั้งค่า)
     remove {username, password}               เหมือน enroll
     enabled {username}                        เจ้าของบัญชีหรือหน้า Login · บอกว่าเปิดเข้าด้วยใบหน้าไหม
+    watch {username, seconds}                 เจ้าของบัญชีเท่านั้น (ไม่ใช่หน้า Login) · ดูว่าเจ้าของยังนั่งอยู่
+                                              (การ์ด 0051 ก) ทุก 2 วิ: กี่หน้า/ใช่เจ้าของไหม · ไม่ส่งภาพ
 - `/run/aipc-vision/visiond-root.sock` (0600 · เฉพาะ uid 0 = `aipc-face-pass` ที่ PAM เรียก):
     consume {username}    ใช้ตั๋ว → {"ok": true} = เข้าระบบได้เลย
     login-ok {}           เข้าระบบสำเร็จ (ด้วยวิธีใดก็ได้) → ปลดล็อกการสแกน
@@ -36,6 +38,7 @@ REQUEST_MAX = 4096
 HELPER = ["sudo", "-n", "/usr/local/sbin/aipc-accounts"]
 ENROLL_SECONDS = 40.0  # เท่าการลงทะเบียนในหน้าตั้งค่า (การ์ด 0010)
 IDENTIFY_MAX_S = 15.0
+WATCH_MAX_S = 60.0  # ตัวตรวจขอใหม่ทุก ≤ 60 วิ (กล้องไม่ค้างถ้าตัวตรวจตาย)
 
 
 def peer_uid(conn: socket.socket) -> int:
@@ -155,6 +158,16 @@ class Handler:
             return self._with_camera(
                 lambda: vars(self.face.identify(_tap(self.frames(secs), last), progress))
             )
+        if op == "watch":
+            # เจ้าของบัญชีเท่านั้น · หน้า Login/root ขอไม่ได้ (ไม่มีเหตุให้ดูว่าใครนั่งอยู่หน้าเครื่อง)
+            owner = isinstance(user, str) and uid not in (0, self.greeter_uid)
+            if not owner or uid != self._uid_of(user):
+                return {"ok": False, "state": "error", "message": "ทำได้เฉพาะบัญชีของตัวเอง"}
+            try:
+                secs = max(1.0, min(float(req.get("seconds", WATCH_MAX_S)), WATCH_MAX_S))
+            except (TypeError, ValueError):
+                secs = WATCH_MAX_S
+            return self._with_camera(lambda: vars(self.face.watch(user, self.frames(secs), send)))
         if not isinstance(user, str) or not self._may_manage(uid, user):
             return {"ok": False, "state": "error", "message": "ทำได้เฉพาะบัญชีของตัวเอง"}
         if op == "enabled":

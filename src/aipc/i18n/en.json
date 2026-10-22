@@ -84,6 +84,8 @@
   "ตรวจจริงทุก 10 วินาที · อ่านอย่างเดียว ไม่แก้อะไรบนเครื่อง": "Checked live every 10 seconds · read-only, changes nothing",
   "ตรวจตอนนี้": "Check now",
   "กำลังตรวจ…": "Checking…",
+  "ต้องเปิด \"เข้าเครื่องด้วยใบหน้า\" ด้านบนก่อน (ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร)": "Turn on \"Face sign-in\" above first (uses the face you registered at sign-up)",
+  "ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร · ": "Uses the face registered at sign-up · ",
   "วันนี้ให้ช่วยอะไรดี · AI ในเครื่องตอบก่อน ถ้าต้องใช้ข้อมูลสดจะถาม Claude": "How can I help today? · the on-device AI answers first, Claude is asked for live information",
   "โหมดแชท": "Chat mode",
   "ในเครื่องก่อน": "on device first",

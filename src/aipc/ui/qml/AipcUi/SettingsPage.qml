@@ -498,11 +498,15 @@ ColumnLayout {
             // ขั้น C: กล้องช่วยดูว่าเจ้าของยังอยู่ · ต้องลงทะเบียน "ใบหน้าของฉัน" ก่อน · เปิดเอง
             AppCheck {
                 objectName: "presenceCheck"
-                enabled: face.state === "enrolled" || uiSettings.presence
+                // การ์ด 0051 ทาง ก: ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร (เข้าด้วยใบหน้า) ได้เลย ไม่ต้องลงทะเบียนซ้ำ ·
+                // "ใบหน้าของฉัน" แบบเดิมยังใช้ได้สำหรับบัญชีที่ไม่ได้เปิดเข้าด้วยใบหน้า
+                readonly property bool hasFace: loginFace.state === "enabled" || face.state === "enrolled"
+                enabled: hasFace || uiSettings.presence
                 text: Tr.t("ใช้กล้องช่วยดูว่าฉันยังนั่งอยู่")
-                detail: face.state !== "enrolled" && !uiSettings.presence
-                        ? Tr.t("ต้องลงทะเบียน \"ใบหน้าของฉัน\" ด้านบนก่อน")
-                        : Tr.t("ไม่ได้แตะเครื่อง 10 วินาที → กล้องเปิด · ไม่เห็นหน้าคุณ ") + uiSettings.presenceLockS
+                detail: !hasFace && !uiSettings.presence
+                        ? Tr.t("ต้องเปิด \"เข้าเครื่องด้วยใบหน้า\" ด้านบนก่อน (ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร)")
+                        : (loginFace.state === "enabled" ? Tr.t("ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร · ") : "")
+                          + Tr.t("ไม่ได้แตะเครื่อง 10 วินาที → กล้องเปิด · ไม่เห็นหน้าคุณ ") + uiSettings.presenceLockS
                           + Tr.t(" วินาที หรือเห็นคนอื่นแทน → ล็อก · ")
                           + (uiSettings.presenceLogoutS === 0
                              ? Tr.t("ไม่ออกจากระบบเอง")

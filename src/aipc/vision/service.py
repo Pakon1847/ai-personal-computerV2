@@ -20,12 +20,15 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from aipc.vision import models, pipeline, store
+from aipc.vision import matching, models, pipeline, store
 
 LOGIN_DIR = Path("/var/lib/aipc-vision/face-login")
 TICKET_TTL_S = 30.0
 LOCK_AFTER = 5
 USER_RE = re.compile(r"^[a-z_][a-z0-9_-]{0,31}$")  # ชื่อบัญชี Linux · กันชื่อไฟล์แปลก ("../")
+# ตัวตรวจว่าเจ้าของยังอยู่ (การ์ด 0051 ทาง ก) · ค่าเดียวกับขั้น C (aipc.ui.presence.THRESHOLD) และสแกนเข้าเครื่อง
+WATCH_THRESHOLD = 0.363
+WATCH_EVERY_S = 2.0
 PURPOSE = "เข้าเครื่องด้วยใบหน้าที่หน้า Login (เจ้าของบัญชีเปิดเอง · ปิดหรือลบได้ในหน้าตั้งค่า)"
 
 
@@ -168,6 +171,30 @@ class FaceLogin:
         ok = self.tickets.consume(user)
         self.log(f"ใช้ตั๋วใบหน้า {user}: {'สำเร็จ' if ok else 'ไม่มีตั๋ว'}")
         return ok
+
+    def watch(self, user: str, frames: Iterable, send, every_s: float | None = None,
+              clock=time.monotonic) -> Outcome:  # fmt: skip
+        """ตัวตรวจว่าเจ้าของยังนั่งอยู่ (การ์ด 0051 ทาง ก) · ใช้แม่แบบที่ลงทะเบียนตอนสมัคร (ชุดเดียว) ·
+        ส่งออกแค่ จำนวนหน้า · ใช่เจ้าของไหม · ความคล้ายสูงสุด — ไม่มีภาพหรือแม่แบบออกไป · ไม่ log ทุกภาพ."""
+        try:
+            stored = self.gallery.store(user).load()
+        except ValueError:
+            stored = None
+        if stored is None:
+            return self._out("no-templates")
+        every_s = WATCH_EVERY_S if every_s is None else every_s
+        last = float("-inf")
+        for frame in frames:
+            now = clock()
+            if now - last < every_s:
+                continue
+            last = now
+            sims = [matching.cosine(e, stored.vector) for e in self.scanner.embed_faces(frame)]
+            best = max(sims) if sims else None
+            send({"state": "seen", "faces": len(sims),
+                  "owner": best is not None and best >= WATCH_THRESHOLD,
+                  "best": None if best is None else round(float(best), 3)})  # fmt: skip
+        return Outcome(True, "done", user)
 
     def password_login(self) -> None:
         """เข้าระบบสำเร็จ (ด้วยรหัสผ่านหรือใบหน้า) · ปลดล็อกการสแกน."""

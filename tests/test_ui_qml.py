@@ -311,6 +311,8 @@ class ShellCardTest(unittest.TestCase):
                              settings_path=Path(tmp) / "ui.json")  # fmt: skip
         app, engine, warnings = uiapp.build(opts)
         settle()
+        if not engine.rootObjects():  # เคยล้มบางรอบโดยไม่บอกเหตุ (2026-10-22/23) → บอกข้อความ QML
+            self.fail("หน้าจอโหลดไม่ขึ้น: " + " | ".join(map(str, warnings))[:2000])
         win = engine.rootObjects()[0]
 
         def close():

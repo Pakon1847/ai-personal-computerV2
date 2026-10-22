@@ -113,6 +113,18 @@ class FaceScanner:
         self.detector, self.liveness, self.embedder, self.cfg = detector, liveness, embedder, cfg
         self._clock = clock
 
+    # ---------- ตัวตรวจว่าเจ้าของยังอยู่ (การ์ด 0051 ทาง ก) ----------
+    def embed_faces(self, frame: np.ndarray, max_faces: int = 3) -> list:
+        """ทุกหน้าในภาพ (ใหญ่ก่อน · ไม่เกิน max_faces) → embedding ที่ normalize แล้ว · ไม่ตรวจคุณภาพ/ความมีชีวิต
+        (ใช้ดูว่าเจ้าของยังนั่งอยู่ ไม่ใช่ใช้เข้าเครื่อง · กติกาเดียวกับขั้น C เดิม)."""
+        rows = [r for r in self.detector.detect(frame) if float(r[14]) >= self.cfg.min_detect_score]
+        out = []
+        for r in rows[:max_faces]:
+            face = Face.from_yunet(r)
+            aligned = align.crop(frame, face.landmarks)
+            out.append(matching.l2_normalize(self.embedder.embed(aligned)))
+        return out
+
     # ---------- ต่อเฟรม ----------
     def process(self, frame: np.ndarray) -> FrameResult:
         t = {}
