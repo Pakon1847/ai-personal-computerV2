@@ -49,6 +49,8 @@ ACTIONS: dict[str, ActionSpec] = {
         # แชท 2 แบบ (การ์ด 0053) · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
         ActionSpec("chat_mode", "low", "สลับแชททั่วไป/แชทงาน"),
         ActionSpec("cloud_model", "low", "เลือกโมเดลของแชทงาน"),
+        # การ์ด 0054: แอปที่รู้จักแต่ไม่มีในเครื่อง → หน้าจอถามติดตั้ง/เปิดเว็บแทน (ไม่รันอะไรเอง)
+        ActionSpec("missing_app", "low", "ถามติดตั้งแอปหรือเปิดผ่านเว็บ"),
     ]
 }
 
@@ -294,7 +296,7 @@ class Executor:
             args = command_for(plan)
         except KeyError:
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
-        if args is None:  # งานที่หน้าจอทำเอง (เช่น gcal_sync · สลับแชท) ไม่มีโปรแกรมให้รัน
+        if args is None:  # งานที่หน้าจอทำเอง (เช่น gcal_sync · สลับแชท · ถามติดตั้งแอป) ไม่มีโปรแกรมให้รัน
             return Outcome(False, f"{plan.spec.label}: สั่งได้จากหน้าจอ/คำสั่งเสียงเท่านั้น")
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)

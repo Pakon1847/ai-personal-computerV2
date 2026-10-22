@@ -285,6 +285,20 @@ def _discovered_aliases() -> dict[str, tuple[str, ...]]:
     return {f"desk:{a.desktop}": a.aliases for a in apps.REGISTRY.apps().values()}
 
 
+def _known_app(target: str, heard: str):
+    """คำเรียกตรงรายการแอปที่รู้จัก → Command เปิดตัวที่ติดตั้งแล้ว หรือ Entry ที่ยังไม่มี · ไม่ตรง = None."""
+    from aipc.skills import app_catalog
+
+    entry = app_catalog.find(target, app_catalog.load())
+    if entry is None:
+        return None
+    table = app_table()
+    for key, aliases in _discovered_aliases().items():
+        if key in table and set(aliases) & set(entry.aliases):
+            return Command(Plan("open_app", {"app": key}, f"เปิด{table[key][0]}"), SURE, heard)
+    return entry
+
+
 def unsupported(text: str) -> str | None:
     """ "เปิดเฟซบุ๊ก" · "เปิดไลน์ให้หน่อย" → ชื่อบริการที่ระบบตั้งใจไม่มี · อื่น ๆ = None."""
     t = normalize(text)
@@ -339,6 +353,15 @@ def parse(text: str) -> Command | None:
     target = raw.removeprefix("หน้า").removeprefix("เว็บ").removeprefix("แอป").removeprefix("โปรแกรม")
     if not target:
         return None
+
+    # การ์ด 0054: แอปที่รู้จัก (app_catalog) · ตรงทั้งคำเท่านั้น และตรวจก่อนตัวเดาคำใกล้เคียง
+    # ติดตั้งแล้ว = เปิดตัวที่ติดตั้ง (ได้คำเรียกไทยของรายการด้วย) · ยังไม่มี = ให้หน้าจอถามติดตั้ง/เปิดเว็บ
+    known = _known_app(raw, heard) or _known_app(target, heard)
+    if known is not None:
+        if isinstance(known, Command):
+            return known
+        plan = Plan("missing_app", {"app": known.key}, f"ไม่มี {known.name} ในเครื่อง")
+        return Command(plan, SURE, heard)
 
     # ลองทั้งแบบมีคำนำ ("หน้าหลัก") และแบบตัดคำนำแล้ว ("ตั้งค่า")
     # แอปที่ติดตั้งจริง (ไฟล์ .desktop) เป็นกลุ่มสุดท้าย · คำเรียกไทยของตารางคงที่มาก่อนเสมอ
