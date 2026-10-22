@@ -1542,7 +1542,22 @@ def _run_quiet(args: list[str]) -> int:
 HELPER = "/usr/local/sbin/aipc-accounts"  # ตัวช่วย root ของการ์ด 0012 (ติดตั้งโดย install-greeter.sh)
 
 
-def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
+APPS_HELPER = "/usr/local/sbin/aipc-apps"  # ตัวติดตั้งแอปของการ์ด 0054 (ติดตั้งโดย install-apps.sh)
+
+
+def run_apps_helper(request: dict) -> dict:
+    """เรียกตัวติดตั้งแอปผ่าน sudo (-n = ไม่ถามรหัส sudo) · รหัสผู้ดูแลอยู่ใน stdin ไม่อยู่ใน argv."""
+    return run_accounts_helper(request, timeout=1900, helper=APPS_HELPER,
+                               missing="ตัวติดตั้งแอปยังไม่ได้ติดตั้งในเครื่องนี้ (install-apps.sh)")  # fmt: skip
+
+
+def _simulated_install(request: dict) -> dict:
+    """เครื่องพัฒนา (ไม่ใช่ Linux): ไม่ติดตั้งจริง และบอกตรง ๆ ว่าจำลอง (H5)."""
+    return {"ok": True, "simulated": True, "message": "จำลอง: เครื่องนี้ไม่ใช่ Pi · ไม่ได้ติดตั้งจริง"}
+
+
+def run_accounts_helper(request: dict, timeout: float = 30, helper: str = "",
+                        missing: str = "") -> dict:  # fmt: skip
     """เรียกตัวช่วยผ่าน sudo (-n = ห้ามถามรหัส ถ้ากฎ sudo ไม่ตรงให้ล้มทันที ไม่ค้าง).
 
     คำขอส่งทาง stdin เป็น JSON · ตัวช่วยตรวจทุกอย่างซ้ำเอง (H7) หน้าจอแค่ส่งและแสดงผล
@@ -1551,7 +1566,7 @@ def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
     import subprocess
 
     try:
-        r = subprocess.run(["sudo", "-n", HELPER], input=json.dumps(request).encode(),
+        r = subprocess.run(["sudo", "-n", helper or HELPER], input=json.dumps(request).encode(),
                            capture_output=True, timeout=timeout, check=False)  # fmt: skip
     except subprocess.TimeoutExpired:
         return {"ok": False, "message": "ตัวจัดการบัญชีไม่ตอบ · ลองอีกครั้ง"}
@@ -1560,7 +1575,10 @@ def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
     try:
         out = json.loads(r.stdout.decode("utf-8").strip().splitlines()[-1])
     except (ValueError, IndexError):
-        return {"ok": False, "message": "ตัวจัดการบัญชียังไม่ได้ติดตั้งในเครื่องนี้ (install-greeter.sh)"}
+        return {
+            "ok": False,
+            "message": missing or "ตัวจัดการบัญชียังไม่ได้ติดตั้งในเครื่องนี้ (install-greeter.sh)",
+        }
     return out if isinstance(out, dict) and "ok" in out else {"ok": False, "message": "ตอบผิดรูปแบบ"}
 
 
@@ -1765,12 +1783,15 @@ class SkillsController(QObject):
     _forged = Signal(object)
     gcalChanged = Signal()  # noqa: N815 · ปฏิทิน Google (การ์ด 0014) และวันหยุดไทย (0033)
     _gcal_done = Signal(object)
+    appInstallChanged = Signal()  # noqa: N815 · ติดตั้งแอป (การ์ด 0054)
+    appInstallDone = Signal("QVariantMap")  # noqa: N815 · การ์ดผล (ติดตั้ง/เปิดแล้ว หรือเหตุที่ไม่สำเร็จ)
+    _app_done = Signal(object)
     _hol_done = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
-                 gcal_alert_min=None, holidays=None, time_synced=None):  # fmt: skip
+                 gcal_alert_min=None, holidays=None, time_synced=None, installer=None):  # fmt: skip
         super().__init__()
         # นาฬิกาตั้งจากเน็ตแล้วไหม (ตรวจทั้งระบบ 1.1: แบต RTC 0.00V → บูตไม่มีเน็ต = เวลาค้างที่ตอนปิดเครื่อง) ·
         # ไม่ได้ตั้ง = การ์ดเวลา/นัดบอกว่าเวลาอาจไม่ตรง (H5) · เทสต์ที่ใส่นาฬิกาปลอม = ถือว่าตั้งแล้ว
@@ -1792,6 +1813,11 @@ class SkillsController(QObject):
         self._hol_done.connect(self._on_hol_done)
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
+        # ติดตั้งแอป (การ์ด 0054): installer(คำขอ) → {"ok", "message"} · ตัวจริง = ตัวติดตั้ง root ผ่าน sudo
+        # (aipc.accounts.apphelper) · ไม่ใช่ Linux = จำลองและบอกว่าจำลอง (H5)
+        self._installer = installer
+        self._installing = ""  # ชื่อแอปที่กำลังติดตั้ง ("" = ไม่มี)
+        self._app_done.connect(self._on_app_installed)
         from aipc.skills import actions, manifest, reminders
 
         # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal
@@ -2629,6 +2655,8 @@ class SkillsController(QObject):
         return out.message
 
     def _run_plan(self, plan) -> dict:
+        if plan.action == "missing_app":
+            return self._missing_app_card(plan.params["app"])
         out = self._exec.execute(plan)
         if out.simulated:
             title = plan.summary + " (จำลอง)"
@@ -2648,6 +2676,115 @@ class SkillsController(QObject):
         elif out.ok and not out.simulated and plan.action in ("open_url", "open_app"):
             card["lines"].append("คำสั่งนี้ย้อนกลับไม่ได้ · ปิดหน้าต่างที่เปิดขึ้นมาเองได้")
         return card
+
+    # ---------- แอปที่ไม่มีในเครื่อง (การ์ด 0054) ----------
+    # ถามทุกครั้ง ไม่จำคำตอบ (Pakon 2026-10-22): ติดตั้งไหม → ไม่ = เปิดผ่านเว็บไหม → ไม่ = ไม่ทำอะไร
+    INSTALL_NOTE = "ติดตั้งต้องให้ผู้ดูแลใส่รหัสผ่าน · ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้"
+
+    def _ask(self, card: dict, pending) -> dict:
+        self._counter += 1
+        token = f"c{self._counter}"
+        self._pending[token] = pending
+        card["confirmToken"] = token
+        return card
+
+    def _missing_app_card(self, key: str) -> dict:
+        from aipc.skills import app_catalog
+
+        entry = app_catalog.load().get(key)
+        card = {"kind": "command", "title": "", "chips": [], "lines": [], "page": "",
+                "confirmToken": ""}  # fmt: skip
+        if entry is None:
+            card["title"] = "ไม่พบแอปนี้ในเครื่อง"
+        elif entry.apt:
+            card.update(title=f"ไม่มี {entry.name} ในเครื่อง · ติดตั้งไหม?", lines=[self.INSTALL_NOTE])
+            return self._ask(card, ("app-install", key))
+        elif entry.web:
+            return self._web_question(entry, card)
+        else:
+            card["title"] = f"ไม่มี {entry.name} ในเครื่อง"
+        return card
+
+    def _web_question(self, entry, card: dict) -> dict:
+        card.update(title=f"ไม่มี {entry.name} ในเครื่อง · จะเปิดผ่านเบราว์เซอร์ไหม?",
+                    lines=[f"เปิด {entry.web} ในเบราว์เซอร์ของผู้ช่วย"])  # fmt: skip
+        return self._ask(card, ("app-web", entry.key))
+
+    def _missing_app_answer(self, step: str, key: str, yes: bool) -> dict:
+        from aipc.skills import app_catalog
+        from aipc.skills.actions import Plan
+
+        entry = app_catalog.load().get(key)
+        card = {"kind": "command", "badge": {}, "title": "", "chips": [], "lines": [], "page": "",
+                "confirmToken": ""}  # fmt: skip
+        if entry is None:
+            card["title"] = "แอปนี้ไม่อยู่ในรายการแล้ว"
+        elif step == "app-install" and yes:
+            # หน้าจอเปิดช่องให้ผู้ดูแลใส่ชื่อและรหัส · รหัสไม่ผ่านการ์ดหรือ log
+            card.update(kind="app-install", appInstall=key, appName=entry.name,
+                        title=f"ให้ผู้ดูแลใส่ชื่อและรหัสผ่านเพื่อติดตั้ง {entry.name}")  # fmt: skip
+        elif step == "app-install" and entry.web:
+            return self._web_question(entry, card)
+        elif step == "app-web" and yes:
+            say = f"เปิด {entry.name} ผ่านเบราว์เซอร์"
+            plan = Plan("open_url", {"url": entry.web, "site": key}, say)
+            card.update(self._run_plan(plan))
+        else:
+            card["title"] = "ไม่ได้ติดตั้งและไม่ได้เปิด"
+        return card
+
+    @Property(str, notify=appInstallChanged)
+    def installing(self) -> str:
+        return self._installing
+
+    @Slot(str, str, str, result=bool)
+    def installApp(self, key: str, admin: str, password: str) -> bool:  # noqa: N802
+        """ผู้ดูแลกดติดตั้ง · ทำในเธรดแยก (apt ใช้เวลาหลายนาที) · ผลมาทาง appInstallDone.
+
+        กำลังติดตั้งอยู่ / ไม่อยู่ในรายการ = False
+        """
+        import sys
+        import threading
+
+        from aipc.skills import app_catalog
+
+        entry = app_catalog.load().get(key)
+        if self._installing or entry is None or not entry.apt:
+            return False
+        run = self._installer
+        if run is None:
+            run = run_apps_helper if sys.platform.startswith("linux") else _simulated_install
+        self._installing = entry.name
+        self.appInstallChanged.emit()
+        req = {"app": key, "admin": admin.strip(), "password": password}
+
+        def work():
+            try:
+                r = run(req)
+            except Exception as e:  # noqa: BLE001 · บอกผู้ใช้แทนการค้าง (H2)
+                r = {"ok": False, "message": f"ติดตั้งไม่สำเร็จ: {e}"}
+            self._app_done.emit((entry, r))
+
+        threading.Thread(target=work, daemon=True).start()
+        return True
+
+    @Slot(object)
+    def _on_app_installed(self, done) -> None:
+        from aipc.skills import command
+
+        entry, r = done
+        self._installing = ""
+        self.appInstallChanged.emit()
+        card = {"kind": "command", "badge": {}, "title": str(r.get("message", "")), "lines": [],
+                "page": "", "confirmToken": "",
+                "chips": [{"text": "ติดตั้งแล้ว" if r.get("ok") else "ไม่สำเร็จ",
+                           "kind": "ok" if r.get("ok") else "danger"}]}  # fmt: skip
+        if r.get("ok") and not r.get("simulated"):
+            # เปิดเลยด้วยทางเดิมของ "เปิด X" (แอปที่เพิ่งติดตั้งมีไฟล์ .desktop แล้ว)
+            cmd = command.parse(f"เปิด{entry.aliases[0]}")
+            if cmd is not None and cmd.plan.action == "open_app":
+                card["lines"].append(self._run_plan(cmd.plan)["title"])
+        self.appInstallDone.emit(card)
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
     def tool_catalog(self, text: str = "") -> list:
@@ -3531,6 +3668,9 @@ class SkillsController(QObject):
 
         if plan is None:
             card["title"] = "คำสั่งนี้หมดอายุแล้ว"
+        elif isinstance(plan, tuple) and plan[0] in ("app-install", "app-web"):
+            # การ์ด 0054 · ตอบ "ไม่" ไม่ได้แปลว่ายกเลิกทันที แต่ถามข้อถัดไป (เปิดผ่านเว็บ)
+            return self._missing_app_answer(plan[0], plan[1], yes)
         elif not yes:
             card["title"] = "ยกเลิกแล้ว ไม่ได้ทำอะไร"
         elif isinstance(plan, tuple) and plan[0] == "tie":

@@ -60,8 +60,8 @@ class InstallTest(unittest.TestCase):
     def test_admin_installs_package_from_the_list_only(self):
         r = ask(self.sys, app="vlc", admin="pakon", password=PW)
         self.assertTrue(r["ok"], r)
-        self.assertEqual(self.sys.apt_calls,
-                         [["update"], ["install", "-y", "--no-install-recommends", "vlc"]])  # fmt: skip
+        install = ["install", "-y", "--no-install-recommends", "vlc"]
+        self.assertEqual(self.sys.apt_calls, [["update"], install])
 
     def test_a3_refusals_never_reach_apt(self):
         bad = [

@@ -72,7 +72,8 @@ def _why_apt_failed(out: str) -> str:
     """ข้อความของ apt → เหตุที่ผู้ใช้เข้าใจ (H2) · ไม่รู้ = บอกว่าไม่สำเร็จพร้อมบรรทัดท้ายจริง."""
     if "Could not get lock" in out or "dpkg was interrupted" in out:
         return "มีการติดตั้งอื่นค้างอยู่ในเครื่อง · รอสักครู่แล้วลองใหม่"
-    if "Temporary failure resolving" in out or "Could not resolve" in out or "Failed to fetch" in out:
+    net = ("Temporary failure resolving", "Could not resolve", "Failed to fetch")
+    if any(w in out for w in net):
         return "ดาวน์โหลดไม่ได้ · ตรวจอินเทอร์เน็ตแล้วลองใหม่"
     if "Unable to locate package" in out:
         return "ไม่พบแพ็กเกจนี้ในคลังของระบบ"
