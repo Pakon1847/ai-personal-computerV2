@@ -1163,9 +1163,12 @@ class LoginController(QObject):
     AUTO_LOGIN_MS = 1500
 
     def __init__(self, dev_mode: bool, demo_scan: str | None = None,
-                 greeter_session: list[str] | None = None, connect=None, face=None):  # fmt: skip
+                 greeter_session: list[str] | None = None, connect=None, face=None,
+                 remember=None):  # fmt: skip
         super().__init__()
         self._dev = dev_mode
+        # เข้าสำเร็จ → บอกตัวช่วยว่าใครเข้าล่าสุด (ธีมหน้า Login ครั้งถัดไป · การ์ด 0051) · None = ไม่ต้องจำ
+        self._remember = remember
         # โหมด greeter (การ์ด 0003): greetd รันหน้านี้ก่อนมีใครเข้าเครื่อง · PAM ของ OS ตรวจรหัสผ่าน
         self._session = greeter_session
         self._connect = connect
@@ -1303,6 +1306,7 @@ class LoginController(QObject):
         except (OSError, greetd.ProtocolError):
             r = greetd.LoginResult(False, greetd.FACE_FAIL)
         if r.ok:
+            self._remember_user(self._found_user)
             QTimer.singleShot(0, QCoreApplication.quit)
             return
         self._state, self._message = "manual", r.message
@@ -1338,9 +1342,18 @@ class LoginController(QObject):
             g.close()
         if not r.ok:
             return "\n".join([*r.notes, r.message])
+        self._remember_user(username.strip())
         # greetd จะเริ่มเซสชันของผู้ใช้หลัง greeter ปิดตัวเอง
         QTimer.singleShot(0, QCoreApplication.quit)
         return ""
+
+    def _remember_user(self, user: str) -> None:
+        """จำไม่ได้ (ตัวช่วยไม่ตอบ) = หน้า Login ครั้งถัดไปใช้ธีมของคนเดิม · ไม่ขวางการเข้าระบบ."""
+        if self._remember is not None:
+            try:
+                self._remember(user)
+            except Exception:  # noqa: BLE001 · เรื่องสีหน้าจอต้องไม่ทำให้เข้าระบบไม่ได้
+                pass
 
 
 def _display_name(user: str) -> str:
@@ -1544,6 +1557,13 @@ def _run_quiet(args: list[str]) -> int:
 
 
 HELPER = "/usr/local/sbin/aipc-accounts"  # ตัวช่วย root ของการ์ด 0012 (ติดตั้งโดย install-greeter.sh)
+
+
+def greeter_theme(user: str | None = None) -> str:
+    """ธีมของหน้า Login จากตัวช่วย (การ์ด 0051) · user = เพิ่งเข้าสำเร็จ (ให้จำไว้) · ไม่ตอบ = ธีมดำ."""
+    req = {"op": "greeter-theme"} if user is None else {"op": "greeter-theme", "user": user}
+    theme = run_accounts_helper(req, timeout=5).get("theme")
+    return theme if theme in settings.THEMES else "dark"
 
 
 def run_accounts_helper(request: dict, timeout: float = 30) -> dict:

@@ -206,6 +206,13 @@ def _local_model_name() -> str:
     return ""
 
 
+def _remember_login(user: str) -> None:
+    """หน้า Login จริง: บอกตัวช่วยว่าใครเพิ่งเข้า → หน้า Login ครั้งถัดไปใช้ธีมของคนนี้ (การ์ด 0051)."""
+    from aipc.ui.backend import greeter_theme
+
+    greeter_theme(user)
+
+
 def _face_client(short: bool = False):
     """ตัวต่อ visiond (การ์ด 0015) · ไม่ได้ติดตั้ง = None (ใช้รหัสผ่านตามเดิม).
 
@@ -266,7 +273,12 @@ def build(opts: Options, argv: list[str] | None = None):
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
-    ui_settings = UiSettings(opts.settings_path, opts.theme)
+    theme = opts.theme
+    if opts.greeter_session and theme is None:
+        from aipc.ui.backend import greeter_theme
+
+        theme = greeter_theme()  # ธีมของผู้ใช้ที่เข้าล่าสุด (การ์ด 0051) · ไม่บันทึกลงไฟล์ของหน้า Login
+    ui_settings = UiSettings(opts.settings_path, theme)
     from aipc.skills.actions import Executor
 
     # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
@@ -286,6 +298,7 @@ def build(opts: Options, argv: list[str] | None = None):
             greeter_session=opts.greeter_session,
             # สแกนหน้าเข้าเครื่อง (การ์ด 0015) · เฉพาะหน้า Login จริงที่มี visiond
             face=_face_client() if opts.greeter_session else None,
+            remember=_remember_login if opts.greeter_session else None,
         ),
         # สมัคร/กู้คืนจริงเฉพาะหน้า Login จริง · หน้าต่างพัฒนาเป็นแบบจำลองที่บอกว่า "จำลอง" (การ์ด 0012)
         "signup": SignupController(
