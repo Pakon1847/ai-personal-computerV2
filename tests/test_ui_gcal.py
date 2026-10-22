@@ -114,6 +114,12 @@ class GoogleAgendaTest(unittest.TestCase):
                                 run_timer=False, gcal=None).handle("ซิงค์ปฏิทิน")  # fmt: skip
         self.assertEqual(card["title"], "ยังไม่ได้เชื่อมต่อปฏิทิน Google")
 
+    def test_voice_show_devices_opens_health_page(self):
+        # การ์ด 0051 · วินโดวส์ไม่มี /sys → แถวละชนิดว่า "ตรวจไม่ได้" ไม่ใช่ "ไม่มี"
+        card = self.make(connected=False).handle("มีอุปกรณ์อะไรต่ออยู่บ้าง")
+        self.assertEqual((card["title"], card["page"]), ("อุปกรณ์ที่ต่ออยู่", "health"))
+        self.assertEqual(len(card["lines"]), 6)
+
     def test_voice_question_gets_google_events_without_ai(self):
         s = self.make()
         card = s.voiceAnswer("พรุ่งนี้มีนัดอะไร")

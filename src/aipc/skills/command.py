@@ -130,6 +130,11 @@ LOCK_PHRASES = tuple(
     for w in ("หน้าจอ", "จอ", "เครื่อง", "คอม")
     for o in ("", "ที", "เลย", "ไว้")
 ) + ("lockscreen", "lockthescreen")
+# ดูอุปกรณ์ที่ต่ออยู่ (การ์ด 0051) · ต้องมีคำว่าต่อ/เสียบ ("อุปกรณ์อะไรดี" = ถามความเห็น ไม่ใช่คำสั่ง)
+DEVICES = re.compile(
+    r"^(มี|ดู|เช็[คก]|ตรวจ|เปิด(หน้า)?|แสดง)?อุปกรณ์(อะไร)?(ที่)?(ต่อ|เสียบ)(อยู่)?(บ้าง)?(อะไรบ้าง)?(ไหม|มั้ย)?$"
+    r"|^(list|show)(the)?devices$|^whatdevicesare(connected|pluggedin)$"
+)
 # ดึงปฏิทิน Google ใหม่ทันที (การ์ด 0051) · ทั้งประโยคเหมือนคำสั่งล็อก
 GCAL_SYNC_PHRASES = tuple(
     f"{v}{c}{o}"
@@ -303,6 +308,8 @@ def parse(text: str) -> Command | None:
         return Command(Plan("lock_screen", {}, "ล็อกหน้าจอแล้ว · ปลดด้วยรหัสผ่าน"), SURE, heard)
     if t in GCAL_SYNC_PHRASES:
         return Command(Plan("gcal_sync", {}, "ดึงปฏิทิน Google ใหม่"), SURE, heard)
+    if DEVICES.match(t):
+        return Command(Plan("show_devices", {}, "อุปกรณ์ที่ต่ออยู่"), SURE, heard)
 
     verb = next((v for v in OPEN_VERBS if t.startswith(v)), None)
     if verb is None:

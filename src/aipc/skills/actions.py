@@ -45,6 +45,7 @@ ACTIONS: dict[str, ActionSpec] = {
         ActionSpec("lock_screen", "low", "ล็อกหน้าจอ"),  # การ์ด 0051 · ปลดด้วยรหัสผ่าน · ไม่ออกจากระบบ
         # การ์ด 0051: ดึงปฏิทิน Google ใหม่ทันที · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
         ActionSpec("gcal_sync", "low", "ดึงปฏิทิน Google ใหม่", needs_network=True),
+        ActionSpec("show_devices", "low", "ดูอุปกรณ์ที่ต่ออยู่"),  # การ์ด 0051 · อ่านอย่างเดียว
     ]
 }
 

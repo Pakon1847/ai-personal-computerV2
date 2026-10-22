@@ -166,6 +166,14 @@ class CommandTest(unittest.TestCase):
         for text in ("ปฏิทินอัปเดตล่าสุดเมื่อไหร่", "อัปเดตปฏิทินทุกเช้า", "เปิดปฏิทิน"):
             self.assertNotEqual(self.plan(text), ("gcal_sync", {}), text)
 
+    def test_show_devices_phrases(self):
+        # การ์ด 0051: ต้องมีคำว่าต่อ/เสียบ · ถามความเห็นเรื่องอุปกรณ์ไม่ใช่คำสั่ง
+        for text in ("มีอุปกรณ์อะไรต่ออยู่บ้าง", "ดูอุปกรณ์ที่ต่ออยู่", "เช็คอุปกรณ์ที่เสียบอยู่หน่อย",
+                     "Show devices"):  # fmt: skip
+            self.assertEqual(self.plan(text), ("show_devices", {}), text)
+        for text in ("ซื้ออุปกรณ์อะไรดี", "อุปกรณ์ต่อพ่วงคืออะไร", "มีอุปกรณ์อะไรแนะนำบ้าง"):
+            self.assertIsNone(self.plan(text), text)
+
     def test_screen_only_action_is_not_run_by_executor(self):
         out = actions.Executor(dry_run=False).execute(actions.Plan("gcal_sync"))
         self.assertFalse(out.ok)

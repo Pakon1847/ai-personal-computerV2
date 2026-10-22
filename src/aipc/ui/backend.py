@@ -813,6 +813,8 @@ class SystemStatus(QObject):
     healthChanged = Signal()  # noqa: N815
     readyChanged = Signal()  # noqa: N815
     _readyDone = Signal(object)  # noqa: N815
+    devicesChanged = Signal()  # noqa: N815 · รายการอุปกรณ์ (การ์ด 0051)
+    _devicesDone = Signal(object)  # noqa: N815
 
     def __init__(self, root: Path = Path("/")):
         super().__init__()
@@ -825,6 +827,9 @@ class SystemStatus(QObject):
         self._ready: list[dict] = []
         self._ready_busy = False
         self._readyDone.connect(self._on_ready)
+        self._devices: list[dict] = []
+        self._devices_busy = False
+        self._devicesDone.connect(self._on_devices)
         self._now = datetime.now()
         self._checks: list[dict] = []
         self._temp: float | None = None
@@ -841,6 +846,49 @@ class SystemStatus(QObject):
     def _tick(self) -> None:
         self._now = datetime.now()
         self.changed.emit()
+
+    # ---------- อุปกรณ์ที่ต่ออยู่ (การ์ด 0051 · aipc.doctor.devices · อ่านอย่างเดียว) ----------
+    @Property("QVariantList", notify=devicesChanged)
+    def devices(self) -> list:
+        return self._devices
+
+    @Property(bool, notify=devicesChanged)
+    def devicesBusy(self) -> bool:  # noqa: N802
+        return self._devices_busy
+
+    @Slot()
+    def scanDevices(self) -> None:  # noqa: N802
+        """ตรวจในเธรดแยก (wpctl/bluetoothctl อาจช้า) · เปิดหน้าหรือกด "ตรวจใหม่" เท่านั้น ไม่ตรวจวนเอง."""
+        import threading
+
+        from aipc.doctor import devices
+
+        if self._devices_busy:
+            return
+        self._devices_busy = True
+        self.devicesChanged.emit()
+        root = self._root
+
+        def work():
+            try:
+                found = devices.scan(root)
+            except Exception:  # noqa: BLE001 · ตรวจไม่ได้ทั้งหมด ดีกว่าค้าง
+                found = dict.fromkeys(devices.KINDS)
+            self._devicesDone.emit(found)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(object)
+    def _on_devices(self, found) -> None:
+        from aipc.doctor import devices
+
+        self._devices = [
+            {"label": devices.LABELS[k], "items": found.get(k) or [],
+             "state": "unknown" if found.get(k) is None else ("none" if not found[k] else "ok")}
+            for k in devices.KINDS
+        ]  # fmt: skip
+        self._devices_busy = False
+        self.devicesChanged.emit()
 
     # ---------- ตรวจความพร้อมก่อนสาธิต ----------
     @Property("QVariantList", notify=readyChanged)
@@ -2668,6 +2716,8 @@ class SkillsController(QObject):
     def _run_plan(self, plan) -> dict:
         if plan.action == "gcal_sync":
             return self._gcal_sync_card()
+        if plan.action == "show_devices":
+            return self._devices_card()
         out = self._exec.execute(plan)
         if out.simulated:
             title = plan.summary + " (จำลอง)"
@@ -2687,6 +2737,13 @@ class SkillsController(QObject):
         elif out.ok and not out.simulated and plan.action in ("open_url", "open_app"):
             card["lines"].append("คำสั่งนี้ย้อนกลับไม่ได้ · ปิดหน้าต่างที่เปิดขึ้นมาเองได้")
         return card
+
+    def _devices_card(self) -> dict:
+        """สั่ง "มีอุปกรณ์อะไรต่ออยู่" (การ์ด 0051) · ตรวจจริงตอนนี้ บรรทัดละชนิด แล้วพาไปหน้าสุขภาพเครื่อง."""
+        from aipc.doctor import devices
+
+        return {"title": "อุปกรณ์ที่ต่ออยู่", "chips": [{"text": "ตรวจแล้ว", "kind": "ok"}],
+                "lines": devices.summary(devices.scan(self._root)), "page": "health"}  # fmt: skip
 
     def _gcal_sync_card(self) -> dict:
         """สั่ง "อัปเดตปฏิทิน" (การ์ด 0051) · ผลจริงมาทีหลังทาง gcalChanged · การ์ดบอกแค่ว่าเริ่มแล้วหรือยัง (H5)."""
