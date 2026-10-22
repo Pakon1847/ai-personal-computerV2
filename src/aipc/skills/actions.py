@@ -43,6 +43,8 @@ ACTIONS: dict[str, ActionSpec] = {
         ActionSpec("mute", "low", "ปิดเสียง"),
         ActionSpec("unmute", "low", "เปิดเสียง"),
         ActionSpec("lock_screen", "low", "ล็อกหน้าจอ"),  # การ์ด 0051 · ปลดด้วยรหัสผ่าน · ไม่ออกจากระบบ
+        # การ์ด 0051: ดึงปฏิทิน Google ใหม่ทันที · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
+        ActionSpec("gcal_sync", "low", "ดึงปฏิทิน Google ใหม่", needs_network=True),
     ]
 }
 
@@ -288,6 +290,8 @@ class Executor:
             args = command_for(plan)
         except KeyError:
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
+        if args is None:  # งานที่หน้าจอทำเอง (เช่น gcal_sync) ไม่มีโปรแกรมให้รัน
+            return Outcome(False, f"{plan.spec.label}: สั่งได้จากหน้าจอ/คำสั่งเสียงเท่านั้น")
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)
         note = ""

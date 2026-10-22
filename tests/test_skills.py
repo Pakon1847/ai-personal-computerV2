@@ -159,6 +159,17 @@ class CommandTest(unittest.TestCase):
         for text in ("ทำไมหน้าจอล็อกเอง", "ล็อกหน้าจอยังไง", "อย่าล็อกหน้าจอ", "ล็อกหน้าจออีก 10 นาที"):
             self.assertIsNone(self.plan(text), text)
 
+    def test_update_calendar_whole_sentence_only(self):
+        # การ์ด 0051: ดึงปฏิทิน Google ใหม่ด้วยเสียง
+        for text in ("อัปเดตปฏิทิน", "ช่วยซิงค์ปฏิทินหน่อย", "รีเฟรชปฏิทินกูเกิล", "Sync the calendar"):
+            self.assertEqual(self.plan(text), ("gcal_sync", {}), text)
+        for text in ("ปฏิทินอัปเดตล่าสุดเมื่อไหร่", "อัปเดตปฏิทินทุกเช้า", "เปิดปฏิทิน"):
+            self.assertNotEqual(self.plan(text), ("gcal_sync", {}), text)
+
+    def test_screen_only_action_is_not_run_by_executor(self):
+        out = actions.Executor(dry_run=False).execute(actions.Plan("gcal_sync"))
+        self.assertFalse(out.ok)
+
     def test_reminder_containing_a_command_is_not_run_now(self):
         for text in ("เตือนปิดเสียงตอนประชุมบ่ายสาม", "นัดเปิดยูทูบดูไลฟ์สองทุ่ม", "อย่าลืมปรับเสียง 50"):
             self.assertIsNone(command.parse(text), text)

@@ -2231,7 +2231,20 @@ class SkillsController(QObject):
                 self._save_failed = True
             if t.due or t.save_failed:
                 self.remindersChanged.emit()
+        self._gcal_auto_sync()
         self._gcal_tick()
+
+    def _gcal_auto_sync(self) -> None:
+        """ดึงปฏิทิน Google เองทุก 15 นาทีระหว่างเข้าระบบ (การ์ด 0051) · นับจากครั้งที่ลองล่าสุด
+        (ออฟไลน์ = ลองใหม่รอบหน้า ไม่ถี่กว่านี้) · ไม่ได้เชื่อมต่อ = ไม่ทำ."""
+        from aipc.skills.gcal import AUTO_SYNC
+
+        g = self._gcal
+        if g is None or not g.connected:
+            return
+        last = [t for t in (self._gcal_tried, g.last_sync) if t is not None]
+        if not last or self._now() - max(last) >= AUTO_SYNC:
+            self._gcal_refresh()
 
     GCAL_ALERT_MAX = (
         3  # การ์ด 0032: นัดพร้อมกันหลายนัด = เตือนทีละไม่เกิน 3 + บอกที่เหลือ (ไม่อ่านออกเสียงยาวเหยียด)
@@ -2653,6 +2666,8 @@ class SkillsController(QObject):
         return out.message
 
     def _run_plan(self, plan) -> dict:
+        if plan.action == "gcal_sync":
+            return self._gcal_sync_card()
         out = self._exec.execute(plan)
         if out.simulated:
             title = plan.summary + " (จำลอง)"
@@ -2671,6 +2686,23 @@ class SkillsController(QObject):
             card["undoToken"] = self._offer_undo(out.undo)
         elif out.ok and not out.simulated and plan.action in ("open_url", "open_app"):
             card["lines"].append("คำสั่งนี้ย้อนกลับไม่ได้ · ปิดหน้าต่างที่เปิดขึ้นมาเองได้")
+        return card
+
+    def _gcal_sync_card(self) -> dict:
+        """สั่ง "อัปเดตปฏิทิน" (การ์ด 0051) · ผลจริงมาทีหลังทาง gcalChanged · การ์ดบอกแค่ว่าเริ่มแล้วหรือยัง (H5)."""
+        card = {"title": "", "chips": [], "lines": [], "page": ""}
+        if self._gcal is None or not self._gcal.connected:
+            card["title"] = "ยังไม่ได้เชื่อมต่อปฏิทิน Google"
+            card["chips"] = [{"text": "ไม่ได้ทำ", "kind": "warn"}]
+            card["lines"] = ["วางลิงก์ iCal ลับได้ที่หน้าตั้งค่า"]
+            card["page"] = "settings"
+        elif self._gcal_refresh():
+            card["title"] = "กำลังดึงปฏิทิน Google ใหม่"
+            card["chips"] = [{"text": "ทำแล้ว", "kind": "ok"}]
+            card["lines"] = ["นัดใหม่จะขึ้นในหน้าปฏิทินเมื่อดึงเสร็จ"]
+        else:
+            card["title"] = "กำลังดึงปฏิทิน Google อยู่แล้ว"
+            card["chips"] = [{"text": "ทำแล้ว", "kind": "ok"}]
         return card
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------

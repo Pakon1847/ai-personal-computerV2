@@ -77,6 +77,43 @@ class GoogleAgendaTest(unittest.TestCase):
         self.assertIn("สำเนาปฏิทิน Google", card["badge"]["reason"])
         self.assertNotIn("private-", str(card))  # ลิงก์ลับไม่ขึ้นจอ
 
+    def test_auto_sync_every_15_minutes_while_signed_in(self):
+        # การ์ด 0051: ไม่ต้องเปิดเว็บ · ดึงเองตามรอบ · ครั้งที่ลองล่าสุดนับรอบ (ออฟไลน์ไม่ถี่ขึ้น)
+        s = self.make()
+        self.fetched.clear()
+        s._gcal_tried = self.now
+        s.tick()
+        self.now += timedelta(minutes=14)
+        s.tick()
+        self.assertEqual(self.fetched, [])
+        self.now += timedelta(minutes=1)
+        s.tick()
+        self.assertTrue(wait_until(lambda: len(self.fetched) == 1 and not s._gcal_busy))
+        self.data = OSError("offline")
+        self.now += timedelta(minutes=15)
+        s.tick()
+        self.assertTrue(wait_until(lambda: len(self.fetched) == 2 and not s._gcal_busy))
+        self.now += timedelta(minutes=5)
+        s.tick()
+        self.assertEqual(len(self.fetched), 2)
+
+    def test_auto_sync_needs_a_connected_calendar(self):
+        s = self.make(connected=False)
+        self.now += timedelta(hours=2)
+        s.tick()
+        self.assertEqual(self.fetched, [])
+
+    def test_voice_update_calendar(self):
+        s = self.make()
+        self.assertTrue(wait_until(lambda: not s._gcal_busy))
+        self.fetched.clear()
+        card = s.handle("อัปเดตปฏิทินหน่อย")
+        self.assertEqual(card["title"], "กำลังดึงปฏิทิน Google ใหม่")
+        self.assertTrue(wait_until(lambda: self.fetched == [LINK]))
+        card = SkillsController(reminders_path=self.reminders, clock=lambda: self.now,
+                                run_timer=False, gcal=None).handle("ซิงค์ปฏิทิน")  # fmt: skip
+        self.assertEqual(card["title"], "ยังไม่ได้เชื่อมต่อปฏิทิน Google")
+
     def test_voice_question_gets_google_events_without_ai(self):
         s = self.make()
         card = s.voiceAnswer("พรุ่งนี้มีนัดอะไร")
@@ -187,6 +224,8 @@ class GoogleAlertTest(unittest.TestCase):
             gcal_alert_min=lambda: self.minutes,
         )
         s.reminderDue.connect(self.got.append)
+        # tick ดึงปฏิทินเองตามรอบ (การ์ด 0051) · รอเธรดดึงจบก่อนลบโฟลเดอร์ชั่วคราว
+        self.addCleanup(lambda: wait_until(lambda: not s._gcal_busy))
         return s, cal
 
     def test_alert_once_with_lead_title_and_source(self):

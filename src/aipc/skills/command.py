@@ -130,6 +130,13 @@ LOCK_PHRASES = tuple(
     for w in ("หน้าจอ", "จอ", "เครื่อง", "คอม")
     for o in ("", "ที", "เลย", "ไว้")
 ) + ("lockscreen", "lockthescreen")
+# ดึงปฏิทิน Google ใหม่ทันที (การ์ด 0051) · ทั้งประโยคเหมือนคำสั่งล็อก
+GCAL_SYNC_PHRASES = tuple(
+    f"{v}{c}{o}"
+    for v in ("อัปเดต", "อัพเดต", "อัพเดท", "อัปเดท", "ซิงค์", "ซิงก์", "รีเฟรช", "ดึง")
+    for c in ("ปฏิทิน", "ปฎิทิน", "ปฏิทินกูเกิล", "ปฏิทินgoogle")
+    for o in ("", "ใหม่", "ที")
+) + ("updatecalendar", "updatethecalendar", "synccalendar", "syncthecalendar", "refreshcalendar")
 
 SURE = 1.0
 FUZZY_CUTOFF = 0.72  # ต่ำกว่านี้ถือว่าไม่ใช่คำสั่ง · สูงกว่านี้แต่ไม่ตรงเป๊ะ = ถามก่อน
@@ -294,6 +301,8 @@ def parse(text: str) -> Command | None:
 
     if t in LOCK_PHRASES:
         return Command(Plan("lock_screen", {}, "ล็อกหน้าจอแล้ว · ปลดด้วยรหัสผ่าน"), SURE, heard)
+    if t in GCAL_SYNC_PHRASES:
+        return Command(Plan("gcal_sync", {}, "ดึงปฏิทิน Google ใหม่"), SURE, heard)
 
     verb = next((v for v in OPEN_VERBS if t.startswith(v)), None)
     if verb is None:
