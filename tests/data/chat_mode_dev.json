@@ -1,0 +1,32 @@
+{
+  "about": "การ์ด 0053 เกณฑ์ M5 · ชุดพัฒนา (Claude เขียน 2026-10-22 ก่อนเขียนโค้ด · ห้ามแก้ให้ผ่าน) · ชุดทดสอบ held-out ให้ Pakon เขียนแยก",
+  "commands": [
+    {"text": "สลับไปแชทงาน", "action": "chat_mode", "params": {"mode": "work"}},
+    {"text": "ไปแชทงานหน่อย", "action": "chat_mode", "params": {"mode": "work"}},
+    {"text": "เปิดแชทงาน", "action": "chat_mode", "params": {"mode": "work"}},
+    {"text": "ใช้แชทงาน", "action": "chat_mode", "params": {"mode": "work"}},
+    {"text": "กลับแชททั่วไป", "action": "chat_mode", "params": {"mode": "general"}},
+    {"text": "สลับไปแชททั่วไปครับ", "action": "chat_mode", "params": {"mode": "general"}},
+    {"text": "เปิดแชททั่วไป", "action": "chat_mode", "params": {"mode": "general"}},
+    {"text": "switch to work chat", "action": "chat_mode", "params": {"mode": "work"}},
+    {"text": "ใช้โมเดล opus", "action": "cloud_model", "params": {"model": "opus"}},
+    {"text": "เปลี่ยนเป็นโมเดลโอปัส", "action": "cloud_model", "params": {"model": "opus"}},
+    {"text": "ใช้ซอนเน็ต", "action": "cloud_model", "params": {"model": "sonnet"}},
+    {"text": "เปลี่ยนโมเดลเป็น sonnet หน่อย", "action": "cloud_model", "params": {"model": "sonnet"}},
+    {"text": "ใช้โมเดลไฮกุ", "action": "cloud_model", "params": {"model": "haiku"}},
+    {"text": "เปลี่ยนเป็น Haiku", "action": "cloud_model", "params": {"model": "haiku"}},
+    {"text": "use opus", "action": "cloud_model", "params": {"model": "opus"}}
+  ],
+  "not_commands": [
+    "แชทงานคืออะไร",
+    "opus กับ sonnet ต่างกันยังไง",
+    "ช่วยเขียนกลอนไฮกุให้หน่อย",
+    "อย่าเปลี่ยนโมเดลนะ",
+    "แชททั่วไปส่งข้อมูลออกนอกเครื่องไหม",
+    "โมเดลไหนถูกที่สุด",
+    "สรุปงานที่คุยในแชทงานเมื่อวาน",
+    "ทุกครั้งที่เปิดเครื่องให้ใช้ opus",
+    "ซอนเน็ตของเชกสเปียร์คืออะไร",
+    "เตือนให้สลับไปแชทงานตอนบ่ายสาม"
+  ]
+}
