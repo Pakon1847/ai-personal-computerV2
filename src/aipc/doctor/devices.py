@@ -18,6 +18,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from aipc.doctor.hardware import SOC_VIDEO_NODES
+from aipc.i18n import tr
 
 KINDS = ("display", "usb", "camera", "audio_out", "audio_in", "bluetooth")
 LABELS = {
@@ -28,6 +29,8 @@ LABELS = {
     "audio_in": "ไมค์",
     "bluetooth": "Bluetooth",
 }
+# ตัวที่ใช้อยู่ · เก็บเป็นไทย แล้วแปลตอนแสดง (หน้าจอ: Tr.t ใน QML สลับภาษาได้ทันที · การ์ดคำตอบ: summary)
+ACTIVE = " · ใช้อยู่"
 HUB_CLASS = "09"  # bDeviceClass ของฮับ USB (รวมฮับในบอร์ด) · ไม่ใช่อุปกรณ์ที่ผู้ใช้เสียบ
 
 Run = Callable[[list[str]], str | None]
@@ -110,7 +113,7 @@ def audio(text: str | None) -> tuple[list[str] | None, list[str] | None]:
         m = AUDIO_LINE.match(line)
         if m and section in found:
             if m[1]:
-                found[section].insert(0, m[2] + " · ใช้อยู่")
+                found[section].insert(0, m[2] + ACTIVE)
             else:
                 found[section].append(m[2])
     return found["Sinks:"], found["Sources:"]
@@ -142,10 +145,10 @@ def summary(found: dict[str, list[str] | None]) -> list[str]:
     for kind in KINDS:
         items = found.get(kind)
         if items is None:
-            text = "ตรวจไม่ได้"
+            text = tr("ตรวจไม่ได้")
         elif not items:
-            text = "ไม่มี"
+            text = tr("ไม่มี")
         else:
-            text = ", ".join(items)
-        lines.append(f"{LABELS[kind]}: {text}")
+            text = ", ".join(x.replace(ACTIVE, tr(ACTIVE)) for x in items)
+        lines.append(f"{tr(LABELS[kind])}: {text}")
     return lines
