@@ -78,15 +78,35 @@ def _cloud_client(budget=None, ledger=None):
     if os.environ.get("AIPC_CLOUD", "1") == "0" or ask.find_claude() is None:
         return None
 
-    def run(question, history):
+    def run(question, history, model=ask.MODEL):
         if budget is not None and not budget.allow():
             return ask.CloudReply(False, error=budget.blocked_message())
-        r = ask.ask(question, history)
+        r = ask.ask(question, history, model=model)
         if budget is not None:
             budget.record(r.cost_usd, "ask")
         if ledger is not None:
-            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok)
+            # โมเดลที่ตอบจริง (จากผลของ claude) ไม่ใช่แค่ที่เลือก (การ์ด 0053 เกณฑ์ M2 · H5)
+            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok,
+                          note=f"เลือก {model} · ตอบโดย {r.model or 'ไม่ทราบ'}")  # fmt: skip
         return r
+
+    return run
+
+
+def _chat_switch(chat, ui_settings):
+    """คำสั่งเสียงสลับแชท/โมเดล (การ์ด 0053) → (สำเร็จไหม, ข้อความ).
+
+    ตัวตรวจค่าอยู่ที่ ChatController.setMode / UiSettings.setCloudModel
+    """
+
+    def run(kind: str, value: str) -> tuple[bool, str]:
+        if kind == "mode":
+            if chat.setMode(value):
+                return True, "สลับไปแชทงาน (Claude)" if value == "work" else "กลับแชททั่วไป"
+            return False, chat.workBlocked or "สลับไม่ได้ตอนนี้ (กำลังตอบอยู่)"
+        if kind == "model" and ui_settings.setCloudModel(value):
+            return True, f"แชทงานใช้โมเดล {value}"
+        return False, "ไม่รู้จักโมเดลนี้"
 
     return run
 
@@ -284,10 +304,13 @@ def build(opts: Options, argv: list[str] | None = None):
     # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
     browser_ctl = BrowserController(active=in_session, ledger=ledger)
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
+    # แชททั่วไปคงไฮบริด: AI ในเครื่องไม่รู้ = ส่งต่อ Claude เอง (Pakon 2026-10-22 · การ์ด 0053 หัวข้อ 8)
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client(budget, ledger) if in_session else None,
                           model_name=_local_model_name(),
-                          forge=skill_forge is not None, claude_on=claude_on)  # fmt: skip
+                          forge=skill_forge is not None, claude_on=claude_on,
+                          cloud_model=lambda: ui_settings.cloudModel,
+                          auto_cloud=True)  # fmt: skip
     engine._backends = {
         "uiSettings": ui_settings,
         "system": SystemStatus(),
@@ -320,6 +343,9 @@ def build(opts: Options, argv: list[str] | None = None):
             gcal=_gcal(ledger) if in_session else None,
             gcal_alert_min=lambda: ui_settings.gcalAlertMin,
             holidays=_holidays(ledger) if in_session else None,
+            # แชท 2 แบบ (การ์ด 0053): ตัวเลือกสกิลรู้ว่าอยู่แชทงาน · คำสั่งเสียงสลับแชท/โมเดล
+            chat_mode=lambda: chat.mode,
+            chat_switch=_chat_switch(chat, ui_settings),
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
@@ -352,6 +378,7 @@ def build(opts: Options, argv: list[str] | None = None):
         if ui_settings.useClaude != last_claude[0]:
             last_claude[0] = ui_settings.useClaude
             chat.claudeSwitched()
+            chat.claudeChanged()  # ปิด Claude ระหว่างแชทงาน = กลับแชททั่วไป (การ์ด 0053)
             engine._backends["skills"].skillsChanged.emit()
 
     ui_settings.changed.connect(on_settings)

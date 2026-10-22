@@ -20,6 +20,8 @@ from aipc.skills import forge
 from aipc.skills.catalog import ABOUT, is_english
 
 MODEL = "sonnet"
+# แชทงาน (การ์ด 0053): ผู้ใช้เลือกได้ 3 ตัว · ชื่อย่อที่ claude -p --model รับ · ค่าอื่น = ไม่ส่ง (H7)
+MODELS = ("haiku", "sonnet", "opus")
 BUDGET_USD = "0.50"
 TIMEOUT_S = 120
 CONTEXT_TURNS = 4
@@ -130,6 +132,8 @@ def ask(
     runner=forge.run_process,
     today: date | None = None,
 ) -> CloudReply:
+    if model not in MODELS:
+        return CloudReply(False, error=f"ไม่รู้จักโมเดล {model!r}")
     exe = claude or find_claude()
     if not exe:
         return CloudReply(False, error="ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในเครื่องนี้")

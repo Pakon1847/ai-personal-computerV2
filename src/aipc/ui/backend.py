@@ -130,6 +130,25 @@ class UiSettings(QObject):
     def useClaude(self) -> bool:  # noqa: N802
         return self._prefs.use_claude
 
+    # โมเดลของแชทงาน (การ์ด 0053)
+    @Property(str, notify=changed)
+    def cloudModel(self) -> str:  # noqa: N802
+        return self._prefs.cloud_model
+
+    @Property("QVariantList", constant=True)
+    def cloudModels(self) -> list:  # noqa: N802
+        return list(settings.CLOUD_MODELS)
+
+    @Slot(str, result=bool)
+    def setCloudModel(self, model: str) -> bool:  # noqa: N802
+        if model not in settings.CLOUD_MODELS:
+            return False
+        if model != self._prefs.cloud_model:
+            self._prefs.cloud_model = model
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+        return True
+
     @Slot(bool)
     def setUseClaude(self, on: bool) -> None:  # noqa: N802
         """สวิตช์ส่งต่อ Claude (การ์ด 0016 หัวข้อ 1) · ปิด = ไม่ถาม Claude และไม่สร้างสกิล ·
@@ -1842,7 +1861,8 @@ class SkillsController(QObject):
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
-                 gcal_alert_min=None, holidays=None, time_synced=None):  # fmt: skip
+                 gcal_alert_min=None, holidays=None, time_synced=None, chat_mode=None,
+                 chat_switch=None):  # fmt: skip
         super().__init__()
         # นาฬิกาตั้งจากเน็ตแล้วไหม (ตรวจทั้งระบบ 1.1: แบต RTC 0.00V → บูตไม่มีเน็ต = เวลาค้างที่ตอนปิดเครื่อง) ·
         # ไม่ได้ตั้ง = การ์ดเวลา/นัดบอกว่าเวลาอาจไม่ตรง (H5) · เทสต์ที่ใส่นาฬิกาปลอม = ถือว่าตั้งแล้ว
@@ -1864,6 +1884,10 @@ class SkillsController(QObject):
         self._hol_done.connect(self._on_hol_done)
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
+        # แชท 2 แบบ (การ์ด 0053): แชทงานส่ง Claude ได้แม้ AI ในเครื่องยังไม่พร้อม
+        # chat_switch(kind, ค่า) → (ok, ข้อความ)
+        self._chat_mode = chat_mode or (lambda: "general")
+        self._chat_switch = chat_switch
         from aipc.skills import actions, manifest, reminders
 
         # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal
@@ -2169,7 +2193,8 @@ class SkillsController(QObject):
         return self._user is not None and all(s.id != skill_id for s in self._builtin)
 
     def available(self) -> set[str]:
-        return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() else set())
+        work = self._chat_mode() == "work"
+        return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() or work else set())
 
     @staticmethod
     def _tile_examples(skill) -> list[str]:
@@ -2718,6 +2743,8 @@ class SkillsController(QObject):
             return self._gcal_sync_card()
         if plan.action == "show_devices":
             return self._devices_card()
+        if plan.action in ("chat_mode", "cloud_model"):
+            return self._chat_switch_card(plan)
         out = self._exec.execute(plan)
         if out.simulated:
             title = plan.summary + " (จำลอง)"
@@ -2761,6 +2788,20 @@ class SkillsController(QObject):
             card["title"] = "กำลังดึงปฏิทิน Google อยู่แล้ว"
             card["chips"] = [{"text": "ทำแล้ว", "kind": "ok"}]
         return card
+
+    def _chat_switch_card(self, plan) -> dict:
+        """สลับแชท/โมเดลด้วยเสียงหรือพิมพ์ (การ์ด 0053) · ผลจริงจาก ChatController/UiSettings."""
+        if plan.action == "chat_mode":
+            kind, value = "mode", plan.params["mode"]
+        else:
+            kind, value = "model", plan.params["model"]
+        if self._chat_switch is None:
+            ok, msg = False, "ใช้ได้ในเซสชันจริงเท่านั้น"
+        else:
+            ok, msg = self._chat_switch(kind, value)
+        return {"title": msg, "chips": [{"text": "ทำแล้ว" if ok else "ไม่ได้ทำ",
+                                         "kind": "ok" if ok else "warn"}],
+                "lines": [], "page": "workspace" if ok and kind == "mode" else ""}  # fmt: skip
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
     def tool_catalog(self, text: str = "") -> list:
@@ -3615,8 +3656,9 @@ class SkillsController(QObject):
             card["kind"] = "needs"
             card["title"] = f"สกิล “{r.skill.name}” ยังใช้ไม่ได้"
             card["lines"] = ["ต้องมีก่อน: " + self.NEED_LABEL[n] for n in (r.missing or r.skill.needs)]
-        elif self._llm_ready():
-            card.update(kind="chat", llm=True, prompt="")  # คุยทั่วไป → LLM ในเครื่อง (การ์ด 0013)
+        elif self._llm_ready() or self._chat_mode() == "work":
+            # คุยทั่วไป → LLM ในเครื่อง (การ์ด 0013) · แชทงาน → Claude (การ์ด 0053)
+            card.update(kind="chat", llm=True, prompt="")
         else:
             card["title"] = "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง"
             card["lines"] = [
@@ -3702,6 +3744,12 @@ class ChatController(QObject):
 
     active=False (หน้า Login) = ไม่ติดต่อ AI เลย · สถานะมาจากการถาม /health จริงทุก 5 วิ (H5)
     คำตอบของ LLM เป็นข้อความเท่านั้น สั่ง Action ไม่ได้ (H8)
+
+    แชท 2 แบบ (การ์ด 0053 · Pakon 2026-10-22):
+      "general" ทั่วไป = ไฮบริดเดิม (การ์ด 0016/0022): AI ในเครื่องตอบก่อน ไม่รู้ = ส่งต่อ Claude เอง
+                 (Pakon 2026-10-22: "บางครั้ง local AI ก็ไม่ฉลาด") · ค่าเริ่มต้นทุกครั้งที่เปิด
+      "work"    งาน   = ทุกข้อความไป Claude ด้วยโมเดลที่ผู้ใช้เลือก (haiku/sonnet/opus) · ไม่ผ่าน AI ในเครื่อง
+    auto_cloud = เปิดการส่งต่อของแชททั่วไป (แอปจริงเปิด · สวิตช์ Claude ในหน้าตั้งค่ายังปิดได้)
     """
 
     from aipc.skills.catalog import SYSTEM, TOOLS_HINT  # ข้อความเดียวกับตัววัด spikes.skill_select
@@ -3722,13 +3770,17 @@ class ChatController(QObject):
     _token = Signal(str)
     _done = Signal(object)
     _health = Signal(str)
+    modeChanged = Signal()  # noqa: N815 · แชท 2 แบบ (การ์ด 0053)
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
-                 claude_on=None, meter=None):  # fmt: skip
+                 claude_on=None, meter=None, auto_cloud=False, cloud_model=None):  # fmt: skip
         super().__init__()
-        # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
+        # cloud(คำถาม, บทสนทนา[, model=]) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
+        self._auto_cloud = auto_cloud
+        self._mode = "general"
+        self._cloud_model = cloud_model or (lambda: "sonnet")  # โมเดลของแชทงานที่ผู้ใช้เลือก (ค่าตั้ง)
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
         self._forge = forge  # มีเครื่องมือ create-skill (การ์ด 0017) → บอก AI ใน system prompt
         self._model_name = model_name
@@ -3778,6 +3830,48 @@ class ChatController(QObject):
     def ready(self) -> bool:
         return self._status == "ready"
 
+    # ---------- แชท 2 แบบ (การ์ด 0053) ----------
+    @Property(str, notify=modeChanged)
+    def mode(self) -> str:
+        return self._mode
+
+    @Property(bool, notify=modeChanged)
+    def workReady(self) -> bool:  # noqa: N802
+        """แชทงานใช้ได้: มี Claude ในบัญชีนี้ และผู้ใช้เปิดสวิตช์ Claude ไว้."""
+        return self._cloud is not None and bool(self._claude_on())
+
+    @Property(str, notify=modeChanged)
+    def workBlocked(self) -> str:  # noqa: N802
+        """ทำไมแชทงานใช้ไม่ได้ ("" = ใช้ได้) · หน้าจอแสดงตรง ๆ (H5)."""
+        if self._cloud is None:
+            return "ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในบัญชีนี้"
+        if not self._claude_on():
+            return "ปิด Claude ไว้ในหน้าตั้งค่า"
+        return ""
+
+    @Slot(str, result=bool)
+    def setMode(self, mode: str) -> bool:  # noqa: N802
+        """สลับแบบแชท = เริ่มบทสนทนาใหม่ของแบบนั้น (ประวัติแยกกัน) · กำลังตอบ/ค่าแปลก/แชทงานใช้ไม่ได้ = False."""
+        if mode not in ("general", "work") or self._busy:
+            return False
+        if mode == "work" and not self.workReady:
+            return False
+        if mode != self._mode:
+            self._mode = mode
+            self.newChat(False)
+            self.modeChanged.emit()
+            if mode == "general" and self._status == "ready":
+                self._warm_up()
+        return True
+
+    @Slot()
+    def claudeChanged(self) -> None:  # noqa: N802
+        """สวิตช์ Claude เปลี่ยน · ปิดระหว่างอยู่แชทงาน = กลับแชททั่วไป (ไม่ส่งออกอีก)."""
+        if self._mode == "work" and not self.workReady and not self._busy:
+            self._mode = "general"
+            self.newChat(False)
+        self.modeChanged.emit()
+
     @Property(bool, notify=changed)
     def busy(self) -> bool:
         return self._busy
@@ -3803,8 +3897,9 @@ class ChatController(QObject):
 
     @Property("QVariantList", notify=changed)
     def history(self) -> list:
+        """ประวัติของแบบแชทที่เปิดอยู่เท่านั้น · แชทเก่าก่อนการ์ด 0053 (ไม่มี mode) = ทั่วไป."""
         try:
-            return self._store.list()
+            return [c for c in self._store.list() if c.get("mode", "general") == self._mode]
         except OSError:
             return []
 
@@ -3863,8 +3958,8 @@ class ChatController(QObject):
         return m
 
     def _cloud_ok(self) -> bool:
-        """มี Claude ในบัญชีนี้ และผู้ใช้เปิดสวิตช์ไว้."""
-        return self._cloud is not None and bool(self._claude_on())
+        """AI ในเครื่องส่งต่อ Claude เองได้ไหม (ไฮบริดของแชททั่วไป) · มี Claude + เปิดสวิตช์ + auto_cloud."""
+        return self._auto_cloud and self._cloud is not None and bool(self._claude_on())
 
     @Slot()
     def claudeSwitched(self) -> None:  # noqa: N802
@@ -3918,6 +4013,8 @@ class ChatController(QObject):
     @Slot(str, str, result=bool)
     @Slot(str, str, bool, result=bool)
     def send(self, text: str, prompt: str = "", use_tools: bool = True) -> bool:
+        if self._mode == "work":
+            return self._send_work(text)
         if self._busy or not text.strip() or self._status != "ready":
             return False
         import threading
@@ -3965,6 +4062,21 @@ class ChatController(QObject):
             target=lambda: self._done.emit(stream.run(self._token.emit)), daemon=True
         ).start()
         return True
+
+    def _send_work(self, text: str) -> bool:
+        """แชทงาน: ส่งให้ Claude ตรง ๆ ไม่ต้องรอ AI ในเครื่อง · สกิลภาษา (แปล/สรุป) ส่งแค่ข้อความของผู้ใช้."""
+        if self._busy or not text.strip() or not self.workReady:
+            return False
+        self._conv["messages"].append({"role": "user", "content": text})
+        self._trace = {"t0": time.monotonic(), "why": "แชทงาน: ทุกข้อความส่งให้ Claude"}
+        self._ask_cloud(f"โมเดลที่เลือก: {self._work_model()}")
+        return True
+
+    def _work_model(self) -> str:
+        from aipc.cloud.ask import MODELS
+
+        m = self._cloud_model()
+        return m if m in MODELS else "sonnet"
 
     @Slot()
     def stop(self) -> None:
@@ -4034,12 +4146,17 @@ class ChatController(QObject):
         note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
         if getattr(reply, "cloud", False):
             note = self.CLOUD_NOTE
+            if self._mode == "work":
+                used = getattr(reply, "model", "") or "ไม่ทราบโมเดล"
+                note = f"แชทงาน · ตอบโดย Claude ({used}) · ส่งออกนอกเครื่อง"
         elif self._switched_off_gave_up(reply, with_file):
             note = self.CLAUDE_OFF_NOTE
         if reply.text:
             msg = {"role": "assistant", "content": reply.text}
             if getattr(reply, "cloud", False):
                 msg["by"] = "claude"  # ส่งให้ AI ในเครื่องครั้งหน้าพร้อมป้ายที่มา (_for_local)
+                if getattr(reply, "model", ""):
+                    msg["model"] = reply.model
             self._conv["messages"].append(msg)
         if not self._temporary:
             try:
@@ -4081,6 +4198,8 @@ class ChatController(QObject):
         cloud = t.get("cloud")
         if cloud:
             who = "Claude (cloud)" if getattr(reply, "cloud", False) else "Claude (ถามไม่สำเร็จ)"
+            if getattr(reply, "model", ""):
+                who += f" · {reply.model}"
             why = f"{t.get('why', '')} → {cloud['why']}"
             ctx = f" + บทสนทนาล่าสุด {cloud['turns']} ข้อความ" if cloud["turns"] else ""
             out = (f"ส่งคำถาม{ctx} ({cloud['chars']} ตัวอักษร) ไป Claude · "
@@ -4123,11 +4242,19 @@ class ChatController(QObject):
         self.changed.emit()
         self.streamChanged.emit()
 
+        work_model = self._work_model() if self._mode == "work" else None
+        if work_model:
+            self._stream_text = f"กำลังถาม Claude ({work_model}) · แชทงาน…"
+
         def work():
-            c = self._cloud(question, history)
+            if work_model:
+                c = self._cloud(question, history, model=work_model)
+            else:
+                c = self._cloud(question, history)
             reply = client.Reply(text=c.text if c.ok else "", reason="" if c.ok else "error",
                                  detail="" if c.ok else c.error)  # fmt: skip
             reply.cloud = c.ok  # type: ignore[attr-defined]
+            reply.model = getattr(c, "model", "") or ""  # type: ignore[attr-defined]
             self._done.emit(reply)
 
         threading.Thread(target=work, daemon=True).start()
@@ -4142,6 +4269,8 @@ class ChatController(QObject):
         """แนบไฟล์ให้คำถามถัดไป ๆ · คืนข้อความผิดพลาด ("" = สำเร็จ) · เนื้อหาไฟล์อยู่ในเครื่องเท่านั้น."""
         from aipc import files_qa
 
+        if self._mode == "work":  # การ์ด 0053 ข้อ 7: แชทงานส่งทุกอย่างออกนอกเครื่อง → ไม่รับไฟล์
+            return "แนบไฟล์ได้เฉพาะแชททั่วไป (เนื้อหาไฟล์ไม่ออกนอกเครื่อง)"
         try:
             text = files_qa.extract(Path(path))
         except files_qa.Unsupported as e:
@@ -4177,6 +4306,7 @@ class ChatController(QObject):
 
         self.stop()
         self._conv, self._temporary, self._trimmed = chat_store.new_conversation(), temporary, False
+        self._conv["mode"] = self._mode
         # ไฟล์ที่แนบเป็นของแชทเดิม (สำรวจบน Pi 5 2026-10-12: แชทใหม่ยังแนบอยู่ → "ปรับเสียงเป็น 40" ถูกถามไฟล์แทน)
         self._file = None
         self.changed.emit()
@@ -4186,6 +4316,12 @@ class ChatController(QObject):
         conv = self._store.load(cid)
         if conv is None or self._busy:
             return []
+        mode = conv.get("mode", "general")
+        if mode == "work" and not self.workReady:
+            return []  # เปิดแชทงานเก่าตอนปิด Claude ไว้ = ถามต่อไม่ได้ · ไม่สลับ
+        if mode != self._mode:
+            self._mode = mode
+            self.modeChanged.emit()
         self._conv, self._temporary, self._trimmed = conv, False, False
         self._file = None
         self.changed.emit()

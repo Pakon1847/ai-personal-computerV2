@@ -65,6 +65,8 @@ class AppDriver(QObject):
             tools=lambda text="": holder["skills"].tool_catalog(text), cloud=cloud,
             model_name=model_name, forge=forge is not None, claude_on=lambda: True,
             meter=lambda: None,
+            # ผลวัดเดิม (การ์ด 0016/0022/0047) วัดแบบไฮบริด · ทำซ้ำได้ด้วยตัวขับนี้ (แอปจริงปิดตั้งแต่การ์ด 0053)
+            auto_cloud=cloud is not None,
         )  # fmt: skip
         self.skills = SkillsController(
             executor=self.exec, reminders_path=work / "reminders.json", run_timer=False,
