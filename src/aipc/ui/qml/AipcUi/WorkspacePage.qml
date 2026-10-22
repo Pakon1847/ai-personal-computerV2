@@ -764,10 +764,42 @@ Item {
                 text: Tr.t("ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้ · ใช้เวลาหลายนาทีและต้องต่ออินเทอร์เน็ต")
             }
             AppText { id: installError; visible: text !== ""; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
-            AppText {
+            // ความคืบหน้าจริงจาก apt (การ์ด 0054 · Pakon 2026-10-23) · ยังไม่มีตัวเลข = แถบวิ่ง ไม่แสดงเลขที่ไม่รู้ (H5)
+            ColumnLayout {
                 visible: skills.installing !== ""
-                text: Tr.t("กำลังติดตั้ง ") + skills.installing + Tr.t(" … อย่าปิดเครื่อง")
                 Layout.fillWidth: true
+                spacing: 6
+                RowLayout {
+                    Layout.fillWidth: true
+                    AppText {
+                        text: (skills.installStage !== "" ? Tr.t(skills.installStage) : Tr.t("กำลังติดตั้ง"))
+                              + " " + skills.installing + Tr.t(" … อย่าปิดเครื่อง")
+                        Layout.fillWidth: true
+                    }
+                    AppText {
+                        objectName: "installPercent"
+                        visible: skills.installPercent >= 0
+                        text: Math.floor(skills.installPercent) + "%"
+                        strong: true
+                    }
+                }
+                ProgressBar {
+                    id: installBar
+                    objectName: "installBar"
+                    Layout.fillWidth: true
+                    from: 0; to: 100
+                    value: Math.max(0, skills.installPercent)
+                    indeterminate: skills.installPercent < 0
+                    background: Rectangle { implicitHeight: 8; radius: 4; color: Theme.surface2 }
+                    contentItem: Item {
+                        implicitHeight: 8
+                        Rectangle {
+                            width: installBar.indeterminate ? parent.width * 0.3 : installBar.visualPosition * parent.width
+                            height: parent.height; radius: 4; color: Theme.accent
+                            Behavior on width { NumberAnimation { duration: Theme.animMs } }
+                        }
+                    }
+                }
             }
             RowLayout {
                 Layout.alignment: Qt.AlignRight

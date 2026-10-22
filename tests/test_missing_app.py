@@ -76,8 +76,11 @@ class FlowTest(unittest.TestCase):
         self.done = []
         self.s.appInstallDone.connect(self.done.append)
 
-    def install(self, req):
+    def install(self, req, on_progress=None):
         self.sent.append(req)
+        if on_progress:
+            for pct in (0, 27.5, 60.0):
+                on_progress({"state": "progress", "stage": "กำลังดาวน์โหลด", "percent": pct})
         return self.result
 
     def test_a1_install_no_then_web_yes(self):
@@ -113,6 +116,8 @@ class FlowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: self.done))
         self.assertEqual(self.sent, [{"app": "vlc"}])  # ไม่มีรหัส (Pakon 2026-10-23)
         self.assertEqual(self.done[0]["chips"][0]["text"], "ติดตั้งแล้ว")
+        self.assertEqual(self.s.installPercent, 60.0)  # ตัวเลขจากตัวติดตั้ง (ของจริงมาจาก apt)
+        self.assertEqual(self.s.installStage, "กำลังดาวน์โหลด")
 
     def test_install_refused_by_helper_is_shown(self):
         self.result = {"ok": False, "message": "ดาวน์โหลดไม่ได้ · ตรวจอินเทอร์เน็ตแล้วลองใหม่"}

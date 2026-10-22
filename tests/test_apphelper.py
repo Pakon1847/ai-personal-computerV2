@@ -14,7 +14,8 @@ class FakeSystem(apphelper.System):
         self.state = tmp / "state"
         self.who = "nok"
         self.free = 10 * 1024**3
-        self.apt_calls, self.logs = [], []
+        self.apt_calls, self.logs, self.shown = [], [], []
+        self.status = []  # บรรทัด Status-Fd ที่ apt "จะส่ง" ระหว่างติดตั้ง
         self.apt_result = {"update": (0, ""), "install": (0, "")}
 
     def caller(self):
@@ -23,9 +24,17 @@ class FakeSystem(apphelper.System):
     def free_bytes(self):
         return self.free
 
-    def apt(self, args):
+    def apt(self, args, on_status=None):
         self.apt_calls.append(args)
+        if on_status is not None:
+            for line in self.status:
+                st = apphelper.parse_status(line)
+                if st:
+                    on_status(*st)
         return self.apt_result[args[0]]
+
+    def progress(self, msg):
+        self.shown.append(msg)
 
     def log(self, text):
         self.logs.append(text)
@@ -51,6 +60,28 @@ class InstallTest(unittest.TestCase):
         install = ["install", "-y", "--no-install-recommends", "vlc"]
         self.assertEqual(self.sys.apt_calls, [["update"], install])
         self.assertIn("ผู้ขอ nok", " ".join(self.sys.logs))  # บันทึกว่าใครขอ
+
+    def test_progress_from_apt_status_lines(self):
+        # Pakon 2026-10-23: แสดง % ที่โหลด · ตัวเลขมาจากบรรทัด Status-Fd ของ apt · ไม่ถอยหลัง
+        self.sys.status = [
+            "dlstatus:1:0.0:Retrieving", "dlstatus:2:50.0:Retrieving", "Get:1 http://x",
+            "dlstatus:3:100:Retrieving", "pmstatus:gimp:20:Unpacking",
+            "pmstatus:gimp:10:Preparing", "pmstatus:gimp:100:Installed gimp",
+        ]  # fmt: skip
+        self.assertTrue(ask(self.sys, app="gimp")["ok"])
+        pcts = [m["percent"] for m in self.sys.shown]
+        self.assertEqual(pcts, [0.0, 5.0, 27.5, 50.0, 60.0, 100.0])  # 10% ของขั้นติดตั้งถอยหลัง = ไม่แสดง
+        self.assertEqual(self.sys.shown[0]["stage"], "กำลังเตรียม")
+        self.assertEqual(self.sys.shown[1]["stage"], "กำลังดาวน์โหลด")
+        self.assertEqual(self.sys.shown[-1]["stage"], "กำลังติดตั้ง")
+
+    def test_parse_status(self):
+        self.assertEqual(apphelper.parse_status("dlstatus:1:42.5:Retrieving file 3 of 9"),
+                         ("download", 42.5))  # fmt: skip
+        got = apphelper.parse_status("pmstatus:gimp:60:Unpacking gimp")
+        self.assertEqual(got, ("install", 60.0))
+        for bad in ("Get:1 http://deb", "pmstatus:gimp:abc:x", "dlstatus:1", ""):
+            self.assertIsNone(apphelper.parse_status(bad), bad)
 
     def test_a3_refusals_never_reach_apt(self):
         bad = [

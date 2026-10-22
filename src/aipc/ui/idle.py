@@ -22,9 +22,27 @@ from pathlib import Path
 EXIT_CMD = "labwc --exit"
 
 
+# วงแหวนรหัสผ่านของ swaylock ให้เข้าชุดกับจอล็อกและธีมดำของแอป (Pakon 2026-10-23 · แนวทาง ui-ux-pro-max:
+# เรียบ คอนทราสต์สูง สีเน้นเดียว) · ค่าสีจาก Theme.qml โหมดมืด · RRGGBB[AA] · 00000000 = โปร่งใส
+RING = {
+    "inside": "111113", "ring": "3F3F48", "line": "00000000", "separator": "00000000",
+    "key-hl": "A5B4FC", "bs-hl": "F0B45C", "text": "F2F2F4",
+    "inside-clear": "111113", "ring-clear": "3F3F48", "line-clear": "00000000",
+    "text-clear": "A1A1AA",
+    "inside-ver": "1C1D38", "ring-ver": "A5B4FC", "line-ver": "00000000", "text-ver": "C7D2FE",
+    "inside-wrong": "33181A", "ring-wrong": "F28B80", "line-wrong": "00000000",
+    "text-wrong": "F6B8B0",
+}  # fmt: skip
+BG = "050506"
+
+
 def lock_command(image: Path | None) -> list[str]:
-    """swaylock: -f กลับทันทีหลังล็อก (swayidle ไม่ค้าง) · -e Enter ว่างไม่นับเป็นรหัสผิด · -k บอกผังแป้นตอนพิมพ์."""
-    cmd = ["swaylock", "-f", "-e", "-k", "-l", "-c", "1d1d1b"]
+    """swaylock: -f กลับทันทีหลังล็อก (swayidle ไม่ค้าง) · -e Enter ว่างไม่นับเป็นรหัสผิด · -k บอกผังแป้นตอนพิมพ์ ·
+    วงแหวนขึ้นตลอด (ผู้ใช้รู้ว่าพิมพ์รหัสตรงไหน) · สีตามธีม."""
+    cmd = ["swaylock", "-f", "-e", "-k", "-l", "-c", BG, "--indicator-idle-visible",
+           "--indicator-radius", "84", "--indicator-thickness", "8"]  # fmt: skip
+    for k, v in RING.items():
+        cmd += [f"--{k}-color", v]
     if image is not None:
         cmd += ["-i", str(image), "-s", "fill"]
     return cmd
@@ -82,37 +100,110 @@ def lock_lines(
     return [
         "หน้าจอล็อกอยู่",
         why,
-        "เจ้าของบัญชี: พิมพ์รหัสผ่านแล้วกด Enter เพื่อกลับเข้าใช้ (ถ้าเป็นแป้นไทย กดปุ่ม ~ เพื่อสลับเป็นอังกฤษ)",
+        "พิมพ์รหัสผ่าน แล้วกด Enter",
+        "แป้นเป็นภาษาไทยอยู่? กดปุ่ม ~ เพื่อสลับเป็นอังกฤษก่อน",
         out,
     ]
 
 
 def render_lock_image(path: Path, lines: list[str], size: tuple[int, int] = (1920, 1080),
                       family: str = "IBM Plex Sans Thai") -> Path:  # fmt: skip
-    """วาดข้อความลงภาพ PNG ให้ swaylock ใช้เป็นพื้นหลัง (swaylock แสดงข้อความเองไม่ได้) ·
-    ใช้ฟอนต์ไทยที่มากับแอป."""
-    from PySide6.QtCore import QRect, Qt
-    from PySide6.QtGui import QColor, QFont, QImage, QPainter
+    """วาดจอล็อกเป็นภาพ PNG ให้ swaylock ใช้เป็นพื้นหลัง (swaylock แสดงข้อความเองไม่ได้).
+
+    หน้าตา (Pakon 2026-10-23: "ทำให้สวยขึ้น" · แนวทาง ui-ux-pro-max: คอลัมน์เดียว ตัวใหญ่ ·
+    เว้นที่ว่าง · คอนทราสต์สูง ·
+    ไม่ใช้ไล่สีม่วงแบบ "AI"): ไอคอนกุญแจ → หัวเรื่องตัวใหญ่ → เหตุที่ล็อก → [วงแหวนรหัสผ่านของ swaylock กลางจอ] →
+    การ์ดวิธีปลด + บรรทัดบอกว่างานยังอยู่ (สีเขียว + เครื่องหมายถูก) หรือจะออกเอง (สีส้ม + เครื่องหมายเตือน ·
+    ไม่ใช้สีอย่างเดียวบอกความหมาย) · ขนาดทุกอย่างคิดจากความสูงจอ
+    """
+    from PySide6.QtCore import QPointF, QRectF, Qt
+    from PySide6.QtGui import (
+        QColor,
+        QFont,
+        QImage,
+        QPainter,
+        QPainterPath,
+        QPen,
+        QRadialGradient,  # fmt: skip
+    )
 
     w, h = size
+    k = h / 1080
+    title, why, how, hint, keep = (lines + [""] * 5)[:5]
+    warn = "จะหาย" in keep or "ออกจากระบบให้เอง" in keep
+
     img = QImage(w, h, QImage.Format.Format_RGB32)
-    img.fill(QColor("#1d1d1b"))
+    img.fill(QColor("#" + BG))
     p = QPainter(img)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.setRenderHint(QPainter.RenderHint.TextAntialiasing)
-    title, *rest = lines
-    p.setPen(QColor("#ffffff"))
-    p.setFont(QFont(family, max(24, h // 18), QFont.Weight.DemiBold))
-    p.drawText(QRect(0, int(h * 0.10), w, int(h * 0.12)), Qt.AlignmentFlag.AlignCenter, title)
-    p.setFont(QFont(family, max(14, h // 45)))
-    p.setPen(QColor("#d9d8d2"))
-    # กลางจอเป็นวงแหวนของ swaylock → ข้อความอยู่บนกับล่าง
-    p.drawText(QRect(0, int(h * 0.22), w, int(h * 0.08)), Qt.AlignmentFlag.AlignCenter, rest[0])
-    box = QRect(int(w * 0.08), int(h * 0.66), int(w * 0.84), int(h * 0.26))
-    p.drawText(
-        box,
-        Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap,
-        "\n\n".join(rest[1:]),
-    )
+    # แสงนุ่ม ๆ หลังวงแหวน (สีเทาเย็น ไม่ใช่ม่วง) · ให้กลางจอเด่นโดยไม่รก
+    glow = QRadialGradient(QPointF(w / 2, h / 2), h * 0.55)
+    glow.setColorAt(0.0, QColor("#15161C"))
+    glow.setColorAt(1.0, QColor("#" + BG))
+    p.fillRect(0, 0, w, h, glow)
+
+    def font(px: float, weight=QFont.Weight.Normal) -> QFont:
+        f = QFont(family)
+        f.setPixelSize(max(10, round(px * k)))
+        f.setWeight(weight)
+        return f
+
+    center = Qt.AlignmentFlag.AlignHCenter
+
+    def text(y: float, hgt: float, s: str, px: float, color: str, weight=QFont.Weight.Normal,
+             x: float = 0, width: float | None = None, align=center):  # fmt: skip
+        p.setFont(font(px, weight))
+        p.setPen(QColor(color))
+        r = QRectF(x, y * k, w if width is None else width, hgt * k)
+        p.drawText(r, align | Qt.AlignmentFlag.AlignVCenter | Qt.TextFlag.TextWordWrap, s)
+
+    # ไอคอนกุญแจ (วาดเอง · เส้น 24×24 แบบเดียวกับ Icons.qml)
+    cx, top, u = w / 2, 150 * k, 2.6 * k
+    p.setPen(QPen(QColor("#A5B4FC"), 1.9 * u, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawRoundedRect(QRectF(cx - 8 * u, top + 10 * u, 16 * u, 12 * u), 2.5 * u, 2.5 * u)
+    shackle = QPainterPath(QPointF(cx - 5 * u, top + 10 * u))
+    shackle.lineTo(cx - 5 * u, top + 6 * u)
+    shackle.arcTo(QRectF(cx - 5 * u, top + 1 * u, 10 * u, 10 * u), 180, -180)
+    shackle.lineTo(cx + 5 * u, top + 10 * u)
+    p.drawPath(shackle)
+
+    text(222, 96, title, 72, "#F2F2F4", QFont.Weight.Bold)
+    text(320, 44, why, 26, "#A1A1AA")
+
+    # การ์ดใต้วงแหวน (วงแหวนของ swaylock อยู่กลางจอ รัศมี 84 + เส้น 8)
+    cw, cy, ch = min(w - 64 * k, 900 * k), 650 * k, 250 * k
+    card = QRectF((w - cw) / 2, cy, cw, ch)
+    p.setPen(QPen(QColor("#26262C"), 1.5 * k))
+    p.setBrush(QColor("#111113"))
+    p.drawRoundedRect(card, 24 * k, 24 * k)
+    pad = 40 * k
+    text(cy / k + 30, 52, how, 34, "#F2F2F4", QFont.Weight.DemiBold)
+    text(cy / k + 84, 40, hint, 22, "#A1A1AA")
+    p.setPen(QPen(QColor("#26262C"), 1.5 * k))
+    p.drawLine(QPointF(card.left() + pad, cy + 146 * k), QPointF(card.right() - pad, cy + 146 * k))
+    # บรรทัดสุดท้าย: งานยังอยู่ (เขียว ✓) หรือจะออกเอง (ส้ม !) · มีไอคอนกำกับ ไม่ใช่สีอย่างเดียว
+    tone = QColor("#F0B45C" if warn else "#6CCB7E")
+    iy, ix, r = cy + 198 * k, card.left() + pad + 14 * k, 13 * k
+    p.setPen(QPen(tone, 2.6 * k, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                  Qt.PenJoinStyle.RoundJoin))  # fmt: skip
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawEllipse(QPointF(ix, iy), r, r)
+    if warn:
+        p.drawLine(QPointF(ix, iy - 6 * k), QPointF(ix, iy + 1.5 * k))
+        p.drawPoint(QPointF(ix, iy + 6 * k))
+    else:
+        mark = QPainterPath(QPointF(ix - 6 * k, iy))
+        mark.lineTo(ix - 1.5 * k, iy + 4.5 * k)
+        mark.lineTo(ix + 6.5 * k, iy - 4.5 * k)
+        p.drawPath(mark)
+    tx = ix + r + 16 * k
+    text(cy / k + 176, 46, keep, 22, tone.name(), x=tx, width=card.right() - pad - tx,
+         align=Qt.AlignmentFlag.AlignLeft)  # fmt: skip
+
+    text(1010, 40, "AI PC", 18, "#636978", QFont.Weight.DemiBold, x=48 * k, width=300 * k,
+         align=Qt.AlignmentFlag.AlignLeft)  # fmt: skip
     p.end()
     path.parent.mkdir(parents=True, exist_ok=True)
     if not img.save(str(path), "PNG"):

@@ -160,7 +160,7 @@ class WiringTest(unittest.TestCase):
     def test_lock_text_mentions_camera_when_presence(self):
         lines = idle.lock_lines("ก", 5, 10, presence_logout_s=30)
         self.assertIn("กล้อง", lines[1])
-        self.assertIn("30 วินาที", lines[3])
+        self.assertIn("30 วินาที", lines[-1])
 
     def test_prefs_default_off_and_validated(self):
         self.assertFalse(settings.UiPrefs().presence)

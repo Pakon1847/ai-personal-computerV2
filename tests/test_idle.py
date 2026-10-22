@@ -49,14 +49,23 @@ class IdleArgsTest(unittest.TestCase):
 
     def test_lock_only_text_says_work_is_kept(self):
         lines = idle.lock_lines("น้ำฝน", 5, 0)
-        self.assertIn("ไม่ออกจากระบบเอง", lines[3])
+        self.assertIn("ไม่ออกจากระบบเอง", lines[-1])
         self.assertFalse(any("จะหาย" in x for x in lines))
+
+    def test_ring_matches_the_theme_and_is_always_visible(self):
+        # Pakon 2026-10-23: จอล็อกสวยขึ้น · วงแหวนขึ้นตลอดให้รู้ว่าพิมพ์รหัสตรงไหน · สีจากธีมดำ
+        cmd = idle.lock_command(None)
+        self.assertIn("--indicator-idle-visible", cmd)
+        self.assertEqual(cmd[cmd.index("--key-hl-color") + 1], "A5B4FC")
+        self.assertEqual(cmd[cmd.index("--ring-wrong-color") + 1], "F28B80")
+        self.assertNotIn("-i", cmd)
 
     def test_lock_text_tells_what_to_do(self):
         lines = idle.lock_lines("น้ำฝน", 5, 10)
         self.assertEqual(lines[0], "หน้าจอล็อกอยู่")
         self.assertIn("น้ำฝน", lines[1])
-        self.assertTrue(any("รหัสผ่าน" in x and "~" in x for x in lines))
+        self.assertTrue(any("รหัสผ่าน" in x and "Enter" in x for x in lines))
+        self.assertTrue(any("~" in x for x in lines))  # แป้นไทย → บอกวิธีสลับ
         self.assertTrue(any("10 นาที" in x and "ออกจากระบบ" in x for x in lines))
 
 
@@ -103,7 +112,8 @@ class IdleLockTest(unittest.TestCase):
 
         lock = self.make(render=broken)
         args = lock.apply(5, 10)
-        self.assertNotIn("-i", args[4])  # จอสีพื้น · ล็อกได้เหมือนเดิม
+        self.assertFalse(any("-i" in a.split() for a in args))  # จอสีพื้น · ล็อกได้เหมือนเดิม
+        self.assertTrue(any(a.startswith("swaylock -f") for a in args))
 
 
 class LockPrefsTest(unittest.TestCase):

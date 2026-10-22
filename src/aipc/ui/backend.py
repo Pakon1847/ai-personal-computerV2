@@ -1704,13 +1704,34 @@ def greeter_theme(user: str | None = None) -> str:
 APPS_HELPER = "/usr/local/sbin/aipc-apps"  # ตัวติดตั้งแอปของการ์ด 0054 (ติดตั้งโดย install-apps.sh)
 
 
-def run_apps_helper(request: dict) -> dict:
-    """เรียกตัวติดตั้งแอปผ่าน sudo (-n = ไม่ถามรหัส sudo) · รหัสผู้ดูแลอยู่ใน stdin ไม่อยู่ใน argv."""
-    return run_accounts_helper(request, timeout=1900, helper=APPS_HELPER,
-                               missing="ตัวติดตั้งแอปยังไม่ได้ติดตั้งในเครื่องนี้ (install-apps.sh)")  # fmt: skip
+def run_apps_helper(request: dict, on_progress=None) -> dict:
+    """เรียกตัวติดตั้งแอปผ่าน sudo (-n = ไม่ถามรหัส sudo) · อ่านทีละบรรทัด: มี "ok" = ผล · อื่น ๆ = ความคืบหน้า."""
+    import json
+    import subprocess
+
+    try:
+        proc = subprocess.Popen(["sudo", "-n", APPS_HELPER], stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)  # fmt: skip
+    except OSError as e:
+        return {"ok": False, "message": f"เรียกตัวติดตั้งแอปไม่ได้ ({e.strerror or e})"}
+    proc.stdin.write(json.dumps(request).encode())
+    proc.stdin.close()
+    result = None
+    for raw in proc.stdout:
+        try:
+            msg = json.loads(raw.decode("utf-8"))
+        except ValueError:
+            continue
+        if isinstance(msg, dict) and "ok" in msg:
+            result = msg
+        elif isinstance(msg, dict) and on_progress is not None:
+            on_progress(msg)
+    proc.wait()
+    return result or {"ok": False,
+                      "message": "ตัวติดตั้งแอปยังไม่ได้ติดตั้งในเครื่องนี้ (install-apps.sh)"}  # fmt: skip
 
 
-def _simulated_install(request: dict) -> dict:
+def _simulated_install(request: dict, on_progress=None) -> dict:
     """เครื่องพัฒนา (ไม่ใช่ Linux): ไม่ติดตั้งจริง และบอกตรง ๆ ว่าจำลอง (H5)."""
     return {"ok": True, "simulated": True, "message": "จำลอง: เครื่องนี้ไม่ใช่ Pi · ไม่ได้ติดตั้งจริง"}
 
@@ -1945,6 +1966,7 @@ class SkillsController(QObject):
     appInstallChanged = Signal()  # noqa: N815 · ติดตั้งแอป (การ์ด 0054)
     appInstallDone = Signal("QVariantMap")  # noqa: N815 · การ์ดผล (ติดตั้ง/เปิดแล้ว หรือเหตุที่ไม่สำเร็จ)
     _app_done = Signal(object)
+    _app_progress = Signal(object)
     _hol_done = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
@@ -1981,7 +2003,9 @@ class SkillsController(QObject):
         # (aipc.accounts.apphelper) · ไม่ใช่ Linux = จำลองและบอกว่าจำลอง (H5)
         self._installer = installer
         self._installing = ""  # ชื่อแอปที่กำลังติดตั้ง ("" = ไม่มี)
+        self._install_pct, self._install_stage = -1.0, ""  # -1 = ยังไม่รู้ (ยังไม่มีตัวเลขจาก apt)
         self._app_done.connect(self._on_app_installed)
+        self._app_progress.connect(self._on_app_progress)
         from aipc.skills import actions, manifest, reminders
 
         # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal
@@ -2959,6 +2983,24 @@ class SkillsController(QObject):
     def installing(self) -> str:
         return self._installing
 
+    @Property(float, notify=appInstallChanged)
+    def installPercent(self) -> float:  # noqa: N802
+        """เปอร์เซ็นต์รวมจากตัวเลขของ apt (การ์ด 0054 · Pakon 2026-10-23) · -1 = ยังไม่มีตัวเลข."""
+        return self._install_pct
+
+    @Property(str, notify=appInstallChanged)
+    def installStage(self) -> str:  # noqa: N802
+        return self._install_stage
+
+    @Slot(object)
+    def _on_app_progress(self, msg) -> None:
+        try:
+            self._install_pct = float(msg.get("percent", self._install_pct))
+        except (TypeError, ValueError):
+            return
+        self._install_stage = str(msg.get("stage", self._install_stage))
+        self.appInstallChanged.emit()
+
     @Slot(str, result=bool)
     def installApp(self, key: str) -> bool:  # noqa: N802
         """ผู้ดูแลกดติดตั้ง · ทำในเธรดแยก (apt ใช้เวลาหลายนาที) · ผลมาทาง appInstallDone.
@@ -2977,12 +3019,13 @@ class SkillsController(QObject):
         if run is None:
             run = run_apps_helper if sys.platform.startswith("linux") else _simulated_install
         self._installing = entry.name
+        self._install_pct, self._install_stage = -1.0, ""
         self.appInstallChanged.emit()
         req = {"app": key}
 
         def work():
             try:
-                r = run(req)
+                r = run(req, self._app_progress.emit)
             except Exception as e:  # noqa: BLE001 · บอกผู้ใช้แทนการค้าง (H2)
                 r = {"ok": False, "message": f"ติดตั้งไม่สำเร็จ: {e}"}
             self._app_done.emit((entry, r))

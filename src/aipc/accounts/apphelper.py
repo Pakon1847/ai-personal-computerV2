@@ -33,16 +33,33 @@ class System(helper.System):
     def free_bytes(self) -> int:
         return shutil.disk_usage("/").free
 
-    def apt(self, args: list[str]) -> tuple[int, str]:
-        env = {**os.environ, "DEBIAN_FRONTEND": "noninteractive", "LC_ALL": "C"}
+    def apt(self, args: list[str], on_status=None) -> tuple[int, str]:
+        """รัน apt-get · on_status(ชนิด, เปอร์เซ็นต์) จากบรรทัด Status-Fd ของ apt เอง
+        (dlstatus = ดาวน์โหลด · pmstatus = ติดตั้ง) · ตัวเลขจาก apt จริง ไม่ได้ประมาณเอง (H5)."""
         import subprocess
+        import time as _time
 
-        try:
-            r = subprocess.run(["apt-get", *args], capture_output=True, text=True, env=env,
-                               timeout=APT_TIMEOUT_S, check=False)  # fmt: skip
-        except subprocess.TimeoutExpired:
-            return 124, "timeout"
-        return r.returncode, (r.stdout + r.stderr)[-4000:]
+        env = {**os.environ, "DEBIAN_FRONTEND": "noninteractive", "LC_ALL": "C"}
+        cmd = ["apt-get", "-o", "APT::Status-Fd=1", *args]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                                env=env)  # fmt: skip
+        tail, end = [], _time.monotonic() + APT_TIMEOUT_S
+        for line in proc.stdout:
+            status = parse_status(line)
+            if status is not None:
+                if on_status is not None:
+                    on_status(*status)
+            else:
+                tail = (tail + [line])[-80:]
+            if _time.monotonic() > end:
+                proc.kill()
+                proc.wait()
+                return 124, "timeout"
+        return proc.wait(), "".join(tail)[-4000:]
+
+    def progress(self, msg: dict) -> None:
+        """ส่งความคืบหน้าให้หน้าจอทันที (บรรทัดละ 1 JSON · บรรทัดสุดท้ายที่มี "ok" คือผล)."""
+        print(json.dumps(msg, ensure_ascii=False), flush=True)
 
     def catalog(self) -> dict:
         return app_catalog.load()
@@ -74,6 +91,27 @@ def _why_apt_failed(out: str) -> str:
     return "ติดตั้งไม่สำเร็จ: " + last[0][:200]
 
 
+def parse_status(line: str) -> tuple[str, float] | None:
+    """บรรทัด Status-Fd ของ apt → (ชนิด, เปอร์เซ็นต์) · อย่างอื่น = None.
+
+    "dlstatus:1:42.5:Retrieving file 3 of 9" → ("download", 42.5) ·
+    "pmstatus:gimp:60:Unpacking" → ("install", 60)
+    """
+    parts = line.strip().split(":", 3)
+    if len(parts) < 3 or parts[0] not in ("dlstatus", "pmstatus"):
+        return None
+    try:
+        pct = max(0.0, min(100.0, float(parts[2])))
+    except ValueError:
+        return None
+    return ("download" if parts[0] == "dlstatus" else "install"), pct
+
+
+# เปอร์เซ็นต์รวมบนจอ: เตรียม (apt update) 0–5 · ดาวน์โหลด 5–50 · ติดตั้ง 50–100 · ไม่ถอยหลัง
+STAGES = {"download": (5.0, 45.0), "install": (50.0, 50.0)}
+STAGE_TEXT = {"prepare": "กำลังเตรียม", "download": "กำลังดาวน์โหลด", "install": "กำลังติดตั้ง"}
+
+
 def install(request: dict, system: System) -> dict:
     key = request.get("app")
     if not isinstance(key, str):
@@ -85,10 +123,20 @@ def install(request: dict, system: System) -> dict:
     if system.free_bytes() < MIN_FREE:
         return helper._fail("พื้นที่ดิสก์เหลือน้อยกว่า 2 GB · ไม่ติดตั้ง")
     system.log(f"ติดตั้ง {entry.apt} ({key}) · ผู้ขอ {caller}")
+    shown = [0.0]
+
+    def report(stage: str, pct: float) -> None:
+        start, span = STAGES.get(stage, (0.0, 5.0))
+        total = max(shown[0], round(start + span * pct / 100, 1))
+        if total > shown[0] or stage == "prepare":
+            shown[0] = total
+            system.progress({"state": "progress", "stage": STAGE_TEXT[stage], "percent": total})
+
+    report("prepare", 0)
     code, out = system.apt(["update"])
     if code != 0:
         return helper._fail(_why_apt_failed(out))
-    code, out = system.apt(["install", "-y", "--no-install-recommends", entry.apt])
+    code, out = system.apt(["install", "-y", "--no-install-recommends", entry.apt], report)
     system.log(f"ติดตั้ง {entry.apt}: {'สำเร็จ' if code == 0 else f'ไม่สำเร็จ ({code})'}")
     if code != 0:
         return helper._fail(_why_apt_failed(out))
