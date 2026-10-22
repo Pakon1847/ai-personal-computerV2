@@ -1,14 +1,16 @@
 """ตัวติดตั้งแอปจากรายการที่อนุญาต (การ์ด 0054) — รันด้วยสิทธิ์ root ผ่าน sudo เท่านั้น.
 
 เซสชันของผู้ใช้เรียกได้ทางเดียว: `sudo -n /usr/local/sbin/aipc-apps` ไม่มีอาร์กิวเมนต์ (install-apps.sh)
-คำขอ JSON ทาง stdin: {"app": "<คีย์ในรายการ>", "admin": "<ชื่อผู้ดูแล>", "password": "<รหัสผู้ดูแล>"}
+คำขอ JSON ทาง stdin: {"app": "<คีย์ในรายการ>"}
 
 หลัก H7 (ตัวนี้ตัดสินเองทุกข้อ ไม่เชื่อหน้าจอ):
 - ติดตั้งได้เฉพาะคีย์ในรายการ (aipc.skills.app_catalog · ไฟล์ของผู้ดูแลหรือของแอปใน /opt ที่ root เป็นเจ้าของ)
   ชื่อแพ็กเกจมาจากรายการ ไม่ใช่จากคำขอ → "vlc; rm -rf /" หรือ "-o ..." ส่งมาก็ไม่มีทางถึง apt
-- ต้องมีรหัสผ่านของบัญชีในกลุ่ม sudo (ผู้ดูแล) · PAM ของ OS ตรวจ · แอปที่ติดตั้งแล้วทุกบัญชีได้ใช้
+- **ไม่ถามรหัส** (Pakon 2026-10-23: กด "ใช่" แล้ว ตกลง/ยกเลิก ก็พอ) · ผู้ใช้ทุกบัญชีบนเครื่องติดตั้งแอปในรายการได้ ·
+  แอปที่ติดตั้งแล้วทุกบัญชีได้ใช้ · ความเสี่ยงที่ยอมรับ (การ์ด 0054 หัวข้อ 9): โปรแกรมในบัญชีผู้ใช้สั่งติดตั้งแอปในรายการได้
+  ผลแย่สุด = มีแอปจากรายการเพิ่มและเปลืองดิสก์ · ไม่ได้สิทธิ์ root หรือแก้อย่างอื่น
 - ดิสก์ว่างน้อยกว่า 2 GB = ไม่ติดตั้ง (H1) · apt-get install แพ็กเกจเดียว ไม่ remove ไม่ upgrade
-บันทึกลง journal ว่าใครขอ แอปอะไร ผลเป็นยังไง · ไม่บันทึกรหัสผ่าน
+บันทึกลง journal ว่าใครขอ แอปอะไร ผลเป็นยังไง
 """
 
 from __future__ import annotations
@@ -17,17 +19,12 @@ import json
 import os
 import shutil
 import sys
-import time
 
-from aipc.accounts import helper, validation
+from aipc.accounts import helper
 from aipc.skills import app_catalog
 
-PAM_SERVICE = "aipc-apps"  # /etc/pam.d/aipc-apps · ติดตั้งโดย install-apps.sh
-ADMIN_GROUP = "sudo"
 MIN_FREE = 2 * 1024**3
 APT_TIMEOUT_S = 1800
-FAIL_WAIT_S = 3  # รหัสผิด = รอก่อนตอบ (ชะลอการเดารหัสผ่านตัวนี้)
-DENIED = "ชื่อหรือรหัสผ่านของผู้ดูแลไม่ถูกต้อง"  # ไม่บอกว่าผิดที่ชื่อหรือรหัส
 
 
 class System(helper.System):
@@ -46,14 +43,6 @@ class System(helper.System):
         except subprocess.TimeoutExpired:
             return 124, "timeout"
         return r.returncode, (r.stdout + r.stderr)[-4000:]
-
-    def authenticate(self, user: str, password: str) -> bool:
-        from aipc.accounts import pam
-
-        return pam.authenticate(PAM_SERVICE, user, password)
-
-    def sleep(self, s: float) -> None:
-        time.sleep(s)
 
     def catalog(self) -> dict:
         return app_catalog.load()
@@ -86,21 +75,16 @@ def _why_apt_failed(out: str) -> str:
 
 
 def install(request: dict, system: System) -> dict:
-    key, admin, password = (request.get(k) for k in ("app", "admin", "password"))
-    if not all(isinstance(v, str) for v in (key, admin, password)):
+    key = request.get("app")
+    if not isinstance(key, str):
         return helper._fail("คำขอไม่ครบ")
     entry = system.catalog().get(key)
     if entry is None or not entry.apt:
         return helper._fail("แอปนี้ไม่อยู่ในรายการที่ติดตั้งได้")
     caller = system.caller()
-    if not validation.USERNAME_RE.match(admin) or not system.in_group(admin, ADMIN_GROUP) or \
-            not system.authenticate(admin, password):  # fmt: skip
-        system.log(f"ติดตั้ง {key}: รหัสผู้ดูแลไม่ผ่าน (ผู้ขอ {caller})")
-        system.sleep(FAIL_WAIT_S)
-        return helper._fail(DENIED)
     if system.free_bytes() < MIN_FREE:
         return helper._fail("พื้นที่ดิสก์เหลือน้อยกว่า 2 GB · ไม่ติดตั้ง")
-    system.log(f"ติดตั้ง {entry.apt} ({key}) · ผู้ขอ {caller} · ผู้ดูแลยืนยัน {admin}")
+    system.log(f"ติดตั้ง {entry.apt} ({key}) · ผู้ขอ {caller}")
     code, out = system.apt(["update"])
     if code != 0:
         return helper._fail(_why_apt_failed(out))

@@ -8,27 +8,17 @@ from pathlib import Path
 from aipc.accounts import apphelper
 from aipc.skills import app_catalog
 
-PW = "admin-pass-77"
-CANARY = "CANARY-9f2e"  # รหัสผ่านต้องไม่หลุดไปใน log หรือคำสั่ง apt
-
 
 class FakeSystem(apphelper.System):
     def __init__(self, tmp: Path):
         self.state = tmp / "state"
         self.who = "nok"
-        self.admins = {"pakon": PW}
         self.free = 10 * 1024**3
-        self.apt_calls, self.logs, self.slept = [], [], []
+        self.apt_calls, self.logs = [], []
         self.apt_result = {"update": (0, ""), "install": (0, "")}
 
     def caller(self):
         return self.who
-
-    def in_group(self, name, group):
-        return group == "sudo" and name in self.admins
-
-    def authenticate(self, user, password):
-        return self.admins.get(user) == password
 
     def free_bytes(self):
         return self.free
@@ -39,9 +29,6 @@ class FakeSystem(apphelper.System):
 
     def log(self, text):
         self.logs.append(text)
-
-    def sleep(self, s):
-        self.slept.append(s)
 
     def catalog(self):
         return app_catalog.load(admin=Path("/ไม่มีไฟล์นี้"))
@@ -57,43 +44,41 @@ class InstallTest(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.sys = FakeSystem(Path(self._tmp.name))
 
-    def test_admin_installs_package_from_the_list_only(self):
-        r = ask(self.sys, app="vlc", admin="pakon", password=PW)
+    def test_any_user_installs_package_from_the_list_only(self):
+        # Pakon 2026-10-23: ไม่ต้องใส่รหัส · ผู้ใช้ทั่วไป (nok) ติดตั้งแอปในรายการได้
+        r = ask(self.sys, app="vlc")
         self.assertTrue(r["ok"], r)
         install = ["install", "-y", "--no-install-recommends", "vlc"]
         self.assertEqual(self.sys.apt_calls, [["update"], install])
+        self.assertIn("ผู้ขอ nok", " ".join(self.sys.logs))  # บันทึกว่าใครขอ
 
     def test_a3_refusals_never_reach_apt(self):
         bad = [
-            {"app": "vlc", "admin": "nok", "password": "x"},  # ไม่ใช่ผู้ดูแล
-            {"app": "vlc", "admin": "pakon", "password": CANARY},  # รหัสผิด
-            {"app": "vlc; rm -rf /", "admin": "pakon", "password": PW},  # นอกรายการ
-            {"app": "-o APT::x=y", "admin": "pakon", "password": PW},
-            {"app": "zoom", "admin": "pakon", "password": PW},  # มีแต่เว็บ ไม่มีแพ็กเกจ
-            {"app": "vlc", "admin": "../root", "password": PW},
-            {"app": "vlc", "admin": "pakon"},  # ไม่ครบ
+            {"app": "vlc; rm -rf /"},  # นอกรายการ
+            {"app": "-o APT::x=y"},
+            {"app": "zoom"},  # มีแต่เว็บ ไม่มีแพ็กเกจ
+            {"app": 7},
+            {},  # ไม่ครบ
         ]
         for req in bad:
             self.assertFalse(ask(self.sys, **req)["ok"], req)
         self.assertEqual(self.sys.apt_calls, [])
-        self.assertNotIn(CANARY, "\n".join(self.sys.logs))
-        self.assertTrue(self.sys.slept)  # รหัสผิด = ชะลอ
 
     def test_only_from_a_user_session(self):
         for who in ("", "root", "_greetd"):
             self.sys.who = who
-            self.assertFalse(ask(self.sys, app="vlc", admin="pakon", password=PW)["ok"], who)
+            self.assertFalse(ask(self.sys, app="vlc")["ok"], who)
         self.assertEqual(self.sys.apt_calls, [])
 
     def test_a4_real_reasons(self):
         self.sys.free = 1024**3
-        self.assertIn("2 GB", ask(self.sys, app="vlc", admin="pakon", password=PW)["message"])
+        self.assertIn("2 GB", ask(self.sys, app="vlc")["message"])
         self.sys.free = 10 * 1024**3
         self.sys.apt_result["update"] = (100, "Temporary failure resolving 'deb.debian.org'")
-        self.assertIn("อินเทอร์เน็ต", ask(self.sys, app="vlc", admin="pakon", password=PW)["message"])
+        self.assertIn("อินเทอร์เน็ต", ask(self.sys, app="vlc")["message"])
         self.sys.apt_result["update"] = (0, "")
         self.sys.apt_result["install"] = (100, "E: Could not get lock /var/lib/dpkg/lock-frontend")
-        self.assertIn("ค้างอยู่", ask(self.sys, app="vlc", admin="pakon", password=PW)["message"])
+        self.assertIn("ค้างอยู่", ask(self.sys, app="vlc")["message"])
 
 
 class CatalogTest(unittest.TestCase):

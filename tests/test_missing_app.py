@@ -103,28 +103,27 @@ class FlowTest(unittest.TestCase):
             self.s.confirm(card["confirmToken"], False)
         self.assertEqual(self.opened, [])
 
-    def test_install_yes_needs_admin_then_opens(self):
+    def test_install_yes_then_ok_installs_and_opens(self):
         card = self.s.handle("เปิด vlc")
         out = self.s.confirm(card["confirmToken"], True)
         self.assertEqual((out["kind"], out["appInstall"]), ("app-install", "vlc"))
-        self.assertEqual(self.sent, [])  # ตอบใช่อย่างเดียวยังไม่ติดตั้ง ต้องมีรหัสผู้ดูแล
-        self.assertTrue(self.s.installApp("vlc", " pakon ", "pw"))
-        self.assertFalse(self.s.installApp("vlc", "pakon", "pw"))  # กำลังติดตั้ง = ไม่ซ้อน
+        self.assertEqual(self.sent, [])  # ตอบใช่อย่างเดียวยังไม่ติดตั้ง ต้องกด "ตกลง" อีกครั้ง
+        self.assertTrue(self.s.installApp("vlc"))
+        self.assertFalse(self.s.installApp("vlc"))  # กำลังติดตั้ง = ไม่ซ้อน
         self.assertTrue(wait_until(lambda: self.done))
-        self.assertEqual(self.sent, [{"app": "vlc", "admin": "pakon", "password": "pw"}])
+        self.assertEqual(self.sent, [{"app": "vlc"}])  # ไม่มีรหัส (Pakon 2026-10-23)
         self.assertEqual(self.done[0]["chips"][0]["text"], "ติดตั้งแล้ว")
-        self.assertNotIn("pw", str(self.done))
 
     def test_install_refused_by_helper_is_shown(self):
-        self.result = {"ok": False, "message": "ชื่อหรือรหัสผ่านของผู้ดูแลไม่ถูกต้อง"}
-        self.s.installApp("vlc", "nok", "x")
+        self.result = {"ok": False, "message": "ดาวน์โหลดไม่ได้ · ตรวจอินเทอร์เน็ตแล้วลองใหม่"}
+        self.s.installApp("vlc")
         self.assertTrue(wait_until(lambda: self.done))
         self.assertEqual(self.done[0]["title"], self.result["message"])
         self.assertEqual(self.opened, [])
 
     def test_only_listed_apps_with_package(self):
-        self.assertFalse(self.s.installApp("zoom", "pakon", "pw"))  # มีแต่เว็บ
-        self.assertFalse(self.s.installApp("vlc; rm -rf /", "pakon", "pw"))
+        self.assertFalse(self.s.installApp("zoom"))  # มีแต่เว็บ
+        self.assertFalse(self.s.installApp("vlc; rm -rf /"))
         self.assertEqual(self.sent, [])
 
 

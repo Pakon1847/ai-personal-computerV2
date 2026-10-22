@@ -2901,7 +2901,7 @@ class SkillsController(QObject):
 
     # ---------- แอปที่ไม่มีในเครื่อง (การ์ด 0054) ----------
     # ถามทุกครั้ง ไม่จำคำตอบ (Pakon 2026-10-22): ติดตั้งไหม → ไม่ = เปิดผ่านเว็บไหม → ไม่ = ไม่ทำอะไร
-    INSTALL_NOTE = "ติดตั้งต้องให้ผู้ดูแลใส่รหัสผ่าน · ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้"
+    INSTALL_NOTE = "ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้ · ใช้เวลาหลายนาทีและต้องต่ออินเทอร์เน็ต"
 
     def _ask(self, card: dict, pending) -> dict:
         self._counter += 1
@@ -2942,9 +2942,9 @@ class SkillsController(QObject):
         if entry is None:
             card["title"] = "แอปนี้ไม่อยู่ในรายการแล้ว"
         elif step == "app-install" and yes:
-            # หน้าจอเปิดช่องให้ผู้ดูแลใส่ชื่อและรหัส · รหัสไม่ผ่านการ์ดหรือ log
+            # หน้าจอถาม ตกลง/ยกเลิก อีกครั้งก่อนติดตั้งจริง (Pakon 2026-10-23: ไม่ต้องใส่รหัส)
             card.update(kind="app-install", appInstall=key, appName=entry.name,
-                        title=f"ให้ผู้ดูแลใส่ชื่อและรหัสผ่านเพื่อติดตั้ง {entry.name}")  # fmt: skip
+                        title=f"กด “ตกลง” เพื่อติดตั้ง {entry.name}")  # fmt: skip
         elif step == "app-install" and entry.web:
             return self._web_question(entry, card)
         elif step == "app-web" and yes:
@@ -2959,8 +2959,8 @@ class SkillsController(QObject):
     def installing(self) -> str:
         return self._installing
 
-    @Slot(str, str, str, result=bool)
-    def installApp(self, key: str, admin: str, password: str) -> bool:  # noqa: N802
+    @Slot(str, result=bool)
+    def installApp(self, key: str) -> bool:  # noqa: N802
         """ผู้ดูแลกดติดตั้ง · ทำในเธรดแยก (apt ใช้เวลาหลายนาที) · ผลมาทาง appInstallDone.
 
         กำลังติดตั้งอยู่ / ไม่อยู่ในรายการ = False
@@ -2978,7 +2978,7 @@ class SkillsController(QObject):
             run = run_apps_helper if sys.platform.startswith("linux") else _simulated_install
         self._installing = entry.name
         self.appInstallChanged.emit()
-        req = {"app": key, "admin": admin.strip(), "password": password}
+        req = {"app": key}
 
         def work():
             try:

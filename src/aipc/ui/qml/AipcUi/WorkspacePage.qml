@@ -243,7 +243,7 @@ Item {
             siteRun(card, heard)
             return
         }
-        if (card.appInstall) {   // การ์ด 0054: ติดตั้งต้องพิมพ์รหัสผู้ดูแลที่จอ (พูดรหัสไม่ได้ · คนรอบข้างได้ยิน)
+        if (card.appInstall) {   // การ์ด 0054: ใช่ แล้วกด ตกลง/ยกเลิก ที่จอ (ยืนยันอีกชั้นก่อนติดตั้งจริง)
             voicePopup.close()
             AppState.page = "workspace"
             showCard(card)
@@ -738,7 +738,8 @@ Item {
         onTriggered: voicePopup.close()
     }
 
-    // ---------- ติดตั้งแอปที่ไม่มีในเครื่อง (การ์ด 0054) · ผู้ดูแลใส่ชื่อและรหัส · ตัวติดตั้ง root ตรวจซ้ำเองทุกข้อ ----------
+    // ---------- ติดตั้งแอปที่ไม่มีในเครื่อง (การ์ด 0054) · ตกลง/ยกเลิก (ไม่ต้องใส่รหัส · Pakon 2026-10-23) ·
+    // ตัวติดตั้ง root ตรวจเองว่าอยู่ในรายการและดิสก์พอ ----------
     Connections {
         target: skills
         function onAppInstallDone(card) { installPopup.close(); root.showCard(card) }
@@ -748,23 +749,20 @@ Item {
         objectName: "installPopup"
         property string key: ""
         property string name: ""
-        function openFor(k, n) { key = k; name = n; adminField.text = ""; adminPw.text = ""; installError.text = ""; open() }
+        function openFor(k, n) { key = k; name = n; installError.text = ""; open() }
         anchors.centerIn: Overlay.overlay
         width: Math.min(520, root.width - 32)
         modal: true
         closePolicy: skills.installing !== "" ? Popup.NoAutoClose : Popup.CloseOnEscape
         padding: 20
         background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
-        onClosed: adminPw.text = ""   // ไม่เก็บรหัสค้างในหน้าจอ
         contentItem: ColumnLayout {
             spacing: 12
-            AppText { text: Tr.t("ติดตั้ง ") + installPopup.name; strong: true; Layout.fillWidth: true }
+            AppText { text: Tr.t("ติดตั้ง ") + installPopup.name + Tr.t(" ไหม?"); strong: true; Layout.fillWidth: true }
             AppText {
                 Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                text: Tr.t("ต้องให้ผู้ดูแลเครื่องใส่ชื่อผู้ใช้และรหัสผ่าน · ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้ · ใช้เวลาหลายนาทีและต้องต่ออินเทอร์เน็ต")
+                text: Tr.t("ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้ · ใช้เวลาหลายนาทีและต้องต่ออินเทอร์เน็ต")
             }
-            AppField { id: adminField; objectName: "installAdmin"; Layout.fillWidth: true; label: Tr.t("ชื่อผู้ใช้ของผู้ดูแล"); mono: true; enabled: skills.installing === "" }
-            AppField { id: adminPw; objectName: "installPassword"; Layout.fillWidth: true; label: Tr.t("รหัสผ่านของผู้ดูแล"); password: true; enabled: skills.installing === "" }
             AppText { id: installError; visible: text !== ""; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
             AppText {
                 visible: skills.installing !== ""
@@ -781,13 +779,10 @@ Item {
                 }
                 AppButton {
                     objectName: "installGo"
-                    text: Tr.t("ติดตั้ง"); kind: "primary"
-                    enabled: skills.installing === "" && adminField.text.trim() !== "" && adminPw.text !== ""
-                    onClicked: {
-                        if (!skills.installApp(installPopup.key, adminField.text, adminPw.text))
-                            installError.text = Tr.t("เริ่มติดตั้งไม่ได้ (มีการติดตั้งอื่นอยู่)")
-                        adminPw.text = ""
-                    }
+                    text: Tr.t("ตกลง"); kind: "primary"
+                    enabled: skills.installing === ""
+                    onClicked: if (!skills.installApp(installPopup.key))
+                                   installError.text = Tr.t("เริ่มติดตั้งไม่ได้ (มีการติดตั้งอื่นอยู่)")
                 }
             }
         }
