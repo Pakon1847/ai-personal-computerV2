@@ -87,7 +87,7 @@
   "แชทงาน · ข้อความที่พิมพ์ส่งให้ Claude (": "Work chat · what you type is sent to Claude (",
   ") นอกเครื่อง": ") off this computer",
   "พิมพ์ข้อความถึง Claude (แชทงาน · ส่งออกนอกเครื่อง)": "Message Claude (work chat · leaves this computer)",
-  "แชททั่วไป (ในเครื่อง)": "General chat (on device)",
+  "แชททั่วไป": "General chat",
   "แชทงาน (Claude)": "Work chat (Claude)",
   "โมเดลของแชทงาน: ": "Work chat model: ",
   "ตรวจความพร้อมก่อนสาธิต": "Pre-demo readiness check",

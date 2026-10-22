@@ -477,7 +477,7 @@ Item {
                 if (!on) voice.stop()
             }
         }
-        // แชท 2 แบบ (การ์ด 0053): ทั่วไป = ในเครื่องเท่านั้น · งาน = Claude (เลือกโมเดลได้) · บอกเป็นคำ ไม่ใช่แค่สี
+        // แชท 2 แบบ (การ์ด 0053): ทั่วไป = ไฮบริดเดิม · งาน = Claude ทุกข้อความ (เลือกโมเดลได้) · บอกเป็นคำ ไม่ใช่แค่สี
         // เห็นเป็น: [แชททั่วไป] [แชทงาน] [Haiku] [Sonnet] [Opus] (โมเดลขึ้นเฉพาะตอนอยู่แชทงาน)
         Repeater {
             model: chat.mode === "work" ? uiSettings.cloudModels.slice().reverse() : []
@@ -500,7 +500,7 @@ Item {
         }
         AppButton {
             objectName: "modeGeneral"
-            text: Tr.t("แชททั่วไป (ในเครื่อง)")
+            text: Tr.t("แชททั่วไป")
             kind: chat.mode === "general" ? "primary" : "secondary"
             onClicked: chat.setMode("general")
         }

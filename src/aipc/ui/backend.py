@@ -3633,10 +3633,10 @@ class ChatController(QObject):
     คำตอบของ LLM เป็นข้อความเท่านั้น สั่ง Action ไม่ได้ (H8)
 
     แชท 2 แบบ (การ์ด 0053 · Pakon 2026-10-22):
-      "general" ทั่วไป = AI ในเครื่องล้วน **ไม่ส่งอะไรออกนอกเครื่อง** (ค่าเริ่มต้นทุกครั้งที่เปิด)
+      "general" ทั่วไป = ไฮบริดเดิม (การ์ด 0016/0022): AI ในเครื่องตอบก่อน ไม่รู้ = ส่งต่อ Claude เอง
+                 (Pakon 2026-10-22: "บางครั้ง local AI ก็ไม่ฉลาด") · ค่าเริ่มต้นทุกครั้งที่เปิด
       "work"    งาน   = ทุกข้อความไป Claude ด้วยโมเดลที่ผู้ใช้เลือก (haiku/sonnet/opus) · ไม่ผ่าน AI ในเครื่อง
-    auto_cloud=True = ไฮบริดแบบเดิม (การ์ด 0016/0022: AI ในเครื่องส่งต่อ Claude เอง) · เปิดเฉพาะตัววัดผลเดิม
-    ให้ทำซ้ำผลที่วัดไว้ได้ · แอปจริงไม่เปิด
+    auto_cloud = เปิดการส่งต่อของแชททั่วไป (แอปจริงเปิด · สวิตช์ Claude ในหน้าตั้งค่ายังปิดได้)
     """
 
     from aipc.skills.catalog import SYSTEM, TOOLS_HINT  # ข้อความเดียวกับตัววัด spikes.skill_select
@@ -3845,7 +3845,7 @@ class ChatController(QObject):
         return m
 
     def _cloud_ok(self) -> bool:
-        """AI ในเครื่องส่งต่อ Claude เองได้ไหม (ไฮบริดเดิม) · แชททั่วไปของแอปจริง = ไม่ได้เสมอ (การ์ด 0053)."""
+        """AI ในเครื่องส่งต่อ Claude เองได้ไหม (ไฮบริดของแชททั่วไป) · มี Claude + เปิดสวิตช์ + auto_cloud."""
         return self._auto_cloud and self._cloud is not None and bool(self._claude_on())
 
     @Slot()
@@ -4036,8 +4036,6 @@ class ChatController(QObject):
             if self._mode == "work":
                 used = getattr(reply, "model", "") or "ไม่ทราบโมเดล"
                 note = f"แชทงาน · ตอบโดย Claude ({used}) · ส่งออกนอกเครื่อง"
-        elif self._local_only_gave_up(reply, with_file):
-            note = self.WORK_HINT
         elif self._switched_off_gave_up(reply, with_file):
             note = self.CLAUDE_OFF_NOTE
         if reply.text:
@@ -4072,16 +4070,6 @@ class ChatController(QObject):
 
         off = self._cloud is not None and not self._claude_on() and not with_file
         return off and not reply.reason and not reply.tool_call and local_gave_up(reply.text)
-
-    # แชททั่วไป (การ์ด 0053) ตอบว่าไม่รู้ และแชทงานใช้ได้ → บอกทาง · ไม่ส่งเอง (ผู้ใช้ตัดสินใจส่งออกเอง · H3)
-    WORK_HINT = "แชททั่วไปตอบในเครื่องเท่านั้น · ข้อนี้ต้องใช้ข้อมูลสด ลองถามในแชทงาน (Claude)"
-
-    def _local_only_gave_up(self, reply, with_file: bool) -> bool:
-        from aipc.cloud.ask import local_gave_up
-
-        if self._auto_cloud or self._mode != "general" or not self.workReady or with_file:
-            return False
-        return not reply.reason and not reply.tool_call and local_gave_up(reply.text)
 
     @Property("QVariantList", notify=changed)
     def lastTrace(self) -> list:  # noqa: N802

@@ -8,7 +8,7 @@ from pathlib import Path
 from aipc.chat import store
 from aipc.cloud import ask
 from aipc.cloud.ask import CloudReply
-from aipc.skills import catalog, command
+from aipc.skills import command
 from tests.test_chat import ChatController, FakeLlama, ServerCase, pump
 
 try:
@@ -27,7 +27,7 @@ class ChatModesTest(ServerCase):
     def setUpClass(cls):
         cls.app = QGuiApplication.instance() or QGuiApplication([])
 
-    def make(self, claude_on=True, cloud=True, model="sonnet"):
+    def make(self, claude_on=True, cloud=True, model="sonnet", auto=False):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         self.asked, self.model = [], [model]
@@ -40,7 +40,7 @@ class ChatModesTest(ServerCase):
 
         c = ChatController(target=self.target, store=store.ChatStore(Path(d.name)), poll_ms=100000,
                            cloud=fake if cloud else None, claude_on=lambda: on[0],
-                           cloud_model=lambda: self.model[0])  # fmt: skip
+                           cloud_model=lambda: self.model[0], auto_cloud=auto)  # fmt: skip
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)
         done = []
@@ -53,23 +53,22 @@ class ChatModesTest(ServerCase):
             self.assertTrue(c.send(t, ""), t)
             pump(lambda n=n: len(done) > n)
 
-    def test_m1_general_never_sends_out(self):
-        # 30 ข้อความ: คุยทั่วไป 10 · AI ในเครื่องตอบว่าไม่รู้ 10 · AI เลือก ask-cloud เอง 10 → ส่งออก 0 ครั้ง
-        c, done = self.make()
-        self.assertEqual(c.mode, "general")
-        self.ask_all(c, done, [f"สวัสดี {i}" for i in range(10)])
+    def test_m1_general_keeps_hybrid(self):
+        # หัวข้อ 8 (Pakon 2026-10-22): แชททั่วไป = ไฮบริดเดิม
+        # ไม่รู้ = ส่งต่อ Claude ด้วยโมเดลเดิม (ไม่ใช่ที่เลือกในแชทงาน)
+        c, done = self.make(auto=True, model="opus")
+        self.ask_all(c, done, ["สวัสดี"])
+        self.assertEqual(self.asked, [])  # ตอบได้เอง = ไม่ส่ง
+        FakeLlama.mode = "dunno"
+        self.ask_all(c, done, ["ราคาทองวันนี้"])
+        self.assertEqual(self.asked, [("ราคาทองวันนี้", None)])
+        self.assertEqual(done[-1][1], c.CLOUD_NOTE)
+
+    def test_m1_general_with_claude_off_sends_nothing(self):
+        c, done = self.make(auto=True, claude_on=False)
         FakeLlama.mode = "dunno"
         self.ask_all(c, done, [f"ราคาทองวันนี้ {i}" for i in range(10)])
-        self.assertTrue(all(note == c.WORK_HINT for _, note in done[-10:]))  # บอกทาง ไม่ส่งเอง
-        FakeLlama.mode, FakeLlama.tool_name = "tool", catalog.ASK_CLOUD
-        self.addCleanup(setattr, FakeLlama, "tool_name", "machine-status")
-        for i in range(10):
-            c.send(f"ข่าววันนี้ {i}", "")
-            pump(lambda: not c.busy)
         self.assertEqual(self.asked, [])
-        real = [b for b in FakeLlama.seen if b.get("max_tokens") != 1]
-        names = {t["function"]["name"] for b in real for t in b.get("tools") or []}
-        self.assertNotIn(catalog.ASK_CLOUD, names)  # AI ในเครื่องไม่เห็นเครื่องมือส่งออกเลย
 
     def test_m2_work_uses_chosen_model_for_each(self):
         c, done = self.make()

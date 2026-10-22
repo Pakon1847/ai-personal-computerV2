@@ -102,7 +102,7 @@ def _chat_switch(chat, ui_settings):
     def run(kind: str, value: str) -> tuple[bool, str]:
         if kind == "mode":
             if chat.setMode(value):
-                return True, "สลับไปแชทงาน (Claude)" if value == "work" else "กลับแชททั่วไป (ในเครื่อง)"
+                return True, "สลับไปแชทงาน (Claude)" if value == "work" else "กลับแชททั่วไป"
             return False, chat.workBlocked or "สลับไม่ได้ตอนนี้ (กำลังตอบอยู่)"
         if kind == "model" and ui_settings.setCloudModel(value):
             return True, f"แชทงานใช้โมเดล {value}"
@@ -292,11 +292,13 @@ def build(opts: Options, argv: list[str] | None = None):
     # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
     browser_ctl = BrowserController(active=in_session, ledger=ledger)
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
+    # แชททั่วไปคงไฮบริด: AI ในเครื่องไม่รู้ = ส่งต่อ Claude เอง (Pakon 2026-10-22 · การ์ด 0053 หัวข้อ 8)
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client(budget, ledger) if in_session else None,
                           model_name=_local_model_name(),
                           forge=skill_forge is not None, claude_on=claude_on,
-                          cloud_model=lambda: ui_settings.cloudModel)  # fmt: skip
+                          cloud_model=lambda: ui_settings.cloudModel,
+                          auto_cloud=True)  # fmt: skip
     engine._backends = {
         "uiSettings": ui_settings,
         "system": SystemStatus(),
