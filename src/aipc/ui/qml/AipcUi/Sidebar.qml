@@ -31,6 +31,23 @@ Rectangle {
         NavItem { text: Tr.t("ตั้งค่า"); iconPath: Icons.sliders; pageName: "settings" }
         Item { Layout.fillHeight: true }
 
+        // ปิด/รีสตาร์ตเครื่อง (การ์ด 0052) · ถามยืนยันก่อนเสมอ (PowerDialog)
+        AppButton {
+            objectName: "rebootButton"
+            Layout.alignment: Qt.AlignHCenter
+            kind: "ghost"; iconPath: Icons.restart
+            Accessible.name: Tr.t("รีสตาร์ตเครื่อง")
+            ToolTip.visible: hovered; ToolTip.text: Tr.t("รีสตาร์ตเครื่อง")
+            onClicked: powerDialog.ask("reboot")
+        }
+        AppButton {
+            objectName: "powerOffButton"
+            Layout.alignment: Qt.AlignHCenter
+            kind: "ghost"; iconPath: Icons.power
+            Accessible.name: Tr.t("ปิดเครื่อง")
+            ToolTip.visible: hovered; ToolTip.text: Tr.t("ปิดเครื่อง")
+            onClicked: powerDialog.ask("power_off")
+        }
         AppButton {
             objectName: "logoutButton"
             Layout.alignment: Qt.AlignHCenter
@@ -53,5 +70,9 @@ Rectangle {
             ToolTip.visible: who.hovered
             ToolTip.text: system.userName + (AppState.devMode ? Tr.t(" · โหมดพัฒนา") : "")
         }
+    }
+    PowerDialog {
+        id: powerDialog
+        note: Tr.t("แชทและนัดบันทึกไว้แล้ว · งานในแอปอื่น (เช่น เอกสารที่ยังไม่บันทึก) จะหาย")
     }
 }

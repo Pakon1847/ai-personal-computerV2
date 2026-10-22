@@ -34,6 +34,7 @@ QtObject {
     readonly property string key: "M4 14a4 4 0 1 0 8 0a4 4 0 1 0-8 0M11 11l9-9M16 6l3 3"
     readonly property string userPlus: "M6 8a4 4 0 1 0 8 0a4 4 0 1 0-8 0M3 21a7 7 0 0 1 14 0M19 8v6M16 11h6"
     readonly property string power: "M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0"
+    readonly property string restart: "M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"  // การ์ด 0052: ลูกศรวน
     readonly property string globe: "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"
     readonly property string terminal: "M4 6l6 6-6 6M12 18h8"
     readonly property string file: "M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5"

@@ -20,6 +20,7 @@ from aipc.ui.backend import (
     FilesBrowser,
     I18nBridge,
     LoginController,
+    PowerController,
     PresenceStatus,
     PrivacyStatus,
     SessionController,
@@ -364,6 +365,8 @@ def build(opts: Options, argv: list[str] | None = None):
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),
+        # ปิด/รีสตาร์ตเครื่อง (การ์ด 0052) · จริงเฉพาะหน้า Login จริงและเซสชันจริง
+        "power": PowerController(bool(opts.greeter_session) or opts.session),
         # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
         "face": FaceController(active=not opts.greeter_session),
         # เจ้าของบัญชีเปิด/ปิดเข้าเครื่องด้วยใบหน้าเอง (การ์ด 0015) · หน้า Login ไม่มีสวิตช์นี้

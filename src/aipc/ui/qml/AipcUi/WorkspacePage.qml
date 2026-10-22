@@ -708,7 +708,8 @@ Item {
     }
     Timer {
         id: voiceClose
-        interval: root.voiceToken() !== "" ? 30000 : 8000
+        // การ์ด 0052: ปิด/รีสตาร์ตเครื่องรอคำตอบแค่ 10 วิ (ไม่ตอบ = ไม่ทำ) · การ์ดยืนยันอื่น 30 วิ
+        interval: root.voiceToken() !== "" ? (root.vc.card && root.vc.card.power ? 10000 : 30000) : 8000
         onTriggered: voicePopup.close()
     }
 

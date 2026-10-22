@@ -42,6 +42,9 @@ ACTIONS: dict[str, ActionSpec] = {
         ActionSpec("change_volume", "medium", "เพิ่ม/ลดเสียง"),
         ActionSpec("mute", "low", "ปิดเสียง"),
         ActionSpec("unmute", "low", "เปิดเสียง"),
+        # การ์ด 0052: ปิด/รีสตาร์ตเครื่อง = ความเสี่ยงสูง → ถามยืนยันเสมอ (Command.needs_confirmation)
+        ActionSpec("power_off", "high", "ปิดเครื่อง"),
+        ActionSpec("reboot", "high", "รีสตาร์ตเครื่อง"),
         ActionSpec("lock_screen", "low", "ล็อกหน้าจอ"),  # การ์ด 0051 · ปลดด้วยรหัสผ่าน · ไม่ออกจากระบบ
         # การ์ด 0051: ดึงปฏิทิน Google ใหม่ทันที · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
         ActionSpec("gcal_sync", "low", "ดึงปฏิทิน Google ใหม่", needs_network=True),
@@ -129,6 +132,10 @@ PAGES = {
 # หน้าความเป็นส่วนตัวตัดออกในขอบเขตรอบ 3 · ที่ลบข้อมูลใบหน้าอยู่ในหน้าตั้งค่า
 # ผู้ใช้ยังพูดว่า "เปิดหน้าความเป็นส่วนตัว" ได้ แต่หน้าจอพาไปหน้าตั้งค่า
 PAGE_SCREEN = {"privacy": "settings"}
+
+# การ์ด 0052: ผ่าน systemd-logind · polkit ของ Pi 5 ให้คนที่นั่งหน้าเครื่องทำได้เลย (implicit active: yes) ·
+# ทาง SSH ต้องใช้รหัสผู้ดูแล · systemd ปิดโปรแกรมและเขียนดิสก์ให้เสร็จก่อนดับ (ไม่ใช่ดึงปลั๊ก · H1)
+POWER_CMDS = {"power_off": ["systemctl", "poweroff"], "reboot": ["systemctl", "reboot"]}
 
 SINK = "@DEFAULT_AUDIO_SINK@"  # ลำโพงหลักของ PipeWire (ระบบเสียงของ Raspberry Pi OS)
 
@@ -259,6 +266,8 @@ def command_for(plan: Plan) -> list[str] | None:
         return ["wpctl", "set-volume", "-l", "1.0", SINK, f"{abs(step)}%{'+' if step > 0 else '-'}"]
     if plan.action in ("mute", "unmute"):
         return ["wpctl", "set-mute", SINK, "1" if plan.action == "mute" else "0"]
+    if plan.action in POWER_CMDS:
+        return list(POWER_CMDS[plan.action])
     if plan.action == "lock_screen":
         # swaylock ตัวเดียวกับล็อกเมื่อไม่ได้ใช้ (aipc.ui.idle) · ใช้ภาพข้อความจอล็อกที่วาดไว้แล้วถ้ามี
         from aipc.ui import idle

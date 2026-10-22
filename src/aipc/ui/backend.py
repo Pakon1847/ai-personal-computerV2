@@ -1433,6 +1433,56 @@ def _display_name(user: str) -> str:
         return user
 
 
+POWER_ACTIONS = ("power_off", "reboot")  # การ์ด 0052
+
+
+class PowerController(QObject):
+    """ปุ่มปิดเครื่อง/รีสตาร์ต (การ์ด 0052) ทั้งหน้า Login และในเซสชัน · หน้าจอถามยืนยันก่อนเรียกเสมอ.
+
+    active = หน้า Login จริง หรือเซสชันจริงบน Pi · หน้าต่างพัฒนา = ไม่ปิดเครื่องจริง และบอกว่าจำลอง (H5)
+    สั่งผ่าน systemctl (systemd-logind + polkit) · ไม่ต้องใช้ sudo หรือแก้ /etc
+    สั่งไม่สำเร็จ = ข้อความค้างให้เห็น (H2) · สั่งแล้ว = ไม่ให้กดซ้ำ
+    """
+
+    changed = Signal()
+
+    def __init__(self, active: bool, runner=None):
+        super().__init__()
+        self._active = active
+        self._run = runner or _run_quiet
+        self._error = ""
+        self._busy = False
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    @Slot(str, result=bool)
+    def request(self, action: str) -> bool:
+        from aipc.skills.actions import POWER_CMDS
+
+        if action not in POWER_CMDS or self._busy:
+            return False
+        if not self._active:
+            self._error = "จำลอง: หน้าต่างพัฒนาไม่ปิด/รีสตาร์ตเครื่องจริง"
+            self.changed.emit()
+            return False
+        self._busy, self._error = True, ""
+        self.changed.emit()
+        code = self._run(POWER_CMDS[action])
+        if code != 0:
+            self._busy = False
+            what = "ปิดเครื่อง" if action == "power_off" else "รีสตาร์ต"
+            self._error = f"{what}ไม่สำเร็จ (systemctl ตอบ {code}) · ลองอีกครั้ง หรือกดปุ่มที่ตัวเครื่องค้างไว้"
+            self.changed.emit()
+            return False
+        return True
+
+
 class SessionController(QObject):
     """เซสชันจริงของผู้ใช้ (การ์ด 0004): หน้าจอ V2 คือทั้งเซสชัน ไม่มีเดสก์ท็อปของ Pi.
 
@@ -3757,7 +3807,19 @@ class SkillsController(QObject):
         if r.kind == "command":
             card["badge"] = self._badge(r.skill, r.reason)
             risk = self.RISK_LABEL[r.command.plan.spec.risk]
-            if r.command.needs_confirmation:
+            if r.command.plan.action in POWER_ACTIONS:  # การ์ด 0052: ถามทุกครั้ง · ไม่ตอบใน 10 วิ = ยกเลิก
+                self._counter += 1
+                token = f"c{self._counter}"
+                self._pending[token] = r.command.plan
+                card.update(
+                    title=f"{r.command.plan.summary}เลยไหม?",
+                    lines=["ตอบ “ใช่” ภายใน 10 วินาที · ไม่ตอบ = ยกเลิก",
+                           "แชทและนัดบันทึกไว้แล้ว · งานในแอปอื่นที่ยังไม่บันทึกจะหาย"],
+                    chips=[{"text": risk, "kind": "neutral"}],
+                    confirmToken=token,
+                    power=True,
+                )  # fmt: skip
+            elif r.command.needs_confirmation:
                 self._counter += 1
                 token = f"c{self._counter}"
                 self._pending[token] = r.command.plan
