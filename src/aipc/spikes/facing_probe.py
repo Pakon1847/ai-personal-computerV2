@@ -28,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--hold", type=float, default=3.0)
     ap.add_argument("--fps", type=float, default=5.0)
     ap.add_argument("--lead", type=float, default=15.0)
+    ap.add_argument("--size", default="", help="ขนาดภาพ เช่น 640x480 (ว่าง = ค่าของ open_camera)")
     ap.add_argument("--out", type=Path)
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
@@ -35,6 +36,12 @@ def main(argv: list[str] | None = None) -> int:
     cfg = config.load(None)
     det = models.Detector(cfg.min_detect_score)
     cap = camera.open_camera()
+    if a.size:  # รอบ 2: ภาพเล็กลง = ถอดรหัสเร็วขึ้น (YuNet ย่อเหลือด้านยาว 640 อยู่แล้ว)
+        import cv2
+
+        w, h = (int(v) for v in a.size.split("x"))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, w)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
     rows, cpu_parts = [], []
     try:
         for _ in camera.frames(cap, camera.WARMUP_SECONDS):  # กล้องปรับแสง
@@ -52,12 +59,16 @@ def main(argv: list[str] | None = None) -> int:
                 w0, c0 = time.monotonic(), time.process_time()
                 next_at = w0
                 while time.monotonic() - w0 < a.hold:
-                    ok, frame = cap.read()
-                    if not ok:
+                    # รอบ 2: grab() = ดึงภาพจากกล้องโดยไม่ถอดรหัส MJPG · ถอดเฉพาะภาพที่ใช้ (รอบ 1 ถอดทุกภาพ
+                    # ~30 ภาพ/วิ ที่ 1280×720 → CPU 52% ของ 1 คอร์)
+                    if not cap.grab():
                         break
                     if time.monotonic() < next_at:
-                        continue  # อ่านทิ้งให้ภาพล่าสุดเสมอ · ตรวจแค่ fps ที่ตั้ง
+                        continue  # ทิ้งภาพที่ไม่ใช้ ให้ภาพที่ตรวจเป็นภาพล่าสุดเสมอ
                     next_at += 1.0 / a.fps
+                    ok, frame = cap.retrieve()
+                    if not ok:
+                        break
                     n += 1
                     found = [r for r in det.detect(frame) if float(r[14]) >= cfg.min_detect_score]
                     if found:
