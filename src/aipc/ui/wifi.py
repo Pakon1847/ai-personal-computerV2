@@ -173,7 +173,13 @@ class WifiController(QObject):
         self._msg, self._ok = "", True
         self._done.connect(self._on_done)
         if active:  # ป้ายบนแถบรู้ชื่อเครือข่ายที่ต่ออยู่ตั้งแต่เปิด (ไม่สั่งค้นหาใหม่ · ใช้รายการที่ NetworkManager มีอยู่)
-            QTimer.singleShot(3000, lambda: self.scan(False))
+            # ผูกกับ self: ปิดหน้าจอก่อนครบเวลา = ยกเลิกเอง
+            # (lambda เปล่า ๆ เรียกวัตถุที่ถูกลบไปแล้ว → แอปล้ม · พบบน Pi 5)
+            QTimer.singleShot(3000, self, self._first_scan)
+
+    @Slot()
+    def _first_scan(self) -> None:
+        self.scan(False)
 
     def _start(self, what: str, work) -> bool:
         if not self._active or self._busy:
@@ -186,7 +192,10 @@ class WifiController(QObject):
                 r = work()
             except Exception as e:  # noqa: BLE001 · เธรดเบื้องหลังห้ามล้มเงียบ (H2)
                 r = ("error", f"{e}")
-            self._done.emit(what, r)
+            try:
+                self._done.emit(what, r)
+            except RuntimeError:  # หน้าจอปิดไปแล้วระหว่างรอ nmcli · ไม่มีใครรอผล
+                pass
 
         threading.Thread(target=go, daemon=True).start()
         return True
