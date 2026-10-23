@@ -3,6 +3,9 @@
     python -m aipc.spikes.endpoint_eval <โฟลเดอร์ที่มี meta.json> [--out ผล.json]
 
 ใส่เสียงรบกวนแบบเดียวกับการทดลองเสียงรบกวน (brown / babble) แล้วป้อนทีละ 100 ms เหมือนอ่านจากไมค์
+
+การ์ด 0056: --tail-s = เสียงรอบข้างดังต่อหลังพูดจบกี่วินาที (เหมือนในห้อง · ไฟล์เดิมมีเงียบท้าย 3 วิ) ·
+--near-db = ค่าของ Endpointer (ไม่ใส่ = ค่าในโค้ด · รันกับโค้ดรุ่นเก่าได้) · babble 15/10 dB = คนพูดห่างไมค์
 """
 
 from __future__ import annotations
@@ -31,8 +34,8 @@ def brown(n: int, rng) -> np.ndarray:
     return x / (np.sqrt(np.mean(x**2)) or 1)
 
 
-def run(x: np.ndarray) -> tuple[str, float]:
-    ep = Endpointer()
+def run(x: np.ndarray, **kw) -> tuple[str, float]:
+    ep = Endpointer(**kw)
     pcm = np.clip(x, -32768, 32767).astype(np.int16).tobytes()
     step = SR // 10 * 2  # 100 ms
     for i in range(0, len(pcm), step):
@@ -45,7 +48,10 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m aipc.spikes.endpoint_eval")
     ap.add_argument("folder", type=Path)
     ap.add_argument("--out", type=Path)
+    ap.add_argument("--tail-s", type=float, default=3.0)
+    ap.add_argument("--near-db", type=float)
     a = ap.parse_args(argv)
+    kw = {} if a.near_db is None else {"near_db": a.near_db}
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     meta = json.loads((a.folder / "meta.json").read_text(encoding="utf-8"))
@@ -55,11 +61,14 @@ def main(argv: list[str] | None = None) -> int:
     for m in meta:
         speech = load(a.folder / m["file"])
         start, end = int(m["speech_start"] * SR), int(m["speech_end"] * SR)
+        speech = np.concatenate([speech[:end], np.zeros(int(a.tail_s * SR))])
         p = np.mean(speech[start:end] ** 2)
         for cond, snr in (
             ("clean", None),
             ("brown", 20),
             ("babble", 20),
+            ("babble", 15),
+            ("babble", 10),
             ("brown", 5),
             ("babble", 5),
         ):
@@ -72,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
                     n = np.tile(n, len(x) // len(n) + 1)[: len(x)]
                     n = n / (np.sqrt(np.mean(n**2)) or 1)
                 x = x + n * np.sqrt(p / 10 ** (snr / 10))
-            result, t = run(x)
+            result, t = run(x, **kw)
             tag = cond if snr is None else f"{cond}{snr}"
             rows.append({"file": m["file"], "kind": m["kind"], "noise": tag, "result": result,
                          "stop_s": round(t, 2),

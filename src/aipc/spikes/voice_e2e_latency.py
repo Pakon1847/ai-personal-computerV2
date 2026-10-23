@@ -6,6 +6,9 @@
 (เสียงพื้นหลังเบา 0.4 วิ · คำพูด (หลายท่อนเว้น pause_s) · เงียบ 3 วิ) แทน pw-record → aipc.voice.stt.Listener
 ตัวจริงของแอป (Endpointer · Zipformer · ทางลองอังกฤษ · callbacks ของ backend) → วัดเวลาที่ on_done ถูกเรียก
 ลบด้วยเวลาที่คำพูดจบในสายเสียง · เสียงสังเคราะห์ไม่ใช่เสียงคน (ดูเวลา + การตัดกลางประโยค ไม่ใช่ความแม่นของคน)
+
+การ์ด 0056: --babble 15 = มีคนพูด (ประโยคอื่นของชุด) เบากว่าเรา 15 dB ตลอดสาย และต่อหลังพูดจบ 16 วิ ·
+--lead 0 = พูดทันทีไม่มีช่วงเงียบนำ (ประโยคแรกยังมี 0.4 วิ ให้ Listener จำระดับเสียงรอบข้าง แล้วส่งต่อประโยคถัดไป)
 """
 
 from __future__ import annotations
@@ -66,6 +69,24 @@ def noise(seconds: float) -> bytes:
     return b"".join(struct.pack("<h", rnd.randint(-30, 30)) for _ in range(int(16000 * seconds)))
 
 
+def mix(stream: bytes, others: bytes, speech: bytes, db: float) -> bytes:
+    """ซ้อนเสียงคนอื่นพูด (others วนซ้ำ) ให้เบากว่าเสียงพูดของเรา db dB ตลอดสาย (การ์ด 0056)."""
+    import array
+
+    s, o, v = array.array("h"), array.array("h"), array.array("h")
+    s.frombytes(stream)
+    o.frombytes(others)
+    v.frombytes(speech)
+
+    def rms(a):
+        return (sum(x * x for x in a) / max(1, len(a))) ** 0.5
+
+    gain = rms(v) / (rms(o) or 1) * 10 ** (-db / 20)
+    out = array.array("h", (max(-32768, min(32767, int(x + gain * o[i % len(o)])))
+                            for i, x in enumerate(s)))  # fmt: skip
+    return out.tobytes()
+
+
 def pcm16k(path: Path, work: Path) -> bytes:
     out = work / (path.stem + "-16k.wav")
     cmd = ["ffmpeg", "-loglevel", "error", "-y", "-i", str(path), "-ar", "16000", "-ac", "1"]
@@ -92,6 +113,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("dataset", type=Path)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--babble", type=float)
+    ap.add_argument("--lead", type=float, default=NOISE_S)
     a = ap.parse_args(argv)
     from aipc.ui import backend
 
@@ -120,11 +143,19 @@ def main(argv: list[str] | None = None) -> int:
     fast.warm()
     fast.transcribe(Path("/nonexistent.wav"))  # รอโหลดเสร็จ (ไฟล์ไม่มี = error แต่โมเดลพร้อมแล้ว)
     rows = []
+    speeches = []
     for it in items:
         chunks = [next(by_voice[it.get("voice", "th")]) for _ in it["parts"]]
-        speech = (b"\x00\x00" * int(16000 * pause)).join(chunks)
+        speeches.append((b"\x00\x00" * int(16000 * pause)).join(chunks))
+    floor = None
+    for k, (it, speech) in enumerate(zip(items, speeches, strict=True)):
+        lead = NOISE_S if k == 0 else a.lead
+        stream = noise(lead) + speech + noise(TAIL_S if a.babble is None else 16.0)
+        if a.babble is not None:
+            others = b"".join(speeches[k + 1 :] + speeches[:k])
+            stream = mix(stream, others, speech, a.babble)
         src = work / "stream.pcm"
-        src.write_bytes(noise(NOISE_S) + speech + noise(TAIL_S))
+        src.write_bytes(stream)
         stamp = work / "stamp.txt"
         stamp.unlink(missing_ok=True)
         done = threading.Event()
@@ -144,14 +175,16 @@ def main(argv: list[str] | None = None) -> int:
                            f"{str(src)!r}, {str(stamp)!r}]; "
                            f"runpy.run_path({str(work / 'streamer.py')!r}, "
                            "run_name='__main__')"]  # fmt: skip
+        lis._noise_floor = floor  # Listener ตัวเดียวในแอปจำค่านี้ข้ามครั้ง (ตัววัดสร้างใหม่ทุกประโยค)
         err = lis.start(fast=True)
         if err:
             print("เริ่มไม่ได้:", err)
             return 1
-        done.wait(20)
+        done.wait(25)
         lis.cancel()
+        floor = getattr(lis, "_noise_floor", None)
         t_start = float(stamp.read_text()) if stamp.exists() else float("nan")
-        end_of_speech = t_start + NOISE_S + len(speech) / 32000
+        end_of_speech = t_start + lead + len(speech) / 32000
         latency = round(got.get("at", float("nan")) - end_of_speech, 3)
         text = got.get("text", "")
         norm = text.replace(" ", "").lower().translate(THAI_DIGITS)

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import math
 import os
+import struct
 import sys
 import tempfile
 import threading
@@ -30,6 +32,12 @@ for k in range(80):
     f.flush()
     time.sleep(0.1)
 """
+
+
+def tone(sec: float, amp: int) -> bytes:
+    """PCM 16 kHz คลื่นไซน์ความดัง amp ยาว sec วิ (แทนเสียงพูด/เสียงรอบข้าง)."""
+    n = int(16000 * sec)
+    return b"".join(struct.pack("<h", int(amp * math.sin(i * 0.3))) for i in range(n))
 
 
 class SttTest(unittest.TestCase):
@@ -112,18 +120,51 @@ class SttTest(unittest.TestCase):
         self.assertEqual(self._files(), [])
 
     def test_endpointer_keeps_listening_through_short_pause(self):
-        import math
-        import struct
-
-        def tone(sec, amp):
-            return b"".join(
-                struct.pack("<h", int(amp * math.sin(i * 0.3))) for i in range(int(16000 * sec))
-            )
-
         ep = Endpointer()
         audio = tone(0.4, 30) + tone(0.6, 8000) + tone(0.5, 30) + tone(0.6, 8000)
         self.assertIsNone(ep.feed(audio))  # เว้น 0.5 วิกลางประโยค ไม่ตัด
         self.assertEqual(ep.feed(tone(1.2, 30)), "end")
+
+    def test_far_voice_does_not_keep_it_listening(self):
+        """การ์ด 0056: พูดจบแล้วมีคนพูดเบา ๆ ห่างไมค์ (เบากว่าเรา 20 dB) ต่อ → จบเอง ·
+        รุ่นเดิม (near_db=0) ฟังต่อ."""
+        audio = tone(0.4, 30) + tone(0.6, 8000) + tone(1.2, 800)
+        self.assertEqual(Endpointer().feed(audio), "end")
+        self.assertIsNone(Endpointer(near_db=0).feed(audio))
+        # คนข้าง ๆ ดังพอ ๆ กับเรา (เบากว่าแค่ 6 dB) = ยังนับเป็นเสียงพูด (ตัดไม่ได้ · H5)
+        self.assertIsNone(Endpointer().feed(tone(0.4, 30) + tone(0.6, 8000) + tone(1.2, 4000)))
+
+    def test_speech_span_keeps_only_speech_plus_padding(self):
+        ep = Endpointer()
+        audio = tone(0.5, 30) + tone(0.6, 8000) + tone(1.2, 30)
+        self.assertEqual(ep.feed(audio), "end")
+        a, b = ep.speech_span(len(audio))
+        self.assertAlmostEqual(a / 32000, 0.5 - 0.25, delta=0.05)  # เริ่มพูด − 0.25 วิ
+        self.assertAlmostEqual(b / 32000, 1.1 + 0.3, delta=0.05)  # พูดจบ + 0.3 วิ
+
+    def test_remembered_room_level_lets_you_speak_at_once(self):
+        """การ์ด 0056: กดแล้วพูดทันที · ไม่มีค่าที่จำไว้ = 0.3 วิแรก (เสียงเรา) ถูกนับเป็นเสียงรอบข้าง → ไม่ได้ยิน."""
+        audio = tone(0.6, 8000) + tone(1.2, 30)
+        self.assertIsNone(Endpointer().feed(audio))
+        ep = Endpointer()
+        ep.use_noise(21.0)
+        self.assertEqual(ep.feed(audio), "end")
+        self.assertEqual(ep.start_frame, 0)
+        self.assertLess(ep.noise_floor, 40)  # ระดับเงียบท้าย = จำไว้ครั้งหน้า
+
+    def test_listener_transcribes_only_the_speech(self):
+        """การ์ด 0056: ไฟล์ที่ส่งให้ตัวถอดเหลือแค่ช่วงพูด (ตัวถอดปลอมพิมพ์ความยาวไฟล์) · จำระดับเสียงรอบข้างไว้."""
+        talker = Path(self.tmp.name) / "talker.py"
+        talker.write_text(TALKER, encoding="utf-8")
+        code = "import sys, wave; print(wave.open(sys.argv[1]).getnframes() / 16000)"
+        length = [sys.executable, "-c", code]
+        lis = Listener(lambda t, e, s: (self.result.append((t, e)), self.done.set()),
+                       record_cmd=[sys.executable, str(talker)], transcribe_cmd=length)  # fmt: skip
+        self.assertEqual(lis.start(), "")
+        self.assertTrue(self.done.wait(15))
+        seconds = float(self.result[0][0])
+        self.assertAlmostEqual(seconds, 0.6 + 0.25 + 0.3, delta=0.1)  # ไม่ใช่ทั้งไฟล์ (~2 วิ)
+        self.assertLess(lis._noise_floor, 100)
 
     def test_unavailable_without_recorder_or_model(self):
         missing = Listener(voice_dir=Path(self.tmp.name) / "none", record_cmd=FAKE_REC)

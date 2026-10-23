@@ -34,6 +34,13 @@ SPEC_AT_S = 0.3
 EARLY_S = 0.6
 DECODE_WAIT_S = 20.0
 MIN_S = 0.4  # กดแล้วปล่อยทันที = ไม่ถอด
+# การ์ด 0056: เสียงที่เบากว่าเสียงเรา (ความดังสูงสุดของเรา) เกินเท่านี้ = นับเป็นเงียบ (ทีวี/คนที่อยู่ไกล) ·
+# ตั้งจากชุดพัฒนา (docs/design/0056 หัวข้อ 10) · 0 = ปิด (เหมือนก่อนการ์ด 0056)
+NEAR_DB = 15.0
+# การ์ด 0056: ส่งไปถอดเฉพาะช่วงพูด · เผื่อหน้า 0.25 วิ (พยัญชนะต้นเบา ๆ) ·
+# เผื่อท้าย 0.3 วิ (เท่าไฟล์ถอดล่วงหน้าของ 0044)
+PAD_BEFORE_S = 0.25
+PAD_AFTER_S = 0.3
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
 TAGS = re.compile(r"\[[^\]]*\]|\([^)]*\)")
 
@@ -44,19 +51,33 @@ class Endpointer:
     ระดับเสียงพื้นหลังวัดจาก 0.3 วิแรก (ก่อนเริ่มพูด) · เริ่มพูด = ดังเกินเกณฑ์ 3 ช่องติด (90 ms) ·
     จบ = หลังเริ่มพูดแล้วเงียบต่อกัน silence_s วิ · ไม่ใช้โมเดล (CPU น้อย ไม่แย่ง AI)
     feed() คืน None (ฟังต่อ) · "end" · "no_speech" · "max"
+
+    การ์ด 0056 (ฟังแค่คนใกล้ไมค์):
+    - noise = ระดับเสียงรอบข้างที่จำจากครั้งก่อน → ใช้ได้ตั้งแต่ช่องแรก (กดแล้วพูดทันทีได้) ·
+      ครบ 0.3 วิแล้วเอาค่าที่ต่ำกว่าระหว่างที่จำกับที่วัดได้ (ช่วงแรกอาจเป็นเสียงเราเอง)
+    - "เงียบ" = เบากว่าเกณฑ์เดิม หรือเบากว่าเสียงเรา near_db dB → ทีวี/คนไกลไม่ทำให้รอจนครบ 15 วิ
+    - speech_span() = ช่วงที่พูด (ไบต์) ให้ตัดไฟล์ก่อนถอด
     """
 
     FRAME = 480  # 30 ms
 
     def __init__(self, silence_s: float = 1.0, no_speech_s: float = 5.0, max_s: float = MAX_S,
-                 sr: int = 16000):  # fmt: skip
+                 sr: int = 16000, noise: float | None = None,
+                 near_db: float = NEAR_DB):  # fmt: skip
         self.frame_s = self.FRAME / sr
         self.silence_frames = round(silence_s / self.frame_s)
         self.no_speech_frames = round(no_speech_s / self.frame_s)
         self.max_frames = round(max_s / self.frame_s)
         self._buf = b""
         self._levels: list[float] = []
-        self._noise: float | None = None
+        self._noise: float | None = noise
+        # ความดังที่เบากว่าเสียงเรา near_db dB เป็นสัดส่วนเท่าไร (dB → อัตราส่วนความดัง: 10^(-dB/20))
+        self._near = 10 ** (-near_db / 20) if near_db > 0 else 0.0
+        self._peak = 0.0  # ความดังสูงสุดของเสียงเรา (เฉลี่ย 3 ช่อง กันเสียงกระแทกช่องเดียว)
+        self._recent: list[float] = []
+        self._tail: list[float] = []  # ความดังของช่วงเงียบท้าย = เสียงรอบข้างตอนนี้ (จำไว้ครั้งหน้า)
+        self.start_frame: int | None = None
+        self.end_frame: int | None = None
         self.frames = 0
         self.speaking = False
         self._loud = 0
@@ -82,32 +103,87 @@ class Endpointer:
                 return r
         return None
 
+    def use_noise(self, noise: float | None) -> None:
+        """ใช้ระดับเสียงรอบข้างที่จำจากครั้งก่อน (ก่อนป้อนเสียงช่องแรก) · None = วัดใหม่ 0.3 วิแรก."""
+        if noise is not None and not self._levels:
+            self._noise = noise
+
+    @property
+    def noise_floor(self) -> float | None:
+        """ระดับเสียงรอบข้างล่าสุด (ไว้จำครั้งหน้า) · จบแบบเงียบ = ค่ากลางของช่วงเงียบท้าย."""
+        if self._tail:
+            return sorted(self._tail)[len(self._tail) // 2]
+        return self._noise
+
+    def speech_span(self, total: int, sr: int = 16000) -> tuple[int, int]:
+        """ช่วงไบต์ที่มีเสียงพูด (+ เผื่อหน้า/ท้าย) จากเสียงทั้งหมด total ไบต์ · ไม่รู้ = ทั้งหมด."""
+        if self.start_frame is None:
+            return 0, total
+        end = self.end_frame if self._quiet else self.frames  # ยังพูดอยู่ (ครบ 15 วิ) = ถึงช่องสุดท้าย
+        a = self.start_frame * self.FRAME * 2 - round(PAD_BEFORE_S * sr) * 2
+        b = end * self.FRAME * 2 + round(PAD_AFTER_S * sr) * 2
+        return max(0, a), min(total, b)
+
     def _frame(self, level: float) -> str | None:
         self.frames += 1
-        if self._noise is None:
+        if len(self._levels) < 10:  # 0.3 วิแรก = ระดับเสียงพื้นหลัง
             self._levels.append(level)
-            if len(self._levels) < 10:  # 0.3 วิแรก = ระดับเสียงพื้นหลัง
+            first = self._noise is None  # ไม่มีค่าที่จำไว้ = รอวัดให้ครบก่อน (เหมือนเดิม)
+            if len(self._levels) == 10:
+                measured = sorted(self._levels)[len(self._levels) // 2]
+                self._noise = measured if first else min(self._noise, measured)
+            if first:
                 return None
-            self._noise = sorted(self._levels)[len(self._levels) // 2]
-            return None
         threshold = max(3.0 * self._noise, 400.0)
+        self._recent = (self._recent + [level])[-3:]
         if not self.speaking:
             self._loud = self._loud + 1 if level > threshold else 0
             if self._loud >= 3:
                 self.speaking = True
-            elif level < threshold:  # ปรับระดับพื้นหลังช้า ๆ ระหว่างยังไม่พูด
+                self.start_frame = self.frames - 3
+            elif level < threshold and len(self._levels) == 10:  # ปรับระดับพื้นหลังช้า ๆ ระหว่างยังไม่พูด
                 self._noise = 0.95 * self._noise + 0.05 * level
             if not self.speaking and self.frames >= self.no_speech_frames:
                 return "no_speech"
         else:
-            if level < 0.7 * threshold:
+            if self._quiet == 0:
+                self._peak = max(self._peak, sum(self._recent) / len(self._recent))
+            if level < max(0.7 * threshold, self._near * self._peak):
+                if self._quiet == 0:
+                    self.end_frame, self._tail = self.frames - 1, []
                 self._quiet += 1
+                self._tail.append(level)
             else:
                 self._quiet = 0
                 self.voiced += 1
             if self._quiet >= self.silence_frames:
                 return "end"
         return "max" if self.frames >= self.max_frames else None
+
+
+def _trim(path: Path, start: int, end: int) -> None:
+    """เหลือแค่ช่วงไบต์ [start, end) ของเสียง (การ์ด 0056) · ทำไม่ได้ = ใช้ไฟล์เต็ม (ไม่ทิ้งสิ่งที่ผู้ใช้พูด · H2).
+
+    หาจุดเริ่มเสียงจาก "data" เอง (แบบ _watch) ไม่เชื่อขนาดในหัวไฟล์ (ตัวอัดที่ถูกฆ่าไม่ได้เขียนให้) ·
+    เขียนไฟล์ใหม่ก่อนแล้วค่อยแทนที่ → ไฟดับกลางคันไฟล์เดิมยังอยู่
+    """
+    import wave
+
+    tmp = path.with_name(path.stem + "-trim.wav")
+    try:
+        raw = path.read_bytes()
+        i = raw.find(b"data", 0, 4096)
+        pcm = raw[i + 8 :][start:end] if i >= 0 else b""
+        if not pcm:
+            return
+        with wave.open(str(tmp), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(16000)
+            w.writeframes(pcm)
+        os.replace(tmp, path)
+    except (OSError, wave.Error):
+        _remove(tmp)
 
 
 def _remove(path: Path) -> None:
@@ -145,6 +221,10 @@ class Listener:
         # การ์ด 0044: complete(ข้อความไทย) = เป็นคำสั่งครบแล้ว (เว็บ/เครื่อง/ค่าตั้ง) → จบเร็วไม่ต้องรอเงียบ 1 วิ
         self._complete = complete
         self._spec_next: dict | None = None  # ผลถอดล่วงหน้าที่ใช้ได้ ส่งต่อให้ stop() → _transcribe
+        # การ์ด 0056: ช่วงที่พูด (ไบต์) ให้ stop() ตัดไฟล์ก่อนถอด ·
+        # ระดับเสียงรอบข้างล่าสุด (ตัวเลขในหน่วยความจำ ไม่เก็บเสียง)
+        self._span_next: tuple[int, int] | None = None
+        self._noise_floor: float | None = None
         # ภาษาของตัวถอด = ภาษาหน้าจอที่ผู้ใช้ตั้ง (การ์ด 0040 · โค้ดเลือก ไม่ให้โมเดลเดาภาษา · H6)
         self._language = language
         self._lang = "th"
@@ -207,6 +287,7 @@ class Listener:
             if not self.available:
                 return "ยังไม่ได้ติดตั้งตัวถอดเสียง หรือไม่มีไมค์"
             self._lang = "en" if self._language() == "en" else "th"
+            self._span_next = None
             # คีย์ลัดฟังสองภาษาเสมอ ไม่ขึ้นกับภาษาหน้าจอ (Pakon 2026-10-20 "ใช้ได้ทั้งไทยและอังกฤษรวมกัน"):
             # Zipformer ไทยก่อน · ไม่ตรงคำสั่ง → ลองอังกฤษ (_maybe_english) · ปุ่มไมค์ยังใช้ภาษาหน้าจอ
             self._use_fast = fast and self._fast is not None and self._fast.available
@@ -240,6 +321,7 @@ class Listener:
         พูดต่อ = ทิ้งผลล่วงหน้า · ผลเป็นคำสั่งครบ + เงียบ EARLY_S = จบเลย · จบตามปกติ = ใช้ผลที่ถอดไว้แล้ว
         """
         ep, offset = self._make_endpointer(), None
+        ep.use_noise(self._noise_floor)  # การ์ด 0056: กดแล้วพูดทันทีได้
         pcm = bytearray()
         spec: dict | None = None
         while self._proc is proc:
@@ -260,6 +342,8 @@ class Listener:
             data = chunk[: len(chunk) - len(chunk) % 2]
             pcm += data
             result = ep.feed(data) if data else None
+            if ep.noise_floor is not None:
+                self._noise_floor = ep.noise_floor
             if result == "no_speech":
                 self.cancel()
                 self._on_done("", "ไม่ได้ยินเสียงพูด ลองแตะแล้วพูดใกล้ไมค์อีกครั้ง", 0.0)
@@ -268,15 +352,18 @@ class Listener:
                 spec = None  # พูดต่อ = ผลล่วงหน้าไม่ครบประโยค ทิ้ง (เธรดลบไฟล์ของมันเอง)
             if result is not None:
                 self._spec_next = spec
+                self._span_next = ep.speech_span(len(pcm))
                 self.stop()
                 return
             if not (self._use_fast and ep.speaking):
                 continue
             if spec is None and ep.quiet_s >= SPEC_AT_S:
-                spec = self._speculate(bytes(pcm), ep.voiced)
+                a, b = ep.speech_span(len(pcm))
+                spec = self._speculate(bytes(pcm[a:b]), ep.voiced)
             done = spec is not None and spec["done"].is_set() and not spec["err"] and spec["text"]
             if done and ep.quiet_s >= EARLY_S and self._complete and self._complete(spec["text"]):
                 self._spec_next = spec
+                self._span_next = ep.speech_span(len(pcm))
                 self.stop()
                 return
 
@@ -316,6 +403,7 @@ class Listener:
         with self._lock:
             proc, path, held = self._proc, self._path, time.monotonic() - self._started
             spec, self._spec_next = self._spec_next, None
+            span, self._span_next = self._span_next, None
             self._proc = None
             if self._timer:
                 self._timer.cancel()
@@ -333,6 +421,8 @@ class Listener:
             _remove(path)
             self._on_done("", "กดค้างไว้ระหว่างพูด แล้วปล่อยเมื่อพูดจบ", 0.0)
             return
+        if span is not None:
+            _trim(path, *span)  # การ์ด 0056: ถอดแค่ช่วงพูด ไม่ถอดเสียงรอบข้างก่อน/หลัง
         threading.Thread(target=self._transcribe, args=(path, spec), daemon=True).start()
 
     def cancel(self) -> None:

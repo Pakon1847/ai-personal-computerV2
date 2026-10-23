@@ -1,6 +1,8 @@
 """เสียงสำหรับวัดตัวจับจุดจบ (การ์ด 0019 ข้อ 10) · รันบน Pi ด้วย venv ของ ~/voice-bench.
 
-    ~/voice-bench/venv/bin/python make-endpoint-audio.py sentences.json outdir/
+    ~/voice-bench/venv/bin/python make-endpoint-audio.py sentences.json outdir/ [เริ่ม]
+
+เริ่ม = 0 (ค่าเดิม · ประโยคลำดับคู่ = ชุดพัฒนา) · 1 = ประโยคลำดับคี่ (ชุดทดสอบของการ์ด 0056)
 
 เขียน single-NN.wav (ประโยคเดียว) และ pair-NN.wav (สองประโยค เว้นกลาง 0.5 วิ) · 16 kHz mono ·
 meta.json บอกจุดเริ่ม/จบเสียงพูด
@@ -22,7 +24,8 @@ D = os.path.expanduser("~/voice-bench")
 
 
 def main() -> int:
-    sents = [s["text"] for s in json.load(open(sys.argv[1], encoding="utf-8"))][::2]
+    first = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+    sents = [s["text"] for s in json.load(open(sys.argv[1], encoding="utf-8"))][first::2]
     out = sys.argv[2]
     os.makedirs(out, exist_ok=True)
     voice = PiperVoice.load(f"{D}/th_TH-tsync2-medium.onnx")
