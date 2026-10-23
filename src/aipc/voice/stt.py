@@ -44,6 +44,9 @@ PAD_AFTER_S = 0.3
 # ปิดไว้: วัดบน Pi (ชุดทดสอบ 2026-10-23) ชุดคำสั่ง 29 → 28/34 (ได้ "ก็" งอกหน้าคำ) · ชุด H 69 เท่าเดิม ·
 # เวลาถอดลดแค่ 0.02 วิ → ไม่ผ่านเกณฑ์ N2 ของการ์ด 0056 (docs/benchmarks/2026-10-23-mic-near)
 TRIM = False
+# การ์ด 0058: ฟังเฉพาะตอนหันหน้าเข้าจอ · ไม่หัน (หรือไม่เห็นหน้า) ต่อกันเท่านี้ระหว่างพูด = จบคำสั่งตรงที่เริ่มหัน
+TURN_S = 0.5
+NOT_FACING = "ไม่ได้หันหน้าเข้าจอ · หันมาที่จอแล้วพูดใหม่ (ตั้งค่า: ฟังเฉพาะตอนหันหน้าเข้าจอ)"
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
 TAGS = re.compile(r"\[[^\]]*\]|\([^)]*\)")
 
@@ -224,7 +227,9 @@ class Listener:
                  en_transcribe_cmd: list[str] | None = None,
                  try_english: Callable[[str], bool] | None = None,
                  use_english: Callable[[str], bool] | None = None,
-                 complete: Callable[[str], bool] | None = None):  # fmt: skip
+                 complete: Callable[[str], bool] | None = None,
+                 facing: Callable | None = None,
+                 facing_on: Callable[[], bool] = lambda: False):  # fmt: skip
         self._on_done = on_done
         # การ์ด 0044: complete(ข้อความไทย) = เป็นคำสั่งครบแล้ว (เว็บ/เครื่อง/ค่าตั้ง) → จบเร็วไม่ต้องรอเงียบ 1 วิ
         self._complete = complete
@@ -233,6 +238,11 @@ class Listener:
         # ระดับเสียงรอบข้างล่าสุด (ตัวเลขในหน่วยความจำ ไม่เก็บเสียง)
         self._span_next: tuple[int, int] | None = None
         self._noise_floor: float | None = None
+        # การ์ด 0058: facing(on_seen, stop) = สตรีม {"faces", "facing"} จาก visiond จนกว่า stop ตั้ง ·
+        # facing_on() = เปิดในตั้งค่าไหม (ค่าเริ่มต้นปิด · กล้องเปิดเฉพาะช่วงฟังคีย์ลัด)
+        self._facing, self._facing_on = facing, facing_on
+        self._face: dict | None = None
+        self._cut_next: int | None = None
         # ภาษาของตัวถอด = ภาษาหน้าจอที่ผู้ใช้ตั้ง (การ์ด 0040 · โค้ดเลือก ไม่ให้โมเดลเดาภาษา · H6)
         self._language = language
         self._lang = "th"
@@ -296,6 +306,7 @@ class Listener:
                 return "ยังไม่ได้ติดตั้งตัวถอดเสียง หรือไม่มีไมค์"
             self._lang = "en" if self._language() == "en" else "th"
             self._span_next = None
+            self._cut_next = None
             # คีย์ลัดฟังสองภาษาเสมอ ไม่ขึ้นกับภาษาหน้าจอ (Pakon 2026-10-20 "ใช้ได้ทั้งไทยและอังกฤษรวมกัน"):
             # Zipformer ไทยก่อน · ไม่ตรงคำสั่ง → ลองอังกฤษ (_maybe_english) · ปุ่มไมค์ยังใช้ภาษาหน้าจอ
             self._use_fast = fast and self._fast is not None and self._fast.available
@@ -313,6 +324,7 @@ class Listener:
                 self._proc = None
                 return f"เปิดไมค์ไม่ได้: {e}"
             self._started = time.monotonic()
+            self._face = self._start_facing() if fast else None
             self._timer = threading.Timer(self._max_s + 1, self.stop)  # กันไมค์ค้าง (ไฟล์ไม่โต)
             self._timer.daemon = True
             self._timer.start()
@@ -321,6 +333,32 @@ class Listener:
                     target=self._watch, args=(self._proc, self._path), daemon=True
                 ).start()
             return ""
+
+    def _start_facing(self) -> dict | None:
+        """การ์ด 0058: เปิดตัวดูการหันหน้าคู่กับไมค์ (เธรดแยก) · ปิดในตั้งค่า/ไม่มี visiond = None (ฟังแบบเดิม)."""
+        try:
+            if self._facing is None or not self._facing_on():
+                return None
+        except Exception:  # noqa: BLE001 · อ่านค่าตั้งไม่ได้ = ฟังแบบเดิม
+            return None
+        face = {"stop": threading.Event(), "seen": False, "faced": False, "away_since": None}
+
+        def on_seen(msg: dict) -> None:
+            now = time.monotonic()
+            face["seen"] = True
+            if msg.get("facing"):
+                face["faced"], face["away_since"] = True, None
+            elif face["away_since"] is None:
+                face["away_since"] = now
+
+        def run() -> None:
+            try:
+                self._facing(on_seen, face["stop"])
+            except Exception:  # noqa: BLE001 · กล้อง/visiond ใช้ไม่ได้ = ฟังแบบเดิม (H5)
+                pass
+
+        threading.Thread(target=run, daemon=True).start()
+        return face
 
     def _watch(self, proc: subprocess.Popen, path: Path) -> None:
         """อ่านเสียงที่อัดเพิ่มทุก 0.1 วิ · Endpointer บอกจบ = หยุดเอง.
@@ -332,6 +370,8 @@ class Listener:
         ep.use_noise(self._noise_floor)  # การ์ด 0056: กดแล้วพูดทันทีได้
         pcm = bytearray()
         spec: dict | None = None
+        # (เวลา, ความยาวเสียงตอนนั้น) · หาจุดตัดตอนเริ่มหันหน้าออก (0058)
+        marks: list[tuple[float, int]] = []
         while self._proc is proc:
             time.sleep(0.1)
             try:
@@ -349,6 +389,7 @@ class Listener:
             offset += len(chunk) - len(chunk) % 2
             data = chunk[: len(chunk) - len(chunk) % 2]
             pcm += data
+            marks.append((time.monotonic(), len(pcm)))
             result = ep.feed(data) if data else None
             if ep.noise_floor is not None:
                 self._noise_floor = ep.noise_floor
@@ -358,6 +399,13 @@ class Listener:
                 return
             if spec is not None and spec["voiced"] != ep.voiced:
                 spec = None  # พูดต่อ = ผลล่วงหน้าไม่ครบประโยค ทิ้ง (เธรดลบไฟล์ของมันเอง)
+            away = self._face["away_since"] if self._face is not None else None
+            if ep.speaking and away is not None and time.monotonic() - away >= TURN_S:
+                # การ์ด 0058: หันหน้าออกระหว่างพูด = จบคำสั่งตรงที่เริ่มหัน · เสียงหลังจากนั้นไม่ถอด
+                self._cut_next = next((n for t, n in reversed(marks) if t <= away), 0)
+                self._spec_next = spec
+                self.stop()
+                return
             if result is not None:
                 self._spec_next = spec
                 self._span_next = ep.speech_span(len(pcm))
@@ -412,6 +460,8 @@ class Listener:
             proc, path, held = self._proc, self._path, time.monotonic() - self._started
             spec, self._spec_next = self._spec_next, None
             span, self._span_next = self._span_next, None
+            cut, self._cut_next = self._cut_next, None
+            face, self._face = self._face, None
             self._proc = None
             if self._timer:
                 self._timer.cancel()
@@ -425,10 +475,22 @@ class Listener:
             proc.wait(timeout=3)
         except subprocess.TimeoutExpired:
             proc.kill()
+        if face is not None:
+            face["stop"].set()  # กล้องดับ
         if held < MIN_S:
             _remove(path)
             self._on_done("", "กดค้างไว้ระหว่างพูด แล้วปล่อยเมื่อพูดจบ", 0.0)
             return
+        if face is not None and face["seen"] and not face["faced"]:
+            _remove(path)  # การ์ด 0058: ไม่เคยหันเข้าจอเลยตลอดช่วงฟัง = พูดกับคนอื่น · ไม่ทำ
+            self._on_done("", NOT_FACING, 0.0)
+            return
+        if cut is not None:
+            if cut <= 0:
+                _remove(path)
+                self._on_done("", NOT_FACING, 0.0)
+                return
+            _trim(path, 0, cut)  # ถอดแค่ส่วนที่พูดตอนหันเข้าจอ
         if TRIM and span is not None:
             _trim(path, *span)  # การ์ด 0056: ถอดแค่ช่วงพูด ไม่ถอดเสียงรอบข้างก่อน/หลัง
         threading.Thread(target=self._transcribe, args=(path, spec), daemon=True).start()
@@ -436,7 +498,10 @@ class Listener:
     def cancel(self) -> None:
         with self._lock:
             proc, path = self._proc, self._path
+            face, self._face = self._face, None
             self._proc = None
+        if face is not None:
+            face["stop"].set()
             if self._timer:
                 self._timer.cancel()
         if proc is not None:

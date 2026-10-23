@@ -363,7 +363,7 @@ def build(opts: Options, argv: list[str] | None = None):
         # ขั้น C: สถานะตัวตรวจด้วยกล้อง (อ่านไฟล์ทุก 2 วิ เฉพาะเซสชันจริง)
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
-        "voice": VoiceController(active=in_session),
+        "voice": VoiceController(active=in_session, face_to_speak=lambda: ui_settings.faceToSpeak),
         "browser": browser_ctl,
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),

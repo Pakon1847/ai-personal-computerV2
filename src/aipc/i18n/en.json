@@ -85,6 +85,8 @@
   "ตรวจตอนนี้": "Check now",
   "กำลังตรวจ…": "Checking…",
   "ปลดจอล็อกเองเมื่อเห็นหน้าฉัน": "Unlock automatically when it sees my face",
+  "ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ": "Only take voice commands while I face the screen",
+  "กด F9 แล้วกล้องเปิดระหว่างฟัง (ไฟกล้องติด) · หันไปคุยกับคนอื่น = ไม่นับเป็นคำสั่ง · ไม่บันทึกภาพ": "After F9 the camera is on while listening (camera light on) · turning to talk to someone else does not count as a command · no images are saved",
   "ต้องเปิด \"เข้าเครื่องด้วยใบหน้า\" ด้านบนก่อน": "Turn on \"Face sign-in\" above first",
   "ตอนจอล็อก กล้องเปิดตลอด (ไฟกล้องติด) · มานั่งหน้าเครื่องแล้วเข้าได้เลย · ตรวจรูปปลอม · ผิด 5 ครั้งต้องใช้รหัสผ่าน · ไม่บันทึกภาพ": "While locked the camera stays on (camera light on) · sit down and you are in · photos are rejected · 5 failures require the password · no images saved",
   "กำลังเตรียม": "Preparing",

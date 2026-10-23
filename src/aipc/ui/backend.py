@@ -133,6 +133,18 @@ class UiSettings(QObject):
     def useClaude(self) -> bool:  # noqa: N802
         return self._prefs.use_claude
 
+    # ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ (การ์ด 0058) · ค่าเริ่มต้นปิด
+    @Property(bool, notify=changed)
+    def faceToSpeak(self) -> bool:  # noqa: N802
+        return self._prefs.face_to_speak
+
+    @Slot(bool)
+    def setFaceToSpeak(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.face_to_speak:
+            self._prefs.face_to_speak = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     # ปลดจอล็อกเองเมื่อเห็นหน้า (การ์ด 0055) · ค่าเริ่มต้นปิด
     @Property(bool, notify=changed)
     def faceAutoUnlock(self) -> bool:  # noqa: N802
@@ -475,7 +487,12 @@ class VoiceController(QObject):
     _heard = Signal(str, str, float)
 
     def __init__(
-        self, speaker=None, active: bool = True, idle_poll_ms: int = 60_000, listener=None
+        self,
+        speaker=None,
+        active: bool = True,
+        idle_poll_ms: int = 60_000,
+        listener=None,
+        face_to_speak=None,
     ):
         super().__init__()
         from aipc.voice import stt, tts, zipformer
@@ -488,9 +505,16 @@ class VoiceController(QObject):
 
             # การ์ด 0044: Zipformer ไม่ปิดตัวเองเมื่อไม่ได้ใช้ (เดิม 10 นาที → กดครั้งถัดไปรอโหลด 4.6 วิ)
             fast = zipformer.Transcriber(idle_s=float("inf"))
+            from aipc.vision import client as vision_client
+
+            def facing(on_seen, stop):  # การ์ด 0058 · visiond ตอบเฉพาะเจ้าของเซสชัน
+                return vision_client.facing(getpass.getuser(), on_seen, stop)
+
             listener = stt.Listener(self._weak("_heard"), fast=fast, complete=_command_complete,
                                     language=i18n.lang, try_english=_thai_missed,
-                                    use_english=_english_command)  # fmt: skip # การ์ด 0040
+                                    use_english=_english_command,  # การ์ด 0040
+                                    facing=facing,
+                                    facing_on=face_to_speak or (lambda: False))  # fmt: skip
         self._listener = listener if active else None
         self._key, self._job, self._message = -1, -1, ""
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0

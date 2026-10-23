@@ -125,6 +125,12 @@ class FaceScanner:
             out.append(matching.l2_normalize(self.embedder.embed(aligned)))
         return out
 
+    # ---------- ฟังคำสั่งเฉพาะตอนหันหน้าเข้าจอ (การ์ด 0058) ----------
+    def face_yaws(self, frame: np.ndarray, max_faces: int = 3) -> list[float]:
+        """มุมหันซ้าย-ขวา (องศา · ค่าคร่าว ๆ จาก 5 จุด) ของทุกหน้าในภาพ · ไม่เทียบว่าเป็นใคร (เร็ว · ประหยัด)."""
+        rows = [r for r in self.detector.detect(frame) if float(r[14]) >= self.cfg.min_detect_score]
+        return [quality.estimate_pose(Face.from_yunet(r).landmarks)[0] for r in rows[:max_faces]]
+
     # ---------- ต่อเฟรม ----------
     def process(self, frame: np.ndarray) -> FrameResult:
         t = {}

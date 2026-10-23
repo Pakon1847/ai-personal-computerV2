@@ -68,6 +68,8 @@ class UiPrefs:
     cloud_model: str = "sonnet"  # แชทงาน (การ์ด 0053) · จำตัวที่เลือกล่าสุด
     # ปลดจอล็อกเองเมื่อเห็นหน้า (การ์ด 0055) · กล้องเปิดตลอดตอนล็อก → ค่าเริ่มต้นปิด (H3)
     face_auto_unlock: bool = False
+    # ฟังคำสั่งเสียง (คีย์ลัด) เฉพาะตอนหันหน้าเข้าจอ (การ์ด 0058) · กล้องเปิดระหว่างฟัง → ค่าเริ่มต้นปิด (H3)
+    face_to_speak: bool = False
     cloud_effort: str = "medium"  # ระดับความคิดของแชทงาน (Pakon 2026-10-22) · จำตัวที่เลือกล่าสุด
     # ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ (การ์ด 0031 รอบ 3) · ค่าเริ่มต้นปิด (ใช้เครื่องคนเดียวยังสะดวก)
     clear_web_on_logout: bool = False
@@ -105,6 +107,7 @@ class UiPrefs:
             language=self.language if self.language in LANGS else "th",
             cloud_model=self.cloud_model if self.cloud_model in CLOUD_MODELS else "sonnet",
             face_auto_unlock=self.face_auto_unlock is True,
+            face_to_speak=self.face_to_speak is True,
             cloud_effort=self.cloud_effort if self.cloud_effort in CLOUD_EFFORTS else "medium",
             clear_web_on_logout=self.clear_web_on_logout is True,
             lock_policy=LOCK_POLICY,
@@ -135,6 +138,7 @@ def load(path: Path | None = None) -> UiPrefs:
             language=str(data.get("language", "th")),
             cloud_model=str(data.get("cloud_model", "sonnet")),
             face_auto_unlock=data.get("face_auto_unlock") is True,
+            face_to_speak=data.get("face_to_speak") is True,
             cloud_effort=str(data.get("cloud_effort", "medium")),
             clear_web_on_logout=data.get("clear_web_on_logout") is True,
         ).cleaned()

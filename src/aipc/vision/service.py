@@ -29,6 +29,10 @@ USER_RE = re.compile(r"^[a-z_][a-z0-9_-]{0,31}$")  # ชื่อบัญชี
 # ตัวตรวจว่าเจ้าของยังอยู่ (การ์ด 0051 ทาง ก) · ค่าเดียวกับขั้น C (aipc.ui.presence.THRESHOLD) และสแกนเข้าเครื่อง
 WATCH_THRESHOLD = 0.363
 WATCH_EVERY_S = 2.0
+# การ์ด 0058: หันเข้าจอ = |yaw| ≤ 30° · ขั้น 0 ที่จอ (Pakon): มองจอ 2.2–7.3° ·
+# หันข้าง = 90° (วัดไม่ได้ = หันมาก) ทุกครั้ง
+FACING_YAW = 30.0
+FACING_EVERY_S = 0.2
 UNLOCK_RETRY_S = 600.0  # ปลดจอล็อกด้วยใบหน้าผิดครบ = พัก 10 นาที (การ์ด 0055)
 PURPOSE = "เข้าเครื่องด้วยใบหน้าที่หน้า Login (เจ้าของบัญชีเปิดเอง · ปิดหรือลบได้ในหน้าตั้งค่า)"
 
@@ -198,6 +202,21 @@ class FaceLogin:
                   "owner": best is not None and best >= WATCH_THRESHOLD,
                   "best": None if best is None else round(float(best), 3)})  # fmt: skip
         return Outcome(True, "done", user)
+
+    def facing(self, frames: Iterable, send, every_s: float | None = None,
+               clock=time.monotonic) -> Outcome:  # fmt: skip
+        """การ์ด 0058: ทุก ~0.2 วิ ส่งแค่ จำนวนหน้า · มีหน้าที่หันเข้าจอไหม — ไม่มีภาพ ไม่เทียบว่าใคร ไม่ log."""
+        every_s = FACING_EVERY_S if every_s is None else every_s
+        last = float("-inf")
+        for frame in frames:
+            now = clock()
+            if now - last < every_s:
+                continue
+            last = now
+            yaws = self.scanner.face_yaws(frame)
+            send({"state": "seen", "faces": len(yaws),
+                  "facing": any(abs(y) <= FACING_YAW for y in yaws)})  # fmt: skip
+        return Outcome(True, "done")
 
     def unlock(self, user: str, frames: Iterable, progress=None) -> Outcome:
         """ปลดจอล็อกด้วยใบหน้า (การ์ด 0055) · เทียบเฉพาะแม่แบบของบัญชีนั้น · ใช้ตัวสแกนเดียวกับหน้า Login

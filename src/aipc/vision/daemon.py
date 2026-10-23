@@ -40,6 +40,7 @@ HELPER = ["sudo", "-n", "/usr/local/sbin/aipc-accounts"]
 ENROLL_SECONDS = 40.0  # เท่าการลงทะเบียนในหน้าตั้งค่า (การ์ด 0010)
 IDENTIFY_MAX_S = 15.0
 WATCH_MAX_S = 60.0  # ตัวตรวจขอใหม่ทุก ≤ 60 วิ (กล้องไม่ค้างถ้าตัวตรวจตาย)
+FACING_MAX_S = 20.0  # การ์ด 0058: ฟังคำสั่งเสียงนานสุด 15 วิ (+ เผื่อ) · ตัวขอตาย = กล้องดับเอง
 UNLOCK_SECONDS = 5.0  # ปลดจอล็อกด้วยใบหน้า (การ์ด 0055) · สั้นกว่าหน้า Login (คนนั่งหน้าจออยู่แล้ว)
 
 
@@ -160,7 +161,7 @@ class Handler:
             return self._with_camera(
                 lambda: vars(self.face.identify(_tap(self.frames(secs), last), progress))
             )
-        if op in ("watch", "unlock"):
+        if op in ("watch", "unlock", "facing"):
             # เจ้าของบัญชีเท่านั้น · หน้า Login/root ขอไม่ได้ (ไม่มีเหตุให้ดูว่าใครนั่งอยู่หน้าเครื่อง ·
             # ปลดจอล็อกของคนอื่นไม่ได้)
             owner = isinstance(user, str) and uid not in (0, self.greeter_uid)
@@ -169,6 +170,10 @@ class Handler:
             if op == "unlock":
                 return self._with_camera(
                     lambda: vars(self.face.unlock(user, self.frames(UNLOCK_SECONDS)))
+                )
+            if op == "facing":
+                return self._with_camera(
+                    lambda: vars(self.face.facing(self.frames(FACING_MAX_S), send))
                 )
             try:
                 secs = max(1.0, min(float(req.get("seconds", WATCH_MAX_S)), WATCH_MAX_S))

@@ -558,6 +558,14 @@ ColumnLayout {
                 checked: uiSettings.faceAutoUnlock
                 onClicked: uiSettings.setFaceAutoUnlock(checked)
             }
+            // การ์ด 0058: ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ (ใช้แค่หาหน้า ไม่ต้องลงทะเบียน) · ค่าเริ่มต้นปิด
+            AppCheck {
+                objectName: "faceToSpeakCheck"
+                text: Tr.t("ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ")
+                detail: Tr.t("กด F9 แล้วกล้องเปิดระหว่างฟัง (ไฟกล้องติด) · หันไปคุยกับคนอื่น = ไม่นับเป็นคำสั่ง · ไม่บันทึกภาพ")
+                checked: uiSettings.faceToSpeak
+                onClicked: uiSettings.setFaceToSpeak(checked)
+            }
             AppText {
                 objectName: "presenceStatusText"
                 visible: uiSettings.presence && presenceStatus.text !== ""
