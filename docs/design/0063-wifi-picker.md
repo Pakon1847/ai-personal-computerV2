@@ -43,3 +43,18 @@
 ## 9. ไม่ทำในรอบนี้
 
 Wi-Fi แบบองค์กร (WPA-Enterprise) · ปล่อยฮอตสปอต · ตั้ง IP เอง
+
+## 10. ผลขั้น 0 (2026-10-24 · Pi 5 · อ่านอย่างเดียว)
+
+นโยบาย NetworkManager (`/usr/share/polkit-1/actions/…NetworkManager.policy`) ของผู้ใช้ที่นั่งหน้าจอ (active):
+`wifi.scan` = yes · `network-control` = yes · `settings.modify.own` = yes · **`settings.modify.system` = auth_admin_keep** ·
+กฎของ Raspberry Pi OS (`/usr/share/polkit-1/rules.d/org.freedesktop.NetworkManager.rules`): modify.system = yes ถ้าอยู่กลุ่ม **netdev** หรือ sudo ·
+pakon ไม่อยู่ netdev (มีแค่ aipc2030)
+
+ทางเลือก:
+- **ก (แนะนำ):** ใส่บัญชีที่ให้เปลี่ยน Wi-Fi ได้เข้ากลุ่ม netdev (ทางเดียวกับที่ Raspberry Pi OS ออกแบบไว้ · ไม่ต้องเขียนกฎ polkit เอง) · แก้ /etc/group = ถาม Pakon ก่อน ·
+  บัญชีใหม่ตอนสมัคร: เพิ่ม netdev ในกลุ่มของตัวช่วยสมัคร (ถ้า Pakon เลือก "ทุกบัญชี")
+- ข: Wi-Fi เป็นของผู้ใช้คนนั้น (connection.permissions) = ไม่ต้องแก้ระบบ แต่ใช้ได้เฉพาะตอนคนนั้นเข้าระบบอยู่ · หน้า Login/คนอื่นไม่มีเน็ตนั้น
+
+ยังไม่รู้ (ต้องลองบน Pi ก่อนเขียนโค้ดส่วนเชื่อมต่อ): ส่งรหัสด้วย `passwd-file` (ไฟล์ 600 ลบทันที) แล้ว NetworkManager จำรหัสไว้ให้ครั้งหน้าหรือไม่ ·
+การลองเปลี่ยน Wi-Fi บน Pi อาจตัด SSH ที่ใช้ฮอตสปอตอยู่ → ต้องลองตอน Pakon อยู่ที่จอ และมี Wi-Fi อีกเครือข่ายให้ลอง
