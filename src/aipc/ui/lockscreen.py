@@ -31,12 +31,17 @@ DATE_THAI = "วัน%Aที่ %e %B %EC %Ey"
 DATE_PLAIN = "%d/%m/%Y"
 LOCALE = "th_TH.UTF-8"
 
+# โมดูลปลดเองเมื่อเห็นหน้า (aipc-autounlock.c · install-lockscreen.sh คอมไพล์ไว้ที่นี่ · root เป็นเจ้าของ)
+AUTO_MODULE = Path("/usr/local/lib/aipc/aipc-autounlock.so")
+IDLE_HIDE_S = 20  # ไม่แตะ 20 วิ = ซ่อนกล่องรหัส เหลือแค่นาฬิกา (Pakon: "ไม่ต้องมีกรอบอะไรเลย")
+HINT_AUTO = "มองกล้องเพื่อเข้าใช้ · หรือกดปุ่มใดก็ได้เพื่อพิมพ์รหัสผ่าน"
+HINT_KEY = "กดปุ่มใดก็ได้เพื่อปลดล็อก"
+
 TEXT = {
-    "face_hint": "มองกล้อง แล้วกด Enter เพื่อปลดด้วยใบหน้า",
+    "face_hint": "กด Enter ว่าง ๆ = ใช้ใบหน้า · แป้นไทยอยู่? กด ~ สลับก่อนพิมพ์รหัส",
     "placeholder": "รหัสผ่าน · หรือกด Enter ว่าง ๆ ใช้ใบหน้า",
     "password": "รหัสผ่าน",
     "unlock": "ปลดล็อก",
-    "hint": "แป้นเป็นภาษาไทยอยู่? กดปุ่ม ~ เพื่อสลับเป็นอังกฤษก่อนพิมพ์รหัส",
 }
 
 
@@ -88,9 +93,10 @@ def style(path: Path, screen_height: int = DESIGN_HEIGHT) -> Path:
     return path
 
 
-def layout(path: Path, keep: str, warn: bool, name: str = "") -> Path:
+def layout(path: Path, keep: str, warn: bool, name: str = "", auto: bool = False) -> Path:
     s = (ASSETS / "gtklock.ui.in").read_text(encoding="utf-8")
-    values = {**TEXT, "keep": ("! " if warn else "✓ ") + keep,
+    values = {**TEXT, "hint": HINT_AUTO if auto else HINT_KEY,
+              "keep": ("! " if warn else "✓ ") + keep,
               "keep_class": "warn" if warn else "keep",
               "name": name, "initial": (name.strip()[:1] or "?").upper()}  # fmt: skip
     for k, v in values.items():
@@ -100,10 +106,12 @@ def layout(path: Path, keep: str, warn: bool, name: str = "") -> Path:
 
 
 def prepare(folder: Path, keep: str, warn: bool, name: str = "", run=subprocess.run,
-            screen_height: int = DESIGN_HEIGHT) -> list[str]:  # fmt: skip
+            screen_height: int = DESIGN_HEIGHT, auto: bool = False,
+            module: Path = AUTO_MODULE) -> list[str]:  # fmt: skip
     """เขียนไฟล์ทั้งหมดใน folder แล้วคืนคำสั่ง (ยังไม่รัน) · เรียกตอนตั้งค่าล็อก ไม่ใช่ตอนล็อก (ล็อกต้องเร็ว)."""
     folder.mkdir(parents=True, exist_ok=True)
-    ui = layout(folder / "gtklock.ui", keep, warn, name)
+    auto = auto and module.exists()  # เปิดในตั้งค่าแต่ยังไม่ได้ติดตั้งโมดูล = ไม่ปลดเอง (ไม่แสดงคำใบ้ที่ไม่จริง · H5)
+    ui = layout(folder / "gtklock.ui", keep, warn, name, auto)
     css = style(folder / "gtklock.css", screen_height)
     conf = fonts_conf(folder / "fonts.conf")
     loc = build_locale(folder / "locale", run)
@@ -112,7 +120,10 @@ def prepare(folder: Path, keep: str, warn: bool, name: str = "", run=subprocess.
         env += [f"LOCPATH={loc}", f"LC_ALL={LOCALE}"]
     cmd = ["env", *env, "gtklock", "-d",
            "-s", str(css), "-x", str(ui),
-           "-t", TIME_FORMAT, "-D", DATE_THAI if loc is not None else DATE_PLAIN]  # fmt: skip
+           "-t", TIME_FORMAT, "-D", DATE_THAI if loc is not None else DATE_PLAIN,
+           "-S", "-H", "-T", str(IDLE_HIDE_S)]  # fmt: skip
     for m in MODULES:
         cmd += ["-m", m]
+    if auto:
+        cmd += ["-m", str(module)]
     return cmd

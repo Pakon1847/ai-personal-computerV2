@@ -106,7 +106,7 @@ class IdleLockTest(unittest.TestCase):
         # การ์ด 0055: มี gtklock = จอล็อกรุ่น 2 · คำสั่งถูกจำไว้ให้สั่งเสียง/ตัวตรวจด้วยกล้องใช้ตัวเดียวกัน
         seen = []
 
-        def prepare(folder, keep, warn, name, height):
+        def prepare(folder, keep, warn, name, height, auto):
             seen.append((keep, warn, name))
             return ["env", "X=1", "gtklock", "-d"]
 
@@ -121,7 +121,7 @@ class IdleLockTest(unittest.TestCase):
 
     def test_voice_lock_gets_gtklock_even_when_timer_lock_is_off(self):
         # พบบน Pi 5 2026-10-23: Pakon ปิดล็อกตามเวลา (lock_min 0) → "ล็อกหน้าจอ" ได้จอรุ่น 1
-        def prepare(folder, keep, warn, name, height):
+        def prepare(folder, keep, warn, name, height, auto):
             return ["gtklock", "-d"]
 
         lock = self.make(which=lambda t: f"/usr/bin/{t}", prepare=prepare)
@@ -132,7 +132,7 @@ class IdleLockTest(unittest.TestCase):
         self.assertIn("ล็อกหน้าจอแล้ว", idle.lock_lines("Pakon", 0, 0)[1])  # ไม่ใช่ "เกิน 0 นาที"
 
     def test_gtklock_failure_falls_back_to_swaylock(self):
-        def broken(folder, keep, warn, name, height):
+        def broken(folder, keep, warn, name, height, auto):
             raise OSError("no gtklock assets")
 
         lock = self.make(which=lambda t: f"/usr/bin/{t}", prepare=broken)

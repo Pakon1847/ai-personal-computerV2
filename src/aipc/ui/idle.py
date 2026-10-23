@@ -261,21 +261,24 @@ class IdleLock:
         from aipc.ui import lockscreen
 
         self._gtklock = gtklock or (lambda: lockscreen.available(self._which))
-        self._prepare = prepare or (lambda folder, keep, warn, name, height: lockscreen.prepare(
-            folder, keep, warn, name, screen_height=height))  # fmt: skip
+        def default_prepare(folder, keep, warn, name, height, auto):
+            return lockscreen.prepare(folder, keep, warn, name, screen_height=height, auto=auto)
+
+        self._prepare = prepare or default_prepare
         self._proc = None
         self._monitor = None  # ตัวตรวจด้วยกล้อง (ขั้น C)
         self._applied: tuple | None = None
         self.status = ""  # "" = ทำงานตามค่า · ข้อความ = เหตุที่ไม่ได้ทำ
 
     def apply(self, lock_min: int, logout_min: int, name: str = "", size=(1920, 1080),
-              presence: tuple[int, int] | None = None) -> list[str] | None:  # fmt: skip
+              presence: tuple[int, int] | None = None,
+              auto_unlock: bool = False) -> list[str] | None:  # fmt: skip
         """ใช้ค่าใหม่ · ค่าเดิม = ไม่ทำอะไร · คืนคำสั่ง swayidle ที่เริ่ม (None = ปิด/ทำไม่ได้).
 
         presence = (วินาทีไม่เห็นเจ้าของก่อนล็อก, วินาทีหลังล็อกก่อนออก) →
         เริ่มตัวตรวจด้วยกล้อง (ขั้น C) · None = ไม่ใช้กล้อง
         """
-        key = (lock_min, logout_min, name, presence)
+        key = (lock_min, logout_min, name, presence, auto_unlock)
         if key == self._applied:
             return None
         self.stop()
@@ -289,7 +292,7 @@ class IdleLock:
             try:
                 keep = lines[-1]
                 warn = "จะหาย" in keep
-                cmd = self._prepare(rdir / "gtklock", keep, warn, name, size[1])
+                cmd = self._prepare(rdir / "gtklock", keep, warn, name, size[1], auto_unlock)
             except Exception:  # noqa: BLE001 · เตรียมรุ่น 2 ไม่ได้ = ใช้รุ่น 1 (ล็อกได้เสมอ)
                 cmd = None
         if cmd is None:

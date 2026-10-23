@@ -66,6 +66,8 @@ class UiPrefs:
     gcal_alert_min: int = 10
     language: str = "th"  # การ์ด 0039
     cloud_model: str = "sonnet"  # แชทงาน (การ์ด 0053) · จำตัวที่เลือกล่าสุด
+    # ปลดจอล็อกเองเมื่อเห็นหน้า (การ์ด 0055) · กล้องเปิดตลอดตอนล็อก → ค่าเริ่มต้นปิด (H3)
+    face_auto_unlock: bool = False
     cloud_effort: str = "medium"  # ระดับความคิดของแชทงาน (Pakon 2026-10-22) · จำตัวที่เลือกล่าสุด
     # ออกจากบัญชีเว็บทุกครั้งที่ออกจากระบบ (การ์ด 0031 รอบ 3) · ค่าเริ่มต้นปิด (ใช้เครื่องคนเดียวยังสะดวก)
     clear_web_on_logout: bool = False
@@ -102,6 +104,7 @@ class UiPrefs:
             else 10,
             language=self.language if self.language in LANGS else "th",
             cloud_model=self.cloud_model if self.cloud_model in CLOUD_MODELS else "sonnet",
+            face_auto_unlock=self.face_auto_unlock is True,
             cloud_effort=self.cloud_effort if self.cloud_effort in CLOUD_EFFORTS else "medium",
             clear_web_on_logout=self.clear_web_on_logout is True,
             lock_policy=LOCK_POLICY,
@@ -131,6 +134,7 @@ def load(path: Path | None = None) -> UiPrefs:
             gcal_alert_min=data.get("gcal_alert_min", 10),
             language=str(data.get("language", "th")),
             cloud_model=str(data.get("cloud_model", "sonnet")),
+            face_auto_unlock=data.get("face_auto_unlock") is True,
             cloud_effort=str(data.get("cloud_effort", "medium")),
             clear_web_on_logout=data.get("clear_web_on_logout") is True,
         ).cleaned()

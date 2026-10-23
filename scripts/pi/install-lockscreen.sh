@@ -10,6 +10,9 @@
 #      (PAM รันเป็นผู้ใช้เจ้าของจอล็อก ไม่ใช่ root · ตัวนี้แค่ถาม visiond ว่าหน้าตรงเจ้าของไหม)
 #   2. /etc/pam.d/gtklock: ลองใบหน้าก่อน (ช่องรหัสว่าง) → ไม่ผ่าน/พิมพ์รหัสมา = รหัสผ่านตามเดิม (auth include login)
 #      เก็บไฟล์เดิมไว้ที่ /var/lib/aipc/gtklock.pam.orig ก่อนเขียน
+#   3. ปลดเองเมื่อเห็นหน้า (เปิดในตั้งค่า · ค่าเริ่มต้นปิด): /usr/local/sbin/aipc-face-watch (ตัวเฝ้า Python) +
+#      คอมไพล์ /usr/local/lib/aipc/aipc-autounlock.so จาก src/aipc/ui/lock/aipc-autounlock.c (ต้องมีแค่ gcc ·
+#      ไม่ใช้ libgtk-3-dev: ลิงก์กับไลบรารี GTK 3 ที่มีในเครื่อง) · ไม่มี gcc = ข้ามขั้นนี้ (กด Enter ยังใช้ได้)
 # ไม่แตะ: PAM ของ login / greetd / swaylock · ไฟล์แม่แบบใบหน้า · ไม่รีบูต
 set -euo pipefail
 
@@ -23,6 +26,9 @@ esac
 
 DEST=/opt/aipc-v2
 WRAPPER=/usr/local/sbin/aipc-face-unlock
+WATCHER=/usr/local/sbin/aipc-face-watch
+MODULE=/usr/local/lib/aipc/aipc-autounlock.so
+SOURCE="$(cd "$(dirname "$0")/../.." && pwd)/src/aipc/ui/lock/aipc-autounlock.c"
 PAMFILE=/etc/pam.d/gtklock
 BACKUP=/var/lib/aipc/gtklock.pam.orig
 
@@ -33,6 +39,9 @@ WRAPPER_TEXT='#!/bin/sh
 # ปลดจอล็อกด้วยใบหน้า (การ์ด 0055) · PAM ของ gtklock เรียก · รหัสที่พิมพ์มาทาง stdin
 # -I = ไม่อ่าน PYTHONPATH และ site ของผู้ใช้ → โหลดโค้ดจาก /opt/aipc-v2 ที่ root เป็นเจ้าของเท่านั้น
 exec /opt/aipc-v2/.venv/bin/python -I -m aipc.vision.face_unlock'
+WATCHER_TEXT='#!/bin/sh
+# ตัวเฝ้าหน้าเจ้าของตอนจอล็อก (การ์ด 0055) · โมดูล aipc-autounlock ของ gtklock เป็นคนเปิด
+exec /opt/aipc-v2/.venv/bin/python -I -m aipc.vision.face_watch'
 PAM_TEXT='# จอล็อก gtklock ของ AI PC (การ์ด 0055 · install-lockscreen.sh)
 # ช่องรหัสว่าง → ลองปลดด้วยใบหน้า (visiond · เจ้าของบัญชีเท่านั้น · มีตรวจรูปปลอม)
 # พิมพ์รหัสมา หรือใบหน้าไม่ผ่าน → ตรวจรหัสผ่านตามเดิม
@@ -46,7 +55,7 @@ if [ "$MODE" = "rollback" ]; then
   else
     printf '%s\n' "auth include login" > "$PAMFILE" && say "+ ไม่มีไฟล์สำรอง · เขียน $PAMFILE ค่าเดิมของแพ็กเกจ (auth include login)"
   fi
-  rm -f "$WRAPPER" && say "+ ลบ $WRAPPER"
+  rm -f "$WRAPPER" "$WATCHER" "$MODULE" && say "+ ลบ $WRAPPER $WATCHER $MODULE"
   say "เสร็จ · จอล็อกปลดได้ด้วยรหัสผ่านอย่างเดียว"
   exit 0
 fi
@@ -78,6 +87,23 @@ if [ "$MODE" = "apply" ] && [ ! -f "$BACKUP" ] && [ -f "$PAMFILE" ]; then
   cp -p "$PAMFILE" "$BACKUP" && say "+ สำรอง $PAMFILE → $BACKUP"
 fi
 install_text "$PAMFILE" 0644 "$PAM_TEXT"
+
+say ""; say "3) ปลดเองเมื่อเห็นหน้า: $WATCHER + $MODULE"
+install_text "$WATCHER" 0755 "$WATCHER_TEXT"
+if command -v gcc >/dev/null; then
+  if [ "$MODE" = "apply" ]; then
+    install -d -o root -g root -m 0755 "$(dirname "$MODULE")"
+    TMP="$(mktemp --suffix=.so)"
+    gcc -shared -fPIC -O2 -Wall -o "$TMP" "$SOURCE" \
+        -l:libgtk-3.so.0 -l:libgobject-2.0.so.0 -l:libglib-2.0.so.0 \
+      && install -o root -g root -m 0644 "$TMP" "$MODULE" && say "+ คอมไพล์ $MODULE"
+    rm -f "$TMP"
+  else
+    say "[จะคอมไพล์] $SOURCE → $MODULE"
+  fi
+else
+  say "   ข้าม: ไม่มี gcc · ปลดด้วยใบหน้าแบบกด Enter ยังใช้ได้"
+fi
 
 say ""
 if [ "$MODE" = "apply" ]; then

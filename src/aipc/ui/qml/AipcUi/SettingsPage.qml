@@ -547,6 +547,17 @@ ColumnLayout {
                     }
                 }
             }
+            // การ์ด 0055: ปลดจอล็อกเองเมื่อเห็นหน้า · ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร · กล้องเปิดตลอดตอนล็อก → เปิดเอง (ค่าเริ่มต้นปิด)
+            AppCheck {
+                objectName: "faceAutoUnlockCheck"
+                enabled: loginFace.state === "enabled" || uiSettings.faceAutoUnlock
+                text: Tr.t("ปลดจอล็อกเองเมื่อเห็นหน้าฉัน")
+                detail: loginFace.state !== "enabled" && !uiSettings.faceAutoUnlock
+                        ? Tr.t("ต้องเปิด \"เข้าเครื่องด้วยใบหน้า\" ด้านบนก่อน")
+                        : Tr.t("ตอนจอล็อก กล้องเปิดตลอด (ไฟกล้องติด) · มานั่งหน้าเครื่องแล้วเข้าได้เลย · ตรวจรูปปลอม · ผิด 5 ครั้งต้องใช้รหัสผ่าน · ไม่บันทึกภาพ")
+                checked: uiSettings.faceAutoUnlock
+                onClicked: uiSettings.setFaceAutoUnlock(checked)
+            }
             AppText {
                 objectName: "presenceStatusText"
                 visible: uiSettings.presence && presenceStatus.text !== ""

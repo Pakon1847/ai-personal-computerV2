@@ -130,6 +130,18 @@ class UiSettings(QObject):
     def useClaude(self) -> bool:  # noqa: N802
         return self._prefs.use_claude
 
+    # ปลดจอล็อกเองเมื่อเห็นหน้า (การ์ด 0055) · ค่าเริ่มต้นปิด
+    @Property(bool, notify=changed)
+    def faceAutoUnlock(self) -> bool:  # noqa: N802
+        return self._prefs.face_auto_unlock
+
+    @Slot(bool)
+    def setFaceAutoUnlock(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.face_auto_unlock:
+            self._prefs.face_auto_unlock = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     # โมเดลของแชทงาน (การ์ด 0053)
     @Property(str, notify=changed)
     def cloudModel(self) -> str:  # noqa: N802

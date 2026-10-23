@@ -68,6 +68,24 @@ class AssetsTest(unittest.TestCase):
         self.assertTrue((self.dir / "gtklock.ui").exists())
         self.assertIn(str(lockscreen.FONTS), (self.dir / "fonts.conf").read_text(encoding="utf-8"))
 
+    def test_clock_only_until_a_key_and_module_only_when_installed(self):
+        # Pakon: "ไม่ต้องมีกรอบอะไรเลย" → เริ่มแบบซ่อนกล่องรหัส · กดปุ่ม = กล่องขึ้น · ไม่แตะ 20 วิ = ซ่อน
+        def fails(args, **kw):
+            raise OSError
+
+        mod = self.dir / "aipc-autounlock.so"
+        cmd = lockscreen.prepare(self.dir, "x", False, "a", run=fails, auto=True, module=mod)
+        self.assertIn("-S", cmd)
+        self.assertIn("-H", cmd)
+        self.assertNotIn(str(mod), cmd)  # ยังไม่ได้ติดตั้งโมดูล = ไม่ปลดเอง
+        self.assertIn(lockscreen.HINT_KEY, (self.dir / "gtklock.ui").read_text(encoding="utf-8"))
+        mod.write_bytes(b"so")
+        cmd = lockscreen.prepare(self.dir, "x", False, "a", run=fails, auto=True, module=mod)
+        self.assertEqual(cmd[cmd.index(str(mod)) - 1], "-m")
+        self.assertIn(lockscreen.HINT_AUTO, (self.dir / "gtklock.ui").read_text(encoding="utf-8"))
+        cmd = lockscreen.prepare(self.dir, "x", False, "a", run=fails, auto=False, module=mod)
+        self.assertNotIn(str(mod), cmd)  # ปิดในตั้งค่า = กล้องไม่เปิดตอนล็อก
+
     def test_no_locale_means_numeric_date_not_a_guess(self):
         def fails(args, **kw):
             raise OSError("no localedef")
@@ -152,3 +170,40 @@ class UnlockOpTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FaceWatchTest(unittest.TestCase):
+    def fake_watch(self, rounds):
+        it = iter(rounds)
+
+        def watch(user, on_seen, stop, seconds=60.0):
+            msgs, final = next(it)
+            for m in msgs:
+                on_seen(m)
+                if stop.is_set():
+                    break
+            return final
+
+        return watch
+
+    def test_prints_owner_and_stops_at_first_sight(self):
+        import io
+
+        from aipc.vision import face_watch
+
+        out = io.StringIO()
+        nobody = [{"faces": 0, "owner": False}]  # รอบแรกไม่มีใคร (หมด 60 วิ)
+        arrives = [{"faces": 1, "owner": False}, {"faces": 1, "owner": True}]
+        rounds = [(nobody, {"ok": True}), (arrives, {"ok": True})]
+        self.assertEqual(face_watch.run("namfon", self.fake_watch(rounds), out), 0)
+        self.assertEqual(out.getvalue(), "OWNER\n")
+
+    def test_unusable_exits_so_module_backs_off(self):
+        import io
+
+        from aipc.vision import face_watch
+
+        out = io.StringIO()
+        rounds = [([], {"ok": False, "state": "no-templates"})]
+        self.assertEqual(face_watch.run("namfon", self.fake_watch(rounds), out), 2)
+        self.assertEqual(out.getvalue(), "")

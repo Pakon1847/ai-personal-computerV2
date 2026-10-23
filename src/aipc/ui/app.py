@@ -207,7 +207,8 @@ def _start_idle_lock(ui_settings, app):
             if ui_settings.presence
             else None
         )
-        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size, presence=presence)
+        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size, presence=presence,
+                   auto_unlock=ui_settings.faceAutoUnlock)  # การ์ด 0055
 
     apply()
     ui_settings.changed.connect(apply)  # ค่าเดิม = IdleLock ไม่ทำอะไร (ธีม/ตัวอักษรเปลี่ยนไม่กระทบ)

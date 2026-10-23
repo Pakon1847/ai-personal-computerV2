@@ -346,7 +346,12 @@ def run(flag: Path, lock_after: float, logout_after: float, image: str | None) -
         idle = flag.exists()
         locked = any_lock()
         busy = busy_flag().exists()
-        want_camera = idle and not busy and d.state in ("active", "watching", "locked")
+        # ล็อกแล้วและไม่ออกจากระบบเอง (การ์ด 0051 ค่าเริ่มต้น) = ไม่ต้องดูต่อ · ปล่อยกล้องให้จอล็อกใช้ปลดด้วยใบหน้า
+        # (การ์ด 0055 · visiond ใช้กล้องทีละงาน)
+        watching = ("active", "watching")
+        if d.logout_after > 0:
+            watching += ("locked",)
+        want_camera = idle and not busy and d.state in watching
         seen = None
         try:
             if want_camera and eyes.on():
