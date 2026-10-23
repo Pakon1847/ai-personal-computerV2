@@ -216,7 +216,9 @@ class SessionConfigTest(unittest.TestCase):
 
     def test_session_does_not_start_pi_desktop(self):
         text = self.code_only(LOOP.parent / "aipc-session")
-        self.assertIn('labwc -C "$HERE/labwc" -S', text)
+        # การ์ด 0060: สำเนาค่าตั้งในโฟลเดอร์ของผู้ใช้ · คัดไม่ได้ = $HERE/labwc ตรง ๆ
+        self.assertIn('CFG="$HERE/labwc"', text)
+        self.assertIn('labwc -C "$CFG" -S', text)
         for bad in ("labwc-pi", "wf-panel", "pcmanfm", " -m"):
             self.assertNotIn(bad, text)
 

@@ -6,6 +6,12 @@
 # ออกจากระบบ: หน้าจอ V2 เรียก `labwc --exit`
 HERE="$(dirname "$(readlink -f "$0")")"
 
+# ข้อความของเซสชัน (สคริปต์ · labwc · แอป) ไปที่ journal แทนจอข้อความ (tty7) ·
+# เดิมโผล่บนจอแบบเทอร์มินัลช่วงก่อนแอปขึ้น/ตอนออกจากระบบ (Pakon 2026-10-23) · ดูด้วย journalctl -t aipc-session
+if [ -z "${AIPC_JOURNALED:-}" ] && command -v systemd-cat >/dev/null 2>&1; then
+  AIPC_JOURNALED=1 exec systemd-cat -t aipc-session "$0" "$@"
+fi
+
 # ค่าเดียวกับ /usr/bin/labwc-pi ของ Raspberry Pi OS (trixie) เพื่อให้วาดจอได้แบบเดียวกัน
 if command -v raspi-config >/dev/null 2>&1 && raspi-config nonint is_pi; then
   export WLR_DRM_FORCE_LIBLIFTOFF=1
@@ -23,7 +29,15 @@ if [ -f /etc/aipc/llm.conf ]; then
 fi
 
 # ไม่ใช้ exec: ต้องได้ทำงานต่อหลัง labwc จบ (การ์ด 0031 รอบ 3) · ทุกทางของการออกจากระบบจบที่ labwc
-labwc -C "$HERE/labwc" -S "$HERE/aipc-shell-loop"
+# ความเร็วเมาส์ของผู้ใช้ (การ์ด 0060): ใช้สำเนาค่าตั้ง labwc ใน runtime dir ของผู้ใช้ (แอปเขียนค่าแล้วสั่งโหลดใหม่) ·
+# คัดไม่ได้ = ใช้ค่าตั้งเดิมของรุ่นนี้
+CFG="$HERE/labwc"
+if [ -n "${XDG_RUNTIME_DIR:-}" ] && mkdir -p "$XDG_RUNTIME_DIR/aipc-labwc" \
+   && cp -f "$HERE"/labwc/* "$XDG_RUNTIME_DIR/aipc-labwc/" 2>/dev/null; then
+  CFG="$XDG_RUNTIME_DIR/aipc-labwc"
+  export AIPC_LABWC_DIR="$CFG"
+fi
+labwc -C "$CFG" -S "$HERE/aipc-shell-loop"
 code=$?
 # ออกจากบัญชีเว็บถ้าผู้ใช้เปิดสวิตช์ · ยังอยู่ในเซสชัน (greetd รอสคริปต์นี้จบ) · จำกัด 20 วินาที ไม่ขวางการออก
 "$HERE/aipc-logout-clear"

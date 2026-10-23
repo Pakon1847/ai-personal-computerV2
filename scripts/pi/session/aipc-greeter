@@ -6,6 +6,10 @@
 # พบ 2026-09-29: เดิม greetd เรียก cage ตรง ๆ ไม่มีผังแป้นไทย → ช่อง "ชื่อที่แสดง" ตอนสมัครพิมพ์ไทยไม่ได้
 # ไฟล์นี้อยู่ในโฟลเดอร์ของรุ่นแอป · update-app.sh ตรวจว่ามีและรันได้ก่อนสลับรุ่น (หน้า Login ต้องไม่หาย)
 HERE="$(dirname "$(readlink -f "$0")")"
+# ข้อความของหน้า Login (cage · แอป) ไปที่ journal แทนจอข้อความ (เดิมโผล่บนจอแบบเทอร์มินัล · Pakon 2026-10-23)
+if [ -z "${AIPC_JOURNALED:-}" ] && command -v systemd-cat >/dev/null 2>&1; then
+  AIPC_JOURNALED=1 exec systemd-cat -t aipc-greeter "$0" "$@"
+fi
 APP="$(dirname "$(dirname "$(dirname "$HERE")")")"
 for v in XKB_DEFAULT_MODEL XKB_DEFAULT_LAYOUT XKB_DEFAULT_OPTIONS; do
   line="$(grep "^$v=" "$HERE/labwc/environment")" && export "$line"

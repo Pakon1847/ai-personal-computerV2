@@ -473,6 +473,8 @@ def build(opts: Options, argv: list[str] | None = None):
         from aipc.ui import splash
 
         QTimer.singleShot(8000, lambda: splash.refresh(ui_settings.theme))
+        # ความเร็วเมาส์ที่ผู้ใช้ตั้งไว้ (การ์ด 0060) · ตั้งให้ labwc ของเซสชันนี้ทันทีที่แอปขึ้น
+        QTimer.singleShot(0, lambda: ui_settings.setMouseSpeed(ui_settings.mouseSpeed))
     return app, engine, warnings
 
 

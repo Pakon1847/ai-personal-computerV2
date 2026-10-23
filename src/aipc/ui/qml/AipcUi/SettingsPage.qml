@@ -62,6 +62,40 @@ ColumnLayout {
         }
     }
 
+    // ความเร็วเมาส์ (การ์ด 0060) · จำค่าไว้ใน ui.json · เข้าระบบครั้งหน้าก็ยังเป็นค่าเดิม
+    Card {
+        Layout.fillWidth: true
+        implicitHeight: mouseRow.implicitHeight + 40
+        RowLayout {
+            id: mouseRow
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 8
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                AppText { text: Tr.t("ความเร็วเมาส์"); strong: true }
+                AppText {
+                    objectName: "mouseSpeedNote"
+                    Layout.fillWidth: true
+                    text: uiSettings.mouseLive ? Tr.t("เปลี่ยนแล้วมีผลทันที · ปิดเครื่องแล้วยังจำค่าไว้")
+                                               : Tr.t("จำค่าไว้แล้ว · มีผลเมื่อเข้าระบบครั้งหน้า")
+                    size: Theme.fontSmall; color: Theme.inkMuted
+                }
+            }
+            Repeater {
+                model: [{ v: 0.3, t: "ช้า" }, { v: 0.6, t: "ปกติ" }, { v: 0.9, t: "เร็ว" }, { v: 1.0, t: "เร็วสุด" }]
+                AppButton {
+                    required property var modelData
+                    objectName: "mouseSpeed" + Math.round(modelData.v * 10)
+                    text: Tr.t(modelData.t)
+                    kind: Math.abs(uiSettings.mouseSpeed - modelData.v) < 0.01 ? "primary" : "secondary"
+                    onClicked: uiSettings.setMouseSpeed(modelData.v)
+                }
+            }
+        }
+    }
+
     FacePanel { Layout.fillWidth: true }
     LoginFacePanel { Layout.fillWidth: true }
 

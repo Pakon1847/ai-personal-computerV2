@@ -79,7 +79,7 @@ class SessionScriptTest(unittest.TestCase):
     def test_session_clears_after_labwc_on_every_logout_path(self):
         text = (SESSION / "aipc-session").read_text(encoding="utf-8")
         self.assertNotIn("exec labwc", text)  # ต้องได้ทำงานต่อหลัง labwc จบ
-        run_labwc = text.index('labwc -C "$HERE/labwc"')
+        run_labwc = text.index('labwc -C "$CFG"')  # การ์ด 0060: สำเนาค่าตั้งของผู้ใช้
         self.assertLess(run_labwc, text.index('"$HERE/aipc-logout-clear"'))
         helper = (SESSION / "aipc-logout-clear").read_text(encoding="utf-8")
         self.assertIn("timeout 20", helper)

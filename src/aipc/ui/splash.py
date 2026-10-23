@@ -11,8 +11,9 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# สีเดียวกับ Theme.qml (bg · ink · inkMuted) · ธีมมืดเป็นค่าเริ่มต้นของแอป
-COLORS = {"dark": ("#050506", "#F2F2F4", "#A1A1AA"), "light": ("#F6F7F9", "#15171C", "#4B5160")}
+# สีเดียวกับ Theme.qml (bg · ink · inkMuted · accent) · ธีมมืดเป็นค่าเริ่มต้นของแอป
+COLORS = {"dark": ("#050506", "#F2F2F4", "#A1A1AA", "#A5B4FC"),
+          "light": ("#F6F7F9", "#15171C", "#4B5160", "#4338CA")}  # fmt: skip
 TITLE = "กำลังเปิด…"
 SUBTITLE = "AI Personal Computer"
 
@@ -25,9 +26,9 @@ def path() -> Path:
 def write(dest: Path, width: int, height: int, theme: str = "dark") -> Path:
     """วาดแล้วบันทึกแบบเขียนไฟล์ใหม่ก่อนค่อยแทนที่ (ไฟดับกลางคัน = ภาพเดิมยังใช้ได้)."""
     from PySide6.QtCore import QRect, Qt
-    from PySide6.QtGui import QColor, QFont, QImage, QPainter
+    from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen
 
-    bg, ink, muted = COLORS.get(theme, COLORS["dark"])
+    bg, ink, muted, accent = COLORS.get(theme, COLORS["dark"])
     img = QImage(max(1, width), max(1, height), QImage.Format.Format_RGB32)
     img.fill(QColor(bg))
     p = QPainter(img)
@@ -35,12 +36,19 @@ def write(dest: Path, width: int, height: int, theme: str = "dark") -> Path:
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setRenderHint(QPainter.RenderHint.TextAntialiasing)
         unit = max(12, height // 36)
+        # โลโก้: วงแหวนสีเน้นของระบบ + "AI" กลางวง (Pakon: "เพิ่มโลโก้ · ให้เข้ากับระบบของเรา")
+        r = unit * 3
+        cx, cy = width // 2, height // 2 - unit * 4
+        p.setPen(QPen(QColor(accent), max(3, unit // 4)))
+        p.drawEllipse(cx - r, cy - r, 2 * r, 2 * r)
+        p.setFont(QFont("IBM Plex Sans Thai", int(unit * 1.6), QFont.Weight.Bold))
+        p.drawText(QRect(cx - r, cy - r, 2 * r, 2 * r), Qt.AlignmentFlag.AlignCenter, "AI")
         p.setPen(QColor(ink))
         p.setFont(QFont("IBM Plex Sans Thai", unit * 2, QFont.Weight.Medium))
-        p.drawText(QRect(0, 0, width, height), Qt.AlignmentFlag.AlignCenter, TITLE)
+        p.drawText(QRect(0, unit * 2, width, height), Qt.AlignmentFlag.AlignCenter, TITLE)
         p.setPen(QColor(muted))
         p.setFont(QFont("IBM Plex Sans Thai", unit))
-        below = QRect(0, height // 2 + unit * 2, width, unit * 3)
+        below = QRect(0, height // 2 + unit * 4, width, unit * 3)
         p.drawText(below, Qt.AlignmentFlag.AlignHCenter, SUBTITLE)
     finally:
         p.end()

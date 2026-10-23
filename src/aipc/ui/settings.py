@@ -20,6 +20,8 @@ CLOUD_MODELS = ("haiku", "sonnet", "opus")  # โมเดลของแชท�
 # ระดับความคิดของแชทงาน · ชุดเดียวกับ ask.EFFORTS
 CLOUD_EFFORTS = ("low", "medium", "high", "xhigh", "max")
 FONT_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0)  # BRIEF 5.7: 100–200%
+# ความเร็วเมาส์ (การ์ด 0060) · ค่า pointerSpeed ของ libinput: ช้า · ปกติ · เร็ว (ค่าเริ่มต้น) · เร็วสุด
+MOUSE_SPEEDS = (0.3, 0.6, 0.9, 1.0)
 # ล็อกเมื่อไม่ได้ใช้เครื่อง (ขั้น A · 2026-10-06): นาทีที่ไม่มีคีย์บอร์ด/เมาส์ก่อนล็อก (0 = ปิด)
 # และนาทีหลังล็อกก่อนออกจากระบบเอง (0 = ไม่ออกเอง · ค่าเริ่มต้นตั้งแต่การ์ด 0051)
 LOCK_CHOICES = (0, 1, 5, 10, 15)
@@ -43,6 +45,7 @@ class UiPrefs:
     # การ์ด 0041: ผู้ใช้ใหม่ได้ธีมดำ · ผู้ใช้เดิมที่มีไฟล์ค่าตั้งแล้วคงค่าเดิม (ทาง ก · ไม่ทับสิ่งที่อาจเลือกเอง)
     theme: str = "dark"
     font_scale: float = 1.0
+    mouse_speed: float = 0.9  # การ์ด 0060
     onboarded: bool = False  # เห็นหน้าแนะนำการใช้งานครั้งแรกแล้ว (ฟีเจอร์ข้อ 8)
     # อ่านคำตอบ AI ออกเสียงเองเมื่อตอบจบ (การ์ด 0019) · Pakon: ค่าเริ่มต้นเปิด ปิดได้จากปุ่มในหน้าแชท
     # (ชื่อใหม่แทน auto_speak ที่ค่าเริ่มต้นปิด · ไฟล์เก่าที่มี auto_speak: false จึงไม่ทำให้เสียงปิด)
@@ -79,9 +82,11 @@ class UiPrefs:
         """ค่าที่อ่านจากไฟล์อาจถูกแก้มือหรือเสีย → ถอยไปค่าเริ่มต้นแทนการ crash."""
         theme = self.theme if self.theme in THEMES else "dark"
         scale = self.font_scale if self.font_scale in FONT_SCALES else 1.0
+        mouse = self.mouse_speed if self.mouse_speed in MOUSE_SPEEDS else 0.9
         return UiPrefs(
             theme=theme,
             font_scale=scale,
+            mouse_speed=mouse,
             onboarded=self.onboarded is True,
             speak_answers=self.speak_answers is not False,
             speak_reminders=self.speak_reminders is True,
@@ -124,6 +129,7 @@ def load(path: Path | None = None) -> UiPrefs:
         return UiPrefs(
             theme=str(data.get("theme", "dark")),
             font_scale=float(data.get("font_scale", 1.0)),
+            mouse_speed=float(data.get("mouse_speed", 0.9)),
             onboarded=data.get("onboarded") is True,
             speak_answers=data.get("speak_answers", True) is not False,
             speak_reminders=data.get("speak_reminders") is True,

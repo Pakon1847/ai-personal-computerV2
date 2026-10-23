@@ -46,6 +46,7 @@ class UiSettings(QObject):
 
     def __init__(self, path: Path | None = None, override_theme: str | None = None):
         super().__init__()
+        self._mouse_live = False  # การ์ด 0060: ตั้งให้ labwc ได้จริงไหม (หน้าจอบอกผู้ใช้)
         self._path = path
         self._prefs = settings.load(path)
         if override_theme in settings.THEMES:
@@ -311,6 +312,27 @@ class UiSettings(QObject):
             self._prefs.onboarded = True
             settings.save(self._prefs, self._path)
             self.changed.emit()
+
+    # ความเร็วเมาส์ (การ์ด 0060) · บันทึก + ตั้งให้ labwc ทันที · ไม่ได้อยู่ในเซสชันของเรา = มีผลเข้าระบบครั้งหน้า
+    @Property(float, notify=changed)
+    def mouseSpeed(self) -> float:  # noqa: N802
+        return self._prefs.mouse_speed
+
+    @Property(bool, notify=changed)
+    def mouseLive(self) -> bool:  # noqa: N802
+        return self._mouse_live
+
+    @Slot(float)
+    def setMouseSpeed(self, speed: float) -> None:  # noqa: N802
+        from aipc.ui import mouse
+
+        if speed not in settings.MOUSE_SPEEDS:
+            return
+        if speed != self._prefs.mouse_speed:
+            self._prefs.mouse_speed = speed
+            settings.save(self._prefs, self._path)
+        self._mouse_live = mouse.apply(speed)
+        self.changed.emit()
 
     @Slot(float)
     def setFontScale(self, scale: float) -> None:  # noqa: N802
