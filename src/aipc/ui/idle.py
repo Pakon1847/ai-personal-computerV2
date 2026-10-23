@@ -108,6 +108,9 @@ def lock_lines(
             if presence_logout_s > 0
             else keep
         )
+    elif lock_min <= 0:  # ปิดล็อกตามเวลา · ล็อกเพราะสั่งเอง (ปุ่ม/เสียง)
+        why = f"{who}ล็อกหน้าจอแล้ว"
+        out = keep
     else:
         why = f"{who}ไม่ได้ใช้เครื่องเกิน {lock_min} นาที"
         out = (
@@ -277,15 +280,8 @@ class IdleLock:
             return None
         self.stop()
         self._applied = key
-        if lock_min <= 0 and presence is None:
-            self.status = "ปิดอยู่"
-            return None
-        missing = [t for t in ("swayidle",) if self._which(t) is None]
-        if self._which("swaylock") is None and not self._gtklock():
-            missing.append("swaylock")
-        if missing:
-            self.status = "เครื่องนี้ไม่มี " + " ".join(missing)
-            return None
+        # เตรียมคำสั่งล็อกก่อนเสมอ แม้ปิดล็อกตามเวลา: สั่งเสียง "ล็อกหน้าจอ" ใช้ตัวเดียวกัน
+        # (พบบน Pi 5 2026-10-23: Pakon ปิดล็อกตามเวลา → คำสั่งเสียงได้ swaylock รุ่น 1 แทน gtklock รุ่น 2)
         rdir = self._dir or runtime_dir()
         lines = lock_lines(name, lock_min, logout_min, presence[1] if presence else None)
         cmd = None
@@ -304,6 +300,15 @@ class IdleLock:
                 image = None
             cmd = lock_command(image)
         _remember_command(rdir / "lock-command.json", cmd)
+        if lock_min <= 0 and presence is None:
+            self.status = "ปิดอยู่"
+            return None
+        missing = [t for t in ("swayidle",) if self._which(t) is None]
+        if self._which("swaylock") is None and not self._gtklock():
+            missing.append("swaylock")
+        if missing:
+            self.status = "เครื่องนี้ไม่มี " + " ".join(missing)
+            return None
         flag = rdir / "input-idle" if presence else None
         args = swayidle_args(lock_min * 60, logout_min * 60, cmd, idle_flag=flag)
         self._proc = self._spawn(args)
