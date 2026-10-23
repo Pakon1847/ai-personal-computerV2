@@ -443,40 +443,45 @@ ColumnLayout {
                 visible: page.section === "ai"
                 Layout.fillWidth: true
                 spacing: 16
-                // Claude (ไฮบริด + สกิลอัตโนมัติ): ใช้ไปเท่าไรวันนี้ + เพดานต่อวัน · ครบแล้วไม่เรียก Claude จนวันใหม่
+                // Claude (การ์ด 0061 รอบ 2 · Pakon 2026-10-24: "ผู้ใช้จะงงตรงที่บอกราคา · ทำให้เข้าใจง่าย"):
+                // บอกก่อนว่า Claude คืออะไร ใช้เมื่อไหร่ · ค่าใช้วันนี้เป็นแถบ + ประโยคธรรมดา · จำกัดต่อวันบอกว่าถึงแล้วเกิดอะไร
                 Card {
+                    id: claudeCard
                     objectName: "cloudUsageCard"
                     Layout.fillWidth: true
                     implicitHeight: cloudCol.implicitHeight + 40
+                    readonly property bool full: cloudUsage.available && cloudUsage.spentToday >= cloudUsage.limit
                     ColumnLayout {
                         id: cloudCol
                         anchors.fill: parent
                         anchors.margins: 20
-                        spacing: 10
+                        spacing: 12
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 16
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: 2
-                                AppText { text: Tr.t("ส่งข้อมูลออกนอกเครื่อง: Claude (ถามข้อมูลสด · สร้างสกิล) และอากาศ"); strong: true }
+                                AppText { text: Tr.t("Claude · AI ออนไลน์ที่เก่งกว่า"); strong: true }
                                 AppText {
-                                    objectName: "cloudUsageText"
                                     Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                                    text: !cloudUsage.available
-                                          ? Tr.t("บัญชีนี้ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude Code · ใช้ได้แค่ AI ในเครื่อง · กดดูวิธีเชื่อมต่อข้างล่าง")
-                                          : Tr.t("วันนี้ใช้ไป $") + cloudUsage.spentToday.toFixed(2) + Tr.t(" จากเพดาน $") + cloudUsage.limit.toFixed(2)
-                                            + " · " + cloudUsage.callsToday + Tr.t(" ครั้ง · ราคาอ้างอิงที่ Claude รายงาน")
+                                    text: Tr.t("ปกติเครื่องตอบเองด้วย AI ในเครื่อง (ฟรี · ไม่ต้องใช้เน็ต) · เรื่องที่ตอบเองไม่ได้ เช่น ข่าววันนี้ ราคาทอง หรือให้สร้างสกิลใหม่ จะถาม Claude ทางอินเทอร์เน็ตแทน")
                                 }
                             }
                             Chip {
                                 visible: cloudUsage.available
-                                text: cloudUsage.spentToday >= cloudUsage.limit ? Tr.t("ครบเพดานวันนี้") : Tr.t("ใช้ได้")
-                                kind: cloudUsage.spentToday >= cloudUsage.limit ? "warn" : "ok"
+                                text: !uiSettings.useClaude ? Tr.t("ปิดอยู่") : claudeCard.full ? Tr.t("ครบวันนี้แล้ว") : Tr.t("พร้อมใช้")
+                                kind: !uiSettings.useClaude ? "neutral" : claudeCard.full ? "warn" : "ok"
                                 dot: true
                             }
                         }
-                        // คู่มือเชื่อมต่อ Claude (การ์ด 0021): ติดตั้งและเข้าสู่ระบบแยกต่อบัญชีผ่าน SSH · มี claude แล้ว = ไม่แสดง (H5)
+                        // ยังไม่ได้เชื่อมต่อ (การ์ด 0021): บอกตรง ๆ + วิธีเชื่อมต่อ · มี claude แล้ว = ไม่แสดง (H5)
+                        AppText {
+                            objectName: "cloudUsageText"
+                            visible: !cloudUsage.available
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.warnInk
+                            text: Tr.t("บัญชีนี้ยังไม่ได้เชื่อมต่อ Claude · ตอนนี้ใช้ได้แค่ AI ในเครื่อง")
+                        }
                         AppButton {
                             id: guideButton
                             objectName: "claudeGuideButton"
@@ -498,14 +503,68 @@ ColumnLayout {
                         AppCheck {
                             objectName: "useClaudeCheck"
                             visible: cloudUsage.available
-                            text: Tr.t("ส่งคำถามที่ยากหรือต้องใช้ข้อมูลสดให้ Claude และให้ Claude สร้างสกิลใหม่")
+                            text: Tr.t("ให้ถาม Claude เมื่อ AI ในเครื่องตอบไม่ได้")
                             detail: uiSettings.useClaude
-                                    ? Tr.t("ส่งเฉพาะคำถามและข้อความล่าสุดไม่เกิน 4 ข้อความ · ไม่ส่งไฟล์ นัด ใบหน้า · ดูสิ่งที่ส่งจริงได้ข้างล่าง")
-                                    : Tr.t("ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีข้อมูลออกไป Anthropic")
+                                    ? Tr.t("ส่งไปแค่คำถามกับข้อความล่าสุด (ไม่เกิน 4 ข้อความ) · ไม่ส่งไฟล์ นัด หรือใบหน้า · ดูทุกอย่างที่ส่งไปได้ที่หมวด \"ความเป็นส่วนตัว\"")
+                                    : Tr.t("ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีอะไรส่งออกไป")
                             checked: uiSettings.useClaude
                             onClicked: uiSettings.setUseClaude(checked)
                         }
-                        // สวิตช์อากาศ (แผงความเป็นส่วนตัว 2026-10-07): ทุกทางที่ข้อมูลออกนอกเครื่อง ผู้ใช้ปิดได้เอง
+                        // ค่าใช้วันนี้: แถบเทียบกับที่จำกัดไว้ + ประโยคธรรมดา (เดิม "$0.12 จากเพดาน $1.00 · ราคาอ้างอิง…" แล้วงง)
+                        ColumnLayout {
+                            objectName: "cloudSpend"
+                            visible: cloudUsage.available && uiSettings.useClaude
+                            Layout.fillWidth: true
+                            spacing: 6
+                            AppText {
+                                objectName: "cloudSpendText"
+                                Layout.fillWidth: true
+                                text: Tr.t("วันนี้ถาม Claude ไป ") + cloudUsage.callsToday + Tr.t(" ครั้ง · คิดเป็นเงินประมาณ $") + cloudUsage.spentToday.toFixed(2)
+                                      + Tr.t(" จาก $") + cloudUsage.limit.toFixed(2) + Tr.t(" ที่ตั้งไว้")
+                            }
+                            Rectangle {   // แถบค่าใช้วันนี้ (สีเตือนเมื่อครบ · มีข้อความกำกับ ไม่ใช้สีอย่างเดียว)
+                                Layout.fillWidth: true
+                                implicitHeight: 8
+                                radius: 4
+                                color: Theme.surface2
+                                Rectangle {
+                                    height: parent.height
+                                    radius: 4
+                                    width: parent.width * Math.min(1, cloudUsage.limit > 0 ? cloudUsage.spentToday / cloudUsage.limit : 0)
+                                    color: cloudUsage.spentToday >= cloudUsage.limit ? Theme.warn : Theme.accent
+                                }
+                            }
+                            AppText {
+                                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                                text: Tr.t("ตัวเงินเป็นดอลลาร์สหรัฐ ตามที่ Claude แจ้งกลับมาทุกครั้งที่ใช้ · ใช้ครบที่ตั้งไว้แล้ว เครื่องจะหยุดถาม Claude จนถึงพรุ่งนี้ และตอบด้วย AI ในเครื่องแทน")
+                            }
+                            RowLayout {
+                                spacing: 8
+                                AppText { text: Tr.t("ใช้ได้ไม่เกินวันละ"); size: Theme.fontSmall; color: Theme.inkMuted }
+                                Repeater {
+                                    model: cloudUsage.limits
+                                    AppButton {
+                                        required property real modelData
+                                        text: "$" + modelData.toFixed(2)
+                                        kind: cloudUsage.limit === modelData ? "primary" : "secondary"
+                                        onClicked: cloudUsage.setLimit(modelData)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // พยากรณ์อากาศ (แผงความเป็นส่วนตัว 2026-10-07): แยกจากการ์ด Claude ให้ไม่ปนกัน (การ์ด 0061 รอบ 2)
+                Card {
+                    Layout.fillWidth: true
+                    implicitHeight: weatherCol.implicitHeight + 40
+                    ColumnLayout {
+                        id: weatherCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 8
+                        AppText { text: Tr.t("พยากรณ์อากาศ"); strong: true }
                         AppCheck {
                             objectName: "useWeatherCheck"
                             text: Tr.t("ถามพยากรณ์อากาศ: ส่งชื่อเมืองไป Open-Meteo")
@@ -514,20 +573,6 @@ ColumnLayout {
                                     : Tr.t("ปิดอยู่: ถามอากาศแล้วไม่ส่งอะไรออกไป")
                             checked: uiSettings.useWeather
                             onClicked: uiSettings.setUseWeather(checked)
-                        }
-                        RowLayout {
-                            visible: cloudUsage.available && uiSettings.useClaude
-                            spacing: 8
-                            AppText { text: Tr.t("เพดานต่อวัน"); size: Theme.fontSmall; color: Theme.inkMuted }
-                            Repeater {
-                                model: cloudUsage.limits
-                                AppButton {
-                                    required property real modelData
-                                    text: "$" + modelData.toFixed(2)
-                                    kind: cloudUsage.limit === modelData ? "primary" : "secondary"
-                                    onClicked: cloudUsage.setLimit(modelData)
-                                }
-                            }
                         }
                     }
                 }

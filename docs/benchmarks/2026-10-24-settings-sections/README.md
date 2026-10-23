@@ -5,3 +5,4 @@
 - ก่อน: `before-dark-1280.png` (การ์ด 12 ใบเรียงยาวหน้าเดียว · เห็นแค่ส่วนบน)
 - หลัง: `settings-dark-100-<หมวด>.png` 6 หมวด · `settings-light-100-look.png` · `settings-dark-200-voice.png` (ตัวอักษร 200%)
 - ยังไม่ได้ดูบน Pi 5 ที่จอ (S5)
+- รอบ 2 (การ์ด Claude เข้าใจง่าย): `settings-dark-100-ai.png` (ยังไม่เชื่อมต่อ) · `claude-connected-dark.png` (เชื่อมต่อแล้ว · จำลองใช้ไป $0.34 ด้วย `--cloud-spent`)
