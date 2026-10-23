@@ -19,12 +19,22 @@ Rectangle {
             StatusBar { Layout.fillWidth: true }
             StackLayout {
                 id: pages
+                objectName: "shellPages"
+                function goTo(name) { AppState.page = name }   // เทสต์/คำสั่งเสียงเปลี่ยนหน้าได้ทางเดียวกัน
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 0
                 // หน้าความเป็นส่วนตัวตัดออกในขอบเขตรอบ 3 · ที่ลบข้อมูลใบหน้าอยู่ในหน้าตั้งค่า จึงพาไปหน้านั้นแทน
                 readonly property var order: ["workspace", "calendar", "files", "skills", "health", "settings"]
                 currentIndex: Math.max(0, order.indexOf(AppState.page === "privacy" ? "settings" : AppState.page))
+                // การ์ด 0062: เปลี่ยนหน้า = จางเข้า + เลื่อนขึ้น 12 px (200 ms) · ปิดภาพเคลื่อนไหว = เปลี่ยนทันที
+                transform: Translate { id: pageShift }
+                onCurrentIndexChanged: if (uiSettings.animations) pageEnter.restart()
+                ParallelAnimation {
+                    id: pageEnter
+                    NumberAnimation { target: pages; property: "opacity"; from: 0; to: 1; duration: 200; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: pageShift; property: "y"; from: 12; to: 0; duration: 200; easing.type: Easing.OutCubic }
+                }
 
                 WorkspacePage {}
                 // ปฏิทินตารางเดือน (การ์ด 0038) · อ่านอย่างเดียว · ข้อมูลชุดเดียวกับคำตอบนัด

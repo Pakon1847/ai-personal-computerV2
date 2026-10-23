@@ -998,7 +998,7 @@ class SystemStatus(QObject):
         from aipc.doctor import devices
 
         self._devices = [
-            {"label": devices.LABELS[k], "items": found.get(k) or [],
+            {"kind": k, "label": devices.LABELS[k], "items": found.get(k) or [],
              "state": "unknown" if found.get(k) is None else ("none" if not found[k] else "ok")}
             for k in devices.KINDS
         ]  # fmt: skip

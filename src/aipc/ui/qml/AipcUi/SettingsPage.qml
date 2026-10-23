@@ -28,7 +28,7 @@ ColumnLayout {
         go(sections[(i + d + sections.length) % sections.length].id)
     }
 
-    PageHeader { title: Tr.t("ตั้งค่า") }
+    PageHeader { title: Tr.t("ตั้งค่า"); subtitle: Tr.t("หน้าตา ใบหน้า เสียง และความเป็นส่วนตัว · เลือกหมวดทางซ้าย") }
 
     RowLayout {
         Layout.fillWidth: true

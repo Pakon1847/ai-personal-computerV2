@@ -8,7 +8,7 @@ ColumnLayout {
 
     PageHeader {
         title: Tr.t("สุขภาพเครื่อง")
-        subtitle: Tr.t("ตรวจจริงทุก 10 วินาที · อ่านอย่างเดียว ไม่แก้อะไรบนเครื่อง")
+        subtitle: Tr.t("เช็กให้ทุก 10 วินาที · ดูอย่างเดียว ไม่แก้อะไรในเครื่อง")
         AppButton { text: Tr.t("ตรวจตอนนี้"); kind: "secondary"; onClicked: system.refresh() }
         AppButton {
             objectName: "readyButton"
@@ -132,23 +132,61 @@ ColumnLayout {
                     onClicked: system.scanDevices()
                 }
             }
-            Repeater {
-                model: system.devices
-                delegate: RowLayout {
-                    id: dv
-                    required property var modelData
-                    Layout.fillWidth: true
-                    spacing: 8
-                    Chip {
-                        Layout.alignment: Qt.AlignTop
-                        text: ({ ok: Tr.t("เจอ"), none: Tr.t("ไม่มี"), unknown: Tr.t("ตรวจไม่ได้") })[dv.modelData.state]
-                        kind: dv.modelData.state === "ok" ? "ok" : "neutral"
-                    }
-                    AppText { text: Tr.t(dv.modelData.label); strong: true; Layout.alignment: Qt.AlignTop }
-                    AppText {
-                        // " · ใช้อยู่" มาจาก Python เป็นไทย · แปลที่นี่ให้สลับภาษาแล้วเปลี่ยนตาม (การ์ด 0039)
-                        text: dv.modelData.items.map(x => x.replace(" · ใช้อยู่", Tr.t(" · ใช้อยู่"))).join(" · ")
-                        size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true
+            // การ์ด 0062: การ์ดเล็กต่ออุปกรณ์ · ไอคอน + ชื่อ + สิ่งที่เจอ · สถานะอยู่ขวา (จุดสี + คำ · ไม่ใช้สีอย่างเดียว)
+            GridLayout {
+                Layout.fillWidth: true
+                columns: Theme.fontScale > 1.4 ? 2 : 3
+                columnSpacing: 10
+                rowSpacing: 10
+                Repeater {
+                    model: system.devices
+                    delegate: Rectangle {
+                        id: dv
+                        required property var modelData
+                        objectName: "deviceTile"
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        implicitHeight: Math.max(Theme.touch + 20, tileRow.implicitHeight + 24)
+                        radius: Theme.radiusCard
+                        color: Theme.surface2
+                        RowLayout {
+                            id: tileRow
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 12
+                            Rectangle {
+                                Layout.alignment: Qt.AlignTop
+                                implicitWidth: Math.round(36 * Theme.fontScale); implicitHeight: implicitWidth
+                                radius: Theme.radiusControl
+                                color: dv.modelData.state === "ok" ? Theme.accentSoft : Theme.surface
+                                Icon {
+                                    anchors.centerIn: parent
+                                    width: Math.round(20 * Theme.fontScale); height: width
+                                    path: ({ display: Icons.monitor, usb: Icons.hdd, camera: Icons.camera, audio_out: Icons.speaker,
+                                             audio_in: Icons.mic, bluetooth: Icons.bluetooth })[dv.modelData.kind] || Icons.activity
+                                    color: dv.modelData.state === "ok" ? Theme.accentInk : Theme.inkMuted
+                                }
+                            }
+                            ColumnLayout {
+                                id: tileCol
+                                Layout.fillWidth: true
+                                spacing: 2
+                                AppText { text: Tr.t(dv.modelData.label); strong: true; Layout.fillWidth: true }
+                                AppText {
+                                    // " · ใช้อยู่" มาจาก Python เป็นไทย · แปลที่นี่ให้สลับภาษาแล้วเปลี่ยนตาม (การ์ด 0039)
+                                    visible: text !== ""
+                                    text: dv.modelData.items.map(x => x.replace(" · ใช้อยู่", Tr.t(" · ใช้อยู่"))).join(" · ")
+                                    size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true
+                                    maximumLineCount: 2; elide: Text.ElideRight
+                                }
+                            }
+                            Chip {
+                                Layout.alignment: Qt.AlignTop
+                                text: ({ ok: Tr.t("เจอ"), none: Tr.t("ไม่มี"), unknown: Tr.t("ตรวจไม่ได้") })[dv.modelData.state]
+                                kind: dv.modelData.state === "ok" ? "ok" : "neutral"
+                                dot: true
+                            }
+                        }
                     }
                 }
             }

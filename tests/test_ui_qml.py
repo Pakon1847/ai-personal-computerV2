@@ -928,6 +928,21 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(skills.holidaysOn)
         self.assertEqual(warnings, [])
 
+    def test_page_change_fades_unless_animations_are_off(self):
+        """การ์ด 0062 P3: เปลี่ยนหน้า = จางเข้า · ปิดภาพเคลื่อนไหว (การ์ด 0061) = เปลี่ยนทันที."""
+        from PySide6.QtCore import Q_ARG, QMetaObject
+
+        engine, win, warnings = self.open_shell("workspace")
+        stack = find_items(win, "shellPages")[0]
+        QMetaObject.invokeMethod(stack, "goTo", Q_ARG("QVariant", "calendar"))
+        self.assertLess(stack.property("opacity"), 1.0)  # กำลังจางเข้า
+        settle()
+        self.assertEqual(stack.property("opacity"), 1.0)
+        engine._backends["uiSettings"].setAnimations(False)
+        QMetaObject.invokeMethod(stack, "goTo", Q_ARG("QVariant", "health"))
+        self.assertEqual(stack.property("opacity"), 1.0)  # ปิด = ทันที
+        self.assertEqual(warnings, [])
+
     def test_settings_sections_keyboard_and_motion(self):
         """การ์ด 0061 S3 S4: ลูกศรเปลี่ยนหมวด (วนรอบ) · แสดงทีละหมวด · ปิดภาพเคลื่อนไหว = ไม่จาง."""
         from PySide6.QtCore import Q_ARG, QMetaObject

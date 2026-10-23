@@ -46,7 +46,7 @@ ColumnLayout {
 
     PageHeader {
         title: Tr.t("ปฏิทิน")
-        subtitle: Tr.t("นัดในเครื่อง · ปฏิทิน Google · วันหยุดไทย · อ่านอย่างเดียว (จดนัดได้ที่หน้าผู้ช่วย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”)")
+        subtitle: Tr.t("นัดของคุณ ปฏิทิน Google และวันหยุด · จดนัดใหม่ได้ที่หน้าผู้ช่วย")
     }
 
     // เดือน + ปุ่มเปลี่ยนเดือน
@@ -194,6 +194,35 @@ ColumnLayout {
                     text: Tr.t("ไม่มีนัดในวันนี้")
                     color: Theme.inkMuted
                     Layout.fillWidth: true
+                }
+                // การ์ด 0062: วันที่เลือกว่าง = แสดงนัดถัดไป 5 รายการ (ข้อมูลเดียวกับแผง "นัดถัดไป" ของหน้าผู้ช่วย)
+                ColumnLayout {
+                    objectName: "calendarUpcoming"
+                    visible: root.picked !== null && root.picked.lines.length === 0
+                    Layout.fillWidth: true
+                    Layout.topMargin: 6
+                    spacing: 8
+                    AppText { text: Tr.t("นัดถัดไป"); strong: true; size: Theme.fontSmall; color: Theme.inkMuted }
+                    AppText {
+                        visible: skills.upcoming.length === 0
+                        text: Tr.t("ยังไม่มีนัดล่วงหน้า · จดนัดได้ที่หน้าผู้ช่วย เช่น “เตือนส่งรายงานพรุ่งนี้บ่ายสอง”")
+                        size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true
+                    }
+                    Repeater {
+                        model: skills.upcoming.slice(0, 5)
+                        delegate: RowLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: 10
+                            Rectangle { Layout.alignment: Qt.AlignTop; Layout.topMargin: 7; width: 8; height: 8; radius: 4; color: Theme.accent }
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+                                AppText { text: modelData.what; Layout.fillWidth: true }
+                                AppText { text: modelData.when; size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                            }
+                        }
+                    }
                 }
                 Repeater {
                     model: root.picked ? root.picked.lines : []

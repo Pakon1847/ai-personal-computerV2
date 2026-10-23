@@ -1236,7 +1236,7 @@ Item {
                                 border.width: ask.visualFocus ? 2 : ask.hovered ? 1 : 0
                                 border.color: Theme.accent
                             }
-                            contentItem: AppText { id: askText; text: ask.text; size: Theme.px(15); maximumLineCount: 2; elide: Text.ElideRight }
+                            contentItem: AppText { id: askText; text: ask.text; size: Theme.px(15); oneLine: true; elide: Text.ElideRight }
                         }
                     }
                 }

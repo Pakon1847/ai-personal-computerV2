@@ -24,6 +24,7 @@ AbstractButton {
     background: Rectangle {
         radius: 14
         color: item.active ? Theme.accentSoft : (item.hovered ? Theme.surface2 : "transparent")
+        Behavior on color { enabled: uiSettings.animations; ColorAnimation { duration: 150 } }
         Rectangle {
             anchors.fill: parent; anchors.margins: -2; radius: parent.radius + 2
             color: "transparent"; border.width: 2; border.color: Theme.accent; visible: item.visualFocus

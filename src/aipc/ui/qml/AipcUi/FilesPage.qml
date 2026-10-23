@@ -10,7 +10,7 @@ ColumnLayout {
 
     PageHeader {
         title: Tr.t("ไฟล์ของฉัน")
-        subtitle: Tr.t("เห็นเฉพาะบัญชีนี้ · อ่านอย่างเดียวในรอบนี้")
+        subtitle: Tr.t("ไฟล์ในโฟลเดอร์ของคุณ · ค้นจากชื่อหรือข้อความในไฟล์ได้")
         AppText { text: filesBrowser.quotaText; color: Theme.inkMuted; oneLine: true }
     }
 
