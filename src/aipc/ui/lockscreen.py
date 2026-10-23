@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -70,6 +71,23 @@ def fonts_conf(path: Path, font_dir: Path | None = None) -> Path:
     return path
 
 
+DESIGN_HEIGHT = 1080  # ขนาดใน gtklock.css ออกแบบที่จอสูง 1080 (เนื้อหาสูงราว 850 px)
+SIZE = re.compile(r"(\d+(?:\.\d+)?)(pt|px)(?![a-z])")
+
+
+def style(path: Path, screen_height: int = DESIGN_HEIGHT) -> Path:
+    """CSS ปรับขนาดตามความสูงจอ · ตัวล็อกต้องพอดีจอ: เนื้อหาสูงกว่าจอ = compositor ปฏิเสธ
+    (Wayland protocol error
+    "committed surface dimensions do not match last acked configure") แล้วจอดำ (พบบน Pi 5 จอ 720 แถว:
+    gtklock วาด 1280×846 · ตรวจด้วย WAYLAND_DEBUG=1 2026-10-23) → คูณทุก pt/px ด้วย ความสูงจอ/1080
+    (ไม่เกิน 1.5 เท่า · ไม่ต่ำกว่า 0.5 เท่า)"""
+    k = max(0.5, min(1.5, screen_height / DESIGN_HEIGHT))
+    css = (ASSETS / "gtklock.css").read_text(encoding="utf-8")
+    css = SIZE.sub(lambda m: f"{max(1, round(float(m[1]) * k))}{m[2]}", css)
+    path.write_text(css, encoding="utf-8")
+    return path
+
+
 def layout(path: Path, keep: str, warn: bool, name: str = "") -> Path:
     s = (ASSETS / "gtklock.ui.in").read_text(encoding="utf-8")
     values = {**TEXT, "keep": ("! " if warn else "✓ ") + keep,
@@ -81,17 +99,19 @@ def layout(path: Path, keep: str, warn: bool, name: str = "") -> Path:
     return path
 
 
-def prepare(folder: Path, keep: str, warn: bool, name: str = "", run=subprocess.run) -> list[str]:
+def prepare(folder: Path, keep: str, warn: bool, name: str = "", run=subprocess.run,
+            screen_height: int = DESIGN_HEIGHT) -> list[str]:  # fmt: skip
     """เขียนไฟล์ทั้งหมดใน folder แล้วคืนคำสั่ง (ยังไม่รัน) · เรียกตอนตั้งค่าล็อก ไม่ใช่ตอนล็อก (ล็อกต้องเร็ว)."""
     folder.mkdir(parents=True, exist_ok=True)
     ui = layout(folder / "gtklock.ui", keep, warn, name)
+    css = style(folder / "gtklock.css", screen_height)
     conf = fonts_conf(folder / "fonts.conf")
     loc = build_locale(folder / "locale", run)
     env = [f"FONTCONFIG_FILE={conf}"]
     if loc is not None:
         env += [f"LOCPATH={loc}", f"LC_ALL={LOCALE}"]
     cmd = ["env", *env, "gtklock", "-d",
-           "-s", str(ASSETS / "gtklock.css"), "-x", str(ui),
+           "-s", str(css), "-x", str(ui),
            "-t", TIME_FORMAT, "-D", DATE_THAI if loc is not None else DATE_PLAIN]  # fmt: skip
     for m in MODULES:
         cmd += ["-m", m]

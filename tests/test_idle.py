@@ -106,7 +106,7 @@ class IdleLockTest(unittest.TestCase):
         # การ์ด 0055: มี gtklock = จอล็อกรุ่น 2 · คำสั่งถูกจำไว้ให้สั่งเสียง/ตัวตรวจด้วยกล้องใช้ตัวเดียวกัน
         seen = []
 
-        def prepare(folder, keep, warn, name):
+        def prepare(folder, keep, warn, name, height):
             seen.append((keep, warn, name))
             return ["env", "X=1", "gtklock", "-d"]
 
@@ -120,7 +120,7 @@ class IdleLockTest(unittest.TestCase):
         self.assertTrue(seen[-1][1])  # ตั้งให้ออกเอง = บรรทัดเตือนสีส้ม
 
     def test_gtklock_failure_falls_back_to_swaylock(self):
-        def broken(folder, keep, warn, name):
+        def broken(folder, keep, warn, name, height):
             raise OSError("no gtklock assets")
 
         lock = self.make(which=lambda t: f"/usr/bin/{t}", prepare=broken)

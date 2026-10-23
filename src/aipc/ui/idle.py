@@ -258,8 +258,8 @@ class IdleLock:
         from aipc.ui import lockscreen
 
         self._gtklock = gtklock or (lambda: lockscreen.available(self._which))
-        self._prepare = prepare or (lambda folder, keep, warn, name: lockscreen.prepare(
-            folder, keep, warn, name))  # fmt: skip
+        self._prepare = prepare or (lambda folder, keep, warn, name, height: lockscreen.prepare(
+            folder, keep, warn, name, screen_height=height))  # fmt: skip
         self._proc = None
         self._monitor = None  # ตัวตรวจด้วยกล้อง (ขั้น C)
         self._applied: tuple | None = None
@@ -293,7 +293,7 @@ class IdleLock:
             try:
                 keep = lines[-1]
                 warn = "จะหาย" in keep
-                cmd = self._prepare(rdir / "gtklock", keep, warn, name)
+                cmd = self._prepare(rdir / "gtklock", keep, warn, name, size[1])
             except Exception:  # noqa: BLE001 · เตรียมรุ่น 2 ไม่ได้ = ใช้รุ่น 1 (ล็อกได้เสมอ)
                 cmd = None
         if cmd is None:

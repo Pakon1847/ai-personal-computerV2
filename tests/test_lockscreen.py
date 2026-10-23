@@ -35,6 +35,17 @@ class AssetsTest(unittest.TestCase):
         self.assertIn(">น้ำฝน<", s)
         self.assertIn(">น<", s)  # วงกลมอักษรแรก
 
+    def test_style_scales_to_screen_height(self):
+        # จอ 720 แถว: เนื้อหาสูงกว่าจอ = Wayland protocol error จอดำ (พบบน Pi 5) → ย่อทุกขนาดตามความสูงจอ
+        big = lockscreen.style(self.dir / "a.css", 1080).read_text(encoding="utf-8")
+        small = lockscreen.style(self.dir / "b.css", 720).read_text(encoding="utf-8")
+        self.assertIn("font-size: 132pt", big)
+        self.assertIn("font-size: 88pt", small)
+        self.assertIn("border-radius: 50%", small)  # % ไม่ถูกย่อ
+        self.assertIn("#16171e", small)  # สีไม่ถูกแตะ
+        tiny = lockscreen.style(self.dir / "c.css", 200).read_text(encoding="utf-8")
+        self.assertIn("font-size: 66pt", tiny)  # ไม่ต่ำกว่าครึ่ง
+
     def test_warning_class_when_logout_is_on(self):
         s = lockscreen.layout(self.dir / "l.ui", "จะหาย", True, "a").read_text(encoding="utf-8")
         self.assertIn('<class name="warn"/>', s)
