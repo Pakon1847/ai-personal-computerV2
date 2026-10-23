@@ -82,12 +82,16 @@ class Endpointer:
         self.speaking = False
         self._loud = 0
         self._quiet = 0
+        # เงียบตามเกณฑ์เดิม (ไม่นับประตูใกล้ไมค์) · ใช้กับทางลัดจบเร็ว 0.3/0.6 วิ ของการ์ด 0044 ·
+        # วัดบน Pi (การ์ด 0056): ใช้ประตูใกล้ไมค์กับทางลัดด้วย = หางเสียงท่อนแรกนับเป็นเงียบ →
+        # ประโยคที่เว้น 0.45 วิ ถูกตัด
+        self._still = 0
         self.voiced = 0  # ช่องที่มีเสียงพูดหลังเริ่มพูด · เปลี่ยน = ผู้ใช้พูดต่อ (การ์ด 0044)
 
     @property
     def quiet_s(self) -> float:
-        """เงียบต่อกันมานานเท่าไรหลังเริ่มพูด (วินาที) · ยังไม่เริ่มพูด = 0."""
-        return self._quiet * self.frame_s if self.speaking else 0.0
+        """เงียบจริง (เกณฑ์เดิม) ต่อกันมานานเท่าไรหลังเริ่มพูด (วินาที) · ยังไม่เริ่มพูด = 0."""
+        return self._still * self.frame_s if self.speaking else 0.0
 
     def feed(self, data: bytes) -> str | None:
         import array
@@ -146,6 +150,7 @@ class Endpointer:
             if not self.speaking and self.frames >= self.no_speech_frames:
                 return "no_speech"
         else:
+            self._still = self._still + 1 if level < 0.7 * threshold else 0
             if self._quiet == 0:
                 self._peak = max(self._peak, sum(self._recent) / len(self._recent))
             if level < max(0.7 * threshold, self._near * self._peak):

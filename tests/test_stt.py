@@ -134,6 +134,15 @@ class SttTest(unittest.TestCase):
         # คนข้าง ๆ ดังพอ ๆ กับเรา (เบากว่าแค่ 6 dB) = ยังนับเป็นเสียงพูด (ตัดไม่ได้ · H5)
         self.assertIsNone(Endpointer().feed(tone(0.4, 30) + tone(0.6, 8000) + tone(1.2, 4000)))
 
+    def test_soft_tail_does_not_trigger_the_early_stop(self):
+        """การ์ด 0056 (วัดบน Pi): หางเสียงเบาของท่อนแรก + เว้น 0.45 วิ · ประตูใกล้ไมค์นับเป็นเงียบ
+        แต่ทางลัดจบเร็ว (quiet_s · การ์ด 0044) ต้องนับแค่เงียบจริง ไม่งั้นท่อนที่สองหาย."""
+        ep = Endpointer()
+        first = tone(0.4, 30) + tone(0.6, 8000) + tone(0.3, 700) + tone(0.45, 30)
+        self.assertIsNone(ep.feed(first))
+        self.assertLess(ep.quiet_s, 0.5)  # เงียบจริงแค่ 0.45 วิ (ไม่ใช่ 0.75)
+        self.assertIsNone(ep.feed(tone(0.6, 8000)))  # ท่อนที่สอง = ยังฟังต่อ
+
     def test_speech_span_keeps_only_speech_plus_padding(self):
         ep = Endpointer()
         audio = tone(0.5, 30) + tone(0.6, 8000) + tone(1.2, 30)
