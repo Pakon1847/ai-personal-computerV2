@@ -257,6 +257,7 @@ class BrowserController(QObject):
         self._skill_match = skill_match  # การ์ด 0028: SkillsController.voiceSkill (app.py ต่อให้)
         self._intent = None  # การ์ด 0042: SkillsController.voiceIntent (app.py ต่อให้)
         self._busy = False
+        self._queued = None  # การ์ด 0057 รอบ 2: คำสั่งที่พูดระหว่างกำลังทำคำสั่งก่อนหน้า
         self._done.connect(self._on_done)
 
     def _ctl(self):
@@ -277,11 +278,16 @@ class BrowserController(QObject):
         from aipc.browser.control import NEEDS_PAGE
         from aipc.skills import browse
 
-        if not self._active or self._busy:
+        if not self._active:
             return False
         cmds = browse.parse(text)
         if not cmds:
             return False
+        if self._busy:
+            # การ์ด 0057 รอบ 2: พูดคำสั่งถัดไประหว่างหน้าเว็บยังโหลด ("เปิดยูทูบ" → "เปิดช่อง 8") ·
+            # เดิมคำสั่งหายเงียบ ๆ → เก็บไว้ 1 คำสั่ง (อันล่าสุด) ทำต่อทันทีที่คำสั่งก่อนหน้าเสร็จ
+            self._queued = cmds
+            return True
         ctl = self._ctl()
         if not ctl.running and all(c.kind in NEEDS_PAGE for c in cmds):
             return False  # ยังไม่เปิดเบราว์เซอร์ เช่น "กลับไปหน้าแชท" = คำสั่งเดิมของแอป
@@ -442,6 +448,9 @@ class BrowserController(QObject):
         self._busy = False
         self.busyChanged.emit()
         (self.opened if quiet else self.finished).emit(say, ok)
+        queued, self._queued = self._queued, None
+        if queued:  # การ์ด 0057 รอบ 2: คำสั่งที่พูดระหว่างรอ
+            self._start(queued)
 
     @Slot()
     def close(self) -> None:

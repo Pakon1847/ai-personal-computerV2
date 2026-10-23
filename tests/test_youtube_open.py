@@ -48,16 +48,73 @@ class RuleTest(unittest.TestCase):
             self.assertFalse(any(c["kind"] == "site_search" for c in cmds(t)), t)
 
     def test_on_youtube_open_something_searches_youtube(self):
-        c = browse.on_site_search("เปิดช่อง 8", "youtube")
-        self.assertEqual(c, BrowseCommand("site_search", query="ช่อง 8", site="youtube"))
+        c = browse.on_site_search("ดูการ์ตูนโดราเอมอน", "youtube")
+        self.assertEqual(c, BrowseCommand("site_search", query="การ์ตูนโดราเอมอน", site="youtube"))
         self.assertEqual(browse.on_site_search("เล่นเพลงลิซ่า", "youtube").query, "เพลงลิซ่า")
-        self.assertEqual(browse.on_site_search("เปิดช่อง 8", "google").kind, "search")
+        self.assertEqual(browse.on_site_search("ดูข่าวเช้า", "google").kind, "search")
+        self.assertIsNone(browse.on_site_search("เปิดช่อง 8", "youtube"))  # กฎช่องทีวีทำแล้ว (รอบ 2)
 
     def test_on_site_never_searches_commands_questions_or_nothing(self):
         for t in ("เปิดคลิปแรก", "หยุดก่อน", "ย้อนกลับ", "ดูไม่ออก", "เปิดไม่ได้ทำไม", "เปิดแล้วค้าง",
                   "เปิดหน่อย", "ดู", "เปิดยูทูบ"):  # fmt: skip
             self.assertIsNone(browse.on_site_search(t, "youtube"), t)
         self.assertIsNone(browse.on_site_search("เปิดช่อง 8", "calendar"))  # เว็บที่ค้นไม่ได้
+
+
+class TvChannelTest(unittest.TestCase):
+    """การ์ด 0057 รอบ 2 (Pakon ที่จอ): "เปิดช่อง 8" = ค้นใน YouTube ทันที ไม่ขึ้นกับหน้าที่เปิด · ไม่ถาม."""
+
+    def test_channel_number_searches_youtube_anywhere(self):
+        for t, q in (("เปิดช่อง 8", "ช่อง 8"), ("เปิดช่องแปด", "ช่องแปด"), ("ดูช่องสาม", "ช่องสาม"),
+                     ("เปิดช่อง 3 สด", "ช่อง 3 สด"), ("เปิดช่อง8หน่อย", "ช่อง8")):  # fmt: skip
+            self.assertEqual(cmds(t), [{"kind": "site_search", "query": q, "site": "youtube"}], t)
+
+    def test_other_channel_words_unchanged(self):
+        self.assertEqual(cmds("เปิดช่องค้นหา"), [{"kind": "search", "query": "เปิดช่อง"}])  # เดิม
+
+
+@unittest.skipIf(SkillsController is None, "ไม่มี PySide6")
+class QueueWhileBusyTest(unittest.TestCase):
+    """พูด "เปิดช่อง 8" ระหว่างหน้า YouTube ยังโหลด → ไม่หาย · ทำต่อเมื่อคำสั่งก่อนหน้าเสร็จ."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QGuiApplication.instance() or QGuiApplication([])
+
+    def test_command_said_while_busy_runs_next(self):
+        import threading
+
+        from PySide6.QtCore import QCoreApplication
+
+        from aipc.browser.control import Result
+        from aipc.ui.handsfree import BrowserController
+
+        gate, ran = threading.Event(), []
+
+        class Slow:
+            running = True
+
+            def run(self, cmd):
+                ran.append(cmd.as_dict())
+                if len(ran) == 1:
+                    gate.wait(5)  # หน้าแรกยังโหลด
+                return Result(True, "ok")
+
+            def close(self):
+                pass
+
+        b = BrowserController(active=True, control=Slow())
+        self.assertTrue(b.handle("เปิดยูทูบ"))
+        self.assertTrue(b.handle("เปิดช่อง 8"))  # ระหว่างยังโหลด
+        gate.set()
+        for _ in range(300):
+            QCoreApplication.processEvents()
+            if len(ran) == 2 and not b.busy:
+                break
+            import time
+
+            time.sleep(0.01)
+        self.assertEqual([r["kind"] for r in ran], ["site", "site_search"])
 
 
 class HonestResultTest(unittest.TestCase):

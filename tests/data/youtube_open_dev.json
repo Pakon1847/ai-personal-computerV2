@@ -1,5 +1,5 @@
 {
- "about": "ชุดพัฒนาการ์ด 0057 (ผู้ช่วยเขียน 2026-10-23 · ใช้ปรับกฎ) · ชุดทดสอบ Pakon เขียนแยก (youtube_open_test.json)",
+ "about": "ชุดพัฒนาการ์ด 0057 (ผู้ช่วยเขียน 2026-10-23 · ใช้ปรับกฎ · รอบ 2: ช่องทีวี = YouTube เสมอ) · ชุดทดสอบ Pakon เขียนแยก (youtube_open_test.json)",
  "items": [
   {"text": "เปิดช่อง 8", "on": "youtube", "expect": {"site": "youtube", "query": "ช่อง 8"}},
   {"text": "เปิดช่องแปด", "on": "youtube", "expect": {"site": "youtube", "query": "ช่องแปด"}},
@@ -11,7 +11,9 @@
   {"text": "เปิดยูทูบแล้วดูข่าวเช้า", "on": "", "expect": {"site": "youtube", "query": "ข่าวเช้า"}},
   {"text": "ดูมวยไทยในยูทูบหน่อย", "on": "", "expect": {"site": "youtube", "query": "มวยไทย"}},
   {"text": "ฟังเพลงบอดี้สแลมในสปอติฟาย", "on": "", "expect": {"site": "spotify", "query": "เพลงบอดี้สแลม"}},
-  {"text": "เปิดช่อง 8", "on": "google", "expect": {"site": "google", "query": "ช่อง 8"}},
+  {"text": "เปิดช่อง 8", "on": "google", "expect": {"site": "youtube", "query": "ช่อง 8"}},
+  {"text": "เปิดช่อง 8", "on": "", "expect": {"site": "youtube", "query": "ช่อง 8"}},
+  {"text": "ดูข่าวเช้า", "on": "google", "expect": {"site": "google", "query": "ข่าวเช้า"}},
   {"text": "ค้นหาช่อง 8 ในยูทูบ", "on": "", "expect": {"site": "youtube", "query": "ช่อง 8"}},
   {"text": "ดูไม่ออกเลย", "on": "youtube", "expect": null},
   {"text": "เปิดไม่ได้ทำไม", "on": "youtube", "expect": null},
