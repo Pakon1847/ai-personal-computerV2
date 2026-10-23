@@ -163,6 +163,10 @@ _OPEN_THEN = re.compile(rf"เปิด\s*{_SVC}\s*(?:แล้ว\s*)?{_VERB}\s
 _WATCH = r"(?:(?:อยาก|ขอ|ช่วย)\s*)?(?:เปิด|ดู|เล่น|ฟัง)"
 _WATCH_IN = re.compile(rf"{_WATCH}\s*{_SAID}\s*(?P<q>.+?)\s*ใน\s*{_SVC}")
 _OPEN_WATCH = re.compile(rf"เปิด\s*{_SVC}\s*(?:แล้ว\s*)?(?:{_WATCH}\s*)?{_SAID}\s*(?P<q>.+)")
+# การ์ด 0057 รอบ 2 (Pakon ที่จอ 2026-10-23: "เปิดช่อง 8" ยังถามใช่/ไม่ใช่ · "ควรเปิดเองเลย") ·
+# "ช่อง + ตัวเลข" = ช่องทีวี → ค้นใน YouTube ทันที ไม่ต้องรู้ว่าหน้าไหนเปิดอยู่ (หน้ายังโหลดไม่เสร็จก็ได้)
+_CHANNEL_NO = r"(?:\d{1,3}|(?:หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ|ยี่|เอ็ด)+)"
+_TV = re.compile(rf"{_WATCH}\s*(?P<q>ช่อง\s*{_CHANNEL_NO}(?:\s*(?:สด|hd))?)")
 # อยู่ในเว็บที่ค้นได้แล้ว (การ์ด 0057 ข้อ 2): กริยา + สิ่งที่อยากดู โดยไม่ต้องพูดชื่อเว็บ
 _ON_SITE = re.compile(rf"(?:{_WATCH}|{_VERB})\s*{_SAID}\s*(?P<q>.+)")
 # ถาม / ปฏิเสธ / เล่าปัญหา ไม่ใช่สิ่งที่อยากดู ("ดูไม่ออก" · "เปิดไม่ได้ทำไม" · "เปิดแล้วค้าง")
@@ -334,6 +338,8 @@ def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
         return BrowseCommand("app")
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
+    if m := _TV.fullmatch(t):  # การ์ด 0057 รอบ 2: ช่องทีวี = ค้นใน YouTube เลย
+        return BrowseCommand("site_search", query=m.group("q"), site="youtube")
     if found := _site_search(t, back):  # ก่อนค้นเว็บทั่วไปและก่อนตัดเรื่องไฟล์: พูดชื่อบริการชัดเจนแล้ว
         return found
     if _VERB_ONLY.fullmatch(t):
