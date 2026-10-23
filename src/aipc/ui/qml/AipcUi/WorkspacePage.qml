@@ -367,6 +367,8 @@ Item {
             // การ์ด 0046: ได้ยินใกล้คำสั่งของเว็บที่เปิดอยู่ = "หมายถึง … ใช่ไหม"
             const near = url !== "" ? skills.siteNear(t, url) : ({})
             if (near.confirmToken) { voiceDispatch(near, t); return }
+            // การ์ด 0057: อยู่ใน YouTube (เว็บที่ค้นได้) + "เปิดช่อง 8" = ค้นในเว็บนั้น (ไม่ส่งให้ Claude ทำสกิล)
+            if (url !== "" && browser.siteSearch(t, url)) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
             // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
             if (ask.confirmToken) { voiceDispatch(ask, t); return }
@@ -376,6 +378,7 @@ Item {
             // การ์ด 0046: อยู่ในเว็บที่คุมได้ + ยังไม่มีคำสั่งนี้ = ถามว่าให้ Claude เพิ่มเข้าสกิลของเว็บนั้นไหม
             const learn = url !== "" ? skills.siteLearn(t, url) : ({})
             if (learn.confirmToken) { voiceDispatch(learn, t); return }
+            if (learn.say) { voiceSay(t, learn.say); return }   // การ์ด 0057: งานที่ต้องพิมพ์ = บอกตามจริง
             // การ์ด 0042 รอบ 3: ไม่ใช่คำสั่งทันที = ถามว่าส่งไปถามในแชทไหม (แทน "ไม่รู้จักคำสั่ง")
             const toChat = skills.voiceAsk(t)
             if (toChat.confirmToken) { voiceDispatch(toChat, t); return }

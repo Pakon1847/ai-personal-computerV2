@@ -26,6 +26,9 @@ from aipc.i18n import tr
 from aipc.skills import machine as skill_machine
 from aipc.ui import files, privacy, settings, thaidate
 
+# การ์ด 0057: คำขอที่ต้องพิมพ์ข้อความ (ค้น/พิมพ์ + สิ่งที่ต้องการ) · สกิลประจำเว็บทำไม่ได้ → ไม่ส่งให้ Claude ทำสกิล
+NEEDS_TYPING = re.compile(r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|หา|เสิร์[ชด]|เซิร์ช|พิมพ์)\s*\S")
+
 
 class I18nBridge(QObject):
     """ให้ QML แปลข้อความที่สร้างตอนทำงาน (การ์ดคำตอบ การเตือน) ด้วยแม่แบบในตารางแปล (การ์ด 0039 · Tr.x)."""
@@ -3594,6 +3597,11 @@ class SkillsController(QObject):
             return {}
         if len(re.sub(r"\s+", "", text)) < 3:
             return {}
+        if NEEDS_TYPING.match(text.strip()):
+            # การ์ด 0057: สกิลประจำเว็บพิมพ์ไม่ได้ (H8) → Claude ได้แค่สกิลที่วางเคอร์เซอร์แล้วบอกว่าทำแล้ว · ไม่ถาม
+            name = SITES[site][0]
+            return {"say": f"ยังค้นใน {name} ด้วยเสียงไม่ได้ · สกิลของเว็บกดได้แค่ปุ่ม พิมพ์ข้อความไม่ได้ · "
+                           "พิมพ์คำค้นเอง หรือพูด “ค้นหา … ในยูทูบ”"}  # fmt: skip
         mine = next((s for s in self._skills if s.site == site and self._is_user(s.id)), None)
         self._counter += 1
         token = f"l{self._counter}"
@@ -3615,7 +3623,9 @@ class SkillsController(QObject):
         ask = (f"ผู้ใช้เปิดเว็บ {SITES[site][0]} อยู่ แล้วสั่งด้วยเสียงว่า “{text}” · "
                f"ทำเป็นสกิลประจำเว็บ (site: {site} · หัวข้อ ## คำสั่ง) ที่มีคำสั่งนี้ "
                "(ใส่คำพูดแบบอื่นที่คนไทยพูดบ่อยด้วย) "
-               "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง")  # fmt: skip
+               "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง · "
+               "ถ้าต้องพิมพ์ข้อความ (ค้นหา/เปิดสิ่งที่ต้องค้นก่อน) ให้ตอบว่าทำไม่ได้ "
+               "ห้ามทำคำสั่งที่แค่วางเคอร์เซอร์หรือเปิดช่องพิมพ์แทน (การ์ด 0057)")  # fmt: skip
         others = [s for s in self._skills if s.site == site and s.id != sid]
         have = [c.phrases[0] for s in others for c in s.commands][:40]
         if have:

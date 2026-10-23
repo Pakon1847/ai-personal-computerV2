@@ -15,7 +15,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import quote, quote_plus, urlsplit
+from urllib.parse import quote, quote_plus, unquote_plus, urlsplit
 
 from aipc.browser import cdp
 from aipc.skills.actions import SITES
@@ -292,6 +292,14 @@ def site_url(name: str) -> str | None:
     return None
 
 
+def landed(url: str, target: str, before: str) -> bool:
+    """เปิดหน้าผลค้นหาได้จริงไหม (การ์ด 0057) · ตรงที่สั่ง หรือเปลี่ยนจากหน้าเดิมไปในเว็บเดียวกัน
+    (Google Maps ผลเดียวเด้งไป /maps/place/) · หน้า error ของ Chromium / ไม่เปลี่ยน = ไม่สำเร็จ."""
+    if not url or urlsplit(url).hostname != urlsplit(target).hostname:
+        return False
+    return unquote_plus(url) == unquote_plus(target) or url != before
+
+
 @dataclass
 class Result:
     ok: bool
@@ -496,7 +504,11 @@ class BrowserControl:
         if cmd.kind == "site_search":  # การ์ด 0036
             name = SITES[cmd.site][0]
             enc = quote(cmd.query, safe="") if cmd.site in PATH_QUERY else quote_plus(cmd.query)
-            url = self._open_search(SITE_SEARCH[cmd.site] + enc)
+            target, before = SITE_SEARCH[cmd.site] + enc, self._url()
+            url = self._open_search(target)
+            if not landed(url, target, before):  # การ์ด 0057: ไม่บอก "แล้ว" ถ้าหน้าผลค้นหาไม่ขึ้น (H5)
+                return Result(False, f"เปิดหน้าค้นหาใน {name} ไม่สำเร็จ (เน็ตหรือเว็บอาจช้า) · ลองอีกครั้ง",
+                              url=url)  # fmt: skip
             return Result(True, f"ค้นหา {cmd.query} ใน {name} แล้ว", url=url)
         if cmd.kind in ("search", "site"):
             url = self._go(
@@ -688,7 +700,8 @@ class BrowserControl:
             # (วัดบน Pi รอบ 1: กด Escape แล้วยังเต็มจอ) → ทำแทนให้เหมือนกดจริง
             self._eval(EXIT_FULLSCREEN_JS, awaitPromise=True)
         time.sleep(0.2)
-        return Result(True, "ทำแล้ว")
+        # การ์ด 0057: บอกว่ากดอะไรไป ไม่ใช่ "ทำแล้ว" (เคยกด / แล้วบอกว่าเปิดช่อง 8 แล้ว ทั้งที่แค่ไปที่ช่องค้นหา)
+        return Result(True, f"กดปุ่ม {cmd.query} แล้ว")
 
     def _do_click(self, cmd: BrowseCommand) -> Result:
         """คลิกปุ่มตามตัวเลือกที่เขียนตายตัวในสกิล (การ์ด 0046) · หาไม่เจอ = บอกตามจริง ไม่กดอย่างอื่นแทน."""

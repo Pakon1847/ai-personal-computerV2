@@ -318,6 +318,19 @@ class BrowserController(QObject):
             return False
         return self._start([BrowseCommand(kind, query=arg, site=site)])
 
+    @Slot(str, str, result=bool)
+    def siteSearch(self, text: str, url: str) -> bool:  # noqa: N802
+        """การ์ด 0057: หน้าที่เปิดอยู่เป็นเว็บที่ค้นได้ + "เปิด/ดู/ค้นหา X" → ค้นในเว็บนั้น · ผลมาทาง finished."""
+        from aipc.skills import browse, sitecmd
+        from aipc.skills.actions import SITES, SYSTEM_BROWSER_SITES
+
+        if not self._active or self._busy or self._control is None or not self._control.running:
+            return False
+        here = (k for k in SITES if k not in SYSTEM_BROWSER_SITES and sitecmd.on_site(k, url))
+        site = next(here, "")
+        cmd = browse.on_site_search(text, site) if site else None
+        return self._start([cmd]) if cmd else False
+
     @Slot(str, result="QVariantMap")
     def appCommand(self, text: str) -> dict:  # noqa: N802
         """ค่าตั้งของแอปจากคีย์ลัด (การ์ด 0042 รอบ 3) · หน้าจอเป็นคนเปลี่ยนค่าผ่าน uiSettings."""
