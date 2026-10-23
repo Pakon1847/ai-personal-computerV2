@@ -228,6 +228,22 @@ class ControllerTest(ServerCase):
         c.finished.connect(lambda text, note: done.append((text, note)))
         return c, done, folder
 
+    def test_delete_one_chat_from_assistant_page(self):
+        """Pakon 2026-10-24: ลบประวัติได้ที่หน้าผู้ช่วย · ลบอันที่เปิดอยู่ = เริ่มแชทใหม่ ไม่ถูกบันทึกกลับ."""
+        c, done, folder = self.make()
+        self.assertTrue(c.send("สวัสดี", ""))
+        pump(lambda: done)
+        first = c.history[0]["id"]
+        c.newChat(False)
+        self.assertTrue(c.send("หวัดดีอีกที", ""))
+        pump(lambda: len(done) > 1)
+        self.assertEqual(len(c.history), 2)
+        self.assertFalse(c.deleteChat(first))  # ไม่ใช่อันที่เปิดอยู่
+        self.assertEqual([h["id"] for h in c.history if h["id"] == first], [])
+        current = c.history[0]["id"]
+        self.assertTrue(c.deleteChat(current))  # อันที่เปิดอยู่ = เริ่มใหม่
+        self.assertEqual(c.history, [])
+
     def test_answer_streams_then_is_saved(self):
         c, done, folder = self.make()
         streamed = []

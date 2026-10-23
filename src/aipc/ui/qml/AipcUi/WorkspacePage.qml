@@ -829,23 +829,55 @@ Item {
         width: 320
         padding: 16
         background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
+        // ประวัติอยู่หน้านี้ทั้งหมด (Pakon 2026-10-24: ลบได้เลยไม่ต้องไปที่ตั้งค่า) · ลบทีละอัน = ปุ่มถังขยะ ·
+        // ลบทั้งหมด = กดสองครั้ง (กันพลาด · H2) · ลบบทสนทนาที่เปิดอยู่ = เริ่มแชทใหม่
+        onClosed: clearAll.armed = false
         contentItem: ColumnLayout {
             spacing: 6
             AppText { text: Tr.t("ประวัติบทสนทนา"); strong: true }
             AppText {
                 Layout.fillWidth: true
-                visible: chat.history.length === 0
-                text: Tr.t("ยังไม่มีบทสนทนาที่บันทึกไว้")
+                text: chat.history.length === 0 ? Tr.t("ยังไม่มีบทสนทนาที่บันทึกไว้")
+                                                : Tr.t("เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · ") + chat.history.length + Tr.t(" บทสนทนา")
                 size: Theme.fontSmall; color: Theme.inkMuted
             }
             Repeater {
                 model: chat.history.slice(0, 12)
-                AppButton {
+                RowLayout {
                     required property var modelData
                     Layout.fillWidth: true
-                    kind: "ghost"
-                    text: modelData.title || Tr.t("(ไม่มีชื่อ)")
-                    onClicked: { root.loadChat(chat.openChat(modelData.id)); historyPopup.close() }
+                    spacing: 4
+                    AppButton {
+                        Layout.fillWidth: true
+                        kind: "ghost"
+                        text: modelData.title || Tr.t("(ไม่มีชื่อ)")
+                        onClicked: { root.loadChat(chat.openChat(modelData.id)); historyPopup.close() }
+                    }
+                    AppButton {
+                        objectName: "deleteChat_" + modelData.id
+                        kind: "ghost"; iconPath: Icons.trash; text: ""
+                        Accessible.name: Tr.t("ลบบทสนทนานี้")
+                        enabled: !chat.busy
+                        onClicked: {
+                            if (chat.deleteChat(modelData.id)) { voice.stop(); root.items = []; root.answered = ({}) }
+                        }
+                    }
+                }
+            }
+            AppButton {
+                id: clearAll
+                objectName: "deleteChats"
+                property bool armed: false
+                visible: chat.history.length > 0
+                Layout.fillWidth: true
+                kind: armed ? "danger" : "secondary"; iconPath: Icons.trash
+                enabled: !chat.busy
+                text: armed ? Tr.t("กดอีกครั้งเพื่อลบทั้งหมด") : Tr.t("ลบประวัติทั้งหมด")
+                onClicked: {
+                    if (!armed) { armed = true; return }
+                    armed = false
+                    chat.deleteAll()
+                    voice.stop(); root.items = []; root.answered = ({})
                 }
             }
         }

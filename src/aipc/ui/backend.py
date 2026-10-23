@@ -4688,10 +4688,18 @@ class ChatController(QObject):
         self.changed.emit()
         return conv["messages"]
 
-    @Slot(str)
-    def deleteChat(self, cid: str) -> None:  # noqa: N802
+    @Slot(str, result=bool)
+    def deleteChat(self, cid: str) -> bool:  # noqa: N802
+        """ลบบทสนทนาเดียว · คืน True = เป็นบทสนทนาที่เปิดอยู่ (เริ่มแชทใหม่ให้ · ไม่บันทึกกลับมาอีก)."""
+        if self._busy:
+            return False
         self._store.delete(cid)
-        self.changed.emit()
+        current = self._conv.get("id") == cid
+        if current:
+            self.newChat(False)
+        else:
+            self.changed.emit()
+        return current
 
     @Slot(result=int)
     def deleteAll(self) -> int:  # noqa: N802

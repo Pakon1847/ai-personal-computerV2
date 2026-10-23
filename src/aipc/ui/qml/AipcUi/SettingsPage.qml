@@ -444,13 +444,12 @@ ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 16
                 // Claude (การ์ด 0061 รอบ 2 · Pakon 2026-10-24: "ผู้ใช้จะงงตรงที่บอกราคา · ทำให้เข้าใจง่าย"):
-                // บอกก่อนว่า Claude คืออะไร ใช้เมื่อไหร่ · ค่าใช้วันนี้เป็นแถบ + ประโยคธรรมดา · จำกัดต่อวันบอกว่าถึงแล้วเกิดอะไร
+                // รอบ 3 (Pakon: "ไม่ควรมีราคา · มีแค่ติ๊กให้ถาม Claude ก็พอ") · ตัวจำกัดค่าใช้ต่อวันยังทำงานใน backend ($1 ค่าเริ่มต้น)
                 Card {
                     id: claudeCard
                     objectName: "cloudUsageCard"
                     Layout.fillWidth: true
                     implicitHeight: cloudCol.implicitHeight + 40
-                    readonly property bool full: cloudUsage.available && cloudUsage.spentToday >= cloudUsage.limit
                     ColumnLayout {
                         id: cloudCol
                         anchors.fill: parent
@@ -470,8 +469,8 @@ ColumnLayout {
                             }
                             Chip {
                                 visible: cloudUsage.available
-                                text: !uiSettings.useClaude ? Tr.t("ปิดอยู่") : claudeCard.full ? Tr.t("ครบวันนี้แล้ว") : Tr.t("พร้อมใช้")
-                                kind: !uiSettings.useClaude ? "neutral" : claudeCard.full ? "warn" : "ok"
+                                text: uiSettings.useClaude ? Tr.t("เปิดอยู่") : Tr.t("ปิดอยู่")
+                                kind: uiSettings.useClaude ? "ok" : "neutral"
                                 dot: true
                             }
                         }
@@ -509,70 +508,6 @@ ColumnLayout {
                                     : Tr.t("ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีอะไรส่งออกไป")
                             checked: uiSettings.useClaude
                             onClicked: uiSettings.setUseClaude(checked)
-                        }
-                        // ค่าใช้วันนี้: แถบเทียบกับที่จำกัดไว้ + ประโยคธรรมดา (เดิม "$0.12 จากเพดาน $1.00 · ราคาอ้างอิง…" แล้วงง)
-                        ColumnLayout {
-                            objectName: "cloudSpend"
-                            visible: cloudUsage.available && uiSettings.useClaude
-                            Layout.fillWidth: true
-                            spacing: 6
-                            AppText {
-                                objectName: "cloudSpendText"
-                                Layout.fillWidth: true
-                                text: Tr.t("วันนี้ถาม Claude ไป ") + cloudUsage.callsToday + Tr.t(" ครั้ง · คิดเป็นเงินประมาณ $") + cloudUsage.spentToday.toFixed(2)
-                                      + Tr.t(" จาก $") + cloudUsage.limit.toFixed(2) + Tr.t(" ที่ตั้งไว้")
-                            }
-                            Rectangle {   // แถบค่าใช้วันนี้ (สีเตือนเมื่อครบ · มีข้อความกำกับ ไม่ใช้สีอย่างเดียว)
-                                Layout.fillWidth: true
-                                implicitHeight: 8
-                                radius: 4
-                                color: Theme.surface2
-                                Rectangle {
-                                    height: parent.height
-                                    radius: 4
-                                    width: parent.width * Math.min(1, cloudUsage.limit > 0 ? cloudUsage.spentToday / cloudUsage.limit : 0)
-                                    color: cloudUsage.spentToday >= cloudUsage.limit ? Theme.warn : Theme.accent
-                                }
-                            }
-                            AppText {
-                                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                                text: Tr.t("ตัวเงินเป็นดอลลาร์สหรัฐ ตามที่ Claude แจ้งกลับมาทุกครั้งที่ใช้ · ใช้ครบที่ตั้งไว้แล้ว เครื่องจะหยุดถาม Claude จนถึงพรุ่งนี้ และตอบด้วย AI ในเครื่องแทน")
-                            }
-                            RowLayout {
-                                spacing: 8
-                                AppText { text: Tr.t("ใช้ได้ไม่เกินวันละ"); size: Theme.fontSmall; color: Theme.inkMuted }
-                                Repeater {
-                                    model: cloudUsage.limits
-                                    AppButton {
-                                        required property real modelData
-                                        text: "$" + modelData.toFixed(2)
-                                        kind: cloudUsage.limit === modelData ? "primary" : "secondary"
-                                        onClicked: cloudUsage.setLimit(modelData)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // พยากรณ์อากาศ (แผงความเป็นส่วนตัว 2026-10-07): แยกจากการ์ด Claude ให้ไม่ปนกัน (การ์ด 0061 รอบ 2)
-                Card {
-                    Layout.fillWidth: true
-                    implicitHeight: weatherCol.implicitHeight + 40
-                    ColumnLayout {
-                        id: weatherCol
-                        anchors.fill: parent
-                        anchors.margins: 20
-                        spacing: 8
-                        AppText { text: Tr.t("พยากรณ์อากาศ"); strong: true }
-                        AppCheck {
-                            objectName: "useWeatherCheck"
-                            text: Tr.t("ถามพยากรณ์อากาศ: ส่งชื่อเมืองไป Open-Meteo")
-                            detail: uiSettings.useWeather
-                                    ? Tr.t("ส่งแค่ชื่อเมืองหรือพิกัด · ไม่ส่งชื่อบัญชีหรือแชท")
-                                    : Tr.t("ปิดอยู่: ถามอากาศแล้วไม่ส่งอะไรออกไป")
-                            checked: uiSettings.useWeather
-                            onClicked: uiSettings.setUseWeather(checked)
                         }
                     }
                 }
@@ -865,30 +800,7 @@ ColumnLayout {
                     }
                 }
 
-                // ประวัติแชทอยู่ใน home ของคุณเท่านั้น · ลบทั้งหมดได้ทันที (การ์ด 0013 ข้อ 4)
-                Card {
-                    Layout.fillWidth: true
-                    implicitHeight: chatRow.implicitHeight + 40
-                    RowLayout {
-                        id: chatRow
-                        anchors.fill: parent
-                        anchors.margins: 20
-                        spacing: 16
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 2
-                            AppText { text: Tr.t("ประวัติแชท"); strong: true }
-                            AppText { id: chatDeleted; Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                                      text: Tr.t("เก็บในเครื่องนี้ในโฟลเดอร์ของคุณ · ") + chat.history.length + Tr.t(" บทสนทนา") }
-                        }
-                        AppButton {
-                            objectName: "deleteChats"
-                            text: Tr.t("ลบประวัติแชททั้งหมด"); kind: "secondary"; iconPath: Icons.trash
-                            enabled: chat.history.length > 0 && !chat.busy
-                            onClicked: chatDeleted.text = Tr.t("ลบแล้ว ") + chat.deleteAll() + Tr.t(" บทสนทนา")
-                        }
-                    }
-                }
+                
             }
             ColumnLayout {
                 objectName: "settingsSection_backup"
