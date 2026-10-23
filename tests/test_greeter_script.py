@@ -60,7 +60,11 @@ class GreeterScriptTest(unittest.TestCase):
         # รันส่วนที่อ่านผังแป้นจริง (ตัดบรรทัด exec cage ออก) แล้วดูค่าที่ export
         body = read(GREETER).replace("exec cage", "env | grep ^XKB_ #")
         cmd = ["sh", "-c", body, str(GREETER)]
-        out = subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
+        # AIPC_JOURNALED=1: ข้ามขั้นส่งข้อความไป journal · ขั้นนั้นรันไฟล์จริงซ้ำ = เปิด cage จริง
+        # (เทสต์ค้างบน Pi 2026-10-24)
+        run_env = {**os.environ, "AIPC_JOURNALED": "1"}
+        out = subprocess.run(cmd, capture_output=True, text=True, check=True, env=run_env,
+                             timeout=30).stdout  # fmt: skip
         env = dict(line.split("=", 1) for line in out.splitlines())
         for line in read(SESSION / "labwc" / "environment").splitlines():
             key = line.split("=", 1)[0]
