@@ -136,8 +136,8 @@ ColumnLayout {
             GridLayout {
                 Layout.fillWidth: true
                 columns: Theme.fontScale > 1.4 ? 2 : 3
-                columnSpacing: 10
-                rowSpacing: 10
+                columnSpacing: 12   // ระยะเท่าการ์ดค่าเครื่องด้านล่าง
+                rowSpacing: 12
                 Repeater {
                     model: system.devices
                     delegate: Rectangle {
@@ -154,8 +154,9 @@ ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 12
                             spacing: 12
+                            // ไอคอน ชื่อ และสถานะอยู่กึ่งกลางแนวตั้งเดียวกัน (Pakon 2026-10-24: ป้ายสถานะลอยสูงกว่าชื่อ)
                             Rectangle {
-                                Layout.alignment: Qt.AlignTop
+                                Layout.alignment: Qt.AlignVCenter
                                 implicitWidth: Math.round(36 * Theme.fontScale); implicitHeight: implicitWidth
                                 radius: Theme.radiusControl
                                 color: dv.modelData.state === "ok" ? Theme.accentSoft : Theme.surface
@@ -181,7 +182,7 @@ ColumnLayout {
                                 }
                             }
                             Chip {
-                                Layout.alignment: Qt.AlignTop
+                                Layout.alignment: Qt.AlignVCenter
                                 text: ({ ok: Tr.t("เจอ"), none: Tr.t("ไม่มี"), unknown: Tr.t("ตรวจไม่ได้") })[dv.modelData.state]
                                 kind: dv.modelData.state === "ok" ? "ok" : "neutral"
                                 dot: true
