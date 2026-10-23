@@ -11,6 +11,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 _OLD_DATA_HOME = os.environ.get("XDG_DATA_HOME")
@@ -306,7 +307,8 @@ class ShellCardTest(unittest.TestCase):
 
     def open_shell(self, page="workspace"):
         tmp = tempfile.mkdtemp(prefix="aipc-shell-")
-        os.environ["XDG_DATA_HOME"] = tmp  # ไฟล์นัดใหม่เปล่า ๆ ต่อเทสต์ ไม่ปนกับเทสต์อื่น
+        # ไฟล์นัดใหม่เปล่า ๆ ต่อเทสต์ ไม่ปนกับเทสต์อื่น · คืนค่าเดิมเมื่อเทสต์จบ (เดิมค้างไปถึงเทสต์ถัดไป)
+        self.enterContext(mock.patch.dict(os.environ, {"XDG_DATA_HOME": tmp}))
         opts = uiapp.Options(screen="shell", page=page, software=True,
                              settings_path=Path(tmp) / "ui.json")  # fmt: skip
         app, engine, warnings = uiapp.build(opts)

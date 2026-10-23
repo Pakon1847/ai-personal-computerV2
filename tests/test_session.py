@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 LOOP = Path(__file__).resolve().parents[1] / "scripts" / "pi" / "session" / "aipc-shell-loop"
 
@@ -144,7 +145,9 @@ class KeymapTest(unittest.TestCase):
     def keysym(self, key: int, group: int, level: int = 0) -> int | None:
         import ctypes as c
 
-        os.environ["XKB_CONFIG_EXTRA_PATH"] = str(LOOP.parent / "xkb")  # เหมือน aipc-session
+        # เหมือน aipc-session · คืนค่าเดิมเมื่อเทสต์จบ (ไม่ค้างไปถึงเทสต์อื่น)
+        xkb = {"XKB_CONFIG_EXTRA_PATH": str(LOOP.parent / "xkb")}
+        self.enterContext(mock.patch.dict(os.environ, xkb))
         x, conf = _xkb(), self.env()
 
         class Names(c.Structure):
