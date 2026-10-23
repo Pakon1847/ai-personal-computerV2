@@ -261,6 +261,7 @@ class IdleLock:
         from aipc.ui import lockscreen
 
         self._gtklock = gtklock or (lambda: lockscreen.available(self._which))
+
         def default_prepare(folder, keep, warn, name, height, auto):
             return lockscreen.prepare(folder, keep, warn, name, screen_height=height, auto=auto)
 

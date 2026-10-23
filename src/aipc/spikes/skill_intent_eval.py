@@ -139,16 +139,20 @@ def main(argv: list[str] | None = None) -> int:
                 row["revise_version"] = store.info(sid)["version"]
                 row["revise_plans"] = t2.plans
                 row["revise_cards"] = [c.get("title", "") for c in t2.cards]
-                row["revise_ledger"] = [{"ok": e["ok"], "cost": e["cost_usd"]}
-                                        for e in ledger.entries()[: len(ledger.entries()) - n2]]
+                row["revise_ledger"] = [
+                    {"ok": e["ok"], "cost": e["cost_usd"]}
+                    for e in ledger.entries()[: len(ledger.entries()) - n2]
+                ]
                 if it["kind"] == "code":
-                    row["revise_ok"] = row["revise_version"] > 1 and same_plans(t2.plans,
-                                                                                rv["expect"])
+                    row["revise_ok"] = row["revise_version"] > 1 and same_plans(
+                        t2.plans, rv["expect"]
+                    )
                 else:
                     out2 = run_llm(sid, it["test"])
                     row["revise_output"] = out2
                     row["revise_ok"] = row["revise_version"] > 1 and check(
-                        rv["check"], out2, rv.get("words", []))
+                        rv["check"], out2, rv.get("words", [])
+                    )
         rows.append(row)
         print(f"{it['id']} ติดตั้ง={row['installed']} {sid or '-':24} ทำตามที่ขอ={row.get('intent_ok')} "
               f"ซ้ำ={row.get('again_route', '-')} แก้={row.get('revise_ok', '-')} "
