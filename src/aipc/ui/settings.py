@@ -46,6 +46,7 @@ class UiPrefs:
     theme: str = "dark"
     font_scale: float = 1.0
     mouse_speed: float = 0.9  # การ์ด 0060
+    animations: bool = True  # การ์ด 0061 · ปิด = เปลี่ยนหน้า/หมวดทันที (ไม่มีจาง/เลื่อน)
     onboarded: bool = False  # เห็นหน้าแนะนำการใช้งานครั้งแรกแล้ว (ฟีเจอร์ข้อ 8)
     # อ่านคำตอบ AI ออกเสียงเองเมื่อตอบจบ (การ์ด 0019) · Pakon: ค่าเริ่มต้นเปิด ปิดได้จากปุ่มในหน้าแชท
     # (ชื่อใหม่แทน auto_speak ที่ค่าเริ่มต้นปิด · ไฟล์เก่าที่มี auto_speak: false จึงไม่ทำให้เสียงปิด)
@@ -87,6 +88,7 @@ class UiPrefs:
             theme=theme,
             font_scale=scale,
             mouse_speed=mouse,
+            animations=self.animations is not False,
             onboarded=self.onboarded is True,
             speak_answers=self.speak_answers is not False,
             speak_reminders=self.speak_reminders is True,
@@ -130,6 +132,7 @@ def load(path: Path | None = None) -> UiPrefs:
             theme=str(data.get("theme", "dark")),
             font_scale=float(data.get("font_scale", 1.0)),
             mouse_speed=float(data.get("mouse_speed", 0.9)),
+            animations=data.get("animations") is not False,
             onboarded=data.get("onboarded") is True,
             speak_answers=data.get("speak_answers", True) is not False,
             speak_reminders=data.get("speak_reminders") is True,

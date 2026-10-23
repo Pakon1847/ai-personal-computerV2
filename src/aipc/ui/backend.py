@@ -313,6 +313,18 @@ class UiSettings(QObject):
             settings.save(self._prefs, self._path)
             self.changed.emit()
 
+    # ภาพเคลื่อนไหว (การ์ด 0061)
+    @Property(bool, notify=changed)
+    def animations(self) -> bool:
+        return self._prefs.animations
+
+    @Slot(bool)
+    def setAnimations(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.animations:
+            self._prefs.animations = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
     # ความเร็วเมาส์ (การ์ด 0060) · บันทึก + ตั้งให้ labwc ทันที · ไม่ได้อยู่ในเซสชันของเรา = มีผลเข้าระบบครั้งหน้า
     @Property(float, notify=changed)
     def mouseSpeed(self) -> float:  # noqa: N802

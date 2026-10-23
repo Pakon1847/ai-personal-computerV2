@@ -160,6 +160,12 @@ def find_all(root, name):
     return [o for o in root.findChildren(QObject) if o.objectName() == name]
 
 
+def show_section(win, section: str) -> None:
+    """การ์ด 0061: เปิดหมวดของหน้าตั้งค่าก่อนตรวจ (หมวดอื่นซ่อน = visible เป็น false)."""
+    find_items(win, "settingsPage")[0].setProperty("section", section)
+    settle()
+
+
 def find_items(win, name):
     """ค้นตามต้นไม้ภาพ (childItems) · ของใน delegate ของ ListView ไม่ได้เป็นลูกแบบ QObject ของหน้าต่าง"""
     out, stack = [], [win.contentItem()]
@@ -397,6 +403,7 @@ class ShellCardTest(unittest.TestCase):
         from PySide6.QtGui import QImage
 
         engine, win, warnings = self.open_shell("settings")
+        show_section(win, "face")  # การ์ด 0061: หน้าตั้งค่าแสดงทีละหมวด
         face = engine.rootContext().contextProperty("face")
         preview = find_all(win, "facePreview")[0]
         self.assertFalse(preview.property("visible"), "ไม่ลงทะเบียน = ไม่มีภาพสด")
@@ -777,6 +784,7 @@ class ShellCardTest(unittest.TestCase):
         from aipc.cloud.ledger import Ledger
 
         engine, win, warnings = self.open_shell("settings")
+        show_section(win, "privacy")  # การ์ด 0061: หน้าตั้งค่าแสดงทีละหมวด
         usage = engine.rootContext().contextProperty("cloudUsage")
         tmp = Path(os.environ["XDG_DATA_HOME"])
         led = Ledger(tmp / "outbound-test.json", now=lambda: datetime(2026, 10, 1, 14, 5))
@@ -805,6 +813,7 @@ class ShellCardTest(unittest.TestCase):
         from tests.test_skill_gcal import ICS, LINK
 
         engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")  # การ์ด 0061: หน้าตั้งค่าแสดงทีละหมวด
         skills = engine._backends["skills"]
         tmp = Path(os.environ["XDG_DATA_HOME"])
         skills._gcal = gcal.GoogleCalendar(
@@ -870,6 +879,7 @@ class ShellCardTest(unittest.TestCase):
         from tests.test_ui_holidays import HOLIDAY_ICS
 
         engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")  # การ์ด 0061: หน้าตั้งค่าแสดงทีละหมวด
         skills = engine._backends["skills"]
         tmp = Path(os.environ["XDG_DATA_HOME"])
         online = {"ok": False}
@@ -918,9 +928,36 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(skills.holidaysOn)
         self.assertEqual(warnings, [])
 
+    def test_settings_sections_keyboard_and_motion(self):
+        """การ์ด 0061 S3 S4: ลูกศรเปลี่ยนหมวด (วนรอบ) · แสดงทีละหมวด · ปิดภาพเคลื่อนไหว = ไม่จาง."""
+        from PySide6.QtCore import Q_ARG, QMetaObject
+
+        engine, win, warnings = self.open_shell("settings")
+        page = find_items(win, "settingsPage")[0]
+        content = find_items(win, "settingsContent")[0]
+        self.assertEqual(page.property("section"), "look")
+        QMetaObject.invokeMethod(page, "step", Q_ARG("QVariant", 1))  # ลูกศรลง
+        settle()
+        self.assertEqual(page.property("section"), "face")
+        self.assertTrue(find_items(win, "settingsSection_face")[0].property("visible"))
+        self.assertFalse(find_items(win, "settingsSection_look")[0].property("visible"))
+        # ขึ้นเกินหมวดแรก = วนไปหมวดสุดท้าย
+        QMetaObject.invokeMethod(page, "step", Q_ARG("QVariant", -2))
+        settle()
+        self.assertEqual(page.property("section"), "backup")
+        QMetaObject.invokeMethod(page, "go", Q_ARG("QVariant", "voice"))
+        self.assertLess(content.property("opacity"), 1.0)  # เปิดภาพเคลื่อนไหว = กำลังจางเข้า
+        settle()
+        self.assertEqual(content.property("opacity"), 1.0)
+        engine._backends["uiSettings"].setAnimations(False)
+        QMetaObject.invokeMethod(page, "go", Q_ARG("QVariant", "ai"))
+        self.assertEqual(content.property("opacity"), 1.0)  # ปิด = เปลี่ยนทันที
+        self.assertEqual(warnings, [])
+
     def test_claude_guide_only_without_claude(self):
         """การ์ด 0021 เกณฑ์ข้อ 3: ไม่มี claude = ปุ่มคู่มือ กดแล้วเห็นทุกขั้นพร้อมกรอบคำสั่ง · มี claude = ไม่มีคู่มือ."""
         engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")  # การ์ด 0061: หน้าตั้งค่าแสดงทีละหมวด
         usage = engine.rootContext().contextProperty("cloudUsage")
         usage._user, usage._addresses, usage._available = "pakon", lambda: ["172.20.10.3"], False
         usage.changed.emit()
