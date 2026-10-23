@@ -696,6 +696,11 @@ class VoiceController(QObject):
         self._transcribing, self._last_stt_s = False, secs
         done = "ทำตามที่สั่งแล้ว" if hands_free else "ตรวจข้อความแล้วกดส่ง"
         self._mic_message = err or f"ถอดเสียงใน {secs:.1f} วิ · {done}"
+        # การ์ด 0058: ตรวจการหันหน้าไม่ได้ = บอกครั้งเดียว (ฟังแบบเดิมไปแล้ว)
+        note = getattr(self._listener, "facing_note", "")
+        if note:
+            self._listener.facing_note = ""
+            self._mic_message = f"{note} · {self._mic_message}"
         self.micChanged.emit()
         if hands_free:
             from aipc.ui.handsfree import beep

@@ -7,6 +7,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from aipc.vision import daemon, service
 from aipc.voice import stt
@@ -67,7 +68,8 @@ class ListenerFacingTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        # คืนค่าเดิมเมื่อเทสต์จบ: เดิมค้างชี้โฟลเดอร์ที่ถูกลบแล้ว → เทสต์หน้าจอที่รันต่อมาล้มเป็นบางรอบ
+        self.enterContext(mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": self.tmp.name}))
         self.talker = Path(self.tmp.name) / "talker.py"
         self.talker.write_text(TALKER, encoding="utf-8")  # เงียบ 0.4 วิ → พูด 0.6 วิ → เงียบ
         self.done, self.result = threading.Event(), []
@@ -99,6 +101,27 @@ class ListenerFacingTest(unittest.TestCase):
         self.assertEqual(err, "")
         self.assertLess(float(text), 1.0)
         self.assertGreater(float(text), 0.3)
+
+    def test_camera_unavailable_listens_as_before_and_says_so_once(self):
+        """H5: visiond ไม่ว่าง/ไม่มีกล้อง → ทำคำสั่งตามปกติ + บอกครั้งเดียว."""
+
+        def busy(on_seen, stop):
+            return {"ok": False, "state": "busy"}
+
+        code = "import os, sys; print((os.path.getsize(sys.argv[1]) - 44) / 32000)"
+        lis = Listener(lambda t, e, s: (self.result.append((t, e)), self.done.set()),
+                       record_cmd=[sys.executable, str(self.talker)],
+                       transcribe_cmd=[sys.executable, "-c", code],
+                       facing=busy, facing_on=lambda: True)  # fmt: skip
+        self.assertEqual(lis.start(fast=True), "")
+        self.assertTrue(self.done.wait(15))
+        self.assertEqual(self.result[0][1], "")  # ทำตามปกติ
+        self.assertEqual(lis.facing_note, stt.FACING_BROKEN)
+        lis.facing_note = ""
+        self.done.clear()
+        self.assertEqual(lis.start(fast=True), "")
+        self.assertTrue(self.done.wait(15))
+        self.assertEqual(lis.facing_note, "")  # ครั้งเดียว
 
     def test_setting_off_never_opens_the_camera(self):
         (text, err), calls = self.run_once(lambda t: False, on=False)

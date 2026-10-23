@@ -47,6 +47,8 @@ TRIM = False
 # การ์ด 0058: ฟังเฉพาะตอนหันหน้าเข้าจอ · ไม่หัน (หรือไม่เห็นหน้า) ต่อกันเท่านี้ระหว่างพูด = จบคำสั่งตรงที่เริ่มหัน
 TURN_S = 0.5
 NOT_FACING = "ไม่ได้หันหน้าเข้าจอ · หันมาที่จอแล้วพูดใหม่ (ตั้งค่า: ฟังเฉพาะตอนหันหน้าเข้าจอ)"
+# กล้อง/visiond ใช้ไม่ได้ = ฟังแบบเดิม แต่ต้องบอก (H5) · บอกครั้งเดียวต่อการเข้าระบบ ไม่ให้รำคาญ
+FACING_BROKEN = "ตรวจการหันหน้าไม่ได้ (กล้องไม่ว่างหรือใช้ไม่ได้) · ครั้งนี้ฟังแบบเดิม"
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
 TAGS = re.compile(r"\[[^\]]*\]|\([^)]*\)")
 
@@ -243,6 +245,8 @@ class Listener:
         self._facing, self._facing_on = facing, facing_on
         self._face: dict | None = None
         self._cut_next: int | None = None
+        self.facing_note = ""  # ข้อความบอกผู้ใช้ครั้งเดียวเมื่อตรวจการหันหน้าไม่ได้ (VoiceController อ่านแล้วล้าง)
+        self._facing_warned = False
         # ภาษาของตัวถอด = ภาษาหน้าจอที่ผู้ใช้ตั้ง (การ์ด 0040 · โค้ดเลือก ไม่ให้โมเดลเดาภาษา · H6)
         self._language = language
         self._lang = "th"
@@ -341,7 +345,8 @@ class Listener:
                 return None
         except Exception:  # noqa: BLE001 · อ่านค่าตั้งไม่ได้ = ฟังแบบเดิม
             return None
-        face = {"stop": threading.Event(), "seen": False, "faced": False, "away_since": None}
+        face = {"stop": threading.Event(), "seen": False, "faced": False, "away_since": None,
+                "broken": False}  # fmt: skip
 
         def on_seen(msg: dict) -> None:
             now = time.monotonic()
@@ -353,9 +358,13 @@ class Listener:
 
         def run() -> None:
             try:
-                self._facing(on_seen, face["stop"])
-            except Exception:  # noqa: BLE001 · กล้อง/visiond ใช้ไม่ได้ = ฟังแบบเดิม (H5)
-                pass
+                r = self._facing(on_seen, face["stop"])
+                # busy / no-camera / unavailable (visiond ไม่ตอบ) = ตรวจไม่ได้ ·
+                # "stopped" = หยุดฟังตามปกติ
+                failed = isinstance(r, dict) and not r.get("ok")
+                face["broken"] = failed and r.get("state") != "stopped"
+            except Exception:  # noqa: BLE001 · กล้อง/visiond ใช้ไม่ได้ = ฟังแบบเดิม แต่บอก (H5)
+                face["broken"] = True
 
         threading.Thread(target=run, daemon=True).start()
         return face
@@ -477,6 +486,8 @@ class Listener:
             proc.kill()
         if face is not None:
             face["stop"].set()  # กล้องดับ
+            if face["broken"] and not face["seen"] and not self._facing_warned:
+                self.facing_note, self._facing_warned = FACING_BROKEN, True
         if held < MIN_S:
             _remove(path)
             self._on_done("", "กดค้างไว้ระหว่างพูด แล้วปล่อยเมื่อพูดจบ", 0.0)
