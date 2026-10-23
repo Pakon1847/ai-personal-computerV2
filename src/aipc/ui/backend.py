@@ -26,6 +26,9 @@ from aipc.i18n import tr
 from aipc.skills import machine as skill_machine
 from aipc.ui import files, privacy, settings, thaidate
 
+# การ์ด 0057: คำขอที่ต้องพิมพ์ข้อความ (ค้น/พิมพ์ + สิ่งที่ต้องการ) · สกิลประจำเว็บทำไม่ได้ → ไม่ส่งให้ Claude ทำสกิล
+NEEDS_TYPING = re.compile(r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|หา|เสิร์[ชด]|เซิร์ช|พิมพ์)\s*\S")
+
 
 class I18nBridge(QObject):
     """ให้ QML แปลข้อความที่สร้างตอนทำงาน (การ์ดคำตอบ การเตือน) ด้วยแม่แบบในตารางแปล (การ์ด 0039 · Tr.x)."""
@@ -130,6 +133,67 @@ class UiSettings(QObject):
     def useClaude(self) -> bool:  # noqa: N802
         return self._prefs.use_claude
 
+    # ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ (การ์ด 0058) · ค่าเริ่มต้นปิด
+    @Property(bool, notify=changed)
+    def faceToSpeak(self) -> bool:  # noqa: N802
+        return self._prefs.face_to_speak
+
+    @Slot(bool)
+    def setFaceToSpeak(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.face_to_speak:
+            self._prefs.face_to_speak = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    # ปลดจอล็อกเองเมื่อเห็นหน้า (การ์ด 0055) · ค่าเริ่มต้นปิด
+    @Property(bool, notify=changed)
+    def faceAutoUnlock(self) -> bool:  # noqa: N802
+        return self._prefs.face_auto_unlock
+
+    @Slot(bool)
+    def setFaceAutoUnlock(self, on: bool) -> None:  # noqa: N802
+        if bool(on) != self._prefs.face_auto_unlock:
+            self._prefs.face_auto_unlock = bool(on)
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+
+    # โมเดลของแชทงาน (การ์ด 0053)
+    @Property(str, notify=changed)
+    def cloudModel(self) -> str:  # noqa: N802
+        return self._prefs.cloud_model
+
+    @Property("QVariantList", constant=True)
+    def cloudModels(self) -> list:  # noqa: N802
+        return list(settings.CLOUD_MODELS)
+
+    @Property(str, notify=changed)
+    def cloudEffort(self) -> str:  # noqa: N802
+        return self._prefs.cloud_effort
+
+    @Property("QVariantList", constant=True)
+    def cloudEfforts(self) -> list:  # noqa: N802
+        return list(settings.CLOUD_EFFORTS)
+
+    @Slot(str, result=bool)
+    def setCloudEffort(self, effort: str) -> bool:  # noqa: N802
+        if effort not in settings.CLOUD_EFFORTS:
+            return False
+        if effort != self._prefs.cloud_effort:
+            self._prefs.cloud_effort = effort
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+        return True
+
+    @Slot(str, result=bool)
+    def setCloudModel(self, model: str) -> bool:  # noqa: N802
+        if model not in settings.CLOUD_MODELS:
+            return False
+        if model != self._prefs.cloud_model:
+            self._prefs.cloud_model = model
+            settings.save(self._prefs, self._path)
+            self.changed.emit()
+        return True
+
     @Slot(bool)
     def setUseClaude(self, on: bool) -> None:  # noqa: N802
         """สวิตช์ส่งต่อ Claude (การ์ด 0016 หัวข้อ 1) · ปิด = ไม่ถาม Claude และไม่สร้างสกิล ·
@@ -215,6 +279,10 @@ class UiSettings(QObject):
     def presenceChoices(self) -> list:  # noqa: N802
         return list(settings.PRESENCE_CHOICES)
 
+    @Property("QVariantList", constant=True)
+    def presenceLogoutChoices(self) -> list:  # noqa: N802
+        return list(settings.PRESENCE_LOGOUT_CHOICES)
+
     @Slot(bool)
     def setPresence(self, on: bool) -> None:  # noqa: N802
         if bool(on) != self._prefs.presence:
@@ -231,7 +299,7 @@ class UiSettings(QObject):
 
     @Slot(int)
     def setPresenceLogoutS(self, s: int) -> None:  # noqa: N802
-        if s in settings.PRESENCE_CHOICES and s != self._prefs.presence_logout_s:
+        if s in settings.PRESENCE_LOGOUT_CHOICES and s != self._prefs.presence_logout_s:
             self._prefs.presence_logout_s = int(s)
             settings.save(self._prefs, self._path)
             self.changed.emit()
@@ -419,7 +487,12 @@ class VoiceController(QObject):
     _heard = Signal(str, str, float)
 
     def __init__(
-        self, speaker=None, active: bool = True, idle_poll_ms: int = 60_000, listener=None
+        self,
+        speaker=None,
+        active: bool = True,
+        idle_poll_ms: int = 60_000,
+        listener=None,
+        face_to_speak=None,
     ):
         super().__init__()
         from aipc.voice import stt, tts, zipformer
@@ -432,9 +505,16 @@ class VoiceController(QObject):
 
             # การ์ด 0044: Zipformer ไม่ปิดตัวเองเมื่อไม่ได้ใช้ (เดิม 10 นาที → กดครั้งถัดไปรอโหลด 4.6 วิ)
             fast = zipformer.Transcriber(idle_s=float("inf"))
+            from aipc.vision import client as vision_client
+
+            def facing(on_seen, stop):  # การ์ด 0058 · visiond ตอบเฉพาะเจ้าของเซสชัน
+                return vision_client.facing(getpass.getuser(), on_seen, stop)
+
             listener = stt.Listener(self._weak("_heard"), fast=fast, complete=_command_complete,
                                     language=i18n.lang, try_english=_thai_missed,
-                                    use_english=_english_command)  # fmt: skip # การ์ด 0040
+                                    use_english=_english_command,  # การ์ด 0040
+                                    facing=facing,
+                                    facing_on=face_to_speak or (lambda: False))  # fmt: skip
         self._listener = listener if active else None
         self._key, self._job, self._message = -1, -1, ""
         self._transcribing, self._mic_message, self._last_stt_s = False, "", 0.0
@@ -616,6 +696,11 @@ class VoiceController(QObject):
         self._transcribing, self._last_stt_s = False, secs
         done = "ทำตามที่สั่งแล้ว" if hands_free else "ตรวจข้อความแล้วกดส่ง"
         self._mic_message = err or f"ถอดเสียงใน {secs:.1f} วิ · {done}"
+        # การ์ด 0058: ตรวจการหันหน้าไม่ได้ = บอกครั้งเดียว (ฟังแบบเดิมไปแล้ว)
+        note = getattr(self._listener, "facing_note", "")
+        if note:
+            self._listener.facing_note = ""
+            self._mic_message = f"{note} · {self._mic_message}"
         self.micChanged.emit()
         if hands_free:
             from aipc.ui.handsfree import beep
@@ -809,6 +894,8 @@ class SystemStatus(QObject):
     healthChanged = Signal()  # noqa: N815
     readyChanged = Signal()  # noqa: N815
     _readyDone = Signal(object)  # noqa: N815
+    devicesChanged = Signal()  # noqa: N815 · รายการอุปกรณ์ (การ์ด 0051)
+    _devicesDone = Signal(object)  # noqa: N815
 
     def __init__(self, root: Path = Path("/")):
         super().__init__()
@@ -821,6 +908,9 @@ class SystemStatus(QObject):
         self._ready: list[dict] = []
         self._ready_busy = False
         self._readyDone.connect(self._on_ready)
+        self._devices: list[dict] = []
+        self._devices_busy = False
+        self._devicesDone.connect(self._on_devices)
         self._now = datetime.now()
         self._checks: list[dict] = []
         self._temp: float | None = None
@@ -837,6 +927,49 @@ class SystemStatus(QObject):
     def _tick(self) -> None:
         self._now = datetime.now()
         self.changed.emit()
+
+    # ---------- อุปกรณ์ที่ต่ออยู่ (การ์ด 0051 · aipc.doctor.devices · อ่านอย่างเดียว) ----------
+    @Property("QVariantList", notify=devicesChanged)
+    def devices(self) -> list:
+        return self._devices
+
+    @Property(bool, notify=devicesChanged)
+    def devicesBusy(self) -> bool:  # noqa: N802
+        return self._devices_busy
+
+    @Slot()
+    def scanDevices(self) -> None:  # noqa: N802
+        """ตรวจในเธรดแยก (wpctl/bluetoothctl อาจช้า) · เปิดหน้าหรือกด "ตรวจใหม่" เท่านั้น ไม่ตรวจวนเอง."""
+        import threading
+
+        from aipc.doctor import devices
+
+        if self._devices_busy:
+            return
+        self._devices_busy = True
+        self.devicesChanged.emit()
+        root = self._root
+
+        def work():
+            try:
+                found = devices.scan(root)
+            except Exception:  # noqa: BLE001 · ตรวจไม่ได้ทั้งหมด ดีกว่าค้าง
+                found = dict.fromkeys(devices.KINDS)
+            self._devicesDone.emit(found)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(object)
+    def _on_devices(self, found) -> None:
+        from aipc.doctor import devices
+
+        self._devices = [
+            {"label": devices.LABELS[k], "items": found.get(k) or [],
+             "state": "unknown" if found.get(k) is None else ("none" if not found[k] else "ok")}
+            for k in devices.KINDS
+        ]  # fmt: skip
+        self._devices_busy = False
+        self.devicesChanged.emit()
 
     # ---------- ตรวจความพร้อมก่อนสาธิต ----------
     @Property("QVariantList", notify=readyChanged)
@@ -1159,9 +1292,12 @@ class LoginController(QObject):
     AUTO_LOGIN_MS = 1500
 
     def __init__(self, dev_mode: bool, demo_scan: str | None = None,
-                 greeter_session: list[str] | None = None, connect=None, face=None):  # fmt: skip
+                 greeter_session: list[str] | None = None, connect=None, face=None,
+                 remember=None):  # fmt: skip
         super().__init__()
         self._dev = dev_mode
+        # เข้าสำเร็จ → บอกตัวช่วยว่าใครเข้าล่าสุด (ธีมหน้า Login ครั้งถัดไป · การ์ด 0051) · None = ไม่ต้องจำ
+        self._remember = remember
         # โหมด greeter (การ์ด 0003): greetd รันหน้านี้ก่อนมีใครเข้าเครื่อง · PAM ของ OS ตรวจรหัสผ่าน
         self._session = greeter_session
         self._connect = connect
@@ -1299,6 +1435,7 @@ class LoginController(QObject):
         except (OSError, greetd.ProtocolError):
             r = greetd.LoginResult(False, greetd.FACE_FAIL)
         if r.ok:
+            self._remember_user(self._found_user)
             QTimer.singleShot(0, QCoreApplication.quit)
             return
         self._state, self._message = "manual", r.message
@@ -1334,9 +1471,18 @@ class LoginController(QObject):
             g.close()
         if not r.ok:
             return "\n".join([*r.notes, r.message])
+        self._remember_user(username.strip())
         # greetd จะเริ่มเซสชันของผู้ใช้หลัง greeter ปิดตัวเอง
         QTimer.singleShot(0, QCoreApplication.quit)
         return ""
+
+    def _remember_user(self, user: str) -> None:
+        """จำไม่ได้ (ตัวช่วยไม่ตอบ) = หน้า Login ครั้งถัดไปใช้ธีมของคนเดิม · ไม่ขวางการเข้าระบบ."""
+        if self._remember is not None:
+            try:
+                self._remember(user)
+            except Exception:  # noqa: BLE001 · เรื่องสีหน้าจอต้องไม่ทำให้เข้าระบบไม่ได้
+                pass
 
 
 def _display_name(user: str) -> str:
@@ -1347,6 +1493,56 @@ def _display_name(user: str) -> str:
         return pwd.getpwnam(user).pw_gecos.split(",")[0] or user
     except (ImportError, KeyError):
         return user
+
+
+POWER_ACTIONS = ("power_off", "reboot")  # การ์ด 0052
+
+
+class PowerController(QObject):
+    """ปุ่มปิดเครื่อง/รีสตาร์ต (การ์ด 0052) ทั้งหน้า Login และในเซสชัน · หน้าจอถามยืนยันก่อนเรียกเสมอ.
+
+    active = หน้า Login จริง หรือเซสชันจริงบน Pi · หน้าต่างพัฒนา = ไม่ปิดเครื่องจริง และบอกว่าจำลอง (H5)
+    สั่งผ่าน systemctl (systemd-logind + polkit) · ไม่ต้องใช้ sudo หรือแก้ /etc
+    สั่งไม่สำเร็จ = ข้อความค้างให้เห็น (H2) · สั่งแล้ว = ไม่ให้กดซ้ำ
+    """
+
+    changed = Signal()
+
+    def __init__(self, active: bool, runner=None):
+        super().__init__()
+        self._active = active
+        self._run = runner or _run_quiet
+        self._error = ""
+        self._busy = False
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    @Slot(str, result=bool)
+    def request(self, action: str) -> bool:
+        from aipc.skills.actions import POWER_CMDS
+
+        if action not in POWER_CMDS or self._busy:
+            return False
+        if not self._active:
+            self._error = "จำลอง: หน้าต่างพัฒนาไม่ปิด/รีสตาร์ตเครื่องจริง"
+            self.changed.emit()
+            return False
+        self._busy, self._error = True, ""
+        self.changed.emit()
+        code = self._run(POWER_CMDS[action])
+        if code != 0:
+            self._busy = False
+            what = "ปิดเครื่อง" if action == "power_off" else "รีสตาร์ต"
+            self._error = f"{what}ไม่สำเร็จ (systemctl ตอบ {code}) · ลองอีกครั้ง หรือกดปุ่มที่ตัวเครื่องค้างไว้"
+            self.changed.emit()
+            return False
+        return True
 
 
 class SessionController(QObject):
@@ -1542,7 +1738,50 @@ def _run_quiet(args: list[str]) -> int:
 HELPER = "/usr/local/sbin/aipc-accounts"  # ตัวช่วย root ของการ์ด 0012 (ติดตั้งโดย install-greeter.sh)
 
 
-def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
+def greeter_theme(user: str | None = None) -> str:
+    """ธีมของหน้า Login จากตัวช่วย (การ์ด 0051) · user = เพิ่งเข้าสำเร็จ (ให้จำไว้) · ไม่ตอบ = ธีมดำ."""
+    req = {"op": "greeter-theme"} if user is None else {"op": "greeter-theme", "user": user}
+    theme = run_accounts_helper(req, timeout=5).get("theme")
+    return theme if theme in settings.THEMES else "dark"
+
+
+APPS_HELPER = "/usr/local/sbin/aipc-apps"  # ตัวติดตั้งแอปของการ์ด 0054 (ติดตั้งโดย install-apps.sh)
+
+
+def run_apps_helper(request: dict, on_progress=None) -> dict:
+    """เรียกตัวติดตั้งแอปผ่าน sudo (-n = ไม่ถามรหัส sudo) · อ่านทีละบรรทัด: มี "ok" = ผล · อื่น ๆ = ความคืบหน้า."""
+    import json
+    import subprocess
+
+    try:
+        proc = subprocess.Popen(["sudo", "-n", APPS_HELPER], stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)  # fmt: skip
+    except OSError as e:
+        return {"ok": False, "message": f"เรียกตัวติดตั้งแอปไม่ได้ ({e.strerror or e})"}
+    proc.stdin.write(json.dumps(request).encode())
+    proc.stdin.close()
+    result = None
+    for raw in proc.stdout:
+        try:
+            msg = json.loads(raw.decode("utf-8"))
+        except ValueError:
+            continue
+        if isinstance(msg, dict) and "ok" in msg:
+            result = msg
+        elif isinstance(msg, dict) and on_progress is not None:
+            on_progress(msg)
+    proc.wait()
+    return result or {"ok": False,
+                      "message": "ตัวติดตั้งแอปยังไม่ได้ติดตั้งในเครื่องนี้ (install-apps.sh)"}  # fmt: skip
+
+
+def _simulated_install(request: dict, on_progress=None) -> dict:
+    """เครื่องพัฒนา (ไม่ใช่ Linux): ไม่ติดตั้งจริง และบอกตรง ๆ ว่าจำลอง (H5)."""
+    return {"ok": True, "simulated": True, "message": "จำลอง: เครื่องนี้ไม่ใช่ Pi · ไม่ได้ติดตั้งจริง"}
+
+
+def run_accounts_helper(request: dict, timeout: float = 30, helper: str = "",
+                        missing: str = "") -> dict:  # fmt: skip
     """เรียกตัวช่วยผ่าน sudo (-n = ห้ามถามรหัส ถ้ากฎ sudo ไม่ตรงให้ล้มทันที ไม่ค้าง).
 
     คำขอส่งทาง stdin เป็น JSON · ตัวช่วยตรวจทุกอย่างซ้ำเอง (H7) หน้าจอแค่ส่งและแสดงผล
@@ -1551,7 +1790,7 @@ def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
     import subprocess
 
     try:
-        r = subprocess.run(["sudo", "-n", HELPER], input=json.dumps(request).encode(),
+        r = subprocess.run(["sudo", "-n", helper or HELPER], input=json.dumps(request).encode(),
                            capture_output=True, timeout=timeout, check=False)  # fmt: skip
     except subprocess.TimeoutExpired:
         return {"ok": False, "message": "ตัวจัดการบัญชีไม่ตอบ · ลองอีกครั้ง"}
@@ -1560,7 +1799,10 @@ def run_accounts_helper(request: dict, timeout: float = 30) -> dict:
     try:
         out = json.loads(r.stdout.decode("utf-8").strip().splitlines()[-1])
     except (ValueError, IndexError):
-        return {"ok": False, "message": "ตัวจัดการบัญชียังไม่ได้ติดตั้งในเครื่องนี้ (install-greeter.sh)"}
+        return {
+            "ok": False,
+            "message": missing or "ตัวจัดการบัญชียังไม่ได้ติดตั้งในเครื่องนี้ (install-greeter.sh)",
+        }
     return out if isinstance(out, dict) and "ok" in out else {"ok": False, "message": "ตอบผิดรูปแบบ"}
 
 
@@ -1765,12 +2007,17 @@ class SkillsController(QObject):
     _forged = Signal(object)
     gcalChanged = Signal()  # noqa: N815 · ปฏิทิน Google (การ์ด 0014) และวันหยุดไทย (0033)
     _gcal_done = Signal(object)
+    appInstallChanged = Signal()  # noqa: N815 · ติดตั้งแอป (การ์ด 0054)
+    appInstallDone = Signal("QVariantMap")  # noqa: N815 · การ์ดผล (ติดตั้ง/เปิดแล้ว หรือเหตุที่ไม่สำเร็จ)
+    _app_done = Signal(object)
+    _app_progress = Signal(object)
     _hol_done = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
-                 gcal_alert_min=None, holidays=None, time_synced=None):  # fmt: skip
+                 gcal_alert_min=None, holidays=None, time_synced=None, chat_mode=None,
+                 chat_switch=None, installer=None):  # fmt: skip
         super().__init__()
         # นาฬิกาตั้งจากเน็ตแล้วไหม (ตรวจทั้งระบบ 1.1: แบต RTC 0.00V → บูตไม่มีเน็ต = เวลาค้างที่ตอนปิดเครื่อง) ·
         # ไม่ได้ตั้ง = การ์ดเวลา/นัดบอกว่าเวลาอาจไม่ตรง (H5) · เทสต์ที่ใส่นาฬิกาปลอม = ถือว่าตั้งแล้ว
@@ -1792,6 +2039,17 @@ class SkillsController(QObject):
         self._hol_done.connect(self._on_hol_done)
         # "llm" พร้อมเมื่อ llama-server ของผู้ใช้ตอบได้จริง (ChatController) · ไม่ใช่ค่าคงที่ (H5)
         self._llm_ready = llm_ready or (lambda: False)
+        # แชท 2 แบบ (การ์ด 0053): แชทงานส่ง Claude ได้แม้ AI ในเครื่องยังไม่พร้อม
+        # chat_switch(kind, ค่า) → (ok, ข้อความ)
+        self._chat_mode = chat_mode or (lambda: "general")
+        self._chat_switch = chat_switch
+        # ติดตั้งแอป (การ์ด 0054): installer(คำขอ) → {"ok", "message"} · ตัวจริง = ตัวติดตั้ง root ผ่าน sudo
+        # (aipc.accounts.apphelper) · ไม่ใช่ Linux = จำลองและบอกว่าจำลอง (H5)
+        self._installer = installer
+        self._installing = ""  # ชื่อแอปที่กำลังติดตั้ง ("" = ไม่มี)
+        self._install_pct, self._install_stage = -1.0, ""  # -1 = ยังไม่รู้ (ยังไม่มีตัวเลขจาก apt)
+        self._app_done.connect(self._on_app_installed)
+        self._app_progress.connect(self._on_app_progress)
         from aipc.skills import actions, manifest, reminders
 
         # สกิลอัตโนมัติ (การ์ด 0017): forge(คำขอ, skills=, check=, revise=) → forge.Proposal
@@ -2097,7 +2355,8 @@ class SkillsController(QObject):
         return self._user is not None and all(s.id != skill_id for s in self._builtin)
 
     def available(self) -> set[str]:
-        return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() else set())
+        work = self._chat_mode() == "work"
+        return set(self.AVAILABLE) | ({"llm"} if self._llm_ready() or work else set())
 
     @staticmethod
     def _tile_examples(skill) -> list[str]:
@@ -2207,7 +2466,20 @@ class SkillsController(QObject):
                 self._save_failed = True
             if t.due or t.save_failed:
                 self.remindersChanged.emit()
+        self._gcal_auto_sync()
         self._gcal_tick()
+
+    def _gcal_auto_sync(self) -> None:
+        """ดึงปฏิทิน Google เองทุก 15 นาทีระหว่างเข้าระบบ (การ์ด 0051) · นับจากครั้งที่ลองล่าสุด
+        (ออฟไลน์ = ลองใหม่รอบหน้า ไม่ถี่กว่านี้) · ไม่ได้เชื่อมต่อ = ไม่ทำ."""
+        from aipc.skills.gcal import AUTO_SYNC
+
+        g = self._gcal
+        if g is None or not g.connected:
+            return
+        last = [t for t in (self._gcal_tried, g.last_sync) if t is not None]
+        if not last or self._now() - max(last) >= AUTO_SYNC:
+            self._gcal_refresh()
 
     GCAL_ALERT_MAX = (
         3  # การ์ด 0032: นัดพร้อมกันหลายนัด = เตือนทีละไม่เกิน 3 + บอกที่เหลือ (ไม่อ่านออกเสียงยาวเหยียด)
@@ -2629,6 +2901,14 @@ class SkillsController(QObject):
         return out.message
 
     def _run_plan(self, plan) -> dict:
+        if plan.action == "gcal_sync":
+            return self._gcal_sync_card()
+        if plan.action == "show_devices":
+            return self._devices_card()
+        if plan.action in ("chat_mode", "cloud_model"):
+            return self._chat_switch_card(plan)
+        if plan.action == "missing_app":
+            return self._missing_app_card(plan.params["app"])
         out = self._exec.execute(plan)
         if out.simulated:
             title = plan.summary + " (จำลอง)"
@@ -2648,6 +2928,172 @@ class SkillsController(QObject):
         elif out.ok and not out.simulated and plan.action in ("open_url", "open_app"):
             card["lines"].append("คำสั่งนี้ย้อนกลับไม่ได้ · ปิดหน้าต่างที่เปิดขึ้นมาเองได้")
         return card
+
+    def _devices_card(self) -> dict:
+        """สั่ง "มีอุปกรณ์อะไรต่ออยู่" (การ์ด 0051) · ตรวจจริงตอนนี้ บรรทัดละชนิด แล้วพาไปหน้าสุขภาพเครื่อง."""
+        from aipc.doctor import devices
+
+        return {"title": "อุปกรณ์ที่ต่ออยู่", "chips": [{"text": "ตรวจแล้ว", "kind": "ok"}],
+                "lines": devices.summary(devices.scan(self._root)), "page": "health"}  # fmt: skip
+
+    def _gcal_sync_card(self) -> dict:
+        """สั่ง "อัปเดตปฏิทิน" (การ์ด 0051) · ผลจริงมาทีหลังทาง gcalChanged · การ์ดบอกแค่ว่าเริ่มแล้วหรือยัง (H5)."""
+        card = {"title": "", "chips": [], "lines": [], "page": ""}
+        if self._gcal is None or not self._gcal.connected:
+            card["title"] = "ยังไม่ได้เชื่อมต่อปฏิทิน Google"
+            card["chips"] = [{"text": "ไม่ได้ทำ", "kind": "warn"}]
+            card["lines"] = ["วางลิงก์ iCal ลับได้ที่หน้าตั้งค่า"]
+            card["page"] = "settings"
+        elif self._gcal_refresh():
+            card["title"] = "กำลังดึงปฏิทิน Google ใหม่"
+            card["chips"] = [{"text": "ทำแล้ว", "kind": "ok"}]
+            card["lines"] = ["นัดใหม่จะขึ้นในหน้าปฏิทินเมื่อดึงเสร็จ"]
+        else:
+            card["title"] = "กำลังดึงปฏิทิน Google อยู่แล้ว"
+            card["chips"] = [{"text": "ทำแล้ว", "kind": "ok"}]
+        return card
+
+    def _chat_switch_card(self, plan) -> dict:
+        """สลับแชท/โมเดลด้วยเสียงหรือพิมพ์ (การ์ด 0053) · ผลจริงจาก ChatController/UiSettings."""
+        if plan.action == "chat_mode":
+            kind, value = "mode", plan.params["mode"]
+        else:
+            kind, value = "model", plan.params["model"]
+        if self._chat_switch is None:
+            ok, msg = False, "ใช้ได้ในเซสชันจริงเท่านั้น"
+        else:
+            ok, msg = self._chat_switch(kind, value)
+        return {"title": msg, "chips": [{"text": "ทำแล้ว" if ok else "ไม่ได้ทำ",
+                                         "kind": "ok" if ok else "warn"}],
+                "lines": [], "page": "workspace" if ok and kind == "mode" else ""}  # fmt: skip
+
+    # ---------- แอปที่ไม่มีในเครื่อง (การ์ด 0054) ----------
+    # ถามทุกครั้ง ไม่จำคำตอบ (Pakon 2026-10-22): ติดตั้งไหม → ไม่ = เปิดผ่านเว็บไหม → ไม่ = ไม่ทำอะไร
+    INSTALL_NOTE = "ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้ · ใช้เวลาหลายนาทีและต้องต่ออินเทอร์เน็ต"
+
+    def _ask(self, card: dict, pending) -> dict:
+        self._counter += 1
+        token = f"c{self._counter}"
+        self._pending[token] = pending
+        card["confirmToken"] = token
+        return card
+
+    def _missing_app_card(self, key: str) -> dict:
+        from aipc.skills import app_catalog
+
+        entry = app_catalog.load().get(key)
+        card = {"kind": "command", "title": "", "chips": [], "lines": [], "page": "",
+                "confirmToken": ""}  # fmt: skip
+        if entry is None:
+            card["title"] = "ไม่พบแอปนี้ในเครื่อง"
+        elif entry.apt:
+            card.update(title=f"ไม่มี {entry.name} ในเครื่อง · ติดตั้งไหม?", lines=[self.INSTALL_NOTE])
+            return self._ask(card, ("app-install", key))
+        elif entry.web:
+            return self._web_question(entry, card)
+        else:
+            card["title"] = f"ไม่มี {entry.name} ในเครื่อง"
+        return card
+
+    def _web_question(self, entry, card: dict) -> dict:
+        card.update(title=f"ไม่มี {entry.name} ในเครื่อง · จะเปิดผ่านเบราว์เซอร์ไหม?",
+                    lines=[f"เปิด {entry.web} ในเบราว์เซอร์ของผู้ช่วย"])  # fmt: skip
+        return self._ask(card, ("app-web", entry.key))
+
+    def _missing_app_answer(self, step: str, key: str, yes: bool) -> dict:
+        from aipc.skills import app_catalog
+        from aipc.skills.actions import Plan
+
+        entry = app_catalog.load().get(key)
+        card = {"kind": "command", "badge": {}, "title": "", "chips": [], "lines": [], "page": "",
+                "confirmToken": ""}  # fmt: skip
+        if entry is None:
+            card["title"] = "แอปนี้ไม่อยู่ในรายการแล้ว"
+        elif step == "app-install" and yes:
+            # หน้าจอถาม ตกลง/ยกเลิก อีกครั้งก่อนติดตั้งจริง (Pakon 2026-10-23: ไม่ต้องใส่รหัส)
+            card.update(kind="app-install", appInstall=key, appName=entry.name,
+                        title=f"กด “ตกลง” เพื่อติดตั้ง {entry.name}")  # fmt: skip
+        elif step == "app-install" and entry.web:
+            return self._web_question(entry, card)
+        elif step == "app-web" and yes:
+            say = f"เปิด {entry.name} ผ่านเบราว์เซอร์"
+            plan = Plan("open_url", {"url": entry.web, "site": key}, say)
+            card.update(self._run_plan(plan))
+        else:
+            card["title"] = "ไม่ได้ติดตั้งและไม่ได้เปิด"
+        return card
+
+    @Property(str, notify=appInstallChanged)
+    def installing(self) -> str:
+        return self._installing
+
+    @Property(float, notify=appInstallChanged)
+    def installPercent(self) -> float:  # noqa: N802
+        """เปอร์เซ็นต์รวมจากตัวเลขของ apt (การ์ด 0054 · Pakon 2026-10-23) · -1 = ยังไม่มีตัวเลข."""
+        return self._install_pct
+
+    @Property(str, notify=appInstallChanged)
+    def installStage(self) -> str:  # noqa: N802
+        return self._install_stage
+
+    @Slot(object)
+    def _on_app_progress(self, msg) -> None:
+        try:
+            self._install_pct = float(msg.get("percent", self._install_pct))
+        except (TypeError, ValueError):
+            return
+        self._install_stage = str(msg.get("stage", self._install_stage))
+        self.appInstallChanged.emit()
+
+    @Slot(str, result=bool)
+    def installApp(self, key: str) -> bool:  # noqa: N802
+        """ผู้ดูแลกดติดตั้ง · ทำในเธรดแยก (apt ใช้เวลาหลายนาที) · ผลมาทาง appInstallDone.
+
+        กำลังติดตั้งอยู่ / ไม่อยู่ในรายการ = False
+        """
+        import sys
+        import threading
+
+        from aipc.skills import app_catalog
+
+        entry = app_catalog.load().get(key)
+        if self._installing or entry is None or not entry.apt:
+            return False
+        run = self._installer
+        if run is None:
+            run = run_apps_helper if sys.platform.startswith("linux") else _simulated_install
+        self._installing = entry.name
+        self._install_pct, self._install_stage = -1.0, ""
+        self.appInstallChanged.emit()
+        req = {"app": key}
+
+        def work():
+            try:
+                r = run(req, self._app_progress.emit)
+            except Exception as e:  # noqa: BLE001 · บอกผู้ใช้แทนการค้าง (H2)
+                r = {"ok": False, "message": f"ติดตั้งไม่สำเร็จ: {e}"}
+            self._app_done.emit((entry, r))
+
+        threading.Thread(target=work, daemon=True).start()
+        return True
+
+    @Slot(object)
+    def _on_app_installed(self, done) -> None:
+        from aipc.skills import command
+
+        entry, r = done
+        self._installing = ""
+        self.appInstallChanged.emit()
+        card = {"kind": "command", "badge": {}, "title": str(r.get("message", "")), "lines": [],
+                "page": "", "confirmToken": "",
+                "chips": [{"text": "ติดตั้งแล้ว" if r.get("ok") else "ไม่สำเร็จ",
+                           "kind": "ok" if r.get("ok") else "danger"}]}  # fmt: skip
+        if r.get("ok") and not r.get("simulated"):
+            # เปิดเลยด้วยทางเดิมของ "เปิด X" (แอปที่เพิ่งติดตั้งมีไฟล์ .desktop แล้ว)
+            cmd = command.parse(f"เปิด{entry.aliases[0]}")
+            if cmd is not None and cmd.plan.action == "open_app":
+                card["lines"].append(self._run_plan(cmd.plan)["title"])
+        self.appInstallDone.emit(card)
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
     def tool_catalog(self, text: str = "") -> list:
@@ -3180,6 +3626,11 @@ class SkillsController(QObject):
             return {}
         if len(re.sub(r"\s+", "", text)) < 3:
             return {}
+        if NEEDS_TYPING.match(text.strip()):
+            # การ์ด 0057: สกิลประจำเว็บพิมพ์ไม่ได้ (H8) → Claude ได้แค่สกิลที่วางเคอร์เซอร์แล้วบอกว่าทำแล้ว · ไม่ถาม
+            name = SITES[site][0]
+            return {"say": f"ยังค้นใน {name} ด้วยเสียงไม่ได้ · สกิลของเว็บกดได้แค่ปุ่ม พิมพ์ข้อความไม่ได้ · "
+                           "พิมพ์คำค้นเอง หรือพูด “ค้นหา … ในยูทูบ”"}  # fmt: skip
         mine = next((s for s in self._skills if s.site == site and self._is_user(s.id)), None)
         self._counter += 1
         token = f"l{self._counter}"
@@ -3201,7 +3652,9 @@ class SkillsController(QObject):
         ask = (f"ผู้ใช้เปิดเว็บ {SITES[site][0]} อยู่ แล้วสั่งด้วยเสียงว่า “{text}” · "
                f"ทำเป็นสกิลประจำเว็บ (site: {site} · หัวข้อ ## คำสั่ง) ที่มีคำสั่งนี้ "
                "(ใส่คำพูดแบบอื่นที่คนไทยพูดบ่อยด้วย) "
-               "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง")  # fmt: skip
+               "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง · "
+               "ถ้าต้องพิมพ์ข้อความ (ค้นหา/เปิดสิ่งที่ต้องค้นก่อน) ให้ตอบว่าทำไม่ได้ "
+               "ห้ามทำคำสั่งที่แค่วางเคอร์เซอร์หรือเปิดช่องพิมพ์แทน (การ์ด 0057)")  # fmt: skip
         others = [s for s in self._skills if s.site == site and s.id != sid]
         have = [c.phrases[0] for s in others for c in s.commands][:40]
         if have:
@@ -3466,7 +3919,19 @@ class SkillsController(QObject):
         if r.kind == "command":
             card["badge"] = self._badge(r.skill, r.reason)
             risk = self.RISK_LABEL[r.command.plan.spec.risk]
-            if r.command.needs_confirmation:
+            if r.command.plan.action in POWER_ACTIONS:  # การ์ด 0052: ถามทุกครั้ง · ไม่ตอบใน 10 วิ = ยกเลิก
+                self._counter += 1
+                token = f"c{self._counter}"
+                self._pending[token] = r.command.plan
+                card.update(
+                    title=f"{r.command.plan.summary}เลยไหม?",
+                    lines=["ตอบ “ใช่” ภายใน 10 วินาที · ไม่ตอบ = ยกเลิก",
+                           "แชทและนัดบันทึกไว้แล้ว · งานในแอปอื่นที่ยังไม่บันทึกจะหาย"],
+                    chips=[{"text": risk, "kind": "neutral"}],
+                    confirmToken=token,
+                    power=True,
+                )  # fmt: skip
+            elif r.command.needs_confirmation:
                 self._counter += 1
                 token = f"c{self._counter}"
                 self._pending[token] = r.command.plan
@@ -3502,8 +3967,9 @@ class SkillsController(QObject):
             card["kind"] = "needs"
             card["title"] = f"สกิล “{r.skill.name}” ยังใช้ไม่ได้"
             card["lines"] = ["ต้องมีก่อน: " + self.NEED_LABEL[n] for n in (r.missing or r.skill.needs)]
-        elif self._llm_ready():
-            card.update(kind="chat", llm=True, prompt="")  # คุยทั่วไป → LLM ในเครื่อง (การ์ด 0013)
+        elif self._llm_ready() or self._chat_mode() == "work":
+            # คุยทั่วไป → LLM ในเครื่อง (การ์ด 0013) · แชทงาน → Claude (การ์ด 0053)
+            card.update(kind="chat", llm=True, prompt="")
         else:
             card["title"] = "ยังตอบไม่ได้: ยังไม่ได้เชื่อมต่อโมเดลในเครื่อง"
             card["lines"] = [
@@ -3531,6 +3997,9 @@ class SkillsController(QObject):
 
         if plan is None:
             card["title"] = "คำสั่งนี้หมดอายุแล้ว"
+        elif isinstance(plan, tuple) and plan[0] in ("app-install", "app-web"):
+            # การ์ด 0054 · ตอบ "ไม่" ไม่ได้แปลว่ายกเลิกทันที แต่ถามข้อถัดไป (เปิดผ่านเว็บ)
+            return self._missing_app_answer(plan[0], plan[1], yes)
         elif not yes:
             card["title"] = "ยกเลิกแล้ว ไม่ได้ทำอะไร"
         elif isinstance(plan, tuple) and plan[0] == "tie":
@@ -3589,6 +4058,12 @@ class ChatController(QObject):
 
     active=False (หน้า Login) = ไม่ติดต่อ AI เลย · สถานะมาจากการถาม /health จริงทุก 5 วิ (H5)
     คำตอบของ LLM เป็นข้อความเท่านั้น สั่ง Action ไม่ได้ (H8)
+
+    แชท 2 แบบ (การ์ด 0053 · Pakon 2026-10-22):
+      "general" ทั่วไป = ไฮบริดเดิม (การ์ด 0016/0022): AI ในเครื่องตอบก่อน ไม่รู้ = ส่งต่อ Claude เอง
+                 (Pakon 2026-10-22: "บางครั้ง local AI ก็ไม่ฉลาด") · ค่าเริ่มต้นทุกครั้งที่เปิด
+      "work"    งาน   = ทุกข้อความไป Claude ด้วยโมเดลที่ผู้ใช้เลือก (haiku/sonnet/opus) · ไม่ผ่าน AI ในเครื่อง
+    auto_cloud = เปิดการส่งต่อของแชททั่วไป (แอปจริงเปิด · สวิตช์ Claude ในหน้าตั้งค่ายังปิดได้)
     """
 
     from aipc.skills.catalog import SYSTEM, TOOLS_HINT  # ข้อความเดียวกับตัววัด spikes.skill_select
@@ -3609,13 +4084,19 @@ class ChatController(QObject):
     _token = Signal(str)
     _done = Signal(object)
     _health = Signal(str)
+    modeChanged = Signal()  # noqa: N815 · แชท 2 แบบ (การ์ด 0053)
 
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
-                 claude_on=None, meter=None):  # fmt: skip
+                 claude_on=None, meter=None, auto_cloud=False, cloud_model=None,
+                 cloud_effort=None):  # fmt: skip
         super().__init__()
-        # ไฮบริด (การ์ด 0016): cloud(คำถาม, บทสนทนา) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
+        # cloud(คำถาม, บทสนทนา[, model=]) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
+        self._auto_cloud = auto_cloud
+        self._mode = "general"
+        self._cloud_model = cloud_model or (lambda: "sonnet")  # โมเดลของแชทงานที่ผู้ใช้เลือก (ค่าตั้ง)
+        self._cloud_effort = cloud_effort or (lambda: None)  # ระดับความคิดของแชทงาน · None = ไม่ส่ง
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า
         self._forge = forge  # มีเครื่องมือ create-skill (การ์ด 0017) → บอก AI ใน system prompt
         self._model_name = model_name
@@ -3665,6 +4146,48 @@ class ChatController(QObject):
     def ready(self) -> bool:
         return self._status == "ready"
 
+    # ---------- แชท 2 แบบ (การ์ด 0053) ----------
+    @Property(str, notify=modeChanged)
+    def mode(self) -> str:
+        return self._mode
+
+    @Property(bool, notify=modeChanged)
+    def workReady(self) -> bool:  # noqa: N802
+        """แชทงานใช้ได้: มี Claude ในบัญชีนี้ และผู้ใช้เปิดสวิตช์ Claude ไว้."""
+        return self._cloud is not None and bool(self._claude_on())
+
+    @Property(str, notify=modeChanged)
+    def workBlocked(self) -> str:  # noqa: N802
+        """ทำไมแชทงานใช้ไม่ได้ ("" = ใช้ได้) · หน้าจอแสดงตรง ๆ (H5)."""
+        if self._cloud is None:
+            return "ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในบัญชีนี้"
+        if not self._claude_on():
+            return "ปิด Claude ไว้ในหน้าตั้งค่า"
+        return ""
+
+    @Slot(str, result=bool)
+    def setMode(self, mode: str) -> bool:  # noqa: N802
+        """สลับแบบแชท = เริ่มบทสนทนาใหม่ของแบบนั้น (ประวัติแยกกัน) · กำลังตอบ/ค่าแปลก/แชทงานใช้ไม่ได้ = False."""
+        if mode not in ("general", "work") or self._busy:
+            return False
+        if mode == "work" and not self.workReady:
+            return False
+        if mode != self._mode:
+            self._mode = mode
+            self.newChat(False)
+            self.modeChanged.emit()
+            if mode == "general" and self._status == "ready":
+                self._warm_up()
+        return True
+
+    @Slot()
+    def claudeChanged(self) -> None:  # noqa: N802
+        """สวิตช์ Claude เปลี่ยน · ปิดระหว่างอยู่แชทงาน = กลับแชททั่วไป (ไม่ส่งออกอีก)."""
+        if self._mode == "work" and not self.workReady and not self._busy:
+            self._mode = "general"
+            self.newChat(False)
+        self.modeChanged.emit()
+
     @Property(bool, notify=changed)
     def busy(self) -> bool:
         return self._busy
@@ -3690,8 +4213,9 @@ class ChatController(QObject):
 
     @Property("QVariantList", notify=changed)
     def history(self) -> list:
+        """ประวัติของแบบแชทที่เปิดอยู่เท่านั้น · แชทเก่าก่อนการ์ด 0053 (ไม่มี mode) = ทั่วไป."""
         try:
-            return self._store.list()
+            return [c for c in self._store.list() if c.get("mode", "general") == self._mode]
         except OSError:
             return []
 
@@ -3750,8 +4274,8 @@ class ChatController(QObject):
         return m
 
     def _cloud_ok(self) -> bool:
-        """มี Claude ในบัญชีนี้ และผู้ใช้เปิดสวิตช์ไว้."""
-        return self._cloud is not None and bool(self._claude_on())
+        """AI ในเครื่องส่งต่อ Claude เองได้ไหม (ไฮบริดของแชททั่วไป) · มี Claude + เปิดสวิตช์ + auto_cloud."""
+        return self._auto_cloud and self._cloud is not None and bool(self._claude_on())
 
     @Slot()
     def claudeSwitched(self) -> None:  # noqa: N802
@@ -3805,6 +4329,8 @@ class ChatController(QObject):
     @Slot(str, str, result=bool)
     @Slot(str, str, bool, result=bool)
     def send(self, text: str, prompt: str = "", use_tools: bool = True) -> bool:
+        if self._mode == "work":
+            return self._send_work(text)
         if self._busy or not text.strip() or self._status != "ready":
             return False
         import threading
@@ -3852,6 +4378,29 @@ class ChatController(QObject):
             target=lambda: self._done.emit(stream.run(self._token.emit)), daemon=True
         ).start()
         return True
+
+    def _send_work(self, text: str) -> bool:
+        """แชทงาน: ส่งให้ Claude ตรง ๆ ไม่ต้องรอ AI ในเครื่อง · สกิลภาษา (แปล/สรุป) ส่งแค่ข้อความของผู้ใช้."""
+        if self._busy or not text.strip() or not self.workReady:
+            return False
+        self._conv["messages"].append({"role": "user", "content": text})
+        self._trace = {"t0": time.monotonic(), "why": "แชทงาน: ทุกข้อความส่งให้ Claude"}
+        effort = self._work_effort()
+        why = f"โมเดลที่เลือก: {self._work_model()}" + (f" · ความคิด {effort}" if effort else "")
+        self._ask_cloud(why)
+        return True
+
+    def _work_effort(self) -> str | None:
+        from aipc.cloud.ask import EFFORTS
+
+        e = self._cloud_effort()
+        return e if e in EFFORTS else None
+
+    def _work_model(self) -> str:
+        from aipc.cloud.ask import MODELS
+
+        m = self._cloud_model()
+        return m if m in MODELS else "sonnet"
 
     @Slot()
     def stop(self) -> None:
@@ -3921,12 +4470,17 @@ class ChatController(QObject):
         note = self.NOTE.get(reply.reason, reply.detail if reply.reason else "")
         if getattr(reply, "cloud", False):
             note = self.CLOUD_NOTE
+            if self._mode == "work":
+                used = getattr(reply, "model", "") or "ไม่ทราบโมเดล"
+                note = f"แชทงาน · ตอบโดย Claude ({used}) · ส่งออกนอกเครื่อง"
         elif self._switched_off_gave_up(reply, with_file):
             note = self.CLAUDE_OFF_NOTE
         if reply.text:
             msg = {"role": "assistant", "content": reply.text}
             if getattr(reply, "cloud", False):
                 msg["by"] = "claude"  # ส่งให้ AI ในเครื่องครั้งหน้าพร้อมป้ายที่มา (_for_local)
+                if getattr(reply, "model", ""):
+                    msg["model"] = reply.model
             self._conv["messages"].append(msg)
         if not self._temporary:
             try:
@@ -3968,6 +4522,8 @@ class ChatController(QObject):
         cloud = t.get("cloud")
         if cloud:
             who = "Claude (cloud)" if getattr(reply, "cloud", False) else "Claude (ถามไม่สำเร็จ)"
+            if getattr(reply, "model", ""):
+                who += f" · {reply.model}"
             why = f"{t.get('why', '')} → {cloud['why']}"
             ctx = f" + บทสนทนาล่าสุด {cloud['turns']} ข้อความ" if cloud["turns"] else ""
             out = (f"ส่งคำถาม{ctx} ({cloud['chars']} ตัวอักษร) ไป Claude · "
@@ -4010,11 +4566,22 @@ class ChatController(QObject):
         self.changed.emit()
         self.streamChanged.emit()
 
+        work_model = self._work_model() if self._mode == "work" else None
+        effort = self._work_effort() if work_model else None
+        if work_model:
+            how = work_model + (f" · ความคิด {effort}" if effort else "")
+            self._stream_text = f"กำลังถาม Claude ({how}) · แชทงาน…"
+
         def work():
-            c = self._cloud(question, history)
+            if work_model:
+                extra = {"effort": effort} if effort else {}
+                c = self._cloud(question, history, model=work_model, **extra)
+            else:
+                c = self._cloud(question, history)
             reply = client.Reply(text=c.text if c.ok else "", reason="" if c.ok else "error",
                                  detail="" if c.ok else c.error)  # fmt: skip
             reply.cloud = c.ok  # type: ignore[attr-defined]
+            reply.model = getattr(c, "model", "") or ""  # type: ignore[attr-defined]
             self._done.emit(reply)
 
         threading.Thread(target=work, daemon=True).start()
@@ -4029,6 +4596,8 @@ class ChatController(QObject):
         """แนบไฟล์ให้คำถามถัดไป ๆ · คืนข้อความผิดพลาด ("" = สำเร็จ) · เนื้อหาไฟล์อยู่ในเครื่องเท่านั้น."""
         from aipc import files_qa
 
+        if self._mode == "work":  # การ์ด 0053 ข้อ 7: แชทงานส่งทุกอย่างออกนอกเครื่อง → ไม่รับไฟล์
+            return "แนบไฟล์ได้เฉพาะแชททั่วไป (เนื้อหาไฟล์ไม่ออกนอกเครื่อง)"
         try:
             text = files_qa.extract(Path(path))
         except files_qa.Unsupported as e:
@@ -4064,6 +4633,7 @@ class ChatController(QObject):
 
         self.stop()
         self._conv, self._temporary, self._trimmed = chat_store.new_conversation(), temporary, False
+        self._conv["mode"] = self._mode
         # ไฟล์ที่แนบเป็นของแชทเดิม (สำรวจบน Pi 5 2026-10-12: แชทใหม่ยังแนบอยู่ → "ปรับเสียงเป็น 40" ถูกถามไฟล์แทน)
         self._file = None
         self.changed.emit()
@@ -4073,6 +4643,12 @@ class ChatController(QObject):
         conv = self._store.load(cid)
         if conv is None or self._busy:
             return []
+        mode = conv.get("mode", "general")
+        if mode == "work" and not self.workReady:
+            return []  # เปิดแชทงานเก่าตอนปิด Claude ไว้ = ถามต่อไม่ได้ · ไม่สลับ
+        if mode != self._mode:
+            self._mode = mode
+            self.modeChanged.emit()
         self._conv, self._temporary, self._trimmed = conv, False, False
         self._file = None
         self.changed.emit()

@@ -26,7 +26,7 @@ vision = ["opencv-python-headless>=4.10", "numpy>=1.26"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-aipc = ["ui/qml/AipcUi/*", "i18n/*.json", "ui/fonts/*", "skills/builtin/*.md", "skills/builtin/*.json", "skills/forge_prompt.md", "spikes/rating_page.html", "spikes/exam_review_page.html", "vision/models/*"]
+aipc = ["ui/qml/AipcUi/*", "i18n/*.json", "ui/fonts/*", "skills/builtin/*.md", "skills/builtin/*.json", "skills/forge_prompt.md", "skills/app_catalog.json", "ui/lock/*", "spikes/rating_page.html", "spikes/exam_review_page.html", "vision/models/*"]
 
 [tool.ruff]
 line-length = 100

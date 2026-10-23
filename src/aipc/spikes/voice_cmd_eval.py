@@ -2,6 +2,7 @@
 
     python -m aipc.spikes.voice_cmd_eval tests/data/voice_cmd_test.json --out ผล.json
     (--app-hotwords = คำใบ้แบบแอปจริง: + คำพูดของสกิล · การ์ด 0046)
+    (--trim = ตัดเหลือช่วงพูดแบบ Listener ก่อนถอด · การ์ด 0056 N2)
 
 ป้าย = aipc.spikes.voice_all_eval.label (ทางเดียวกับคีย์ลัดในแอป) ของข้อความที่ถอดได้ เทียบกับของประโยคต้นฉบับ ·
 ถูกตรง = ป้ายเท่ากัน · ถูกผ่านการยืนยัน = ได้การ์ด "หมายถึง … ใช่ไหม" ที่ชี้คำสั่งถูก
@@ -34,12 +35,35 @@ for i, text in enumerate(json.load(open(sys.argv[2], encoding="utf-8"))):
 ACTS = ("browser:", "command", "app:")
 
 
+def trim_like_app(wav: Path) -> None:
+    """การ์ด 0056: เสียงรอบข้างเบา 0.4 วิ + คำพูด + เงียบ 1.5 วิ → Endpointer หาช่วงพูด →
+    เขียนไฟล์เหลือแค่ช่วงนั้น (ทางเดียวกับ Listener._watch → stop() → _trim)."""
+    import random
+    import struct
+    import wave
+
+    rnd = random.Random(7)
+    with wave.open(str(wav)) as w:
+        pcm = w.readframes(w.getnframes())
+    lead = b"".join(struct.pack("<h", rnd.randint(-30, 30)) for _ in range(6400))
+    stream = lead + pcm + b"\x00\x00" * 24000
+    ep = stt.Endpointer()
+    ep.feed(stream)
+    a, b = ep.speech_span(len(stream))
+    with wave.open(str(wav), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(16000)
+        w.writeframes(stream[a:b])
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("dataset", type=Path)
     ap.add_argument("--out", type=Path, required=True)
     # การ์ด 0046 W6: คำใบ้แบบแอปจริงของบัญชีใหม่ = รายการเดิม + คำพูดของสกิล (SkillsController.voicePhrases)
     ap.add_argument("--app-hotwords", action="store_true")
+    ap.add_argument("--trim", action="store_true")
     a = ap.parse_args(argv)
     items = json.loads(a.dataset.read_text(encoding="utf-8"))["items"]
     work = Path(tempfile.mkdtemp(prefix="vcmd-"))
@@ -54,6 +78,8 @@ def main(argv: list[str] | None = None) -> int:
         src, wav = work / f"{i:03d}.wav", work / f"{i:03d}-16k.wav"
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-ar", "16000",
                         "-ac", "1", str(wav)], check=True)  # fmt: skip
+        if a.trim:
+            trim_like_app(wav)
         t = time.monotonic()
         heard, err = fast.transcribe(wav)
         secs = round(time.monotonic() - t, 3)

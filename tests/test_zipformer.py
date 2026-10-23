@@ -9,6 +9,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from aipc.voice import zipformer
 from aipc.voice.stt import Listener
@@ -143,7 +144,8 @@ class ListenerFastPathTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        # คืนค่าเดิมเมื่อเทสต์จบ: เดิมค้างชี้โฟลเดอร์ที่ถูกลบแล้ว → เทสต์หน้าจอที่รันต่อมาล้มเป็นบางรอบ
+        self.enterContext(mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": self.tmp.name}))
         self.done = threading.Event()
         self.result: list = []
 

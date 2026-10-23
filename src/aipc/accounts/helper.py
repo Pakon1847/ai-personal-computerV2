@@ -443,6 +443,47 @@ def _resume_deleting(system: System) -> None:
         system.log(f"ลบบัญชีที่ค้างจากไฟดับต่อ: {name}")
 
 
+THEMES = ("dark", "light")  # ชุดเดียวกับ aipc.ui.settings.THEMES (ตัวช่วยไม่ import ส่วนหน้าจอ)
+THEME_FILE_MAX = 65536
+
+
+def _greeter_user_file(system: System) -> Path:
+    return system.state / "greeter-user.json"
+
+
+def greeter_theme(request: dict, system: System) -> dict:
+    """ธีมของหน้า Login = ธีมของผู้ใช้ที่เข้าล่าสุด (การ์ด 0051 · Pakon 2026-10-22).
+
+    หน้า Login (`_greetd`) อ่าน home ของผู้ใช้ไม่ได้ (ตั้งใจ) → ตัวช่วยอ่านให้ แต่คืนแค่ "dark"/"light"
+    มี "user" = เพิ่งเข้าสำเร็จ → จำชื่อไว้ (root 0600) · ไม่มี = หน้า Login เพิ่งเปิด → อ่านธีมปัจจุบันของคนที่จำไว้
+    (จึงได้ธีมที่ผู้ใช้เปลี่ยนระหว่างใช้งานด้วย) · อ่านไม่ได้ทุกกรณี = ธีมดำ (ค่าเริ่มต้นการ์ด 0041)
+    """
+    user = request.get("user")
+    if user is not None:
+        if not isinstance(user, str) or not validation.USERNAME_RE.match(user):
+            return _fail("ชื่อผู้ใช้ไม่ถูกต้อง")
+        if system.user_home(user) is not None:
+            _write_private(_greeter_user_file(system), {"user": user})
+    return {"ok": True, "theme": _theme_of_last_user(system)}
+
+
+def _theme_of_last_user(system: System) -> str:
+    try:
+        user = json.loads(_greeter_user_file(system).read_text(encoding="utf-8")).get("user")
+        home = system.user_home(user) if isinstance(user, str) else None
+        if home is None:
+            return "dark"
+        # ไฟล์อยู่ในพื้นที่ของผู้ใช้ (ผู้ใช้แก้/ทำลิงก์ได้) → ต้องอยู่ใน home จริง · จำกัดขนาด ·
+        # คืนได้แค่ค่าในรายการ จึงไม่มีข้อมูลอื่นรั่วออกไปหน้า Login
+        path = (home / ".config" / "aipc" / "ui.json").resolve()
+        if not path.is_relative_to(home.resolve()) or path.stat().st_size > THEME_FILE_MAX:
+            return "dark"
+        theme = json.loads(path.read_text(encoding="utf-8")).get("theme")
+    except (OSError, ValueError, AttributeError):
+        return "dark"
+    return theme if theme in THEMES else "dark"
+
+
 def handle(raw: bytes, system: System) -> dict:
     caller = system.caller()
     if caller not in (CALLER, VISION):
@@ -456,7 +497,7 @@ def handle(raw: bytes, system: System) -> dict:
     if not isinstance(request, dict):
         return _fail("คำขออ่านไม่ได้")
     ops = (
-        {"create": create, "recover": recover, "delete": delete}
+        {"create": create, "recover": recover, "delete": delete, "greeter-theme": greeter_theme}
         if caller == CALLER
         else {"check-password": check_password}
     )

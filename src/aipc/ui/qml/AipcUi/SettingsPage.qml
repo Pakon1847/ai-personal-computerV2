@@ -459,8 +459,10 @@ ColumnLayout {
                 Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                 text: uiSettings.lockMin === 0
                       ? Tr.t("ปิดอยู่: ถ้าลืมกดออกแล้วลุกไป คนต่อไปจะเห็นงาน แชท และบัญชีเว็บที่เข้าไว้")
-                      : Tr.t("ไม่ได้แตะคีย์บอร์ดหรือเมาส์ ") + uiSettings.lockMin + Tr.t(" นาที → ล็อกทุกหน้าต่าง (ปลดด้วยรหัสผ่าน) · ล็อกค้างอีก ")
-                        + uiSettings.logoutMin + Tr.t(" นาที → ออกจากระบบเอง งานที่ยังไม่บันทึกจะหาย")
+                      : Tr.t("ไม่ได้แตะคีย์บอร์ดหรือเมาส์ ") + uiSettings.lockMin + Tr.t(" นาที → ล็อกทุกหน้าต่าง (ปลดด้วยรหัสผ่าน) · ")
+                        + (uiSettings.logoutMin === 0
+                           ? Tr.t("ไม่ออกจากระบบเอง แอปและงานที่เปิดไว้ยังอยู่")
+                           : Tr.t("ล็อกค้างอีก ") + uiSettings.logoutMin + Tr.t(" นาที → ออกจากระบบเอง งานที่ยังไม่บันทึกจะหาย"))
             }
             Flow {
                 Layout.fillWidth: true
@@ -487,7 +489,7 @@ ColumnLayout {
                     AppButton {
                         required property int modelData
                         objectName: "logoutMin" + modelData
-                        text: modelData + Tr.t(" นาที")
+                        text: modelData === 0 ? Tr.t("ไม่ออกเอง") : modelData + Tr.t(" นาที")
                         kind: uiSettings.logoutMin === modelData ? "primary" : "secondary"
                         onClicked: uiSettings.setLogoutMin(modelData)
                     }
@@ -496,13 +498,20 @@ ColumnLayout {
             // ขั้น C: กล้องช่วยดูว่าเจ้าของยังอยู่ · ต้องลงทะเบียน "ใบหน้าของฉัน" ก่อน · เปิดเอง
             AppCheck {
                 objectName: "presenceCheck"
-                enabled: face.state === "enrolled" || uiSettings.presence
+                // การ์ด 0051 ทาง ก: ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร (เข้าด้วยใบหน้า) ได้เลย ไม่ต้องลงทะเบียนซ้ำ ·
+                // "ใบหน้าของฉัน" แบบเดิมยังใช้ได้สำหรับบัญชีที่ไม่ได้เปิดเข้าด้วยใบหน้า
+                readonly property bool hasFace: loginFace.state === "enabled" || face.state === "enrolled"
+                enabled: hasFace || uiSettings.presence
                 text: Tr.t("ใช้กล้องช่วยดูว่าฉันยังนั่งอยู่")
-                detail: face.state !== "enrolled" && !uiSettings.presence
-                        ? Tr.t("ต้องลงทะเบียน \"ใบหน้าของฉัน\" ด้านบนก่อน")
-                        : Tr.t("ไม่ได้แตะเครื่อง 10 วินาที → กล้องเปิด · ไม่เห็นหน้าคุณ ") + uiSettings.presenceLockS
-                          + Tr.t(" วินาที หรือเห็นคนอื่นแทน → ล็อก · ล็อกแล้วไม่มีใครอยู่อีก ") + uiSettings.presenceLogoutS
-                          + Tr.t(" วินาที → ออกจากระบบ · ไม่บันทึกภาพ · ไฟกล้องติดเฉพาะตอนกล้องเปิด")
+                detail: !hasFace && !uiSettings.presence
+                        ? Tr.t("ต้องเปิด \"เข้าเครื่องด้วยใบหน้า\" ด้านบนก่อน (ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร)")
+                        : (loginFace.state === "enabled" ? Tr.t("ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร · ") : "")
+                          + Tr.t("ไม่ได้แตะเครื่อง 10 วินาที → กล้องเปิด · ไม่เห็นหน้าคุณ ") + uiSettings.presenceLockS
+                          + Tr.t(" วินาที หรือเห็นคนอื่นแทน → ล็อก · ")
+                          + (uiSettings.presenceLogoutS === 0
+                             ? Tr.t("ไม่ออกจากระบบเอง")
+                             : Tr.t("ล็อกแล้วไม่มีใครอยู่อีก ") + uiSettings.presenceLogoutS + Tr.t(" วินาที → ออกจากระบบ"))
+                          + Tr.t(" · ไม่บันทึกภาพ · ไฟกล้องติดเฉพาะตอนกล้องเปิด")
                 checked: uiSettings.presence
                 onClicked: uiSettings.setPresence(checked)
             }
@@ -528,15 +537,34 @@ ColumnLayout {
                 spacing: 8
                 AppText { text: Tr.t("ออกหลังล็อกถ้าไม่มีใคร"); size: Theme.fontSmall; color: Theme.inkMuted; height: 44; verticalAlignment: Text.AlignVCenter }
                 Repeater {
-                    model: uiSettings.presenceChoices
+                    model: uiSettings.presenceLogoutChoices
                     AppButton {
                         required property int modelData
                         objectName: "presenceLogout" + modelData
-                        text: modelData + Tr.t(" วินาที")
+                        text: modelData === 0 ? Tr.t("ไม่ออกเอง") : modelData + Tr.t(" วินาที")
                         kind: uiSettings.presenceLogoutS === modelData ? "primary" : "secondary"
                         onClicked: uiSettings.setPresenceLogoutS(modelData)
                     }
                 }
+            }
+            // การ์ด 0055: ปลดจอล็อกเองเมื่อเห็นหน้า · ใช้ใบหน้าที่ลงทะเบียนตอนสมัคร · กล้องเปิดตลอดตอนล็อก → เปิดเอง (ค่าเริ่มต้นปิด)
+            AppCheck {
+                objectName: "faceAutoUnlockCheck"
+                enabled: loginFace.state === "enabled" || uiSettings.faceAutoUnlock
+                text: Tr.t("ปลดจอล็อกเองเมื่อเห็นหน้าฉัน")
+                detail: loginFace.state !== "enabled" && !uiSettings.faceAutoUnlock
+                        ? Tr.t("ต้องเปิด \"เข้าเครื่องด้วยใบหน้า\" ด้านบนก่อน")
+                        : Tr.t("ตอนจอล็อก กล้องเปิดตลอด (ไฟกล้องติด) · มานั่งหน้าเครื่องแล้วเข้าได้เลย · ตรวจรูปปลอม · ผิด 5 ครั้งต้องใช้รหัสผ่าน · ไม่บันทึกภาพ")
+                checked: uiSettings.faceAutoUnlock
+                onClicked: uiSettings.setFaceAutoUnlock(checked)
+            }
+            // การ์ด 0058: ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ (ใช้แค่หาหน้า ไม่ต้องลงทะเบียน) · ค่าเริ่มต้นปิด
+            AppCheck {
+                objectName: "faceToSpeakCheck"
+                text: Tr.t("ฟังคำสั่งเสียงเฉพาะตอนหันหน้าเข้าจอ")
+                detail: Tr.t("กด F9 แล้วกล้องเปิดระหว่างฟัง (ไฟกล้องติด) · หันไปคุยกับคนอื่น = ไม่นับเป็นคำสั่ง · ไม่บันทึกภาพ")
+                checked: uiSettings.faceToSpeak
+                onClicked: uiSettings.setFaceToSpeak(checked)
             }
             AppText {
                 objectName: "presenceStatusText"

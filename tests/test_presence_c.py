@@ -37,6 +37,10 @@ class DeciderTest(unittest.TestCase):
         self.assertEqual(acts, [(30.0, "lock"), (60.0, "logout")])
         self.assertEqual(d.reason, "absent")
 
+    def test_logout_zero_locks_but_never_logs_out(self):
+        # การ์ด 0051: ไม่มีคน = ล็อกอย่างเดียว · ไม่มีใครอีกนานแค่ไหนก็ไม่ออก
+        self.assertEqual(drive(Decider(30, 0), [NOBODY] * 2000), [(30.0, "lock")])
+
     def test_looking_down_shorter_than_threshold_is_fine(self):
         # ขั้น B: ระหว่างนั่งใช้ ไม่เห็นหน้านานสุด 14.5 วิ
         self.assertEqual(drive(Decider(), ([OWNER] + [NOBODY] * 29) * 20), [])
@@ -156,12 +160,14 @@ class WiringTest(unittest.TestCase):
     def test_lock_text_mentions_camera_when_presence(self):
         lines = idle.lock_lines("ก", 5, 10, presence_logout_s=30)
         self.assertIn("กล้อง", lines[1])
-        self.assertIn("30 วินาที", lines[3])
+        self.assertIn("30 วินาที", lines[-1])
 
     def test_prefs_default_off_and_validated(self):
         self.assertFalse(settings.UiPrefs().presence)
         p = settings.UiPrefs(presence=True, presence_lock_s=45, presence_logout_s=True).cleaned()
-        self.assertEqual((p.presence, p.presence_lock_s, p.presence_logout_s), (True, 30, 30))
+        self.assertEqual((p.presence, p.presence_lock_s, p.presence_logout_s), (True, 30, 0))
+        self.assertEqual(settings.UiPrefs(presence_logout_s=60).cleaned().presence_logout_s, 60)
+        self.assertEqual(settings.UiPrefs(presence_lock_s=0).cleaned().presence_lock_s, 30)
 
     def test_camera_claim_flag_removed_after(self):
         with tempfile.TemporaryDirectory() as d:

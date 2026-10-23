@@ -40,8 +40,9 @@ def stub_cloud(question, history):
 
 def _route_ok(r: dict, names: dict) -> bool:
     """สกิลที่คาดไว้ (id) ตรงกับทางที่แอปไป: skill:<id> (AI เลือก) หรือ rule:<ชนิด>:<ชื่อสกิล> (กฎ)."""
-    return bool(r.get("skill")) and (r["route"] == f"skill:{r['skill']}"
-                                     or r["route"].endswith(":" + names.get(r["skill"], "?")))
+    return bool(r.get("skill")) and (
+        r["route"] == f"skill:{r['skill']}" or r["route"].endswith(":" + names.get(r["skill"], "?"))
+    )
 
 
 def summarize(rows: list[dict], crit: dict) -> dict:

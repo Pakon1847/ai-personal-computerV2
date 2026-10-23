@@ -40,9 +40,11 @@ class ModelFileTest(unittest.TestCase):
                     self.assertEqual(models.locate(fake), Path(shared) / "x.onnx")
 
     def test_missing_download_says_how_to_fetch(self):
+        # ปิดที่เก็บกลางด้วย: บน Pi มีโมเดลจริงอยู่ที่ shared_dir → เดิมเทสต์นี้ล้มทุกครั้ง (หาเจอ ไม่ error)
         with tempfile.TemporaryDirectory() as d, mock.patch.dict(os.environ, {"AIPC_MODEL_DIR": d}):
-            with self.assertRaisesRegex(models.ModelError, "fetch"):
-                models.locate(models.SFACE)
+            with mock.patch.object(models, "shared_dir", return_value=Path(d) / "none"):
+                with self.assertRaisesRegex(models.ModelError, "fetch"):
+                    models.locate(models.SFACE)
 
     def test_fetch_rejects_wrong_download_and_leaves_nothing(self):
         def fake_download(url, path):

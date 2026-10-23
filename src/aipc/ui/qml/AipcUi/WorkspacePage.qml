@@ -98,6 +98,7 @@ Item {
     }
     function showCard(card) {
         push({ user: false, card: card })
+        if (card.appInstall) installPopup.openFor(card.appInstall, card.appName)   // การ์ด 0054: ผู้ดูแลใส่รหัส
         if (card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
     }
     function send() {
@@ -121,8 +122,8 @@ Item {
     // การ์ดจากสกิล → แสดง และ/หรือส่งให้ AI ในเครื่อง · ใช้ทั้งตอนผู้ใช้พิมพ์ และตอน AI เลือกสกิลให้ (skillRequested)
     function dispatch(card, text) {
         const toAi = card.llm === true && chat.send(text, card.prompt || "", card.tools !== false)
-        if (card.llm && !toAi)
-            card.title = Tr.t("ยังตอบไม่ได้: ") + chat.statusText   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง
+        if (card.llm && !toAi)   // สถานะเปลี่ยนระหว่างทาง · บอกตามจริง (แชทงาน = เหตุที่ Claude ใช้ไม่ได้ · การ์ด 0053)
+            card.title = Tr.t("ยังตอบไม่ได้: ") + (chat.mode === "work" ? chat.workBlocked : chat.statusText)
         // สกิลแบบขั้นตอนเห็นการ์ดขั้นตอนเสมอ แม้ขั้นสุดท้ายจะส่งต่อให้ AI
         if (!toAi || card.kind === "steps")
             showCard(card)
@@ -136,6 +137,11 @@ Item {
         answered = ({})
     }
     // ข้อความจากเสียง: ใส่ช่องพิมพ์ให้ตรวจ/แก้แล้วกดส่งเอง (ทดลองแล้ว: ถอดผิดทำให้ทำคำสั่งผิดโดยไม่ถาม)
+    // แชท 2 แบบ (การ์ด 0053): สลับแบบ = บทสนทนาใหม่ของแบบนั้น · ล้างฟองข้อความของแบบเดิม
+    Connections {
+        target: chat
+        function onModeChanged() { voice.stop(); root.items = []; root.answered = ({}) }
+    }
     Connections {
         target: voice
         function onTranscribed(text) {
@@ -235,6 +241,12 @@ Item {
         }
         if (card.siteRun) {    // การ์ด 0046: ยืนยันคำสั่งของสกิลประจำเว็บแล้ว
             siteRun(card, heard)
+            return
+        }
+        if (card.appInstall) {   // การ์ด 0054: ใช่ แล้วกด ตกลง/ยกเลิก ที่จอ (ยืนยันอีกชั้นก่อนติดตั้งจริง)
+            voicePopup.close()
+            AppState.page = "workspace"
+            showCard(card)
             return
         }
         if (card.chatText) {   // การ์ด 0042 รอบ 3: ถามในแชท = เหมือนพิมพ์เอง
@@ -355,6 +367,8 @@ Item {
             // การ์ด 0046: ได้ยินใกล้คำสั่งของเว็บที่เปิดอยู่ = "หมายถึง … ใช่ไหม"
             const near = url !== "" ? skills.siteNear(t, url) : ({})
             if (near.confirmToken) { voiceDispatch(near, t); return }
+            // การ์ด 0057: อยู่ใน YouTube (เว็บที่ค้นได้) + "เปิดช่อง 8" = ค้นในเว็บนั้น (ไม่ส่งให้ Claude ทำสกิล)
+            if (url !== "" && browser.siteSearch(t, url)) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
             // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
             if (ask.confirmToken) { voiceDispatch(ask, t); return }
@@ -364,6 +378,7 @@ Item {
             // การ์ด 0046: อยู่ในเว็บที่คุมได้ + ยังไม่มีคำสั่งนี้ = ถามว่าให้ Claude เพิ่มเข้าสกิลของเว็บนั้นไหม
             const learn = url !== "" ? skills.siteLearn(t, url) : ({})
             if (learn.confirmToken) { voiceDispatch(learn, t); return }
+            if (learn.say) { voiceSay(t, learn.say); return }   // การ์ด 0057: งานที่ต้องพิมพ์ = บอกตามจริง
             // การ์ด 0042 รอบ 3: ไม่ใช่คำสั่งทันที = ถามว่าส่งไปถามในแชทไหม (แทน "ไม่รู้จักคำสั่ง")
             const toChat = skills.voiceAsk(t)
             if (toChat.confirmToken) { voiceDispatch(toChat, t); return }
@@ -432,40 +447,97 @@ Item {
     }
 
     // ---------- ปุ่มมุมขวาบน ----------
-    RowLayout {
+    // แถว 1: ปุ่มเปิด-ปิด/คำสั่ง ชิดขวา (Flow ขวาไปซ้าย · ตัวอักษรใหญ่แล้วขึ้นแถวใหม่ · ตัวแรกในไฟล์อยู่ขวาสุด)
+    // แถว 2: เลือกโหมดแชท/โมเดล/ระดับความคิด เป็นแถบแบ่งช่อง (การ์ด 0053)
+    ColumnLayout {
         id: tools
+        anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        anchors.leftMargin: 24
         anchors.rightMargin: 24
-        spacing: 8
-        // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
-        AppButton {
-            objectName: "speakSwitch"
-            visible: voice.available
-            kind: uiSettings.speakAnswers ? "primary" : "secondary"
-            iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
-            text: Tr.t("อ่านคำตอบออกเสียง: ") + (uiSettings.speakAnswers ? Tr.t("เปิด") : Tr.t("ปิด"))
-            Accessible.name: text + Tr.t(" · แตะเพื่อ") + (uiSettings.speakAnswers ? Tr.t("ปิด") : Tr.t("เปิด"))
-            onClicked: {
-                const on = !uiSettings.speakAnswers
-                uiSettings.setSpeakAnswers(on)
-                if (!on) voice.stop()
+        spacing: 10
+        Flow {
+            Layout.fillWidth: true
+            layoutDirection: Qt.RightToLeft
+            spacing: 8
+            AppButton {
+                text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
+                ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
+                onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
+            }
+            AppButton {
+                visible: !root.home
+                text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
+                onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
+            }
+            AppButton {
+                id: historyButton
+                text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
+                onClicked: historyPopup.open()
+            }
+            // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
+            AppButton {
+                objectName: "speakSwitch"
+                visible: voice.available
+                kind: uiSettings.speakAnswers ? "primary" : "secondary"
+                iconPath: uiSettings.speakAnswers ? Icons.speaker : Icons.speakerOff
+                text: Tr.t("อ่านคำตอบออกเสียง: ") + (uiSettings.speakAnswers ? Tr.t("เปิด") : Tr.t("ปิด"))
+                Accessible.name: text + Tr.t(" · แตะเพื่อ") + (uiSettings.speakAnswers ? Tr.t("ปิด") : Tr.t("เปิด"))
+                onClicked: {
+                    const on = !uiSettings.speakAnswers
+                    uiSettings.setSpeakAnswers(on)
+                    if (!on) voice.stop()
+                }
             }
         }
-        AppButton {
-            id: historyButton
-            text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
-            onClicked: historyPopup.open()
-        }
-        AppButton {
-            visible: !root.home
-            text: Tr.t("แชทใหม่"); kind: "secondary"; iconPath: Icons.plus
-            onClicked: { voice.stop(); chat.newChat(false); root.items = []; root.answered = ({}) }
-        }
-        AppButton {
-            text: chat.temporary ? Tr.t("แชทชั่วคราว ✓") : Tr.t("แชทชั่วคราว"); kind: "secondary"
-            ToolTip.visible: hovered; ToolTip.text: Tr.t("ไม่บันทึกประวัติของบทสนทนานี้")
-            onClicked: { voice.stop(); chat.newChat(!chat.temporary); root.items = []; root.answered = ({}) }
+        // แชท 2 แบบ (การ์ด 0053) · แถวของตัวเอง แยกจากปุ่มเปิด-ปิดด้านบน (Pakon 2026-10-22: เดิมหน้าตาเหมือนปุ่มเสียงอ่าน)
+        // ทั่วไป = AI ในเครื่องก่อน (ไม่รู้ = ส่ง Claude เอง) · งาน = Claude ทุกข้อความ เลือกโมเดลและระดับความคิดได้
+        Flow {
+            objectName: "chatSetup"
+            Layout.fillWidth: true
+            spacing: 16
+            Segmented {
+                objectName: "modeSwitch"
+                label: Tr.t("โหมดแชท")
+                current: chat.mode
+                options: [
+                    { value: "general", text: Tr.t("แชททั่วไป"), hint: Tr.t("ในเครื่องก่อน") },
+                    { value: "work", text: Tr.t("แชทงาน"), hint: Tr.t("Claude ทุกข้อความ") }
+                ]
+                onPicked: (v) => { if (!chat.setMode(v)) modeNote.text = Tr.t("แชทงานใช้ไม่ได้: ") + chat.workBlocked }
+            }
+            Segmented {
+                objectName: "modelSwitch"
+                visible: chat.mode === "work"
+                label: Tr.t("โมเดล")
+                current: uiSettings.cloudModel
+                options: [
+                    { value: "haiku", text: "Haiku", hint: Tr.t("เร็ว") },
+                    { value: "sonnet", text: "Sonnet", hint: Tr.t("สมดุล") },
+                    { value: "opus", text: "Opus", hint: Tr.t("ละเอียดสุด") }
+                ]
+                onPicked: (v) => uiSettings.setCloudModel(v)
+            }
+            Segmented {
+                objectName: "effortSwitch"
+                visible: chat.mode === "work"
+                label: Tr.t("ระดับความคิด")
+                current: uiSettings.cloudEffort
+                options: [
+                    { value: "low", text: "Low" }, { value: "medium", text: "Medium" },
+                    { value: "high", text: "High" }, { value: "xhigh", text: "Extra" }, { value: "max", text: "Max" }
+                ]
+                onPicked: (v) => uiSettings.setCloudEffort(v)
+            }
+            AppText {
+                id: modeNote
+                objectName: "modeNote"
+                visible: text !== "" && chat.mode === "general"
+                text: ""
+                color: Theme.warnInk; size: Theme.fontSmall
+                height: Theme.touch; verticalAlignment: Text.AlignVCenter
+            }
         }
     }
     // กล่องคำสั่งเสียง (Pakon 2026-10-20): หน้าต่างแยกของตัวเอง ลอยบนสุดเหนือทุกหน้าต่าง รวมเบราว์เซอร์เต็มจอ
@@ -664,10 +736,92 @@ Item {
     }
     Timer {
         id: voiceClose
-        interval: root.voiceToken() !== "" ? 30000 : 8000
+        // การ์ด 0052: ปิด/รีสตาร์ตเครื่องรอคำตอบแค่ 10 วิ (ไม่ตอบ = ไม่ทำ) · การ์ดยืนยันอื่น 30 วิ
+        interval: root.voiceToken() !== "" ? (root.vc.card && root.vc.card.power ? 10000 : 30000) : 8000
         onTriggered: voicePopup.close()
     }
 
+    // ---------- ติดตั้งแอปที่ไม่มีในเครื่อง (การ์ด 0054) · ตกลง/ยกเลิก (ไม่ต้องใส่รหัส · Pakon 2026-10-23) ·
+    // ตัวติดตั้ง root ตรวจเองว่าอยู่ในรายการและดิสก์พอ ----------
+    Connections {
+        target: skills
+        function onAppInstallDone(card) { installPopup.close(); root.showCard(card) }
+    }
+    Popup {
+        id: installPopup
+        objectName: "installPopup"
+        property string key: ""
+        property string name: ""
+        function openFor(k, n) { key = k; name = n; installError.text = ""; open() }
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(520, root.width - 32)
+        modal: true
+        closePolicy: skills.installing !== "" ? Popup.NoAutoClose : Popup.CloseOnEscape
+        padding: 20
+        background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
+        contentItem: ColumnLayout {
+            spacing: 12
+            AppText { text: Tr.t("ติดตั้ง ") + installPopup.name + Tr.t(" ไหม?"); strong: true; Layout.fillWidth: true }
+            AppText {
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                text: Tr.t("ติดตั้งแล้วทุกบัญชีในเครื่องใช้ได้ · ใช้เวลาหลายนาทีและต้องต่ออินเทอร์เน็ต")
+            }
+            AppText { id: installError; visible: text !== ""; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
+            // ความคืบหน้าจริงจาก apt (การ์ด 0054 · Pakon 2026-10-23) · ยังไม่มีตัวเลข = แถบวิ่ง ไม่แสดงเลขที่ไม่รู้ (H5)
+            ColumnLayout {
+                visible: skills.installing !== ""
+                Layout.fillWidth: true
+                spacing: 6
+                RowLayout {
+                    Layout.fillWidth: true
+                    AppText {
+                        text: (skills.installStage !== "" ? Tr.t(skills.installStage) : Tr.t("กำลังติดตั้ง"))
+                              + " " + skills.installing + Tr.t(" … อย่าปิดเครื่อง")
+                        Layout.fillWidth: true
+                    }
+                    AppText {
+                        objectName: "installPercent"
+                        visible: skills.installPercent >= 0
+                        text: Math.floor(skills.installPercent) + "%"
+                        strong: true
+                    }
+                }
+                ProgressBar {
+                    id: installBar
+                    objectName: "installBar"
+                    Layout.fillWidth: true
+                    from: 0; to: 100
+                    value: Math.max(0, skills.installPercent)
+                    indeterminate: skills.installPercent < 0
+                    background: Rectangle { implicitHeight: 8; radius: 4; color: Theme.surface2 }
+                    contentItem: Item {
+                        implicitHeight: 8
+                        Rectangle {
+                            width: installBar.indeterminate ? parent.width * 0.3 : installBar.visualPosition * parent.width
+                            height: parent.height; radius: 4; color: Theme.accent
+                            Behavior on width { NumberAnimation { duration: Theme.animMs } }
+                        }
+                    }
+                }
+            }
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                spacing: 8
+                AppButton {
+                    text: Tr.t("ยกเลิก"); kind: "secondary"
+                    enabled: skills.installing === ""
+                    onClicked: installPopup.close()
+                }
+                AppButton {
+                    objectName: "installGo"
+                    text: Tr.t("ตกลง"); kind: "primary"
+                    enabled: skills.installing === ""
+                    onClicked: if (!skills.installApp(installPopup.key))
+                                   installError.text = Tr.t("เริ่มติดตั้งไม่ได้ (มีการติดตั้งอื่นอยู่)")
+                }
+            }
+        }
+    }
     Popup {
         id: historyPopup
         x: root.width - width - 24
@@ -833,7 +987,12 @@ Item {
             }
             AppText {
                 Layout.alignment: Qt.AlignHCenter
-                text: Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
+                // แชทงานส่งออกนอกเครื่อง → ห้ามเขียนว่า "ทำในเครื่อง" (H5 · การ์ด 0053)
+                text: chat.mode === "work"
+                      ? Tr.t("แชทงาน · ข้อความที่พิมพ์ส่งให้ Claude (") + uiSettings.cloudModel + Tr.t(") นอกเครื่อง")
+                      : chat.workReady   // ไฮบริด: ถามยาก/ข้อมูลสดจะส่ง Claude (H5 · ห้ามบอกว่าทำในเครื่องทั้งหมด)
+                        ? Tr.t("วันนี้ให้ช่วยอะไรดี · AI ในเครื่องตอบก่อน ถ้าต้องใช้ข้อมูลสดจะถาม Claude")
+                        : Tr.t("วันนี้ให้ช่วยอะไรดี · ทุกอย่างทำในเครื่องนี้")
                 color: Theme.inkMuted; oneLine: true
             }
             // อ่านสรุปวันนี้ให้ฟัง (การ์ด 0019) · สำหรับคนที่ไม่สะดวกอ่านจอ · ใช้ข้อมูลเดียวกับการ์ดข้างล่าง
@@ -1305,6 +1464,7 @@ Item {
                     objectName: "chatInput"
                     placeholderText: !!root.feedbackFor
                                      ? Tr.t("บอกว่าสกิล “") + root.feedbackFor.name + Tr.t("” ผิดตรงไหน เช่น ให้เปิด Gmail แทน · Esc = ยกเลิก")
+                                     : chat.mode === "work" ? Tr.t("พิมพ์ข้อความถึง Claude (แชทงาน · ส่งออกนอกเครื่อง)")
                                      : Tr.t("พิมพ์ข้อความถึงผู้ช่วย AI")
                     placeholderTextColor: Theme.inkFaint
                     color: Theme.ink

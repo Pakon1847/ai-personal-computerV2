@@ -20,6 +20,7 @@ from aipc.ui.backend import (
     FilesBrowser,
     I18nBridge,
     LoginController,
+    PowerController,
     PresenceStatus,
     PrivacyStatus,
     SessionController,
@@ -78,15 +79,36 @@ def _cloud_client(budget=None, ledger=None):
     if os.environ.get("AIPC_CLOUD", "1") == "0" or ask.find_claude() is None:
         return None
 
-    def run(question, history):
+    def run(question, history, model=ask.MODEL, effort=None):
         if budget is not None and not budget.allow():
             return ask.CloudReply(False, error=budget.blocked_message())
-        r = ask.ask(question, history)
+        r = ask.ask(question, history, model=model, effort=effort)
         if budget is not None:
             budget.record(r.cost_usd, "ask")
         if ledger is not None:
-            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok)
+            # โมเดลที่ตอบจริง (จากผลของ claude) ไม่ใช่แค่ที่เลือก (การ์ด 0053 เกณฑ์ M2 · H5)
+            ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok,
+                          note=f"เลือก {model}" + (f" · ความคิด {effort}" if effort else "")
+                          + f" · ตอบโดย {r.model or 'ไม่ทราบ'}")  # fmt: skip
         return r
+
+    return run
+
+
+def _chat_switch(chat, ui_settings):
+    """คำสั่งเสียงสลับแชท/โมเดล (การ์ด 0053) → (สำเร็จไหม, ข้อความ).
+
+    ตัวตรวจค่าอยู่ที่ ChatController.setMode / UiSettings.setCloudModel
+    """
+
+    def run(kind: str, value: str) -> tuple[bool, str]:
+        if kind == "mode":
+            if chat.setMode(value):
+                return True, "สลับไปแชทงาน (Claude)" if value == "work" else "กลับแชททั่วไป"
+            return False, chat.workBlocked or "สลับไม่ได้ตอนนี้ (กำลังตอบอยู่)"
+        if kind == "model" and ui_settings.setCloudModel(value):
+            return True, f"แชทงานใช้โมเดล {value}"
+        return False, "ไม่รู้จักโมเดลนี้"
 
     return run
 
@@ -185,7 +207,8 @@ def _start_idle_lock(ui_settings, app):
             if ui_settings.presence
             else None
         )
-        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size, presence=presence)
+        lock.apply(ui_settings.lockMin, ui_settings.logoutMin, name, size, presence=presence,
+                   auto_unlock=ui_settings.faceAutoUnlock)  # การ์ด 0055  # fmt: skip
 
     apply()
     ui_settings.changed.connect(apply)  # ค่าเดิม = IdleLock ไม่ทำอะไร (ธีม/ตัวอักษรเปลี่ยนไม่กระทบ)
@@ -204,6 +227,13 @@ def _local_model_name() -> str:
     except OSError:
         pass
     return ""
+
+
+def _remember_login(user: str) -> None:
+    """หน้า Login จริง: บอกตัวช่วยว่าใครเพิ่งเข้า → หน้า Login ครั้งถัดไปใช้ธีมของคนนี้ (การ์ด 0051)."""
+    from aipc.ui.backend import greeter_theme
+
+    greeter_theme(user)
 
 
 def _face_client(short: bool = False):
@@ -266,16 +296,25 @@ def build(opts: Options, argv: list[str] | None = None):
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
-    ui_settings = UiSettings(opts.settings_path, opts.theme)
+    theme = opts.theme
+    if opts.greeter_session and theme is None:
+        from aipc.ui.backend import greeter_theme
+
+        theme = greeter_theme()  # ธีมของผู้ใช้ที่เข้าล่าสุด (การ์ด 0051) · ไม่บันทึกลงไฟล์ของหน้า Login
+    ui_settings = UiSettings(opts.settings_path, theme)
     from aipc.skills.actions import Executor
 
     # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
     browser_ctl = BrowserController(active=in_session, ledger=ledger)
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
+    # แชททั่วไปคงไฮบริด: AI ในเครื่องไม่รู้ = ส่งต่อ Claude เอง (Pakon 2026-10-22 · การ์ด 0053 หัวข้อ 8)
     chat = ChatController(active=in_session, tools=tools,
                           cloud=_cloud_client(budget, ledger) if in_session else None,
                           model_name=_local_model_name(),
-                          forge=skill_forge is not None, claude_on=claude_on)  # fmt: skip
+                          forge=skill_forge is not None, claude_on=claude_on,
+                          cloud_model=lambda: ui_settings.cloudModel,
+                          cloud_effort=lambda: ui_settings.cloudEffort,
+                          auto_cloud=True)  # fmt: skip
     engine._backends = {
         "uiSettings": ui_settings,
         "system": SystemStatus(),
@@ -286,6 +325,7 @@ def build(opts: Options, argv: list[str] | None = None):
             greeter_session=opts.greeter_session,
             # สแกนหน้าเข้าเครื่อง (การ์ด 0015) · เฉพาะหน้า Login จริงที่มี visiond
             face=_face_client() if opts.greeter_session else None,
+            remember=_remember_login if opts.greeter_session else None,
         ),
         # สมัคร/กู้คืนจริงเฉพาะหน้า Login จริง · หน้าต่างพัฒนาเป็นแบบจำลองที่บอกว่า "จำลอง" (การ์ด 0012)
         "signup": SignupController(
@@ -307,6 +347,9 @@ def build(opts: Options, argv: list[str] | None = None):
             gcal=_gcal(ledger) if in_session else None,
             gcal_alert_min=lambda: ui_settings.gcalAlertMin,
             holidays=_holidays(ledger) if in_session else None,
+            # แชท 2 แบบ (การ์ด 0053): ตัวเลือกสกิลรู้ว่าอยู่แชทงาน · คำสั่งเสียงสลับแชท/โมเดล
+            chat_mode=lambda: chat.mode,
+            chat_switch=_chat_switch(chat, ui_settings),
         ),
         "chat": chat,
         "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
@@ -320,11 +363,13 @@ def build(opts: Options, argv: list[str] | None = None):
         # ขั้น C: สถานะตัวตรวจด้วยกล้อง (อ่านไฟล์ทุก 2 วิ เฉพาะเซสชันจริง)
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
-        "voice": VoiceController(active=in_session),
+        "voice": VoiceController(active=in_session, face_to_speak=lambda: ui_settings.faceToSpeak),
         "browser": browser_ctl,
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),
+        # ปิด/รีสตาร์ตเครื่อง (การ์ด 0052) · จริงเฉพาะหน้า Login จริงและเซสชันจริง
+        "power": PowerController(bool(opts.greeter_session) or opts.session),
         # หน้า Login (ผู้ใช้ _greetd) ไม่มีเจ้าของเซสชัน → ไม่เปิดระบบใบหน้า (การ์ด 0006)
         "face": FaceController(active=not opts.greeter_session),
         # เจ้าของบัญชีเปิด/ปิดเข้าเครื่องด้วยใบหน้าเอง (การ์ด 0015) · หน้า Login ไม่มีสวิตช์นี้
@@ -339,6 +384,7 @@ def build(opts: Options, argv: list[str] | None = None):
         if ui_settings.useClaude != last_claude[0]:
             last_claude[0] = ui_settings.useClaude
             chat.claudeSwitched()
+            chat.claudeChanged()  # ปิด Claude ระหว่างแชทงาน = กลับแชททั่วไป (การ์ด 0053)
             engine._backends["skills"].skillsChanged.emit()
 
     ui_settings.changed.connect(on_settings)

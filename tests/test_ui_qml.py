@@ -11,6 +11,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 _OLD_DATA_HOME = os.environ.get("XDG_DATA_HOME")
@@ -306,11 +307,14 @@ class ShellCardTest(unittest.TestCase):
 
     def open_shell(self, page="workspace"):
         tmp = tempfile.mkdtemp(prefix="aipc-shell-")
-        os.environ["XDG_DATA_HOME"] = tmp  # ไฟล์นัดใหม่เปล่า ๆ ต่อเทสต์ ไม่ปนกับเทสต์อื่น
+        # ไฟล์นัดใหม่เปล่า ๆ ต่อเทสต์ ไม่ปนกับเทสต์อื่น · คืนค่าเดิมเมื่อเทสต์จบ (เดิมค้างไปถึงเทสต์ถัดไป)
+        self.enterContext(mock.patch.dict(os.environ, {"XDG_DATA_HOME": tmp}))
         opts = uiapp.Options(screen="shell", page=page, software=True,
                              settings_path=Path(tmp) / "ui.json")  # fmt: skip
         app, engine, warnings = uiapp.build(opts)
         settle()
+        if not engine.rootObjects():  # เคยล้มบางรอบโดยไม่บอกเหตุ (2026-10-22/23) → บอกข้อความ QML
+            self.fail("หน้าจอโหลดไม่ขึ้น: " + " | ".join(map(str, warnings))[:2000])
         win = engine.rootObjects()[0]
 
         def close():
@@ -1368,6 +1372,19 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("ยังไม่พร้อม", system.readySummary)  # AI ไม่พร้อม = ต้องแก้
         ai = [c for c in system.readyChecks if c["title"] == "AI ในเครื่อง"][0]
         self.assertEqual(ai["level"], "danger")
+        self.assertEqual(warnings, [])
+
+    def test_devices_card_on_health_page(self):
+        """การ์ด 0051: เปิดหน้าแล้วตรวจอุปกรณ์เอง · วินโดวส์ไม่มี /sys = "ตรวจไม่ได้" ทุกแถว ไม่ใช่ "ไม่มี"."""
+        engine, win, warnings = self.open_shell("health")
+        system = engine._backends["system"]
+        end = time.monotonic() + 15
+        while (system.devicesBusy or not system.devices) and time.monotonic() < end:
+            settle(50)
+        self.assertTrue(find_items(win, "devicesCard")[0].isVisible())
+        self.assertEqual(len(system.devices), 6)
+        if not Path("/sys/bus/usb/devices").is_dir():
+            self.assertTrue(any(d["state"] == "unknown" for d in system.devices))
         self.assertEqual(warnings, [])
 
     def test_latex_answers_become_plain_text(self):

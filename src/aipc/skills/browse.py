@@ -159,6 +159,19 @@ _SAID = r"(?P<said>คำว่า|ว่า)?"
 _IN_FIRST = re.compile(rf"(?:ช่วย\s*)?{_VERB}\s*(?:ดู\s*)?ใน\s*{_SVC}\s*{_SAID}\s*(?P<q>.*)")
 _IN_LAST = re.compile(rf"(?:ช่วย\s*)?{_VERB}\s*{_SAID}\s*(?P<q>.+?)\s*ใน\s*{_SVC}")
 _OPEN_THEN = re.compile(rf"เปิด\s*{_SVC}\s*(?:แล้ว\s*)?{_VERB}\s*{_SAID}\s*(?P<q>.+)")
+# การ์ด 0057: "เปิด/ดู/เล่น/ฟัง X ในยูทูบ" · "เปิดยูทูบ(แล้ว)(ดู) X" = ค้น X ในบริการนั้น (พบ: "เปิดช่อง 8" ไม่รู้จัก)
+_WATCH = r"(?:(?:อยาก|ขอ|ช่วย)\s*)?(?:เปิด|ดู|เล่น|ฟัง)"
+_WATCH_IN = re.compile(rf"{_WATCH}\s*{_SAID}\s*(?P<q>.+?)\s*ใน\s*{_SVC}")
+_OPEN_WATCH = re.compile(rf"เปิด\s*{_SVC}\s*(?:แล้ว\s*)?(?:{_WATCH}\s*)?{_SAID}\s*(?P<q>.+)")
+# การ์ด 0057 รอบ 2 (Pakon ที่จอ 2026-10-23: "เปิดช่อง 8" ยังถามใช่/ไม่ใช่ · "ควรเปิดเองเลย") ·
+# "ช่อง + ตัวเลข" = ช่องทีวี → ค้นใน YouTube ทันที ไม่ต้องรู้ว่าหน้าไหนเปิดอยู่ (หน้ายังโหลดไม่เสร็จก็ได้)
+_CHANNEL_NO = r"(?:\d{1,3}|(?:หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ|ยี่|เอ็ด)+)"
+_TV = re.compile(rf"{_WATCH}\s*(?P<q>ช่อง\s*{_CHANNEL_NO}(?:\s*(?:สด|hd))?)")
+# อยู่ในเว็บที่ค้นได้แล้ว (การ์ด 0057 ข้อ 2): กริยา + สิ่งที่อยากดู โดยไม่ต้องพูดชื่อเว็บ
+_ON_SITE = re.compile(rf"(?:{_WATCH}|{_VERB})\s*{_SAID}\s*(?P<q>.+)")
+# ถาม / ปฏิเสธ / เล่าปัญหา ไม่ใช่สิ่งที่อยากดู ("ดูไม่ออก" · "เปิดไม่ได้ทำไม" · "เปิดแล้วค้าง")
+_NOT_CONTENT = re.compile(r"ไม่|ทำไม|ยังไง|อย่างไร|เมื่อไร|เมื่อไหร่|ค้าง|เสีย|พัง")
+_NAMES = re.compile("|".join([*SITE_NAMES.values(), *SEARCH_SITE_NAMES.values()]))
 MAX_QUERY = 200
 # เล่าว่าหาไม่เจอ = เล่าปัญหา ไม่ใช่สั่งค้น ("เปิดยูทูบแล้วหาปุ่มตั้งค่าไม่เจอ" · พบในชุดวัดรอบ 1 · N10) ·
 # ไม่ใช้ _LOST ทั้งก้อน: "อยู่ไหน" เป็นคำค้นแผนที่ได้ ("ค้นในแผนที่ว่าโรงพยาบาลอยู่ไหน")
@@ -170,10 +183,20 @@ _STORY = re.compile(r"(?:แล้ว|แต่(?!ง)|ทีไร)")
 
 
 def _site_match(t: str) -> re.Match | None:
-    for pat in (_IN_FIRST, _IN_LAST, _OPEN_THEN):
+    for pat in (_IN_FIRST, _IN_LAST, _OPEN_THEN, _WATCH_IN, _OPEN_WATCH):
         if m := pat.fullmatch(t):
+            if pat in (_WATCH_IN, _OPEN_WATCH) and not _content(m.group("q")):
+                continue  # "เปิดยูทูบแล้วเปิดคลิปแรก" = คำสั่ง ไม่ใช่คำค้น · "เปิดยูทูบไม่ได้" = เล่าปัญหา
             return m
     return None
+
+
+def _content(q: str) -> bool:
+    """q เป็นสิ่งที่อยากดู (ค้นได้) ไม่ใช่คำสั่งเว็บอื่น/คำถาม/ปัญหา (การ์ด 0057)."""
+    q = q.strip()
+    if not q or _NOT_CONTENT.search(q) or _NAMES.fullmatch(q):  # "ดูแผนที่ในกูเกิลแมพ" = ชื่อเว็บ ไม่ใช่คำค้น
+        return False
+    return _single_exact(q, False) is None
 
 
 def _site_story(t: str) -> bool:
@@ -315,6 +338,8 @@ def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
         return BrowseCommand("app")
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
+    if m := _TV.fullmatch(t):  # การ์ด 0057 รอบ 2: ช่องทีวี = ค้นใน YouTube เลย
+        return BrowseCommand("site_search", query=m.group("q"), site="youtube")
     if found := _site_search(t, back):  # ก่อนค้นเว็บทั่วไปและก่อนตัดเรื่องไฟล์: พูดชื่อบริการชัดเจนแล้ว
         return found
     if _VERB_ONLY.fullmatch(t):
@@ -338,6 +363,25 @@ def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
 
 # Facebook/Instagram เอาออกจากระบบแล้ว (Pakon 2026-10-19) · ประโยคที่พูดถึง = ไม่ใช่คำสั่งเว็บ
 _REMOVED = re.compile(r"เฟ[ซส]บุ[๊]?[กค]|facebook|อินสตา|ไอจี|instagram")
+
+
+def on_site_search(text: str, site: str) -> BrowseCommand | None:
+    """การ์ด 0057 ข้อ 2: หน้าที่เปิดอยู่เป็นเว็บที่ค้นได้ (site) + "เปิด/ดู/เล่น/ฟัง/ค้นหา X" → ค้น X ในเว็บนั้น ·
+    เป็นคำสั่งเว็บอยู่แล้ว / คำถาม / ปัญหา / ไม่มีคำค้น = None · google = ค้นเว็บทั่วไป."""
+    if site != "google" and site not in SEARCH_SITE_NAMES:
+        return None
+    if parse(text):
+        return None
+    t, back = _clean(text)
+    m = _ON_SITE.fullmatch(t)
+    if m is None or _STORY.match(m.group("q")) or not _content(m.group("q")):
+        return None
+    query = (m.group("q") + back).strip(" \"'“”")[:MAX_QUERY].strip()
+    if len(query) < 2:
+        return None
+    if site == "google":
+        return BrowseCommand("search", query=query)
+    return BrowseCommand("site_search", query=query, site=site)
 
 
 def parse(text: str) -> list[BrowseCommand]:

@@ -1,0 +1,254 @@
+{
+ "summary": {
+  "command_median_s": 0.626,
+  "question_median_s": 0.952,
+  "english_median_s": 1.542,
+  "english_ok": 3,
+  "english_n": 6,
+  "cut": 1,
+  "with_pause": 5,
+  "n": 30
+ },
+ "rows": [
+  {
+   "said": "เปิดยูทูบ",
+   "kind": "command",
+   "heard": "เปิดยูทูบ",
+   "err": "",
+   "latency_s": 0.668,
+   "cut": false
+  },
+  {
+   "said": "ย้อนกลับ",
+   "kind": "command",
+   "heard": "ย้อนกลับ",
+   "err": "",
+   "latency_s": 0.486,
+   "cut": false
+  },
+  {
+   "said": "เลื่อนลง",
+   "kind": "command",
+   "heard": "เลื่อนลง",
+   "err": "",
+   "latency_s": 0.581,
+   "cut": false
+  },
+  {
+   "said": "เพิ่มเสียง",
+   "kind": "command",
+   "heard": "เพิ่มเสียง",
+   "err": "",
+   "latency_s": 0.626,
+   "cut": false
+  },
+  {
+   "said": "ปิดเสียง",
+   "kind": "command",
+   "heard": "ปิดเสียง",
+   "err": "",
+   "latency_s": 0.555,
+   "cut": false
+  },
+  {
+   "said": "เปิดหน้าตั้งค่า",
+   "kind": "command",
+   "heard": "เปิดหน้าตั้งค่า",
+   "err": "",
+   "latency_s": 0.584,
+   "cut": false
+  },
+  {
+   "said": "หยุดเพลง",
+   "kind": "command",
+   "heard": "หยุดเพลง",
+   "err": "",
+   "latency_s": 0.58,
+   "cut": false
+  },
+  {
+   "said": "เพลงถัดไป",
+   "kind": "command",
+   "heard": "ถัดไป",
+   "err": "",
+   "latency_s": 1.523,
+   "cut": false
+  },
+  {
+   "said": "เข้าลิงก์ที่สอง",
+   "kind": "command",
+   "heard": "ลิงที่สอง",
+   "err": "",
+   "latency_s": 1.439,
+   "cut": false
+  },
+  {
+   "said": "ค้นหาราคาทองวันนี้",
+   "kind": "command",
+   "heard": "ค้นหาราคาทองวันนี้",
+   "err": "",
+   "latency_s": 0.647,
+   "cut": false
+  },
+  {
+   "said": "เตือนกินยาสองทุ่ม",
+   "kind": "command",
+   "heard": "เตือนกินยา2ทุ่ม",
+   "err": "",
+   "latency_s": 1.935,
+   "cut": false
+  },
+  {
+   "said": "ตอนนี้กี่โมง",
+   "kind": "command",
+   "heard": "ตอนนี้กี่โมง",
+   "err": "",
+   "latency_s": 0.825,
+   "cut": false
+  },
+  {
+   "said": "ทำไมเครื่องช้า",
+   "kind": "command",
+   "heard": "ทำไมเครื่องช้า",
+   "err": "",
+   "latency_s": 0.925,
+   "cut": false
+  },
+  {
+   "said": "เปิดโหมดมืด",
+   "kind": "command",
+   "heard": "เปิดโหมดมืด",
+   "err": "",
+   "latency_s": 0.572,
+   "cut": false
+  },
+  {
+   "said": "อากาศพรุ่งนี้เป็นยังไง",
+   "kind": "question",
+   "heard": "อากาศพรุ่งนี้เป็นยังไง",
+   "err": "",
+   "latency_s": 0.794,
+   "cut": false
+  },
+  {
+   "said": "ช่วยคิดเมนูอาหารเย็นให้หน่อย",
+   "kind": "question",
+   "heard": "ช่วยคิดเมนูอาหารเย็นให้หน่อย",
+   "err": "",
+   "latency_s": 0.678,
+   "cut": false
+  },
+  {
+   "said": "ใครแต่งเพลงนี้",
+   "kind": "question",
+   "heard": "ใครแต่งเพลงนี้",
+   "err": "",
+   "latency_s": 0.952,
+   "cut": false
+  },
+  {
+   "said": "วันนี้เหนื่อยมาก",
+   "kind": "question",
+   "heard": "What time is it.",
+   "err": "",
+   "latency_s": 1.695,
+   "cut": false
+  },
+  {
+   "said": "เล่าเรื่องตลกให้ฟังหน่อย",
+   "kind": "question",
+   "heard": "เล่าเรื่องตลกให้ฟังหน่อย",
+   "err": "",
+   "latency_s": 1.805,
+   "cut": false
+  },
+  {
+   "said": "เปิดยูทูบ / แล้วหาเพลงลูกทุ่ง",
+   "kind": "command",
+   "heard": "เปิดยูทูบแล้วหาเพลงลูกทุ่ง",
+   "err": "",
+   "latency_s": 0.692,
+   "cut": false
+  },
+  {
+   "said": "ค้นหาร้านอาหาร / แถวสยาม",
+   "kind": "command",
+   "heard": "ค้นหาร้านอาหาร",
+   "err": "",
+   "latency_s": -1.136,
+   "cut": true
+  },
+  {
+   "said": "เตือนประชุม / พรุ่งนี้สิบโมง",
+   "kind": "command",
+   "heard": "เตือนประชุมพรุ่งนี้10โมง",
+   "err": "",
+   "latency_s": 1.707,
+   "cut": false
+  },
+  {
+   "said": "ย้อนกลับ / แล้วเลื่อนลง",
+   "kind": "command",
+   "heard": "ย้อนกลับแล้วเลื่อนลง",
+   "err": "",
+   "latency_s": 0.576,
+   "cut": false
+  },
+  {
+   "said": "ปิดเสียง / ตอนสามทุ่ม",
+   "kind": "command",
+   "heard": "ปิดเสียงตอนสา",
+   "err": "",
+   "latency_s": 0.57,
+   "cut": false
+  },
+  {
+   "said": "Open YouTube",
+   "kind": "english",
+   "heard": "Open YouTube.",
+   "err": "",
+   "latency_s": 1.644,
+   "cut": false
+  },
+  {
+   "said": "Volume up",
+   "kind": "english",
+   "heard": "Volume up.",
+   "err": "",
+   "latency_s": 1.541,
+   "cut": false
+  },
+  {
+   "said": "Go back",
+   "kind": "english",
+   "heard": "แบ็ค",
+   "err": "",
+   "latency_s": 1.543,
+   "cut": true
+  },
+  {
+   "said": "Scroll down",
+   "kind": "english",
+   "heard": "ครูแก้ว",
+   "err": "",
+   "latency_s": 1.449,
+   "cut": true
+  },
+  {
+   "said": "Next song",
+   "kind": "english",
+   "heard": "สอง",
+   "err": "",
+   "latency_s": 1.448,
+   "cut": true
+  },
+  {
+   "said": "What time is it",
+   "kind": "english",
+   "heard": "What time is it.",
+   "err": "",
+   "latency_s": 1.635,
+   "cut": false
+  }
+ ]
+}

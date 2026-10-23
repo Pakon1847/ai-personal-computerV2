@@ -20,6 +20,11 @@ from aipc.skills import forge
 from aipc.skills.catalog import ABOUT, is_english
 
 MODEL = "sonnet"
+# แชทงาน (การ์ด 0053): ผู้ใช้เลือกได้ 3 ตัว · ชื่อย่อที่ claude -p --model รับ · ค่าอื่น = ไม่ส่ง (H7)
+MODELS = ("haiku", "sonnet", "opus")
+# ระดับความคิดของแชทงาน (Pakon 2026-10-22) · ค่าที่ claude -p --effort รับ
+# (ตรวจกับ claude 2.1.294 บน Pi 5 · ลองจริงแล้ว haiku/sonnet + max ไม่ error) · ค่าอื่น = ไม่ส่ง
+EFFORTS = ("low", "medium", "high", "xhigh", "max")
 BUDGET_USD = "0.50"
 TIMEOUT_S = 120
 CONTEXT_TURNS = 4
@@ -129,7 +134,12 @@ def ask(
     model: str = MODEL,
     runner=forge.run_process,
     today: date | None = None,
+    effort: str | None = None,
 ) -> CloudReply:
+    if model not in MODELS:
+        return CloudReply(False, error=f"ไม่รู้จักโมเดล {model!r}")
+    if effort is not None and effort not in EFFORTS:
+        return CloudReply(False, error=f"ไม่รู้จักระดับความคิด {effort!r}")
     exe = claude or find_claude()
     if not exe:
         return CloudReply(False, error="ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในเครื่องนี้")
@@ -149,6 +159,7 @@ def ask(
         BUDGET_USD,
         "--model",
         model,
+        *(["--effort", effort] if effort else []),
         # แทน system prompt ทั้งหมด + ไม่โหลด MCP/สกิลของบัญชี: เดิม append ต่อท้าย prompt ของ Claude Code
         # ถาม "ทำอะไรได้บ้าง" แล้ว Claude เล่าความสามารถของตัวเอง (Claude Docs, PDF)
         # แทนของเครื่อง (ชุดสอบจบ H07)

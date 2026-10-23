@@ -10,6 +10,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from aipc.voice import tts
 from aipc.voice.speech_text import number_words, sentences, to_speech, to_speech_en
@@ -97,7 +98,9 @@ class SpeakerTest(unittest.TestCase):
             if not speaking:
                 self.done.set()
 
-        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        # คืนค่าเดิมเมื่อเทสต์จบ: เดิมค้างชี้โฟลเดอร์ที่ถูกลบแล้ว → เทสต์หน้าจอที่รันต่อมาล้มเป็นบางรอบ
+
+        self.enterContext(mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": self.tmp.name}))
         self.sp = Speaker(on_state, play_cmd=play, worker_cmd=[sys.executable, str(worker)])
         self.addCleanup(self.sp.close)
 
@@ -174,7 +177,8 @@ class EnglishVoiceTest(unittest.TestCase):
         self.log = Path(self.tmp.name) / "jobs.jsonl"
         os.environ["FAKE_LOG"] = str(self.log)
         self.addCleanup(os.environ.pop, "FAKE_LOG", None)
-        os.environ["XDG_RUNTIME_DIR"] = self.tmp.name
+        # คืนค่าเดิมเมื่อเทสต์จบ: เดิมค้างชี้โฟลเดอร์ที่ถูกลบแล้ว → เทสต์หน้าจอที่รันต่อมาล้มเป็นบางรอบ
+        self.enterContext(mock.patch.dict(os.environ, {"XDG_RUNTIME_DIR": self.tmp.name}))
         self.done = threading.Event()
         self.play = [sys.executable, "-c", "pass"]
         self.cmd = [sys.executable, str(worker)]

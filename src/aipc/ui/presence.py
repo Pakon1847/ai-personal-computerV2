@@ -6,7 +6,8 @@
   ล็อกแล้วไม่เห็นหน้าใครเลยอีก logout_after วิ → ออกจากระบบ (M1/M2 ผ่าน)
 - เห็น "คนอื่น" 3 ครั้งติดและไม่มีเจ้าของ → **ล็อกทันที แต่ไม่ออกจากระบบ** (M3 ไม่ผ่าน → ห้าม logout จากการจำหน้า)
 - เทียบ**ทุกหน้า** ในภาพ: มีเจ้าของอยู่หน้าหนึ่ง = เจ้าของอยู่ (B: เจ้าของนั่งแต่หน้าคนอื่นใหญ่กว่า → ตัววัดเดิมนับผิด)
-- ไม่บันทึกภาพ · แม่แบบเจ้าของมาจาก "ใบหน้าของฉัน" (ยินยอมแล้ว · ~/.local/share/aipc/face-template.json)
+- ไม่บันทึกภาพ · แม่แบบเจ้าของ: ใบหน้าที่ลงทะเบียนตอนสมัคร (visiond ตรวจให้ · การ์ด 0051 ทาง ก · แม่แบบชุดเดียว)
+  ไม่มี = "ใบหน้าของฉัน" แบบเดิม (~/.local/share/aipc/face-template.json · ผู้ใช้ก่อนการ์ด 0051)
 ปลดล็อกด้วยรหัสผ่านเสมอ (การ์ด 0015: หน้าจอล็อกใช้รหัสผ่าน)
 
     python -m aipc.ui.presence run --flag <ไฟล์ธง> --lock-after 30 --logout-after 30
@@ -135,7 +136,9 @@ class Decider:
         # เห็นคนอื่นแล้วยังอยู่หน้าจอ = ไม่ออก (ขั้น B M3 ไม่ผ่าน) · คนอื่นเดินไปแล้วไม่มีใครอีก 30 วิ = ออก (M1/M2 ผ่าน)
         if seen.faces > 0:
             self.last_face = now
-        if idle and now - max(self.locked_at, self.last_face) >= self.logout_after:
+        # logout_after ≤ 0 = ล็อกอย่างเดียว ไม่ออก (การ์ด 0051 · ค่าเริ่มต้น)
+        quiet = now - max(self.locked_at, self.last_face)
+        if self.logout_after > 0 and idle and quiet >= self.logout_after:
             self._to("logout", now)
             return "logout"
         return None
@@ -212,19 +215,102 @@ class Eyes:
         self.recent = (self.recent + [[round(now, 1), faces, sim]])[-12:]
 
 
-def lock_now(image: str | None) -> subprocess.Popen:
-    """swaylock แบบไม่ -f (ไม่แยกตัว) · ปลดล็อกแล้วโปรเซสจบเอง."""
+class VisiondEyes:
+    """ตาแบบใหม่ (การ์ด 0051 ทาง ก): ให้ visiond เปิดกล้องและเทียบกับใบหน้าที่ลงทะเบียนตอนสมัคร ·
+    ได้กลับมาแค่ จำนวนหน้า/ใช่เจ้าของไหม/ความคล้าย · ตัวนี้ไม่เห็นภาพหรือแม่แบบเลย ·
+    คำขอหนึ่งครั้งยาวไม่เกิน 60 วิ แล้วขอใหม่เอง · off() = ปิดการเชื่อมต่อ → visiond ปล่อยกล้องทันที."""
+
+    def __init__(self, user: str, watch=None):
+        from aipc.vision import client
+
+        self.user = user
+        self._watch = watch or client.watch
+        self.cap = None  # ไม่ใช่ None = กำลังขอดูอยู่ (ชื่อเดียวกับ Eyes ให้ run() ใช้ร่วมกัน)
+        self._stop = None
+        self._latest = None
+        self._error = ""
+        self.recent: list = []
+
+    def on(self) -> bool:
+        import threading
+
+        if self.cap is not None:
+            if self._error:
+                err, self._error = self._error, ""
+                self.off()
+                raise RuntimeError(err)
+            return True
+        stop = threading.Event()
+        self._stop, self._error = stop, ""
+
+        def loop():
+            while not stop.is_set():
+                r = self._watch(self.user, self._seen, stop)
+                if not stop.is_set() and not r.get("ok"):
+                    self._error = str(r.get("message") or r.get("state") or "visiond ไม่ตอบ")
+                    return
+
+        self.cap = threading.Thread(target=loop, daemon=True)
+        self.cap.start()
+        return True
+
+    def _seen(self, msg: dict) -> None:
+        self._latest = msg
+
+    def off(self) -> None:
+        if self._stop is not None:
+            self._stop.set()
+        self.cap = self._stop = self._latest = None
+
+    def look(self, now: float) -> Seen | None:
+        msg, self._latest = self._latest, None
+        if msg is None:
+            return None
+        faces = int(msg.get("faces") or 0)
+        best = msg.get("best")
+        self.recent = (self.recent + [[round(now, 1), faces, best]])[-12:]
+        if faces == 0:
+            return Seen(0)
+        owner = bool(msg.get("owner"))
+        return Seen(faces, owner=owner, stranger=not owner)
+
+
+def pick_eyes(user: str, enabled=None, local=None):
+    """ใบหน้าตอนสมัคร (visiond) ก่อน · ไม่มี = "ใบหน้าของฉัน" แบบเดิม · ไม่มีทั้งคู่ = None."""
+    if enabled is None:
+        from aipc.vision import client
+
+        def enabled(u):
+            r = client.request({"op": "enabled", "username": u}, timeout=5)
+            return r.get("state") == "enabled"
+
+    if local is None:
+        from aipc.vision import store
+
+        def local():
+            return store.FaceStore().load()
+
+    if enabled(user):
+        return VisiondEyes(user)
+    stored = local()
+    return Eyes(stored.vector) if stored is not None else None
+
+
+def lock_now(image: str | None = None) -> subprocess.Popen:
+    """ตัวล็อกเดียวกับล็อกเมื่อไม่ได้ใช้ (gtklock รุ่น 2 / swaylock รุ่น 1) แบบไม่แยกตัว (ไม่ -d/-f) ·
+    ปลดล็อกแล้วโปรเซสจบเอง."""
     from aipc.ui import idle
 
-    cmd = [a for a in idle.lock_command(Path(image) if image else None) if a != "-f"]
+    cmd = [a for a in idle.current_lock_command() if a not in ("-f", "-d")]
     return subprocess.Popen(
         cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
 
 
 def any_lock(run=subprocess.run) -> bool:
-    """มี swaylock ของผู้ใช้คนนี้อยู่ไหม (ของขั้น A หรือที่ตัวนี้สั่ง)."""
-    r = run(["pgrep", "-u", str(os.getuid()), "-x", "swaylock"], capture_output=True, check=False)
+    """มีตัวล็อก (swaylock/gtklock) ของผู้ใช้คนนี้อยู่ไหม (ของขั้น A หรือที่ตัวนี้สั่ง)."""
+    r = run(["pgrep", "-u", str(os.getuid()), "-x", "swaylock|gtklock"],
+            capture_output=True, check=False)  # fmt: skip
     return r.returncode == 0
 
 
@@ -245,13 +331,14 @@ def write_status(
 
 
 def run(flag: Path, lock_after: float, logout_after: float, image: str | None) -> int:
-    from aipc.vision import store
+    import getpass
 
-    stored = store.FaceStore().load()
-    if stored is None:
-        write_status("no-template", 'ลงทะเบียน "ใบหน้าของฉัน" ในหน้าตั้งค่าก่อน')
+    eyes = pick_eyes(getpass.getuser())
+    if eyes is None:
+        why = 'เปิด "เข้าเครื่องด้วยใบหน้า" หรือลงทะเบียน "ใบหน้าของฉัน" ในหน้าตั้งค่าก่อน'
+        write_status("no-template", why)
         return 3
-    eyes, d = Eyes(stored.vector), Decider(lock_after, logout_after)
+    d = Decider(lock_after, logout_after)
     write_status("active")
     last = None
     while True:
@@ -259,7 +346,12 @@ def run(flag: Path, lock_after: float, logout_after: float, image: str | None) -
         idle = flag.exists()
         locked = any_lock()
         busy = busy_flag().exists()
-        want_camera = idle and not busy and d.state in ("active", "watching", "locked")
+        # ล็อกแล้วและไม่ออกจากระบบเอง (การ์ด 0051 ค่าเริ่มต้น) = ไม่ต้องดูต่อ · ปล่อยกล้องให้จอล็อกใช้ปลดด้วยใบหน้า
+        # (การ์ด 0055 · visiond ใช้กล้องทีละงาน)
+        watching = ("active", "watching")
+        if d.logout_after > 0:
+            watching += ("locked",)
+        want_camera = idle and not busy and d.state in watching
         seen = None
         try:
             if want_camera and eyes.on():

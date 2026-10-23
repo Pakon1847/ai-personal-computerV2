@@ -151,6 +151,33 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(self.plan("เสียงดังไป"), ("change_volume", {"step": -10}))  # "…ไป" = มากเกิน
         self.assertEqual(self.plan("เสียงเบาไป"), ("change_volume", {"step": 10}))
 
+    def test_lock_screen_whole_sentence_only(self):
+        # การ์ด 0051: สั่งล็อกด้วยเสียง · ต้องเป็นคำสั่งทั้งประโยค ไม่ใช่แค่มีคำว่าล็อก
+        for text in ("ล็อกหน้าจอ", "ล็อคจอหน่อย", "ช่วยล็อกเครื่องให้หน่อย", "ล็อกจอเลยครับ", "Lock screen"):
+            self.assertEqual(self.plan(text), ("lock_screen", {}), text)
+            self.assertFalse(command.parse(text).needs_confirmation, text)
+        for text in ("ทำไมหน้าจอล็อกเอง", "ล็อกหน้าจอยังไง", "อย่าล็อกหน้าจอ", "ล็อกหน้าจออีก 10 นาที"):
+            self.assertIsNone(self.plan(text), text)
+
+    def test_update_calendar_whole_sentence_only(self):
+        # การ์ด 0051: ดึงปฏิทิน Google ใหม่ด้วยเสียง
+        for text in ("อัปเดตปฏิทิน", "ช่วยซิงค์ปฏิทินหน่อย", "รีเฟรชปฏิทินกูเกิล", "Sync the calendar"):
+            self.assertEqual(self.plan(text), ("gcal_sync", {}), text)
+        for text in ("ปฏิทินอัปเดตล่าสุดเมื่อไหร่", "อัปเดตปฏิทินทุกเช้า", "เปิดปฏิทิน"):
+            self.assertNotEqual(self.plan(text), ("gcal_sync", {}), text)
+
+    def test_show_devices_phrases(self):
+        # การ์ด 0051: ต้องมีคำว่าต่อ/เสียบ · ถามความเห็นเรื่องอุปกรณ์ไม่ใช่คำสั่ง
+        for text in ("มีอุปกรณ์อะไรต่ออยู่บ้าง", "ดูอุปกรณ์ที่ต่ออยู่", "เช็คอุปกรณ์ที่เสียบอยู่หน่อย",
+                     "Show devices"):  # fmt: skip
+            self.assertEqual(self.plan(text), ("show_devices", {}), text)
+        for text in ("ซื้ออุปกรณ์อะไรดี", "อุปกรณ์ต่อพ่วงคืออะไร", "มีอุปกรณ์อะไรแนะนำบ้าง"):
+            self.assertIsNone(self.plan(text), text)
+
+    def test_screen_only_action_is_not_run_by_executor(self):
+        out = actions.Executor(dry_run=False).execute(actions.Plan("gcal_sync"))
+        self.assertFalse(out.ok)
+
     def test_reminder_containing_a_command_is_not_run_now(self):
         for text in ("เตือนปิดเสียงตอนประชุมบ่ายสาม", "นัดเปิดยูทูบดูไลฟ์สองทุ่ม", "อย่าลืมปรับเสียง 50"):
             self.assertIsNone(command.parse(text), text)
@@ -172,6 +199,13 @@ class ExecutorTest(unittest.TestCase):
         self.assertIn(["xdg-open", "https://www.youtube.com"], calls)
         self.assertIn(["wpctl", "set-volume", actions.SINK, "40%"], calls)
         self.assertIn(["wpctl", "set-volume", "-l", "1.0", actions.SINK, "10%-"], calls)
+
+    def test_lock_screen_runs_swaylock_without_logout(self):
+        calls = []
+        ex = actions.Executor(runner=lambda a: calls.append(a) or 0, dry_run=False)
+        self.assertTrue(ex.execute(command.parse("ล็อกหน้าจอ").plan).ok)
+        self.assertEqual(calls[0][:2], ["swaylock", "-f"])
+        self.assertFalse(any("labwc" in x for x in calls[0]))
 
     def test_dry_run_says_so(self):
         out = actions.Executor(dry_run=True).execute(command.parse("เปิดยูทูบ").plan)

@@ -233,6 +233,28 @@ class GreeterModeTest(Base):
         self.assertEqual(c.signIn(" pakon ", PW), "")
         self.assertEqual(self.fake.got[0]["username"], "pakon")  # ตัดช่องว่างที่พิมพ์เกิน
 
+    def test_success_remembers_user_for_login_theme(self):
+        # การ์ด 0051: เข้าสำเร็จเท่านั้นที่จำ · จำไม่ได้ต้องไม่ขวางการเข้าระบบ
+        got = []
+        ok = [("create_session", SECRET), ("post_auth_message_response", OK), ("start_session", OK)]
+        c = self.make(ok)
+        c._remember = got.append
+        self.assertEqual(c.signIn(" pakon ", PW), "")
+        self.assertEqual(got, ["pakon"])
+        bad = [("create_session", SECRET), ("post_auth_message_response", AUTH_ERR),
+               ("cancel_session", OK)]  # fmt: skip
+        c = self.make(bad)
+        c._remember = got.append
+        c.signIn("pakon", PW)
+        self.assertEqual(got, ["pakon"])
+
+        def broken(user):
+            raise OSError("helper down")
+
+        c = self.make(ok)
+        c._remember = broken
+        self.assertEqual(c.signIn("pakon", PW), "")
+
     def test_greetd_unreachable_points_to_fallback(self):
         def boom():
             raise OSError("no socket")

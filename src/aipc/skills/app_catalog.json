@@ -1,0 +1,15 @@
+{
+  "about": "การ์ด 0054 · แอปที่ระบบรู้จักแม้ยังไม่ได้ติดตั้ง · apt = ชื่อแพ็กเกจที่ผู้ดูแลติดตั้งให้ได้ (Raspberry Pi OS) · web = เปิดผ่านเบราว์เซอร์แทนได้ · ผู้ดูแลแทนทั้งรายการได้ที่ /etc/aipc/apps-allowed.json · ชื่อแพ็กเกจและลิงก์มาจากไฟล์นี้เท่านั้น ไม่รับจากข้อความ/AI (H7 H8)",
+  "apps": {
+    "writer": {"name": "LibreOffice Writer (เขียนเอกสาร)", "aliases": ["libreofficewriter", "writer", "ไรเตอร์", "ลิเบรออฟฟิศ", "ลิเบอร์ออฟฟิศ", "libreoffice", "โปรแกรมพิมพ์เอกสาร"], "apt": "libreoffice-writer"},
+    "calc": {"name": "LibreOffice Calc (ตารางคำนวณ)", "aliases": ["libreofficecalc", "calc", "แคลค์", "โปรแกรมตารางคำนวณ", "สเปรดชีต"], "apt": "libreoffice-calc"},
+    "vlc": {"name": "VLC (เล่นวิดีโอ/เพลง)", "aliases": ["vlc", "วีแอลซี", "vlcmediaplayer"], "apt": "vlc"},
+    "gimp": {"name": "GIMP (แต่งรูป)", "aliases": ["gimp", "กิมป์", "กิมพ์", "โปรแกรมแต่งรูป"], "apt": "gimp"},
+    "inkscape": {"name": "Inkscape (วาดภาพเวกเตอร์)", "aliases": ["inkscape", "อิงค์สเคป", "อิ้งสเคป"], "apt": "inkscape"},
+    "thonny": {"name": "Thonny (เขียนโปรแกรม Python)", "aliases": ["thonny", "ทอนนี่", "ธอนนี่"], "apt": "thonny"},
+    "discord": {"name": "Discord", "aliases": ["discord", "ดิสคอร์ด", "ดิสคอด"], "web": "https://discord.com/app"},
+    "zoom": {"name": "Zoom", "aliases": ["zoom", "ซูม"], "web": "https://app.zoom.us/wc"},
+    "teams": {"name": "Microsoft Teams", "aliases": ["teams", "microsoftteams", "ทีมส์", "ไมโครซอฟต์ทีมส์"], "web": "https://teams.microsoft.com"},
+    "canva": {"name": "Canva", "aliases": ["canva", "แคนวา", "แคนว่า"], "web": "https://www.canva.com"}
+  }
+}

@@ -109,6 +109,7 @@ class ChatFileTest(ServerCase or unittest.TestCase):
             store=store.ChatStore(Path(d.name) / "c"),
             poll_ms=100000,
             cloud=lambda q, h: asked.append(q) or CloudReply(True, "x"),
+            auto_cloud=True,  # ไฮบริดเดิม: กันเนื้อหาไฟล์ออกนอกเครื่องแม้เปิดส่งต่อ
         )
         self.addCleanup(c.shutdown)
         pump(lambda: c.ready)

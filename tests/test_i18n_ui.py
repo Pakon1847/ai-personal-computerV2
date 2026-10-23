@@ -46,6 +46,10 @@ def visible_texts(item, out):
     return out
 
 
+def masked(texts):
+    return [re.sub(r"\d+", "#", t) for t in texts]
+
+
 @unittest.skipIf(uiapp is None, "ไม่มี PySide6")
 class EnglishPagesTest(unittest.TestCase):
     def setUp(self):
@@ -93,7 +97,10 @@ class EnglishPagesTest(unittest.TestCase):
                 self.assertEqual(left, [], f"ยังมีข้อความไทยในหน้า {page}")
                 ui.setLanguage("th")
                 settle(300)
-                self.assertEqual(visible_texts(win.contentItem(), []), thai_before, page)
+                # ตัวเลขสด (เวลา · พื้นที่ว่าง) เปลี่ยนระหว่างเทสต์ได้ (2026-10-22/23: 16:56→16:57 · 67→68 GB)
+                # → เทียบรูปข้อความ ไม่เทียบตัวเลข
+                back = visible_texts(win.contentItem(), [])
+                self.assertEqual(masked(back), masked(thai_before), page)
                 self.assertEqual(warnings, [])
 
     def test_answer_cards_follow_language_and_keep_user_data(self):

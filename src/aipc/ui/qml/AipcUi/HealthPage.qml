@@ -109,6 +109,52 @@ ColumnLayout {
         }
     }
 
+    // อุปกรณ์ที่ต่ออยู่ (การ์ด 0051) · ตรวจตอนเปิดหน้าและตอนกด "ตรวจใหม่" · ตรวจไม่ได้ ≠ ไม่มี
+    Card {
+        objectName: "devicesCard"
+        Layout.fillWidth: true
+        implicitHeight: devCol.implicitHeight + 32
+        radius: Theme.radiusCard
+        Component.onCompleted: system.scanDevices()
+        ColumnLayout {
+            id: devCol
+            anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+            anchors.margins: 16
+            spacing: 8
+            RowLayout {
+                Layout.fillWidth: true
+                AppText { text: Tr.t("อุปกรณ์ที่ต่ออยู่"); strong: true; Layout.fillWidth: true }
+                AppButton {
+                    objectName: "scanDevices"
+                    text: system.devicesBusy ? Tr.t("กำลังตรวจ…") : Tr.t("ตรวจใหม่")
+                    kind: "secondary"
+                    enabled: !system.devicesBusy
+                    onClicked: system.scanDevices()
+                }
+            }
+            Repeater {
+                model: system.devices
+                delegate: RowLayout {
+                    id: dv
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: 8
+                    Chip {
+                        Layout.alignment: Qt.AlignTop
+                        text: ({ ok: Tr.t("เจอ"), none: Tr.t("ไม่มี"), unknown: Tr.t("ตรวจไม่ได้") })[dv.modelData.state]
+                        kind: dv.modelData.state === "ok" ? "ok" : "neutral"
+                    }
+                    AppText { text: Tr.t(dv.modelData.label); strong: true; Layout.alignment: Qt.AlignTop }
+                    AppText {
+                        // " · ใช้อยู่" มาจาก Python เป็นไทย · แปลที่นี่ให้สลับภาษาแล้วเปลี่ยนตาม (การ์ด 0039)
+                        text: dv.modelData.items.map(x => x.replace(" · ใช้อยู่", Tr.t(" · ใช้อยู่"))).join(" · ")
+                        size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true
+                    }
+                }
+            }
+        }
+    }
+
     GridLayout {
         Layout.fillWidth: true
         // ตัวอักษรใหญ่ → 2 คอลัมน์ การ์ดกว้างขึ้น ข้อความไม่ต้องตัด (การ์ด 0002 ข้อ 6)

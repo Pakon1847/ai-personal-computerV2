@@ -122,6 +122,49 @@ NEGATIONS = ("อย่า", "ไม่ต้อง", "ห้าม")
 # มีคำว่า "เสียง" แต่ไม่ใช่เสียงลำโพง · ตัวเลขที่ตามด้วยหน่วยเวลาไม่ใช่ระดับเสียง ("อัดเสียง 10 นาที" เคยได้ 10%)
 NOT_VOLUME = ("อัดเสียง", "ข้อความเสียง", "ไฟล์เสียง", "ส่งเสียง")
 DURATION = re.compile(r"นาที|ชั่วโมง|ชม\.|วินาที")
+# ล็อกหน้าจอทันที (การ์ด 0051) · ต้องเป็นคำสั่งทั้งประโยค (หลังตัดคำสุภาพ) ไม่ใช่แค่มีคำว่าล็อก
+# ("ทำไมหน้าจอล็อกเอง" = คำถาม ไม่ใช่คำสั่ง) · สะกด ล็อก/ล็อค ทั้งสองแบบเพราะตัวถอดเสียงให้ได้ทั้งคู่
+LOCK_PHRASES = tuple(
+    f"{v}{w}{o}"
+    for v in ("ล็อก", "ล็อค")
+    for w in ("หน้าจอ", "จอ", "เครื่อง", "คอม")
+    for o in ("", "ที", "เลย", "ไว้")
+) + ("lockscreen", "lockthescreen")
+# ปิด/รีสตาร์ตเครื่อง (การ์ด 0052) · ทั้งประโยคเท่านั้น และถามยืนยันเสมอ (ความเสี่ยงสูง)
+# "ปิดเครื่องดูดฝุ่น" "ปิดเครื่องปรับอากาศ" = ไม่ใช่คำสั่ง
+_ENDS = ("", "เลย", "ที", "ได้เลย")
+_OFF = ("ปิดเครื่อง", "ปิดคอม", "ปิดคอมพิวเตอร์", "ชัตดาวน์", "ชัทดาวน์", "shutdown",
+        "shutdownthecomputer", "poweroff", "turnoffthecomputer")  # fmt: skip
+_REBOOT = ("รีสตาร์ต", "รีสตาร์ท", "รีสตาร์ทเครื่อง", "รีสตาร์ตเครื่อง", "รีบูต", "รีบูท", "รีบูตเครื่อง",
+           "เริ่มเครื่องใหม่", "restart", "reboot", "restartthecomputer")  # fmt: skip
+POWER_PHRASES = {
+    "power_off": tuple(v + o for v in _OFF for o in _ENDS),
+    "reboot": tuple(v + o for v in _REBOOT for o in _ENDS),
+}
+# ดูอุปกรณ์ที่ต่ออยู่ (การ์ด 0051) · ต้องมีคำว่าต่อ/เสียบ ("อุปกรณ์อะไรดี" = ถามความเห็น ไม่ใช่คำสั่ง)
+DEVICES = re.compile(
+    r"^(มี|ดู|เช็[คก]|ตรวจ|เปิด(หน้า)?|แสดง)?อุปกรณ์(อะไร)?(ที่)?(ต่อ|เสียบ)(อยู่)?(บ้าง)?(อะไรบ้าง)?(ไหม|มั้ย)?$"
+    r"|^(list|show)(the)?devices$|^whatdevicesare(connected|pluggedin)$"
+)
+# ดึงปฏิทิน Google ใหม่ทันที (การ์ด 0051) · ทั้งประโยคเหมือนคำสั่งล็อก
+GCAL_SYNC_PHRASES = tuple(
+    f"{v}{c}{o}"
+    for v in ("อัปเดต", "อัพเดต", "อัพเดท", "อัปเดท", "ซิงค์", "ซิงก์", "รีเฟรช", "ดึง")
+    for c in ("ปฏิทิน", "ปฎิทิน", "ปฏิทินกูเกิล", "ปฏิทินgoogle")
+    for o in ("", "ใหม่", "ที")
+) + ("updatecalendar", "updatethecalendar", "synccalendar", "syncthecalendar", "refreshcalendar")
+# แชท 2 แบบ (การ์ด 0053) · ทั้งประโยค ("แชทงานคืออะไร" = คำถาม ไม่ใช่คำสั่ง)
+CHAT_MODE = re.compile(r"^(สลับ|เปลี่ยน|กลับ|เปิด|ใช้|ไป)(ไป|เป็น|มา)?(ที่)?(หน้า)?แชท(งาน|ทั่วไป)$")
+CHAT_MODE_EN = re.compile(r"^(switch|go|change)(back)?to(the)?(work|general)chat$")
+# เลือกโมเดลของแชทงาน · ต้องมีคำกริยา ใช้/เปลี่ยน ("ช่วยเขียนกลอนไฮกุ" ≠ เลือกโมเดล)
+MODEL_NAMES = {
+    "haiku": ("haiku", "ไฮกุ", "ไฮคุ"),
+    "sonnet": ("sonnet", "ซอนเน็ต", "ซอนเนต", "ซอนเน็ท"),
+    "opus": ("opus", "โอปัส", "โอปุส"),
+}
+MODEL_CMD = re.compile(
+    r"^(ใช้|เปลี่ยน|สลับ|use|switchto)(โมเดล|model)?(เป็น|ไป)?(โมเดล|model)?(?P<name>[a-zก-๙]+)$"
+)
 
 SURE = 1.0
 FUZZY_CUTOFF = 0.72  # ต่ำกว่านี้ถือว่าไม่ใช่คำสั่ง · สูงกว่านี้แต่ไม่ตรงเป๊ะ = ถามก่อน
@@ -253,6 +296,20 @@ def _discovered_aliases() -> dict[str, tuple[str, ...]]:
     return {f"desk:{a.desktop}": a.aliases for a in apps.REGISTRY.apps().values()}
 
 
+def _known_app(target: str, heard: str):
+    """คำเรียกตรงรายการแอปที่รู้จัก → Command เปิดตัวที่ติดตั้งแล้ว หรือ Entry ที่ยังไม่มี · ไม่ตรง = None."""
+    from aipc.skills import app_catalog
+
+    entry = app_catalog.find(target, app_catalog.load())
+    if entry is None:
+        return None
+    table = app_table()
+    for key, aliases in _discovered_aliases().items():
+        if key in table and set(aliases) & set(entry.aliases):
+            return Command(Plan("open_app", {"app": key}, f"เปิด{table[key][0]}"), SURE, heard)
+    return entry
+
+
 def unsupported(text: str) -> str | None:
     """ "เปิดเฟซบุ๊ก" · "เปิดไลน์ให้หน่อย" → ชื่อบริการที่ระบบตั้งใจไม่มี · อื่น ๆ = None."""
     t = normalize(text)
@@ -284,6 +341,26 @@ def parse(text: str) -> Command | None:
     if vol:
         return vol
 
+    for action, phrases in POWER_PHRASES.items():
+        if t in phrases:
+            say = "ปิดเครื่อง" if action == "power_off" else "รีสตาร์ตเครื่อง"
+            return Command(Plan(action, {}, say), SURE, heard)
+    if t in LOCK_PHRASES:
+        return Command(Plan("lock_screen", {}, "ล็อกหน้าจอแล้ว · ปลดด้วยรหัสผ่าน"), SURE, heard)
+    if t in GCAL_SYNC_PHRASES:
+        return Command(Plan("gcal_sync", {}, "ดึงปฏิทิน Google ใหม่"), SURE, heard)
+    if DEVICES.match(t):
+        return Command(Plan("show_devices", {}, "อุปกรณ์ที่ต่ออยู่"), SURE, heard)
+    if (m := CHAT_MODE.match(t)) or (m := CHAT_MODE_EN.match(t)):
+        mode = "work" if m.group(m.lastindex) in ("งาน", "work") else "general"
+        say = "สลับไปแชทงาน" if mode == "work" else "กลับแชททั่วไป"
+        return Command(Plan("chat_mode", {"mode": mode}, say), SURE, heard)
+    if m := MODEL_CMD.match(t):
+        model = next((k for k, names in MODEL_NAMES.items() if m["name"] in names), None)
+        if model:
+            plan = Plan("cloud_model", {"model": model}, f"แชทงานใช้โมเดล {model}")
+            return Command(plan, SURE, heard)
+
     verb = next((v for v in OPEN_VERBS if t.startswith(v)), None)
     if verb is None:
         return None
@@ -291,6 +368,15 @@ def parse(text: str) -> Command | None:
     target = raw.removeprefix("หน้า").removeprefix("เว็บ").removeprefix("แอป").removeprefix("โปรแกรม")
     if not target:
         return None
+
+    # การ์ด 0054: แอปที่รู้จัก (app_catalog) · ตรงทั้งคำเท่านั้น และตรวจก่อนตัวเดาคำใกล้เคียง
+    # ติดตั้งแล้ว = เปิดตัวที่ติดตั้ง (ได้คำเรียกไทยของรายการด้วย) · ยังไม่มี = ให้หน้าจอถามติดตั้ง/เปิดเว็บ
+    known = _known_app(raw, heard) or _known_app(target, heard)
+    if known is not None:
+        if isinstance(known, Command):
+            return known
+        plan = Plan("missing_app", {"app": known.key}, f"ไม่มี {known.name} ในเครื่อง")
+        return Command(plan, SURE, heard)
 
     # ลองทั้งแบบมีคำนำ ("หน้าหลัก") และแบบตัดคำนำแล้ว ("ตั้งค่า")
     # แอปที่ติดตั้งจริง (ไฟล์ .desktop) เป็นกลุ่มสุดท้าย · คำเรียกไทยของตารางคงที่มาก่อนเสมอ

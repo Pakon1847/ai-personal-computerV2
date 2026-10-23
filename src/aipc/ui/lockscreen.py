@@ -1,0 +1,129 @@
+"""จอล็อกรุ่น 2 ด้วย gtklock (การ์ด 0055 · Pakon อนุมัติ 2026-10-23).
+
+ทำไม gtklock: นาฬิกาเดินจริง · แต่งด้วย CSS ได้ · ตรวจรหัสผ่าน PAM (ใส่การปลดด้วยใบหน้าได้) ·
+ล็อกแบบ ext-session-lock เหมือน swaylock (ตัวล็อกตาย = จอยังล็อก) ·
+ไม่มี gtklock ในเครื่อง = กลับไปใช้ swaylock รุ่น 1 (aipc.ui.idle)
+
+เตรียมไฟล์ในโฟลเดอร์ชั่วคราวของผู้ใช้ (ไม่แตะ /etc):
+- layout (gtklock.ui) จากแม่แบบ + ข้อความไทย · สไตล์ gtklock.css (ธีมดำ)
+- fonts.conf: ให้ GTK เห็นฟอนต์ไทยที่มากับแอป (Raspberry Pi OS ไม่มีฟอนต์ไทยในระบบ · ตรวจ 2026-10-23)
+- locale th_TH ของผู้ใช้เอง (localedef → LOCPATH) · วันที่ "วันศุกร์ที่ 23 ตุลาคม พ.ศ. 2569"
+  เดินตามจริงแม้ล็อกข้ามคืน ·
+  สร้างไม่ได้ = วันที่ตัวเลข (ไม่เดา)
+"""
+
+from __future__ import annotations
+
+import re
+import shutil
+import subprocess
+from pathlib import Path
+from xml.sax.saxutils import escape
+
+HERE = Path(__file__).resolve().parent
+ASSETS = HERE / "lock"
+FONTS = HERE / "fonts"
+# userinfo-module ไม่ใช้: ทำ protocol error เมื่อใช้คู่กับฟอนต์ไทยของแอป (ทดสอบบน Pi 5 2026-10-23 · ซ้ำ 2/2) →
+# วาดชื่อ + วงกลมอักษรแรกเองใน layout แทน
+MODULES = ("playerctl-module",)
+TIME_FORMAT = "%H:%M"
+DATE_THAI = "วัน%Aที่ %e %B %EC %Ey"
+DATE_PLAIN = "%d/%m/%Y"
+LOCALE = "th_TH.UTF-8"
+
+# โมดูลปลดเองเมื่อเห็นหน้า (aipc-autounlock.c · install-lockscreen.sh คอมไพล์ไว้ที่นี่ · root เป็นเจ้าของ)
+AUTO_MODULE = Path("/usr/local/lib/aipc/aipc-autounlock.so")
+IDLE_HIDE_S = 20  # ไม่แตะ 20 วิ = ซ่อนกล่องรหัส เหลือแค่นาฬิกา (Pakon: "ไม่ต้องมีกรอบอะไรเลย")
+HINT_AUTO = "มองกล้องเพื่อเข้าใช้ · หรือกดปุ่มใดก็ได้เพื่อพิมพ์รหัสผ่าน"
+HINT_KEY = "กดปุ่มใดก็ได้เพื่อปลดล็อก"
+
+TEXT = {
+    "face_hint": "กด Enter ว่าง ๆ = ใช้ใบหน้า · แป้นไทยอยู่? กด ~ สลับก่อนพิมพ์รหัส",
+    "placeholder": "รหัสผ่าน · หรือกด Enter ว่าง ๆ ใช้ใบหน้า",
+    "password": "รหัสผ่าน",
+    "unlock": "ปลดล็อก",
+}
+
+
+def available(which=shutil.which) -> bool:
+    return which("gtklock") is not None
+
+
+def build_locale(folder: Path, run=subprocess.run) -> Path | None:
+    """locale ไทยของผู้ใช้ (ครั้งเดียว · ~1 วิ) · ไม่มี localedef/ไฟล์ต้นทาง = None."""
+    target = folder / LOCALE
+    if (target / "LC_TIME").exists():
+        return folder
+    folder.mkdir(parents=True, exist_ok=True)  # localedef ไม่สร้างโฟลเดอร์แม่ให้ (พบบน Pi 5)
+    try:
+        r = run(["localedef", "-i", "th_TH", "-f", "UTF-8", str(target)],
+                capture_output=True, timeout=30, check=False)  # fmt: skip
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return folder if r.returncode == 0 and (target / "LC_TIME").exists() else None
+
+
+def fonts_conf(path: Path, font_dir: Path | None = None) -> Path:
+    font_dir = font_dir or FONTS
+    path.write_text(
+        '<?xml version="1.0"?>\n<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">\n'
+        "<fontconfig>\n"
+        '  <include ignore_missing="yes">/etc/fonts/fonts.conf</include>\n'
+        f"  <dir>{escape(str(font_dir))}</dir>\n"
+        "</fontconfig>\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+DESIGN_HEIGHT = 1080  # ขนาดใน gtklock.css ออกแบบที่จอสูง 1080 (เนื้อหาสูงราว 850 px)
+SIZE = re.compile(r"(\d+(?:\.\d+)?)(pt|px)(?![a-z])")
+
+
+def style(path: Path, screen_height: int = DESIGN_HEIGHT) -> Path:
+    """CSS ปรับขนาดตามความสูงจอ · ตัวล็อกต้องพอดีจอ: เนื้อหาสูงกว่าจอ = compositor ปฏิเสธ
+    (Wayland protocol error
+    "committed surface dimensions do not match last acked configure") แล้วจอดำ (พบบน Pi 5 จอ 720 แถว:
+    gtklock วาด 1280×846 · ตรวจด้วย WAYLAND_DEBUG=1 2026-10-23) → คูณทุก pt/px ด้วย ความสูงจอ/1080
+    (ไม่เกิน 1.5 เท่า · ไม่ต่ำกว่า 0.5 เท่า)"""
+    k = max(0.5, min(1.5, screen_height / DESIGN_HEIGHT))
+    css = (ASSETS / "gtklock.css").read_text(encoding="utf-8")
+    css = SIZE.sub(lambda m: f"{max(1, round(float(m[1]) * k))}{m[2]}", css)
+    path.write_text(css, encoding="utf-8")
+    return path
+
+
+def layout(path: Path, keep: str, warn: bool, name: str = "", auto: bool = False) -> Path:
+    s = (ASSETS / "gtklock.ui.in").read_text(encoding="utf-8")
+    values = {**TEXT, "hint": HINT_AUTO if auto else HINT_KEY,
+              "keep": ("! " if warn else "✓ ") + keep,
+              "keep_class": "warn" if warn else "keep",
+              "name": name, "initial": (name.strip()[:1] or "?").upper()}  # fmt: skip
+    for k, v in values.items():
+        s = s.replace("{" + k + "}", escape(v, {'"': "&quot;"}))
+    path.write_text(s, encoding="utf-8")
+    return path
+
+
+def prepare(folder: Path, keep: str, warn: bool, name: str = "", run=subprocess.run,
+            screen_height: int = DESIGN_HEIGHT, auto: bool = False,
+            module: Path = AUTO_MODULE) -> list[str]:  # fmt: skip
+    """เขียนไฟล์ทั้งหมดใน folder แล้วคืนคำสั่ง (ยังไม่รัน) · เรียกตอนตั้งค่าล็อก ไม่ใช่ตอนล็อก (ล็อกต้องเร็ว)."""
+    folder.mkdir(parents=True, exist_ok=True)
+    auto = auto and module.exists()  # เปิดในตั้งค่าแต่ยังไม่ได้ติดตั้งโมดูล = ไม่ปลดเอง (ไม่แสดงคำใบ้ที่ไม่จริง · H5)
+    ui = layout(folder / "gtklock.ui", keep, warn, name, auto)
+    css = style(folder / "gtklock.css", screen_height)
+    conf = fonts_conf(folder / "fonts.conf")
+    loc = build_locale(folder / "locale", run)
+    env = [f"FONTCONFIG_FILE={conf}"]
+    if loc is not None:
+        env += [f"LOCPATH={loc}", f"LC_ALL={LOCALE}"]
+    cmd = ["env", *env, "gtklock", "-d",
+           "-s", str(css), "-x", str(ui),
+           "-t", TIME_FORMAT, "-D", DATE_THAI if loc is not None else DATE_PLAIN,
+           "-S", "-H", "-T", str(IDLE_HIDE_S)]  # fmt: skip
+    for m in MODULES:
+        cmd += ["-m", m]
+    if auto:
+        cmd += ["-m", str(module)]
+    return cmd

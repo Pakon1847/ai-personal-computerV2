@@ -37,6 +37,8 @@ MAX_BYTES = 5 * 1024 * 1024
 TIMEOUT_S = 20
 PAST = timedelta(days=1)
 FUTURE = timedelta(days=60)
+# ดึงเองตามรอบระหว่างเข้าระบบอยู่ (การ์ด 0051) · ไม่ต้องเปิดเว็บ · ลิงก์ iCal ของ Google เองก็หน่วงอยู่แล้ว
+AUTO_SYNC = timedelta(minutes=15)
 STALE = timedelta(minutes=30)  # ถามเรื่องนัดแล้วสำเนาเก่ากว่านี้ = ดึงใหม่เบื้องหลัง (ตอบจากสำเนาไปก่อน)
 OLD = timedelta(hours=24)  # สำเนาเก่ากว่านี้ = เตือนในคำตอบ
 TITLE_MAX = 120

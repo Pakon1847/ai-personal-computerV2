@@ -45,3 +45,42 @@ def request(req: dict, on_progress: Callable[[dict], None] | None = None, path: 
                         on_progress(msg)
     except (OSError, ValueError):
         return dict(UNAVAILABLE)
+
+
+def facing(user: str, on_seen: Callable[[dict], None], stop, path: Path = PUBLIC) -> dict:
+    """การ์ด 0058: หันหน้าเข้าจอไหม ทุก ~0.2 วิ ระหว่างฟังคำสั่งเสียง · stop ตั้ง = กล้องดับ."""
+    return watch(user, on_seen, stop, path=path, op="facing")
+
+
+def watch(user: str, on_seen: Callable[[dict], None], stop, seconds: float = 60.0,
+          path: Path = PUBLIC, op: str = "watch") -> dict:  # fmt: skip
+    """ตัวตรวจว่าเจ้าของยังอยู่ (การ์ด 0051 ทาง ก) · เรียก on_seen ทุกผลจาก visiond ·
+    stop (threading.Event) ตั้ง = ปิดการเชื่อมต่อ → visiond ปล่อยกล้อง · คืนผลสุดท้าย/สาเหตุที่หยุด."""
+    if not available(path):
+        return dict(UNAVAILABLE)
+    try:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.settimeout(1.0)
+            s.connect(str(path))
+            req = {"op": op, "username": user, "seconds": seconds}
+            s.sendall(json.dumps(req, ensure_ascii=False).encode() + b"\n")
+            buf = b""
+            while not stop.is_set():
+                try:
+                    chunk = s.recv(4096)
+                except TimeoutError:
+                    continue
+                if not chunk:
+                    return dict(UNAVAILABLE)
+                buf += chunk
+                while b"\n" in buf:
+                    line, buf = buf.split(b"\n", 1)
+                    msg = json.loads(line)
+                    if not isinstance(msg, dict):
+                        continue
+                    if "ok" in msg:
+                        return msg
+                    on_seen(msg)
+            return {"ok": True, "state": "stopped"}
+    except (OSError, ValueError):
+        return dict(UNAVAILABLE)

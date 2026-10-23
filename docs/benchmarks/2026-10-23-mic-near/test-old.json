@@ -1,0 +1,2561 @@
+{
+ "summary": {
+  "clean": {
+   "n": 44,
+   "stop_within_1_5s": 44,
+   "cut_early": 0,
+   "cut_early_pairs": 0,
+   "results": {
+    "end": 44,
+    "no_speech": 0,
+    "max": 0,
+    "eof": 0
+   },
+   "after_end_median": 1.0
+  },
+  "brown20": {
+   "n": 44,
+   "stop_within_1_5s": 42,
+   "cut_early": 0,
+   "cut_early_pairs": 0,
+   "results": {
+    "end": 44,
+    "no_speech": 0,
+    "max": 0,
+    "eof": 0
+   },
+   "after_end_median": 0.99
+  },
+  "babble20": {
+   "n": 44,
+   "stop_within_1_5s": 39,
+   "cut_early": 0,
+   "cut_early_pairs": 0,
+   "results": {
+    "end": 42,
+    "no_speech": 0,
+    "max": 2,
+    "eof": 0
+   },
+   "after_end_median": 0.99
+  },
+  "babble15": {
+   "n": 44,
+   "stop_within_1_5s": 40,
+   "cut_early": 0,
+   "cut_early_pairs": 0,
+   "results": {
+    "end": 41,
+    "no_speech": 0,
+    "max": 3,
+    "eof": 0
+   },
+   "after_end_median": 0.97
+  },
+  "babble10": {
+   "n": 44,
+   "stop_within_1_5s": 40,
+   "cut_early": 1,
+   "cut_early_pairs": 1,
+   "results": {
+    "end": 42,
+    "no_speech": 1,
+    "max": 1,
+    "eof": 0
+   },
+   "after_end_median": 0.91
+  },
+  "brown5": {
+   "n": 44,
+   "stop_within_1_5s": 32,
+   "cut_early": 0,
+   "cut_early_pairs": 0,
+   "results": {
+    "end": 34,
+    "no_speech": 10,
+    "max": 0,
+    "eof": 0
+   },
+   "after_end_median": 0.89
+  },
+  "babble5": {
+   "n": 44,
+   "stop_within_1_5s": 12,
+   "cut_early": 0,
+   "cut_early_pairs": 0,
+   "results": {
+    "end": 13,
+    "no_speech": 28,
+    "max": 3,
+    "eof": 0
+   },
+   "after_end_median": 0.97
+  }
+ },
+ "rows": [
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.73,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.73,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.73,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.73,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.73,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.7,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-00.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.93
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.86,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.83,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.83,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.68,
+   "after_end_s": 0.8
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.71
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.71
+  },
+  {
+   "file": "pair-00.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 0.62
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.15,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.12,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.12,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.97,
+   "after_end_s": 0.8
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 0.74
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.84
+  },
+  {
+   "file": "single-01.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.84
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 5.04,
+   "after_end_s": 0.91
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.89,
+   "after_end_s": 0.76
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.92,
+   "after_end_s": 0.79
+  },
+  {
+   "file": "pair-01.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 5.07,
+   "after_end_s": 0.94
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.94,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.76,
+   "after_end_s": 0.81
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.73,
+   "after_end_s": 0.78
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.72
+  },
+  {
+   "file": "single-02.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.06
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 5.07,
+   "after_end_s": 0.92
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.86,
+   "after_end_s": 0.71
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.83,
+   "after_end_s": 0.68
+  },
+  {
+   "file": "pair-02.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 0.86
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.27,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.24,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.18,
+   "after_end_s": 0.91
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 1.93
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.79
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.94,
+   "after_end_s": 0.67
+  },
+  {
+   "file": "single-03.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.74
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 5.19,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 5.19,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 5.79,
+   "after_end_s": 1.59
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.9
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.9
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.98,
+   "after_end_s": 0.78
+  },
+  {
+   "file": "pair-03.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 0.81
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.94,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.94,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.88,
+   "after_end_s": 0.93
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.82,
+   "after_end_s": 0.87
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.76,
+   "after_end_s": 0.81
+  },
+  {
+   "file": "single-04.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.06
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 5.13,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 0.88
+  },
+  {
+   "file": "pair-04.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 5.1,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.24,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.24,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.24,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.21,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 3.21,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.77
+  },
+  {
+   "file": "single-05.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.77
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.77,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-05.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.25
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.52,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.54,
+   "after_end_s": 2.01
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.52,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.52,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.49,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.48
+  },
+  {
+   "file": "single-06.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.48
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.8
+  },
+  {
+   "file": "pair-06.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.8
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.33
+  },
+  {
+   "file": "single-07.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 13.32
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.53,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.47,
+   "after_end_s": 0.94
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.38,
+   "after_end_s": 0.85
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.2,
+   "after_end_s": 0.67
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 5.04,
+   "after_end_s": 1.51
+  },
+  {
+   "file": "pair-07.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.65,
+   "after_end_s": 1.12
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.85,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.82,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.79,
+   "after_end_s": 0.93
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.33,
+   "after_end_s": 1.47
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.58,
+   "after_end_s": 0.72
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.52,
+   "after_end_s": 0.66
+  },
+  {
+   "file": "single-08.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.15
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 11.5
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.35,
+   "after_end_s": 0.85
+  },
+  {
+   "file": "pair-08.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.47,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.61,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.61,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 13.39
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.61,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.52,
+   "after_end_s": 0.91
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.52,
+   "after_end_s": 0.91
+  },
+  {
+   "file": "single-09.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.4
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.86,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.83,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.77,
+   "after_end_s": 0.91
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.85
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.7
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.68,
+   "after_end_s": 0.82
+  },
+  {
+   "file": "pair-09.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.15
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.24,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.21,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.18,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.15,
+   "after_end_s": 0.92
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.83
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 3.03,
+   "after_end_s": 0.8
+  },
+  {
+   "file": "single-10.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 0.68
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.8,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 5.79,
+   "after_end_s": 1.99
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.8,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.77,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 5.91,
+   "after_end_s": 2.11
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.77,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-10.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.21
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.61,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.61,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-11.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.36
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-11.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.27
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 3.03,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 3.06,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-12.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 3.36,
+   "after_end_s": 1.29
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 5.04,
+   "after_end_s": 1.29
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.65,
+   "after_end_s": 0.9
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 0.75
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.44,
+   "after_end_s": 0.69
+  },
+  {
+   "file": "pair-12.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.44,
+   "after_end_s": 0.69
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 13.34
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.49,
+   "after_end_s": 0.83
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.55,
+   "after_end_s": 0.89
+  },
+  {
+   "file": "single-13.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.35
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.92,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.89,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.86,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.8,
+   "after_end_s": 0.89
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 0.83
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.47,
+   "after_end_s": 0.56
+  },
+  {
+   "file": "pair-13.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 11.09
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.18,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.18,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.15,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.09,
+   "after_end_s": 0.9
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.88,
+   "after_end_s": 0.69
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.79,
+   "after_end_s": 0.6
+  },
+  {
+   "file": "single-14.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.82
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 5.07,
+   "after_end_s": 1.5
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.53,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "pair-14.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.53,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.37,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.37,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.37,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.34,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.34,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.64
+  },
+  {
+   "file": "single-15.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.64
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.99,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.99,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.99,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.96,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 12.0
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.01
+  },
+  {
+   "file": "pair-15.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.01
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.64,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.58,
+   "after_end_s": 0.92
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.4,
+   "after_end_s": 0.74
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.31,
+   "after_end_s": 0.65
+  },
+  {
+   "file": "single-16.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.35
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.96
+  },
+  {
+   "file": "pair-16.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.59,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.91,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.88,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-17.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 7.29,
+   "after_end_s": 5.38
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.44,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.41,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.41,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.41,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.41,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.83,
+   "after_end_s": 1.4
+  },
+  {
+   "file": "pair-17.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "end",
+   "stop_s": 4.65,
+   "after_end_s": 1.22
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.49,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.49,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 2.49,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 13.51
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.52
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 2.37,
+   "after_end_s": 0.88
+  },
+  {
+   "file": "single-18.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.52
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.17,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.14,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.14,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.11,
+   "after_end_s": 0.94
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 1.92,
+   "after_end_s": -1.25
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.77,
+   "after_end_s": 1.6
+  },
+  {
+   "file": "pair-18.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.84
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 2.67,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 13.32
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.58,
+   "after_end_s": 0.9
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.55,
+   "after_end_s": 0.87
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.33
+  },
+  {
+   "file": "single-19.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.33
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.74,
+   "after_end_s": 1.01
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 8.43,
+   "after_end_s": 4.7
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.56,
+   "after_end_s": 0.83
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.5,
+   "after_end_s": 0.77
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.53,
+   "after_end_s": 0.8
+  },
+  {
+   "file": "pair-19.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.28
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 1.0
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 2.97,
+   "after_end_s": 0.97
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 2.79,
+   "after_end_s": 0.79
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.01
+  },
+  {
+   "file": "single-20.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 3.01
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.98,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.98,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 6.33,
+   "after_end_s": 2.34
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.98,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.98,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.98,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-20.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 1.02
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 3.03,
+   "after_end_s": 0.98
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 3.0,
+   "after_end_s": 0.95
+  },
+  {
+   "file": "single-21.wav",
+   "kind": "single",
+   "noise": "babble5",
+   "result": "no_speech",
+   "stop_s": 5.01,
+   "after_end_s": 2.96
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "clean",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "brown20",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "babble20",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "babble15",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "babble10",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "brown5",
+   "result": "end",
+   "stop_s": 4.71,
+   "after_end_s": 0.99
+  },
+  {
+   "file": "pair-21.wav",
+   "kind": "pair",
+   "noise": "babble5",
+   "result": "max",
+   "stop_s": 15.0,
+   "after_end_s": 11.28
+  }
+ ]
+}

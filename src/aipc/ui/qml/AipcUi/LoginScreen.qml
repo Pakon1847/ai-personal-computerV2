@@ -277,7 +277,11 @@ Rectangle {
         AppButton { text: Tr.both("สมัครบัญชี"); kind: "secondary"; iconPath: Icons.userPlus
                     onClicked: AppState.go("signup") }
         AppButton { text: Tr.both("ภาษา: ไทย"); kind: "secondary"; iconPath: Icons.globe; enabled: false }
-        AppButton { text: Tr.both("ปิดเครื่อง"); kind: "secondary"; iconPath: Icons.power; enabled: false
-                    ToolTip.visible: hovered; ToolTip.text: Tr.both("ยังไม่พร้อม (เฟส 1)") }
+        // การ์ด 0052: ปิด/รีสตาร์ตเครื่องอย่างปลอดภัยจากหน้า Login (แทนการดึงปลั๊ก) · ถามยืนยันก่อน
+        AppButton { objectName: "loginReboot"; text: Tr.both("รีสตาร์ตเครื่อง"); kind: "secondary"; iconPath: Icons.restart
+                    onClicked: powerDialog.ask("reboot") }
+        AppButton { objectName: "loginPowerOff"; text: Tr.both("ปิดเครื่อง"); kind: "secondary"; iconPath: Icons.power
+                    onClicked: powerDialog.ask("power_off") }
     }
+    PowerDialog { id: powerDialog; twoLangs: true }
 }

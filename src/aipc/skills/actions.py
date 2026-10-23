@@ -42,6 +42,18 @@ ACTIONS: dict[str, ActionSpec] = {
         ActionSpec("change_volume", "medium", "เพิ่ม/ลดเสียง"),
         ActionSpec("mute", "low", "ปิดเสียง"),
         ActionSpec("unmute", "low", "เปิดเสียง"),
+        # การ์ด 0052: ปิด/รีสตาร์ตเครื่อง = ความเสี่ยงสูง → ถามยืนยันเสมอ (Command.needs_confirmation)
+        ActionSpec("power_off", "high", "ปิดเครื่อง"),
+        ActionSpec("reboot", "high", "รีสตาร์ตเครื่อง"),
+        ActionSpec("lock_screen", "low", "ล็อกหน้าจอ"),  # การ์ด 0051 · ปลดด้วยรหัสผ่าน · ไม่ออกจากระบบ
+        # การ์ด 0051: ดึงปฏิทิน Google ใหม่ทันที · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
+        ActionSpec("gcal_sync", "low", "ดึงปฏิทิน Google ใหม่", needs_network=True),
+        ActionSpec("show_devices", "low", "ดูอุปกรณ์ที่ต่ออยู่"),  # การ์ด 0051 · อ่านอย่างเดียว
+        # แชท 2 แบบ (การ์ด 0053) · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
+        ActionSpec("chat_mode", "low", "สลับแชททั่วไป/แชทงาน"),
+        ActionSpec("cloud_model", "low", "เลือกโมเดลของแชทงาน"),
+        # การ์ด 0054: แอปที่รู้จักแต่ไม่มีในเครื่อง → หน้าจอถามติดตั้ง/เปิดเว็บแทน (ไม่รันอะไรเอง)
+        ActionSpec("missing_app", "low", "ถามติดตั้งแอปหรือเปิดผ่านเว็บ"),
     ]
 }
 
@@ -120,6 +132,10 @@ PAGES = {
 # หน้าความเป็นส่วนตัวตัดออกในขอบเขตรอบ 3 · ที่ลบข้อมูลใบหน้าอยู่ในหน้าตั้งค่า
 # ผู้ใช้ยังพูดว่า "เปิดหน้าความเป็นส่วนตัว" ได้ แต่หน้าจอพาไปหน้าตั้งค่า
 PAGE_SCREEN = {"privacy": "settings"}
+
+# การ์ด 0052: ผ่าน systemd-logind · polkit ของ Pi 5 ให้คนที่นั่งหน้าเครื่องทำได้เลย (implicit active: yes) ·
+# ทาง SSH ต้องใช้รหัสผู้ดูแล · systemd ปิดโปรแกรมและเขียนดิสก์ให้เสร็จก่อนดับ (ไม่ใช่ดึงปลั๊ก · H1)
+POWER_CMDS = {"power_off": ["systemctl", "poweroff"], "reboot": ["systemctl", "reboot"]}
 
 SINK = "@DEFAULT_AUDIO_SINK@"  # ลำโพงหลักของ PipeWire (ระบบเสียงของ Raspberry Pi OS)
 
@@ -250,6 +266,16 @@ def command_for(plan: Plan) -> list[str] | None:
         return ["wpctl", "set-volume", "-l", "1.0", SINK, f"{abs(step)}%{'+' if step > 0 else '-'}"]
     if plan.action in ("mute", "unmute"):
         return ["wpctl", "set-mute", SINK, "1" if plan.action == "mute" else "0"]
+    if plan.action in POWER_CMDS:
+        return list(POWER_CMDS[plan.action])
+    if plan.action == "lock_screen":
+        # ตัวล็อกเดียวกับล็อกเมื่อไม่ได้ใช้ (aipc.ui.idle): gtklock รุ่น 2 (การ์ด 0055) หรือ swaylock รุ่น 1
+        from aipc.ui import idle
+
+        try:
+            return idle.current_lock_command()
+        except AttributeError:  # วินโดวส์ไม่มี os.getuid · ล็อกจอสีพื้นแทน
+            return idle.lock_command(None)
     return None
 
 
@@ -278,6 +304,8 @@ class Executor:
             args = command_for(plan)
         except KeyError:
             return Outcome(False, "ไม่พบแอปนี้ในเครื่อง")
+        if args is None:  # งานที่หน้าจอทำเอง (เช่น gcal_sync · สลับแชท · ถามติดตั้งแอป) ไม่มีโปรแกรมให้รัน
+            return Outcome(False, f"{plan.spec.label}: สั่งได้จากหน้าจอ/คำสั่งเสียงเท่านั้น")
         if self.dry_run:
             return Outcome(True, f"จำลอง (ไม่ได้รันจริงบนเครื่องนี้): {' '.join(args)}", simulated=True)
         note = ""

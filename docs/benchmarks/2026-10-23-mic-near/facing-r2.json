@@ -1,0 +1,78 @@
+{
+ "summary": {
+  "front_median_peak_db": 56.1,
+  "side_drops_db": [
+   -7.1,
+   2.6,
+   3.2,
+   1.6,
+   4.5
+  ],
+  "near_db": 10.0,
+  "side_cut_by_gate": 0,
+  "side_n": 5,
+  "floor_median_db": 46.3
+ },
+ "rows": [
+  {
+   "pose": "front",
+   "round": 1,
+   "peak_db": 55.8,
+   "floor_db": 45.7
+  },
+  {
+   "pose": "front",
+   "round": 2,
+   "peak_db": 56.1,
+   "floor_db": 48.3
+  },
+  {
+   "pose": "front",
+   "round": 3,
+   "peak_db": 59.6,
+   "floor_db": 45.6
+  },
+  {
+   "pose": "front",
+   "round": 4,
+   "peak_db": 62.8,
+   "floor_db": 46.5
+  },
+  {
+   "pose": "front",
+   "round": 5,
+   "peak_db": 53.5,
+   "floor_db": 44.6
+  },
+  {
+   "pose": "side",
+   "round": 1,
+   "peak_db": 63.2,
+   "floor_db": 47.0
+  },
+  {
+   "pose": "side",
+   "round": 2,
+   "peak_db": 53.5,
+   "floor_db": 40.9
+  },
+  {
+   "pose": "side",
+   "round": 3,
+   "peak_db": 52.9,
+   "floor_db": 40.6
+  },
+  {
+   "pose": "side",
+   "round": 4,
+   "peak_db": 54.5,
+   "floor_db": 46.3
+  },
+  {
+   "pose": "side",
+   "round": 5,
+   "peak_db": 51.6,
+   "floor_db": 47.0
+  }
+ ]
+}
