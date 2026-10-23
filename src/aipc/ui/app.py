@@ -33,6 +33,7 @@ from aipc.ui.backend import (
 from aipc.ui.face import FaceController
 from aipc.ui.handsfree import BrowserController, HotkeyListener
 from aipc.ui.loginface import LoginFaceController
+from aipc.ui.wifi import WifiController
 
 HERE = Path(__file__).resolve().parent
 QML_DIR = HERE / "qml"
@@ -365,6 +366,8 @@ def build(opts: Options, argv: list[str] | None = None):
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session, face_to_speak=lambda: ui_settings.faceToSpeak),
         "browser": browser_ctl,
+        # เลือก Wi-Fi จากแถบบน (การ์ด 0063) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่เปิด
+        "wifi": WifiController(active=in_session),
         # หน้า Login ไม่มีเจ้าของข้อมูล → ไม่มีรายการไดรฟ์ให้สำรอง
         "backupCtl": BackupController(drives=(lambda: []) if opts.greeter_session else None),
         "session": SessionController(opts.session and not opts.greeter_session),

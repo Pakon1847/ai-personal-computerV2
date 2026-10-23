@@ -15,6 +15,7 @@ QtObject {
     readonly property string eyeOff: "M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c5 0 9 4.5 10 7-.4 1-1.2 2.3-2.4 3.5M6.6 6.6C4.4 8 2.9 10.1 2 12c1 2.5 5 7 10 7 1.6 0 3.1-.5 4.4-1.2"
     readonly property string logout: "M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3"
     readonly property string monitor: "M3 5h18v12H3zM8 21h8M12 17v4"  // การ์ด 0062 · จอ
+    readonly property string wifi: "M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5v.01"  // การ์ด 0063
     readonly property string bluetooth: "M7 7l10 10-5 5V2l5 5L7 17"  // การ์ด 0062 · Bluetooth
     readonly property string camera: "M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM8.5 13a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0"
     readonly property string cameraOff: "M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 4l16 16"

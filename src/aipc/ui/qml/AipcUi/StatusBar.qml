@@ -52,6 +52,18 @@ Item {
             Accessible.name: privacyStatus.text
             TapHandler { onTapped: AppState.open("settings") }
         }
+        // เลือก Wi-Fi (การ์ด 0063) · ป้ายบอกชื่อเครือข่ายที่ต่ออยู่ · แตะ = หน้าต่างรายชื่อ Wi-Fi
+        Chip {
+            id: wifiChip
+            objectName: "wifiIndicator"
+            visible: wifi.available
+            text: wifi.current !== "" ? wifi.current : "Wi-Fi"
+            iconPath: Icons.wifi
+            compact: bar.tight
+            Accessible.name: wifi.current !== "" ? Tr.t("Wi-Fi ต่อ ") + wifi.current : Tr.t("Wi-Fi ยังไม่ได้ต่อ")
+            TapHandler { onTapped: wifiPopup.opened ? wifiPopup.close() : wifiPopup.open() }
+            WifiPopup { id: wifiPopup; y: wifiChip.height + 8; x: Math.min(0, wifiChip.width - width) }
+        }
         Chip {
             objectName: "machineIndicator"
             readonly property var first: bar.problems.length ? bar.problems[0] : null

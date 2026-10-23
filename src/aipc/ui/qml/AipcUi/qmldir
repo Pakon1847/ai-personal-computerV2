@@ -23,6 +23,7 @@ SignupFlow 1.0 SignupFlow.qml
 RecoverFlow 1.0 RecoverFlow.qml
 AppCheck 1.0 AppCheck.qml
 StatusBar 1.0 StatusBar.qml
+WifiPopup 1.0 WifiPopup.qml
 NavItem 1.0 NavItem.qml
 Sidebar 1.0 Sidebar.qml
 PageHeader 1.0 PageHeader.qml
