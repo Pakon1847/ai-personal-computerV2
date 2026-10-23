@@ -45,6 +45,10 @@
 | greetd (ตัวจัดการ Login) | GPL-3.0 | ได้แต่ต้องเปิดซอร์สตาม GPL ถ้าแจกจ่าย · เราใช้แพ็กเกจของ OS ไม่ได้แก้ | github.com/kennylevinsen/greetd | 2026-10-07 |
 | labwc (compositor) | GPL-2.0 | เหมือน greetd | github.com/labwc/labwc | 2026-10-07 |
 | swaylock · swayidle (ล็อก/ไม่ได้ใช้เครื่อง) | MIT | ได้ | github.com/swaywm/swaylock · swayidle | 2026-10-07 |
+| gtklock 4.0.0-1 (จอล็อกรุ่น 2 · การ์ด 0055) | GPL-3.0-or-later | ได้แต่ต้องเปิดซอร์สตาม GPL ถ้าแจกจ่าย · ใช้แพ็กเกจของ OS ไม่ได้แก้ | `/usr/share/doc/gtklock/copyright` บน Pi 5 | 2026-10-23 |
+| gtklock-playerctl-module 4.0.0-2 (ปุ่มเพลงบนจอล็อก) | GPL-3.0-or-later (`gtklock-module.h` = Expat) | เหมือน gtklock | `/usr/share/doc/gtklock-playerctl-module/copyright` บน Pi 5 | 2026-10-23 |
+| playerctl / libplayerctl2 2.4.1-3 (คุมเพลงผ่าน MPRIS) | LGPL-3.0-or-later | ได้ (ใช้เป็นโปรแกรม/ไลบรารีของ OS · ไม่ได้แก้) | `/usr/share/doc/playerctl/copyright` บน Pi 5 | 2026-10-23 |
+| `aipc-autounlock.c` ของเรา (โมดูลที่ gtklock โหลดเข้าโปรเซส · การ์ด 0055) | ของโปรเจกต์ (ไม่ได้ใส่ไลเซนส์) · **ทำงานในโปรเซสของโปรแกรม GPL** | งานศึกษา = ได้ · **ถ้าแจกจ่ายต้องเปิดซอร์สโมดูลนี้ด้วยไลเซนส์ที่เข้ากับ GPL-3.0** (ปลั๊กอินที่โหลดเข้าโปรเซสนับเป็นงานต่อยอด · ตามแนวของ FSF GPL FAQ) | อ่านจาก copyright ของ gtklock ข้างบน · ผมไม่ใช่นักกฎหมาย | 2026-10-23 |
 | ข้อมูลอากาศ Open-Meteo (บริการภายนอก) | ข้อมูล CC BY 4.0 (ต้องให้เครดิต) · API แบบฟรีไม่เกิน 10,000 ครั้ง/วัน | ข้อมูลได้ (ให้เครดิต) · **ไม่ได้ตรวจเงื่อนไข API เชิงพาณิชย์** | open-meteo.com/en/terms | 2026-10-07 |
 
 **ยังไม่ได้ตรวจ (ห้ามระบุไลเซนส์ในเล่มจนกว่าจะตรวจ):** Claude Code / บริการของ Anthropic (เป็นบริการตามข้อตกลงของบัญชี ไม่ใช่ไลเซนส์ซอฟต์แวร์เปิด) · Chromium (แพ็กเกจของ OS) ·
