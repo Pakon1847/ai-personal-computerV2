@@ -167,11 +167,6 @@ class UnlockOpTest(unittest.TestCase):
         self.assertTrue(self.unlock(NAMFON)["ok"])
 
 
-
-if __name__ == "__main__":
-    unittest.main()
-
-
 class FaceWatchTest(unittest.TestCase):
     def fake_watch(self, rounds):
         it = iter(rounds)
@@ -207,3 +202,7 @@ class FaceWatchTest(unittest.TestCase):
         rounds = [([], {"ok": False, "state": "no-templates"})]
         self.assertEqual(face_watch.run("namfon", self.fake_watch(rounds), out), 2)
         self.assertEqual(out.getvalue(), "")
+
+
+if __name__ == "__main__":
+    unittest.main()
