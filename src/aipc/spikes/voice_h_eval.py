@@ -116,6 +116,7 @@ def main() -> None:
     # การ์ด 0028 ข4: hotwords ของสกิลต่อท้าย (ไฟล์ JSON รายการประโยค) · วัดเฉพาะ Zipformer (ข้าม whisper)
     ap.add_argument("--extra-hotwords", default="")
     ap.add_argument("--zip-only", action="store_true")
+    ap.add_argument("--trim", action="store_true")  # การ์ด 0056 N2: ตัดเหลือช่วงพูดแบบแอปก่อนถอด
     a = ap.parse_args()
     work = Path(a.work)
     work.mkdir(parents=True, exist_ok=True)
@@ -173,6 +174,12 @@ def main() -> None:
     rows = []
     for i, it in enumerate(items):
         wav = work / f"{i:03d}-16k.wav"
+        if a.trim:
+            from aipc.spikes.voice_cmd_eval import trim_like_app
+
+            wav = work / f"{i:03d}-trim.wav"
+            wav.write_bytes((work / f"{i:03d}-16k.wav").read_bytes())
+            trim_like_app(wav)
         t1 = time.monotonic()
         heard, err = z.transcribe(wav)
         secs = round(time.monotonic() - t1, 3)
