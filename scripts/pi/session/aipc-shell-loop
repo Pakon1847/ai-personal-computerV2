@@ -29,6 +29,20 @@ labwc_alive() {
 # รุ่นที่เซสชันนี้เริ่มถูกลบไประหว่างใช้ (อัปเดตแอป · พบบน Pi 5 2026-10-01: เปิดใหม่ได้รหัส 127 สองครั้ง
 # แล้วเด้งกลับหน้า Login) → เปิดจากรุ่นปัจจุบัน /opt/aipc-v2 แทน
 CURRENT="${AIPC_CURRENT_APP:-/opt/aipc-v2}"
+
+# หน้า "กำลังเปิด…" ระหว่างรอแอปโหลด (~4 วิ · เดิมจอดำหลังสแกนหน้าผ่าน · Pakon 2026-10-23) ·
+# ภาพมาจากแอปรอบก่อน (aipc.ui.splash) · ยังไม่มี = สีพื้นของธีม · swaybg ไม่มี = เหมือนเดิม ·
+# เป็นพื้นหลังของ labwc: หน้าต่างแอปเต็มจอทับเอง · แอปล่มแล้วเปิดใหม่ก็เห็นภาพนี้แทนจอดำ
+if command -v swaybg >/dev/null 2>&1; then
+  SPLASH="${XDG_CACHE_HOME:-$HOME/.cache}/aipc/splash.png"
+  if [ -s "$SPLASH" ]; then
+    swaybg -m fill -i "$SPLASH" >/dev/null 2>&1 &
+  elif grep -qs '"theme": *"light"' "${XDG_CONFIG_HOME:-$HOME/.config}/aipc/ui.json"; then
+    swaybg -c '#F6F7F9' >/dev/null 2>&1 &
+  else
+    swaybg -c '#050506' >/dev/null 2>&1 &
+  fi
+fi
 recent=""   # เวลาที่ล่มในช่วง WINDOW วินาทีล่าสุด คั่นด้วยช่องว่าง
 while labwc_alive; do
   if [ -z "${AIPC_SHELL_CMD:-}" ] && [ ! -x "$APP/.venv/bin/python" ] && [ -x "$CURRENT/.venv/bin/python" ]; then

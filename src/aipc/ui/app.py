@@ -468,6 +468,11 @@ def build(opts: Options, argv: list[str] | None = None):
     ctx.setContextProperty("hotkeyReady", engine._hotkey.available)
 
     engine.load(QUrl.fromLocalFile(str(QML_DIR / "AipcUi" / "Main.qml")))
+    if opts.session and not opts.greeter_session:
+        # หน้า "กำลังเปิด…" ของการเข้าระบบครั้งหน้า (แทนจอดำ ~4 วิ) · วาดหลังแอปขึ้นแล้ว ไม่ถ่วงตอนเปิด
+        from aipc.ui import splash
+
+        QTimer.singleShot(8000, lambda: splash.refresh(ui_settings.theme))
     return app, engine, warnings
 
 
