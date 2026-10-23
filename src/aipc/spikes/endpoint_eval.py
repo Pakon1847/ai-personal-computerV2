@@ -50,6 +50,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path)
     ap.add_argument("--tail-s", type=float, default=3.0)
     ap.add_argument("--near-db", type=float)
+    # การ์ด 0056: babble เดิมต่อไฟล์ทั้งไฟล์ (มีเงียบนำ 0.5 + ท้าย 3 วิ ทุกประโยค) = ไม่ใช่คนคุยต่อเนื่อง ·
+    # --continuous = ต่อเฉพาะช่วงพูด (ตัดเงียบออก) แบบคนคุยกันไม่หยุด
+    ap.add_argument("--continuous", action="store_true")
     a = ap.parse_args(argv)
     kw = {} if a.near_db is None else {"near_db": a.near_db}
     if hasattr(sys.stdout, "reconfigure"):
@@ -57,6 +60,10 @@ def main(argv: list[str] | None = None) -> int:
     meta = json.loads((a.folder / "meta.json").read_text(encoding="utf-8"))
     rng = np.random.default_rng(20261001)
     babble_src = [load(a.folder / m["file"]) for m in meta if m["kind"] == "single"]
+    if a.continuous:
+        singles = [m for m in meta if m["kind"] == "single"]
+        babble_src = [x[int(m["speech_start"] * SR) : int(m["speech_end"] * SR)]
+                      for x, m in zip(babble_src, singles, strict=True)]  # fmt: skip
     rows = []
     for m in meta:
         speech = load(a.folder / m["file"])
