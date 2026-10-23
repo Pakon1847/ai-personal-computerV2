@@ -35,7 +35,8 @@ from aipc.accounts import validation
 CALLER = "_greetd"  # ผู้ใช้ของหน้า Login · คนอื่นเรียกไม่ได้ แม้ผ่าน sudo
 VISION = "_aipcvision"  # visiond (การ์ด 0015) · เรียกได้เฉพาะ check-password
 PAM_SERVICE = "aipc-face-check"  # /etc/pam.d/aipc-face-check · ติดตั้งโดย install-visiond.sh
-GROUPS = ("video", "render", "audio")  # จอ กล้อง เสียง · ใส่เฉพาะกลุ่มที่เครื่องมีจริง
+GROUPS = ("video", "render", "audio", "netdev")  # จอ กล้อง เสียง · เลือก Wi-Fi (การ์ด 0063 ทาง ก)
+# ใส่เฉพาะกลุ่มที่เครื่องมีจริง · netdev = NetworkManager ให้เปลี่ยน Wi-Fi ของเครื่องได้ (กฎของ Raspberry Pi OS) ไม่ใช่สิทธิ์ผู้ดูแล
 STATE = Path("/var/lib/aipc")
 REQUEST_MAX = 4096
 FAIL_FREE = 5  # ผิดได้เท่านี้ก่อนต้องรอ

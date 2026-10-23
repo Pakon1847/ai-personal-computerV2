@@ -102,6 +102,12 @@ class HelperTest(unittest.TestCase):
         self.assertEqual(add[add.index("--groups") + 1], "video,audio")
         self.assertTrue(all("sudo" not in arg for arg in add))
 
+    def test_new_account_can_pick_wifi(self):  # การ์ด 0063 ทาง ก "ทุกบัญชี"
+        self.sys.groups.add("netdev")
+        helper.handle(create_req(), self.sys)
+        add = self.useradd_calls()[0]
+        self.assertEqual(add[add.index("--groups") + 1], "video,audio,netdev")
+
     def test_taken_username_is_refused(self):
         self.assertTrue(helper.handle(create_req(), self.sys)["ok"])
         r = helper.handle(create_req(password="another-pass-42"), self.sys)
