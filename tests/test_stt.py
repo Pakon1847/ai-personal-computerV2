@@ -11,7 +11,9 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
+from aipc.voice import stt
 from aipc.voice.stt import Endpointer, Listener, clean
 
 # ตัวอัดปลอม: เขียนไฟล์แล้วรอจนถูกหยุด · ตัวถอดปลอม: พิมพ์ข้อความคงที่
@@ -162,7 +164,12 @@ class SttTest(unittest.TestCase):
         self.assertLess(ep.noise_floor, 40)  # ระดับเงียบท้าย = จำไว้ครั้งหน้า
 
     def test_listener_transcribes_only_the_speech(self):
-        """การ์ด 0056: ไฟล์ที่ส่งให้ตัวถอดเหลือแค่ช่วงพูด (ตัวถอดปลอมพิมพ์ความยาวไฟล์) · จำระดับเสียงรอบข้างไว้."""
+        """การ์ด 0056: เปิด TRIM = ไฟล์ที่ส่งให้ตัวถอดเหลือแค่ช่วงพูด (ตัวถอดปลอมพิมพ์ความยาวไฟล์) ·
+        จำระดับเสียงรอบข้างไว้ · ค่าในแอปปิดอยู่ (วัดแล้วความแม่นลด · ดู stt.TRIM)."""
+        self.assertFalse(stt.TRIM)
+        patch = mock.patch.object(stt, "TRIM", True)
+        patch.start()
+        self.addCleanup(patch.stop)
         talker = Path(self.tmp.name) / "talker.py"
         talker.write_text(TALKER, encoding="utf-8")
         code = "import sys, wave; print(wave.open(sys.argv[1]).getnframes() / 16000)"

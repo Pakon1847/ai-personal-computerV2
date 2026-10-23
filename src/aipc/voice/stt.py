@@ -41,6 +41,9 @@ NEAR_DB = 10.0
 # เผื่อท้าย 0.3 วิ (เท่าไฟล์ถอดล่วงหน้าของ 0044)
 PAD_BEFORE_S = 0.25
 PAD_AFTER_S = 0.3
+# ปิดไว้: วัดบน Pi (ชุดทดสอบ 2026-10-23) ชุดคำสั่ง 29 → 28/34 (ได้ "ก็" งอกหน้าคำ) · ชุด H 69 เท่าเดิม ·
+# เวลาถอดลดแค่ 0.02 วิ → ไม่ผ่านเกณฑ์ N2 ของการ์ด 0056 (docs/benchmarks/2026-10-23-mic-near)
+TRIM = False
 # whisper ใส่ป้ายเช่น [BLANK_AUDIO] (เสียงดนตรี) ตอนไม่มีเสียงพูด
 TAGS = re.compile(r"\[[^\]]*\]|\([^)]*\)")
 
@@ -363,7 +366,7 @@ class Listener:
             if not (self._use_fast and ep.speaking):
                 continue
             if spec is None and ep.quiet_s >= SPEC_AT_S:
-                a, b = ep.speech_span(len(pcm))
+                a, b = ep.speech_span(len(pcm)) if TRIM else (0, len(pcm))
                 spec = self._speculate(bytes(pcm[a:b]), ep.voiced)
             done = spec is not None and spec["done"].is_set() and not spec["err"] and spec["text"]
             if done and ep.quiet_s >= EARLY_S and self._complete and self._complete(spec["text"]):
@@ -426,7 +429,7 @@ class Listener:
             _remove(path)
             self._on_done("", "กดค้างไว้ระหว่างพูด แล้วปล่อยเมื่อพูดจบ", 0.0)
             return
-        if span is not None:
+        if TRIM and span is not None:
             _trim(path, *span)  # การ์ด 0056: ถอดแค่ช่วงพูด ไม่ถอดเสียงรอบข้างก่อน/หลัง
         threading.Thread(target=self._transcribe, args=(path, spec), daemon=True).start()
 
