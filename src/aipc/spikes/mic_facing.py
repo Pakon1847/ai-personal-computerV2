@@ -50,20 +50,25 @@ def db(x: float) -> float:
     return 20 * math.log10(max(x, 1e-9))
 
 
-def record(seconds: float, folder: Path) -> bytes:
-    path = folder / f"facing-{os.getpid()}-{time.monotonic_ns()}.wav"
-    cmd = ["pw-record", "--rate", "16000", "--channels", "1", "--format", "s16", str(path)]
-    p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    try:
-        time.sleep(seconds)
-    finally:
-        p.send_signal(2)
-        p.wait(timeout=3)
-    try:
-        with wave.open(str(path)) as w:
-            return w.readframes(w.getnframes())
-    finally:
-        path.unlink(missing_ok=True)  # ไม่เก็บเสียง
+PRE_S, SKIP_S, FRAME_S = 0.6, 0.35, FRAME / 16000
+
+
+class Recorder:
+    """อัดจากไมค์ของเซสชันจนกว่าจะ stop() · คืน PCM แล้วลบไฟล์ทันที (ไม่เก็บเสียง)."""
+
+    def __init__(self, folder: Path):
+        self.path = folder / f"facing-{os.getpid()}-{time.monotonic_ns()}.wav"
+        cmd = ["pw-record", "--rate", "16000", "--channels", "1", "--format", "s16", str(self.path)]
+        self.proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def stop(self) -> bytes:
+        self.proc.send_signal(2)
+        self.proc.wait(timeout=3)
+        try:
+            with wave.open(str(self.path)) as w:
+                return w.readframes(w.getnframes())
+        finally:
+            self.path.unlink(missing_ok=True)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -89,9 +94,15 @@ def main(argv: list[str] | None = None) -> int:
         beep(False)
         time.sleep(2.5)  # ให้เวลาหันตัว
         for k in range(a.rounds):
+            # รอบ 2 (2026-10-23): รอบแรกเสียงติ๊กปนอยู่ในช่วงที่อัด → อัดยาวต่อเนื่อง ·
+            # พื้นเสียง = 0.5 วิก่อนติ๊ก · ยอดเสียงพูด = หลังติ๊ก 0.35 วิขึ้นไป (ข้ามเสียงติ๊กทั้งหมด)
+            p = Recorder(folder)
+            time.sleep(PRE_S)
             beep(True)
-            time.sleep(0.15)  # ไม่ให้เสียงติ๊กเข้าไปปนช่วงวัดพื้นเสียง
-            peak, floor = peak_and_floor(levels(record(a.seconds, folder)))
+            time.sleep(a.seconds)
+            lv = levels(p.stop())
+            floor = sorted(lv[:16])[8] if len(lv) > 16 else 0.0
+            peak, _ = peak_and_floor([0.0] * 10 + lv[round((PRE_S + SKIP_S) / FRAME_S) :])
             rows.append({"pose": pose, "round": k + 1, "peak_db": round(db(peak), 1),
                          "floor_db": round(db(floor), 1)})  # fmt: skip
             print(
