@@ -78,8 +78,26 @@ def label(text: str, skills) -> str:
     return "none" if way == handsfree.UNKNOWN else way
 
 
+# คำตอบที่เปลี่ยนเพราะออกแบบใหม่ ไม่ใช่เพราะโค้ดผิด · ไฟล์ชุดวัดไม่แก้ (เก็บเป็นหลักฐานรอบเดิม) · ใช้กับทุกชุด
+# การ์ด 0064 (Pakon เลือก 2026-10-26): บัญชี Google เปิดในเบราว์เซอร์ของผู้ช่วยแล้ว
+# (เดิม 0031 = หน้าต่างบัญชี · command)
+# ตรวจ 2026-10-26: ก่อน/หลังแก้ ต่างกันเฉพาะ 4 ประโยคนี้ · ข้อผิดอื่นเหมือนเดิมทุกข้อ
+CHANGED_BY_DESIGN: dict[str, tuple[str, str, str]] = {
+    "เปิดจีเมล": ("command", "browser:site", "0064"),  # dev3
+    "เปิดจีเมลให้หน่อย": ("command", "browser:site", "0064"),  # test
+    "เปิดจีเมลหน่อย": ("command", "browser:site", "0064"),  # test3
+    "เข้ากูเกิลไดรฟ์": ("command", "browser:site", "0064"),  # test3
+}
+
+
+def expected(item: dict) -> str:
+    old, new, _card = CHANGED_BY_DESIGN.get(item["text"], (None, None, None))
+    return new if old == item["expect"] else item["expect"]
+
+
 def score(name: str, skills) -> dict:
     items = json.loads((DATA / f"voice_all_{name}.json").read_text(encoding="utf-8"))["items"]
+    items = [{**i, "expect": expected(i), "expect_file": i["expect"]} for i in items]
     rows = [{**i, "got": label(i["text"], skills)} for i in items]
     cmd = [r for r in rows if r["expect"] not in ("none", "ask")]
     non = [r for r in rows if r["expect"] in ("none", "ask")]

@@ -143,17 +143,17 @@ class PoliteTailTest(unittest.TestCase):
 
 
 class LoginParseTest(unittest.TestCase):
-    """เข้าสู่ระบบ YouTube ด้วยเสียง: Google ไม่ให้กรอกรหัสในเบราว์เซอร์ที่ถูกคุม → หน้าต่างแบบไม่คุม."""
+    """เข้าสู่ระบบ Google ด้วยเสียง (การ์ด 0064): Google ไม่ให้กรอกรหัสในเบราว์เซอร์ที่ถูกคุม → หน้าต่างแบบไม่คุม."""
 
     def test_login_phrasings(self):
         for text in ["เข้าสู่ระบบยูทูบ", "ล็อกอินยูทูบ", "ล็อคอินยูทูป", "login youtube",
                      "เข้าสู่ระบบ youtube ให้หน่อย", "ลงชื่อเข้าใช้ยูทูบ", "เข้าสู่ระบบกูเกิล",
-                     "ล็อกอินเข้ายูทูบ"]:  # fmt: skip
-            self.assertEqual(parsed(text), [{"kind": "login", "site": "youtube"}], text)
+                     "ล็อกอินเข้ายูทูบ", "เข้าสู่ระบบจีเมล", "ล็อกอิน gmail"]:  # fmt: skip
+            self.assertEqual(parsed(text), [{"kind": "login", "site": "google"}], text)
 
     def test_not_login(self):
-        # ไม่บอกเว็บ = ไม่รู้ว่าเข้าอะไร · Gmail เปิดในหน้าต่างบัญชีแยกอยู่แล้ว (การ์ด 0031)
-        for text in ["เข้าสู่ระบบ", "เข้าสู่ระบบจีเมล"]:
+        # ไม่บอกเว็บ = ไม่รู้ว่าเข้าอะไร (อาจหมายถึงบัญชีเครื่อง) · เว็บที่ไม่ใช่บัญชี Google ไม่ใช่คำสั่งนี้
+        for text in ["เข้าสู่ระบบ", "ล็อกอินเฟซบุ๊ก"]:
             self.assertEqual(parsed(text), [], text)
         self.assertEqual(parsed("เปิดยูทูบ"), [{"kind": "site", "site": "youtube"}])
 

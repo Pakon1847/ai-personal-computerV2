@@ -111,14 +111,19 @@ def site_host(site: str) -> str:
     return (urlsplit(SITES[site][1]).hostname or "").removeprefix("www.") if site in SITES else ""
 
 
-def check_site(site: str) -> list[str]:
-    from aipc.skills.actions import SITES, SYSTEM_BROWSER_SITES
+# เว็บบัญชี Google: เดิมเปิดในหน้าต่างบัญชีที่ระบบไม่ได้คุม (การ์ด 0031) · การ์ด 0064 ย้ายมาเบราว์เซอร์ของผู้ช่วยแล้ว
+# แต่สกิลประจำเว็บ (กดคีย์/คลิกในอีเมล เอกสาร ไฟล์) ยังไม่ได้วัดผลและอยู่นอกขอบเขต 0064 → ยังไม่รับ (ชุดวัด W4 x07)
+NO_SITE_SKILL: frozenset[str] = frozenset({"gmail", "calendar", "drive", "docs"})
 
-    if site in SYSTEM_BROWSER_SITES:
-        return [f"เว็บ {site} เปิดในหน้าต่างบัญชีแยกที่ระบบไม่ได้คุม (การ์ด 0031) · สั่งในหน้าเว็บนี้ไม่ได้"]
+
+def check_site(site: str) -> list[str]:
+    from aipc.skills.actions import SITES
+
+    if site in NO_SITE_SKILL:
+        return [f"เว็บ {site} เป็นบัญชี Google · ยังไม่รับสกิลประจำเว็บนี้ (การ์ด 0064 หัวข้อ 9)"]
     if site not in SITES and not (site.startswith("https://") and site_host(site)):
         return [
-            f"site ต้องเป็นชื่อในรายการเว็บ ({', '.join(sorted(set(SITES) - SYSTEM_BROWSER_SITES))}) หรือ https://…"
+            f"site ต้องเป็นชื่อในรายการเว็บ ({', '.join(sorted(set(SITES) - NO_SITE_SKILL))}) หรือ https://…"
         ]
     return []
 

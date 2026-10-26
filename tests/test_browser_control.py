@@ -280,7 +280,7 @@ class LoginWindowTest(unittest.TestCase):
 
     def test_login_opens_uncontrolled_window_with_same_profile(self):
         self.b._start("about:blank")
-        r = self.b.run(control.BrowseCommand("login", site="youtube"))
+        r = self.b.run(control.BrowseCommand("login", site="google"))
         self.assertTrue(r.ok)
         self.assertFalse(self.b.running)  # เบราว์เซอร์ที่ถูกคุมปิดแล้ว (ปล่อยโปรไฟล์)
         argv = self.started[0]
@@ -289,16 +289,56 @@ class LoginWindowTest(unittest.TestCase):
         self.assertEqual(argv[-1], control.LOGIN_URL)
 
     def test_other_commands_wait_for_login_window(self):
-        self.b.run(control.BrowseCommand("login", site="youtube"))
+        self.b.run(control.BrowseCommand("login", site="google"))
         r = self.b.run(control.BrowseCommand("site", site="youtube"))
         self.assertFalse(r.ok)
         self.assertIn("ปิดหน้าต่าง", r.say)
-        again = self.b.run(control.BrowseCommand("login", site="youtube"))
+        again = self.b.run(control.BrowseCommand("login", site="google"))
         self.assertEqual(len(self.started), 1)  # ไม่เปิดหน้าต่างซ้อน
         self.assertTrue(again.ok)
         self.proc.alive = False  # ผู้ใช้ปิดหน้าต่างแล้ว → เปิดเบราว์เซอร์ของผู้ช่วยได้ตามเดิม
         self.assertFalse(self.b.logging_in)
         self.assertTrue(self.b.run(control.BrowseCommand("site", site="youtube")).ok)
+
+
+class GoogleLoginPageTest(unittest.TestCase):
+    """การ์ด 0064: Gmail ในเบราว์เซอร์ของผู้ช่วย · ยังไม่เข้าสู่ระบบ = เด้งไปหน้า Google →
+    บอกทางเข้าสู่ระบบ ไม่บอก "เปิดแล้ว"."""
+
+    LOGIN = (
+        "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com"
+    )
+
+    def browser(self, redirect: bool):
+        cdp_ = FakeCdp({})
+        go = cdp_.go
+
+        def go_redirect(url):
+            go(self.LOGIN if redirect and "google.com" in url and "accounts." not in url else url)
+
+        cdp_.go = go_redirect
+        return BrowserControl(launcher=lambda argv: (FakeProc(), cdp_))
+
+    def test_not_signed_in_says_how_to_sign_in(self):
+        r = self.browser(redirect=True).run(control.BrowseCommand("site", site="gmail"))
+        self.assertFalse(r.ok)  # H5
+        self.assertIn("เข้าสู่ระบบกูเกิล", r.say)
+        r = self.browser(redirect=True).run(
+            control.BrowseCommand("site_search", query="ใบเสร็จ", site="gmail")
+        )
+        self.assertFalse(r.ok)
+        self.assertIn("เข้าสู่ระบบกูเกิล", r.say)
+
+    def test_signed_in_opens_normally(self):
+        r = self.browser(redirect=False).run(control.BrowseCommand("site", site="gmail"))
+        self.assertTrue(r.ok)
+        self.assertEqual(r.say, "เปิด Gmail แล้ว")
+
+    def test_only_the_google_sign_in_host_counts(self):
+        self.assertTrue(control.google_login_page(self.LOGIN))
+        for url in ["https://mail.google.com/mail/u/0/", "https://www.youtube.com/",
+                    "https://example.org/?next=accounts.google.com", "about:blank"]:  # fmt: skip
+            self.assertFalse(control.google_login_page(url), url)
 
 
 if __name__ == "__main__":

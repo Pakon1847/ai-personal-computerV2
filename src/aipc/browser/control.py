@@ -27,13 +27,23 @@ GOOGLE = "https://www.google.com/search?hl=th&q="
 # Bing ให้ผลไม่ตรงคำค้น 3/4 (ไข่เจียว → หน้าช่วยเหลือ Windows · อากาศเชียงใหม่ → แบบทดสอบ Harry Potter)
 # DuckDuckGo ตรง 8/8 และลิงก์ชี้เว็บปลายทางตรง ๆ (Bing ผ่านตัวพาไป bing.com/ck/a)
 DDG = "https://duckduckgo.com/?kl=th-th&q="
-# เข้าสู่ระบบ YouTube: Google ขึ้น "Couldn't sign you in" ในเบราว์เซอร์ที่ถูกคุม (Pakon ลอง 2026-10-19) →
-# เปิดหน้านี้ด้วยโปรไฟล์ของผู้ช่วยแบบไม่คุม (ไม่มี --remote-debugging-pipe) · ผู้ใช้กรอกรหัสเอง ระบบไม่เห็น ·
-# ปิดหน้าต่างแล้ว เบราว์เซอร์ของผู้ช่วยเปิดใหม่ด้วยคุกกี้เดิม = เข้าสู่ระบบอยู่
+# เข้าสู่ระบบ Google (การ์ด 0064): Google ขึ้น "Couldn't sign you in" ในเบราว์เซอร์ที่ถูกคุม
+# (Pakon ลอง 2026-10-19) → เปิดหน้านี้ด้วยโปรไฟล์ของผู้ช่วยแบบไม่คุม (ไม่มี --remote-debugging-pipe) ·
+# ผู้ใช้กรอกรหัสเอง ระบบไม่เห็น · ปิดหน้าต่างแล้ว เบราว์เซอร์ของผู้ช่วยเปิดใหม่ด้วยคุกกี้เดิม = เข้าสู่ระบบอยู่ ·
+# บัญชีเดียวใช้ได้ทั้ง YouTube Gmail ไดรฟ์ ปฏิทิน เอกสาร
 LOGIN_URL = (
     "https://accounts.google.com/ServiceLogin?service=youtube&hl=th"
     "&continue=https%3A%2F%2Fwww.youtube.com%2F"
 )
+LOGIN_HINT = "พูด “เข้าสู่ระบบกูเกิล” แล้วกรอกบัญชีเอง"
+
+
+def google_login_page(url: str) -> bool:
+    """เปิด Gmail/ไดรฟ์/ปฏิทินแล้วเด้งมาหน้านี้ = ยังไม่ได้เข้าสู่ระบบ (ตรวจด้วยชื่อเว็บ · H6) ·
+    กรอกรหัสในเบราว์เซอร์ที่ถูกคุมไม่ได้ → บอกทางเข้าสู่ระบบแทน."""
+    return (urlsplit(url).hostname or "") == "accounts.google.com"
+
+
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
 NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media", "fullscreen",
               "skip_ad", "key", "click"}  # fmt: skip
@@ -527,6 +537,8 @@ class BrowserControl:
             enc = quote(cmd.query, safe="") if cmd.site in PATH_QUERY else quote_plus(cmd.query)
             target, before = SITE_SEARCH[cmd.site] + enc, self._url()
             url = self._open_search(target)
+            if google_login_page(url):  # ค้นในจีเมลก่อนเข้าสู่ระบบ (การ์ด 0064)
+                return Result(False, f"ยังไม่ได้เข้าสู่ระบบ Google · {LOGIN_HINT}", url=url)
             if not landed(url, target, before):  # การ์ด 0057: ไม่บอก "แล้ว" ถ้าหน้าผลค้นหาไม่ขึ้น (H5)
                 return Result(False, f"เปิดหน้าค้นหาใน {name} ไม่สำเร็จ (เน็ตหรือเว็บอาจช้า) · ลองอีกครั้ง",
                               url=url)  # fmt: skip
@@ -562,7 +574,7 @@ class BrowserControl:
         )
         return Result(
             True,
-            "เปิดหน้าเข้าสู่ระบบ YouTube แล้ว · กรอกบัญชี Google เอง แล้วปิดหน้าต่างนั้น · จากนั้นพูด “เปิดยูทูบ”",
+            "เปิดหน้าเข้าสู่ระบบ Google แล้ว · กรอกบัญชีเอง แล้วปิดหน้าต่างนั้น · จากนั้นพูด “เปิดยูทูบ” หรือ “เปิดจีเมล”",
             url=LOGIN_URL,
         )
 
@@ -580,6 +592,8 @@ class BrowserControl:
 
     def _after_open(self, cmd: BrowseCommand, url: str) -> Result:
         if cmd.kind == "site":
+            if google_login_page(url):  # ไม่บอก "เปิดแล้ว" ทั้งที่ใช้ไม่ได้ (H5)
+                return Result(False, f"ยังไม่ได้เข้าสู่ระบบ Google · {LOGIN_HINT}", url=url)
             return Result(True, f"เปิด {SITES[cmd.site][0]} แล้ว", url=url)
         if "/sorry/" in url:  # Google ขอยืนยันว่าไม่ใช่บอต (พบกับเน็ตมือถือ 2026-10-13) → DuckDuckGo
             self._google_blocked = True

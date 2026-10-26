@@ -155,23 +155,14 @@ class ExecutorTest(unittest.TestCase):
         self.assertEqual(self.ran, [["xdg-open", URL["wikipedia"]]])
         self.assertIn("เปิดด้วยเบราว์เซอร์ปกติแทน", out.message)  # H2 ไม่เงียบ
 
-    def test_google_account_sites_open_in_account_window(self):
-        """ข้อ 0 (Pakon ที่จอ Pi 5 2026-10-19): Google ไม่ให้เข้าสู่ระบบในเบราว์เซอร์ที่ถูกคุม →
-        Gmail/ปฏิทิน/ไดรฟ์/เอกสาร เปิดในหน้าต่างบัญชีแยก (โปรไฟล์ของเรา · ไม่ถูกคุม) และบอกผู้ใช้."""
-        self.assertEqual(actions.SYSTEM_BROWSER_SITES, {"gmail", "calendar", "drive", "docs"})
-        with mock.patch.object(actions.shutil, "which", lambda n: "/usr/bin/chromium"):
-            out = self.make(True).execute(command.parse("เปิดจีเมล").plan)
-        self.assertEqual(self.hooked, [])  # ไม่ใช้เบราว์เซอร์ของผู้ช่วย
-        args = self.ran[0]
-        self.assertEqual(args[0], "chromium")
-        self.assertIn(f"--user-data-dir={actions.account_profile()}", args)
-        self.assertNotIn("--remote-debugging-pipe", args)
-        self.assertEqual(args[-1], URL["gmail"])
-        self.assertEqual(out.message, "เปิด Gmail" + actions.ACCOUNT_NOTE)
-        self.ran.clear()
-        with mock.patch.object(actions.shutil, "which", lambda n: None):  # ไม่มี Chromium = ทางเดิม
-            self.make(True).execute(command.parse("เปิดจีเมล").plan)
-        self.assertEqual(self.ran, [["xdg-open", URL["gmail"]]])
+    def test_google_account_sites_open_in_assistant_browser(self):
+        """การ์ด 0064: เข้าสู่ระบบ Google แบบไม่คุมด้วยโปรไฟล์ของผู้ช่วยแล้ว → Gmail/ปฏิทิน/ไดรฟ์/เอกสาร
+        เปิดในเบราว์เซอร์ของผู้ช่วย (สั่งด้วยเสียงต่อได้) · เดิม (0031 ข้อ 0) เปิดในหน้าต่างบัญชีแยก."""
+        self.assertEqual(actions.SYSTEM_BROWSER_SITES, frozenset())
+        out = self.make(True).execute(command.parse("เปิดจีเมล").plan)
+        self.assertEqual(self.hooked, [("gmail", URL["gmail"])])
+        self.assertEqual(self.ran, [])
+        self.assertEqual(out.message, "เปิด Gmail ในเบราว์เซอร์ของผู้ช่วย")
 
     def test_skill_steps_use_the_same_browser(self):
         ex = self.make(True)
@@ -319,9 +310,9 @@ class BrowserControllerWebTest(unittest.TestCase):
     def test_voice_routes(self):
         self.assertEqual(route("เปิดยูทูบ", False), BROWSER)
         self.assertEqual(route("เปิดวิกิพีเดีย", False), BROWSER)
-        # บัญชี Google (ข้อ 0 · 2026-10-19): ทางคำสั่งเครื่อง → หน้าต่างบัญชี ไม่ใช่เบราว์เซอร์ของผู้ช่วย
+        # บัญชี Google: เดิม (0031 ข้อ 0) ไปหน้าต่างบัญชี · การ์ด 0064 = เบราว์เซอร์ของผู้ช่วย (สั่งด้วยเสียงต่อได้)
         for t in ("เปิดจีเมล", "เปิดกูเกิลไดรฟ์", "เปิดปฏิทินกูเกิล", "เปิดกูเกิลด็อก"):
-            self.assertEqual(route(t, False), COMMAND, t)
+            self.assertEqual(route(t, False), BROWSER, t)
         self.assertEqual(route("เปิดปฏิทิน", False), COMMAND)  # หน้าปฏิทินของเครื่อง
 
 

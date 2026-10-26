@@ -190,3 +190,22 @@ class Round3Test(unittest.TestCase):
         res = voice_all_eval.score("dev3", skills)
         self.assertEqual(res["wrong"], [])
         self.assertEqual(res["noncommands_acted"], 0)
+
+    def test_design_changes_are_listed_not_edited_into_the_sets(self):
+        """การ์ด 0064: คำตอบที่เปลี่ยนตามการออกแบบ อยู่ในรายการที่เดียว · ไฟล์ชุดวัดยังเป็นคำตอบเดิม."""
+        import json
+
+        from aipc.spikes import voice_all_eval
+
+        files = {}
+        for name in ("dev3", "test", "test3"):
+            path = voice_all_eval.DATA / f"voice_all_{name}.json"
+            for i in json.loads(path.read_text(encoding="utf-8"))["items"]:
+                files[i["text"]] = i["expect"]
+        for text, (old, new, card) in voice_all_eval.CHANGED_BY_DESIGN.items():
+            with self.subTest(text=text):
+                self.assertEqual(files[text], old)  # ไม่ได้แก้ไฟล์ชุดวัด
+                self.assertEqual(voice_all_eval.expected({"text": text, "expect": old}), new)
+                self.assertEqual(card, "0064")
+        # คำตอบอื่นที่ไม่ได้อยู่ในรายการ = ใช้ตามไฟล์
+        self.assertEqual(voice_all_eval.expected({"text": "เปิดจีเมล", "expect": "none"}), "none")
