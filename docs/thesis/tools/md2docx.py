@@ -13,6 +13,8 @@
 - ข้อความไทยแยกเป็นช่วง (run) ที่ติดป้าย complex script ให้ Word ตัดคำไทยได้
   (ไม่อย่างนั้นการกระจายแบบไทยจะยืดตัวอักษร)
 - คอมเมนต์ <!-- ที่มา … --> ถูกตัด (หลักฐานอยู่ในไฟล์ร่าง) · ```mermaid = ที่ว่างสำหรับรูป (ต้องแปลงเป็นรูปเอง)
+- อ้างอิง [R12] ในร่าง → [1] [2] … ตามลำดับที่อ้างครั้งแรกทั้งเล่ม · บรรณานุกรมเรียงตามเลขใหม่ (Pakon 2026-10-26)
+- ตารางที่ช่องหัวแรกมีเครื่องหมาย backslash = ตารางระยะเวลาแบบลูกศรตามแม่แบบ (ดูหัวข้อ gantt ด้านล่าง)
 """
 
 from __future__ import annotations
@@ -155,6 +157,131 @@ def table(rows: list[list[str]]) -> str:
             for c, w in zip(cells, widths, strict=True)
         )
         out.append(f"<w:tr>{trpr}{tcs}</w:tr>")
+    out.append("</w:tbl>")
+    return "".join(out) + blank()
+
+
+# ---------- ตารางระยะเวลา (แผนภูมิแกนต์ตามแม่แบบ ตารางที่ 1.1) ----------
+#
+# ร่างเขียนเป็นตาราง Markdown ธรรมดา:
+#   | รายการ \ เวลา | 2569/ก.ค. | 2569/ส.ค. | 2569/ก.ย. | … |   ← "กลุ่ม/ช่อง" = หัวสองชั้น (ปี/เดือน)
+#   | 1. งานแรก     | 20–31     | ↔         | 1–22      |   |   ← ช่องที่ไม่ว่างติดกัน = ลูกศร 1 เส้น
+# ช่องแรกของหัวที่มี "\" = ตารางชนิดนี้ (ช่องหัวมีเส้นทแยง: คำขวาบน = เวลา · คำซ้ายล่าง = รายการ)
+# ช่อง "↔" = ทั้งเดือน · ช่อง "วัน–วัน" = ลูกศรเริ่ม/จบตามสัดส่วนวันในเดือน (คิดเดือนละ 31 วัน · ใกล้เคียงพอสำหรับรูป)
+
+GANTT_COL = 1300  # ความกว้างช่องเดือนสูงสุด (twip) · ช่องรายการได้ที่เหลือ
+GANTT_ITEM_MIN = 2600  # ช่องรายการแคบสุด (twip) · เดือนเยอะ = ช่องเดือนแคบลง
+ARROW_Y = 120000  # ระยะลูกศรจากบนย่อหน้าในช่อง (EMU) ≈ กลางบรรทัด
+CELL_MARGIN = 108  # ระยะขอบในช่องตารางค่าเริ่มต้นของ Word ซ้าย/ขวา (twip) · ตำแหน่งลูกศรนับจากหลังขอบนี้
+ARROW_INSET = 60  # หัวลูกศรไม่ชนเส้นตาราง (twip)
+ARROW_MIN = 400  # ลูกศรสั้นสุด (twip) · งานไม่กี่วันยังเห็นเป็นลูกศร ไม่ใช่แค่หัวชนกัน
+DAYS = re.compile(r"(\d{1,2})\s*[–-]\s*(\d{1,2})")
+
+
+def span_of(mark: str) -> tuple[float, float]:
+    """ข้อความในช่อง → ช่วงในช่อง (0 = ขอบซ้าย · 1 = ขอบขวา)"""
+    m = DAYS.fullmatch(mark.strip())
+    return ((int(m.group(1)) - 1) / 31, int(m.group(2)) / 31) if m else (0.0, 1.0)
+
+
+WPS = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+DML = "http://schemas.openxmlformats.org/drawingml/2006/main"
+
+
+def cell(width: int, content: str, *, span: int = 1, vmerge: str = "", diag: bool = False) -> str:
+    """ช่องตารางจัดกลางแนวตั้ง · span = กินกี่คอลัมน์ · vmerge = restart/continue · diag = เส้นทแยง"""
+    pr = f'<w:tcW w:w="{width}" w:type="dxa"/>'
+    pr += f'<w:gridSpan w:val="{span}"/>' if span > 1 else ""
+    pr += {"restart": '<w:vMerge w:val="restart"/>', "continue": "<w:vMerge/>"}.get(vmerge, "")
+    if diag:
+        line = '<w:tl2br w:val="single" w:sz="4" w:space="0" w:color="000000"/>'
+        pr += f"<w:tcBorders>{line}</w:tcBorders>"
+    return f'<w:tc><w:tcPr>{pr}<w:vAlign w:val="center"/></w:tcPr>{content or para()}</w:tc>'
+
+
+def arrow(left: int, width: int, n: int) -> str:
+    """ลูกศรสองหัวยาว width twip เริ่มที่ left twip จากขอบซ้ายของช่อง ·
+    ยึดกับช่องแรกของช่วง แล้วลากทับช่องถัดไป (เหมือนแม่แบบ)"""
+    cx, x = width * 635, (left - CELL_MARGIN) * 635  # 1 twip = 635 EMU
+    return (
+        '<w:r><mc:AlternateContent><mc:Choice Requires="wps"><w:drawing>'
+        '<wp:anchor distT="0" distB="0" distL="0" distR="0" simplePos="0"'
+        f' relativeHeight="{251700000 + n}" behindDoc="0" locked="0" layoutInCell="1"'
+        ' allowOverlap="1"><wp:simplePos x="0" y="0"/>'
+        f'<wp:positionH relativeFrom="column"><wp:posOffset>{x}</wp:posOffset></wp:positionH>'
+        '<wp:positionV relativeFrom="paragraph">'
+        f"<wp:posOffset>{ARROW_Y}</wp:posOffset></wp:positionV>"
+        f'<wp:extent cx="{cx}" cy="0"/><wp:effectExtent l="0" t="76200" r="0" b="76200"/>'
+        "<wp:wrapNone/>"
+        f'<wp:docPr id="{8000 + n}" name="ลูกศร {n}"/><wp:cNvGraphicFramePr/>'
+        f'<a:graphic xmlns:a="{DML}"><a:graphicData uri="{WPS}"><wps:wsp><wps:cNvCnPr/><wps:spPr>'
+        f'<a:xfrm><a:off x="0" y="0"/><a:ext cx="{cx}" cy="0"/></a:xfrm>'
+        '<a:prstGeom prst="straightConnector1"><a:avLst/></a:prstGeom>'
+        '<a:ln w="12700"><a:solidFill><a:srgbClr val="000000"/></a:solidFill>'
+        '<a:headEnd type="triangle"/><a:tailEnd type="triangle"/></a:ln></wps:spPr><wps:bodyPr/>'
+        "</wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing></mc:Choice>"
+        "</mc:AlternateContent></w:r>"
+    )
+
+
+def gantt(rows: list[list[str]]) -> str:
+    head, body = rows[0], rows[1:]
+    item_label, _, time_label = (s.strip() for s in head[0].partition("\\"))
+    cols = len(head) - 1
+    groups = [h.split("/", 1)[0].strip() if "/" in h else "" for h in head[1:]]
+    labels = [h.split("/", 1)[-1].strip() for h in head[1:]]
+    two = any(groups)
+    col_w = min(GANTT_COL, (TEXT_W - GANTT_ITEM_MIN) // cols)
+    widths = [TEXT_W - col_w * cols] + [col_w] * cols
+    border = "".join(
+        f'<w:{s} w:val="single" w:sz="4" w:space="0" w:color="000000"/>'
+        for s in ("top", "left", "bottom", "right", "insideH", "insideV")
+    )
+    grid = "".join(f'<w:gridCol w:w="{w}"/>' for w in widths)
+    out = [
+        f'<w:tbl><w:tblPr><w:tblW w:w="{TEXT_W}" w:type="dxa"/>'
+        f"<w:tblBorders>{border}</w:tblBorders>"
+        f'<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>{grid}</w:tblGrid>'
+    ]
+    hdr = "<w:trPr><w:cantSplit/><w:tblHeader/></w:trPr>"
+    corner = para(time_label, bold=True, jc="right") + para(item_label, bold=True)
+    if two:  # แถวบน = กลุ่ม (กลุ่มเดียวกันที่ติดกันรวมเป็นช่องเดียว)
+        tcs = [cell(widths[0], corner, vmerge="restart", diag=True)]
+        c = 0
+        while c < cols:
+            n = 1
+            while c + n < cols and groups[c + n] == groups[c]:
+                n += 1
+            tcs.append(cell(col_w * n, para(groups[c], bold=True, jc="center"), span=n))
+            c += n
+        out.append(f"<w:tr>{hdr}{''.join(tcs)}</w:tr>")
+    tcs = [cell(widths[0], "" if two else corner, vmerge="continue" if two else "", diag=True)]
+    tcs += [cell(col_w, para(label, bold=True, jc="center")) for label in labels]
+    out.append(f"<w:tr>{hdr}{''.join(tcs)}</w:tr>")
+    n_arrow = 0
+    for r in body:
+        marks = [x.strip() for x in (r[1:] + [""] * cols)[:cols]]
+        tcs = [cell(widths[0], para(r[0]))]
+        c = 0
+        while c < cols:
+            if not marks[c]:
+                tcs.append(cell(col_w, ""))
+                c += 1
+                continue
+            n = 1
+            while c + n < cols and marks[c + n]:
+                n += 1
+            left = int(span_of(marks[c])[0] * col_w) + ARROW_INSET
+            right = int(((n - 1) + span_of(marks[c + n - 1])[1]) * col_w) - ARROW_INSET
+            if right - left < ARROW_MIN:  # ยืดออกเท่ากันสองข้างรอบช่วงวันจริง
+                mid = (left + right) // 2
+                left, right = mid - ARROW_MIN // 2, mid + ARROW_MIN // 2
+            n_arrow += 1
+            line = arrow(left, right - left, n_arrow)
+            tcs.append(cell(col_w, f"<w:p><w:pPr>{rpr()}</w:pPr>{line}</w:p>"))
+            tcs += [cell(col_w, "")] * (n - 1)
+            c += n
+        out.append(f"<w:tr><w:trPr><w:cantSplit/></w:trPr>{''.join(tcs)}</w:tr>")
     out.append("</w:tbl>")
     return "".join(out) + blank()
 
@@ -328,7 +455,7 @@ def convert(md: str, numbering: Numbering, media: Media | None = None) -> tuple[
                 if not all(re.fullmatch(r":?-{2,}:?", c) for c in cells if c):
                     rows.append(cells)
                 i += 1
-            out.append(table(rows))
+            out.append(gantt(rows) if "\\" in rows[0][0] else table(rows))
             continue
         if m := re.match(r"#\s+(บทที่\s*\d+)\s*(.*)", line):
             title = clean(m.group(2))
@@ -439,6 +566,43 @@ def convert(md: str, numbering: Numbering, media: Media | None = None) -> tuple[
             out.append(para(clean(line), first=720, jc="thaiDistribute"))
         i += 1
     return "".join(out), toc
+
+
+# ---------- เลขอ้างอิง ----------
+# ร่างอ้างด้วยเลข R ของ facts-ch2.md (ตรวจย้อนได้) · ในเล่มเป็น [1] [2] … ตามลำดับที่อ้างครั้งแรก
+# (บทที่ 1 → 6) และบรรณานุกรมเรียงตามเลขใหม่ · เพิ่ม/ลบอ้างอิงในร่างแล้วสร้างใหม่ = เลขเรียงใหม่เอง
+
+CITE = re.compile(r"\[R(\d+)\]")
+REF_ENTRY = re.compile(r"^\[(\d+)\]\t(.+)$", re.M)
+
+
+def cite_order(texts: list[str]) -> dict[int, int]:
+    """เลข R → เลขในเล่ม ตามลำดับที่พบครั้งแรก (ไม่นับในคอมเมนต์)"""
+    order: dict[int, int] = {}
+    for text in texts:
+        for m in CITE.finditer(re.sub(r"<!--.*?-->", "", text, flags=re.S)):
+            order.setdefault(int(m.group(1)), len(order) + 1)
+    return order
+
+
+def renumber_cites(text: str, order: dict[int, int]) -> str:
+    return CITE.sub(lambda m: f"[{order[int(m.group(1))]}]", text)
+
+
+def renumber_refs(md: str, order: dict[int, int]) -> str:
+    """บรรณานุกรม (เลข R) → เรียงตามเลขในเล่ม · รายการที่ไม่มีบทไหนอ้าง = ต่อท้ายและแจ้งเตือน (ไม่ลบทิ้งเงียบ ๆ)"""
+    entries = {int(n): text for n, text in REF_ENTRY.findall(md)}
+    missing = sorted(set(order) - set(entries))
+    if missing:
+        raise SystemExit(f"ร่างอ้าง R{missing} แต่ไม่มีใน references.md")
+    unused = sorted(set(entries) - set(order))
+    if unused:
+        print(f"คำเตือน: บรรณานุกรมที่ไม่มีบทไหนอ้าง R{unused} (อยู่ท้ายรายการ)")
+    final = {**order, **{r: len(order) + k for k, r in enumerate(unused, 1)}}
+    first = REF_ENTRY.search(md)
+    head = md[: first.start()] if first else md
+    body = "\n\n".join(f"[{final[r]}]\t{entries[r]}" for r in sorted(final, key=final.get))
+    return head + body + "\n"
 
 
 def next_is_table(lines: list[str], i: int) -> bool:
@@ -818,14 +982,21 @@ def generate(word_dir: Path, out: Path) -> None:
     # เลขหน้าเริ่มของแต่ละบท = ต่อจากบทก่อนหน้า (ต้องมีผลนับหน้าจาก Word)
     start = 1
     tocs = []
+    drafts = {
+        d: (DRAFT / d).read_text(encoding="utf-8") for d, _ in CHAPTERS if (DRAFT / d).exists()
+    }
+    order = cite_order([t for d, t in drafts.items() if d != "references.md"])
     for draft, name in CHAPTERS:
-        src = DRAFT / draft
-        if not src.exists():
+        if draft not in drafts:
             print(f"ข้าม {draft} (ยังไม่มีร่าง)")
             continue
+        text = drafts[draft]
+        text = (
+            renumber_refs(text, order) if draft == "references.md" else renumber_cites(text, order)
+        )
         numbering = Numbering()
         media = Media()
-        body, toc = convert(src.read_text(encoding="utf-8"), numbering, media)
+        body, toc = convert(text, numbering, media)
         build(
             template(word_dir, "04"),
             body,
