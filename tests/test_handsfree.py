@@ -129,6 +129,19 @@ class HandsFreeTest(unittest.TestCase):
         self.assertEqual(ledger.rows, [("web", "ค้นเว็บ: ราคาทอง", True)])
         self.assertTrue(b.handle("ย้อนกลับ"))  # เปิดเบราว์เซอร์แล้ว = งานของเรา
 
+    def test_back_to_assistant_page_asks_the_app_to_switch(self):
+        """พูดชื่อหน้าผู้ช่วยขณะเปิดเบราว์เซอร์ = ย่อเบราว์เซอร์ + แอปไปหน้าผู้ช่วย · "กลับไปแอป" = หน้าเดิม."""
+        b = BrowserController(control=FakeControl(running=True), ledger=FakeLedger())
+        pages, done = [], []
+        b.pageRequested.connect(pages.append)
+        b.finished.connect(lambda say, ok: done.append(ok))
+        self.assertTrue(b.handle("กลับไปหน้าผู้ช่วย"))
+        self.assertTrue(pump(lambda: done))
+        self.assertEqual(pages, ["workspace"])
+        self.assertTrue(b.handle("กลับไปแอป"))
+        self.assertTrue(pump(lambda: len(done) == 2))
+        self.assertEqual(pages, ["workspace"])  # ไม่เปลี่ยนหน้าเพิ่ม
+
     def test_error_mid_command_never_leaves_voice_stuck(self):
         """ตรวจทั้งระบบ 2.8: จดสมุดไม่ได้ (ดิสก์เต็ม) หรือเบราว์เซอร์พังกลางทาง = บอกผู้ใช้ + รับคำสั่งถัดไปได้."""
 

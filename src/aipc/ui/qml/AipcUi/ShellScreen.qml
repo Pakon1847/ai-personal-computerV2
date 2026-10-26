@@ -7,6 +7,12 @@ Rectangle {
     // ออกจาก Shell (เช่นกด "ออก" ในหน้าต่างพัฒนา) = หยุดงานกล้องที่ค้างอยู่ ไม่ให้กล้องเปิดต่อหลังหน้าจอหายไป
     // (การ์ด 0006 ข้อ 6 · พบ 2026-09-28 ว่าไม่มีใครสั่งหยุด)
     Component.onDestruction: if (typeof face !== "undefined" && face) face.cancel()
+    // "กลับไปหน้าผู้ช่วย" ขณะเปิดเบราว์เซอร์: ย่อเบราว์เซอร์แล้วไปหน้านั้นด้วย (Pakon 2026-10-26 · เดิมค้างหน้าปฏิทิน)
+    Connections {
+        target: typeof browser !== "undefined" ? browser : null
+        ignoreUnknownSignals: true
+        function onPageRequested(page) { AppState.page = page }
+    }
 
     RowLayout {
         anchors.fill: parent

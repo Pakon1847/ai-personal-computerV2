@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from aipc.skills import browse
+from aipc.spikes.browse_eval import as_recorded
 
 DATA = Path(__file__).parent / "data"
 
@@ -71,11 +72,11 @@ class BrowseParseTest(unittest.TestCase):
             "สกรอลล์ลงอีกนิด": [{"kind": "scroll", "direction": "down"}],
             "ขอดูผลที่หกหน่อย": [{"kind": "open", "n": 6}],
             "เข้าไปดูเว็บลำดับที่หนึ่งค่ะ": [{"kind": "open", "n": 1}],
-            "สลับไปหน้าต่างผู้ช่วยค่ะ": [{"kind": "app"}],
+            "สลับไปหน้าต่างผู้ช่วยค่ะ": [{"kind": "app", "query": "workspace"}],
             "เข้ากูเกิลหน่อยครับ": [{"kind": "site", "site": "google"}],
             "ช่วยเปิดแผนที่กูเกิลให้ทีครับ": [{"kind": "site", "site": "maps"}],
             "ไปที่วิกิพีเดียให้หน่อย": [{"kind": "site", "site": "wikipedia"}],
-            "ปิดแท็บนี้แล้วกลับไปหน้าผู้ช่วยครับ": [{"kind": "close"}, {"kind": "app"}],
+            "ปิดแท็บนี้แล้วกลับไปหน้าผู้ช่วยครับ": [{"kind": "close"}, {"kind": "app", "query": "workspace"}],
             "ย้อนกลับแล้วเปิดลิงก์ที่สามแทน": [{"kind": "back"}, {"kind": "open", "n": 3}],
             "ราคาน้ำมันวันนี้ ลองกูเกิลดูหน่อย": [{"kind": "search", "query": "ราคาน้ำมันวันนี้"}],
             "ข่าวเศรษฐกิจวันนี้ หาให้หน่อยสิ": [{"kind": "search", "query": "ข่าวเศรษฐกิจวันนี้"}],
@@ -96,7 +97,7 @@ class BrowseParseTest(unittest.TestCase):
 
     def test_v1_dev_set(self):
         items = json.loads((DATA / "browse_v1.json").read_text(encoding="utf-8"))["items"]
-        wrong = [it["text"] for it in items if parsed(it["text"]) != it["expect"]]
+        wrong = [it["text"] for it in items if as_recorded(parsed(it["text"])) != it["expect"]]
         # 1 ข้อที่ยอมพลาด: "กูเกิลวิธีทำไข่เจียว" (กูเกิล + คำค้นตรง ๆ ชนกับ "กูเกิลก่อตั้งปีไหน" ในชุดเดิม)
         self.assertEqual(wrong, ["กูเกิลวิธีทำไข่เจียว"])
 
@@ -156,6 +157,25 @@ class LoginParseTest(unittest.TestCase):
         for text in ["เข้าสู่ระบบ", "ล็อกอินเฟซบุ๊ก"]:
             self.assertEqual(parsed(text), [], text)
         self.assertEqual(parsed("เปิดยูทูบ"), [{"kind": "site", "site": "youtube"}])
+
+
+class BackToAssistantPageTest(unittest.TestCase):
+    """Pakon 2026-10-26: อยู่หน้าปฏิทิน พูด "กลับไปหน้าผู้ช่วย" แล้วแอปค้างหน้าปฏิทิน · พูดชื่อหน้า = ไปหน้านั้นด้วย."""
+
+    def test_naming_the_assistant_page_goes_there(self):
+        for text in ["กลับไปหน้าผู้ช่วย", "กลับไปในผู้ช่วย", "กลับไปผู้ช่วย", "ไปหน้าแชท"]:
+            self.assertEqual(parsed(text), [{"kind": "app", "query": "workspace"}], text)
+
+    def test_back_to_app_keeps_the_current_page(self):
+        for text in ["กลับไปแอป", "กลับไปหน้าหลัก"]:
+            self.assertEqual(parsed(text), [{"kind": "app"}], text)
+
+    def test_recorded_sets_only_lose_the_new_page_field(self):
+        """ชุดวัดเดิมไม่แก้: as_recorded ตัดเฉพาะ query ของ app · ช่องอื่นและคำสั่งอื่นไม่แตะ."""
+        self.assertEqual(as_recorded(parsed("กลับไปหน้าผู้ช่วย")), [{"kind": "app"}])
+        self.assertEqual(
+            as_recorded(parsed("ค้นหาราคาทอง")), [{"kind": "search", "query": "ราคาทอง"}]
+        )
 
 
 if __name__ == "__main__":

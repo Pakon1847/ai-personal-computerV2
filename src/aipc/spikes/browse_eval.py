@@ -12,11 +12,23 @@ from pathlib import Path
 from aipc.skills import browse
 
 
+def as_recorded(cmds: list[dict]) -> list[dict]:
+    """ผลแปลในรูปแบบที่ชุดวัดเดิมบันทึกไว้ · ไฟล์ชุดวัดไม่แก้ (Pakon เลือกทาง 1 · 2026-10-26).
+
+    ช่องที่เพิ่มทีหลังตามการออกแบบ (ไม่ใช่โค้ดผิด) ตัดออกก่อนเทียบ:
+    - "app" + query="workspace" (2026-10-26 · พูดชื่อหน้าผู้ช่วย/แชท = แอปไปหน้านั้นด้วย) ·
+      ชนิดคำสั่งยังเป็น app เหมือนเดิม · ตรวจ 2026-10-26: ต่างจากไฟล์ 8 ประโยคใน 5 ชุด เฉพาะช่องนี้
+    """
+    return [
+        {k: v for k, v in c.items() if not (c.get("kind") == "app" and k == "query")} for c in cmds
+    ]
+
+
 def run(path: Path) -> dict:
     items = json.loads(path.read_text(encoding="utf-8"))["items"]
     rows = []
     for it in items:
-        got = [c.as_dict() for c in browse.parse(it["text"])]
+        got = as_recorded([c.as_dict() for c in browse.parse(it["text"])])
         rows.append(
             {"text": it["text"], "expect": it["expect"], "got": got, "ok": got == it["expect"]}
         )

@@ -243,6 +243,7 @@ class BrowserController(QObject):
     finished = Signal(str, bool)
     # การ์ด 0031: เปิดจากปุ่ม/สกิล ไม่ใช่คำสั่งเสียง → ไม่ไปแก้ข้อความล่าสุดในแชท (เดิมแชทรับ finished ทุกครั้ง)
     opened = Signal(str, bool)
+    pageRequested = Signal(str)  # noqa: N815 · "กลับไปหน้าผู้ช่วย" = ย่อเบราว์เซอร์แล้วให้แอปไปหน้านั้น
     busyChanged = Signal()  # noqa: N815
     _done = Signal(str, bool, bool)
 
@@ -258,6 +259,7 @@ class BrowserController(QObject):
         self._intent = None  # การ์ด 0042: SkillsController.voiceIntent (app.py ต่อให้)
         self._busy = False
         self._queued = None  # การ์ด 0057 รอบ 2: คำสั่งที่พูดระหว่างกำลังทำคำสั่งก่อนหน้า
+        self._page_next = ""  # หน้าของแอปที่ต้องไปหลังทำคำสั่งเสร็จ (อ่านใน _on_done บนเธรดหลัก)
         self._done.connect(self._on_done)
 
     def _ctl(self):
@@ -434,6 +436,8 @@ class BrowserController(QObject):
                         says.append("ค้นแล้ว แต่จดลงสมุดสิ่งที่ส่งออกไม่ได้ (พื้นที่อาจเต็ม)")
                 if r.say:
                     says.append(r.say)
+                if c.kind == "app" and c.query and r.ok:
+                    self._page_next = c.query
                 if not r.ok:
                     ok = False
                     break
@@ -447,6 +451,9 @@ class BrowserController(QObject):
     def _on_done(self, say: str, ok: bool, quiet: bool) -> None:
         self._busy = False
         self.busyChanged.emit()
+        page, self._page_next = self._page_next, ""
+        if page:
+            self.pageRequested.emit(page)
         (self.opened if quiet else self.finished).emit(say, ok)
         queued, self._queued = self._queued, None
         if queued:  # การ์ด 0057 รอบ 2: คำสั่งที่พูดระหว่างรอ

@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 
 from aipc.skills import browse
+from aipc.spikes.browse_eval import as_recorded
 from aipc.voice import stt, tts
 
 SYNTH = r"""
@@ -52,7 +53,7 @@ def main(argv: list[str] | None = None) -> int:
         r = subprocess.run([*whisper, str(wav)], capture_output=True, text=True)
         secs = round(time.monotonic() - t1, 2)
         heard = stt.clean(r.stdout)
-        got = [c.as_dict() for c in browse.parse(heard)]
+        got = as_recorded([c.as_dict() for c in browse.parse(heard)])
         ok = got == it["expect"]
         rows.append({"text": it["text"], "heard": heard, "expect": it["expect"], "got": got,
                      "ok": ok, "stt_seconds": secs})  # fmt: skip

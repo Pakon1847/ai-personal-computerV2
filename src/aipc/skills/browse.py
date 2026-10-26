@@ -114,8 +114,11 @@ _PREV = re.compile(
 _NEXT = re.compile(rf"(?:(?:ไป|เปิด|เล่น)\s*)?{_MEDIA}\s*(?:ถัด|ต่อ)\s*ไป|ข้าม\s*{_MEDIA}(?:\s*นี้)?")
 _CLOSE = re.compile(r"ปิด\s*(?:แท็บ|แทบ|tab|หน้า\s*(?:นี้|เว็บ)|เว็บ)\s*(?:นี้|ที่\s*เปิด\s*อยู่)?\s*(?:ไป)?")
 _APP = re.compile(
-    r"(?:กลับ|ไป|สลับ)\s*(?:ไป)?\s*(?:ที่|หา)?\s*(?:แอป|แอพ|หน้า(?:ต่าง)?\s*(?:ผู้ช่วย|แชท|หลัก|แอป|แอพ)|ผู้ช่วย)"
+    r"(?:กลับ|ไป|สลับ)\s*(?:ไป)?\s*(?:ที่|หา|ใน)?\s*(?:แอป|แอพ|หน้า(?:ต่าง)?\s*(?:ผู้ช่วย|แชท|หลัก|แอป|แอพ)|ผู้ช่วย)"
 )
+# พูดชื่อหน้าผู้ช่วย/แชท = ย่อเบราว์เซอร์แล้วไปหน้าผู้ช่วยด้วย (Pakon 2026-10-26: อยู่หน้าปฏิทิน พูด "กลับไปหน้าผู้ช่วย"
+# แล้วแอปค้างหน้าปฏิทิน) · "กลับไปแอป" เฉย ๆ = อยู่หน้าเดิม
+_APP_WORKSPACE = re.compile(r".*(?:ผู้ช่วย|แชท).*")
 SITE_NAMES = {
     # แทน Facebook/Instagram (Pakon 2026-10-19) · Docs ต้องมีคำว่ากูเกิล
     # ("เอกสาร" เฉย ๆ อาจเป็นไฟล์ในเครื่อง)
@@ -345,7 +348,7 @@ def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
     if _CLOSE.fullmatch(t):
         return BrowseCommand("close")
     if _APP.fullmatch(t):
-        return BrowseCommand("app")
+        return BrowseCommand("app", query="workspace" if _APP_WORKSPACE.fullmatch(t) else "")
     if m := _SITE.fullmatch(t):
         return BrowseCommand("site", site=next(k for k in SITE_NAMES if m.group(k)))
     if m := _TV.fullmatch(t):  # การ์ด 0057 รอบ 2: ช่องทีวี = ค้นใน YouTube เลย
