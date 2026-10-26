@@ -3212,7 +3212,10 @@ class SkillsController(QObject):
                 sitecmd._norm(ph) == key for c in m.commands for ph in c.phrases
             ):
                 why = "เว็บนี้ไม่มีคีย์ลัดหรือปุ่มสำหรับงานนี้ · ไม่ได้ติดตั้งอะไร (สกิลเดิมไม่เปลี่ยน)"
-                card = self._plain("forge-failed", f"Claude เพิ่มคำสั่ง “{wanted}” ไม่ได้", [why])
+                # เหตุผลจาก Claude = ข้อความแสดงบนจอเท่านั้น ไม่ได้รันอะไร (H8) · ตัดให้สั้น บรรทัดเดียว
+                reason = " ".join(str(p.note).split())[:200]
+                lines = [f"Claude บอกว่า: {reason}", why] if reason else [why]
+                card = self._plain("forge-failed", f"Claude เพิ่มคำสั่ง “{wanted}” ไม่ได้", lines)
                 card.update(fallback=False, voice=by_voice)
                 self.forgeDone.emit(card, text)
                 return
@@ -3704,7 +3707,9 @@ class SkillsController(QObject):
                "(ใส่คำพูดแบบอื่นที่คนไทยพูดบ่อยด้วย) "
                "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง · "
                "ถ้าต้องพิมพ์ข้อความ (ค้นหา/เปิดสิ่งที่ต้องค้นก่อน) ให้ตอบว่าทำไม่ได้ "
-               "ห้ามทำคำสั่งที่แค่วางเคอร์เซอร์หรือเปิดช่องพิมพ์แทน (การ์ด 0057)")  # fmt: skip
+               "ห้ามทำคำสั่งที่แค่วางเคอร์เซอร์หรือเปิดช่องพิมพ์แทน (การ์ด 0057) · "
+               "ถ้าเพิ่มคำสั่งนี้ไม่ได้ ให้ส่ง skill_md รุ่นเดิม แล้วเขียน note เป็นเหตุผลสั้น ๆ ที่คนทั่วไปเข้าใจ "
+               "(1 ประโยค ไม่มีศัพท์เทคนิค) และบอกคำพูดอื่นที่ระบบทำได้ถ้ามี")  # fmt: skip
         others = [s for s in self._skills if s.site == site and s.id != sid]
         have = [c.phrases[0] for s in others for c in s.commands][:40]
         if have:

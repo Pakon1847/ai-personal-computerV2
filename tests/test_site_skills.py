@@ -292,7 +292,7 @@ class VoiceFlowTest(unittest.TestCase):
     def setUpClass(cls):
         cls.app = QGuiApplication.instance() or QGuiApplication([])
 
-    def make(self, reply_md=""):
+    def make(self, reply_md="", note=""):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
         self.seen = []
@@ -301,7 +301,8 @@ class VoiceFlowTest(unittest.TestCase):
             self.seen.append((request, kw))
             errors = kw["check"](reply_md)
             return forge.Proposal(not errors, request, skill_md="" if errors else reply_md,
-                                  errors=errors, model="fake", cost_usd=0.05)  # fmt: skip
+                                  errors=errors, model="fake", cost_usd=0.05,
+                                  note=note)  # fmt: skip
 
         store = userskills.UserSkills(Path(d.name) / "u")
         s = SkillsController(executor=actions.Executor(dry_run=True), run_timer=False,
@@ -367,6 +368,18 @@ class VoiceFlowTest(unittest.TestCase):
         self.assertIn("ไม่ได้ติดตั้งอะไร", done[0]["lines"][0])
         self.assertTrue(done[0]["voice"])
         self.assertNotIn("yt-mine", [x["id"] for x in s.userSkills])  # ไม่ได้ติดตั้ง
+
+    def test_claude_reason_is_shown_and_asked_for(self):
+        """Pakon เลือกข้อ 1 (2026-10-26): Claude เพิ่มไม่ได้ = บอกเหตุผลของ Claude บนจอ · ขอเหตุผลในคำขอ."""
+        mine = YT.replace("id: yt-test", "id: yt-mine")
+        s, done = self.make(mine, note="YouTube ไม่มีปุ่มเปิดแท็บ\nลองพูดว่า เปิดยูทูบอีกแท็บ")
+        ask = s.siteLearn("เพิ่มอีกหนึ่งแถบ", WATCH)
+        s.confirm(ask["confirmToken"], True)
+        pump(lambda: done)
+        self.assertIn("ถ้าเพิ่มคำสั่งนี้ไม่ได้", self.seen[0][0])  # ขอเหตุผลจาก Claude
+        self.assertEqual(
+            done[0]["lines"][0], "Claude บอกว่า: YouTube ไม่มีปุ่มเปิดแท็บ ลองพูดว่า เปิดยูทูบอีกแท็บ"
+        )  # บรรทัดเดียว
 
     def test_learn_only_where_it_can(self):
         s, _ = self.make()

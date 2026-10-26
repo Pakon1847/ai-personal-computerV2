@@ -204,5 +204,17 @@ class TabPhrasesTest(unittest.TestCase):
         )
 
 
+class ShortPauseTest(unittest.TestCase):
+    """Pakon 2026-10-26: "หยุด" คำเดียวในหน้า YouTube เดิมไม่รู้จัก → ถามให้ Claude เพิ่ม → ทำไม่ได้ → ถามซ้ำ."""
+
+    def test_short_stop_words_pause(self):
+        for text in ["หยุด", "หยุดเล่น", "หยุดก่อน", "หยุดแป๊บ", "พักก่อน", "พักแป๊บ"]:
+            self.assertEqual(parsed(text), [{"kind": "media", "direction": "pause"}], text)
+
+    def test_other_stops_are_not_media(self):
+        for text in ["หยุดพูด", "หยุดอ่าน", "หยุดทำงาน", "พัก", "หยุดฝน"]:
+            self.assertEqual(parsed(text), [], text)
+
+
 if __name__ == "__main__":
     unittest.main()
