@@ -1,0 +1,15 @@
+{
+ "about": "การ์ด 0066 ชุดพัฒนา (ผู้ช่วยเขียน 2026-10-26 ก่อนเขียนโค้ด · ใช้ปรับคำขอ/กฎได้) · ทุกประโยคผ่าน --precheck (ถึงการ์ดให้ Claude เพิ่ม) · expect = คำสั่งของระบบที่คำนั้นหมายถึง (เทียบเฉพาะช่องที่เขียน) · keys = คีย์ลัดของเว็บที่ยอมรับแทนได้ · expect null = ทำไม่ได้จริง ต้องไม่ติดตั้ง",
+ "items": [
+  {"text": "ขอแท็บใหม่", "site": "youtube", "expect": {"kind": "site", "direction": "newtab"}},
+  {"text": "ถอยไปหน้าเมื่อกี้", "site": "youtube", "expect": {"kind": "back"}},
+  {"text": "ขอโหลดหน้านี้อีกที", "site": "youtube", "expect": {"kind": "reload"}},
+  {"text": "ขยับลงไปอีกหน่อย", "site": "youtube", "expect": {"kind": "scroll", "direction": "down"}},
+  {"text": "พอแค่นี้ก่อน", "site": "youtube", "expect": {"kind": "media", "direction": "pause"}, "keys": ["k"]},
+  {"text": "เอาคลิปต่อไป", "site": "youtube", "expect": {"kind": "media", "direction": "next"}, "keys": ["Shift+N", "Shift+n"]},
+  {"text": "ขยายจอให้ใหญ่สุด", "site": "youtube", "expect": {"kind": "fullscreen"}, "keys": ["f"]},
+  {"text": "ไม่เอาโฆษณา", "site": "youtube", "expect": {"kind": "skip_ad"}},
+  {"text": "ไม่ใช้หน้านี้แล้ว", "site": "youtube", "expect": {"kind": "close"}},
+  {"text": "ปิดไฟห้องนอน", "site": "youtube", "expect": null}
+ ]
+}

@@ -1,0 +1,25 @@
+{
+ "about": "การ์ด 0066 ชุดทดสอบ held-out (ผู้ช่วยเขียน 2026-10-26 · commit ก่อนเขียนโค้ด · ห้ามใช้ปรับคำขอ/กฎ · รันกับ Claude จริงครั้งเดียว) · ไม่ซ้ำกับชุดพัฒนา · ทุกประโยคผ่าน --precheck · \"เพิ่มอีกหนึ่งแถบ\" = ประโยคจริงของ Pakon (outbound 2026-10-26 22:16) · Pakon เปลี่ยน/เพิ่มประโยคเองได้ก่อนรัน",
+ "items": [
+  {"text": "ขออีกหน้าต่างนึง", "site": "youtube", "expect": {"kind": "site", "direction": "newtab"}},
+  {"text": "เพิ่มอีกหนึ่งแถบ", "site": "youtube", "expect": {"kind": "site", "direction": "newtab"}},
+  {"text": "หน้าค้าง รีใหม่หน่อย", "site": "youtube", "expect": {"kind": "reload"}},
+  {"text": "เลื่อนจอลงอีกนิด", "site": "youtube", "expect": {"kind": "scroll", "direction": "down"}},
+  {"text": "ขยับขึ้นไปข้างบน", "site": "youtube", "expect": {"kind": "scroll", "direction": "up"}},
+  {"text": "ค้างไว้ตรงนี้", "site": "youtube", "expect": {"kind": "media", "direction": "pause"}, "keys": ["k"]},
+  {"text": "ต่อจากเมื่อกี้", "site": "youtube", "expect": {"kind": "media", "direction": "play"}, "keys": ["k"]},
+  {"text": "ไม่ชอบคลิปนี้ เอาอันใหม่", "site": "youtube", "expect": {"kind": "media", "direction": "next"}, "keys": ["Shift+N", "Shift+n"]},
+  {"text": "ขอคลิปเมื่อกี้อีกที", "site": "youtube", "expect": {"kind": "media", "direction": "prev"}, "keys": ["Shift+P", "Shift+p"]},
+  {"text": "ขอแบบเต็มตา", "site": "youtube", "expect": {"kind": "fullscreen"}, "keys": ["f"]},
+  {"text": "โฆษณาน่ารำคาญ เอาออกที", "site": "youtube", "expect": {"kind": "skip_ad"}},
+  {"text": "เอาคลิปบนสุด", "site": "youtube", "expect": {"kind": "open", "n": 1}},
+  {"text": "เก็บแท็บนี้ไป", "site": "youtube", "expect": {"kind": "close"}},
+  {"text": "ขอคุยกับผู้ช่วยหน่อย", "site": "youtube", "expect": {"kind": "app"}},
+  {"text": "แวะไปเมลแป๊บ", "site": "youtube", "expect": {"kind": "site", "site": "gmail"}},
+  {"text": "เอาเพลงต่อไปเลย", "site": "spotify", "expect": {"kind": "media", "direction": "next"}},
+  {"text": "กลับไปบทความเมื่อกี้", "site": "wikipedia", "expect": {"kind": "back"}},
+  {"text": "ขึ้นไปบนสุดของหน้า", "site": "wikipedia", "expect": {"kind": "scroll", "direction": "up"}, "keys": ["Home"]},
+  {"text": "ชาร์จมือถือให้หน่อย", "site": "youtube", "expect": null},
+  {"text": "สั่งพิซซ่าให้หน่อย", "site": "youtube", "expect": null}
+ ]
+}
