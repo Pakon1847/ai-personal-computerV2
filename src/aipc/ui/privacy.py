@@ -64,24 +64,29 @@ def today_counts(entries: list[dict], today: date) -> dict[str, int]:
     return out
 
 
-def panel_text(llm: str, sent_today: int, all_off: bool) -> str:
+def panel_text(llm: str, sent_today: int, all_off: bool, claude_off: bool = False) -> str:
     parts = []
     if llm == "locked":
         parts.append(tr("AI ในเครื่อง: ต่อเน็ตไม่ได้"))
     elif llm == "open":
         parts.append(tr("AI ในเครื่อง: ไม่ได้ล็อกเน็ต"))
     # all_off = ปิดทางที่ส่งออกเอง (Claude · อากาศ) · ค้นเว็บด้วยเสียงไม่มีสวิตช์และส่งเมื่อผู้ใช้สั่ง →
-    # ห้ามเขียน "ปิดทั้งหมด" และนับครั้งที่ส่งจริงเสมอ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.6 · H5)
+    # ห้ามเขียน "ปิดทั้งหมด" และนับครั้งที่ส่งจริงเสมอ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.6 · H5) ·
+    # การ์ด 0061 รอบ 3 เอาสวิตช์อากาศออก (ผู้ใช้ปิดไม่ได้) → เดิมป้ายนี้ไม่มีวันขึ้น · ปิด Claude = "Claude: ปิด"
+    # (แก้ 2026-10-27 · บทสาธิตเดิมสั่ง "ปิดสวิตช์ Claude และอากาศ" ซึ่งทำไม่ได้แล้ว) · บัญชีที่ปิดอากาศไว้ก่อน = เดิม
     if all_off:
         parts.append(tr("Claude/อากาศ: ปิด"))
+    elif claude_off:
+        parts.append(tr("Claude: ปิด"))
     parts.append(tr("ส่งออกวันนี้ {n} ครั้ง", n=sent_today))
     return " · ".join(parts)
 
 
-def panel_kind(llm: str, all_off: bool, flash: bool) -> str:
-    """สีของป้าย: มีข้อมูลเพิ่งออก = accent · AI ไม่ได้ล็อก = warn · ล็อก/ปิดทั้งหมด = ok."""
+def panel_kind(llm: str, all_off: bool, flash: bool, claude_off: bool = False) -> str:
+    """สีของป้าย: มีข้อมูลเพิ่งออก = accent · AI ไม่ได้ล็อก = warn ·
+    ล็อก / ปิดทางที่ระบบส่งเอง (Claude) = ok."""
     if flash:
         return "accent"
     if llm == "open":
         return "warn"
-    return "ok" if llm == "locked" or all_off else "neutral"
+    return "ok" if llm == "locked" or all_off or claude_off else "neutral"

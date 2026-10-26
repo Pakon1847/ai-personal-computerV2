@@ -1725,8 +1725,9 @@ class PrivacyStatus(QObject):
         self._publish()
 
     def _publish(self) -> None:
-        all_off = not self._claude_on() and not self._weather_on()
-        state = (self._llm, self._sent, all_off, self._clock() < self._flash_until)
+        claude_off = not self._claude_on()
+        all_off = claude_off and not self._weather_on()
+        state = (self._llm, self._sent, all_off, self._clock() < self._flash_until, claude_off)
         if state != self._state:
             self._state = state
             self.changed.emit()
@@ -1751,13 +1752,17 @@ class PrivacyStatus(QObject):
     def flash(self) -> bool:
         return bool(self._state and self._state[3])
 
+    @Property(bool, notify=changed)
+    def claudeOff(self) -> bool:  # noqa: N802
+        return bool(self._state and self._state[4])
+
     @Property(str, notify=changed)
     def text(self) -> str:
-        return privacy.panel_text(self.llmState, self.sentToday, self.allOff)
+        return privacy.panel_text(self.llmState, self.sentToday, self.allOff, self.claudeOff)
 
     @Property(str, notify=changed)
     def kind(self) -> str:
-        return privacy.panel_kind(self.llmState, self.allOff, self.flash)
+        return privacy.panel_kind(self.llmState, self.allOff, self.flash, self.claudeOff)
 
 
 def _run_quiet(args: list[str]) -> int:
@@ -3855,7 +3860,7 @@ class SkillsController(QObject):
            "forge-ask": "ขอโหมด/งานประจำที่ยังไม่มีสกิล (กฎ) · ส่งออกต้องยืนยันก่อน (การ์ด 0030)",
            "files": "ตรงรูปประโยคหาไฟล์ (กฎ) · AI ในเครื่องเปิดไฟล์เองไม่ได้",
            "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล",
-           "weather-off": "ถามอากาศ แต่ปิดสวิตช์อากาศในหน้าตั้งค่า",
+           "weather-off": "ถามอากาศ แต่บัญชีนี้ปิดการส่งข้อมูลอากาศไว้ (ตั้งไว้ก่อนเอาสวิตช์ออก)",
            "clock": "ตรงรูปประโยคถามเวลา (กฎ) · AI ในเครื่องไม่รู้เวลาตอนนี้"}  # fmt: skip
 
     def _why(self, card: dict, t0: float) -> dict:
@@ -3974,9 +3979,11 @@ class SkillsController(QObject):
     def _weather_off_card(self) -> dict:
         return {"kind": "weather-off", "badge": {}, "chips": [], "confirmToken": "", "page": "",
                 "title": "ปิดการถามพยากรณ์อากาศอยู่",
-                "lines": ["ตอนนี้ไม่ส่งชื่อเมืองไป Open-Meteo ตามที่ตั้งไว้",
-                          "เปิดได้ที่หน้าตั้งค่า › ส่งออกนอกเครื่อง"],
-                "_outbound": "ไม่มี · ปิดสวิตช์อากาศอยู่"}  # fmt: skip
+                # การ์ด 0061 รอบ 3 เอาสวิตช์อากาศออก · บัญชีที่ปิดไว้ก่อนหน้ายังปิดอยู่ (ไม่เปิดคืนเอง · H3) ·
+                # เดิมบอก "เปิดได้ที่หน้าตั้งค่า" ซึ่งไม่มีแล้ว (แก้ 2026-10-27 · H5)
+                "lines": ["ตอนนี้ไม่ส่งชื่อเมืองไป Open-Meteo ตามที่บัญชีนี้ตั้งไว้ในรุ่นก่อน",
+                          "รุ่นนี้ไม่มีสวิตช์อากาศในหน้าตั้งค่าแล้ว · ถ้าต้องการเปิดคืน แจ้งผู้ดูแลเครื่อง"],
+                "_outbound": "ไม่มี · บัญชีนี้ปิดการส่งข้อมูลอากาศไว้"}  # fmt: skip
 
     def _weather_card(self, day: str, city: str) -> dict:
         from aipc.skills.weather import Ask, answer
