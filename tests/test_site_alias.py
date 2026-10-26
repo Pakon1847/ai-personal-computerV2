@@ -75,6 +75,15 @@ class AliasLineTest(unittest.TestCase):
         self.assertEqual(m.commands[0].arg, "เปิดยูทูบอีกแท็บ")
         self.assertTrue(m.commands[3].confirm)  # คำเสี่ยงยังต้องยืนยันเหมือนบรรทัดอื่น
 
+    def test_words_the_system_already_knows_are_dropped_not_fatal(self):
+        """ชุดพัฒนา A3 (2026-10-27): Claude แถมคำที่ระบบรู้จักแล้ว ("โหลดใหม่") มากับคำพ้องที่ถูก ·
+        เดิมทั้งสกิลไม่ผ่าน → ตัดเฉพาะคำนั้น เก็บคำที่ใช้ได้ · ทุกคำเป็นคำของระบบ = ยังไม่รับ (a10)."""
+        m, errors = userskills.check_md(md("- ขอโหลดหน้านี้อีกที | โหลดใหม่ | รีหน้าให้ที → ทำคำสั่ง รีเฟรช"))
+        self.assertEqual(errors, [])
+        self.assertEqual(m.commands[0].phrases, ("ขอโหลดหน้านี้อีกที", "รีหน้าให้ที"))
+        _m, errors = userskills.check_md(md("- โหลดใหม่ | รีเฟรช → ทำคำสั่ง รีเฟรช"))
+        self.assertTrue(any("ทุกคำ" in e for e in errors), errors)
+
     def test_old_key_lines_with_system_words_still_load(self):
         """H2: สกิลเดิมของ Pakon มี "พักก่อน → กดคีย์ k" (ตอนนี้ระบบรู้จัก "พักก่อน" แล้ว) · ต้องไม่ถูกปิด."""
         m, errors = userskills.check_md(md("- พักก่อน | พอแล้ว | stop → กดคีย์ k"))

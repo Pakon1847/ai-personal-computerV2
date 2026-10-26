@@ -138,13 +138,17 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
             _cmds, why = alias_commands(arg)
             if why:
                 errors.append(f"บรรทัด {n}: {why}")
-            # เฉพาะบรรทัดคำพ้อง: สกิลเดิมที่มีคำแบบนี้ (กดคีย์) ไม่ถูกปิด (H2)
+            # คำที่ระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ) ไม่มีวันถึงสกิล → ตัดออก แสดงเฉพาะคำที่ใช้ได้ (H5) ·
+            # เดิมปฏิเสธทั้งสกิล: ชุดพัฒนา A3 (2026-10-27) Claude ใส่คำพ้องถูก แต่แถม "โหลดใหม่"
+            # "กลับหน้าเมื่อกี้" "ขอคลิปต่อไป" (ระบบรู้จักแล้ว) → ตก 3/9 · Claude เดาไม่ได้ว่าตัวแปลรู้จักคำไหน (H6) ·
+            # ตัดแล้วไม่เหลือ = ไม่รับ · เฉพาะบรรทัดคำพ้อง (สกิลเดิมแบบกดคีย์ไม่ถูกแตะ · H2)
             from aipc.skills import browse
 
-            if dead := [p for p in phrases if browse.parse(p)]:
-                errors.append(
-                    f"บรรทัด {n}: คำพูด “{dead[0]}” ระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)"
-                )
+            live = tuple(p for p in phrases if not browse.parse(p))
+            if not live:
+                errors.append(f"บรรทัด {n}: คำพูดทุกคำระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)")
+            else:
+                phrases = live
         if not confirm and any(w in p.lower() for p in phrases for w in RISKY):
             errors.append(
                 f"บรรทัด {n}: คำสั่ง “{phrases[0]}” ย้อนไม่ได้หรือแตะบัญชี ต้องลงท้ายด้วย “· ยืนยันก่อน”"

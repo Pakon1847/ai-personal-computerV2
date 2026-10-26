@@ -1,0 +1,31 @@
+{
+ "about": "A3 รอบ 2 (2026-10-27): รันซ้ำเฉพาะ 3 ข้อของชุดพัฒนาที่ตกในรอบ 1 หลังแก้ตัวตรวจ (ตัดคำที่ระบบรู้จักแล้ว) · คัดจาก tests/data/site_alias_dev.json ไม่แก้ข้อความ",
+ "items": [
+  {
+   "text": "ถอยไปหน้าเมื่อกี้",
+   "site": "youtube",
+   "expect": {
+    "kind": "back"
+   }
+  },
+  {
+   "text": "ขอโหลดหน้านี้อีกที",
+   "site": "youtube",
+   "expect": {
+    "kind": "reload"
+   }
+  },
+  {
+   "text": "เอาคลิปต่อไป",
+   "site": "youtube",
+   "expect": {
+    "kind": "media",
+    "direction": "next"
+   },
+   "keys": [
+    "Shift+N",
+    "Shift+n"
+   ]
+  }
+ ]
+}
