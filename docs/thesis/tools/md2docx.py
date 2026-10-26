@@ -534,6 +534,26 @@ INFO_SKIP = re.compile(
 )
 
 
+def ack_body() -> str:
+    """กิตติกรรมประกาศจาก draft/acknowledgement.md · บรรทัด "ผู้จัดทำ: ชื่อ" = ชื่อชิดขวาท้ายข้อความ"""
+    src = DRAFT / "acknowledgement.md"
+    md = re.sub(
+        r"<!--.*?-->", "", src.read_text(encoding="utf-8") if src.exists() else "", flags=re.S
+    )
+    out = [para("กิตติกรรมประกาศ", size=40, bold=True, jc="center"), blank()]
+    signer = "[ต้องเติม: ชื่อ นามสกุล]"
+    for line in (x.strip() for x in md.splitlines()):
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("ผู้จัดทำ:"):
+            signer = line.split(":", 1)[1].strip()
+        else:
+            out.append(para(clean(line), first=720, jc="thaiDistribute"))
+    if len(out) == 2:
+        out.append(para("[ต้องเติม: กิตติกรรมประกาศ]", first=720, jc="thaiDistribute"))
+    return "".join(out) + blank(32, 3) + para(signer, jc="right")
+
+
 def abstract_body(md: str) -> str:
     md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
     parts = re.split(r"^#\s+.+$", md, flags=re.M)
@@ -567,17 +587,7 @@ def abstract_body(md: str) -> str:
                 out.append(para(clean(line), first=720, jc="thaiDistribute"))
         return "".join(out)
 
-    ack = (
-        para("กิตติกรรมประกาศ", size=40, bold=True, jc="center")
-        + blank()
-        + para(
-            "[ต้องเติม: กิตติกรรมประกาศ — ผู้จัดทำเขียนเอง ขอบคุณอาจารย์ที่ปรึกษา คณะกรรมการ และผู้ที่ช่วยเหลือ]",
-            first=720,
-            jc="thaiDistribute",
-        )
-        + blank(32, 3)
-        + para("[ต้องเติม: ชื่อ นามสกุล]", jc="right")
-    )
+    ack = ack_body()
     thai = (
         info(
             [
