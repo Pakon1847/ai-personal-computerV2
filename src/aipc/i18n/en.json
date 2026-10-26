@@ -1066,5 +1066,9 @@
   "รหัสของ ": "Password for ",
   "แสดงรหัส": "Show password",
   "Wi-Fi ต่อ ": "Wi-Fi connected to ",
-  "Wi-Fi ยังไม่ได้ต่อ": "Wi-Fi not connected"
+  "Wi-Fi ยังไม่ได้ต่อ": "Wi-Fi not connected",
+  "ยังไม่ได้เชื่อมปฏิทิน Google · เชื่อมแล้วนัดจาก Google จะขึ้นในหน้านี้": "Google Calendar is not connected · once connected, Google events show on this page",
+  "เชื่อมปฏิทิน Google": "Connect Google Calendar",
+  " · Claude สร้าง": " · made by Claude",
+  "คำสั่งเสียงในเว็บ {name} · {n} คำสั่ง จาก {k} สกิล": "Voice commands on {name} · {n} commands from {k} skills"
 }

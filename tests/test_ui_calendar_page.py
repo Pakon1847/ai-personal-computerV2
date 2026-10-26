@@ -120,6 +120,28 @@ class CalendarPageQmlTest(unittest.TestCase):
         self.assertTrue(any("โทรหาหมอ · Google" in x for x in lines), lines)
         self.assertEqual(warnings, [])
 
+    def test_connect_banner_takes_you_to_the_calendar_card(self):
+        """การ์ด 0067 G2: ยังไม่เชื่อมปฏิทิน Google = แถบ + ปุ่มพาไปการ์ดเชื่อมในหน้าตั้งค่า · เชื่อมแล้ว = แถบหาย."""
+        engine, win, warnings = self.open_shell("calendar")
+        skills = engine._backends["skills"]
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        skills._gcal = gcal.GoogleCalendar(tmp / "l2.json", tmp / "e2.json",
+                                           fetcher=lambda link: ICS, clock=lambda: NOW)  # fmt: skip
+        skills.gcalChanged.emit()
+        qml.settle(50)
+        banner = qml.find_items(win, "gcalBanner")[0]
+        self.assertTrue(banner.property("visible"))
+        qml.find_items(win, "gcalConnectFromCalendar")[0].clicked.emit()
+        qml.settle(80)
+        settings = qml.find_items(win, "settingsPage")[0]
+        self.assertEqual(settings.property("section"), "ai")  # หมวดที่มีการ์ดปฏิทิน Google
+        self.assertTrue(settings.property("visible"))
+        self.assertTrue(skills._gcal.connect(LINK).ok)
+        skills.gcalChanged.emit()
+        qml.settle(50)
+        self.assertFalse(banner.property("visible"))
+        self.assertEqual(warnings, [])
+
     def test_large_font_and_dark_theme_have_no_warnings(self):
         engine, win, warnings = self.open_shell("calendar")
         ui = engine._backends["uiSettings"]

@@ -10,6 +10,16 @@ ColumnLayout {
     objectName: "settingsPage"
     spacing: 16
     property string section: "look"
+    // การ์ด 0067: ปุ่มเชื่อมปฏิทินในหน้าปฏิทินพามาที่นี่ = เปิดหมวด AI และอินเทอร์เน็ต + ขั้นตอนเชื่อม
+    Connections {
+        target: AppState
+        function onSettingsFocusChanged() {
+            if (AppState.settingsFocus !== "gcal") return
+            page.section = "ai"
+            gcalCard.guideOpen = true
+            AppState.settingsFocus = ""
+        }
+    }
     readonly property var sections: [
         { id: "look", text: Tr.t("หน้าตาและการใช้"), icon: Icons.sliders },
         { id: "face", text: Tr.t("ใบหน้าและการล็อก"), icon: Icons.lock },

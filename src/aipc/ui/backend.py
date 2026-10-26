@@ -2410,7 +2410,16 @@ class SkillsController(QObject):
     @Property("QVariantList", notify=skillsChanged)
     def skills(self) -> list:
         out = []
+        sites: dict[
+            str, list
+        ] = {}  # การ์ด 0067: สกิลประจำเว็บ = ไทล์เดียวต่อเว็บ (ตำแหน่งของสกิลแรกของเว็บนั้น)
         for s in self._skills:
+            if s.site:
+                if s.site not in sites:
+                    sites[s.site] = []
+                    out.append({"_site": s.site})
+                sites[s.site].append(s)
+                continue
             missing = [n for n in s.needs if n not in self.available()]
             out.append({
                 # แปลตอนแสดง (การ์ด 0039) · สกิลที่ Claude สร้างไม่มีคำแปล = แสดงภาษาเดิม
@@ -2422,7 +2431,34 @@ class SkillsController(QObject):
                 "examples": self._tile_examples(s),
                 "commands": [self._command_text(c) for c in s.commands],  # สกิลประจำเว็บ (การ์ด 0046)
             })  # fmt: skip
-        return out
+        return [self._site_tile(t["_site"], sites[t["_site"]]) if "_site" in t else t for t in out]
+
+    def _site_tile(self, site: str, group: list) -> dict:
+        """ไทล์รวมของเว็บเดียว (การ์ด 0067) · แสดงผลอย่างเดียว · เปิด/ปิด ย้อนรุ่น ลบ ยังทำทีละสกิลที่ "สกิลของฉัน" ·
+        แต่ละคำสั่งบอกที่มา (H5) · ลำดับคำสั่ง = ลำดับที่ sitecmd.match หา (สกิลก่อนได้ก่อน)."""
+        from aipc.skills import sitecmd
+        from aipc.skills.actions import SITES
+
+        name = SITES[site][0] if site in SITES else sitecmd.site_host(site)
+        commands = [
+            self._command_text(c) + (tr(" · Claude สร้าง") if self._is_user(s.id) else "")
+            for s in group
+            for c in s.commands
+        ]
+        missing = sorted({n for s in group for n in s.needs if n not in self.available()})
+        perms = sorted({tr(p) for s in group for p in s.permission_labels()})
+        return {
+            "id": f"site:{site}", "name": name,
+            "description": tr("คำสั่งเสียงในเว็บ {name} · {n} คำสั่ง จาก {k} สกิล", name=name,
+                              n=len(commands), k=len(group)),
+            "worker": tr(self.WORKER_LABEL["code"]), "permissions": perms,
+            "ready": not missing, "missing": [tr(self.NEED_LABEL[n]) for n in missing],
+            "byClaude": False,
+            # หน้าจออังกฤษ: ไม่แสดงคำพูดไทยปน (กติกาเดียวกับ _tile_examples)
+            "examples": [e for e in [c.phrases[0] for s in group for c in s.commands][:2]
+                         if i18n.lang() != "en" or not i18n.THAI.search(e)],  # fmt: skip
+            "commands": commands, "skills": [s.id for s in group],
+        }  # fmt: skip
 
     @Property(bool, constant=True)
     def simulated(self) -> bool:

@@ -48,6 +48,32 @@ ColumnLayout {
         title: Tr.t("ปฏิทิน")
         subtitle: Tr.t("นัดของคุณ ปฏิทิน Google และวันหยุด · จดนัดใหม่ได้ที่หน้าผู้ช่วย")
     }
+    // การ์ด 0067: ยังไม่เชื่อมปฏิทิน Google = บอก + ปุ่มพาไปการ์ดเชื่อมในหน้าตั้งค่า (ทางเชื่อมเดิมทางเดียว)
+    Rectangle {
+        objectName: "gcalBanner"
+        visible: skills.gcalAvailable && !skills.gcalConnected
+        Layout.fillWidth: true
+        radius: Theme.radiusLarge
+        color: Theme.surface
+        implicitHeight: bannerRow.implicitHeight + 24
+        RowLayout {
+            id: bannerRow
+            anchors.fill: parent
+            anchors.margins: 12
+            spacing: 12
+            AppText {
+                Layout.fillWidth: true
+                size: Theme.fontSmall
+                color: Theme.inkMuted
+                text: Tr.t("ยังไม่ได้เชื่อมปฏิทิน Google · เชื่อมแล้วนัดจาก Google จะขึ้นในหน้านี้")
+            }
+            AppButton {
+                objectName: "gcalConnectFromCalendar"
+                text: Tr.t("เชื่อมปฏิทิน Google")
+                onClicked: { AppState.settingsFocus = "gcal"; AppState.page = "settings" }
+            }
+        }
+    }
 
     // เดือน + ปุ่มเปลี่ยนเดือน
     RowLayout {
