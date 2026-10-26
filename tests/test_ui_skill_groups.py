@@ -54,6 +54,8 @@ class SiteTileTest(unittest.TestCase):
         builtin = [c for c in yt["commands"] if not c.endswith("Claude สร้าง")]
         self.assertGreater(len(builtin), 5)  # คำสั่งของสกิล YouTube ของระบบอยู่ครบในไทล์เดียว
         self.assertIn(f"{len(yt['commands'])} คำสั่ง จาก 2 สกิล", yt["description"])
+        self.assertEqual(yt["subtitle"], f"{len(yt['commands'])} คำสั่ง")  # ไทล์บอกจำนวนคำสั่ง
+        self.assertEqual(s.voiceSites, "สั่งด้วยเสียงได้ในเว็บ: YouTube, Gmail, Google และอื่น ๆ อีก 12 เว็บ")
         # ไม่มีไทล์แยกของสกิลประจำเว็บเหลืออยู่ · สกิลอื่นยังเป็นไทล์ของตัวเอง
         ids = [t["id"] for t in tiles]
         self.assertNotIn("youtube-voice", ids)

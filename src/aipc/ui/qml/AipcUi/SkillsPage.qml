@@ -153,6 +153,13 @@ ColumnLayout {
             }
         }
     }
+    // Pakon 2026-10-27: บอกว่าสั่งด้วยเสียงได้ในเว็บไหนบ้าง (ไทล์ประจำเว็บมีเฉพาะเว็บที่มีสกิล)
+    AppText {
+        objectName: "voiceSitesLine"
+        text: skills.voiceSites
+        Layout.fillWidth: true
+        size: Theme.fontSmall; color: Theme.inkMuted
+    }
     GridLayout {
         objectName: "localSkillsGrid"
         Layout.fillWidth: true
@@ -214,6 +221,7 @@ ColumnLayout {
                         color: sc.modelData.ready ? Theme.inkMuted : Theme.inkFaint
                         maximumLineCount: sc.open ? 4 : 2; elide: Text.ElideRight
                         text: !sc.modelData.ready ? Tr.t("ต้องมีก่อน: ") + sc.modelData.missing.join(", ")
+                              : sc.modelData.subtitle ? sc.modelData.subtitle   // ไทล์ประจำเว็บ = จำนวนคำสั่ง (การ์ด 0067)
                               : sc.modelData.examples.length ? sc.modelData.examples.map(e => "“" + e + "”").join("  ")
                               : Tr.t("แตะเพื่อดูรายละเอียด")
                     }

@@ -2458,7 +2458,18 @@ class SkillsController(QObject):
             "examples": [e for e in [c.phrases[0] for s in group for c in s.commands][:2]
                          if i18n.lang() != "en" or not i18n.THAI.search(e)],  # fmt: skip
             "commands": commands, "skills": [s.id for s in group],
+            "subtitle": tr("{n} คำสั่ง", n=len(commands)),  # Pakon 2026-10-27: ไทล์บอกจำนวนคำสั่ง
         }  # fmt: skip
+
+    @Property(str, notify=skillsChanged)  # เปลี่ยนภาษา = อ่านใหม่พร้อมไทล์
+    def voiceSites(self) -> str:  # noqa: N802
+        """บรรทัดบนหน้า Skill (Pakon 2026-10-27): เว็บที่สั่งด้วยเสียงได้ ·
+        3 ชื่อแรกตามรายการเว็บ + จำนวนที่เหลือ."""
+        from aipc.skills.actions import SITES
+
+        names = [tr(v[0]) for v in SITES.values()]
+        return tr("สั่งด้วยเสียงได้ในเว็บ: {names} และอื่น ๆ อีก {n} เว็บ",
+                  names=", ".join(names[:3]), n=len(names) - 3)  # fmt: skip
 
     @Property(bool, constant=True)
     def simulated(self) -> bool:
