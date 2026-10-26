@@ -13,6 +13,13 @@ ColumnLayout {
     property string filter: "all"       // ตัวกรองสกิลในเครื่อง: all | ready | notReady (การ์ด 0041)
     property string openId: ""          // ไทล์ที่แตะเปิดดูรายละเอียดอยู่
     property string openWeb: ""         // แถวเว็บที่กางอยู่ (การ์ด 0067 รอบ 2)
+    // ไอคอนประจำเว็บ (ชุดไอคอนเส้นเดิม · ไม่ใช้อีโมจิ) · เว็บอื่น = ลูกโลก
+    readonly property var webIcons: ({
+        "all": Icons.sparkle, "youtube": Icons.play, "gmail": Icons.mail, "google": Icons.search,
+        "calendar": Icons.calendar, "drive": Icons.folder, "docs": Icons.file, "news": Icons.monitor,
+        "netflix": Icons.play, "viu": Icons.play, "iqiyi": Icons.play, "wetv": Icons.play, "disney": Icons.play,
+        "spotify": Icons.speaker
+    })
     // ไทล์ประจำเว็บ (id "site:…") ไม่แสดงซ้ำ · อยู่ใน "สั่งด้วยเสียงในเว็บ" แล้ว (การ์ด 0067 รอบ 2)
     readonly property var localSkills: skills.skills.filter(s => !s.byClaude && !s.id.startsWith("site:"))
     // ไอคอนของสกิลในเครื่อง (ไอคอนเส้นชุดเดิม) · สกิลอื่น = ประกาย
@@ -26,54 +33,114 @@ ColumnLayout {
         subtitle: Tr.t("สิ่งที่ผู้ช่วยทำให้ได้ · พิมพ์หรือพูดตามตัวอย่างได้เลย")
     }
 
-    // ---------- สั่งด้วยเสียงในเว็บ (การ์ด 0067 รอบ 2): แถวละเว็บ แตะ = คำสั่งทั้งหมดของเว็บนั้น ----------
-    AppText { text: Tr.t("สั่งด้วยเสียงในเว็บ"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
-    ColumnLayout {
+    // ---------- สั่งด้วยเสียงในเว็บ (การ์ด 0067 รอบ 2 · ปรับหน้าตาตาม ui-ux-pro-max 2026-10-27) ----------
+    // ไทล์ละเว็บ (ไอคอน · ชื่อ · จำนวนคำสั่ง · ลูกศร) · แตะหัวไทล์ = กางเต็มแถว · คำพูดเป็นป้ายแยกหมวด ·
+    // แตะได้เฉพาะหัว (กดปุ่มในการ์ดสกิลแล้วไม่พับเอง) · เป้าแตะ ≥ 44 px · ช่องห่าง ≥ 8 px
+    RowLayout {
+        Layout.fillWidth: true
+        AppText { text: Tr.t("สั่งด้วยเสียงในเว็บ"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
+        Chip { text: (skills.webCommands.length - 1) + Tr.t(" เว็บ") }
+    }
+    AppText {
+        text: Tr.t("แตะชื่อเว็บเพื่อดูว่าพูดอะไรได้บ้าง · คำสั่งใน “ใช้ได้ทุกเว็บ” ใช้ได้กับทุกเว็บ")
+        Layout.fillWidth: true
+        size: Theme.fontSmall; color: Theme.inkMuted
+    }
+    GridLayout {
+        id: webGrid
         objectName: "webList"
         Layout.fillWidth: true
-        spacing: 8
+        columns: Theme.fontScale > 1.25 ? 1 : page.width >= 900 ? 3 : 2
+        columnSpacing: 12
+        rowSpacing: 12
         Repeater {
             model: skills.webCommands
-            Card {
+            Rectangle {
                 id: wr
                 required property var modelData
-                objectName: "webRow"
+                objectName: "webRowCard"
                 readonly property bool open: page.openWeb === modelData.key
+                readonly property bool every: modelData.key === "all"
                 Layout.fillWidth: true
-                Layout.preferredHeight: wcol.implicitHeight + 24
-                radius: Theme.radiusCard
+                Layout.preferredWidth: 1
+                Layout.alignment: Qt.AlignTop
+                Layout.columnSpan: open ? webGrid.columns : 1
+                implicitHeight: wcol.implicitHeight + 24
+                radius: Theme.radiusLarge
+                color: every ? Theme.accentSoft : Theme.surface
+                border.width: head.visualFocus ? 2 : (head.hovered || open) ? 1 : 0
+                border.color: Theme.accent
                 ColumnLayout {
                     id: wcol
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 12
-                    spacing: 6
-                    AppButton {
-                        objectName: "webRowToggle"
+                    spacing: 10
+                    Button {
+                        id: head
+                        objectName: "webRow"
+                        text: wr.modelData.name
                         Layout.fillWidth: true
-                        kind: "ghost"
-                        text: (wr.open ? "▾ " : "▸ ") + wr.modelData.name + " · " + wr.modelData.count + Tr.t(" คำสั่ง")
-                              + (wr.modelData.mine > 0 ? Tr.t(" · ที่คุณสอน ") + wr.modelData.mine + Tr.t(" สกิล") : "")
+                        implicitHeight: Math.max(48, headRow.implicitHeight)
+                        padding: 0
+                        hoverEnabled: true
+                        Accessible.name: wr.modelData.name + " · " + wr.modelData.count + Tr.t(" คำสั่ง")
+                        Keys.onReturnPressed: (event) => { head.clicked(); event.accepted = true }
                         onClicked: page.openWeb = wr.open ? "" : wr.modelData.key
+                        background: Item {}
+                        contentItem: RowLayout {
+                            id: headRow
+                            spacing: 12
+                            Rectangle {
+                                implicitWidth: 40; implicitHeight: 40; radius: 12
+                                color: wr.every ? Theme.surface : Theme.accentSoft
+                                Icon {
+                                    anchors.centerIn: parent
+                                    path: page.webIcons[wr.modelData.key] || Icons.globe
+                                    color: Theme.accentInk
+                                    width: 20; height: 20
+                                }
+                            }
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+                                AppText { text: wr.modelData.name; strong: true; size: Theme.px(16); oneLine: true; Layout.fillWidth: true }
+                                AppText {
+                                    text: wr.modelData.count + Tr.t(" คำสั่ง")
+                                          + (wr.modelData.mine > 0 ? Tr.t(" · ที่คุณสอน ") + wr.modelData.mine + Tr.t(" สกิล") : "")
+                                    size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; Layout.fillWidth: true
+                                }
+                            }
+                            Icon {   // ลูกศร: พับ = ชี้ขวา · กาง = ชี้ลง
+                                path: Icons.back
+                                rotation: wr.open ? -90 : 180
+                                color: Theme.inkMuted
+                                width: 18; height: 18
+                            }
+                        }
                     }
                     Repeater {
                         model: wr.open ? wr.modelData.groups : []
                         ColumnLayout {
                             required property var modelData
                             Layout.fillWidth: true
-                            spacing: 2
-                            AppText { text: modelData.title; strong: true; size: Theme.fontSmall; Layout.fillWidth: true }
-                            Repeater {
-                                model: modelData.lines
-                                AppText { required property string modelData; objectName: "webLine"; text: modelData
-                                          size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                            spacing: 6
+                            AppText { text: modelData.title; strong: true; size: Theme.fontCaption; color: Theme.inkFaint; Layout.fillWidth: true }
+                            Flow {
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Repeater {
+                                    model: modelData.lines
+                                    Chip { required property string modelData; objectName: "webLine"; text: modelData }
+                                }
                             }
                         }
                     }
                     AppText {
                         visible: wr.open && wr.modelData.mine > 0
-                        text: Tr.t("ที่คุณสอน (Claude สร้าง)"); strong: true; size: Theme.fontSmall; Layout.fillWidth: true
+                        text: Tr.t("ที่คุณสอน (Claude สร้าง)")
+                        strong: true; size: Theme.fontCaption; color: Theme.inkFaint; Layout.fillWidth: true
                     }
                     Repeater {
                         model: wr.open ? skills.userSkills.filter(u => u.site === wr.modelData.key) : []

@@ -1614,12 +1614,11 @@ class ShellCardTest(unittest.TestCase):
         from aipc.skills.actions import SITES
 
         engine, win, warnings = self.open_shell("skills")
-        rows = find_items(win, "webRow")
-        self.assertEqual(len(rows), 1 + len(SITES))
-        toggles = find_items(win, "webRowToggle")
+        toggles = find_items(win, "webRow")  # หัวไทล์ (แตะได้) · ไทล์ละเว็บ
+        self.assertEqual(len(toggles), 1 + len(SITES))
         self.assertTrue(any("ใช้ได้ทุกเว็บ" in t.property("text") for t in toggles))
         self.assertEqual([x.property("text") for x in find_items(win, "webLine")], [])  # พับไว้ทั้งหมด
-        gmail = next(t for t in toggles if "Gmail" in t.property("text"))
+        gmail = next(t for t in toggles if t.property("text") == "Gmail")
         gmail.clicked.emit()
         settle(30)
         lines = [x.property("text") for x in find_items(win, "webLine") if x.isVisible()]

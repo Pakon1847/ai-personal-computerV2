@@ -77,7 +77,8 @@ class SiteTileTest(unittest.TestCase):
         for r in rows:
             for g in r["groups"]:
                 for line in g["lines"]:
-                    if "→" in line:  # คำสั่งของสกิลประจำเว็บ (ตรวจด้วยตัวตรวจไฟล์สกิลแล้ว)
+                    self.assertNotIn("→", line)  # แสดงแค่คำที่พูด ไม่มีคีย์/ตัวเลือกปุ่ม
+                    if g["title"] == "ของเว็บนี้":  # คำของสกิลประจำเว็บ (ตรวจด้วยตัวตรวจไฟล์สกิลแล้ว)
                         continue
                     said = line.strip("“”").replace("…", "แมว").replace("ค้นหา แมว", "ค้นหาแมว")
                     self.assertTrue(browse.parse(said), (r["key"], line))

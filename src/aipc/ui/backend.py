@@ -2480,7 +2480,8 @@ class SkillsController(QObject):
         users = [s for s in self._skills if s.site and self._is_user(s.id)]
         for site, (name, _url) in SITES.items():
             opened = [f"“{p}”" for p in browse.site_phrases(site)]
-            own = [self._command_text(c) for s in self._skills
+            # แสดงแค่คำที่พูดได้ (คีย์/ตัวเลือกปุ่มดูได้ที่การ์ดจัดการสกิล · ui-ux-pro-max: ไม่ให้ศัพท์เทคนิครกหน้า)
+            own = [" / ".join(f"“{p}”" for p in c.phrases) for s in self._skills
                    if s.site == site and not self._is_user(s.id) for c in s.commands]  # fmt: skip
             mine = [s for s in users if s.site == site]
             groups = [{"title": tr("เปิดและค้นหา"), "lines": lines(opened)}]
