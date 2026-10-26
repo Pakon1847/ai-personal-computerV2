@@ -317,13 +317,18 @@ class BrowserController(QObject):
 
     @Slot(str, str, str, result=bool)
     def runSite(self, kind: str, arg: str, site: str) -> bool:  # noqa: N802
-        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก) · ผลมาทางสัญญาณ finished เหมือนคำสั่งเว็บอื่น."""
+        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก · คำพ้องของคำสั่งระบบ การ์ด 0066) ·
+        ผลมาทางสัญญาณ finished เหมือนคำสั่งเว็บอื่น."""
+        from aipc.skills import sitecmd
         from aipc.skills.browse import BrowseCommand
 
-        if not self._active or self._busy or kind not in ("key", "click"):
+        if not self._active or self._busy or kind not in ("key", "click", "system"):
             return False
         if self._control is None or not self._control.running:
             return False
+        if kind == "system":  # ตรวจซ้ำตอนทำ ไม่เชื่อไฟล์อย่างเดียว (H7) · แปลด้วยตัวเดียวกับเสียง (H6)
+            cmds, why = sitecmd.alias_commands(arg)
+            return self._start(cmds) if not why else False
         return self._start([BrowseCommand(kind, query=arg, site=site)])
 
     @Slot(str, str, result=bool)

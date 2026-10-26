@@ -2403,7 +2403,7 @@ class SkillsController(QObject):
     @staticmethod
     def _command_text(c) -> str:
         """คำสั่งของสกิลประจำเว็บสำหรับหน้า Skill: คำพูด → ทำอะไร (เห็นคีย์/ตัวเลือกจริงที่ไฟล์เขียน · H5)."""
-        what = f"กดคีย์ {c.arg}" if c.kind == "key" else f"คลิกปุ่ม {c.arg}"
+        what = {"key": f"กดคีย์ {c.arg}", "system": f"ทำคำสั่ง “{c.arg}”"}.get(c.kind, f"คลิกปุ่ม {c.arg}")
         ask = " · ยืนยันก่อน" if c.confirm else ""
         return " / ".join(f"“{p}”" for p in c.phrases) + f" → {what}{ask}"
 
@@ -3288,9 +3288,15 @@ class SkillsController(QObject):
         out = []
         for m in self._user.load_all():
             e = self._user.info(m.id)
-            detail = (
-                [s.text for s in m.steps] if m.steps else [m.prompt.strip().splitlines()[0][:120]]
-            )
+            # สกิลประจำเว็บไม่มีขั้นตอนและ prompt ว่าง → เดิม IndexError ทั้งรายการ
+            # (พบ 2026-10-26 ตอนเขียนเทสต์ 0066 · บัญชี pakon บน Pi มีสกิลประจำเว็บ = หน้าจัดการสกิลเปิดไม่ได้)
+            # → แสดงคำสั่งของเว็บแทน
+            if m.steps:
+                detail = [s.text for s in m.steps]
+            elif m.commands:
+                detail = [self._command_text(c) for c in m.commands][:8]
+            else:
+                detail = [m.prompt.strip().splitlines()[0][:120]] if m.prompt.strip() else []
             out.append({
                 "id": m.id, "name": m.name, "description": m.description, "detail": detail,
                 "version": e["version"], "versions": self._user.versions(m.id),
@@ -3708,6 +3714,8 @@ class SkillsController(QObject):
                "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง · "
                "ถ้าต้องพิมพ์ข้อความ (ค้นหา/เปิดสิ่งที่ต้องค้นก่อน) ให้ตอบว่าทำไม่ได้ "
                "ห้ามทำคำสั่งที่แค่วางเคอร์เซอร์หรือเปิดช่องพิมพ์แทน (การ์ด 0057) · "
+               "ถ้าคำนี้หมายถึงงานของตัวเบราว์เซอร์หรือคำสั่งที่ระบบมีอยู่แล้ว (แท็บใหม่ ปิดแท็บ ย้อนกลับ หยุด เล่นต่อ …) "
+               "ให้เพิ่มคำนี้เป็น “→ ทำคำสั่ง <ประโยคคำสั่งของระบบ>” (การ์ด 0066) · "
                "ถ้าเพิ่มคำสั่งนี้ไม่ได้ ให้ส่ง skill_md รุ่นเดิม แล้วเขียน note เป็นเหตุผลสั้น ๆ ที่คนทั่วไปเข้าใจ "
                "(1 ประโยค ไม่มีศัพท์เทคนิค) และบอกคำพูดอื่นที่ระบบทำได้ถ้ามี")  # fmt: skip
         others = [s for s in self._skills if s.site == site and s.id != sid]

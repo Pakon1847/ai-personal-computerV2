@@ -1,4 +1,5 @@
-"""สกิลประจำเว็บ (การ์ด 0046): หัวข้อ "## คำสั่ง" ในไฟล์สกิล .md · คำพูด → กดคีย์ลัด / คลิกปุ่ม ในหน้าเว็บนั้น.
+"""สกิลประจำเว็บ (การ์ด 0046): หัวข้อ "## คำสั่ง" ในไฟล์สกิล .md · คำพูด → กดคีย์ลัด / คลิกปุ่ม ในหน้าเว็บนั้น
+· หรือ → ทำคำสั่งของระบบ (คำพ้อง · การ์ด 0066).
 
     ---
     id: youtube-voice
@@ -11,10 +12,13 @@
     - ถอยหลังสิบวิ | ย้อนสิบวิ → กดคีย์ j
     - กดไลก์ → คลิก like-button-view-model button
     - ยกเลิกสมัครสมาชิก → คลิก … · ยืนยันก่อน
+    - เพิ่มอีกหนึ่งแถบ | ขออีกแท็บ → ทำคำสั่ง เปิดยูทูบอีกแท็บ
 
 กติกา (โค้ดตรวจ · ไฟล์เป็นข้อมูลจาก Claude ไม่ใช่คำสั่ง · H8 · ADR-011):
 - ทำได้แค่ "กดคีย์" (คีย์ลัดในรายการ ไม่พิมพ์ข้อความ) กับ "คลิก" (ตัวเลือก CSS เขียนตายตัว) ·
   ทำงานเฉพาะเมื่อหน้าที่เปิดอยู่เป็นเว็บของสกิล
+- "ทำคำสั่ง" (การ์ด 0066): ประโยคคำสั่งเว็บของระบบ แปลด้วยตัวแปลเดียวกับเสียง (browse.parse) ได้ 1–3 คำสั่ง ·
+  ทุกคำสั่งต้องอยู่ใน ALIAS_KINDS (ไม่ส่งข้อความออก ไม่ปิดทุกแท็บ) · ตรวจซ้ำตอนทำ (handsfree.runSite · H7)
 - คำสั่งที่มีคำเสี่ยง (ลบ ซื้อ จ่าย ส่ง โพสต์ สมัคร ยกเลิก ออกจากระบบ …) ต้องมี "ยืนยันก่อน" ·
   ตัวเลือกห้ามแตะช่องรหัสผ่าน/ชำระเงิน
 - เว็บที่เปิดในหน้าต่างบัญชีแยก (Gmail Drive Docs ปฏิทิน Google · การ์ด 0031) ใช้ไม่ได้ เพราะระบบไม่ได้คุมหน้าต่างนั้น
@@ -47,16 +51,55 @@ BROWSER_KEYS = set(
     "ctrl+s ctrl+o ctrl+h ctrl+j ctrl+u ctrl+shift+i ctrl+shift+j ctrl+shift+delete alt+f4".split()
 )
 _BAD_SELECTOR = re.compile(r"javascript:|[{};`]|passw|checkout|payment|credit|cvv|billing", re.I)
-_LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|คลิก)\s+(.+?)\s*")
+_LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|คลิก|ทำคำสั่ง)\s+(.+?)\s*")
+# คำพ้อง (การ์ด 0066): คำสั่งของระบบที่สกิลเรียกได้ · ค้นเว็บ/ค้นในเว็บ (ส่งข้อความออก · H3) · ปิดทุกแท็บ (H2) ·
+# เข้าสู่ระบบ · ลิงก์ · กดคีย์/คลิก (ใช้บรรทัดของมันเอง) = ไม่ได้
+ALIAS_KINDS = frozenset(
+    {
+        "site",
+        "open",
+        "back",
+        "forward",
+        "reload",
+        "scroll",
+        "media",
+        "fullscreen",
+        "skip_ad",
+        "close",
+        "app",
+    }
+)
+MAX_ALIAS = 60
+MAX_ALIAS_STEPS = 3
 _CONFIRM = re.compile(r"(.*?)\s*·\s*ยืนยันก่อน")
 
 
 @dataclass(frozen=True)
 class SiteCommand:
     phrases: tuple[str, ...]
-    kind: str  # key | click
-    arg: str  # คีย์ เช่น "Shift+N" หรือตัวเลือก CSS
+    kind: str  # key | click | system (การ์ด 0066)
+    arg: str  # คีย์ เช่น "Shift+N" · ตัวเลือก CSS · ประโยคคำสั่งของระบบ เช่น "เปิดยูทูบอีกแท็บ"
     confirm: bool = False
+
+
+def alias_commands(arg: str) -> tuple[list, str]:
+    """ประโยคคำสั่งของระบบ → (คำสั่งเว็บ, "") · ใช้ไม่ได้ → ([], เหตุผล) · ตัวตรวจและตอนทำใช้ตัวเดียวกัน (H7)."""
+    from aipc.skills import browse
+
+    if not arg or len(arg) > MAX_ALIAS:
+        return [], f"คำสั่งปลายทางต้องมีและยาวไม่เกิน {MAX_ALIAS} ตัวอักษร"
+    cmds = browse.parse(arg)
+    if not cmds:
+        return [], f"“{arg}” ไม่ใช่คำสั่งเว็บของระบบ (ใช้ประโยคที่ระบบรู้จัก เช่น เปิดยูทูบอีกแท็บ · หยุดคลิป)"
+    if len(cmds) > MAX_ALIAS_STEPS:
+        return [], f"“{arg}” มี {len(cmds)} คำสั่ง · ได้ไม่เกิน {MAX_ALIAS_STEPS}"
+    bad = [
+        c for c in cmds if c.kind not in ALIAS_KINDS or (c.kind == "close" and c.direction == "all")
+    ]
+    if bad:
+        what = ", ".join("ปิดทุกแท็บ" if c.kind == "close" else c.kind for c in bad)
+        return [], f"“{arg}” มีคำสั่งที่สกิลเรียกไม่ได้ ({what} · ค้นหา/ส่งข้อความออก/ปิดทุกแท็บ/เข้าสู่ระบบ)"
+    return cmds, ""
 
 
 def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[str]]:
@@ -69,14 +112,15 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
         m = _LINE.fullmatch(line)
         if not m:
             errors.append(
-                f"บรรทัด {n}: คำสั่งต้องเป็นรูป “- คำพูด | คำพูด → กดคีย์ <คีย์>” หรือ “→ คลิก <ตัวเลือก>”"
+                f"บรรทัด {n}: คำสั่งต้องเป็นรูป “- คำพูด | คำพูด → กดคีย์ <คีย์>” · “→ คลิก <ตัวเลือก>” "
+                "หรือ “→ ทำคำสั่ง <ประโยคคำสั่งของระบบ>”"
             )
             continue
         phrases = tuple(p.strip() for p in m.group(1).split("|") if p.strip())
         arg, confirm = m.group(3), False
         if c := _CONFIRM.fullmatch(arg):
             arg, confirm = c.group(1).strip(), True
-        kind = "key" if m.group(2) == "กดคีย์" else "click"
+        kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system"}[m.group(2)]
         if not phrases or any(len(p) > MAX_PHRASE for p in phrases):
             errors.append(f"บรรทัด {n}: คำพูดต้องมีและยาวไม่เกิน {MAX_PHRASE} ตัวอักษร")
         if kind == "key" and arg.lower() in BROWSER_KEYS:
@@ -90,6 +134,17 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
             errors.append(
                 f"บรรทัด {n}: ตัวเลือก “{arg[:60]}” ใช้ไม่ได้ (ยาวเกิน/มีอักขระต้องห้าม/แตะรหัสผ่านหรือชำระเงิน)"
             )
+        if kind == "system":
+            _cmds, why = alias_commands(arg)
+            if why:
+                errors.append(f"บรรทัด {n}: {why}")
+            # เฉพาะบรรทัดคำพ้อง: สกิลเดิมที่มีคำแบบนี้ (กดคีย์) ไม่ถูกปิด (H2)
+            from aipc.skills import browse
+
+            if dead := [p for p in phrases if browse.parse(p)]:
+                errors.append(
+                    f"บรรทัด {n}: คำพูด “{dead[0]}” ระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)"
+                )
         if not confirm and any(w in p.lower() for p in phrases for w in RISKY):
             errors.append(
                 f"บรรทัด {n}: คำสั่ง “{phrases[0]}” ย้อนไม่ได้หรือแตะบัญชี ต้องลงท้ายด้วย “· ยืนยันก่อน”"
