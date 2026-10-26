@@ -288,6 +288,14 @@ class LoginWindowTest(unittest.TestCase):
         self.assertNotIn("--remote-debugging-pipe", argv)
         self.assertEqual(argv[-1], control.LOGIN_URL)
 
+    def test_after_sign_in_goes_to_the_google_account_page_not_youtube(self):
+        """Pakon 2026-10-27: "เข้าสู่ระบบกูเกิล" แล้วไปหน้า YouTube เอง → ไปหน้าบัญชี Google แทน."""
+        from urllib.parse import parse_qs, urlsplit
+
+        q = parse_qs(urlsplit(control.LOGIN_URL).query)
+        self.assertEqual(q["continue"], ["https://myaccount.google.com/"])
+        self.assertNotIn("youtube", control.LOGIN_URL)
+
     def test_other_commands_wait_for_login_window(self):
         self.b.run(control.BrowseCommand("login", site="google"))
         r = self.b.run(control.BrowseCommand("site", site="youtube"))

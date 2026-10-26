@@ -31,9 +31,10 @@ DDG = "https://duckduckgo.com/?kl=th-th&q="
 # (Pakon ลอง 2026-10-19) → เปิดหน้านี้ด้วยโปรไฟล์ของผู้ช่วยแบบไม่คุม (ไม่มี --remote-debugging-pipe) ·
 # ผู้ใช้กรอกรหัสเอง ระบบไม่เห็น · ปิดหน้าต่างแล้ว เบราว์เซอร์ของผู้ช่วยเปิดใหม่ด้วยคุกกี้เดิม = เข้าสู่ระบบอยู่ ·
 # บัญชีเดียวใช้ได้ทั้ง YouTube Gmail ไดรฟ์ ปฏิทิน เอกสาร
+# หลังกรอกเสร็จไปหน้าบัญชี Google (เห็นว่าเข้าสู่ระบบแล้ว) ไม่ใช่ YouTube (Pakon 2026-10-27: "เข้าสู่ระบบกูเกิล
+# แล้วไปหน้า YouTube เอง") · YouTube เข้าสู่ระบบเองเมื่อเปิดครั้งแรก (บัญชีเดียวกัน) · ต้องยืนยันที่จอ
 LOGIN_URL = (
-    "https://accounts.google.com/ServiceLogin?service=youtube&hl=th"
-    "&continue=https%3A%2F%2Fwww.youtube.com%2F"
+    "https://accounts.google.com/ServiceLogin?hl=th&continue=https%3A%2F%2Fmyaccount.google.com%2F"
 )
 LOGIN_HINT = "พูด “เข้าสู่ระบบกูเกิล” แล้วกรอกบัญชีเอง"
 # เปิดเว็บเป็นแท็บใหม่ (การ์ด 0065) · เพดานเป็นค่าร่าง ยังไม่ได้วัด RAM ต่อแท็บบน Pi (T2)
