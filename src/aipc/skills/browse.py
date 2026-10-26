@@ -18,6 +18,7 @@ class BrowseCommand:
     # media (การ์ด 0035 · direction = pause | play | next) · site_search (การ์ด 0036 · site + query) ·
     # fullscreen · skip_ad (การ์ด 0042) · open + direction="clip" = เลือกคลิป/วิดีโอ (การ์ด 0042) ·
     # key / click (การ์ด 0046 · สกิลประจำเว็บ · query = คีย์หรือตัวเลือก · site = เว็บของสกิล) ·
+    # site + direction="newtab" · close + direction="all" (การ์ด 0065) ·
     # login (การ์ด 0064 · เปิดหน้าเข้าสู่ระบบ Google แบบไม่คุม · ผู้ใช้กรอกรหัสเอง · บัญชีเดียวใช้ได้ทุกบริการ)
     kind: str
     query: str = ""
@@ -112,7 +113,11 @@ _PREV = re.compile(
     rf"|(?:ย้อน|ถอย)\s*{_MEDIA}(?:\s*กลับ)?"
 )
 _NEXT = re.compile(rf"(?:(?:ไป|เปิด|เล่น)\s*)?{_MEDIA}\s*(?:ถัด|ต่อ)\s*ไป|ข้าม\s*{_MEDIA}(?:\s*นี้)?")
-_CLOSE = re.compile(r"ปิด\s*(?:แท็บ|แทบ|tab|หน้า\s*(?:นี้|เว็บ)|เว็บ)\s*(?:นี้|ที่\s*เปิด\s*อยู่)?\s*(?:ไป)?")
+# ปิดทุกแท็บ = ปิดเบราว์เซอร์ของผู้ช่วย (Pakon ขอ 2026-10-26 · การ์ด 0065)
+_CLOSE_ALL = re.compile(
+    r"ปิด\s*(?:(?:แท็บ|แทบ|แถบ|tab)\s*(?:ทั้ง\s*หมด|ทุก\s*(?:แท็บ|แทบ|แถบ|อัน))|ทุก\s*(?:แท็บ|แทบ|แถบ|tab)|เบราว์เซอร์|บราวเซอร์)\s*(?:เลย|ไป)?"
+)
+_CLOSE = re.compile(r"ปิด\s*(?:แท็บ|แทบ|แถบ|tab|หน้า\s*(?:นี้|เว็บ)|เว็บ)\s*(?:นี้|ที่\s*เปิด\s*อยู่)?\s*(?:ไป)?")
 _APP = re.compile(
     r"(?:กลับ|ไป|สลับ)\s*(?:ไป)?\s*(?:ที่|หา|ใน)?\s*(?:แอป|แอพ|หน้า(?:ต่าง)?\s*(?:ผู้ช่วย|แชท|หลัก|แอป|แอพ)|ผู้ช่วย)"
 )
@@ -236,6 +241,15 @@ _SITE = re.compile(
     + "|".join(f"(?P<{k}>{v})" for k, v in SITE_NAMES.items())
     + r")"
 )
+# "เปิดยูทูบอีกแท็บ" · "เปิดยูทูบแท็บที่สอง" · "เปิดยูทูบแท็บใหม่" = แท็บใหม่แม้เว็บนั้นเปิดอยู่แล้ว (การ์ด 0065 ·
+# Pakon 2026-10-26: เดิมแปลเป็น "ค้นในยูทูบว่า อีกแท็บ" แล้วทับแท็บ Gmail ที่เปิดอยู่)
+_TAB = r"(?:แท็บ|แทบ|แถบ|tab)"
+_SITE_NEW_TAB = re.compile(
+    _SITE.pattern
+    + rf"\s*(?:ใน\s*|เป็น\s*)?(?:(?:เพิ่ม\s*)?อีก\s*(?:หนึ่ง|1|๑)?\s*{_TAB}"
+    + rf"|{_TAB}\s*(?:ใหม่|ที่\s*(?:สอง|2|๒|สาม|3|ถัด\s*ไป))"
+    + rf"|เพิ่ม\s*(?:อีก\s*)?(?:หนึ่ง|1|๑)?\s*{_TAB})"
+)
 _SEARCH = re.compile(
     r"(?:ช่วย\s*)?(?:ค้น\s*หา|ค้น|เสิร์[ชด]|เซิร์ช|search|(?:กูเกิ้?ล|google)\s*(?:หา|ดู)?(?=\s*(?:ว่า|คำว่า)|(?<=หา)|(?<=ดู)))\s*"
     r"(?:ดู\s*(?:หน่อย\s*)?)?(?:ใน\s*(?:กูเกิ้?ล|google|เน็ต|อินเทอร์เน็ต|เว็บ)\s*)?(?:ว่า|คำว่า)?\s*(.+)"
@@ -325,6 +339,12 @@ _VERB_ONLY = re.compile(
 def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
     if _LOGIN.fullmatch(t):
         return BrowseCommand("login", site="google")
+    if m := _SITE_NEW_TAB.fullmatch(t):  # ก่อน "ค้นใน<เว็บ>ว่า…"
+        return BrowseCommand(
+            "site", site=next(k for k in SITE_NAMES if m.group(k)), direction="newtab"
+        )
+    if _CLOSE_ALL.fullmatch(t):
+        return BrowseCommand("close", direction="all")
     if m := _OPEN_RE.fullmatch(t):
         clip = "clip" if re.search(_CLIP, t) else ""
         return BrowseCommand("open", n=_ordinal(m.group(1)), direction=clip)

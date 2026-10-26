@@ -178,5 +178,31 @@ class BackToAssistantPageTest(unittest.TestCase):
         )
 
 
+class TabPhrasesTest(unittest.TestCase):
+    """การ์ด 0065 (Pakon 2026-10-26): "เปิดยูทูบอีกแท็บ" เดิมแปลเป็นค้นในยูทูบว่า "อีกแท็บ" แล้วทับแท็บ Gmail."""
+
+    def test_another_tab(self):
+        for text in ["เปิดยูทูบอีกแท็บ", "เปิดยูทูบเพิ่มอีกแท็บ", "เปิดยูทูบแท็บที่สอง", "เปิดยูทูบแท็บใหม่",
+                     "เปิดจีเมลอีกหนึ่งแท็บ"]:  # fmt: skip
+            got = parsed(text)
+            self.assertEqual(
+                [(c["kind"], c.get("direction")) for c in got], [("site", "newtab")], text
+            )
+
+    def test_close_all(self):
+        for text in ["ปิดแท็บทั้งหมด", "ปิดทุกแท็บ", "ปิดเบราว์เซอร์"]:
+            self.assertEqual(parsed(text), [{"kind": "close", "direction": "all"}], text)
+        self.assertEqual(parsed("ปิดแท็บ"), [{"kind": "close"}])
+        # ตัวถอดเสียงได้ยิน "แท็บ" เป็น "แถบ" (log บน Pi 2026-10-26: "เพิ่มอีกหนึ่งแถบ")
+        self.assertEqual(parsed("ปิดแถบ"), [{"kind": "close"}])
+        self.assertEqual(parsed("ปิดแถบทั้งหมด"), [{"kind": "close", "direction": "all"}])
+        self.assertEqual(parsed("เปิดยูทูบอีกหนึ่งแถบ")[0]["direction"], "newtab")
+
+    def test_search_in_site_unchanged(self):
+        self.assertEqual(
+            parsed("ค้นในยูทูบว่าแมว"), [{"kind": "site_search", "query": "แมว", "site": "youtube"}]
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

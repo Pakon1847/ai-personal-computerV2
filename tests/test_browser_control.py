@@ -444,6 +444,22 @@ class NewTabTest(unittest.TestCase):
         self.assertIn("ปิดแท็บ", r.say)
         self.assertEqual(len(self.cdp.tabs), control.MAX_TABS)  # ไม่ปิดแท็บของผู้ใช้เอง
 
+    def test_another_tab_of_the_same_site_when_asked(self):
+        """Pakon 2026-10-26: "เปิดยูทูบอีกแท็บ" = แท็บใหม่แม้ YouTube เปิดอยู่ · ไม่ทับแท็บที่ดูอยู่."""
+        self.site("youtube")
+        self.site("gmail")
+        r = self.b.run(control.BrowseCommand("site", site="youtube", direction="newtab"))
+        self.assertTrue(r.ok)
+        self.assertEqual(len(self.cdp.tabs), 3)
+        self.assertTrue(self.cdp.tabs["T2"].url.startswith("https://mail.google.com"))  # ไม่ทับ
+
+    def test_close_all_closes_the_browser(self):
+        self.site("youtube")
+        self.site("gmail")
+        r = self.b.run(control.BrowseCommand("close", direction="all"))
+        self.assertEqual((r.ok, r.say), (True, "ปิดแท็บทั้งหมดแล้ว"))
+        self.assertFalse(self.b.running)
+
     def test_same_site(self):
         self.assertTrue(
             control.same_site("https://www.youtube.com/watch?v=1", "https://youtube.com")

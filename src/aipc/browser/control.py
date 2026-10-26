@@ -541,11 +541,11 @@ class BrowserControl:
                 self._target, self._session = target, ""
                 return
 
-    def _tab_for(self, url: str) -> str:
+    def _tab_for(self, url: str, new: bool = False) -> str:
         """เปิดเว็บ (การ์ด 0065): เว็บนี้เปิดอยู่แล้ว = สลับไปแท็บนั้น ("same") · แท็บที่ใช้อยู่ว่าง = ใช้แท็บนี้ ("here") ·
         ไม่งั้นเปิดแท็บใหม่ ("new") · แท็บครบเพดานแล้ว = ไม่เปิด ("full" · ไม่ปิดแท็บของผู้ใช้เอง · H2)."""
         pages = self._pages()
-        for p in pages:
+        for p in [] if new else pages:  # "เปิดยูทูบอีกแท็บ" = ไม่สลับไปแท็บเดิม
             if same_site(p.get("url", ""), url):
                 self._use(p["targetId"])
                 return "same"
@@ -598,7 +598,8 @@ class BrowserControl:
             return Result(False, "เปิดได้เฉพาะลิงก์ https")
         if cmd.kind in ("site", "url"):  # การ์ด 0065: ไม่ทับหน้าที่เปิดอยู่
             name = SITES[cmd.site][0] if cmd.kind == "site" else "เว็บนี้"
-            tab = self._tab_for(SITES[cmd.site][1] if cmd.kind == "site" else cmd.query)
+            tab = self._tab_for(SITES[cmd.site][1] if cmd.kind == "site" else cmd.query,
+                                new=cmd.direction == "newtab")  # fmt: skip
             if tab == "same":
                 return Result(True, f"สลับไปแท็บ {name} แล้ว", url=self._url())
             if tab == "full":
@@ -854,6 +855,9 @@ class BrowserControl:
         return Result(False, "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร")
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
+        if cmd.direction == "all":  # "ปิดแท็บทั้งหมด" = ปิดเบราว์เซอร์ของผู้ช่วย (การ์ด 0065)
+            self.close()
+            return Result(True, "ปิดแท็บทั้งหมดแล้ว")
         pages = [
             t for t in self._cdp.call("Target.getTargets")["targetInfos"] if t["type"] == "page"
         ]

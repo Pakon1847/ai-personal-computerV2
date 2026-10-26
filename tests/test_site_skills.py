@@ -355,6 +355,19 @@ class VoiceFlowTest(unittest.TestCase):
         self.assertIsNotNone(self.seen[1][1]["revise"])
         self.assertIn("เพิ่มคำสั่งเสียง", self.seen[1][1]["revise"][1])
 
+    def test_claude_could_not_add_it_says_so_and_installs_nothing(self):
+        """Pakon 2026-10-26: ขอ "เพิ่มอีกหนึ่งแถบ" → Claude ส่งสกิลที่ไม่มีคำนี้ (คีย์ลัดเปิดแท็บไม่ได้) ·
+        เดิมขึ้น "แก้สกิลแล้ว" + ติดตั้งรุ่นใหม่ · พูดซ้ำก็ถามซ้ำ → ต้องบอกว่าเพิ่มไม่ได้ และไม่ติดตั้ง (H5)."""
+        mine = YT.replace("id: yt-test", "id: yt-mine")  # ไม่มีคำว่า "เพิ่มอีกหนึ่งแถบ"
+        s, done = self.make(mine)
+        ask = s.siteLearn("เพิ่มอีกหนึ่งแถบ", WATCH)
+        s.confirm(ask["confirmToken"], True)
+        pump(lambda: done)
+        self.assertEqual(done[0]["title"], "Claude เพิ่มคำสั่ง “เพิ่มอีกหนึ่งแถบ” ไม่ได้")
+        self.assertIn("ไม่ได้ติดตั้งอะไร", done[0]["lines"][0])
+        self.assertTrue(done[0]["voice"])
+        self.assertNotIn("yt-mine", [x["id"] for x in s.userSkills])  # ไม่ได้ติดตั้ง
+
     def test_learn_only_where_it_can(self):
         s, _ = self.make()
         self.assertEqual(s.siteLearn("ซ่อนแชทสด", ""), {})  # ไม่มีหน้าเว็บ

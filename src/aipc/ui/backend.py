@@ -2092,6 +2092,7 @@ class SkillsController(QObject):
         self._claude_on = claude_on or (lambda: True)  # สวิตช์ Claude ในหน้าตั้งค่า (ผู้ใช้ปิดเองได้)
         self._forging = False
         self._voice_forges: set[str] = set()  # การ์ด 0030: คำขอที่เริ่มจากเสียง (ไม่สำเร็จ = ไม่ส่งต่อ)
+        self._site_learns: dict[str, str] = {}  # การ์ด 0046: คำขอ → ประโยคที่ขอให้เพิ่ม (ตรวจว่าเพิ่มจริงไหม)
         self._user = user_skills
         self._builtin = manifest.load_builtin()
         self._skills = self._builtin + (user_skills.load() if user_skills is not None else [])
@@ -3192,14 +3193,29 @@ class SkillsController(QObject):
 
     @Slot(object)
     def _on_forged(self, result) -> None:
-        from aipc.skills import manifest
+        from aipc.skills import manifest, sitecmd, userskills
 
         p, text, revise_id = result
         self._forging = False
         by_voice = text in self._voice_forges
         self._voice_forges.discard(text)
+        wanted = self._site_learns.pop(text, "")
         errors = [str(p)] if isinstance(p, Exception) else list(p.errors)
         new = None
+        if wanted and not isinstance(p, Exception) and p.skill_md:
+            # Pakon 2026-10-26: ขอเพิ่ม "เพิ่มอีกหนึ่งแถบ" → Claude ไม่ใส่ (คีย์ลัดเว็บเปิดแท็บไม่ได้) แต่หน้าจอบอก
+            # "แก้สกิลแล้ว" และติดตั้งรุ่นใหม่ · พูดซ้ำก็ถามซ้ำ เสียเงินทุกครั้ง → ไม่มีคำนี้ = ไม่ติดตั้ง + บอกตามจริง (H5)
+            others = [s for s in self._skills if s.id != revise_id]
+            m, _errs = userskills.gate(p.skill_md, others, revise_id)
+            key = sitecmd._norm(wanted)
+            if m is not None and not any(
+                sitecmd._norm(ph) == key for c in m.commands for ph in c.phrases
+            ):
+                why = "เว็บนี้ไม่มีคีย์ลัดหรือปุ่มสำหรับงานนี้ · ไม่ได้ติดตั้งอะไร (สกิลเดิมไม่เปลี่ยน)"
+                card = self._plain("forge-failed", f"Claude เพิ่มคำสั่ง “{wanted}” ไม่ได้", [why])
+                card.update(fallback=False, voice=by_voice)
+                self.forgeDone.emit(card, text)
+                return
         if not isinstance(p, Exception) and p.skill_md:
             try:
                 new = self._user.install(p.skill_md, self._skills, request=text, model=p.model,
@@ -4061,6 +4077,7 @@ class SkillsController(QObject):
             _, site, sid, text = plan
             request = self._site_request(site, text, sid)
             self._voice_forges.add(request)
+            self._site_learns[request] = text
             if sid:
                 return self._start_forge(request, revise_id=sid, feedback=f"เพิ่มคำสั่งเสียง “{text}”")
             return self._start_forge(request)
