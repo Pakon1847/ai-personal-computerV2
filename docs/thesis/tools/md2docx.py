@@ -21,6 +21,7 @@ import argparse
 import json
 import re
 import shutil
+import struct
 import subprocess
 import zipfile
 from pathlib import Path
@@ -233,6 +234,55 @@ class Numbering:
         return xml.replace("</w:numbering>", "".join(self.nums) + "</w:numbering>")
 
 
+# ---------- รูป ----------
+
+EMU = 914400  # หน่วยของ Word: 914400 ต่อ 1 นิ้ว
+MAX_W, MAX_H = 5.5, 7.0  # ขนาดรูปสูงสุดในหน้า (นิ้ว) · พื้นที่พิมพ์กว้าง 5.77 นิ้ว
+
+
+class Media:
+    """รูปที่ใส่ในไฟล์หนึ่งไฟล์ · แต่ละรูปได้ rId ของตัวเองใน document.xml.rels"""
+
+    def __init__(self) -> None:
+        self.files: list[tuple[str, Path]] = []
+
+    def add(self, path: Path) -> str:
+        rid = f"rIdAipcImg{len(self.files) + 1}"
+        self.files.append((rid, path))
+        return rid
+
+
+def png_size(path: Path) -> tuple[int, int]:
+    with path.open("rb") as f:
+        head = f.read(24)
+    if head[:8] != b"\x89PNG\r\n\x1a\n":
+        raise SystemExit(f"{path}: รองรับเฉพาะรูป PNG")
+    return struct.unpack(">II", head[16:24])
+
+
+def image_para(rid: str, path: Path, n: int) -> str:
+    """ย่อหน้ากลางหน้าที่มีรูปหนึ่งรูป · ย่อให้พอดีพื้นที่พิมพ์โดยคงสัดส่วน · ติดกับชื่อรูปบรรทัดถัดไป"""
+    px_w, px_h = png_size(path)
+    scale = min(MAX_W / (px_w / 96), MAX_H / (px_h / 96), 1.0)
+    cx, cy = int(px_w / 96 * scale * EMU), int(px_h / 96 * scale * EMU)
+    a = "http://schemas.openxmlformats.org/drawingml/2006/main"
+    pic = "http://schemas.openxmlformats.org/drawingml/2006/picture"
+    drawing = (
+        f'<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">'
+        f'<wp:extent cx="{cx}" cy="{cy}"/><wp:docPr id="{9000 + n}" name="รูป {n}"/>'
+        f'<a:graphic xmlns:a="{a}"><a:graphicData uri="{pic}"><pic:pic xmlns:pic="{pic}">'
+        f'<pic:nvPicPr><pic:cNvPr id="{9000 + n}" name="{escape(path.name)}"/>'
+        f"<pic:cNvPicPr/></pic:nvPicPr>"
+        f'<pic:blipFill><a:blip r:embed="{rid}"/>'
+        f"<a:stretch><a:fillRect/></a:stretch></pic:blipFill>"
+        f'<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm>'
+        f'<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>'
+        f"</a:graphicData></a:graphic></wp:inline></w:drawing>"
+    )
+    ppr = '<w:keepNext/><w:spacing w:before="240" w:after="120" w:line="240" w:lineRule="auto"/>'
+    return f'<w:p><w:pPr>{ppr}<w:jc w:val="center"/></w:pPr><w:r>{drawing}</w:r></w:p>'
+
+
 # ---------- แปลงร่างบท ----------
 
 
@@ -240,14 +290,14 @@ def clean(text: str) -> str:
     text = re.sub(r"`([^`]*)`", r"\1", text)
     text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
     text = re.sub(r"\[([^\]]+)\]\((?:[^)]+)\)", r"\1", text)  # ลิงก์ = เหลือข้อความ
-    return text.replace("ภาพที่", "รูปที่").strip()  # แม่แบบใช้คำว่า "รูปที่"
+    return re.sub(r"ภาพที่(?=\s*\d)", "รูปที่", text).strip()  # แม่แบบใช้คำว่า "รูปที่"
 
 
 CAPTION = re.compile(r"(ตารางที่|ภาพที่|รูปที่)\s*([0-9ก-ฮ]+\.\d+)\s*(.*)")
 LIST = re.compile(r"(\s*)(?:([-*])|(\d+)[.)])\s+(.+)")
 
 
-def convert(md: str, numbering: Numbering) -> tuple[str, list[dict]]:
+def convert(md: str, numbering: Numbering, media: Media | None = None) -> tuple[str, list[dict]]:
     """Markdown → XML ของเนื้อหา และรายการหัวข้อ/ตาราง/รูปสำหรับสารบัญ"""
     md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
     lines = md.splitlines()
@@ -267,8 +317,8 @@ def convert(md: str, numbering: Numbering) -> tuple[str, list[dict]]:
             j = i + 1
             while j < len(lines) and not lines[j].startswith("```"):
                 j += 1
-            label = "แผนภาพ (Mermaid) ในไฟล์ร่าง · ต้องแปลงเป็นรูป" if kind == "mermaid" else kind
-            out.append(para(f"[{label}]", italic=True, jc="center", before=120))
+            if kind != "mermaid":  # โค้ด Mermaid = ต้นฉบับของรูป (render_figures.py) ไม่พิมพ์ลงเล่ม
+                out.append(para(f"[{kind}]", italic=True, jc="center", before=120))
             i = j + 1
             continue
         if line.startswith("|"):
@@ -309,6 +359,26 @@ def convert(md: str, numbering: Numbering) -> tuple[str, list[dict]]:
             if key not in list_id:
                 list_id[key] = numbering.new(bullet, 1 if bullet else int(m.group(3)))
             out.append(para(clean(m.group(4)), num=(list_id[key], depth), jc="thaiDistribute"))
+        elif (m := re.match(r"!\[(.+)\]\((.+)\)\s*$", line)) and media is not None:
+            path = (DRAFT / m.group(2)).resolve()
+            if not path.exists():
+                raise SystemExit(f"ไม่พบรูป {path} (รัน docs/thesis/tools/render_figures.py ก่อน?)")
+            out.append(image_para(media.add(path), path, len(media.files)))
+            cap = CAPTION.match(clean(m.group(1)))
+            out.append(
+                caption_fig(cap.group(2), cap.group(3))
+                if cap
+                else para(clean(m.group(1)), jc="center")
+            )
+            if cap:
+                toc.append(
+                    {
+                        "kind": "figure",
+                        "num": cap.group(2),
+                        "text": cap.group(3),
+                        "find": f"รูปที่ {cap.group(2)}",
+                    }
+                )
         elif line.startswith("[ภาพที่") or line.startswith("[รูปที่"):
             inner = clean(line.strip()[1:-1] if line.strip().endswith("]") else line.strip()[1:])
             name, _, note = inner.partition(" — ")
@@ -661,6 +731,7 @@ def build(
     *,
     page_start: int | None = None,
     numbering: Numbering | None = None,
+    media: Media | None = None,
 ) -> None:
     with zipfile.ZipFile(tpl) as z:
         doc = z.read("word/document.xml").decode("utf-8")
@@ -683,6 +754,15 @@ def build(
             if "/image" in rel and rid not in used:
                 rels = rels.replace(rel, "")
                 dropped.add("word/" + re.search(r'Target="([^"]+)"', rel).group(1))
+        images = media.files if media else []
+        new_rels = "".join(
+            f'<Relationship Id="{rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+            f'relationships/image" Target="media/aipc-{n}.png"/>'
+            for n, (rid, _) in enumerate(images, 1)
+        )
+        rels = rels.replace("</Relationships>", new_rels + "</Relationships>")
+        for n, (_, path) in enumerate(images, 1):
+            zout.write(path, f"word/media/aipc-{n}.png")
         for item in zin.infolist():
             if item.filename in dropped:
                 continue
@@ -691,6 +771,12 @@ def build(
                 data = new.encode("utf-8")
             elif item.filename == "word/_rels/document.xml.rels":
                 data = rels.encode("utf-8")
+            elif (
+                item.filename == "[Content_Types].xml" and images and b'Extension="png"' not in data
+            ):
+                data = data.replace(
+                    b"<Default ", b'<Default Extension="png" ContentType="image/png"/><Default ', 1
+                )
             elif item.filename == "word/numbering.xml" and numbering:
                 data = numbering.merge(data.decode("utf-8")).encode("utf-8")
             elif item.filename == "docProps/core.xml":  # ชื่อผู้เขียน/ผู้แก้ล่าสุดของแม่แบบ = ล้างออก
@@ -728,8 +814,16 @@ def generate(word_dir: Path, out: Path) -> None:
             print(f"ข้าม {draft} (ยังไม่มีร่าง)")
             continue
         numbering = Numbering()
-        body, toc = convert(src.read_text(encoding="utf-8"), numbering)
-        build(template(word_dir, "04"), body, out / name, page_start=start, numbering=numbering)
+        media = Media()
+        body, toc = convert(src.read_text(encoding="utf-8"), numbering, media)
+        build(
+            template(word_dir, "04"),
+            body,
+            out / name,
+            page_start=start,
+            numbering=numbering,
+            media=media,
+        )
         if name in pages:
             pages[name]["start"] = start
             start += pages[name]["pages"]
