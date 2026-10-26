@@ -17,7 +17,8 @@ class BrowseCommand:
     # search · open · back · forward · reload · scroll · close · app · site · url (การ์ด 0031) ·
     # media (การ์ด 0035 · direction = pause | play | next) · site_search (การ์ด 0036 · site + query) ·
     # fullscreen · skip_ad (การ์ด 0042) · open + direction="clip" = เลือกคลิป/วิดีโอ (การ์ด 0042) ·
-    # key / click (การ์ด 0046 · สกิลประจำเว็บ · query = คีย์หรือตัวเลือก · site = เว็บของสกิล)
+    # key / click (การ์ด 0046 · สกิลประจำเว็บ · query = คีย์หรือตัวเลือก · site = เว็บของสกิล) ·
+    # login (เปิดหน้าเข้าสู่ระบบ YouTube แบบไม่คุม · ผู้ใช้กรอกรหัสเอง)
     kind: str
     query: str = ""
     n: int = 0
@@ -220,6 +221,12 @@ def _site_search(t: str, back: str = "") -> BrowseCommand | None:
     return BrowseCommand("site_search", query=query, site=site)
 
 
+# เข้าสู่ระบบ YouTube (บัญชี Google) · Google ไม่ให้กรอกรหัสในเบราว์เซอร์ที่ถูกคุม (การ์ด 0031 ข้อ 0) →
+# เปิดหน้าเข้าสู่ระบบด้วยโปรไฟล์เดียวกันแบบไม่คุม · ผู้ใช้กรอกเอง · ปิดหน้าต่างแล้วเบราว์เซอร์ของผู้ช่วยใช้คุกกี้ต่อ
+_LOGIN = re.compile(
+    r"(?:เข้า\s*สู่\s*ระบบ|ล็?อ[กค]\s*อิน|ลง\s*ชื่อ\s*เข้า\s*ใช้|log\s*-?\s*in|sign\s*in)\s*(?:บัญชี\s*)?"
+    r"(?:ใน\s*|ที่\s*|เข้า\s*)?(?:ยูทู[บป]|youtube|กูเกิ้?ล|google)(?:\s*(?:ใหม่|ให้))?"
+)
 _SITE = re.compile(
     r"(?:เปิด|เข้า|ไป\s*(?:ที่)?)\s*(?:เว็บ\s*)?("
     + "|".join(f"(?P<{k}>{v})" for k, v in SITE_NAMES.items())
@@ -312,6 +319,8 @@ _VERB_ONLY = re.compile(
 
 
 def _single_exact(t: str, asked: bool, back: str = "") -> BrowseCommand | None:
+    if _LOGIN.fullmatch(t):
+        return BrowseCommand("login", site="youtube")
     if m := _OPEN_RE.fullmatch(t):
         clip = "clip" if re.search(_CLIP, t) else ""
         return BrowseCommand("open", n=_ordinal(m.group(1)), direction=clip)

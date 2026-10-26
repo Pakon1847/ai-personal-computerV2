@@ -142,5 +142,21 @@ class PoliteTailTest(unittest.TestCase):
         self.assertEqual(parsed("ค้นหา คลิกลิงก์ที่สอง"), [{"kind": "open", "n": 2}])
 
 
+class LoginParseTest(unittest.TestCase):
+    """เข้าสู่ระบบ YouTube ด้วยเสียง: Google ไม่ให้กรอกรหัสในเบราว์เซอร์ที่ถูกคุม → หน้าต่างแบบไม่คุม."""
+
+    def test_login_phrasings(self):
+        for text in ["เข้าสู่ระบบยูทูบ", "ล็อกอินยูทูบ", "ล็อคอินยูทูป", "login youtube",
+                     "เข้าสู่ระบบ youtube ให้หน่อย", "ลงชื่อเข้าใช้ยูทูบ", "เข้าสู่ระบบกูเกิล",
+                     "ล็อกอินเข้ายูทูบ"]:  # fmt: skip
+            self.assertEqual(parsed(text), [{"kind": "login", "site": "youtube"}], text)
+
+    def test_not_login(self):
+        # ไม่บอกเว็บ = ไม่รู้ว่าเข้าอะไร · Gmail เปิดในหน้าต่างบัญชีแยกอยู่แล้ว (การ์ด 0031)
+        for text in ["เข้าสู่ระบบ", "เข้าสู่ระบบจีเมล"]:
+            self.assertEqual(parsed(text), [], text)
+        self.assertEqual(parsed("เปิดยูทูบ"), [{"kind": "site", "site": "youtube"}])
+
+
 if __name__ == "__main__":
     unittest.main()

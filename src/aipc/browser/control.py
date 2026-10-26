@@ -11,6 +11,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import threading
 import time
 from dataclasses import dataclass
@@ -26,6 +27,13 @@ GOOGLE = "https://www.google.com/search?hl=th&q="
 # Bing ให้ผลไม่ตรงคำค้น 3/4 (ไข่เจียว → หน้าช่วยเหลือ Windows · อากาศเชียงใหม่ → แบบทดสอบ Harry Potter)
 # DuckDuckGo ตรง 8/8 และลิงก์ชี้เว็บปลายทางตรง ๆ (Bing ผ่านตัวพาไป bing.com/ck/a)
 DDG = "https://duckduckgo.com/?kl=th-th&q="
+# เข้าสู่ระบบ YouTube: Google ขึ้น "Couldn't sign you in" ในเบราว์เซอร์ที่ถูกคุม (Pakon ลอง 2026-10-19) →
+# เปิดหน้านี้ด้วยโปรไฟล์ของผู้ช่วยแบบไม่คุม (ไม่มี --remote-debugging-pipe) · ผู้ใช้กรอกรหัสเอง ระบบไม่เห็น ·
+# ปิดหน้าต่างแล้ว เบราว์เซอร์ของผู้ช่วยเปิดใหม่ด้วยคุกกี้เดิม = เข้าสู่ระบบอยู่
+LOGIN_URL = (
+    "https://accounts.google.com/ServiceLogin?service=youtube&hl=th"
+    "&continue=https%3A%2F%2Fwww.youtube.com%2F"
+)
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
 NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media", "fullscreen",
               "skip_ad", "key", "click"}  # fmt: skip
@@ -369,6 +377,7 @@ class BrowserControl:
         self._google_blocked = False
         self._lock = threading.Lock()  # ทีละคำสั่ง
         self._mark = 0
+        self._login_proc = None  # หน้าต่างเข้าสู่ระบบแบบไม่คุม (ใช้โปรไฟล์เดียวกัน)
         self._google_blocked = False  # เจอ /sorry/ แล้ว = ค้นด้วย DuckDuckGo ตรง ๆ จนปิดเบราว์เซอร์
 
     # ---------- เปิด / ต่อ ----------
@@ -381,12 +390,11 @@ class BrowserControl:
     def running(self) -> bool:
         return self._cdp is not None and not self._cdp.closed and self._proc.poll() is None
 
-    def _start(self, url: str) -> None:
-        self._profile.mkdir(parents=True, exist_ok=True)
+    def _argv(self, url: str, controlled: bool = True) -> list[str]:
         argv = [
             self._chromium,
             f"--user-data-dir={self._profile}",
-            "--remote-debugging-pipe",
+            *(["--remote-debugging-pipe"] if controlled else []),
             "--no-first-run",
             "--no-default-browser-check",
             "--start-maximized",
@@ -396,7 +404,16 @@ class BrowserControl:
         if os.environ.get("WAYLAND_DISPLAY"):
             # Chromium บน Pi เลือก X11 เอง (hint=auto ก็ X11) · ไม่มี $DISPLAY = ปิดตัวทันที (พบ 2026-10-13)
             argv.insert(1, "--ozone-platform=wayland")
-        self._proc, self._cdp = self._launch(argv)
+        return argv
+
+    @property
+    def logging_in(self) -> bool:
+        """หน้าต่างเข้าสู่ระบบยังเปิดอยู่ (ถือโปรไฟล์อยู่ · เปิดเบราว์เซอร์ของผู้ช่วยซ้อนไม่ได้)."""
+        return self._login_proc is not None and self._login_proc.poll() is None
+
+    def _start(self, url: str) -> None:
+        self._profile.mkdir(parents=True, exist_ok=True)
+        self._proc, self._cdp = self._launch(self._argv(url))
         self._session = self._target = ""
         self._cdp.call("Browser.getVersion", timeout=30)  # รอจนพร้อม (เปิดครั้งแรกบน Pi ~1–3 วิ)
 
@@ -488,6 +505,10 @@ class BrowserControl:
                 return Result(False, f"เปิดเบราว์เซอร์ไม่ได้: {e.strerror or e}")
 
     def _run(self, cmd: BrowseCommand) -> Result:
+        if cmd.kind == "login":
+            return self._do_login(cmd)
+        if self.logging_in:
+            return Result(False, "ยังเปิดหน้าเข้าสู่ระบบอยู่ · เข้าสู่ระบบให้เสร็จแล้วปิดหน้าต่างนั้นก่อน")
         if not self.running:
             if cmd.kind in NEEDS_PAGE:
                 return Result(False, "", handled=False)
@@ -516,6 +537,34 @@ class BrowserControl:
             )
             return self._after_open(cmd, url)
         return getattr(self, "_do_" + cmd.kind)(cmd)
+
+    def _do_login(self, cmd: BrowseCommand) -> Result:
+        """ปิดเบราว์เซอร์ของผู้ช่วย แล้วเปิดหน้าเข้าสู่ระบบ Google ด้วยโปรไฟล์เดียวกันแบบไม่คุม.
+
+        ไม่รอให้ผู้ใช้กรอกเสร็จ (อาจนานหลายนาที · ไม่ถือคำสั่งค้าง) · ระหว่างนั้นคำสั่งเว็บอื่นตอบให้ปิดหน้าต่างก่อน ·
+        ปิดหน้าต่างแล้ว คำสั่งเว็บถัดไปเปิดเบราว์เซอร์ของผู้ช่วยใหม่ด้วยคุกกี้ที่เพิ่งเข้าสู่ระบบ
+        """
+        if self.logging_in:
+            return Result(True, "หน้าเข้าสู่ระบบเปิดอยู่แล้ว · กรอกบัญชี Google แล้วปิดหน้าต่างเมื่อเสร็จ")
+        self.close()
+        end = time.monotonic() + 5
+        while profile_in_use(self._profile) and time.monotonic() < end:
+            time.sleep(0.1)
+        if profile_in_use(self._profile):
+            return Result(False, "เบราว์เซอร์ของผู้ช่วยยังปิดไม่เสร็จ · ลองสั่งเข้าสู่ระบบอีกครั้ง")
+        self._profile.mkdir(parents=True, exist_ok=True)
+        self._login_proc = subprocess.Popen(
+            self._argv(LOGIN_URL, controlled=False),
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+        return Result(
+            True,
+            "เปิดหน้าเข้าสู่ระบบ YouTube แล้ว · กรอกบัญชี Google เอง แล้วปิดหน้าต่างนั้น · จากนั้นพูด “เปิดยูทูบ”",
+            url=LOGIN_URL,
+        )
 
     def _open_search(self, url: str) -> str:
         """เปิดหน้าค้นของบริการ · ต่างจากหน้าปัจจุบันแค่หลัง # (ค้นในจีเมลขณะเปิดจีเมลอยู่) = เปลี่ยนในหน้าเดิม

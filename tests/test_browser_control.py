@@ -246,5 +246,60 @@ class LaunchTest(unittest.TestCase):
         proc.wait(timeout=10)
 
 
+class LoginWindowTest(unittest.TestCase):
+    """“เข้าสู่ระบบยูทูบ”: ปิดเบราว์เซอร์ที่ถูกคุม แล้วเปิดหน้า Google แบบไม่คุมด้วยโปรไฟล์เดียวกัน."""
+
+    def setUp(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        self.profile = Path(self.dir.name) / "browser"
+        self.started = []
+
+        class LoginProc:
+            alive = True
+
+            def poll(self):
+                return None if self.alive else 0
+
+        self.proc = LoginProc()
+
+        def popen(argv, **kw):
+            self.started.append(argv)
+            return self.proc
+
+        patcher = mock.patch.object(control.subprocess, "Popen", side_effect=popen)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.b = BrowserControl(
+            profile=self.profile, launcher=lambda argv: (FakeProc(), FakeCdp({}))
+        )
+
+    def test_login_opens_uncontrolled_window_with_same_profile(self):
+        self.b._start("about:blank")
+        r = self.b.run(control.BrowseCommand("login", site="youtube"))
+        self.assertTrue(r.ok)
+        self.assertFalse(self.b.running)  # เบราว์เซอร์ที่ถูกคุมปิดแล้ว (ปล่อยโปรไฟล์)
+        argv = self.started[0]
+        self.assertIn(f"--user-data-dir={self.profile}", argv)
+        self.assertNotIn("--remote-debugging-pipe", argv)
+        self.assertEqual(argv[-1], control.LOGIN_URL)
+
+    def test_other_commands_wait_for_login_window(self):
+        self.b.run(control.BrowseCommand("login", site="youtube"))
+        r = self.b.run(control.BrowseCommand("site", site="youtube"))
+        self.assertFalse(r.ok)
+        self.assertIn("ปิดหน้าต่าง", r.say)
+        again = self.b.run(control.BrowseCommand("login", site="youtube"))
+        self.assertEqual(len(self.started), 1)  # ไม่เปิดหน้าต่างซ้อน
+        self.assertTrue(again.ok)
+        self.proc.alive = False  # ผู้ใช้ปิดหน้าต่างแล้ว → เปิดเบราว์เซอร์ของผู้ช่วยได้ตามเดิม
+        self.assertFalse(self.b.logging_in)
+        self.assertTrue(self.b.run(control.BrowseCommand("site", site="youtube")).ok)
+
+
 if __name__ == "__main__":
     unittest.main()
