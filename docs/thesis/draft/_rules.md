@@ -1,6 +1,7 @@
 # กติการ่างเล่ม (ผู้ช่วยร่าง · Pakon แก้เองภายหลัง · 2026-10-21)
 
 Pakon สั่ง: "คุณทำมาก่อน เดี๋ยวผมไปแก้เอง" (หลังได้รับคำเตือนเรื่องระเบียบคณะเรื่องการใช้ AI) · เล่มตัวอย่างของคณะ = `word/` (ของกลุ่มอื่น · ใช้เป็นแบบโครงเท่านั้น ห้ามลอกเนื้อหา)
+· รูปแบบเล่ม = แม่แบบคณะ `word/Template รหัส 66/` (2026-10-26) · สร้าง Word: `python docs/thesis/tools/md2docx.py --with-word` (ต้องมี Microsoft Word เพื่อนับหน้าใส่สารบัญ)
 
 1. **ข้อเท็จจริงมาจากไฟล์ในโปรเจกต์เท่านั้น:** `docs/thesis/facts-ch*.md` · `docs/thesis/outline.md` · `docs/thesis/template-map.md` · `docs/BRIEF.md` · `docs/DESIGN.md` ·
    `docs/ARCHITECTURE.md` · `docs/STATUS.md` · `docs/design/*.md` (การ์ด) · `docs/benchmarks/*/README.md` · `docs/evaluation/` · `docs/THREAT_MODEL.md` · `docs/adr/`
