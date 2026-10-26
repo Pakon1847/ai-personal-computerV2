@@ -36,6 +36,16 @@ LOGIN_URL = (
     "&continue=https%3A%2F%2Fwww.youtube.com%2F"
 )
 LOGIN_HINT = "พูด “เข้าสู่ระบบกูเกิล” แล้วกรอกบัญชีเอง"
+# เปิดเว็บเป็นแท็บใหม่ (การ์ด 0065) · เพดานเป็นค่าร่าง ยังไม่ได้วัด RAM ต่อแท็บบน Pi (T2)
+MAX_TABS = 6
+BLANK_TABS = {"", "about:blank", "chrome://newtab/", "chrome://new-tab-page/"}
+
+
+def same_site(a: str, b: str) -> bool:
+    """เว็บเดียวกันไหม (ชื่อเว็บตรงกัน ไม่สน www. · หน้าไหนก็ได้ในเว็บนั้น)."""
+    ha = (urlsplit(a).hostname or "").removeprefix("www.")
+    hb = (urlsplit(b).hostname or "").removeprefix("www.")
+    return bool(ha) and ha == hb
 
 
 def google_login_page(url: str) -> bool:
@@ -427,15 +437,19 @@ class BrowserControl:
         self._session = self._target = ""
         self._cdp.call("Browser.getVersion", timeout=30)  # รอจนพร้อม (เปิดครั้งแรกบน Pi ~1–3 วิ)
 
-    def _page(self) -> str:
-        """session ของแท็บที่ใช้อยู่ (แท็บล่าสุด) · แท็บเดิมปิดไปแล้ว = ต่อแท็บใหม่."""
-        pages = [
+    def _pages(self) -> list[dict]:
+        return [
             t for t in self._cdp.call("Target.getTargets")["targetInfos"] if t["type"] == "page"
         ]
+
+    def _page(self) -> str:
+        """session ของแท็บที่ใช้อยู่ · แท็บนั้นปิดไปแล้ว = แท็บล่าสุด · ไม่มีแท็บเลย = เปิดแท็บใหม่."""
+        pages = self._pages()
         if not pages:
             created = self._cdp.call("Target.createTarget", {"url": "about:blank"})
             pages = [{"targetId": created["targetId"]}]
-        target = pages[0]["targetId"]
+        ids = [p["targetId"] for p in pages]
+        target = self._target if self._target in ids else ids[0]
         if target != self._target or not self._session:
             self._session = self._cdp.call(
                 "Target.attachToTarget", {"targetId": target, "flatten": True}
@@ -492,6 +506,55 @@ class BrowserControl:
             time.sleep(0.2)
         return last or ""
 
+    def _use(self, target: str) -> None:
+        """สลับไปคุมแท็บนี้ และให้แท็บนี้ขึ้นหน้า."""
+        self._cdp.call("Target.activateTarget", {"targetId": target})
+        if target != self._target:
+            self._target, self._session = target, ""
+        self._page()
+
+    def _visible(self, target: str) -> bool:
+        """แท็บนี้อยู่หน้าสุดไหม (T0 การ์ด 0065 บน Pi 5: ถูก 5/5)."""
+        session = self._cdp.call("Target.attachToTarget", {"targetId": target, "flatten": True})[
+            "sessionId"
+        ]
+        try:
+            r = self._cdp.call(
+                "Runtime.evaluate",
+                {"expression": "document.visibilityState", "returnByValue": True},
+                session=session,
+                timeout=3,
+            )
+        finally:
+            self._cdp.call("Target.detachFromTarget", {"sessionId": session})
+        return r.get("result", {}).get("value") == "visible"
+
+    def _follow_user(self) -> None:
+        """ผู้ใช้คลิกสลับแท็บเอง → คำสั่งเสียงคุมแท็บที่เห็น (การ์ด 0065) · หาไม่ได้ = แท็บเดิม."""
+        ids = [p["targetId"] for p in self._pages()]
+        if len(ids) < 2 or (self._target in ids and self._visible(self._target)):
+            return
+        for target in ids:
+            if target != self._target and self._visible(target):
+                self._target, self._session = target, ""
+                return
+
+    def _tab_for(self, url: str) -> str:
+        """เปิดเว็บ (การ์ด 0065): เว็บนี้เปิดอยู่แล้ว = สลับไปแท็บนั้น ("same") · แท็บที่ใช้อยู่ว่าง = ใช้แท็บนี้ ("here") ·
+        ไม่งั้นเปิดแท็บใหม่ ("new") · แท็บครบเพดานแล้ว = ไม่เปิด ("full" · ไม่ปิดแท็บของผู้ใช้เอง · H2)."""
+        pages = self._pages()
+        for p in pages:
+            if same_site(p.get("url", ""), url):
+                self._use(p["targetId"])
+                return "same"
+        here = next((p for p in pages if p["targetId"] == self._target), None)
+        if here is None or here.get("url", "") in BLANK_TABS:
+            return "here"
+        if len(pages) >= MAX_TABS:
+            return "full"
+        self._use(self._cdp.call("Target.createTarget", {"url": "about:blank"})["targetId"])
+        return "new"
+
     def _front(self) -> None:
         """เบราว์เซอร์มาอยู่หน้าสุด (เคยย่อไว้ด้วย "กลับไปแอป")."""
         try:
@@ -524,13 +587,21 @@ class BrowserControl:
                 return Result(False, "", handled=False)
             self._start("about:blank")
             self._page()
+        self._follow_user()
         self._page()
         if cmd.kind != "app":
             self._front()
         # ขั้น "เปิดเว็บ https://…" ของสกิล (ลิงก์ตายตัวในไฟล์ที่ผ่านประตูตรวจแล้ว · การ์ด 0031)
+        if cmd.kind == "url" and not cmd.query.lower().startswith("https://"):
+            return Result(False, "เปิดได้เฉพาะลิงก์ https")
+        if cmd.kind in ("site", "url"):  # การ์ด 0065: ไม่ทับหน้าที่เปิดอยู่
+            name = SITES[cmd.site][0] if cmd.kind == "site" else "เว็บนี้"
+            tab = self._tab_for(SITES[cmd.site][1] if cmd.kind == "site" else cmd.query)
+            if tab == "same":
+                return Result(True, f"สลับไปแท็บ {name} แล้ว", url=self._url())
+            if tab == "full":
+                return Result(False, f"เปิดอยู่ {MAX_TABS} แท็บแล้ว · พูด “ปิดแท็บ” ก่อน")
         if cmd.kind == "url":
-            if not cmd.query.lower().startswith("https://"):
-                return Result(False, "เปิดได้เฉพาะลิงก์ https")
             return Result(True, "เปิดเว็บแล้ว", url=self._go(cmd.query))
         if cmd.kind == "site_search":  # การ์ด 0036
             name = SITES[cmd.site][0]

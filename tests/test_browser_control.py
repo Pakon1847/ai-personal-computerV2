@@ -341,5 +341,116 @@ class GoogleLoginPageTest(unittest.TestCase):
             self.assertFalse(control.google_login_page(url), url)
 
 
+class TabsCdp(FakeCdp):
+    """หลายแท็บ: แต่ละแท็บมีหน้าของตัวเอง · front = แท็บที่ผู้ใช้เห็น (การ์ด 0065)."""
+
+    def __init__(self, first="about:blank"):
+        super().__init__({})
+        self.tabs = {"T1": FakePage(first)}
+        self.front, self.sessions, self.n = "T1", {}, 1
+
+    def call(self, method, params=None, session="", timeout=15.0):
+        params = params or {}
+        if method == "Target.getTargets":
+            self.calls.append(method)
+            return {"targetInfos": [{"type": "page", "targetId": t, "url": p.url}
+                                    for t, p in reversed(self.tabs.items())]}  # fmt: skip
+        if method == "Target.attachToTarget":
+            sid = f"S-{params['targetId']}-{len(self.sessions)}"
+            self.sessions[sid] = params["targetId"]
+            return {"sessionId": sid}
+        if method == "Target.createTarget":
+            self.n += 1
+            t = f"T{self.n}"
+            self.tabs[t] = FakePage(params["url"])
+            self.front = t
+            return {"targetId": t}
+        if method == "Target.activateTarget":
+            self.front = params["targetId"]
+            return {}
+        if method == "Target.closeTarget":
+            del self.tabs[params["targetId"]]
+            self.front = next(reversed(self.tabs), "")
+            return {}
+        if session in self.sessions:
+            target = self.sessions[session]
+            if method == "Runtime.evaluate" and params["expression"] == "document.visibilityState":
+                return {"result": {"value": "visible" if target == self.front else "hidden"}}
+            self.cur = self.tabs[target]
+        return super().call(method, params, session, timeout)
+
+    def go(self, url):
+        self.cur.url = url
+        self.marker = None
+
+
+class NewTabTest(unittest.TestCase):
+    """การ์ด 0065: เปิดเว็บไม่ทับหน้าเดิม · เว็บเดิม = สลับไปแท็บนั้น · คำสั่งตามแท็บที่ผู้ใช้เห็น."""
+
+    def setUp(self):
+        self.cdp = TabsCdp()
+        self.b = BrowserControl(launcher=lambda argv: (FakeProc(), self.cdp))
+
+    def site(self, name):
+        return self.b.run(control.BrowseCommand("site", site=name))
+
+    def urls(self):
+        return {t: p.url for t, p in self.cdp.tabs.items()}
+
+    def test_first_site_uses_the_blank_tab(self):
+        self.assertTrue(self.site("youtube").ok)
+        self.assertEqual(len(self.cdp.tabs), 1)
+
+    def test_second_site_opens_a_new_tab_and_keeps_the_first(self):
+        self.site("youtube")
+        self.cdp.tabs["T1"].url = "https://www.youtube.com/watch?v=abc"  # กำลังดูคลิป
+        r = self.site("gmail")
+        self.assertTrue(r.ok)
+        self.assertEqual(len(self.cdp.tabs), 2)
+        self.assertEqual(self.cdp.tabs["T1"].url, "https://www.youtube.com/watch?v=abc")  # H2
+        self.assertTrue(self.cdp.tabs["T2"].url.startswith("https://mail.google.com"))
+        self.assertEqual(self.cdp.front, "T2")
+
+    def test_open_site_that_is_already_open_switches_without_reloading(self):
+        self.site("youtube")
+        self.cdp.tabs["T1"].url = "https://www.youtube.com/watch?v=abc"
+        self.site("gmail")
+        r = self.site("youtube")
+        self.assertTrue(r.ok)
+        self.assertEqual(r.say, "สลับไปแท็บ YouTube แล้ว")
+        self.assertEqual(len(self.cdp.tabs), 2)  # ไม่เปิดแท็บที่ 3
+        self.assertEqual(self.cdp.front, "T1")
+        self.assertEqual(self.cdp.tabs["T1"].url, "https://www.youtube.com/watch?v=abc")  # คลิปไม่หาย
+
+    def test_commands_follow_the_tab_the_user_clicked(self):
+        self.site("youtube")
+        self.site("gmail")
+        self.cdp.front = "T1"  # ผู้ใช้คลิกกลับไปแท็บ YouTube เอง
+        self.b.run(control.BrowseCommand("reload"))
+        self.assertEqual(self.b._target, "T1")
+
+    def test_search_stays_in_the_current_tab(self):
+        self.site("youtube")
+        self.b.run(control.BrowseCommand("search", query="ข่าว"))
+        self.assertEqual(len(self.cdp.tabs), 1)
+
+    def test_full_does_not_open_or_close_tabs(self):
+        for i in range(control.MAX_TABS):
+            self.cdp.tabs[f"X{i}"] = FakePage(f"https://site{i}.example/")
+        self.cdp.tabs.pop("T1")
+        self.cdp.front = "X0"
+        r = self.site("youtube")
+        self.assertFalse(r.ok)
+        self.assertIn("ปิดแท็บ", r.say)
+        self.assertEqual(len(self.cdp.tabs), control.MAX_TABS)  # ไม่ปิดแท็บของผู้ใช้เอง
+
+    def test_same_site(self):
+        self.assertTrue(
+            control.same_site("https://www.youtube.com/watch?v=1", "https://youtube.com")
+        )
+        self.assertFalse(control.same_site("https://mail.google.com", "https://drive.google.com"))
+        self.assertFalse(control.same_site("about:blank", "about:blank"))
+
+
 if __name__ == "__main__":
     unittest.main()
