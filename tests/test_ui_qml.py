@@ -1581,7 +1581,8 @@ class ShellCardTest(unittest.TestCase):
         """การ์ด 0041: หน้า Skill เป็นไทล์ · ตัวกรองนับตรงกับข้อมูลจริง · แตะไทล์ = เห็นรายละเอียดและสิทธิ์."""
         engine, win, warnings = self.open_shell("skills")
         skills = engine._backends["skills"]
-        local = [x for x in skills.skills if not x["byClaude"]]
+        # ไทล์ประจำเว็บ (site:…) ย้ายไปอยู่ใน "สั่งด้วยเสียงในเว็บ" (การ์ด 0067 รอบ 2) · ไม่นับในตารางนี้
+        local = [x for x in skills.skills if not x["byClaude"] and not x["id"].startswith("site:")]
         ready = sum(x["ready"] for x in local)
 
         def tiles():
@@ -1605,6 +1606,28 @@ class ShellCardTest(unittest.TestCase):
         tile.clicked.emit()  # แตะอีกครั้ง = ปิด
         settle(30)
         self.assertFalse(any(d.isVisible() for d in find_items(win, "skillDetail")))
+        self.assertEqual(warnings, [])
+
+    def test_web_list_one_row_per_site_and_what_to_say(self):
+        """การ์ด 0067 รอบ 2: "YouTube มีคำสั่งอะไรบ้าง Gmail มีคำสั่งอะไรบ้าง" ·
+        ใช้ได้ทุกเว็บ + แถวละเว็บ · แตะ = คำพูด."""
+        from aipc.skills.actions import SITES
+
+        engine, win, warnings = self.open_shell("skills")
+        rows = find_items(win, "webRow")
+        self.assertEqual(len(rows), 1 + len(SITES))
+        toggles = find_items(win, "webRowToggle")
+        self.assertTrue(any("ใช้ได้ทุกเว็บ" in t.property("text") for t in toggles))
+        self.assertEqual([x.property("text") for x in find_items(win, "webLine")], [])  # พับไว้ทั้งหมด
+        gmail = next(t for t in toggles if "Gmail" in t.property("text"))
+        gmail.clicked.emit()
+        settle(30)
+        lines = [x.property("text") for x in find_items(win, "webLine") if x.isVisible()]
+        self.assertIn("“เปิดจีเมล”", lines)
+        self.assertIn("“ค้นในจีเมลว่า …”", lines)
+        gmail.clicked.emit()  # แตะอีกครั้ง = พับ
+        settle(30)
+        self.assertEqual([x for x in find_items(win, "webLine") if x.isVisible()], [])
         self.assertEqual(warnings, [])
 
     def test_calendar_cells_share_the_width(self):

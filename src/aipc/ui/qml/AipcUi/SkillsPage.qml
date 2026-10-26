@@ -12,7 +12,9 @@ ColumnLayout {
     property string message: ""
     property string filter: "all"       // ตัวกรองสกิลในเครื่อง: all | ready | notReady (การ์ด 0041)
     property string openId: ""          // ไทล์ที่แตะเปิดดูรายละเอียดอยู่
-    readonly property var localSkills: skills.skills.filter(s => !s.byClaude)
+    property string openWeb: ""         // แถวเว็บที่กางอยู่ (การ์ด 0067 รอบ 2)
+    // ไทล์ประจำเว็บ (id "site:…") ไม่แสดงซ้ำ · อยู่ใน "สั่งด้วยเสียงในเว็บ" แล้ว (การ์ด 0067 รอบ 2)
+    readonly property var localSkills: skills.skills.filter(s => !s.byClaude && !s.id.startsWith("site:"))
     // ไอคอนของสกิลในเครื่อง (ไอคอนเส้นชุดเดิม) · สกิลอื่น = ประกาย
     readonly property var icons: ({
         "reminder": Icons.calendar, "system-command": Icons.terminal, "machine-status": Icons.activity,
@@ -24,11 +26,69 @@ ColumnLayout {
         subtitle: Tr.t("สิ่งที่ผู้ช่วยทำให้ได้ · พิมพ์หรือพูดตามตัวอย่างได้เลย")
     }
 
+    // ---------- สั่งด้วยเสียงในเว็บ (การ์ด 0067 รอบ 2): แถวละเว็บ แตะ = คำสั่งทั้งหมดของเว็บนั้น ----------
+    AppText { text: Tr.t("สั่งด้วยเสียงในเว็บ"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
+    ColumnLayout {
+        objectName: "webList"
+        Layout.fillWidth: true
+        spacing: 8
+        Repeater {
+            model: skills.webCommands
+            Card {
+                id: wr
+                required property var modelData
+                objectName: "webRow"
+                readonly property bool open: page.openWeb === modelData.key
+                Layout.fillWidth: true
+                Layout.preferredHeight: wcol.implicitHeight + 24
+                radius: Theme.radiusCard
+                ColumnLayout {
+                    id: wcol
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 12
+                    spacing: 6
+                    AppButton {
+                        objectName: "webRowToggle"
+                        Layout.fillWidth: true
+                        kind: "ghost"
+                        text: (wr.open ? "▾ " : "▸ ") + wr.modelData.name + " · " + wr.modelData.count + Tr.t(" คำสั่ง")
+                              + (wr.modelData.mine > 0 ? Tr.t(" · ที่คุณสอน ") + wr.modelData.mine + Tr.t(" สกิล") : "")
+                        onClicked: page.openWeb = wr.open ? "" : wr.modelData.key
+                    }
+                    Repeater {
+                        model: wr.open ? wr.modelData.groups : []
+                        ColumnLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: 2
+                            AppText { text: modelData.title; strong: true; size: Theme.fontSmall; Layout.fillWidth: true }
+                            Repeater {
+                                model: modelData.lines
+                                AppText { required property string modelData; objectName: "webLine"; text: modelData
+                                          size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                            }
+                        }
+                    }
+                    AppText {
+                        visible: wr.open && wr.modelData.mine > 0
+                        text: Tr.t("ที่คุณสอน (Claude สร้าง)"); strong: true; size: Theme.fontSmall; Layout.fillWidth: true
+                    }
+                    Repeater {
+                        model: wr.open ? skills.userSkills.filter(u => u.site === wr.modelData.key) : []
+                        delegate: userCard
+                    }
+                }
+            }
+        }
+    }
+
     // ---------- สกิลที่ Claude สร้างให้ผู้ใช้คนนี้ ----------
     RowLayout {
         Layout.fillWidth: true
-        AppText { text: Tr.t("สกิลที่ Claude สร้างให้คุณ"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
-        Chip { text: skills.userSkills.length + Tr.t(" สกิล") }
+        AppText { text: Tr.t("สกิลอื่นที่ Claude สร้างให้คุณ"); strong: true; size: Theme.px(17); Layout.fillWidth: true }
+        Chip { text: skills.userSkills.filter(u => u.site === "").length + Tr.t(" สกิล") }
     }
     AppText {
         objectName: "userSkillsEmpty"
@@ -52,82 +112,8 @@ ColumnLayout {
         columnSpacing: 12
         rowSpacing: 12
         Repeater {
-            model: skills.userSkills
-            Card {
-                id: uc
-                required property var modelData
-                objectName: "userSkillCard"
-                Layout.fillWidth: true
-                Layout.preferredHeight: ucol.implicitHeight + 28
-                Layout.alignment: Qt.AlignTop
-                radius: Theme.radiusCard
-                opacity: uc.modelData.enabled ? 1 : 0.72
-                ColumnLayout {
-                    id: ucol
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: 14
-                    spacing: 6
-                    RowLayout {
-                        Layout.fillWidth: true
-                        AppText { text: uc.modelData.name; strong: true; size: Theme.px(17); oneLine: true; Layout.fillWidth: true }
-                        Chip { text: uc.modelData.enabled ? Tr.t("เปิดอยู่") : Tr.t("ปิดอยู่"); kind: uc.modelData.enabled ? "ok" : "neutral"; dot: true }
-                    }
-                    Flow {
-                        Layout.fillWidth: true
-                        spacing: 6
-                        Chip { text: (uc.modelData.imported ? Tr.t("นำเข้าจากไฟล์") : Tr.t("Claude สร้าง")) + Tr.t(" · รุ่น ") + uc.modelData.version; kind: "accent" }
-                        Chip { text: Tr.t("ใช้แล้ว ") + uc.modelData.uses + Tr.t(" ครั้ง") }
-                        Chip { visible: uc.modelData.created !== ""; text: uc.modelData.created }
-                    }
-                    Repeater {
-                        model: uc.modelData.detail
-                        AppText { required property string modelData; required property int index
-                                  text: (uc.modelData.detail.length > 1 ? (index + 1) + ". " : "") + modelData
-                                  size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
-                    }
-                    AppText {
-                        visible: uc.modelData.request !== ""
-                        text: Tr.t("สร้างจาก: “") + uc.modelData.request + "”"
-                        size: Theme.fontCaption; color: Theme.inkFaint; Layout.fillWidth: true
-                    }
-                    Flow {
-                        Layout.fillWidth: true
-                        spacing: 6
-                        AppButton {
-                            text: uc.modelData.enabled ? Tr.t("ปิด") : Tr.t("เปิดใช้"); kind: "secondary"
-                            onClicked: { page.message = ""; skills.setSkillEnabled(uc.modelData.id, !uc.modelData.enabled) }
-                        }
-                        AppButton {
-                            // ย้อนไปรุ่นก่อนหน้าที่เก็บไว้ (รุ่นที่มีเลขน้อยกว่ารุ่นปัจจุบัน)
-                            readonly property var older: uc.modelData.versions.filter(v => v < uc.modelData.version)
-                            visible: older.length > 0
-                            text: visible ? Tr.t("ย้อนไปรุ่น ") + older[older.length - 1] : ""
-                            kind: "secondary"
-                            onClicked: page.message = skills.revertSkill(uc.modelData.id, older[older.length - 1])
-                        }
-                        AppButton {
-                            text: Tr.t("ส่งออกเป็นไฟล์"); kind: "secondary"
-                            onClicked: page.message = skills.exportSkill(uc.modelData.id)
-                        }
-                        AppButton {
-                            objectName: "deleteSkillButton"
-                            text: page.confirmDelete === uc.modelData.id ? Tr.t("กดอีกครั้งเพื่อลบ") : Tr.t("ลบ")
-                            kind: page.confirmDelete === uc.modelData.id ? "danger" : "ghost"
-                            onClicked: {
-                                if (page.confirmDelete === uc.modelData.id) {
-                                    page.confirmDelete = ""
-                                    page.message = ""
-                                    skills.removeSkill(uc.modelData.id)
-                                } else {
-                                    page.confirmDelete = uc.modelData.id
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            model: skills.userSkills.filter(u => u.site === "")   // สกิลประจำเว็บอยู่ในแถวของเว็บนั้น
+            delegate: userCard
         }
     }
 
@@ -152,13 +138,6 @@ ColumnLayout {
                 onClicked: { page.filter = modelData.key; page.openId = "" }
             }
         }
-    }
-    // Pakon 2026-10-27: บอกว่าสั่งด้วยเสียงได้ในเว็บไหนบ้าง (ไทล์ประจำเว็บมีเฉพาะเว็บที่มีสกิล)
-    AppText {
-        objectName: "voiceSitesLine"
-        text: skills.voiceSites
-        Layout.fillWidth: true
-        size: Theme.fontSmall; color: Theme.inkMuted
     }
     GridLayout {
         objectName: "localSkillsGrid"
@@ -249,6 +228,85 @@ ColumnLayout {
                             spacing: 6
                             Chip { text: sc.modelData.worker }
                             Repeater { model: sc.modelData.permissions; Chip { required property string modelData; text: modelData; kind: "warn" } }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // การ์ดจัดการสกิลของผู้ใช้ (ใช้ทั้งในแถวของเว็บ และ "สกิลอื่นที่ Claude สร้าง") · การ์ด 0067 รอบ 2
+    Component {
+        id: userCard
+        Card {
+            id: uc
+            required property var modelData
+            objectName: "userSkillCard"
+            Layout.fillWidth: true
+            Layout.preferredHeight: ucol.implicitHeight + 28
+            Layout.alignment: Qt.AlignTop
+            radius: Theme.radiusCard
+            opacity: uc.modelData.enabled ? 1 : 0.72
+            ColumnLayout {
+                id: ucol
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 14
+                spacing: 6
+                RowLayout {
+                    Layout.fillWidth: true
+                    AppText { text: uc.modelData.name; strong: true; size: Theme.px(17); oneLine: true; Layout.fillWidth: true }
+                    Chip { text: uc.modelData.enabled ? Tr.t("เปิดอยู่") : Tr.t("ปิดอยู่"); kind: uc.modelData.enabled ? "ok" : "neutral"; dot: true }
+                }
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 6
+                    Chip { text: (uc.modelData.imported ? Tr.t("นำเข้าจากไฟล์") : Tr.t("Claude สร้าง")) + Tr.t(" · รุ่น ") + uc.modelData.version; kind: "accent" }
+                    Chip { text: Tr.t("ใช้แล้ว ") + uc.modelData.uses + Tr.t(" ครั้ง") }
+                    Chip { visible: uc.modelData.created !== ""; text: uc.modelData.created }
+                }
+                Repeater {
+                    model: uc.modelData.detail
+                    AppText { required property string modelData; required property int index
+                              text: (uc.modelData.detail.length > 1 ? (index + 1) + ". " : "") + modelData
+                              size: Theme.fontSmall; color: Theme.inkMuted; Layout.fillWidth: true }
+                }
+                AppText {
+                    visible: uc.modelData.request !== ""
+                    text: Tr.t("สร้างจาก: “") + uc.modelData.request + "”"
+                    size: Theme.fontCaption; color: Theme.inkFaint; Layout.fillWidth: true
+                }
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 6
+                    AppButton {
+                        text: uc.modelData.enabled ? Tr.t("ปิด") : Tr.t("เปิดใช้"); kind: "secondary"
+                        onClicked: { page.message = ""; skills.setSkillEnabled(uc.modelData.id, !uc.modelData.enabled) }
+                    }
+                    AppButton {
+                        // ย้อนไปรุ่นก่อนหน้าที่เก็บไว้ (รุ่นที่มีเลขน้อยกว่ารุ่นปัจจุบัน)
+                        readonly property var older: uc.modelData.versions.filter(v => v < uc.modelData.version)
+                        visible: older.length > 0
+                        text: visible ? Tr.t("ย้อนไปรุ่น ") + older[older.length - 1] : ""
+                        kind: "secondary"
+                        onClicked: page.message = skills.revertSkill(uc.modelData.id, older[older.length - 1])
+                    }
+                    AppButton {
+                        text: Tr.t("ส่งออกเป็นไฟล์"); kind: "secondary"
+                        onClicked: page.message = skills.exportSkill(uc.modelData.id)
+                    }
+                    AppButton {
+                        objectName: "deleteSkillButton"
+                        text: page.confirmDelete === uc.modelData.id ? Tr.t("กดอีกครั้งเพื่อลบ") : Tr.t("ลบ")
+                        kind: page.confirmDelete === uc.modelData.id ? "danger" : "ghost"
+                        onClicked: {
+                            if (page.confirmDelete === uc.modelData.id) {
+                                page.confirmDelete = ""
+                                page.message = ""
+                                skills.removeSkill(uc.modelData.id)
+                            } else {
+                                page.confirmDelete = uc.modelData.id
+                            }
                         }
                     }
                 }

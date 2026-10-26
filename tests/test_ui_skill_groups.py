@@ -66,6 +66,26 @@ class SiteTileTest(unittest.TestCase):
         s = self.make()
         self.assertEqual([x["id"] for x in s.userSkills], ["yt-mine"])
 
+    def test_web_rows_every_line_is_a_real_command(self):
+        """ทุกคำพูดที่หน้าจอแสดงต้องแปลได้คำสั่งจริง (H5) · สกิลของผู้ใช้นับในแถวของเว็บนั้น."""
+        from aipc.skills import browse
+        from aipc.skills.actions import SITES
+
+        s = self.make()
+        rows = s.webCommands
+        self.assertEqual([r["key"] for r in rows], ["all", *SITES])
+        for r in rows:
+            for g in r["groups"]:
+                for line in g["lines"]:
+                    if "→" in line:  # คำสั่งของสกิลประจำเว็บ (ตรวจด้วยตัวตรวจไฟล์สกิลแล้ว)
+                        continue
+                    said = line.strip("“”").replace("…", "แมว").replace("ค้นหา แมว", "ค้นหาแมว")
+                    self.assertTrue(browse.parse(said), (r["key"], line))
+        yt = next(r for r in rows if r["key"] == "youtube")
+        self.assertEqual(yt["mine"], 1)
+        self.assertEqual(next(r for r in rows if r["key"] == "gmail")["mine"], 0)
+        self.assertEqual([u["site"] for u in s.userSkills], ["youtube"])
+
     def test_disabled_skill_commands_are_not_in_the_tile(self):
         s = self.make()
         s._user.set_enabled("yt-mine", False)

@@ -2461,6 +2461,36 @@ class SkillsController(QObject):
             "subtitle": tr("{n} คำสั่ง", n=len(commands)),  # Pakon 2026-10-27: ไทล์บอกจำนวนคำสั่ง
         }  # fmt: skip
 
+    @Property("QVariantList", notify=skillsChanged)
+    def webCommands(self) -> list:  # noqa: N802
+        """หน้า Skill "สั่งด้วยเสียงในเว็บ" (การ์ด 0067 รอบ 2 ·
+        Pakon "YouTube มีคำสั่งอะไรบ้าง Gmail มีคำสั่งอะไรบ้าง"):
+        แถวแรก = ใช้ได้ทุกเว็บ · แล้วแถวละเว็บตามรายการเว็บ · คำพูดมาจากตัวแปลและไฟล์สกิลจริง (H5 H6) ·
+        สกิลประจำเว็บของผู้ใช้ = หน้าจอวางการ์ดจัดการ (userSkills ที่ site ตรงกัน) ในแถวนั้น ·
+        หน้าจออังกฤษ: ไม่แสดงคำพูดไทย (เหลือชื่อเว็บกับจำนวน · กติกาเดียวกับไทล์)"""
+        from aipc.skills import browse
+        from aipc.skills.actions import SITES
+
+        def lines(texts: list[str]) -> list[str]:
+            return [t for t in texts if i18n.lang() != "en" or not i18n.THAI.search(t)]
+
+        every = [f"“{p}”" for p in browse.EVERY_SITE]
+        rows = [{"key": "all", "name": tr("ใช้ได้ทุกเว็บ"), "count": len(every), "mine": 0,
+                 "groups": [{"title": tr("คำสั่งของระบบ"), "lines": lines(every)}]}]  # fmt: skip
+        users = [s for s in self._skills if s.site and self._is_user(s.id)]
+        for site, (name, _url) in SITES.items():
+            opened = [f"“{p}”" for p in browse.site_phrases(site)]
+            own = [self._command_text(c) for s in self._skills
+                   if s.site == site and not self._is_user(s.id) for c in s.commands]  # fmt: skip
+            mine = [s for s in users if s.site == site]
+            groups = [{"title": tr("เปิดและค้นหา"), "lines": lines(opened)}]
+            if own:
+                groups.append({"title": tr("ของเว็บนี้"), "lines": lines(own)})
+            count = len(opened) + len(own) + sum(len(s.commands) for s in mine)
+            rows.append({"key": site, "name": tr(name), "groups": groups, "mine": len(mine),
+                         "count": count})  # fmt: skip
+        return rows
+
     @Property(str, notify=skillsChanged)  # เปลี่ยนภาษา = อ่านใหม่พร้อมไทล์
     def voiceSites(self) -> str:  # noqa: N802
         """บรรทัดบนหน้า Skill (Pakon 2026-10-27): เว็บที่สั่งด้วยเสียงได้ ·
@@ -3352,6 +3382,7 @@ class SkillsController(QObject):
                 "imported": e.get("model") == self.IMPORT_TAG,
                 "request": e.get("request") or m.extra.get("request", ""),
                 "created": (e.get("created") or m.extra.get("created", ""))[:10],
+                "site": m.site,  # การ์ด 0067 รอบ 2: สกิลประจำเว็บไปอยู่ในแถวของเว็บนั้น
             })  # fmt: skip
         return out
 

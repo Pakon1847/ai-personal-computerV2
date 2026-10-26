@@ -1072,5 +1072,14 @@
   " · Claude สร้าง": " · made by Claude",
   "คำสั่งเสียงในเว็บ {name} · {n} คำสั่ง จาก {k} สกิล": "Voice commands on {name} · {n} commands from {k} skills",
   "{n} คำสั่ง": "{n} commands",
-  "สั่งด้วยเสียงได้ในเว็บ: {names} และอื่น ๆ อีก {n} เว็บ": "Voice works on: {names} and {n} more sites"
+  "สั่งด้วยเสียงได้ในเว็บ: {names} และอื่น ๆ อีก {n} เว็บ": "Voice works on: {names} and {n} more sites",
+  "สั่งด้วยเสียงในเว็บ": "Voice commands on websites",
+  " คำสั่ง": " commands",
+  " · ที่คุณสอน ": " · taught by you ",
+  "ที่คุณสอน (Claude สร้าง)": "Taught by you (made by Claude)",
+  "สกิลอื่นที่ Claude สร้างให้คุณ": "Other skills Claude made for you",
+  "ใช้ได้ทุกเว็บ": "Every website",
+  "คำสั่งของระบบ": "System commands",
+  "เปิดและค้นหา": "Open and search",
+  "ของเว็บนี้": "This website's own"
 }
