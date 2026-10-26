@@ -452,5 +452,15 @@ class NewTabTest(unittest.TestCase):
         self.assertFalse(control.same_site("about:blank", "about:blank"))
 
 
+class YoutubeClipSelectorTest(unittest.TestCase):
+    """S0 ข้อ 2 (การ์ด 0064 · Pi 5 2026-10-26): หน้าแรก YouTube ที่เข้าสู่ระบบแล้วใช้ class แบบใหม่ ·
+    ตัวเลือกเดิมเจอ 0 ลิงก์ ("หน้านี้ไม่มีคลิปให้เลือก") · เพิ่มแล้วเจอ 22 (yt_links_probe.py) ·
+    JS รันจริงได้บน Pi เท่านั้น ที่นี่กันไม่ให้ชื่อใดชื่อหนึ่งหายไปตอนแก้ครั้งหน้า."""
+
+    def test_both_old_and_new_title_classes_are_kept(self):
+        for cls in ("a.yt-lockup-metadata-view-model__title", "a.ytLockupMetadataViewModelTitle"):
+            self.assertIn(cls, control.LINKS_JS)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -202,8 +202,10 @@ LINKS_JS = r"""(() => {
   else if (/(^|\.)bing\.com$/.test(host) && location.pathname === '/search')
     sel = 'li.b_algo h2 a, li.b_ad h2 a, .b_adTop h2 a';
   else if (/(^|\.)youtube\.com$/.test(host) && location.pathname !== '/watch')
+    // คลิป ไม่ใช่โลโก้/เมนู (0025) · ytLockup…Title = ชื่อ class แบบใหม่ของหน้าแรกที่เข้าสู่ระบบแล้ว
+    // (Pi 5 2026-10-26 · src/aipc/spikes/yt_links_probe.py: 23 ลิงก์ · แบบเดิมเจอ 0)
     sel = 'a#video-title-link, a#video-title, a.yt-lockup-metadata-view-model__title, ' +
-          'a.yt-lockup-metadata-view-model-wiz__title';  // คลิป ไม่ใช่โลโก้/เมนู (0025)
+          'a.yt-lockup-metadata-view-model-wiz__title, a.ytLockupMetadataViewModelTitle';
   else if (/duckduckgo\.com$/.test(host))
     sel = 'a.result__a, a[data-testid=result-title-a]';
   const push = (a) => {
