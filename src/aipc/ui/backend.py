@@ -1529,7 +1529,7 @@ def _display_name(user: str) -> str:
         return user
 
 
-POWER_ACTIONS = ("power_off", "reboot")  # การ์ด 0052
+POWER_ACTIONS = ("power_off", "reboot", "logout")  # การ์ด 0052 · ออกจากระบบ (2026-10-27) ถามเหมือนกัน
 
 
 class PowerController(QObject):
