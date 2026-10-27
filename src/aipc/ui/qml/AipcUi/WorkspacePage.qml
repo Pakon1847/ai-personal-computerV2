@@ -1337,10 +1337,27 @@ Item {
         spacing: 14
         clip: true
         model: root.items
-        // ความสูงของการ์ดรู้หลังวาดเสร็จ จึงเลื่อนลงล่างสุดทุกครั้งที่เนื้อหายาวขึ้น
+        // ความสูงของการ์ดรู้หลังวาดเสร็จ จึงเลื่อนลงล่างสุดเมื่อเนื้อหายาวขึ้น
         // · เลื่อนหลังวาดรอบนี้เสร็จ (callLater): พบ 2026-10-12 วางข้อความยาวมาก → ค้างบนสุด ไม่เห็นคำตอบใหม่
-        onContentHeightChanged: Qt.callLater(positionViewAtEnd)
-        onCountChanged: Qt.callLater(positionViewAtEnd)
+        // · ตามล่างสุดเฉพาะเมื่อผู้ใช้อยู่ล่างสุด (stick): พบ 2026-10-27 เลื่อนขึ้นไม่ได้ เพราะความสูงเปลี่ยน
+        //   ระหว่างวาดข้อความเก่าแล้วถูกดึงลงทุกครั้ง · ผู้ใช้เลื่อนเอง (ลาก/ปัด/ล้อเมาส์) เท่านั้นที่เปลี่ยน stick
+        property bool stick: true
+        property real keepY: 0
+        function nearEnd() { return contentY + height >= originY + contentHeight - 80 }
+        onMovementStarted: stick = false  // ระหว่างปัด ความสูงเปลี่ยนได้ (วาดข้อความเก่า) → ห้ามดึงลง
+        onMovementEnded: { stick = nearEnd(); keepY = contentY }
+        onContentHeightChanged: if (stick) Qt.callLater(positionViewAtEnd)
+        onCountChanged: if (stick) Qt.callLater(positionViewAtEnd)
+        // ทุกการเปลี่ยนแปลงแทนที่ทั้งรายการ · ข้อความเพิ่มขึ้นจริง = ไปล่างสุด ·
+        // คำตอบที่กำลังพิมพ์ (จำนวนเท่าเดิม) ขณะผู้ใช้อ่านข้างบน = คืนตำแหน่งเดิม
+        property int seen: 0
+        onModelChanged: {
+            const n = model ? model.length : 0
+            if (n > seen)
+                stick = true
+            seen = n
+            Qt.callLater(() => { if (stick) positionViewAtEnd(); else contentY = keepY })
+        }
         delegate: Item {
             id: row
             required property var modelData

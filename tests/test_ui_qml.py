@@ -40,7 +40,7 @@ def tearDownModule():
 
 
 try:
-    from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer
+    from PySide6.QtCore import Q_ARG, QCoreApplication, QEventLoop, QMetaObject, QObject, QTimer
 
     from aipc.ui import app as uiapp
 except ImportError:  # pragma: no cover
@@ -447,6 +447,36 @@ class ShellCardTest(unittest.TestCase):
             page.setProperty("items", items)
             settle(200)
             self.assertTrue(chat_list.property("atYEnd"), f"ข้อความที่ {i}: ต้องเห็นข้อความล่าสุด")
+        self.assertEqual(warnings, [])
+
+    def test_chat_stays_where_the_user_scrolled(self):
+        # พบบน Pi 5 2026-10-27 (Pakon): เลื่อนแชทขึ้นไม่ได้ ถูกดึงกลับล่างสุดทุกครั้ง ·
+        # สาเหตุ: ความสูงเนื้อหาเปลี่ยนระหว่างวาดข้อความเก่า → onContentHeightChanged เลื่อนลงล่างสุดเสมอ
+        _, win, warnings = self.open_shell()
+        win.resize(1280, 800)
+        page = find_all(win, "workspace")[0]
+        chat_list = find_all(win, "chatList")[0]
+        items = []
+        for i in range(12):
+            items += [
+                {"user": True, "text": f"ถาม {i} " + "คำถาม " * 30},
+                {"ai": True, "text": f"คำตอบ {i} " + "ข้อความ " * 150, "note": "", "done": True},
+            ]
+        page.setProperty("items", items)
+        settle(300)
+        self.assertTrue(chat_list.property("atYEnd"))
+        # ผู้ใช้ปัดขึ้น (ท่าเดียวกับนิ้ว/ล้อเมาส์ · เกิด movementStarted/Ended)
+        QMetaObject.invokeMethod(chat_list, "flick", Q_ARG(float, 0.0), Q_ARG(float, 6000.0))
+        settle(2500)
+        self.assertFalse(chat_list.property("atYEnd"), "เลื่อนขึ้นแล้วต้องอยู่ที่เดิม ไม่ถูกดึงลงล่างสุด")
+        # คำตอบกำลังพิมพ์ (จำนวนข้อความเท่าเดิม) ระหว่างผู้ใช้อ่านข้างบน → ไม่ดึงลง
+        items[-1] = {**items[-1], "text": items[-1]["text"] + " ต่อ"}
+        page.setProperty("items", items)
+        settle(300)
+        self.assertFalse(chat_list.property("atYEnd"), "อ่านข้างบนอยู่ คำตอบที่ยาวขึ้นต้องไม่ดึงลง")
+        page.setProperty("items", items + [{"user": True, "text": "ถามใหม่"}])  # ส่งข้อความใหม่
+        settle(300)
+        self.assertTrue(chat_list.property("atYEnd"), "ข้อความใหม่ = ไปล่างสุดเหมือนเดิม")
         self.assertEqual(warnings, [])
 
     def test_ai_answers_draw_without_warnings(self):
