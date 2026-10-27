@@ -315,21 +315,48 @@ class BrowserController(QObject):
         except Exception:  # noqa: BLE001 · อ่านไม่ได้ = ไม่มีสกิลประจำเว็บ (ไม่ทำให้คีย์ลัดพัง)
             return ""
 
-    @Slot(str, str, str, result=bool)
-    def runSite(self, kind: str, arg: str, site: str) -> bool:  # noqa: N802
-        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก · คำพ้องของคำสั่งระบบ การ์ด 0066) ·
+    @Slot(str, str, str, str, result=bool)
+    def runSite(self, kind: str, arg: str, site: str, words: str = "") -> bool:  # noqa: N802
+        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก · คำพ้องของคำสั่งระบบ การ์ด 0066 · กดปุ่มตามป้าย การ์ด 0069) ·
+        words = คำพูดของคำสั่ง (คั่น "|") ใช้หาปุ่มด้วยป้ายเมื่อตัวเลือก CSS หาไม่เจอ ·
         ผลมาทางสัญญาณ finished เหมือนคำสั่งเว็บอื่น."""
         from aipc.skills import sitecmd
         from aipc.skills.browse import BrowseCommand
 
-        if not self._active or self._busy or kind not in ("key", "click", "system"):
+        if not self._active or self._busy or kind not in ("key", "click", "click_text", "system"):
             return False
         if self._control is None or not self._control.running:
             return False
         if kind == "system":  # ตรวจซ้ำตอนทำ ไม่เชื่อไฟล์อย่างเดียว (H7) · แปลด้วยตัวเดียวกับเสียง (H6)
             cmds, why = sitecmd.alias_commands(arg)
             return self._start(cmds) if not why else False
-        return self._start([BrowseCommand(kind, query=arg, site=site)])
+        back = words if kind == "click" else ""
+        return self._start([BrowseCommand(kind, query=arg, site=site, direction=back)])
+
+    @Slot(str, result="QVariantMap")
+    def clickText(self, text: str) -> dict:  # noqa: N802
+        """การ์ด 0069: คำพูดตรงกับป้ายของปุ่มที่มองเห็นบนหน้าที่เปิดอยู่ → กด (ผลมาทาง finished) ·
+        {"started": True} = กำลังกด · {"say": …} = ไม่กดและบอกเหตุผล · {} = ไม่ใช่ชื่อปุ่ม (ทางเสียงอื่นทำต่อ) ·
+        หน้าจอเรียกเมื่อทางเดิมไม่รู้จักประโยคนี้ ก่อนขอให้ Claude สร้างสกิล."""
+        from aipc.browser import textclick
+        from aipc.skills.browse import BrowseCommand
+
+        if not self._active or self._busy or self._control is None or not self._control.running:
+            return {}
+        words, said_press = textclick.spoken_target(text)
+        if not words:
+            return {}
+        try:
+            pick = textclick.choose(words, self._control.buttons())
+        except Exception:  # noqa: BLE001 · อ่านหน้าไม่ได้ = ไม่ใช่ทางนี้ (ไม่ทำให้คีย์ลัดพัง)
+            return {}
+        if pick.item is None and not pick.choices:
+            # ไม่เจอ: พูดว่า "กด…" = บอกตรง ๆ · พูดแค่ชื่อ = อาจเป็นคำสั่งอื่น ให้ทางเดิมทำต่อ
+            return {"say": textclick.refuse_text(words, pick)} if said_press else {}
+        if why := textclick.refuse_text(words, pick):
+            return {"say": why}
+        self._start([BrowseCommand("click_text", query=pick.item["label"])])
+        return {"started": True}
 
     @Slot(str, str, result=bool)
     def siteSearch(self, text: str, url: str) -> bool:  # noqa: N802

@@ -11,11 +11,13 @@
     ## คำสั่ง
     - ถอยหลังสิบวิ | ย้อนสิบวิ → กดคีย์ j
     - กดไลก์ → คลิก like-button-view-model button
+    - เข้าสู่ระบบ | ล็อกอิน → กดปุ่มที่เขียนว่า เข้าสู่ระบบ|Log in|Sign in   ← การ์ด 0069
     - ยกเลิกสมัครสมาชิก → คลิก … · ยืนยันก่อน
     - เพิ่มอีกหนึ่งแถบ | ขออีกแท็บ → ทำคำสั่ง เปิดยูทูบอีกแท็บ
 
 กติกา (โค้ดตรวจ · ไฟล์เป็นข้อมูลจาก Claude ไม่ใช่คำสั่ง · H8 · ADR-011):
 - ทำได้แค่ "กดคีย์" (คีย์ลัดในรายการ ไม่พิมพ์ข้อความ) กับ "คลิก" (ตัวเลือก CSS เขียนตายตัว) ·
+  "กดปุ่มที่เขียนว่า" (การ์ด 0069: ป้ายบนปุ่ม คั่น | · โค้ดหาปุ่มที่มองเห็นบนหน้าจริง · ไม่ต้องเดา CSS) ·
   ทำงานเฉพาะเมื่อหน้าที่เปิดอยู่เป็นเว็บของสกิล
 - "ทำคำสั่ง" (การ์ด 0066): ประโยคคำสั่งเว็บของระบบ แปลด้วยตัวแปลเดียวกับเสียง (browse.parse) ได้ 1–3 คำสั่ง ·
   ทุกคำสั่งต้องอยู่ใน ALIAS_KINDS (ไม่ส่งข้อความออก ไม่ปิดทุกแท็บ) · ตรวจซ้ำตอนทำ (handsfree.runSite · H7)
@@ -51,7 +53,7 @@ BROWSER_KEYS = set(
     "ctrl+s ctrl+o ctrl+h ctrl+j ctrl+u ctrl+shift+i ctrl+shift+j ctrl+shift+delete alt+f4".split()
 )
 _BAD_SELECTOR = re.compile(r"javascript:|[{};`]|passw|checkout|payment|credit|cvv|billing", re.I)
-_LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|คลิก|ทำคำสั่ง)\s+(.+?)\s*")
+_LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|กดปุ่มที่เขียนว่า|คลิก|ทำคำสั่ง)\s+(.+?)\s*")
 # คำพ้อง (การ์ด 0066): คำสั่งของระบบที่สกิลเรียกได้ · ค้นเว็บ/ค้นในเว็บ (ส่งข้อความออก · H3) · ปิดทุกแท็บ (H2) ·
 # เข้าสู่ระบบ · ลิงก์ · กดคีย์/คลิก (ใช้บรรทัดของมันเอง) = ไม่ได้
 ALIAS_KINDS = frozenset(
@@ -77,7 +79,7 @@ _CONFIRM = re.compile(r"(.*?)\s*·\s*ยืนยันก่อน")
 @dataclass(frozen=True)
 class SiteCommand:
     phrases: tuple[str, ...]
-    kind: str  # key | click | system (การ์ด 0066)
+    kind: str  # key | click | system (การ์ด 0066) | click_text (การ์ด 0069)
     arg: str  # คีย์ เช่น "Shift+N" · ตัวเลือก CSS · ประโยคคำสั่งของระบบ เช่น "เปิดยูทูบอีกแท็บ"
     confirm: bool = False
 
@@ -120,7 +122,8 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
         arg, confirm = m.group(3), False
         if c := _CONFIRM.fullmatch(arg):
             arg, confirm = c.group(1).strip(), True
-        kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system"}[m.group(2)]
+        kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system",
+                "กดปุ่มที่เขียนว่า": "click_text"}[m.group(2)]  # fmt: skip
         if not phrases or any(len(p) > MAX_PHRASE for p in phrases):
             errors.append(f"บรรทัด {n}: คำพูดต้องมีและยาวไม่เกิน {MAX_PHRASE} ตัวอักษร")
         if kind == "key" and arg.lower() in BROWSER_KEYS:
@@ -134,6 +137,12 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
             errors.append(
                 f"บรรทัด {n}: ตัวเลือก “{arg[:60]}” ใช้ไม่ได้ (ยาวเกิน/มีอักขระต้องห้าม/แตะรหัสผ่านหรือชำระเงิน)"
             )
+        words = [w.strip() for w in arg.split("|")]
+        if kind == "click_text" and (
+            not all(words) or any(len(w) > MAX_PHRASE or _BAD_SELECTOR.search(w) for w in words)
+        ):
+            why = f"ว่าง/ยาวเกิน {MAX_PHRASE}/มีอักขระต้องห้าม"
+            errors.append(f"บรรทัด {n}: ป้ายปุ่ม “{arg[:60]}” ใช้ไม่ได้ ({why})")
         if kind == "system":
             _cmds, why = alias_commands(arg)
             if why:

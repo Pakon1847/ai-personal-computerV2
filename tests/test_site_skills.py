@@ -317,7 +317,8 @@ class VoiceFlowTest(unittest.TestCase):
         s, _ = self.make()
         s._skills = [*s._skills, skill()]
         card = s.siteCommand("ถอยหลังสิบวิ", WATCH)
-        self.assertEqual(card["siteRun"], {"kind": "key", "arg": "j", "site": "youtube"})
+        want = {"kind": "key", "arg": "j", "site": "youtube", "words": "ถอยหลังสิบวิ|ย้อนสิบวิ"}
+        self.assertEqual(card["siteRun"], want)
         self.assertEqual(s.siteCommand("ถอยหลังสิบวิ", "https://www.netflix.com/"), {})
         risky = s.siteCommand("ยกเลิกสมัครสมาชิก", WATCH)
         self.assertNotIn("siteRun", risky)  # คำสั่งที่มี "ยืนยันก่อน" ไม่ทำเอง

@@ -315,7 +315,7 @@ Item {
     // คำสั่งของสกิลประจำเว็บ (การ์ด 0046): กดคีย์/คลิกในเบราว์เซอร์ของผู้ช่วย · ผลมาทาง onFinished
     function siteRun(card, heard) {
         const r = card.siteRun
-        if (browser.runSite(r.kind, r.arg, r.site)) voiceShow(heard, null, Tr.t("กำลังทำ…"), true)
+        if (browser.runSite(r.kind, r.arg, r.site, r.words || "")) voiceShow(heard, null, Tr.t("กำลังทำ…"), true)
         else voiceSay(heard, Tr.t("ยังสั่งในเว็บไม่ได้ · เปิดเว็บนั้นในเบราว์เซอร์ของผู้ช่วยก่อน"))
     }
     function voiceSay(heard, say) {   // บอกว่าทำไม่ได้/ไม่รู้จัก (กล่องสีส้ม)
@@ -389,6 +389,10 @@ Item {
             if (near.confirmToken) { voiceDispatch(near, t); return }
             // การ์ด 0057: อยู่ใน YouTube (เว็บที่ค้นได้) + "เปิดช่อง 8" = ค้นในเว็บนั้น (ไม่ส่งให้ Claude ทำสกิล)
             if (url !== "" && browser.siteSearch(t, url)) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
+            // การ์ด 0069: ป้ายของปุ่มที่มองเห็นบนหน้าตรงกับคำพูด = กด (โค้ดหาจากหน้าจริง · ไม่ต้องให้ Claude สร้างสกิล)
+            const tap = url !== "" ? browser.clickText(t) : ({})
+            if (tap.started) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
+            if (tap.say) { voiceSay(t, tap.say); return }
             // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
             if (ask.confirmToken) { voiceDispatch(ask, t); return }

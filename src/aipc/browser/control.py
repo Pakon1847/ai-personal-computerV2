@@ -57,7 +57,44 @@ def google_login_page(url: str) -> bool:
 
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
 NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media", "fullscreen",
-              "skip_ad", "key", "click"}  # fmt: skip
+              "skip_ad", "key", "click", "click_text"}  # fmt: skip
+# ปุ่ม/ลิงก์ที่มองเห็นในจอ + ป้ายของมัน (การ์ด 0069 · aipc.browser.textclick เทียบคำ) · เรียงบนลงล่าง ซ้ายไปขวา ·
+# ติดเลขไว้ที่ data-aipc-t ให้ CLICK_TEXT_JS กดตัวที่เลือก · ไม่อ่านช่องกรอก/ช่องรหัสผ่าน
+BUTTONS_JS = r"""(() => {
+  for (const el of document.querySelectorAll('[data-aipc-t]')) el.removeAttribute('data-aipc-t');
+  const SEL = 'a[href], button, input[type=submit], input[type=button], [role=button], ' +
+              '[role=link], [role=tab], [role=menuitem], [onclick]';
+  const clean = (t) => (t || '').replace(/\s+/g, ' ').trim();
+  const items = [];
+  for (const el of document.querySelectorAll(SEL)) {
+    if (el.closest('[aria-hidden=true]')) continue;
+    if (el.parentElement && el.parentElement.closest(SEL)) continue;  // ปุ่มซ้อนในปุ่ม = ส่วนของตัวนอก
+    const r = el.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4 || r.bottom < 0 || r.top > innerHeight || r.right < 0 ||
+        r.left > innerWidth) continue;
+    if (el.checkVisibility && !el.checkVisibility({checkOpacity: true, checkVisibilityCSS: true}))
+      continue;
+    const label = clean(el.innerText || el.getAttribute('aria-label') || el.title || el.value ||
+                        (el.querySelector('img[alt]') || {}).alt || '').slice(0, 80);
+    if (!label) continue;
+    items.push({el, label, y: r.top, x: r.left});
+    if (items.length >= 300) break;
+  }
+  items.sort((p, q) => (Math.round(p.y / 8) - Math.round(q.y / 8)) || (p.x - q.x));
+  return items.map((it, i) => {
+    it.el.setAttribute('data-aipc-t', String(i));
+    return {i, label: it.label};
+  });
+})()"""
+CLICK_TEXT_JS = r"""((i) => {
+  const el = document.querySelector('[data-aipc-t="' + i + '"]');
+  if (!el) return false;
+  const a = el.closest('a');
+  if (a) a.removeAttribute('target');
+  el.scrollIntoView({block: 'center'});
+  el.click();
+  return true;
+})"""
 # คลิกตามตัวเลือกที่เขียนตายตัวในสกิลประจำเว็บ (การ์ด 0046) · เลือกตัวแรกที่มองเห็น · ไม่อ่านข้อความในหน้า ·
 # ok = กดแล้ว · none = หาไม่เจอ · bad = ตัวเลือกผิดรูป
 SELECTOR_CLICK_JS = r"""((sel) => {
@@ -851,9 +888,32 @@ class BrowserControl:
         if state == "ok":
             time.sleep(0.3)
             return Result(True, "ทำแล้ว")
+        if cmd.direction:  # การ์ด 0069: ตัวเลือกที่ Claude เดาไม่เจอ → หาปุ่มจากคำของคำสั่งนี้บนหน้าจริง
+            return self._do_click_text(BrowseCommand("click_text", query=cmd.direction))
         if state == "bad":
             return Result(False, "สกิลเขียนตัวเลือกปุ่มผิดรูป · ให้ Claude แก้สกิล")
         return Result(False, "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร")
+
+    def _do_click_text(self, cmd: BrowseCommand) -> Result:
+        """กดปุ่มที่มองเห็นและป้ายตรงกับคำ (การ์ด 0069) · query = คำ (คั่น "|" ได้) · ไม่ชัด/เสี่ยง = ไม่กด."""
+        from aipc.browser import textclick
+
+        if cmd.site and (bad := self._site_check(cmd)):
+            return bad
+        pick = textclick.choose(cmd.query, self._eval(BUTTONS_JS) or [])
+        if why := textclick.refuse_text(cmd.query, pick):
+            return Result(False, why)
+        if not self._eval(f"{CLICK_TEXT_JS}({pick.item['i']})", userGesture=True):
+            return Result(False, "หน้าเว็บเปลี่ยนระหว่างกด · ไม่ได้กดอะไร · ลองพูดอีกครั้ง")
+        time.sleep(0.3)
+        return Result(True, f"กด “{pick.item['label']}” แล้ว")
+
+    def buttons(self) -> list[dict]:
+        """ปุ่มที่มองเห็นในจอ (การ์ด 0069) · ยังไม่เปิด = []."""
+        if not self.running:
+            return []
+        with self._lock:
+            return self._eval(BUTTONS_JS) or []
 
     def _do_close(self, cmd: BrowseCommand) -> Result:
         if cmd.direction == "all":  # "ปิดแท็บทั้งหมด" = ปิดเบราว์เซอร์ของผู้ช่วย (การ์ด 0065)
