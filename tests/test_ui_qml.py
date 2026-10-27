@@ -144,6 +144,40 @@ class ChatInputTest(unittest.TestCase):
             win.close()
             uiapp.shutdown(engine)
 
+    def test_arrow_keys_choose_and_enter_answers_the_confirm_card(self):
+        """Pakon 2026-10-27: การ์ดใช่/ไม่ใช่ เลือกด้วยลูกศร · Enter ยืนยัน (ช่องพิมพ์ว่าง)."""
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+
+        with tempfile.TemporaryDirectory() as tmp:
+            opts = uiapp.Options(screen="shell", software=True, settings_path=Path(tmp) / "ui.json")
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            win = engine.rootObjects()[0]
+            win.resize(1280, 800)  # ให้รายการแชทสูงพอ สร้างการ์ดจริง
+            chat_input = win.findChild(QObject, "chatInput")
+            page = find_all(win, "workspace")[0]
+            chat_input.forceActiveFocus()
+            settle(100)
+            chat_input.setProperty("text", "ปิดเครื่อง")  # การ์ดยืนยันเสมอ (หน้าต่างพัฒนาไม่ปิดจริง)
+            QTest.keyClick(win, Qt.Key.Key_Return)
+            settle(200)
+            self.assertTrue(page.property("keyToken"), "มีการ์ดรอตอบ")
+            self.assertEqual(page.property("keyChoice"), 0)  # เริ่มที่ "ใช่" (ปุ่มสีหลักเดิม)
+            QTest.keyClick(win, Qt.Key.Key_Right)
+            settle(100)
+            self.assertEqual(page.property("keyChoice"), 1)
+            no = [b.property("kind") for b in find_items(win, "confirmNo")]  # รวมการ์ดในรายการแชท
+            self.assertIn("primary", no, "ปุ่มที่เลือกต้องมีสี")
+            QTest.keyClick(win, Qt.Key.Key_Return)  # Enter = ตอบ "ไม่ใช่"
+            settle(200)
+            self.assertEqual(page.property("keyToken"), "", "ตอบแล้ว ไม่มีการ์ดรอ")
+            titles = [((i or {}).get("card") or {}).get("title", "") for i in items_of(page)]
+            self.assertIn("ยกเลิกแล้ว ไม่ได้ทำอะไร", titles)
+            self.assertEqual(warnings, [])
+            win.close()
+            uiapp.shutdown(engine)
+
 
 def items_of(page):
     v = page.property("items")

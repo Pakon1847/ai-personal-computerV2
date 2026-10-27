@@ -8,6 +8,9 @@ Rectangle {
     property var info: ({})
     property bool answered: false
     property bool undone: false  // กดย้อนกลับไปแล้ว
+    // เลือกด้วยคีย์บอร์ด (Pakon 2026-10-27): 0 = ใช่ · 1 = ไม่ใช่ · -1 = การ์ดนี้ไม่ใช่การ์ดที่คีย์บอร์ดคุมอยู่
+    // ลูกศรสลับ · Enter ยืนยัน (หน้าแชท/กล่องคำสั่งเสียงเป็นคนรับคีย์ แล้วส่งค่ามาที่นี่)
+    property int keyChoice: -1
     signal answer(bool yes)
     signal undo()  // คำสั่งที่ทำไปแล้ว (ปรับเสียง): คืนสภาพเดิม
     // สกิลที่ Claude สร้าง (การ์ด 0017 ชั้นที่ 2): ลบทิ้ง หรือบอกว่าผิดตรงไหนให้ Claude แก้
@@ -86,8 +89,23 @@ Rectangle {
         RowLayout {
             visible: (card.info.confirmToken || "") !== "" && !card.answered
             spacing: 8
-            AppButton { text: Tr.t("ใช่ ทำเลย"); onClicked: card.answer(true) }
-            AppButton { text: Tr.t("ไม่ใช่"); kind: "secondary"; onClicked: card.answer(false) }
+            AppButton {
+                objectName: "confirmYes"
+                text: Tr.t("ใช่ ทำเลย")
+                kind: card.keyChoice === 1 ? "secondary" : "primary"   // ปุ่มที่เลือกอยู่ = สีหลัก
+                onClicked: card.answer(true)
+            }
+            AppButton {
+                objectName: "confirmNo"
+                text: Tr.t("ไม่ใช่")
+                kind: card.keyChoice === 1 ? "primary" : "secondary"
+                onClicked: card.answer(false)
+            }
+            AppText {
+                visible: card.keyChoice >= 0
+                text: Tr.t("← → เลือก · Enter ยืนยัน")
+                size: Theme.fontCaption; color: Theme.inkFaint; oneLine: true
+            }
         }
 
         // ย้อนกลับ (ข้อเสนอ 2026-10-03): ถอดเสียงผิดจนทำคำสั่งผิด แก้คืนได้ในกดเดียว · เฉพาะคำสั่งล่าสุด

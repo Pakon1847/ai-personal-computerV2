@@ -196,6 +196,26 @@ Item {
         }
         return ""
     }
+    // ตอบการ์ดยืนยันด้วยคีย์บอร์ด (Pakon 2026-10-27): ลูกศร = สลับ ใช่/ไม่ใช่ · Enter = ยืนยันอันที่เลือก ·
+    // การ์ดใหม่เริ่มที่ "ใช่" เหมือนปุ่มสีหลักเดิม (กด Enter ทันที = เหมือนกดปุ่มสีหลัก)
+    property int keyChoice: 0
+    readonly property string keyToken: voiceToken() || pendingConfirm()
+    onKeyTokenChanged: keyChoice = 0
+    function keyConfirm(key) {
+        const token = keyToken
+        if (token === "") return false
+        if (key === Qt.Key_Left || key === Qt.Key_Right || key === Qt.Key_Up || key === Qt.Key_Down) {
+            keyChoice = keyChoice === 0 ? 1 : 0
+            return true
+        }
+        if (key === Qt.Key_Return || key === Qt.Key_Enter) {
+            const yes = keyChoice === 0
+            if (token === voiceToken()) answerVoice(token, yes, vc.heard)
+            else answer(token, yes)
+            return true
+        }
+        return false
+    }
     // การ์ดยืนยันที่เด้งจากคำสั่งเสียงและยังไม่ตอบ (มาก่อนการ์ดในแชท)
     function voiceToken() {
         const c = vc.card
@@ -567,6 +587,17 @@ Item {
         readonly property bool failed: !listening && !working && !root.vc.card && root.vc.ok === false
         readonly property color tone: listening || working || !!root.vc.card ? Theme.accent : failed ? Theme.warn : Theme.ok
         Shortcut { sequence: "Esc"; onActivated: voicePopup.close() }  // labwc ให้กล่องรับคีย์บอร์ดตอนเปิด · กลับเบราว์เซอร์เมื่อปิด
+        // การ์ดยืนยันในกล่องนี้: ลูกศรเลือก · Enter ยืนยัน (Pakon 2026-10-27)
+        Shortcut {
+            sequences: ["Left", "Right", "Up", "Down"]
+            enabled: root.voiceToken() !== ""
+            onActivated: root.keyConfirm(Qt.Key_Left)
+        }
+        Shortcut {
+            sequences: ["Return", "Enter"]
+            enabled: root.voiceToken() !== ""
+            onActivated: root.keyConfirm(Qt.Key_Return)
+        }
         Rectangle {
             anchors.fill: parent
             radius: 22
@@ -727,6 +758,7 @@ Item {
                 visible: !!root.vc.card
                 Layout.fillWidth: true
                 info: root.vc.card || ({})
+                keyChoice: (root.vc.card || {}).confirmToken === root.keyToken ? root.keyChoice : -1
                 answered: !!root.answered[(root.vc.card || {}).confirmToken]
                 onAnswer: (yes) => root.answerVoice(root.vc.card.confirmToken, yes, root.vc.heard)
                 undone: !!root.answered[(root.vc.card || {}).undoToken]
@@ -1476,6 +1508,7 @@ Item {
                 width: parent.width
                 height: visible ? implicitHeight : 0
                 info: row.modelData.card || ({})
+                keyChoice: (row.modelData.card || {}).confirmToken === root.keyToken ? root.keyChoice : -1
                 answered: !!root.answered[(row.modelData.card || {}).confirmToken]
                 onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
                 undone: !!root.answered[(row.modelData.card || {}).undoToken]
@@ -1543,6 +1576,11 @@ Item {
                     background: null
                     Accessible.name: Tr.t("ข้อความ")
                     Keys.onPressed: (event) => {
+                        // ช่องพิมพ์ว่าง + มีการ์ดรอตอบ: ลูกศร/Enter ตอบการ์ด (มีข้อความ = ลูกศรเลื่อนเคอร์เซอร์ Enter ส่งตามเดิม)
+                        if (input.text.trim() === "" && !input.inputMethodComposing && root.keyConfirm(event.key)) {
+                            event.accepted = true
+                            return
+                        }
                         const enter = event.key === Qt.Key_Return || event.key === Qt.Key_Enter
                         // inputMethodComposing = กำลังพิมพ์ผ่าน IME และคำยังไม่เสร็จ → ห้ามส่ง
                         if (enter && !(event.modifiers & Qt.ShiftModifier) && !input.inputMethodComposing) {
