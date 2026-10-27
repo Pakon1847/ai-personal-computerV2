@@ -2800,13 +2800,19 @@ class SkillsController(QObject):
         # ชื่อนัด = ก่อน "ไป"/"เป็น" ตัวสุดท้าย ("ไปหาหมอไปพรุ่งนี้" ยังแยกถูก) · เวลาใหม่ = หลังจากนั้น
         m = re.fullmatch(r"(.*)(?:ไป|เป็น)(.+)", rest)
         name, target = (m.group(1), m.group(2)) if m else (rest, "")
+        target = re.sub(r"(?:แทน|ครับ|ค่ะ|คะ|นะ|หน่อย)+$", "", target)
         hits = [r for r in self._store.items
                 if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in name]  # fmt: skip
         google = [e for e in self._gcal_upcoming(self._now())
                   if e.what.replace(" ", "").removeprefix("นัด") in name]  # fmt: skip
+        if not hits and not google and (day := self._move_day(name)):  # "วันที่ 30 ตุลาเลื่อนไป…"
+            hits = [r for r in self._store.items if not r.fired and aware(r.when).date() == day]
+            google = [e for e in self._gcal_upcoming(self._now()) if aware(e.when).date() == day]
+            if len(hits) + len(google) > 1:  # นัดในเครื่องปนนัด Google วันเดียวกัน = ให้บอกชื่อ
+                hits = hits + google
         why = "ขอเลื่อนนัด · ยืนยันก่อนเปลี่ยน · ไม่จดนัดใหม่"
         if len(hits) > 1:
-            title = f"มีนัดที่ชื่อตรง {len(hits)} นัด"
+            title = f"มีนัดที่ตรง {len(hits)} นัด"
             lines = ["ระบุชื่อให้ชัดขึ้น หรือยกเลิกแล้วจดใหม่"] + [self._reminder_line(x) for x in hits[:5]]
         elif hits and not target:
             title = f"เลื่อนนัด “{hits[0].what}” ไปเมื่อไหร่ครับ"
@@ -2835,6 +2841,15 @@ class SkillsController(QObject):
             title = "ไม่พบนัดชื่อนี้ในเครื่อง"
             lines = ["ดูนัดที่มีได้ด้วย “นัดถัดไป” หรือหน้าปฏิทิน"]
         return self._with_reminder_badge(self._plain("reminder", title, lines), why)
+
+    def _move_day(self, name: str):
+        """นัดเดิมบอกเป็นวัน ("วันที่30ตุลา" · "พุธที่11") → วันที่ · ไม่ใช่วัน = None."""
+        from aipc.skills import when
+
+        w = when.parse(name, self._now().replace(tzinfo=None))
+        if w.at is None or w.repeat or not re.search(r"\d|พรุ่งนี้|มะรืน|วันนี้", name):
+            return None
+        return w.at.date()
 
     def _move_when(self, r, target: str) -> tuple[datetime | None, str]:
         """เวลาใหม่ของนัด r จากข้อความหลัง "ไป" · ตัวแปลงตัวเดียวกับจดนัด (H6) · ไม่ได้ = (None, เหตุผล)."""

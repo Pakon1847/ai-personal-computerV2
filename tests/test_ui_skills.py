@@ -91,6 +91,33 @@ class SkillsControllerTest(unittest.TestCase):
         self.s.confirm(self.s.voiceAnswer(said)["confirmToken"], True)
         self.assertEqual((r.when.day, r.when.hour, len(self.s._store.items)), (15, 15, 1))
 
+    def test_move_reminder_said_by_its_day(self):
+        """การ์ด 0068 · ประโยคของ Pakon ที่จอ 2026-10-28 (บอกวันของนัดเดิมก่อน ไม่บอกชื่อ) ·
+        เดิม: ไปถึง Claude / กลายเป็นนัดใหม่ชื่อ "พุธที่ เลื่อนนัดไปเป็นวันที่12แทน"."""
+        from datetime import timedelta
+
+        from aipc.skills.gcal import Event
+
+        self.s.confirm(self.s.handle("เตือนพบอาจารย์วันที่ 11 ตุลา บ่ายโมง")["confirmToken"], True)
+        r = self.s._store.items[0]
+        card = self.s.handle("วันที่11ตุลาเลื่อนมาเป็นวันที่12ตุลา")
+        self.s.confirm(card["confirmToken"], True)
+        self.assertEqual((r.when.day, r.when.hour), (12, 13))
+        card = self.s.voiceAnswer("เลื่อนนัดวันที่ 12 ตุลา ไปวันที่ 14 ตุลาแทน")
+        self.s.confirm(card["confirmToken"], True)
+        self.assertEqual((r.when.day, r.when.hour), (14, 13))
+        # วันนั้นมีแต่นัด Google = บอกว่าเลื่อนที่นี่ไม่ได้ · มีทั้งสองแบบ = ให้บอกชื่อ · ไม่จดนัดใหม่
+        at = r.when.replace(day=30)
+        g = Event("ไปเซ็นทรัล", at, at + timedelta(hours=2))
+        self.s._gcal_upcoming = lambda now: [g]
+        card = self.s.handle("วันที่30ตุลาเลื่อนมาเป็นวันที่6พฤศจิกา")
+        self.assertEqual(card["confirmToken"], "")
+        self.assertEqual(card["title"], "นัดจากปฏิทิน Google เลื่อนในระบบนี้ไม่ได้")
+        g = Event("ไปเซ็นทรัล", r.when, r.when + timedelta(hours=2))
+        card = self.s.handle("วันที่14ตุลาเลื่อนไปวันที่15ตุลา")
+        self.assertEqual((card["title"], card["confirmToken"]), ("มีนัดที่ตรง 2 นัด", ""))
+        self.assertEqual((len(self.s._store.items), r.when.day), (1, 14))
+
     def test_move_reminder_refuses_clearly_without_changing_anything(self):
         """การ์ด 0068 M1: นัดซ้ำ · ชื่อตรงหลายนัด · ไม่มีนัดนี้ · เวลาผ่านไปแล้ว = ไม่เปลี่ยน ไม่จดนัดใหม่ บอกเหตุผล."""
         for text in ("เตือนกินยาทุกวันตอน 8 โมงเช้า", "เตือนประชุมพรุ่งนี้บ่ายสอง",
