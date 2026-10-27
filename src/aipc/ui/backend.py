@@ -2788,23 +2788,79 @@ class SkillsController(QObject):
         )
 
     def _move_card(self, text: str) -> dict | None:
-        """ "เลื่อนนัดประชุมไปบ่ายสาม" → ยังเลื่อนเองไม่ได้ บอกวิธีทำด้วยสองคำสั่ง (ไม่จดนัดใหม่ผิด ๆ)."""
+        """ "เลื่อนนัดประชุมไปบ่ายสาม" (การ์ด 0068) · นัดในเครื่องที่ชื่อตรง 1 นัด = การ์ดยืนยัน แล้วโค้ดเลื่อนให้ ·
+        นัดจาก Google (iCal อ่านอย่างเดียว) · นัดซ้ำ · ชื่อตรงหลายนัด · เวลาใหม่ไม่ชัด = ไม่เปลี่ยนและบอกเหตุผล ·
+        ทุกกรณีไม่จดนัดใหม่ (เดิม 2026-10-12: กลายเป็นนัดชื่อ "เลื่อนนัดประชุมไป")."""
         from aipc.skills import agenda
+        from aipc.skills.reminders import aware
 
         rest = agenda.move_target(text)
         if rest is None:
             return None
+        # ชื่อนัด = ก่อน "ไป"/"เป็น" ตัวสุดท้าย ("ไปหาหมอไปพรุ่งนี้" ยังแยกถูก) · เวลาใหม่ = หลังจากนั้น
+        m = re.fullmatch(r"(.*)(?:ไป|เป็น)(.+)", rest)
+        name, target = (m.group(1), m.group(2)) if m else (rest, "")
         hits = [r for r in self._store.items
-                if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
-        lines = ["ทำได้ 2 ขั้น: พิมพ์ “ยกเลิกนัด…” แล้วจดนัดใหม่ เช่น “พรุ่งนี้บ่ายสามประชุม”"]
-        lines += [self._reminder_line(r) for r in hits[:5]]
+                if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in name]  # fmt: skip
         google = [e for e in self._gcal_upcoming(self._now())
-                  if e.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
-        if google:  # การ์ด 0014: นัดจาก Google แก้ได้ในแอป Google Calendar เท่านั้น
-            lines.append("นัดจากปฏิทิน Google เลื่อนได้ในแอป Google Calendar เท่านั้น:")
+                  if e.what.replace(" ", "").removeprefix("นัด") in name]  # fmt: skip
+        why = "ขอเลื่อนนัด · ยืนยันก่อนเปลี่ยน · ไม่จดนัดใหม่"
+        if len(hits) > 1:
+            title = f"มีนัดที่ชื่อตรง {len(hits)} นัด"
+            lines = ["ระบุชื่อให้ชัดขึ้น หรือยกเลิกแล้วจดใหม่"] + [self._reminder_line(x) for x in hits[:5]]
+        elif hits and not target:
+            title = f"เลื่อนนัด “{hits[0].what}” ไปเมื่อไหร่ครับ"
+            lines = ["บอกเวลาใหม่ด้วย เช่น “เลื่อนนัดประชุมไปพรุ่งนี้บ่ายสาม”"]
+        elif hits and hits[0].repeat:
+            title = "นัดซ้ำยังเลื่อนไม่ได้"
+            lines = ["ใช้ “ยกเลิกนัด…” แล้วจดนัดซ้ำใหม่", self._reminder_line(hits[0])]
+        elif hits:
+            r = hits[0]
+            new, problem = self._move_when(r, target)
+            if new is not None:
+                self._counter += 1
+                token = f"c{self._counter}"
+                self._pending[token] = ("move", r.id, new)
+                card = self._plain("reminder", f"เลื่อนนัด “{r.what}” ใช่ไหม",
+                                   [f"เดิม: {self._when_text(aware(r.when))}",
+                                    f"ใหม่: {self._when_text(new)}"])  # fmt: skip
+                card["confirmToken"] = token
+                return self._with_reminder_badge(card, why)
+            title, lines = f"ยังเลื่อนนัด “{r.what}” ไม่ได้", [problem]
+        elif google:  # การ์ด 0014: ลิงก์ iCal อ่านอย่างเดียว · แก้ได้ในแอป Google Calendar เท่านั้น
+            title = "นัดจากปฏิทิน Google เลื่อนในระบบนี้ไม่ได้"
+            lines = ["แก้ได้ในแอป Google Calendar แล้วพูด “อัปเดตปฏิทิน”"]
             lines += [self._reminder_line(e) for e in google[:5]]
-        card = self._plain("reminder", "ยังเลื่อนนัดให้ไม่ได้", lines)
-        return self._with_reminder_badge(card, "ขอเลื่อนนัด · ยังไม่รองรับ จึงไม่จดนัดใหม่")
+        else:
+            title = "ไม่พบนัดชื่อนี้ในเครื่อง"
+            lines = ["ดูนัดที่มีได้ด้วย “นัดถัดไป” หรือหน้าปฏิทิน"]
+        return self._with_reminder_badge(self._plain("reminder", title, lines), why)
+
+    def _move_when(self, r, target: str) -> tuple[datetime | None, str]:
+        """เวลาใหม่ของนัด r จากข้อความหลัง "ไป" · ตัวแปลงตัวเดียวกับจดนัด (H6) · ไม่ได้ = (None, เหตุผล)."""
+        from aipc.skills import when
+        from aipc.skills.reminders import aware
+
+        # บอกวันมาไหม · ไม่บอก = คงวันเดิมของนัด ("เลื่อนนัดประชุมไปบ่ายสาม")
+        date_words = re.compile(
+            r"วันที่|วันนี้|พรุ่งนี้|มะรืน|วัน(?:จันทร์|อังคาร|พุธ|พฤหัส|ศุกร์|เสาร์|อาทิตย์)|สัปดาห์|"
+            r"อาทิตย์หน้า|เดือน|\d+/\d+|"
+            + "|".join(re.escape(k) for k in sorted(when.MONTHS, key=len, reverse=True))
+        )
+        now = self._now()
+        old = aware(r.when)
+        w = when.parse(target, now.replace(tzinfo=None))
+        if w.at is None or not w.confident or w.repeat:
+            return None, w.problem or "ไม่เข้าใจเวลาใหม่ · ลองพิมพ์ เช่น “พรุ่งนี้บ่ายสาม” หรือ “วันที่ 12 บ่ายโมง”"
+        at = w.at
+        if any(a.startswith("ไม่ได้บอกเวลา") for a in w.assumptions):  # บอกแค่วัน = คงเวลาเดิม
+            at = at.replace(hour=old.hour, minute=old.minute)
+        elif not date_words.search(target):  # บอกแค่เวลา = คงวันเดิม
+            at = datetime.combine(old.date(), at.time())
+        new = aware(at)
+        if new <= now:
+            return None, f"เวลาใหม่ ({self._when_text(new)}) ผ่านไปแล้ว"
+        return new, ""
 
     def _until_card(self, text: str) -> dict | None:
         """ "อีกกี่วันจะถึงปีใหม่" → นับจากวันที่ของเครื่อง · None = ไม่ใช่คำถามนี้."""
@@ -4247,6 +4303,20 @@ class SkillsController(QObject):
                 return card
             self.remindersChanged.emit()
             card["title"] = f"ลบนัดแล้ว {n} รายการ"
+        elif isinstance(plan, tuple) and plan[0] == "move":  # การ์ด 0068: เลื่อนนัดในเครื่อง
+            _, rid, new = plan
+            card["kind"] = "reminder"
+            try:
+                r = self._store.move(rid, new, self._now())
+            except (OSError, reminders.Unreadable) as e:
+                card["title"] = f"เลื่อนไม่สำเร็จ: {e}"
+                return card
+            if r is None:
+                card["title"] = "ไม่พบนัดนี้แล้ว (อาจถูกลบไปก่อน)"
+                return card
+            self.remindersChanged.emit()
+            card["title"] = f"เลื่อนแล้ว: {r.what}"
+            card["chips"] = [{"text": self._when_text(new), "kind": "ok"}]
         elif isinstance(plan, tuple) and plan[0] == "steps":
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))

@@ -58,11 +58,52 @@ class SkillsControllerTest(unittest.TestCase):
         self.assertIn("กินยา", card["lines"][0])
         self.assertFalse(card.get("llm"))
         before = len(self.s._store.items)
+        # การ์ด 0068: เลื่อนได้แล้ว · บอกแค่เวลา = คงวันเดิม (24 ก.ย.) · ไม่จดนัดใหม่
         card = self.s.handle("เลื่อนนัดประชุมไปบ่ายสาม")
-        self.assertEqual(card["title"], "ยังเลื่อนนัดให้ไม่ได้")
-        self.assertEqual(card["confirmToken"], "")
-        self.assertTrue(any("ประชุม" in line for line in card["lines"][1:]))
+        self.assertEqual(card["title"], "เลื่อนนัด “ประชุม” ใช่ไหม")
+        self.s.confirm(card["confirmToken"], True)
         self.assertEqual(len(self.s._store.items), before)
+        moved = next(r for r in self.s._store.items if r.what == "ประชุม")
+        self.assertEqual((moved.when.day, moved.when.hour), (24, 15))
+
+    def test_move_reminder_asks_first_and_keeps_what_was_not_said(self):
+        """การ์ด 0068 M1 · Pakon ที่จอ 2026-10-28: "เลื่อนนัดจากวันที่ 11 ไปวันที่ 12" แล้วนัดไม่ย้าย."""
+        self.s.confirm(self.s.handle("เตือนพบอาจารย์วันที่ 11 ตุลา บ่ายโมง")["confirmToken"], True)
+        r = self.s._store.items[0]
+        card = self.s.handle("เลื่อนนัดพบอาจารย์จากวันที่ 11 ไปวันที่ 12")
+        self.assertIn("เดิม", card["lines"][0])
+        self.assertIn("ใหม่", card["lines"][1])
+        self.s.confirm(card["confirmToken"], False)  # ตอบไม่ = ไม่เปลี่ยน
+        self.assertEqual((r.when.day, r.when.hour), (11, 13))
+        card = self.s.handle("ช่วยเลื่อนนัดพบอาจารย์ไปวันที่ 12")  # บอกแค่วัน = คงเวลาบ่ายโมง
+        done = self.s.confirm(card["confirmToken"], True)
+        self.assertEqual(done["title"], "เลื่อนแล้ว: พบอาจารย์")
+        self.assertEqual((r.when.month, r.when.day, r.when.hour), (10, 12, 13))
+        self.assertFalse(r.fired)
+        card = self.s.handle("เลื่อนนัดพบอาจารย์เป็น 15 ตุลา 10 โมง")  # วัน + เวลา
+        self.s.confirm(card["confirmToken"], True)
+        self.assertEqual((r.when.day, r.when.hour), (15, 10))
+        self.assertEqual(len(self.s._store.items), 1)
+        # คีย์ลัดเสียง: ทางตั้งเตือน (voiceReminder) และทางคำถาม (voiceAnswer) = การ์ดเลื่อน ไม่จดนัดใหม่
+        said = "เลื่อนนัดพบอาจารย์ไปบ่ายสาม"
+        for way in (self.s.voiceReminder, self.s.voiceAnswer):
+            self.assertEqual(way(said)["title"], "เลื่อนนัด “พบอาจารย์” ใช่ไหม", way.__name__)
+        self.s.confirm(self.s.voiceAnswer(said)["confirmToken"], True)
+        self.assertEqual((r.when.day, r.when.hour, len(self.s._store.items)), (15, 15, 1))
+
+    def test_move_reminder_refuses_clearly_without_changing_anything(self):
+        """การ์ด 0068 M1: นัดซ้ำ · ชื่อตรงหลายนัด · ไม่มีนัดนี้ · เวลาผ่านไปแล้ว = ไม่เปลี่ยน ไม่จดนัดใหม่ บอกเหตุผล."""
+        for text in ("เตือนกินยาทุกวันตอน 8 โมงเช้า", "เตือนประชุมพรุ่งนี้บ่ายสอง",
+                     "เตือนประชุมมะรืนนี้ 10 โมง"):  # fmt: skip
+            self.s.confirm(self.s.handle(text)["confirmToken"], True)
+        before = [(r.id, r.when) for r in self.s._store.items]
+        cases = {"เลื่อนนัดกินยาไป 9 โมง": "นัดซ้ำ", "เลื่อนนัดประชุมไปบ่ายสาม": "2 นัด",
+                 "เลื่อนนัดหมอฟันไปพรุ่งนี้": "ไม่พบนัด", "เลื่อนนัดกินยา": "เวลาใหม่"}  # fmt: skip
+        for text, why in cases.items():
+            card = self.s.handle(text)
+            self.assertEqual(card["confirmToken"], "", text)
+            self.assertIn(why, card["title"] + " ".join(card["lines"]), text)
+        self.assertEqual([(r.id, r.when) for r in self.s._store.items], before)
 
     def test_days_until_counted_by_code(self):
         # สำรวจบน Pi 5 2026-10-12: "อีกกี่วันจะถึงปีใหม่" AI ในเครื่องตอบ 109 วัน (ที่ถูก 81) · ชุดสอบข้อ C06
