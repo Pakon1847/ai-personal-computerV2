@@ -473,8 +473,14 @@ Item {
             }
             AppButton {
                 id: historyButton
-                text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
-                onClicked: historyPopup.open()
+                objectName: "historyButton"
+                // เปิดอยู่ = สีหลัก · กดซ้ำ = ปิด (Pakon 2026-10-27: กดแล้วปิดไม่ได้) · การกดนอกหน้าต่างปิดมันก่อน
+                // แล้วปุ่มเปิดใหม่ทันที → จำเวลาที่เพิ่งปิด ไม่เปิดซ้ำภายใน 300 ms
+                text: Tr.t("ประวัติ"); kind: historyPopup.opened ? "primary" : "secondary"; iconPath: Icons.chat
+                onClicked: {
+                    if (historyPopup.opened) historyPopup.close()
+                    else if (Date.now() - historyPopup.closedAt > 300) historyPopup.open()
+                }
             }
             // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
             AppButton {
@@ -831,10 +837,21 @@ Item {
         background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
         // ประวัติอยู่หน้านี้ทั้งหมด (Pakon 2026-10-24: ลบได้เลยไม่ต้องไปที่ตั้งค่า) · ลบทีละอัน = ปุ่มถังขยะ ·
         // ลบทั้งหมด = กดสองครั้ง (กันพลาด · H2) · ลบบทสนทนาที่เปิดอยู่ = เริ่มแชทใหม่
-        onClosed: clearAll.armed = false
+        objectName: "historyPopup"
+        property real closedAt: 0
+        onClosed: { clearAll.armed = false; closedAt = Date.now() }
         contentItem: ColumnLayout {
             spacing: 6
-            AppText { text: Tr.t("ประวัติบทสนทนา"); strong: true }
+            RowLayout {
+                Layout.fillWidth: true
+                AppText { Layout.fillWidth: true; text: Tr.t("ประวัติบทสนทนา"); strong: true }
+                AppButton {
+                    objectName: "historyClose"
+                    kind: "ghost"; text: "✕"
+                    Accessible.name: Tr.t("ปิดหน้าต่างประวัติ")
+                    onClicked: historyPopup.close()
+                }
+            }
             AppText {
                 Layout.fillWidth: true
                 text: chat.history.length === 0 ? Tr.t("ยังไม่มีบทสนทนาที่บันทึกไว้")
@@ -848,8 +865,10 @@ Item {
                     Layout.fillWidth: true
                     spacing: 4
                     AppButton {
+                        objectName: "openChat_" + modelData.id
                         Layout.fillWidth: true
-                        kind: "ghost"
+                        // บทสนทนาที่เปิดอยู่ = สีหลัก (เห็นว่ากดอันไหนไปแล้ว)
+                        kind: modelData.id === chat.currentId ? "primary" : "ghost"
                         text: modelData.title || Tr.t("(ไม่มีชื่อ)")
                         onClicked: { root.loadChat(chat.openChat(modelData.id)); historyPopup.close() }
                     }

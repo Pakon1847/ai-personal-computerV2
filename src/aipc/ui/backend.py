@@ -4450,6 +4450,11 @@ class ChatController(QObject):
         except OSError:
             return []
 
+    @Property(str, notify=changed)
+    def currentId(self) -> str:  # noqa: N802
+        """บทสนทนาที่เปิดอยู่ · หน้าประวัติไฮไลต์อันนี้ (Pakon ขอ 2026-10-27: กดแล้วต้องรู้ว่าเลือกอันไหน)."""
+        return self._conv.get("id", "")
+
     # ---------- สถานะ AI ----------
     @Slot()
     def refresh(self) -> None:

@@ -479,6 +479,41 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(chat_list.property("atYEnd"), "ข้อความใหม่ = ไปล่างสุดเหมือนเดิม")
         self.assertEqual(warnings, [])
 
+    def test_history_button_toggles_and_shows_the_open_chat(self):
+        # Pakon ที่จอ 2026-10-27: กดประวัติแล้วกดปิดไม่ได้ · อยากเห็นสีว่ากดอันไหน
+        engine, win, warnings = self.open_shell()
+        button = find_all(win, "historyButton")[0]
+        popup = find_all(win, "historyPopup")[0]
+        button.clicked.emit()
+        settle()
+        self.assertTrue(popup.property("opened"))
+        self.assertEqual(button.property("kind"), "primary")  # เปิดอยู่ = มีสี
+        button.clicked.emit()  # กดซ้ำ = ปิด
+        settle(400)
+        self.assertFalse(popup.property("opened"))
+        self.assertEqual(button.property("kind"), "secondary")
+        settle(400)
+        button.clicked.emit()
+        settle()
+        find_all(win, "historyClose")[0].clicked.emit()  # ปุ่ม ✕
+        settle(400)
+        self.assertFalse(popup.property("opened"))
+        # คลิกเมาส์จริงที่ปุ่ม (การกดนอกหน้าต่างปิดมันก่อน แล้วปุ่มเคยเปิดใหม่ทันที = ปิดไม่ได้)
+        from PySide6.QtCore import QPointF, Qt
+        from PySide6.QtTest import QTest
+
+        settle(400)
+        at = button.mapToScene(QPointF(button.width() / 2, button.height() / 2)).toPoint()
+        QTest.mouseClick(win, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, at)
+        settle(400)
+        self.assertTrue(popup.property("opened"))
+        QTest.mouseClick(win, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, at)
+        settle(400)
+        self.assertFalse(popup.property("opened"), "คลิกปุ่มประวัติซ้ำต้องปิด")
+        chat = engine.rootContext().contextProperty("chat")
+        self.assertTrue(chat.property("currentId"))  # บทสนทนาที่เปิดอยู่ให้หน้าประวัติไฮไลต์
+        self.assertEqual(warnings, [])
+
     def test_ai_answers_draw_without_warnings(self):
         """การ์ด 0013: ข้อความ AI (กำลังตอบ / จบ / หยุด) วาดได้โดยไม่มี warning
         · พบ 2026-09-28: ข้อความ AI ไม่มีช่อง user ทำให้ binding ได้ undefined."""
