@@ -397,6 +397,62 @@ ColumnLayout {
                 visible: page.section === "voice"
                 Layout.fillWidth: true
                 spacing: 16
+                // ระดับเสียง (2026-10-27): ปุ่มเดียวกับคำสั่งเสียง เพิ่ม/ลด/ปิดเสียง · บอกว่าเสียงออกช่องไหน
+                Card {
+                    objectName: "volumeCard"
+                    Layout.fillWidth: true
+                    implicitHeight: volCol.implicitHeight + 40
+                    Timer {   // คำสั่งเสียง "เพิ่มเสียง" เปลี่ยนจากที่อื่นได้ → อ่านใหม่ระหว่างเปิดหมวดนี้
+                        interval: 3000; repeat: true; triggeredOnStart: true
+                        running: page.visible && page.section === "voice" && audio.available
+                        onTriggered: audio.refresh()
+                    }
+                    ColumnLayout {
+                        id: volCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 8
+                        AppText { text: Tr.t("ระดับเสียง"); strong: true }
+                        AppText {
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: !audio.available ? Tr.t("ปรับได้เมื่อใช้งานบนเครื่องจริง")
+                                  : audio.error !== "" ? Tr.t(audio.error)
+                                  : Tr.t("เสียงออกทาง: ") + (audio.device || Tr.t("ไม่ทราบ"))
+                        }
+                        RowLayout {
+                            visible: audio.available
+                            spacing: 12
+                            AppButton {
+                                objectName: "volumeDown"
+                                text: "−"
+                                kind: "secondary"
+                                Accessible.name: Tr.t("ลดเสียง")
+                                onClicked: audio.step(-1)
+                            }
+                            AppText {
+                                objectName: "volumeText"
+                                Layout.preferredWidth: Math.round(120 * Theme.fontScale)
+                                horizontalAlignment: Text.AlignHCenter
+                                strong: true
+                                text: audio.muted ? Tr.t("ปิดเสียงอยู่") : audio.percent + "%"
+                                color: audio.muted ? Theme.danger : Theme.ink
+                            }
+                            AppButton {
+                                objectName: "volumeUp"
+                                text: "+"
+                                kind: "secondary"
+                                Accessible.name: Tr.t("เพิ่มเสียง")
+                                onClicked: audio.step(1)
+                            }
+                            AppButton {
+                                objectName: "volumeMute"
+                                text: audio.muted ? Tr.t("เปิดเสียง") : Tr.t("ปิดเสียง")
+                                kind: audio.muted ? "primary" : "secondary"
+                                onClicked: audio.setMuted(!audio.muted)
+                            }
+                        }
+                    }
+                }
                 // เสียง (การ์ด 0019): อ่านออกเสียงในเครื่อง · ตั้งให้อ่านเตือนนัดได้
                 Card {
                     objectName: "voiceCard"

@@ -1532,6 +1532,87 @@ def _display_name(user: str) -> str:
 POWER_ACTIONS = ("power_off", "reboot", "logout")  # การ์ด 0052 · ออกจากระบบ (2026-10-27) ถามเหมือนกัน
 
 
+class AudioController(QObject):
+    """ระดับเสียงในหน้าตั้งค่า (Pakon ขอ 2026-10-27 · พบหูฟังถูกปิดเสียงค้างแล้วหาไม่เจอ).
+
+    ใช้คำสั่ง wpctl ชุดเดียวกับคำสั่งเสียง "เพิ่มเสียง/ลดเสียง/ปิดเสียง" (actions.command_for) · ไม่มีคำสั่งใหม่ ·
+    แสดงชื่อช่องที่เสียงออก (หูฟัง/HDMI) เพื่อให้รู้ว่าเสียงไปไหน · หน้าต่างพัฒนา/หน้า Login = ไม่แตะเสียงจริง
+    """
+
+    changed = Signal()
+    STEP = 10
+
+    def __init__(self, active: bool, runner=None, reader=None):
+        super().__init__()
+        from aipc.skills import actions
+
+        self._active = active
+        self._run = runner or actions.run_process
+        self._read = reader or actions.read_output
+        self._percent, self._muted, self._device, self._error = 0, False, "", ""
+
+    @Property(bool, constant=True)
+    def available(self) -> bool:
+        return self._active
+
+    @Property(int, notify=changed)
+    def percent(self) -> int:
+        return self._percent
+
+    @Property(bool, notify=changed)
+    def muted(self) -> bool:
+        return self._muted
+
+    @Property(str, notify=changed)
+    def device(self) -> str:
+        return self._device
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Slot()
+    def refresh(self) -> None:
+        from aipc.skills import actions
+
+        if not self._active:
+            return
+        now = actions.parse_volume(self._read(["wpctl", "get-volume", actions.SINK]))
+        info = self._read(["wpctl", "inspect", actions.SINK]) or ""
+        m = re.search(r'node\.description = "([^"]*)"', info)
+        old = (self._percent, self._muted, self._device, self._error)
+        if now is None:
+            self._error = "อ่านระดับเสียงไม่ได้ (ไม่พบลำโพงหรือหูฟัง)"
+        else:
+            (self._percent, self._muted), self._error = now, ""
+        self._device = m[1] if m else ""
+        if (self._percent, self._muted, self._device, self._error) != old:
+            self.changed.emit()
+
+    def _do(self, plan) -> None:
+        from aipc.skills import actions
+
+        if not self._active:
+            return
+        if self._run(actions.command_for(plan)) != 0:
+            self._error = "ปรับเสียงไม่สำเร็จ · ลองอีกครั้ง"
+            self.changed.emit()
+            return
+        self.refresh()
+
+    @Slot(int)
+    def step(self, direction: int) -> None:
+        from aipc.skills.actions import Plan
+
+        self._do(Plan("change_volume", {"step": self.STEP if direction > 0 else -self.STEP}))
+
+    @Slot(bool)
+    def setMuted(self, muted: bool) -> None:  # noqa: N802
+        from aipc.skills.actions import Plan
+
+        self._do(Plan("mute" if muted else "unmute"))
+
+
 class PowerController(QObject):
     """ปุ่มปิดเครื่อง/รีสตาร์ต (การ์ด 0052) ทั้งหน้า Login และในเซสชัน · หน้าจอถามยืนยันก่อนเรียกเสมอ.
 

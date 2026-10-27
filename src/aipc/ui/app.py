@@ -14,6 +14,7 @@ from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
 from aipc import i18n
 from aipc.ui.backend import (
+    AudioController,
     BackupController,
     ChatController,
     CloudUsage,
@@ -365,6 +366,8 @@ def build(opts: Options, argv: list[str] | None = None):
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session, face_to_speak=lambda: ui_settings.faceToSpeak),
+        # ระดับเสียงในหน้าตั้งค่า (2026-10-27) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่แตะเสียง
+        "audio": AudioController(active=in_session),
         "browser": browser_ctl,
         # เลือก Wi-Fi จากแถบบน (การ์ด 0063) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่เปิด
         "wifi": WifiController(active=in_session),
