@@ -1127,6 +1127,13 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(btn.isVisible())
         self.assertTrue(find_items(win, "claudeGuideButton")[0].isVisible())
         self.assertIn("ออกจาก Claude แล้ว", find_items(win, "claudeLogoutText")[0].property("text"))
+        # Pakon 2026-10-28: เข้าใหม่ผ่านหน้าต่างคำสั่งในเครื่องได้จากหน้าตั้งค่าเลย (มี lxterminal เท่านั้น)
+        here = find_items(win, "settingsConnectHere")[0]
+        self.assertFalse(here.isVisible())
+        usage._terminal = "/usr/bin/lxterminal"
+        usage.guideChanged.emit()
+        settle(50)
+        self.assertTrue(here.isVisible())
         self.assertEqual(warnings, [])
 
     def test_claude_daily_level_without_money(self):

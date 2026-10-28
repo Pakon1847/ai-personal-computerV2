@@ -554,12 +554,32 @@ ColumnLayout {
                             property bool open: false
                             visible: !cloudUsage.available || cloudUsage.logoutState === "done"
                             kind: "secondary"
-                            text: open ? Tr.t("ซ่อนวิธีเชื่อมต่อ") : Tr.t("วิธีเชื่อมต่อ Claude")
+                            text: open ? Tr.t("ซ่อนวิธีเชื่อมต่อ") : Tr.t("วิธีเชื่อมต่อจากคอมพิวเตอร์อีกเครื่อง")
                             onClicked: {
                                 if (!open)
                                     cloudUsage.refreshGuide()
                                 open = !open
                             }
+                        }
+                        // เชื่อมต่อที่เครื่องนี้ (การ์ด 0021 หัวข้อ 10 · Pakon 2026-10-28: "ทำให้เข้าผ่านเทอร์มินัลในเครื่องได้เลย")
+                        // หน้าต่างคำสั่งรัน claude auth login ให้เอง · ไม่ใช่เทอร์มินัลเปล่า (การ์ด 0004 ไม่มี shell ทั่วไป)
+                        AppText {
+                            visible: guideButton.visible && cloudUsage.canConnectHere
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: Tr.t("ง่ายที่สุด: กดปุ่มนี้ หน้าต่างคำสั่งจะเปิดและเข้าสู่ระบบ Claude ให้เอง · ถ้าหน้าเว็บให้รหัสมา กด Copy Code แล้วกลับไปหน้าต่างคำสั่ง กด Ctrl+Shift+V แล้วกด Enter")
+                        }
+                        AppButton {
+                            objectName: "settingsConnectHere"
+                            visible: guideButton.visible && cloudUsage.canConnectHere
+                            enabled: !cloudUsage.connecting
+                            iconPath: Icons.terminal
+                            text: cloudUsage.connecting ? Tr.t("หน้าต่างเชื่อมต่อเปิดอยู่…") : Tr.t("เชื่อมต่อที่เครื่องนี้")
+                            onClicked: cloudUsage.connectHere()
+                        }
+                        AppText {
+                            visible: cloudUsage.connectedNow
+                            Layout.fillWidth: true; strong: true; color: Theme.okInk
+                            text: Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
                         }
                         ClaudeGuide {
                             objectName: "claudeGuide"

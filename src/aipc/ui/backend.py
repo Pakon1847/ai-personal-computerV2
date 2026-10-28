@@ -909,7 +909,7 @@ class CloudUsage(QObject):
     def _logout_done(self, ok: bool, detail: str) -> None:
         self._logout_state = "done" if ok else "failed"
         self._logout_text = (
-            'ออกจาก Claude แล้ว · ปิด "ให้ถาม Claude" ให้แล้ว · จะใช้อีกครั้ง กด "วิธีเชื่อมต่อ Claude"'
+            'ออกจาก Claude แล้ว · ปิด "ให้ถาม Claude" ให้แล้ว · จะใช้อีกครั้ง กด "เชื่อมต่อที่เครื่องนี้"'
             if ok
             else f"ออกจาก Claude ไม่สำเร็จ · {detail or 'ไม่ทราบสาเหตุ'} · ยังเข้าอยู่เหมือนเดิม"
         )
