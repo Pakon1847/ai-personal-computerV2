@@ -27,12 +27,22 @@ _LATEST = re.compile(
 _FROM = re.compile(
     _LEAD + r"(?:(?:อ่าน|มี)\s*)?" + _MAIL + r"\s*(?:ที่\s*)?(?:มา\s*)?จาก\s*(?P<who>.+?)" + _TAIL
 )
+_SUMMARY = re.compile(
+    _LEAD + r"สรุป\s*" + _MAIL + r"\s*(?P<what>ล่าสุด|ใหม่|(?:ที่\s*)?ยังไม่(?:ได้)?อ่าน|ในกล่อง(?:จดหมาย)?)?"
+    + _TAIL
+)  # fmt: skip
 MAX_READ = 3
 
 
 def parse(text: str) -> tuple[str, str] | None:
-    """(ชนิด, ชื่อผู้ส่ง) · ชนิด = latest | unread | from · ไม่ใช่เรื่องอ่านเมล = None."""
+    """(ชนิด, ชื่อผู้ส่ง) · ชนิด = latest | unread | from | summary | summary_unread (การ์ด 0072) ·
+    ไม่ใช่เรื่องอ่านเมล = None."""
     t = (text or "").strip()
+    if m := _SUMMARY.match(t):
+        what = m.group("what") or ""
+        return (
+            "summary_unread" if what and what != "ล่าสุด" and "กล่อง" not in what else "summary"
+        ), ""
     if m := _FROM.match(t):
         return "from", m.group("who").strip()
     if _UNREAD.match(t):

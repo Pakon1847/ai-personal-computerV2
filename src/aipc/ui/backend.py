@@ -761,6 +761,77 @@ class VoiceController(QObject):
                 fast.close()
 
 
+class GmailLink(QObject):
+    """เชื่อมต่อ Gmail แบบอ่านอย่างเดียว (การ์ด 0072) · หน้าตั้งค่า หมวด AI ·
+    โทเค็นอยู่ใน ~/.local/share/aipc ของผู้ใช้."""
+
+    changed = Signal()
+    _finished = Signal(bool, str)
+
+    def __init__(self, api=None, open_url=None, active: bool = True):
+        super().__init__()
+        self._api, self._open_url, self._active = api, open_url, active
+        self._busy, self._text = False, ""
+        self._finished.connect(self._on_finished)
+
+    def _gmail(self):
+        if self._api is None:
+            from aipc.cloud import gmail_api
+
+            self._api = gmail_api
+        return self._api
+
+    @Property(bool, notify=changed)
+    def available(self) -> bool:
+        """มีไฟล์ OAuth client ของเครื่อง (google_credentials.json) · ไม่มี = บอกตามจริง ไม่มีปุ่ม (H5)."""
+        return self._active and self._gmail().client_path().is_file()
+
+    @Property(bool, notify=changed)
+    def connected(self) -> bool:
+        return self._active and self._gmail().connected()
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    @Property(str, notify=changed)
+    def text(self) -> str:
+        return self._text
+
+    @Slot()
+    def connect(self) -> None:
+        """เปิดหน้าขออนุญาตของ Google ในเบราว์เซอร์ แล้วรอ (เธรดแยก · จอไม่ค้าง)."""
+        import threading
+        import webbrowser
+
+        if self._busy or not self.available:
+            return
+        self._busy, self._text = True, "เปิดหน้าขออนุญาตของ Google แล้ว · เลือกบัญชี แล้วกด “อนุญาต” (Allow)"
+        self.changed.emit()
+        api, opener = self._gmail(), self._open_url or webbrowser.open
+
+        def work():
+            try:
+                api.connect(opener)
+                self._finished.emit(True, "เชื่อมต่อ Gmail แล้ว · พูด “สรุปเมล” หรือ “มีเมลใหม่ไหม” ได้เลย")
+            except api.GmailError as e:
+                self._finished.emit(False, str(e))
+            except Exception as e:  # noqa: BLE001
+                self._finished.emit(False, f"เชื่อมต่อ Gmail ไม่สำเร็จ ({type(e).__name__})")
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot()
+    def disconnect(self) -> None:
+        self._gmail().disconnect()
+        self._text = "เลิกเชื่อมต่อ Gmail แล้ว · ลบสิทธิ์ในเครื่องแล้ว"
+        self.changed.emit()
+
+    def _on_finished(self, ok: bool, text: str) -> None:
+        self._busy, self._text = False, text
+        self.changed.emit()
+
+
 class CloudUsage(QObject):
     """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget
     · ไม่มี Claude = available False."""

@@ -676,6 +676,74 @@ ColumnLayout {
                     }
                 }
 
+                // Gmail แบบอ่านอย่างเดียว (การ์ด 0072 · Pakon 2026-10-28) · สรุปด้วย AI ในเครื่อง · เนื้อหาเมลไม่ไป Claude (H3)
+                // ไม่มีไฟล์ OAuth client ของเครื่อง = บอกตามจริง ไม่มีปุ่ม (H5) · เลิกเชื่อมต่อต้องกดสองครั้ง
+                Card {
+                    id: gmailCard
+                    objectName: "gmailCard"
+                    Layout.fillWidth: true
+                    implicitHeight: gmailCol.implicitHeight + 40
+                    property bool confirmOff: false
+                    ColumnLayout {
+                        id: gmailCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 10
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 16
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+                                AppText { text: Tr.t("Gmail · อ่านและสรุปเมลด้วยเสียง"); strong: true }
+                                AppText {
+                                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                                    text: Tr.t("ขอสิทธิ์อ่านอย่างเดียวจาก Google (ส่ง ลบ หรือแก้เมลไม่ได้) · พูด “สรุปเมล” “มีเมลใหม่ไหม” · สรุปด้วย AI ในเครื่อง เนื้อหาเมลไม่ส่งไป Claude")
+                                }
+                            }
+                            Chip {
+                                visible: gmailLink.available
+                                text: gmailLink.connected ? Tr.t("เชื่อมต่อแล้ว") : Tr.t("ยังไม่เชื่อมต่อ")
+                                kind: gmailLink.connected ? "ok" : "neutral"
+                                dot: true
+                            }
+                        }
+                        AppText {
+                            objectName: "gmailMissing"
+                            visible: !gmailLink.available
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.warnInk
+                            text: Tr.t("เครื่องนี้ยังไม่มีไฟล์ google_credentials.json ของบัญชีนี้ · ผู้ดูแลต้องใส่ไว้ที่ ~/.local/share/aipc ก่อน")
+                        }
+                        RowLayout {
+                            visible: gmailLink.available
+                            spacing: 12
+                            AppButton {
+                                objectName: "gmailConnect"
+                                visible: !gmailLink.connected
+                                enabled: !gmailLink.busy
+                                text: gmailLink.busy ? Tr.t("รอการอนุญาตจาก Google…") : Tr.t("เชื่อมต่อ Gmail")
+                                onClicked: gmailLink.connect()
+                            }
+                            AppButton {
+                                objectName: "gmailDisconnect"
+                                visible: gmailLink.connected
+                                kind: gmailCard.confirmOff ? "danger" : "ghost"
+                                text: gmailCard.confirmOff ? Tr.t("กดอีกครั้งเพื่อเลิกเชื่อมต่อ") : Tr.t("เลิกเชื่อมต่อ Gmail")
+                                onClicked: {
+                                    if (gmailCard.confirmOff) { gmailCard.confirmOff = false; gmailLink.disconnect() }
+                                    else gmailCard.confirmOff = true
+                                }
+                            }
+                        }
+                        AppText {
+                            objectName: "gmailText"
+                            visible: gmailLink.text !== ""
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: gmailLink.text
+                        }
+                    }
+                }
+
                 // ปฏิทิน Google แบบอ่านอย่างเดียว (การ์ด 0014): วางลิงก์ iCal ลับ → นัดจาก Google ขึ้นในคำตอบนัด หน้าแรก และเสียง
                 // ลิงก์ผิด/ดึงไม่ได้ = ไม่จำลิงก์ · เครื่องไม่เห็นรหัสผ่าน Google · เลิกเชื่อมต่อต้องกดสองครั้ง
                 Card {

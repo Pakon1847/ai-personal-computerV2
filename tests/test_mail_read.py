@@ -170,6 +170,11 @@ class FakeControl:
         self.running = False
 
 
+class NoApi:
+    def connected(self):
+        return False
+
+
 def pump(until, timeout=5.0):
     end = time.monotonic() + timeout
     while not until() and time.monotonic() < end:
@@ -185,10 +190,12 @@ class VoiceTest(unittest.TestCase):
 
     def run_voice(self, url, text):
         ctl = FakeControl(url)
-        b = BrowserController(control=ctl)
+        b = BrowserController(
+            control=ctl, gmail=NoApi()
+        )  # ยังไม่เชื่อม Gmail API (การ์ด 0072) = อ่านจากหน้าเว็บ
         done = []
         b.finished.connect(lambda say, ok: done.append(ok))
-        started = b.mailRead(text)
+        started = bool(b.mailRead(text).get("started"))
         if started:
             pump(lambda: done)
         return started, ctl.ran

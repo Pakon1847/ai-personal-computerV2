@@ -1169,6 +1169,64 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("5%", find_items(win, "cloudLevelText")[0].property("text"))
         self.assertEqual(warnings, [])
 
+    def test_gmail_card_connects_read_only(self):
+        """การ์ด 0072 G1: ไม่มีไฟล์ OAuth client = บอกตรง ๆ ไม่มีปุ่ม · มี = กดเชื่อมต่อ (Google ปลอม) ·
+        เลิกเชื่อมต่อต้องกดสองครั้ง."""
+        from aipc.cloud import gmail_api
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        link = engine.rootContext().contextProperty("gmailLink")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        state = {"linked": False, "opened": []}
+
+        class Api:
+            GmailError = gmail_api.GmailError
+            client = tmp / "no-client.json"
+
+            def client_path(self):
+                return self.client
+
+            def connected(self):
+                return state["linked"]
+
+            def connect(self, opener):
+                opener("https://accounts.google.com/o/oauth2/auth?scope=gmail.readonly")
+                state["linked"] = True
+
+            def disconnect(self):
+                state["linked"] = False
+
+        api = Api()
+        link._api, link._active, link._open_url = api, True, state["opened"].append
+        link.changed.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "gmailMissing")[0].isVisible())
+        self.assertFalse(find_items(win, "gmailConnect")[0].isVisible())
+        api.client = tmp / "google_credentials.json"
+        api.client.write_text("{}", "utf-8")
+        link.changed.emit()
+        settle(50)
+        btn = find_items(win, "gmailConnect")[0]
+        self.assertTrue(btn.isVisible())
+        btn.clicked.emit()
+        for _ in range(100):
+            settle(20)
+            if not link.busy:
+                break
+        self.assertEqual(len(state["opened"]), 1)
+        self.assertIn("เชื่อมต่อ Gmail แล้ว", find_items(win, "gmailText")[0].property("text"))
+        off = find_items(win, "gmailDisconnect")[0]
+        self.assertTrue(off.isVisible())
+        off.clicked.emit()
+        settle(30)
+        self.assertTrue(state["linked"])  # กดครั้งแรก = ถามยืนยัน
+        off.clicked.emit()
+        settle(30)
+        self.assertFalse(state["linked"])
+        self.assertTrue(find_items(win, "gmailConnect")[0].isVisible())
+        self.assertEqual(warnings, [])
+
     def test_claude_logout_failure_says_so(self):
         """การ์ด 0070 L1: คำสั่งล้ม = บอกไม่สำเร็จ ไม่เปลี่ยนค่าอื่น (H5)."""
         import subprocess

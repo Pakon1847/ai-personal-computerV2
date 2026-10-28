@@ -19,6 +19,7 @@ from aipc.ui.backend import (
     ChatController,
     CloudUsage,
     FilesBrowser,
+    GmailLink,
     I18nBridge,
     LoginController,
     PowerController,
@@ -369,6 +370,7 @@ def build(opts: Options, argv: list[str] | None = None):
             chat_switch=_chat_switch(chat, ui_settings),
         ),
         "chat": chat,
+        "gmailLink": GmailLink(active=in_session),  # การ์ด 0072: เชื่อม Gmail แบบอ่านอย่างเดียว
         "cloudUsage": CloudUsage(
             budget,
             available=chat._cloud is not None,

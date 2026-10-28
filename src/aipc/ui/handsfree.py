@@ -248,8 +248,12 @@ class BrowserController(QObject):
     _done = Signal(str, bool, bool)
 
     def __init__(self, active: bool = True, control=None, ledger=None, skill_match=None,
-                 profile=None):  # fmt: skip
+                 profile=None, gmail=None, summarize=None):  # fmt: skip
         super().__init__()
+        # การ์ด 0072: Gmail API (aipc.cloud.gmail_api · เทสต์ใส่ของปลอม) ·
+        # summarize(messages) = AI ในเครื่องสรุป
+        self._gmail = gmail
+        self._summarize = summarize
         self._active = active
         self._control = control
         # โฟลเดอร์โปรไฟล์ของเบราว์เซอร์ของผู้ช่วย · None = ค่าเริ่มต้น (เทสต์ใส่โฟลเดอร์ชั่วคราว)
@@ -358,22 +362,94 @@ class BrowserController(QObject):
         self._start([BrowseCommand("click_text", query=pick.item["label"])])
         return {"started": True}
 
-    @Slot(str, result=bool)
-    def mailRead(self, text: str) -> bool:  # noqa: N802
-        """การ์ด 0071: "อ่านเมลล่าสุด" / "มีเมลใหม่ไหม" / "มีเมลจาก … ไหม" → อ่านกล่องจดหมาย Gmail
-        ในเบราว์เซอร์ของผู้ช่วย · ยังไม่ได้เปิด Gmail = เปิดก่อน (แท็บเดิมถ้ามี) · ผลมาทาง finished ·
-        ไม่ใช่เรื่องอ่านเมล = False."""
+    @Slot(str, result="QVariantMap")
+    def mailRead(self, text: str) -> dict:  # noqa: N802
+        """การ์ด 0071/0072: "อ่านเมลล่าสุด" / "มีเมลใหม่ไหม" / "มีเมลจาก … ไหม" / "สรุปเมล" ·
+        เชื่อม Gmail API แล้ว = อ่านผ่าน API (สรุปด้วย AI ในเครื่อง) ·
+        ยังไม่เชื่อม = อ่านจากหน้า Gmail ในเบราว์เซอร์ของผู้ช่วย
+        (เปิดให้ก่อนถ้ายังไม่เปิด) · {"started": True} = ผลมาทาง finished · {"say": …} = บอกเลย ·
+        {} = ไม่ใช่เรื่องอ่านเมล."""
         from aipc.skills import mailread
         from aipc.skills.browse import BrowseCommand
 
         asked = mailread.parse(text)
         if not self._active or self._busy or asked is None:
-            return False
+            return {}
         kind, who = asked
+        api = self._gmail_api()
+        if api is not None and api.connected():
+            self._start_job(lambda: self._mail_by_api(api, kind, who))
+            return {"started": True}
+        if kind.startswith("summary"):
+            return {"say": "สรุปเมลต้องเชื่อมต่อ Gmail ก่อน · ไปที่หน้าตั้งค่า → หมวด AI → “เชื่อมต่อ Gmail” · "
+                           "ตอนนี้พูด “อ่านเมลล่าสุด” ได้"}  # fmt: skip
         cmds = [BrowseCommand("mail_read", query=kind, direction=who)]
         if "mail.google.com" not in self.currentUrl():
             cmds.insert(0, BrowseCommand("site", site="gmail"))
-        return self._start(cmds)
+        self._start(cmds)
+        return {"started": True}
+
+    def _gmail_api(self):
+        if self._gmail is None:
+            from aipc.cloud import gmail_api
+
+            self._gmail = gmail_api
+        return self._gmail
+
+    def _mail_by_api(self, api, kind: str, who: str) -> tuple[str, bool]:
+        """เธรดแยก (การ์ด 0072) · อ่านผ่าน Gmail API แบบอ่านอย่างเดียว ·
+        สรุป = AI ในเครื่อง (เนื้อหาเมลไม่ไป Claude · H3)."""
+        from aipc.skills import mailread
+
+        summary = kind.startswith("summary")
+        want = "unread" if kind == "summary_unread" else ("latest" if summary else kind)
+        try:
+            token = api.access_token()
+            rows = api.mails(want, who, n=3 if summary else 10, body=summary, token=token)
+        except api.GmailError as e:
+            self._record_gmail(0, summary, ok=False)
+            return str(e), False
+        self._record_gmail(len(rows), summary, ok=True)
+        if not summary:
+            return mailread.answer(want, who, rows).replace(
+                "ในหน้าแรกของกล่องจดหมาย", "ในกล่องจดหมาย"
+            ), True
+        if not rows:
+            return (
+                "ไม่มีเมลที่ยังไม่อ่านในกล่องจดหมาย" if want == "unread" else "ไม่มีเมลในกล่องจดหมาย"
+            ), True
+        try:
+            text = (self._summarize or _local_summary)(api.summary_messages(rows))
+        except Exception as e:  # noqa: BLE001 · AI ในเครื่องไม่พร้อม = บอกตามจริง แล้วอ่านหัวเรื่องแทน
+            head = mailread.answer(want, who, rows).replace("ในหน้าแรกของกล่องจดหมาย", "ในกล่องจดหมาย")
+            return f"AI ในเครื่องสรุปไม่ได้ ({e}) · {head}", False
+        return f"สรุปเมล{'ที่ยังไม่อ่าน' if want == 'unread' else 'ล่าสุด'} {len(rows)} ฉบับ: {text}", True
+
+    def _record_gmail(self, n: int, body: bool, ok: bool) -> None:
+        if self._ledger is None:
+            return
+        what = f"{n} ฉบับ" + (" · ดึงเนื้อหามาสรุปด้วย AI ในเครื่อง" if body else " · ผู้ส่ง หัวเรื่อง เวลา")
+        try:
+            sent = f"อ่าน Gmail ผ่าน Gmail API ({what}) · เนื้อหาเมลไม่ได้ส่งไปที่ไหน"
+            self._ledger.record("gmail", sent, ok=ok, note="สั่งด้วยเสียง · scope gmail.readonly")
+        except OSError:
+            pass
+
+    def _start_job(self, job) -> None:
+        """งานที่ไม่ใช่คำสั่งเบราว์เซอร์ (การ์ด 0072) · ผลมาทาง finished เหมือนคำสั่งเว็บ."""
+        self._busy = True
+        self.busyChanged.emit()
+
+        def work():
+            say, ok = "ทำไม่สำเร็จ", False
+            try:
+                say, ok = job()
+            except Exception as e:  # noqa: BLE001 · ต้องจบด้วยการบอกผู้ใช้เสมอ (ไม่ค้าง busy)
+                say = f"ทำไม่สำเร็จ: {type(e).__name__}"
+            finally:
+                self._done.emit(say, ok, False)
+
+        threading.Thread(target=work, daemon=True).start()
 
     @Slot(str, str, result=bool)
     def siteSearch(self, text: str, url: str) -> bool:  # noqa: N802
@@ -512,3 +588,13 @@ class BrowserController(QObject):
     def close(self) -> None:
         if self._control is not None:
             self._control.close()
+
+
+def _local_summary(messages: list[dict]) -> str:
+    """ให้ AI ในเครื่อง (llama-server) สรุป · ไม่มี/ไม่พร้อม = ยกข้อผิดพลาด (ผู้เรียกบอกผู้ใช้)."""
+    from aipc.chat.client import Stream, Target
+
+    r = Stream(Target.from_env(), messages, timeout=240).run(lambda token: None)
+    if r.reason or not r.text.strip():
+        raise RuntimeError(r.reason or "ไม่มีคำตอบ")
+    return r.text.strip()
