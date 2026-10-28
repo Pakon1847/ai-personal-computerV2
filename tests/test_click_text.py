@@ -60,6 +60,21 @@ class ChooseTest(unittest.TestCase):
             self.assertTrue(pick.risky, words)
             self.assertIn("กดเองที่จอ", textclick.refuse_text(words, pick))
 
+    def test_spelling_variants_still_match(self):
+        """หน้า Viu จริง (Pi 5 2026-10-28): ป้าย "บุ๊กมาร์ก" · คนพูด/สกิลเขียน "บุ๊กมาร์ค"."""
+        self.assertEqual(textclick.choose("บุ๊กมาร์ค", items("ประวัติ", "บุ๊กมาร์ก")).item["i"], 1)
+        self.assertEqual(textclick.choose("กูเกิ้ล", items("กูเกิล")).item["i"], 0)
+        self.assertIsNone(textclick.choose("ประวัติ", items("บุ๊กมาร์ก")).item)
+
+    def test_login_without_a_login_button_uses_the_account_entry(self):
+        """Viu: ไม่มีปุ่มเข้าสู่ระบบ มี "โปรไฟล์" · Youku: รูปคนไม่มีชื่อ (BUTTONS_JS ตั้งป้าย "ไอคอนบัญชี")."""
+        pick = textclick.choose("เข้าสู่ระบบ", items("ประวัติ", "บุ๊กมาร์ก", "โปรไฟล์"))
+        self.assertEqual((pick.item["label"], pick.instead), ("โปรไฟล์", True))
+        self.assertEqual(textclick.choose("login", items("History", "ไอคอนบัญชี")).item["i"], 1)
+        pick = textclick.choose("เข้าสู่ระบบ", items("Log in", "โปรไฟล์"))
+        self.assertEqual((pick.item["label"], pick.instead), ("Log in", False))  # มีปุ่มจริง = กดปุ่มจริง
+        self.assertIsNone(textclick.choose("ประวัติ", items("โปรไฟล์")).item)  # เฉพาะคำว่าเข้าสู่ระบบ
+
     def test_nothing_found_says_so(self):
         pick = textclick.choose("เข้าสู่ระบบ", items("หน้าแรก", "ค้นหา"))
         self.assertIn("ไม่เห็นปุ่ม “เข้าสู่ระบบ”", textclick.refuse_text("เข้าสู่ระบบ", pick))
@@ -149,6 +164,18 @@ class ControlTest(unittest.TestCase):
         self.assertTrue(r.ok, r.say)
         self.assertEqual(cdp.clicked, [1])
 
+    def test_skill_label_missing_falls_back_to_the_words(self):
+        """สกิล Viu ที่ Claude สร้าง: ป้าย "รายการของฉัน|My List" ไม่มีในหน้า · คำพูด "บุ๊กมาร์ก" มี."""
+        bc, cdp = browser(["ประวัติ", "บุ๊กมาร์ก", "โปรไฟล์"])
+        cmd = BrowseCommand("click_text", query="รายการของฉัน|My List", site="viu",
+                            direction="บุ๊กมาร์ค|bookmark|ดูทีหลัง")  # fmt: skip
+        r = bc.run(cmd)
+        self.assertEqual((cdp.clicked, r.ok), ([1], True))
+        guess = 'a[href*="login"]'
+        r = bc.run(BrowseCommand("click", query=guess, site="viu", direction="เข้าสู่ระบบ|login"))
+        self.assertEqual(cdp.clicked, [1, 2])
+        self.assertIn("แทน", r.say)
+
     def test_skill_label_only_on_its_site(self):
         bc, cdp = browser(["เข้าสู่ระบบ"], url="https://www.netflix.com/th/")
         r = bc.run(BrowseCommand("click_text", query="เข้าสู่ระบบ", site="viu"))
@@ -208,8 +235,11 @@ class VoiceTest(unittest.TestCase):
         b.finished.connect(lambda say, ok: done.append(ok))
         self.assertTrue(b.runSite("click", 'a[href*="login"]', "viu", "เข้าสู่ระบบ|ล็อกอิน"))
         pump(lambda: done)
-        self.assertTrue(b.runSite("click_text", "เข้าสู่ระบบ|Log in", "viu", ""))
+        self.assertTrue(b.runSite("click_text", "เข้าสู่ระบบ|Log in", "viu", "ล็อกอิน"))
         pump(lambda: len(done) == 2)
         guess = {"kind": "click", "query": 'a[href*="login"]', "site": "viu"}
         label = {"kind": "click_text", "query": "เข้าสู่ระบบ|Log in", "site": "viu"}
-        self.assertEqual(ctl.ran, [{**guess, "direction": "เข้าสู่ระบบ|ล็อกอิน"}, label])
+        self.assertEqual(
+            ctl.ran,
+            [{**guess, "direction": "เข้าสู่ระบบ|ล็อกอิน"}, {**label, "direction": "ล็อกอิน"}],
+        )

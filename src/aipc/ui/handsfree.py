@@ -330,7 +330,7 @@ class BrowserController(QObject):
         if kind == "system":  # ตรวจซ้ำตอนทำ ไม่เชื่อไฟล์อย่างเดียว (H7) · แปลด้วยตัวเดียวกับเสียง (H6)
             cmds, why = sitecmd.alias_commands(arg)
             return self._start(cmds) if not why else False
-        back = words if kind == "click" else ""
+        back = words if kind in ("click", "click_text") else ""
         return self._start([BrowseCommand(kind, query=arg, site=site, direction=back)])
 
     @Slot(str, result="QVariantMap")

@@ -65,6 +65,7 @@ BUTTONS_JS = r"""(() => {
   const SEL = 'a[href], button, input[type=submit], input[type=button], [role=button], ' +
               '[role=link], [role=tab], [role=menuitem], [onclick]';
   const clean = (t) => (t || '').replace(/\s+/g, ' ').trim();
+  const ACCOUNT = /avatar|user[-_]?center|log[-_]?in|sign[-_]?in|passport|account|profile/i;
   const items = [];
   for (const el of document.querySelectorAll(SEL)) {
     if (el.closest('[aria-hidden=true]')) continue;
@@ -74,8 +75,15 @@ BUTTONS_JS = r"""(() => {
         r.left > innerWidth) continue;
     if (el.checkVisibility && !el.checkVisibility({checkOpacity: true, checkVisibilityCSS: true}))
       continue;
-    const label = clean(el.innerText || el.getAttribute('aria-label') || el.title || el.value ||
-                        (el.querySelector('img[alt]') || {}).alt || '').slice(0, 80);
+    let label = clean(el.innerText || el.getAttribute('aria-label') || el.title || el.value ||
+                      (el.querySelector('img[alt]') || {}).alt || '').slice(0, 80);
+    if (!label && r.top < 120) {  // รูปคน/ไอคอนบัญชีบนหัวหน้าเว็บที่ไม่มีชื่อ (Youku) · ดูจากชื่อ class
+      const img = el.querySelector('img, svg');
+      const hint = [el.getAttribute('class'), el.id, el.dataset.spm, el.getAttribute('href'),
+                    el.parentElement && el.parentElement.getAttribute('class'),
+                    img && img.getAttribute('class'), img && img.getAttribute('src')].join(' ');
+      if (ACCOUNT.test(hint)) label = 'ไอคอนบัญชี';
+    }
     if (!label) continue;
     items.push({el, label, y: r.top, x: r.left});
     if (items.length >= 300) break;
@@ -900,12 +908,17 @@ class BrowserControl:
 
         if cmd.site and (bad := self._site_check(cmd)):
             return bad
-        pick = textclick.choose(cmd.query, self._eval(BUTTONS_JS) or [])
+        items = self._eval(BUTTONS_JS) or []
+        pick = textclick.choose(cmd.query, items)
+        if pick.item is None and not pick.choices and cmd.direction:
+            pick = textclick.choose(cmd.direction, items)  # ป้ายที่สกิลเขียนไม่มีในหน้า → คำพูดของคำสั่งนี้
         if why := textclick.refuse_text(cmd.query, pick):
             return Result(False, why)
         if not self._eval(f"{CLICK_TEXT_JS}({pick.item['i']})", userGesture=True):
             return Result(False, "หน้าเว็บเปลี่ยนระหว่างกด · ไม่ได้กดอะไร · ลองพูดอีกครั้ง")
         time.sleep(0.3)
+        if pick.instead:
+            return Result(True, f"ไม่มีปุ่มเข้าสู่ระบบ · กด “{pick.item['label']}” แทน (ทางเข้าบัญชีของเว็บนี้)")
         return Result(True, f"กด “{pick.item['label']}” แล้ว")
 
     def buttons(self) -> list[dict]:

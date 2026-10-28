@@ -43,10 +43,16 @@ _PUNCT = re.compile(r"[\s​.,:;!?()\[\]{}\"'“”‘’·•|/\\>+*_–—-]+"
 MAX_WORDS = 30  # ยาวกว่านี้ = ประโยคคุย/เล่าเรื่อง ไม่ใช่ชื่อปุ่ม
 MAX_PARTIAL_LABEL = 40  # ป้ายยาว (หัวข้อข่าว ชื่อคลิป) ที่บังเอิญมีคำสั้น ๆ ไม่นับว่าเป็นปุ่มนั้น
 MAX_CHOICES = 4
+# ไม่สนวรรณยุกต์ ไม้ไต่คู้ การันต์ และ ค = ก: คนสะกดไม่ตรงกัน
+# (บุ๊กมาร์ค/บุ๊กมาร์ก ในหน้า Viu จริง 2026-10-28 · ล็อคอิน/ล็อกอิน · กูเกิ้ล/กูเกิล)
+_MARKS = re.compile("[\u0e47-\u0e4c]")
+# ไม่มีปุ่ม "เข้าสู่ระบบ" ในหน้า → ทางเข้าบัญชีของเว็บ (Viu = "โปรไฟล์" · Youku = รูปคนมุมขวาบนไม่มีชื่อ
+# ที่ BUTTONS_JS ตั้งป้ายให้ว่า "ไอคอนบัญชี") · กดแล้วหน้าเข้าสู่ระบบขึ้น (ลองบน Pi 5 2026-10-28)
+ACCOUNT = ("ไอคอนบัญชี", "โปรไฟล์", "profile", "บัญชี", "บัญชีของฉัน", "account", "my account", "ฉัน", "me")
 
 
 def norm(text: str) -> str:
-    return _PUNCT.sub("", (text or "").lower())
+    return _MARKS.sub("", _PUNCT.sub("", (text or "").lower())).replace("ค", "ก")
 
 
 def spoken_target(text: str) -> tuple[str, bool]:
@@ -82,6 +88,7 @@ def risky(label: str) -> bool:
 @dataclass
 class Pick:
     item: dict | None = None  # ปุ่มที่จะกด {"i", "label", "kind"}
+    instead: bool = False  # ไม่มีปุ่มเข้าสู่ระบบ → กดทางเข้าบัญชีแทน (บอกผู้ใช้)
     choices: list[str] = field(default_factory=list)  # ใกล้หลายปุ่ม = ชื่อให้ผู้ใช้เลือก
     risky: bool = False
 
@@ -101,6 +108,10 @@ def choose(words: str, items: list[dict]) -> Pick:
         and any(len(v) >= 3 and v in lab for v in want)
     ]
     if not hits:
+        if want & variants("เข้าสู่ระบบ"):
+            entry = {norm(x) for x in ACCOUNT}
+            if acc := [it for it in items if norm(it.get("label", "")) in entry]:
+                return Pick(item=acc[0], instead=True)
         return Pick()
     labels = list(dict.fromkeys(it["label"] for it in hits))
     # ตรงเป๊ะ = ความหมายเดียวกันทั้งหมด (ป้ายซ้ำหัว/ท้ายหน้า หรือคำพ้อง) → ตัวบนสุด · ใกล้หลายแบบ = ถาม
