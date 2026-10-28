@@ -1129,6 +1129,36 @@ class ShellCardTest(unittest.TestCase):
         self.assertIn("ออกจาก Claude แล้ว", find_items(win, "claudeLogoutText")[0].property("text"))
         self.assertEqual(warnings, [])
 
+    def test_claude_daily_level_without_money(self):
+        """Pakon 2026-10-28: เลือกเพดานต่อวันได้อีก แต่เป็นระดับ ไม่แสดงเงิน · แสดง % ที่ใช้ไปวันนี้."""
+        from aipc.cloud.budget import Budget
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._b = Budget(Path(os.environ["XDG_DATA_HOME"]) / "usage-level.json")
+        usage._b.record(0.25, "ask")
+        usage._available = True
+        engine._backends["uiSettings"].setUseClaude(True)
+        usage.changed.emit()
+        settle(50)
+        text = find_items(win, "cloudLevelText")[0].property("text")
+        self.assertIn("25%", text)
+        names = [b.property("text") for b in find_items(win, "cloudLevel_5")]
+        self.assertEqual(names, ["มากที่สุด"])
+        texts, stack = [], [find_items(win, "cloudUsageCard")[0]]
+        while stack:
+            item = stack.pop()
+            if item.isVisible() and isinstance(item.property("text"), str):
+                texts.append(item.property("text"))
+            stack.extend(item.childItems())
+        self.assertFalse([t for t in texts if "$" in t])
+        find_items(win, "cloudLevel_5")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(usage._b.limit, 5.0)
+        self.assertIn("5%", find_items(win, "cloudLevelText")[0].property("text"))
+        self.assertEqual(warnings, [])
+
     def test_claude_logout_failure_says_so(self):
         """การ์ด 0070 L1: คำสั่งล้ม = บอกไม่สำเร็จ ไม่เปลี่ยนค่าอื่น (H5)."""
         import subprocess

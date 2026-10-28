@@ -933,6 +933,17 @@ class CloudUsage(QObject):
 
         return list(LIMITS)
 
+    @Property("QVariantList", constant=True)
+    def levels(self) -> list:
+        """ตัวเลือกเพดานต่อวันแบบไม่แสดงเงิน [{value, name}] เรียงน้อยไปมาก."""
+        from aipc.cloud.budget import LEVELS
+
+        return [{"value": v, "name": n} for v, n in LEVELS.items()]
+
+    @Property(int, notify=changed)
+    def usedPercent(self) -> int:  # noqa: N802
+        return self._b.used_percent() if self._b else 0
+
     @Slot(float)
     def setLimit(self, usd: float) -> None:  # noqa: N802
         if self._b is not None:

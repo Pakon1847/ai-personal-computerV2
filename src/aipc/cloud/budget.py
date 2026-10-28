@@ -17,6 +17,8 @@ from datetime import date
 from pathlib import Path
 
 LIMITS = (0.5, 1.0, 2.0, 5.0)  # USD ต่อวัน ที่ให้เลือกในหน้าตั้งค่า
+# ชื่อระดับที่ผู้ใช้เห็น ไม่แสดงเงิน (Pakon 2026-10-28: "เอาตัวเลือกกลับมาแต่ให้เขียนเป็นอย่างอื่นที่ไม่ใช้เงิน")
+LEVELS = {0.5: "น้อย", 1.0: "ปกติ", 2.0: "มาก", 5.0: "มากที่สุด"}
 DEFAULT_LIMIT = 1.0
 KEEP_DAYS = 31
 
@@ -72,9 +74,13 @@ class Budget:
     def allow(self) -> bool:
         return self.spent() < self.limit
 
+    def used_percent(self) -> int:
+        """ใช้ไปกี่ % ของที่ตั้งไว้วันนี้ (หน้าตั้งค่าแสดงแทนตัวเงิน)."""
+        return min(100, round(100 * self.spent() / self.limit)) if self.limit > 0 else 0
+
     def blocked_message(self) -> str:
-        return (f"ใช้ Claude วันนี้ครบเพดาน ${self.limit:.2f} แล้ว (ราคาอ้างอิง ${self.spent():.2f}) · "
-                "AI ในเครื่องยังใช้ได้ · เพิ่มเพดานได้ที่หน้าตั้งค่า หรือรอวันใหม่")  # fmt: skip
+        return (f"ใช้ Claude วันนี้ครบเพดานที่ตั้งไว้แล้ว (ระดับ “{LEVELS[self.limit]}”) · AI ในเครื่องยังใช้ได้ · "
+                "เพิ่มระดับได้ที่หน้าตั้งค่า หมวด AI หรือรอพรุ่งนี้")  # fmt: skip
 
     def record(self, usd: float, kind: str) -> None:
         with self._lock:
