@@ -534,7 +534,7 @@ ColumnLayout {
                                 }
                             }
                             Chip {
-                                visible: cloudUsage.available
+                                visible: cloudUsage.available && cloudUsage.logoutState !== "done"
                                 text: uiSettings.useClaude ? Tr.t("เปิดอยู่") : Tr.t("ปิดอยู่")
                                 kind: uiSettings.useClaude ? "ok" : "neutral"
                                 dot: true
@@ -551,7 +551,7 @@ ColumnLayout {
                             id: guideButton
                             objectName: "claudeGuideButton"
                             property bool open: false
-                            visible: !cloudUsage.available
+                            visible: !cloudUsage.available || cloudUsage.logoutState === "done"
                             kind: "secondary"
                             text: open ? Tr.t("ซ่อนวิธีเชื่อมต่อ") : Tr.t("วิธีเชื่อมต่อ Claude")
                             onClicked: {
@@ -567,13 +567,47 @@ ColumnLayout {
                         }
                         AppCheck {
                             objectName: "useClaudeCheck"
-                            visible: cloudUsage.available
+                            visible: cloudUsage.available && cloudUsage.logoutState !== "done"
                             text: Tr.t("ให้ถาม Claude เมื่อ AI ในเครื่องตอบไม่ได้")
                             detail: uiSettings.useClaude
                                     ? Tr.t("ส่งไปแค่คำถามกับข้อความล่าสุด (ไม่เกิน 4 ข้อความ) · ไม่ส่งไฟล์ นัด หรือใบหน้า · ดูทุกอย่างที่ส่งไปได้ที่หมวด \"ความเป็นส่วนตัว\"")
                                     : Tr.t("ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีอะไรส่งออกไป")
                             checked: uiSettings.useClaude
                             onClicked: uiSettings.setUseClaude(checked)
+                        }
+                        // ออกจาก Claude (การ์ด 0070 · Pakon 2026-10-28) · กดสองครั้ง · ออกแล้วปิด "ให้ถาม Claude" ให้ (H2)
+                        Connections {
+                            target: cloudUsage
+                            function onGuideChanged() {
+                                if (cloudUsage.logoutState === "done" && uiSettings.useClaude)
+                                    uiSettings.setUseClaude(false)
+                            }
+                        }
+                        RowLayout {
+                            visible: cloudUsage.available
+                            Layout.fillWidth: true
+                            spacing: 12
+                            AppButton {
+                                id: claudeLogout
+                                objectName: "claudeLogoutButton"
+                                property bool confirm: false
+                                visible: cloudUsage.logoutState !== "done"
+                                enabled: cloudUsage.logoutState !== "busy"
+                                kind: confirm ? "danger" : "ghost"
+                                text: cloudUsage.logoutState === "busy" ? Tr.t("กำลังออกจาก Claude…")
+                                      : confirm ? Tr.t("กดอีกครั้งเพื่อออกจาก Claude") : Tr.t("ออกจาก Claude")
+                                onClicked: {
+                                    if (confirm) { confirm = false; cloudUsage.logout() }
+                                    else confirm = true
+                                }
+                            }
+                            AppText {
+                                objectName: "claudeLogoutText"
+                                visible: cloudUsage.logoutText !== ""
+                                Layout.fillWidth: true; size: Theme.fontSmall
+                                color: cloudUsage.logoutState === "failed" ? Theme.warnInk : Theme.inkMuted
+                                text: cloudUsage.logoutText
+                            }
                         }
                     }
                 }

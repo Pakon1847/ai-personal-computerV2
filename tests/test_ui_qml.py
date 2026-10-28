@@ -1093,6 +1093,68 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(find_items(win, "claudeGuide")[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_claude_logout_button(self):
+        """การ์ด 0070 L1: กดสองครั้ง · รัน claude auth logout · ออกแล้วปิดถาม Claude + เห็นปุ่มเชื่อมต่อ."""
+        import subprocess
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        ran = []
+
+        def fake_run(argv, **kw):
+            ran.append(argv)
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        usage._run, usage._find, usage._available = fake_run, lambda: "/x/claude", True
+        usage.changed.emit()
+        engine._backends["uiSettings"].setUseClaude(True)
+        settle(50)
+        btn = find_items(win, "claudeLogoutButton")[0]
+        self.assertTrue(btn.isVisible())
+        btn.clicked.emit()
+        settle(50)
+        self.assertEqual(ran, [])  # กดครั้งแรก = ถามยืนยัน
+        self.assertIn("อีกครั้ง", btn.property("text"))
+        btn.clicked.emit()
+        for _ in range(100):
+            settle(20)
+            if usage.logoutState != "busy":
+                break
+        self.assertEqual(ran, [["/x/claude", "auth", "logout"]])
+        self.assertEqual(usage.logoutState, "done")
+        self.assertFalse(engine._backends["uiSettings"].useClaude)
+        self.assertFalse(btn.isVisible())
+        self.assertTrue(find_items(win, "claudeGuideButton")[0].isVisible())
+        self.assertIn("ออกจาก Claude แล้ว", find_items(win, "claudeLogoutText")[0].property("text"))
+        self.assertEqual(warnings, [])
+
+    def test_claude_logout_failure_says_so(self):
+        """การ์ด 0070 L1: คำสั่งล้ม = บอกไม่สำเร็จ ไม่เปลี่ยนค่าอื่น (H5)."""
+        import subprocess
+
+        engine, win, warnings = self.open_shell("settings")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._find = lambda: "/x/claude"
+
+        def boom(argv, **kw):
+            raise subprocess.TimeoutExpired(argv, 20)
+
+        usage._run = boom
+        engine._backends["uiSettings"].setUseClaude(True)
+        usage.logout()
+        for _ in range(100):
+            settle(20)
+            if usage.logoutState != "busy":
+                break
+        self.assertEqual(usage.logoutState, "failed")
+        self.assertIn("ไม่สำเร็จ", usage.logoutText)
+        self.assertTrue(engine._backends["uiSettings"].useClaude)
+        usage._find = lambda: None
+        usage.logout()
+        self.assertIn("ไม่พบโปรแกรม Claude", usage.logoutText)
+        self.assertEqual(warnings, [])
+
     def test_claude_connect_card_on_assistant_page(self):
         """การ์ด 0021 เกณฑ์ข้อ 3ข: หน้าผู้ช่วยมีแถบเชื่อมต่อใต้คำทักทาย · กดแล้วขั้นตอนขึ้นกลางจอ ·
         "ไว้ทีหลัง" ซ่อน · มี claude แล้วไม่แสดง."""

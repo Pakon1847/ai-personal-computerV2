@@ -767,11 +767,17 @@ class CloudUsage(QObject):
 
     changed = Signal()
     guideChanged = Signal()  # noqa: N815
+    _logoutFinished = Signal(bool, str)  # noqa: N815 · จากเธรดที่รัน claude auth logout → เธรดหน้าจอ
 
     def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None,
                  user: str | None = None, addresses=None, terminal=None, spawn=None,
-                 find=None):  # fmt: skip
+                 find=None, run=None):  # fmt: skip
         super().__init__()
+        # ออกจาก Claude (การ์ด 0070) · run = ตัวรันคำสั่ง (เทสต์ใส่ของปลอม · None = subprocess.run)
+        self._run = run
+        self._logout_state = ""  # "" | busy | done | failed
+        self._logout_text = ""
+        self._logoutFinished.connect(self._logout_done)
         self._user = user or getpass.getuser()
         self._addresses = addresses  # ฟังก์ชันอ่าน IP (เทสต์ใส่ของปลอม) · None = setup_guide.addresses
         self._guide: list = []
@@ -856,6 +862,57 @@ class CloudUsage(QObject):
         self._proc = None
         self._watch.stop()
         self._connected_now = (self._find or find_claude)() is not None
+        self.guideChanged.emit()
+
+    # ---------- ออกจาก Claude (การ์ด 0070) ----------
+    @Property(str, notify=guideChanged)
+    def logoutState(self) -> str:  # noqa: N802
+        return self._logout_state
+
+    @Property(str, notify=guideChanged)
+    def logoutText(self) -> str:  # noqa: N802
+        return self._logout_text
+
+    @Slot()
+    def logout(self) -> None:
+        """รัน `claude auth logout` ของบัญชีนี้ (คำสั่งตายตัว ไม่ผ่าน shell · H7) ในเธรดแยก จอไม่ค้าง ·
+        ผลมาที่ logoutState / logoutText."""
+        import threading
+
+        from aipc.cloud.ask import find_claude
+
+        if self._logout_state == "busy":
+            return
+        exe = (self._find or find_claude)()
+        if exe is None:
+            self._logout_done(False, "ไม่พบโปรแกรม Claude ในบัญชีนี้")
+            return
+        self._logout_state, self._logout_text = "busy", ""
+        self.guideChanged.emit()
+        threading.Thread(target=self._do_logout, args=(exe,), daemon=True).start()
+
+    def _do_logout(self, exe: str) -> None:
+        import subprocess
+
+        try:
+            r = (self._run or subprocess.run)(
+                [exe, "auth", "logout"], stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                timeout=20,
+            )  # fmt: skip
+            ok, detail = r.returncode == 0, (r.stderr or r.stdout or "").strip()
+        except subprocess.TimeoutExpired:
+            ok, detail = False, "คำสั่งไม่ตอบใน 20 วินาที"
+        except OSError as e:
+            ok, detail = False, str(e)
+        self._logoutFinished.emit(ok, detail[:120])
+
+    def _logout_done(self, ok: bool, detail: str) -> None:
+        self._logout_state = "done" if ok else "failed"
+        self._logout_text = (
+            'ออกจาก Claude แล้ว · ปิด "ให้ถาม Claude" ให้แล้ว · จะใช้อีกครั้ง กด "วิธีเชื่อมต่อ Claude"'
+            if ok
+            else f"ออกจาก Claude ไม่สำเร็จ · {detail or 'ไม่ทราบสาเหตุ'} · ยังเข้าอยู่เหมือนเดิม"
+        )
         self.guideChanged.emit()
 
     @Property(float, notify=changed)
