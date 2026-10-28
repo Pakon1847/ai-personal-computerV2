@@ -358,6 +358,23 @@ class BrowserController(QObject):
         self._start([BrowseCommand("click_text", query=pick.item["label"])])
         return {"started": True}
 
+    @Slot(str, result=bool)
+    def mailRead(self, text: str) -> bool:  # noqa: N802
+        """การ์ด 0071: "อ่านเมลล่าสุด" / "มีเมลใหม่ไหม" / "มีเมลจาก … ไหม" → อ่านกล่องจดหมาย Gmail
+        ในเบราว์เซอร์ของผู้ช่วย · ยังไม่ได้เปิด Gmail = เปิดก่อน (แท็บเดิมถ้ามี) · ผลมาทาง finished ·
+        ไม่ใช่เรื่องอ่านเมล = False."""
+        from aipc.skills import mailread
+        from aipc.skills.browse import BrowseCommand
+
+        asked = mailread.parse(text)
+        if not self._active or self._busy or asked is None:
+            return False
+        kind, who = asked
+        cmds = [BrowseCommand("mail_read", query=kind, direction=who)]
+        if "mail.google.com" not in self.currentUrl():
+            cmds.insert(0, BrowseCommand("site", site="gmail"))
+        return self._start(cmds)
+
     @Slot(str, str, result=bool)
     def siteSearch(self, text: str, url: str) -> bool:  # noqa: N802
         """การ์ด 0057: หน้าที่เปิดอยู่เป็นเว็บที่ค้นได้ + "เปิด/ดู/ค้นหา X" → ค้นในเว็บนั้น · ผลมาทาง finished."""

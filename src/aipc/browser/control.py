@@ -94,6 +94,28 @@ BUTTONS_JS = r"""(() => {
     return {i, label: it.label};
   });
 })()"""
+# แถวในกล่องจดหมาย Gmail ที่มองเห็น (การ์ด 0071) · ผู้ส่ง หัวเรื่อง เวลา · ยังไม่อ่าน = แถว zE ·
+# รายการของแท็บที่ซ่อน (โปรโมชัน ฯลฯ) ขนาด 0 = ไม่นับ · ไม่ใช่หน้า Gmail = null · อ่านอย่างเดียว ไม่กดอะไร
+INBOX_JS = r"""(() => {
+  if (location.hostname !== 'mail.google.com') return null;
+  const clean = (t) => (t || '').replace(/\s+/g, ' ').trim();
+  const rows = [];
+  for (const tr of document.querySelectorAll('tr.zA')) {
+    const r = tr.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) continue;
+    const who = tr.querySelector('.yX [email], .yW [email], [email]');
+    const when = tr.querySelector('td.xW span, .xW span');
+    rows.push({
+      unread: tr.classList.contains('zE'),
+      sender: clean(who ? (who.getAttribute('name') || who.textContent) : ''),
+      email: who ? (who.getAttribute('email') || '') : '',
+      subject: clean((tr.querySelector('.bog') || {}).textContent).slice(0, 120),
+      time: clean(when ? (when.textContent || when.getAttribute('title')) : '').slice(0, 40),
+    });
+    if (rows.length >= 20) break;
+  }
+  return rows;
+})()"""
 CLICK_TEXT_JS = r"""((i) => {
   const el = document.querySelector('[data-aipc-t="' + i + '"]');
   if (!el) return false;
@@ -447,6 +469,7 @@ class BrowserControl:
         self._mark = 0
         self._login_proc = None  # หน้าต่างเข้าสู่ระบบแบบไม่คุม (ใช้โปรไฟล์เดียวกัน)
         self._google_blocked = False  # เจอ /sorry/ แล้ว = ค้นด้วย DuckDuckGo ตรง ๆ จนปิดเบราว์เซอร์
+        self._mail_wait = 20.0  # วินาทีที่รอรายการเมลขึ้นหลังเปิด Gmail (การ์ด 0071 · Gmail บน Pi โหลดช้า)
 
     # ---------- เปิด / ต่อ ----------
     @property
@@ -920,6 +943,27 @@ class BrowserControl:
         if pick.instead:
             return Result(True, f"ไม่มีปุ่มเข้าสู่ระบบ · กด “{pick.item['label']}” แทน (ทางเข้าบัญชีของเว็บนี้)")
         return Result(True, f"กด “{pick.item['label']}” แล้ว")
+
+    def _do_mail_read(self, cmd: BrowseCommand) -> Result:
+        """อ่านกล่องจดหมาย Gmail ที่เปิดอยู่ (การ์ด 0071) · query = latest | unread | from ·
+        direction = ชื่อผู้ส่ง · เนื้อหาเมลอยู่ในเครื่อง ไม่ส่งให้ AI (H3) · ไม่ใช่หน้า Gmail = ไม่อ่าน."""
+        from aipc.skills import mailread
+
+        url = self._url()
+        if google_login_page(url):
+            return Result(False, "ยังไม่ได้เข้าสู่ระบบ Gmail · พูด “เข้าสู่ระบบจีเมล” ก่อน")
+        if (urlsplit(url).hostname or "") != "mail.google.com":
+            return Result(False, "ไม่ได้เปิด Gmail อยู่ · พูด “เช็คเมล” ก่อน แล้วพูดอีกครั้ง")
+        if urlsplit(url).fragment not in ("", "inbox"):
+            # เปิดเมลฉบับเดียว (#inbox/…) หรือกล่องอื่น (#sent) อยู่ = กลับหน้ากล่องจดหมายก่อนอ่าน
+            self._eval("location.hash = '#inbox'")
+        end = time.monotonic() + self._mail_wait
+        while True:
+            rows = self._eval(INBOX_JS) or []
+            if rows or time.monotonic() > end:
+                break
+            time.sleep(0.5)  # เพิ่งเปิด Gmail = รอรายการขึ้น
+        return Result(bool(rows), mailread.answer(cmd.query, cmd.direction, rows))
 
     def buttons(self) -> list[dict]:
         """ปุ่มที่มองเห็นในจอ (การ์ด 0069) · ยังไม่เปิด = []."""

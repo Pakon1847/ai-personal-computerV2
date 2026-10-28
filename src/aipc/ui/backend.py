@@ -4004,6 +4004,13 @@ class SkillsController(QObject):
             return {}
         if len(re.sub(r"\s+", "", text)) < 3:
             return {}
+        if site in sitecmd.NO_SITE_SKILL:
+            # Gmail ปฏิทิน ไดรฟ์ เอกสาร: สกิลประจำเว็บไม่รับอยู่แล้ว · เดิมยังถามแล้วส่งให้ Claude จนล้ม 2 รอบ
+            # (Pakon ใน Gmail พูด "เมลล่าสุด" 2026-10-28 · ledger 11:14:55 · $0.10) → บอกตรง ๆ
+            # ไม่ส่งอะไรออก
+            name = SITES[site][0]
+            return {"say": f"ยังเพิ่มคำสั่งเสียงให้ {name} ไม่ได้ (เว็บที่มีข้อมูลส่วนตัว) · "
+                           "ในจีเมลพูดได้ เช่น “อ่านเมลล่าสุด” “มีเมลใหม่ไหม” “ค้นในจีเมลว่า …”"}  # fmt: skip
         if NEEDS_TYPING.match(text.strip()):
             # การ์ด 0057: สกิลประจำเว็บพิมพ์ไม่ได้ (H8) → Claude ได้แค่สกิลที่วางเคอร์เซอร์แล้วบอกว่าทำแล้ว · ไม่ถาม
             name = SITES[site][0]

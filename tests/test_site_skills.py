@@ -357,6 +357,15 @@ class VoiceFlowTest(unittest.TestCase):
         self.assertIsNotNone(self.seen[1][1]["revise"])
         self.assertIn("เพิ่มคำสั่งเสียง", self.seen[1][1]["revise"][1])
 
+    def test_gmail_never_asks_claude_for_a_site_skill(self):
+        """การ์ด 0071 (Pakon ใน Gmail พูด "เมลล่าสุด" · ledger 2026-10-28 11:14:55 · ล้ม 2 รอบ $0.10):
+        เว็บที่สกิลประจำเว็บไม่รับ = บอกตรง ๆ · ไม่ถาม ไม่ส่ง Claude."""
+        s, _ = self.make(YT)
+        said = s.siteLearn("เมลล่าสุด", "https://mail.google.com/mail/u/0/#inbox")
+        self.assertNotIn("confirmToken", said)
+        self.assertIn("อ่านเมลล่าสุด", said["say"])
+        self.assertEqual(self.seen, [])
+
     def test_claude_could_not_add_it_says_so_and_installs_nothing(self):
         """Pakon 2026-10-26: ขอ "เพิ่มอีกหนึ่งแถบ" → Claude ส่งสกิลที่ไม่มีคำนี้ (คีย์ลัดเปิดแท็บไม่ได้) ·
         เดิมขึ้น "แก้สกิลแล้ว" + ติดตั้งรุ่นใหม่ · พูดซ้ำก็ถามซ้ำ → ต้องบอกว่าเพิ่มไม่ได้ และไม่ติดตั้ง (H5)."""
