@@ -1000,7 +1000,7 @@ Item {
                             objectName: "claudeConnectedNow"
                             visible: cloudUsage.connectedNow
                             Layout.fillWidth: true; strong: true; color: Theme.okInk
-                            text: Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
+                            text: Tr.t("เชื่อมต่อ Claude แล้ว · ใช้ได้เลย")
                         }
                     }
                 }
@@ -1328,7 +1328,7 @@ Item {
                     AppText {
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                         text: cloudUsage.connectedNow
-                              ? Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
+                              ? Tr.t("เชื่อมต่อ Claude แล้ว · ใช้ได้เลย")
                               : Tr.t("ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย")
                     }
                 }

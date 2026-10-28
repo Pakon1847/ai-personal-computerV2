@@ -1268,12 +1268,31 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(inner.endswith("-m aipc.cloud.connect"))
         self.assertIn(Path(sys.executable).name, inner)
         self.assertFalse(btn.property("enabled"))
+        import subprocess
+
         usage._find = lambda: "/home/pakon/.local/bin/claude"
+        status = []
+
+        def auth(argv, **kw):
+            status.append(argv)
+            return subprocess.CompletedProcess(argv, 0, f'{{"loggedIn": {logged}}}', "")
+
+        logged, usage._run = "false", auth  # ปิดหน้าต่างโดยยังไม่เข้า = ยังไม่เชื่อมต่อ (H5)
         proc.done = True
         usage._check_connect()
         settle(30)
+        self.assertFalse(usage.connectedNow)
+        self.assertEqual(status, [["/home/pakon/.local/bin/claude", "auth", "status"]])
+        usage._proc, logged = proc, "true"
+        # Pakon 2026-10-28: "เชื่อมต่อแล้วต้องใช้ได้เลย" · ไม่ต้องออกจากระบบ
+        made = []
+        usage._on_connected = lambda: made.append(1) or True
+        usage._check_connect()
+        settle(30)
         self.assertTrue(usage.connectedNow)
+        self.assertEqual((made, usage.available), ([1], True))
         self.assertTrue(find_items(win, "claudeConnectedNow")[0].isVisible())
+        self.assertIn("ใช้ได้เลย", find_items(win, "claudeConnectedNow")[0].property("text"))
         self.assertTrue(btn.property("enabled"))
         usage._terminal = ""  # ไม่มีเทอร์มินัล = เหลือทาง SSH
         usage.guideChanged.emit()

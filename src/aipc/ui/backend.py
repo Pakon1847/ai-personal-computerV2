@@ -771,8 +771,12 @@ class CloudUsage(QObject):
 
     def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None,
                  user: str | None = None, addresses=None, terminal=None, spawn=None,
-                 find=None, run=None):  # fmt: skip
+                 find=None, run=None, on_connected=None):  # fmt: skip
         super().__init__()
+        # เชื่อมต่อเสร็จ = ใช้ได้เลย ไม่ต้องออกแล้วเข้าใหม่ (Pakon 2026-10-28) ·
+        # on_connected() สร้างตัวส่งต่อ Claude ที่ยังไม่มี (เพิ่งติดตั้ง) + เปิด "ให้ถาม Claude" ·
+        # คืน True = แอปใช้ Claude ได้แล้ว
+        self._on_connected = on_connected
         # ออกจาก Claude (การ์ด 0070) · run = ตัวรันคำสั่ง (เทสต์ใส่ของปลอม · None = subprocess.run)
         self._run = run
         self._logout_state = ""  # "" | busy | done | failed
@@ -857,11 +861,22 @@ class CloudUsage(QObject):
     def _check_connect(self) -> None:
         if self._proc is None or self._proc.poll() is None:
             return
+        import subprocess
+
+        from aipc.cloud import connect
         from aipc.cloud.ask import find_claude
 
         self._proc = None
         self._watch.stop()
-        self._connected_now = (self._find or find_claude)() is not None
+        exe = (self._find or find_claude)()
+        # เข้าสู่ระบบจริงไหม ถาม claude auth status (แค่มีโปรแกรม ≠ เข้าแล้ว · H5)
+        run = self._run or subprocess.run
+        self._connected_now = exe is not None and connect.logged_in(exe, run)
+        if self._connected_now:
+            if self._on_connected is not None:
+                self._available = bool(self._on_connected()) or self._available
+            self._logout_state, self._logout_text = "", ""
+        self.changed.emit()
         self.guideChanged.emit()
 
     # ---------- ออกจาก Claude (การ์ด 0070) ----------

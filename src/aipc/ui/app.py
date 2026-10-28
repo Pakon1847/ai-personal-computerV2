@@ -317,6 +317,21 @@ def build(opts: Options, argv: list[str] | None = None):
                           cloud_model=lambda: ui_settings.cloudModel,
                           cloud_effort=lambda: ui_settings.cloudEffort,
                           auto_cloud=True)  # fmt: skip
+
+    def _on_claude_connected() -> bool:
+        """เชื่อมต่อ Claude ที่เครื่องนี้เสร็จ (การ์ด 0070 รอบ 3) · ใช้ได้เลยไม่ต้องออกจากระบบ:
+        เพิ่งติดตั้ง = สร้างตัวส่งต่อ + ตัวสร้างสกิลตอนนี้ · เปิด "ให้ถาม Claude" (ผู้ใช้เพิ่งเชื่อมต่อเอง)."""
+        if chat._cloud is None:
+            chat._cloud = _cloud_client(budget, ledger)
+        skills = engine._backends["skills"]
+        if skills._forge is None:
+            skills._forge = _skill_forge(budget, ledger)
+            chat._forge = skills._forge is not None
+        if chat._cloud is None:
+            return False
+        ui_settings.setUseClaude(True)
+        return True
+
     engine._backends = {
         "uiSettings": ui_settings,
         "system": SystemStatus(),
@@ -354,7 +369,12 @@ def build(opts: Options, argv: list[str] | None = None):
             chat_switch=_chat_switch(chat, ui_settings),
         ),
         "chat": chat,
-        "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
+        "cloudUsage": CloudUsage(
+            budget,
+            available=chat._cloud is not None,
+            ledger=ledger,
+            on_connected=_on_claude_connected if in_session else None,
+        ),  # fmt: skip
         # แผงความเป็นส่วนตัวแบบสด (2026-10-07) · หน้า Login ไม่มีเจ้าของข้อมูล → ไม่แสดง
         "privacyStatus": PrivacyStatus(
             ledger=ledger,

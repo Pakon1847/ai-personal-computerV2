@@ -579,7 +579,7 @@ ColumnLayout {
                         AppText {
                             visible: cloudUsage.connectedNow
                             Layout.fillWidth: true; strong: true; color: Theme.okInk
-                            text: Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
+                            text: Tr.t("เชื่อมต่อ Claude แล้ว · ใช้ได้เลย")
                         }
                         ClaudeGuide {
                             objectName: "claudeGuide"

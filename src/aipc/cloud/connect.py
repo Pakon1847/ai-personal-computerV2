@@ -58,7 +58,7 @@ def main(find=find_claude, run=subprocess.run, out=print, ask=input) -> int:
         out('\nยังไม่ได้เข้าสู่ระบบ Claude · ปิดหน้าต่างนี้แล้วกดปุ่ม "เชื่อมต่อที่เครื่องนี้" ใหม่')
         _wait(ask)
         return 1
-    out("\nเข้าสู่ระบบ Claude แล้ว · ออกจากระบบแล้วเข้าใหม่ หน้าผู้ช่วยจะใช้ Claude ได้")
+    out("\nเข้าสู่ระบบ Claude แล้ว · กด Enter ปิดหน้าต่างนี้ แล้วใช้ Claude ได้เลย")
     _wait(ask)
     return 0
 
