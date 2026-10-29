@@ -8,6 +8,7 @@
 set -u
 cd "$(dirname "$0")/../.."
 MODELS="$HOME/bench-models"
+USB=/mnt/bench-usb/bench-models   # microSD ที่ว่างไม่พอ (19 GB < 24 GB) · อ่านจากแฟลชไดรฟ์ (ro) · ตรวจ sha256 แล้วบนโน้ตบุ๊ก
 OUT="docs/benchmarks/2026-10-29-llm-compare/raw"
 PY="${PY:-$HOME/aipc-0025/.venv/bin/python}"
 BENCH="$HOME/llama.cpp/build/bin/llama-bench"
@@ -30,6 +31,7 @@ state() { echo "$(date -Iseconds) temp=$(temp) $(vcgencmd get_throttled) avail_m
 for LABEL in "$@"; do
   F="$(file_of "$LABEL")"
   M="$MODELS/$F"
+  [ -f "$M" ] || M="$USB/$F"
   [ -f "$M" ] || M="/opt/aipc-models/$F"
   [ -f "$M" ] || { echo "SKIP $LABEL: ไม่มีไฟล์ $F"; continue; }
   LOG="$OUT/$LABEL.log"
