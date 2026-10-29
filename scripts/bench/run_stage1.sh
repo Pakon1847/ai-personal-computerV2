@@ -1,7 +1,7 @@
 #!/bin/sh
 # เทียบ LLM ขั้น 1 (ทุกโมเดล) บน Pi 5 · 2026-10-29 · docs/benchmarks/2026-10-29-llm-compare/README.md
 #   ./scripts/bench/run_stage1.sh <label> [<label> ...]
-# ต่อโมเดล: รอ < 65°C → llama-bench (pp200 / tg64 · 3 thread · 3 รอบ) → llama-server ค่าเดียวกับแอป
+# ต่อโมเดล: รอ < 65°C → llama-bench (pp200 / tg64 · 3 thread · 5 รอบ) → llama-server ค่าเดียวกับแอป
 # (TCP 127.0.0.1:18080 ชั่วคราว) → เวลาเริ่มตอบ 9 ข้อจากชุดพัฒนา (A01–A09) → RAM สูงสุดของ llama-server → ปิด
 # ชุดทดสอบอิสระไม่รันบน Pi (รันบนโน้ตบุ๊ก · README หัวข้อ "แก้ก่อนรัน")
 # ไม่แตะหน้า Login · service ของระบบ · /etc · /opt (อ่านอย่างเดียว) · ผลอยู่ใน OUT · ไม่ commit เอง
@@ -39,7 +39,7 @@ for LABEL in "$@"; do
   cool
   echo "before-bench $(state)" >> "$LOG"
   $PY -m aipc.spikes.llm --bench "$BENCH" --model "$M" --label "$LABEL" --size 3-4b --threads 3 \
-      --prompt 200 --gen 64 --runs 3 --meta "llama_cpp=$(git -C "$HOME/llama.cpp" rev-parse --short HEAD)" \
+      --prompt 200 --gen 64 --runs 5 --meta "llama_cpp=$(git -C "$HOME/llama.cpp" rev-parse --short HEAD)" \
       --out "$OUT" >> "$LOG" 2>&1 || echo "BENCH-FAIL $LABEL" | tee -a "$LOG"
   echo "after-bench $(state)" >> "$LOG"
   cool
