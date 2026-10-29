@@ -212,11 +212,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--fallback", action="store_true",
                     help="ไฮบริด: AI ในเครื่องตอบว่าไม่รู้ = ส่งต่อ Claude ด้วย (เหมือนแอป)")  # fmt: skip
     ap.add_argument("--only", default="", help="เฉพาะ id ที่ขึ้นต้นด้วย (เช่น B) · ว่าง = ทุกข้อ")
+    ap.add_argument("--dataset", type=Path, default=DATASET,
+                    help="ชุดคำถาม · ไม่มี criteria = ใช้เกณฑ์ของชุดสอบ 100 ข้อ")  # fmt: skip
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    data = json.loads(DATASET.read_text(encoding="utf-8"))
+    data = json.loads(a.dataset.read_text(encoding="utf-8"))
+    if "criteria" not in data:  # ชุดทดสอบอิสระ (2026-10-29) ตัดสินด้วยเกณฑ์เดียวกับชุดสอบ 100 ข้อ
+        data["criteria"] = json.loads(DATASET.read_text(encoding="utf-8"))["criteria"]
     items = [i for i in data["items"] if i["id"].startswith(a.only)]
     now = datetime.now()
     ph = placeholders(now)
@@ -241,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
         "cloud": a.cloud,
         "fallback": a.fallback,
         "date": now.isoformat(timespec="minutes"),
+        "dataset": a.dataset.name,
         "system_chars": len(system),
         "rows": rows,
     }
