@@ -2,7 +2,8 @@
 # เทียบ LLM ขั้น 1 (ทุกโมเดล) บน Pi 5 · 2026-10-29 · docs/benchmarks/2026-10-29-llm-compare/README.md
 #   ./scripts/bench/run_stage1.sh <label> [<label> ...]
 # ต่อโมเดล: รอ < 65°C → llama-bench (pp200 / tg64 · 3 thread · 3 รอบ) → llama-server ค่าเดียวกับแอป
-# (TCP 127.0.0.1:18080 ชั่วคราว) → ชุดทดสอบอิสระ 100 ข้อ (รันครั้งเดียว) → RAM สูงสุดของ llama-server → ปิด
+# (TCP 127.0.0.1:18080 ชั่วคราว) → เวลาเริ่มตอบ 9 ข้อจากชุดพัฒนา (A01–A09) → RAM สูงสุดของ llama-server → ปิด
+# ชุดทดสอบอิสระไม่รันบน Pi (รันบนโน้ตบุ๊ก · README หัวข้อ "แก้ก่อนรัน")
 # ไม่แตะหน้า Login · service ของระบบ · /etc · /opt (อ่านอย่างเดียว) · ผลอยู่ใน OUT · ไม่ commit เอง
 set -u
 cd "$(dirname "$0")/../.."
@@ -58,7 +59,7 @@ for LABEL in "$@"; do
   fi
   echo "server-ready-s $(( $(date +%s) - T0 ))" >> "$LOG"
   $PY -m aipc.spikes.exam --label "$LABEL" --model-name "" --server http://127.0.0.1:18080 \
-      --dataset tests/data/llm_compare_heldout.json --out "$OUT/$LABEL-heldout.json" >> "$LOG" 2>&1 \
+      --only A0 --out "$OUT/$LABEL-ttft-dev.json" >> "$LOG" 2>&1 \
       || echo "EXAM-FAIL $LABEL" | tee -a "$LOG"
   grep -E "^(VmHWM|VmRSS)" /proc/$PID/status | tr -s ' \t' ' ' | sed 's/^/server-/' >> "$LOG"
   echo "after-exam $(state)" >> "$LOG"
