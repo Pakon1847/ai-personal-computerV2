@@ -73,7 +73,7 @@ def main() -> int:
             "fab": d["summary"]["fabricated"],
             "honest": "{}/{}".format(*d["summary"]["honest"]),
             "route": "{}/{}".format(*d["summary"]["route"]),
-            "empty": sum(r["by"] == "local" and not (r.get("text") or r.get("tool")) for r in rows),
+            "empty": sum(r["route"] == "chat" and not r["text"] for r in llm),
             "passed": sum(v is True for v in crit.values()),
             "unknown": sum(v is None for v in crit.values()),
             "crit": crit,
