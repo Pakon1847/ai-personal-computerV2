@@ -1,0 +1,267 @@
+{
+ "label": "qwen2.5-coder-1.5b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T03:41",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่รู้",
+   "ttft": 50.33,
+   "seconds": 50.74,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1879,
+    "prompt_ms": 50297.623,
+    "prompt_per_token_ms": 26.768293241085683,
+    "prompt_per_second": 37.35763020053651,
+    "predicted_n": 5,
+    "predicted_ms": 408.213,
+    "predicted_per_token_ms": 102.05325,
+    "predicted_per_second": 9.798806015487012
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "{\"name\": \"temperature\", \"arguments\": {\"type\": \"object\", \"properties\": {\"temperature\": 20}}}\n\nขออภัยที่ผ่านมา ถ้ามีคำถามอื่นๆ โปรดถาม",
+   "ttft": 1.16,
+   "seconds": 6.23,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 35,
+    "prompt_ms": 1133.352,
+    "prompt_per_token_ms": 32.381485714285716,
+    "prompt_per_second": 30.881844299035073,
+    "predicted_n": 49,
+    "predicted_ms": 5065.149,
+    "predicted_per_token_ms": 105.5239375,
+    "predicted_per_second": 9.476522803179137
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมี 31 จังหวัด",
+   "ttft": 0.51,
+   "seconds": 1.69,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 14,
+    "prompt_ms": 491.363,
+    "prompt_per_token_ms": 35.09735714285714,
+    "prompt_per_second": 28.492173810400864,
+    "predicted_n": 12,
+    "predicted_ms": 1182.316,
+    "predicted_per_token_ms": 107.48327272727273,
+    "predicted_per_second": 9.303773272120145
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "ผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์คือที่ชื่อว่านิวอร์ซัล นิวอร์ซัลเป็นผู้คิดค้นและพัฒนาหลอดไฟที่ใช้ในพาณิชย์ในช่วงที่ยังไม่ใช่เทคโนโลยีปัจจุบัน",
+   "ttft": 1.11,
+   "seconds": 11.8,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 34,
+    "prompt_ms": 1092.042,
+    "prompt_per_token_ms": 32.11888235294117,
+    "prompt_per_second": 31.134333661159555,
+    "predicted_n": 101,
+    "predicted_ms": 10685.586,
+    "predicted_per_token_ms": 106.85585999999999,
+    "predicted_per_second": 9.358401120911854
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"water-chemical\", \"description\": \"สูตรเคมีของน้ำ: น้ำเป็นสารก๊าซ์ที่มีชื่อว่า H2O ซึ่งเป็นส่วนหนึ่งของอนุกรมเคมี ซึ่งประกอบด้วย H (Hydrogen) และ O (Oxygen) ทั้งหมดอยู่ในจำนวน 2 ตัว\", \"parameters\": {\"type\": \"object\", \"properties\": {}}}}\n</tools>",
+   "ttft": 0.71,
+   "seconds": 14.91,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 17,
+    "prompt_ms": 586.784,
+    "prompt_per_token_ms": 34.51670588235294,
+    "prompt_per_second": 28.97147843158641,
+    "predicted_n": 134,
+    "predicted_ms": 14302.541,
+    "predicted_per_token_ms": 107.5379022556391,
+    "predicted_per_second": 9.299046931590688
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "ดวงที่ใหญ่ที่สุดในระบบสุริยะคือดวงที่เรียกว่า นักรูป หรือ ดาวที่ใหญ่ที่สุด คือดวงที่เรียกว่า นักรูป หรือ ดาวที่ใหญ่ที่สุด คือดวงที่เรียกว่า นักรูป หรือ ดาวที่ใหญ่ที่สุด",
+   "ttft": 0.95,
+   "seconds": 11.91,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 29,
+    "prompt_ms": 932.563,
+    "prompt_per_token_ms": 32.15734482758621,
+    "prompt_per_second": 31.09709478072795,
+    "predicted_n": 103,
+    "predicted_ms": 10954.767,
+    "predicted_per_token_ms": 107.39967647058823,
+    "predicted_per_second": 9.311015012916295
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่ใช่",
+   "ttft": 0.79,
+   "seconds": 1.23,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 24,
+    "prompt_ms": 769.876,
+    "prompt_per_token_ms": 32.07816666666667,
+    "prompt_per_second": 31.17385137346794,
+    "predicted_n": 5,
+    "predicted_ms": 441.721,
+    "predicted_per_token_ms": 110.43025,
+    "predicted_per_second": 9.055489777483977
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำแม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำแม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำแม่น้ำที่ยาวที่สุดในประเทศไทย",
+   "ttft": 0.82,
+   "seconds": 7.58,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 23,
+    "prompt_ms": 801.131,
+    "prompt_per_token_ms": 34.831782608695654,
+    "prompt_per_second": 28.709412068687893,
+    "predicted_n": 64,
+    "predicted_ms": 6756.803,
+    "predicted_per_token_ms": 107.25084126984127,
+    "predicted_per_second": 9.323936186980736
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "CPU คือ Central Processing Unit หรือพื้นฐานในการทำงานของคอมพิวเตอร์ ทำหน้าที่สำคัญสุดของ CPU คือ ทำคำสั่ง และข้อมูลให้คอมพิวเตอร์ทำงานอย่างถูกต้อง ซึ่งทำให้คอมพิวเตอร์สามารถทำงานได้ดีและสูงประสิทธิภาพ",
+   "ttft": 0.65,
+   "seconds": 11.49,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1861,
+    "prompt_n": 18,
+    "prompt_ms": 628.091,
+    "prompt_per_token_ms": 34.89394444444444,
+    "prompt_per_second": 28.658267671404303,
+    "predicted_n": 98,
+    "predicted_ms": 10846.238,
+    "predicted_per_token_ms": 111.81688659793814,
+    "predicted_per_second": 8.943193022317969
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 2,
+  "to_check": 7,
+  "cloud": 0,
+  "ttft_median": 0.82,
+  "seconds_total": 117.6,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 2,
+    "check": 7,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

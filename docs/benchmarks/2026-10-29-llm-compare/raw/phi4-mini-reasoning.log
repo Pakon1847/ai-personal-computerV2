@@ -1,0 +1,78 @@
+== phi4-mini-reasoning (Phi-4-mini-reasoning-Q4_K_M.gguf) 03:43:42
+before-bench 2026-10-30T03:43:52+07:00 temp=64.8 throttled=0xe0000 avail_mb=7644
+# 2026-10-30-pi5-llm-phi4-mini-reasoning-t3
+
+**ยังใช้เป็นหลักฐานระดับ 4 ไม่ได้**
+
+- คำเตือน: ไฟตกหรือร้อนเกินระหว่างรอบ [1, 3, 4] — ผลชุดนี้ใช้ไม่ได้ ต้องวัดใหม่
+- คำเตือน: get_throttled ก่อนวัด = 0xe0000 (เคยลดความเร็วตั้งแต่บูต) — ตรวจไม่ได้ว่าเกิดซ้ำระหว่างวัดไหม · ไม่นับเป็นระดับ 4 · รีบูตแล้ววัดใหม่
+- คำเตือน: มีไฟล์ที่ยังไม่ commit ตอนวัด — ผลนี้ไม่ได้ผูกกับ commit ใดจริง
+
+## ผล (วินาที ไม่รวม warm-up)
+
+| n | median | p95 | min | max |
+|---|---|---|---|---|
+| 5 | 44.8366 | 46.5330 | 44.3177 | 46.5330 |
+
+p95 คำนวณแบบ nearest-rank · เมื่อ n = 5 p95 คือลำดับที่ 5 จาก 5 ของค่าที่เรียงแล้ว
+
+## ค่าที่โปรแกรมรายงาน (ไม่รวม warm-up)
+
+| ค่า | n | median | p95 | min | max |
+|---|---|---|---|---|---|
+| peak_rss_mb | 5 | 4838 | 4838 | 4838 | 4838 |
+| pp_tok_s | 5 | 16.17 | 16.58 | 16.05 | 16.58 |
+| prefill_s | 5 | 12.37 | 12.46 | 12.06 | 12.46 |
+| tg_tok_s | 5 | 4.386 | 4.442 | 4.375 | 4.442 |
+
+ค่าที่ "ยิ่งสูงยิ่งดี" (เช่น tok/s) ให้ดู min แทน p95 — p95 ของ tok/s คือรอบที่เร็ว ไม่ใช่รอบที่แย่
+
+## เครื่อง
+
+- บอร์ด: Raspberry Pi 5 Model B Rev 1.0 (pi5)
+- RAM: 8062 MB
+- OS: Debian GNU/Linux 13 (trixie) · kernel 6.18.50+rpt-rpi-2712 · Python 3.13.5
+- commit: 7ea91916ab8a47c19ed5ff1f14168f68ca3fb370 (มีไฟล์ค้างแก้: True)
+- อุณหภูมิตอนเริ่ม: 64.45 °C
+
+## คำสั่งที่วัด
+
+```
+/home/aipc2030/llama.cpp/build/bin/llama-bench -m /mnt/bench-usb/bench-models/Phi-4-mini-reasoning-Q4_K_M.gguf -t 3 -p 200 -n 64 -r 1 -o json
+```
+
+## ค่าที่ตั้ง
+
+- threads: 3
+- prompt_tokens: 200
+- gen_tokens: 64
+- size_class: 3-4b
+- ttft_target_s: 10.0
+- llama_cpp: 86ea01d
+
+## ไฟล์ที่ใช้ (sha256)
+
+- `/mnt/bench-usb/bench-models/Phi-4-mini-reasoning-Q4_K_M.gguf` 81878401a2f8160473649af89560a7fc0932f3623e4f6e58143d5dcbf71d6480
+
+## หมายเหตุของผู้วัด
+
+(เขียนเพิ่มเองด้วยมือ: ไฟ, cooler, รุ่น SD/SSD, สิ่งที่เห็นผิดปกติ)
+
+เกณฑ์ BRIEF 5.4 (prefill 200 token ≤ 10.0 วิ, ใช้รอบที่แย่สุด): 12.46 วิ → ไม่ผ่าน
+after-bench 2026-10-30T03:49:15+07:00 temp=77.9 throttled=0xe0000 avail_mb=7632
+before-server 2026-10-30T03:49:35+07:00 temp=59.8 throttled=0xe0000 avail_mb=7665
+server-ready-s 10
+A01 local chat            check          ttft 54.34 · 150.45 วิ · '<think>\n\n</think>\n\nท้องฟ้าที่เป็นสีน้ำเงินได้นำไปทำให้ท้องฟ้'
+A02 local chat            ok             ttft 2.64 · 135.49 วิ · '<think>\n\nOkay, so I need to figure out how many degrees Cels'
+A03 local chat            check          ttft 0.82 · 137.42 วิ · '<think>\nAlright, so the user is asking how many dance steps '
+A04 local chat            check          ttft 2.66 · 139.39 วิ · "<think>\nAlright, let's try to figure out who is responsible "
+A05 local chat            ok             ttft 1.19 · 136.8 วิ · "<think>\nOkay, let's try to figure out the molecular structur"
+A06 local chat            ok             ttft 2.07 · 138.28 วิ · "<think>\nAlright, let's try to figure out this question. The "
+A07 local chat            check          ttft 1.97 · 138.24 วิ · "<think>\n\nOkay, let's try to figure out if Thalassai Pen Raja"
+A08 local chat            check          ttft 1.67 · 137.91 วิ · '<think>\n\nOkay, so I need to figure out which major river in '
+A09 local chat            ok             ttft 1.29 · 137.1 วิ · '<think>\n\nAlright, so I need to figure out what the question '
+phi4-mini-reasoning: ok อัตโนมัติ 4/9 · ให้คนตรวจ 5 · แต่ง 0 · สกิลถูก 0/0 · บอกตรง ๆ 0/0 · ส่ง cloud 0 · เริ่มตอบ (มัธยฐาน) 1.97 วิ
+server-VmHWM: 5521984 kB
+server-VmRSS: 5521984 kB
+after-exam 2026-10-30T04:10:37+07:00 temp=84.5 throttled=0xe0008 avail_mb=4627
+DONE phi4-mini-reasoning 04:10:37

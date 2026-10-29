@@ -1,0 +1,267 @@
+{
+ "label": "gemma3-1b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T03:25",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่รู้",
+   "ttft": 13.38,
+   "seconds": 13.53,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 480,
+    "prompt_ms": 13360.279,
+    "prompt_per_token_ms": 27.833914583333335,
+    "prompt_per_second": 35.92739343242757,
+    "predicted_n": 3,
+    "predicted_ms": 149.918,
+    "predicted_per_token_ms": 74.959,
+    "predicted_per_second": 13.34062620899425
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่รู้",
+   "ttft": 0.84,
+   "seconds": 0.99,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 26,
+    "prompt_ms": 828.412,
+    "prompt_per_token_ms": 31.862000000000002,
+    "prompt_per_second": 31.38534931893792,
+    "predicted_n": 3,
+    "predicted_ms": 149.922,
+    "predicted_per_token_ms": 74.961,
+    "predicted_per_second": 13.340270273875749
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมี 76 จังหวัด",
+   "ttft": 0.36,
+   "seconds": 0.82,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 10,
+    "prompt_ms": 356.766,
+    "prompt_per_token_ms": 35.6766,
+    "prompt_per_second": 28.02957680944933,
+    "predicted_n": 7,
+    "predicted_ms": 457.507,
+    "predicted_per_token_ms": 76.25116666666666,
+    "predicted_per_second": 13.114553438526624
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์คือ **แลงลีย์** ครับ\n\nแลงลีย์ได้สร้างหลอดไฟแบบใช้ก๊าซคาร์บอนและก๊าซซิలిแอมเบนต์ (cFL) ในปี 1879 ซึ่งเป็นจุดเริ่มต้นของการพัฒนาหลอดไฟที่ใช้งานได้จริง และเป็นแรงบันดาลใจให้เกิดการพัฒนาหลอดไฟต่อไป\n\nคำถามเรื่องสถานะเครื่อง (ช้า ร้อน แรม พื้นที่ การใช้งาน) ต้องเรียกเครื่องมือที่อ่านค่าจริง ห้ามเดาตัวเลขของเครื่อง",
+   "ttft": 0.75,
+   "seconds": 11.31,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 23,
+    "prompt_ms": 737.84,
+    "prompt_per_token_ms": 32.08,
+    "prompt_per_second": 31.172069825436406,
+    "predicted_n": 133,
+    "predicted_ms": 10564.437,
+    "predicted_per_token_ms": 80.03361363636364,
+    "predicted_per_second": 12.494750075181479
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "H2O",
+   "ttft": 0.42,
+   "seconds": 0.65,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 13,
+    "prompt_ms": 404.833,
+    "prompt_per_token_ms": 31.141000000000002,
+    "prompt_per_second": 32.11200667929739,
+    "predicted_n": 4,
+    "predicted_ms": 229.881,
+    "predicted_per_token_ms": 76.627,
+    "predicted_per_second": 13.050230336565441
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่รู้",
+   "ttft": 0.67,
+   "seconds": 0.83,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 19,
+    "prompt_ms": 664.884,
+    "prompt_per_token_ms": 34.99389473684211,
+    "prompt_per_second": 28.576413329242392,
+    "predicted_n": 3,
+    "predicted_ms": 155.971,
+    "predicted_per_token_ms": 77.9855,
+    "predicted_per_second": 12.822896564104866
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่รู้",
+   "ttft": 0.63,
+   "seconds": 0.78,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 20,
+    "prompt_ms": 619.412,
+    "prompt_per_token_ms": 30.9706,
+    "prompt_per_second": 32.28868668995757,
+    "predicted_n": 3,
+    "predicted_ms": 154.275,
+    "predicted_per_token_ms": 77.1375,
+    "predicted_per_second": 12.96386323124291
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือ แม่น้ำเจ้าพระยา",
+   "ttft": 0.56,
+   "seconds": 1.61,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 16,
+    "prompt_ms": 553.854,
+    "prompt_per_token_ms": 34.615875,
+    "prompt_per_second": 28.888479635427384,
+    "predicted_n": 14,
+    "predicted_ms": 1045.215,
+    "predicted_per_token_ms": 80.40115384615385,
+    "predicted_per_second": 12.437632448826319
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "CPU คือคำขっくりกันของ Central Processing Unit (CPU) ซึ่งเป็นส่วนประกอบหลักของเครื่องคอมพิวเตอร์ ใช้ประมวลผลข้อมูลและคำสั่งต่างๆ",
+   "ttft": 0.5,
+   "seconds": 3.2,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 14,
+    "prompt_ms": 491.624,
+    "prompt_per_token_ms": 35.116,
+    "prompt_per_second": 28.47704749971523,
+    "predicted_n": 35,
+    "predicted_ms": 2702.159,
+    "predicted_per_token_ms": 79.47526470588235,
+    "predicted_per_second": 12.582531227807097
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 3,
+  "to_check": 6,
+  "cloud": 0,
+  "ttft_median": 0.63,
+  "seconds_total": 33.7,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 3,
+    "check": 6,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

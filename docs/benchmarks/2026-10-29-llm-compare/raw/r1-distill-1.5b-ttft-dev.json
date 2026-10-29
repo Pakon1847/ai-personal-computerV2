@@ -1,0 +1,267 @@
+{
+ "label": "r1-distill-1.5b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T04:13",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\n requested的问题是“Why does the apple fall?” 这句话有点奇怪，因为苹果是水果，不会掉到地面上或者空中。如果你是在问苹果树为什么会落叶，或者苹果为什么会掉在某个地方，那我可能需要更准确地回答。请提供更多上下文或具体问题，我会尽力帮助你解答！",
+   "ttft": 53.53,
+   "seconds": 60.64,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 831,
+    "prompt_ms": 19667.037,
+    "prompt_per_token_ms": 23.66671119133574,
+    "prompt_per_second": 42.25344163434482,
+    "predicted_n": 400,
+    "predicted_ms": 40953.342,
+    "predicted_per_token_ms": 102.63995488721804,
+    "predicted_per_second": 9.742794617347714
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\nคุณต้องการตรวจสอบwater temperature ของ Raspberry Pi หรือมีการตรวจสอบเพื่อการตรวจสอบได้? คุณต้องการให้รับ information หรือให้ช่วยเหลืออะไรกับการตรวจสอบwater temperature ของPi คุณสามารถตรวจสอบwater temperature ของPi ได้ด้วย/method ที่ให้คุณตรวจสอบ periodically หรือคุณอาจใช้แพลตฟอร์มPi ที่ให้คุณตรวจสอบwater temperature ได้ คุณสามารถตรวจสอบwater temperature ได้ด้วยแพลตฟอร์มPi ที่ให้คุณตรวจสอบ periodically หรือคุณอาจใช้แพลตฟอร์มPi ที่ให้คุณตรวจสอบwater temperature ได้ คุณสามารถตรวจสอบwater temperature ได้ด้วยแพลตฟอร์มPi ที่ให้คุณตรวจสอบ periodically ได้ คุณสามารถตรวจสอบwater temperature ได้ด้วยแพลตฟอร์มPi ที่ให้คุณตรวจสอบ periodically ได้ คุณสามารถตรวจสอบwater temperature ได้ด้วยแพลตฟอร์มPi ที่ให้คุณตรวจสอบ periodically ได้ คุณสามารถตรวจสอบwater temperature ได้ด้วยแพลตฟอร์มPi ที่ให้คุณตรวจสอบ periodically ได้ คุณสามารถตรวจสอบwater temperature ได้",
+   "ttft": 19.13,
+   "seconds": 53.6,
+   "finish": "length",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 33,
+    "prompt_ms": 998.24,
+    "prompt_per_token_ms": 30.24969696969697,
+    "prompt_per_second": 33.0581824010258,
+    "predicted_n": 512,
+    "predicted_ms": 52597.776,
+    "predicted_per_token_ms": 102.93106849315068,
+    "predicted_per_second": 9.715239670970119
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\nเกี่ยวกับระบบนี้:\n\n1. **Raspberry Pi 5**:\n   - **CPU**: Raspberry Pi 5 通常使用 CPU 0568，具备 8 ตุลาคม (8-bit) 的速度，适合处理简单的程序。\n   - **RAM**: 5 RAM ตุลาคม 256-bit คือ 5 ตุลาคม (5MB) หรือ 1 ตุลาคม 16MB คือ 16MB ตุลาคม (16-bit) คือ 8 ตุลาคม (8-bit) คือ 8 ตุลาคม (8-bit) คือ 1 ตุลาคม 16MB。\n   - **CPU 8 ตุลาคม (8-bit)**: CPU 0568 คือ 0",
+   "ttft": 32.99,
+   "seconds": 52.83,
+   "finish": "length",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 12,
+    "prompt_ms": 362.606,
+    "prompt_per_token_ms": 30.217166666666667,
+    "prompt_per_second": 33.09377120069718,
+    "predicted_n": 512,
+    "predicted_ms": 52457.058,
+    "predicted_per_token_ms": 102.65569080234833,
+    "predicted_per_second": 9.741301161037281
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\nBased on the thought process and the provided commands, the formula to calculate the time required for the AI to run 100 commands is:\n\n\\[ t = \\frac{1}{4} \\times 100 \\]\n\nThis simplifies to:\n\n\\[ t = 25 \\text{ seconds} \\]\n\nSo, the time it takes for the AI to run 100 commands is **25 seconds**.",
+   "ttft": 19.14,
+   "seconds": 28.31,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 32,
+    "prompt_ms": 952.97,
+    "prompt_per_token_ms": 29.7803125,
+    "prompt_per_second": 33.57923124547467,
+    "predicted_n": 270,
+    "predicted_ms": 27351.784,
+    "predicted_per_token_ms": 101.67949442379182,
+    "predicted_per_second": 9.8348246681094
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\nสูตรเคมีของน้ำคือ N₂H₆ ที่เป็นการต่อ chemical formula ของ water ที่ต่อ chemical formula ของ N 2 ที่เป็น 2 ตัว N ต่อ chemical formula ของ H ที่เป็น 6 ตัว H ต่อ chemical formula ของ N 2 ที่เป็น 2 ตัว N ต่อ chemical formula ของ H ที่เป็น 6 ตัว H ต่อ chemical formula ของ N 2 ที่เป็น 2 ตัว N ต่อ chemical formula ของ H ที่เป็น 6 ตัว H ต่อ chemical formula ของ N 2 ที่เป็น 2",
+   "ttft": 35.75,
+   "seconds": 53.39,
+   "finish": "length",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 15,
+    "prompt_ms": 505.41,
+    "prompt_per_token_ms": 33.694,
+    "prompt_per_second": 29.678874577076037,
+    "predicted_n": 512,
+    "predicted_ms": 52871.125,
+    "predicted_per_token_ms": 103.46599804305283,
+    "predicted_per_second": 9.665010910965107
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\nหากคุณต้องการเกี่ยวกับ Data from Raspberry Pi 5 (Raspberry Pi 5) ที่เกี่ยวข้องกับ วันศุกร์ที่ 30 ตุลาคม พ.ศ. 2569 (ค.ศ. 2026)，คุณสามารถทำตามขั้นตอนต่อไปนี้:\n\n1. **ค้นหา Data**:\n   - ค้นหา Data ที่เกี่ยวข้องกับ Raspberry Pi 5 ที่คุณต้องการเกี่ยวกับ:\n     - 时间: 30 ตุลาคม พ.ศ. 2569 (ค.ศ. 2026)\n     - ลิขสิทธิ์: คุณต้องการเกี่ยวกับ Data ที่เกี่ยวข้องกับสถาบันหรือสิ่งที่เกี่ยวข้องกับ Raspberry Pi 5\n     - 更新: คุณต้องการเกี่ยวกับ Data ที่เกี่ยวข",
+   "ttft": 27.83,
+   "seconds": 53.84,
+   "finish": "length",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 27,
+    "prompt_ms": 804.159,
+    "prompt_per_token_ms": 29.783666666666665,
+    "prompt_per_second": 33.575449631229645,
+    "predicted_n": 512,
+    "predicted_ms": 53027.813,
+    "predicted_per_token_ms": 103.77262818003915,
+    "predicted_per_second": 9.636452478249481
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\nSuan Yattanasupong was born on December 13, 2000.",
+   "ttft": 12.11,
+   "seconds": 14.36,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 22,
+    "prompt_ms": 694.53,
+    "prompt_per_token_ms": 31.56954545454545,
+    "prompt_per_second": 31.67609750478741,
+    "predicted_n": 135,
+    "predicted_ms": 13652.595,
+    "predicted_per_token_ms": 101.88503731343283,
+    "predicted_per_second": 9.814983891340804
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 53.74,
+   "finish": "length",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 21,
+    "prompt_ms": 633.615,
+    "prompt_per_token_ms": 30.17214285714286,
+    "prompt_per_second": 33.14315475485902,
+    "predicted_n": 512,
+    "predicted_ms": 53099.899,
+    "predicted_per_token_ms": 103.91369667318982,
+    "predicted_per_second": 9.62337047006436
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "\n\n CPU คือ ชื่อเต็มของ ตัว>a ของ ทีมที่เกี่ยวข้องกับการ process ข้อมูล ตรวจสอบ ต้องการ process ข้อมูลอย่างเป็นทางการ fastest ที่สุด คือ 4 คำต่อวินาที หรือ 1000 ต่อวินาที ซึ่งเป็น 4ms ที่สุด ต้องการ process ข้อมูลอย่างเป็นทางการ fastest ที่สุด คือ 4 คำต่อวินาที หรือ 1000 ต่อวินาที ซึ่งเป็น 4ms ที่สุด\n\nPi 5 ของ Raspberry Pi 5 คือ 5 ตุลาคม 2026 ที่คุณต้องการใช้ คุณต้องการใช้ Raspberry Pi 5 ที่มี 5 ตุลาคม 2026 ที่คุณต้องการใช้ คุณต้องการใช้ Raspberry Pi 5 ที่ม",
+   "ttft": 25.56,
+   "seconds": 53.14,
+   "finish": "length",
+   "timings": {
+    "cache_n": 815,
+    "prompt_n": 16,
+    "prompt_ms": 502.041,
+    "prompt_per_token_ms": 31.3775625,
+    "prompt_per_second": 31.869907039464906,
+    "predicted_n": 512,
+    "predicted_ms": 52624.232,
+    "predicted_per_token_ms": 102.98284148727986,
+    "predicted_per_second": 9.710355487943271
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 0,
+  "to_check": 9,
+  "cloud": 0,
+  "ttft_median": 27.83,
+  "seconds_total": 423.9,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 0,
+    "check": 9,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": false
+  }
+ }
+}

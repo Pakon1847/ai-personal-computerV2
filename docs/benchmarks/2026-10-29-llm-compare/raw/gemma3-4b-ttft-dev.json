@@ -1,0 +1,267 @@
+{
+ "label": "gemma3-4b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T02:45",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "ท้องฟ้าเป็นสีฟ้าเนื่องจากปรากฏการณ์ที่เรียกว่า การกระเจิงของแสง (Rayleigh scattering) แสงอาทิตย์ประกอบด้วยสีต่างๆ เมื่อแสงเดินทางผ่านชั้นบรรยากาศ โมเลกุลของอากาศจะกระเจิงแสงสีฟ้ามากกว่าสีอื่นๆ เนื่องจากความยาวคลื่นของแสงสีฟ้าสั้นกว่า ทำให้แสงสีฟ้ากระเจิงไปทั่วท้องฟ้า และเรามองเห็นสีฟ้าเป็นส่วนใหญ่ครับ",
+   "ttft": 27.99,
+   "seconds": 50.11,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 480,
+    "prompt_ms": 27945.746,
+    "prompt_per_token_ms": 58.220304166666665,
+    "prompt_per_second": 17.17613836467275,
+    "predicted_n": 91,
+    "predicted_ms": 22122.852,
+    "predicted_per_token_ms": 245.80946666666665,
+    "predicted_per_second": 4.068191569513732
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "น้ำเดือดที่ระดับน้ำทะเลอยู่ที่ 100 องศาเซลเซียสครับ",
+   "ttft": 1.74,
+   "seconds": 6.69,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 26,
+    "prompt_ms": 1732.145,
+    "prompt_per_token_ms": 66.62096153846154,
+    "prompt_per_second": 15.01029070891871,
+    "predicted_n": 21,
+    "predicted_ms": 4952.464,
+    "predicted_per_token_ms": 247.6232,
+    "predicted_per_second": 4.038393817703673
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมี 77 จังหวัดครับ\n",
+   "ttft": 0.82,
+   "seconds": 2.79,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 10,
+    "prompt_ms": 816.559,
+    "prompt_per_token_ms": 81.6559,
+    "prompt_per_second": 12.246512499402984,
+    "predicted_n": 9,
+    "predicted_ms": 1967.309,
+    "predicted_per_token_ms": 245.913625,
+    "predicted_per_second": 4.066468460216468
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "ผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์คือ โทมัส เอดิสัน (Thomas Edison) ในปี 1879 ครับ",
+   "ttft": 1.71,
+   "seconds": 10.84,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 23,
+    "prompt_ms": 1703.06,
+    "prompt_per_token_ms": 74.04608695652173,
+    "prompt_per_second": 13.50510258006177,
+    "predicted_n": 38,
+    "predicted_ms": 9133.507,
+    "predicted_per_token_ms": 246.85154054054053,
+    "predicted_per_second": 4.051017862032624
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "H₂O\n",
+   "ttft": 0.95,
+   "seconds": 1.92,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 13,
+    "prompt_ms": 938.576,
+    "prompt_per_token_ms": 72.19815384615384,
+    "prompt_per_second": 13.85076967661649,
+    "predicted_n": 5,
+    "predicted_ms": 971.173,
+    "predicted_per_token_ms": 242.79325,
+    "predicted_per_second": 4.118730648401469
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดาวอังคารครับ",
+   "ttft": 1.4,
+   "seconds": 5.33,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 19,
+    "prompt_ms": 1393.899,
+    "prompt_per_token_ms": 73.36310526315789,
+    "prompt_per_second": 13.630829780349941,
+    "predicted_n": 17,
+    "predicted_ms": 3923.64,
+    "predicted_per_token_ms": 245.2275,
+    "predicted_per_second": 4.077846081699646
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "ถูกต้องแล้วครับ สุโขทัยเป็นราชธานีแห่งแรกของประเทศไทยในช่วงสมัยทวาราวดี (พ.ศ. 1900-2100) ครับ",
+   "ttft": 1.4,
+   "seconds": 11.51,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 20,
+    "prompt_ms": 1393.117,
+    "prompt_per_token_ms": 69.65585,
+    "prompt_per_second": 14.356295989496935,
+    "predicted_n": 42,
+    "predicted_ms": 10103.15,
+    "predicted_per_token_ms": 246.41829268292682,
+    "predicted_per_second": 4.05814028298105
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำลพบุรีครับ",
+   "ttft": 1.06,
+   "seconds": 4.54,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 16,
+    "prompt_ms": 1048.516,
+    "prompt_per_token_ms": 65.53225,
+    "prompt_per_second": 15.259662227376596,
+    "predicted_n": 15,
+    "predicted_ms": 3485.257,
+    "predicted_per_token_ms": 248.94692857142857,
+    "predicted_per_second": 4.016920416485785
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "CPU ย่อมาจาก Central Processing Unit หรือหน่วยประมวลผลกลาง เป็นส่วนประกอบหลักของคอมพิวเตอร์ ทำหน้าที่ประมวลผลคำสั่งต่างๆ ที่ได้รับจากโปรแกรม ทำให้คอมพิวเตอร์ทำงานได้ตามที่เราต้องการครับ",
+   "ttft": 1.07,
+   "seconds": 12.98,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 467,
+    "prompt_n": 14,
+    "prompt_ms": 1054.866,
+    "prompt_per_token_ms": 75.34757142857143,
+    "prompt_per_second": 13.27182789093591,
+    "predicted_n": 49,
+    "predicted_ms": 11911.023,
+    "predicted_per_token_ms": 248.1463125,
+    "predicted_per_second": 4.029880556858971
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 7,
+  "to_check": 2,
+  "cloud": 0,
+  "ttft_median": 1.4,
+  "seconds_total": 106.7,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 7,
+    "check": 2,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

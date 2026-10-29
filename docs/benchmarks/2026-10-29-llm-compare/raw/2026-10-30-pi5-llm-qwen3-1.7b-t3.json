@@ -1,0 +1,101 @@
+{
+  "name": "2026-10-30-pi5-llm-qwen3-1.7b-t3",
+  "command": [
+    "/home/aipc2030/llama.cpp/build/bin/llama-bench",
+    "-m",
+    "/mnt/bench-usb/bench-models/Qwen3-1.7B-Q4_K_M.gguf",
+    "-t",
+    "3",
+    "-p",
+    "200",
+    "-n",
+    "64",
+    "-r",
+    "1",
+    "-o",
+    "json"
+  ],
+  "meta": {
+    "threads": "3",
+    "prompt_tokens": "200",
+    "gen_tokens": "64",
+    "size_class": "3-4b",
+    "ttft_target_s": "10.0",
+    "llama_cpp": "86ea01d"
+  },
+  "files_sha256": {
+    "/mnt/bench-usb/bench-models/Qwen3-1.7B-Q4_K_M.gguf": "b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897"
+  },
+  "machine": {
+    "collected_at": "2026-10-29T20:18:21+00:00",
+    "hostname": "ai-pc",
+    "board_model": "Raspberry Pi 5 Model B Rev 1.0",
+    "board_class": "pi5",
+    "ram_total_mb": 8062,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "6.18.50+rpt-rpi-2712",
+    "python": "3.13.5",
+    "cpu_temp_c": 60.6,
+    "throttled": 917504,
+    "throttled_problems": [
+      "เคยถูกจำกัดความถี่ตั้งแต่บูต",
+      "เคยถูกลดความเร็วตั้งแต่บูต",
+      "เคยถึงขีดอุณหภูมิแบบนุ่มตั้งแต่บูต"
+    ],
+    "git_commit": "7ea91916ab8a47c19ed5ff1f14168f68ca3fb370",
+    "git_dirty": true
+  },
+  "throttled_before": 917504,
+  "summary_seconds": {
+    "n": 5,
+    "median": 19.491855059000954,
+    "p95": 20.08616716400138,
+    "minimum": 19.237600846001442,
+    "maximum": 20.08616716400138
+  },
+  "summary_metrics": {
+    "peak_rss_mb": {
+      "n": 5,
+      "median": 2201.328125,
+      "p95": 2201.328125,
+      "minimum": 2200.8125,
+      "maximum": 2201.328125
+    },
+    "pp_tok_s": {
+      "n": 5,
+      "median": 38.578294,
+      "p95": 39.82615,
+      "minimum": 38.311778,
+      "maximum": 39.82615
+    },
+    "prefill_s": {
+      "n": 5,
+      "median": 5.184262424875501,
+      "p95": 5.220326762177417,
+      "minimum": 5.021826111738142,
+      "maximum": 5.220326762177417
+    },
+    "tg_tok_s": {
+      "n": 5,
+      "median": 9.917545,
+      "p95": 10.042264,
+      "minimum": 9.88206,
+      "maximum": 10.042264
+    }
+  },
+  "verdict": {
+    "evidence_level4": false,
+    "throttled_runs": [
+      0,
+      3,
+      4,
+      5
+    ],
+    "throttle_unknown": false,
+    "warnings": [
+      "ไฟตกหรือร้อนเกินระหว่างรอบ [0, 3, 4, 5] — ผลชุดนี้ใช้ไม่ได้ ต้องวัดใหม่",
+      "get_throttled ก่อนวัด = 0xe0000 (เคยลดความเร็วตั้งแต่บูต) — ตรวจไม่ได้ว่าเกิดซ้ำระหว่างวัดไหม · ไม่นับเป็นระดับ 4 · รีบูตแล้ววัดใหม่",
+      "มีไฟล์ที่ยังไม่ commit ตอนวัด — ผลนี้ไม่ได้ผูกกับ commit ใดจริง"
+    ]
+  }
+}

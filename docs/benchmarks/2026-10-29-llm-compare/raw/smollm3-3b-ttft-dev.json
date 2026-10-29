@@ -1,0 +1,267 @@
+{
+ "label": "smollm3-3b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T02:51",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nท้องฟ้าเป็นสีฟ้าเนื่องจากแสงแดนที่ส่องเข้ามายังบรรยากาศโลกส่วนใหญ่ประกอบด้วยโมเลกุลของอิเล็กโทรนิกส์ (oxygen) ซึ่งสามารถสะท้อนแสงเหลืองและแดงจากแสงแดนที่มีแสงสีเหลืองสุดสีน้ำตาล (sunlight) มีแสงสีอ่อนมากกว่าแสงแดงมาก ในทางกลับกันแสงสีเขียวและสีม่วงได้ถูกดูดซับโดยโมเลกุลของอิเล็กโทรนิกส์ ไม่ได้ส่องออกมาให้เรามองเห็นได้ เมื่อแสงเหลืองสุดสีน้ำตาลจากแดดผสมกับแสงสีอ่อนที่สะท้อนจากโมเลกุลของอิเล็กโทรนิกส์ เราก็เห็นแสงเหลืองสีฟ้า\n\nนอกจากนี้ แสงสีฟ้าในอวกาศส่วนใหญ่มักมีสีเขียวมากกว่าสีเขียวสีน้ำตาล ในช่วงเวลากลางวัน แสงแดดที่ส่องเข้ามาในบรรยากาศโลกมีแสงสีเขียวสีน้ำตาลมากกว่าแสงเหลืองสีฟ้า ซึ่งทำให้ท้องฟ้าดูเป็นสีเขียว แต่เมื่อแสงแดดผ่านชั้นบรรยากาศโลกที่มีโมเลกุลของอิเล็กโทรนิกส์มากขึ้น (เช่นในช่วงเวลากลางคืนหรือในช่วงเย็น) แสงสีเขียวสีน้ำตาลจะถูกดูดซับและสะท้อนกลับเป็นแสงสีอ่อนสีฟ้า ซึ่งเป็นสีที่เห็นได้ในช่วงเวลากลางคืน โดยเฉพาะเวลาที่มีแสงจันทร์สว่างไสว\n\nนอกจากนี้ ท้องฟ้าอาจมีสีเขียวหรือสีเขียวอ่อนในบางเวลาเนื่องจากการสะท้อนแสงจากชั้นบรรยากาศที่มีฝุ่นหรือควันขนาดเล็ก ซึ่งสะท้อนแสงแดดให้เห็นเป็นสีเขียวหรือสีเขียวอ่อน\n\nแต่สาเหตุที่ท้อง",
+   "ttft": 39.86,
+   "seconds": 140.57,
+   "finish": "length",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 752,
+    "prompt_ms": 39823.319,
+    "prompt_per_token_ms": 52.95654122340426,
+    "prompt_per_second": 18.88340848737394,
+    "predicted_n": 512,
+    "predicted_ms": 100714.696,
+    "predicted_per_token_ms": 197.0933385518591,
+    "predicted_per_second": 5.073738196062271
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nน้ำเดือดที่ระดับน้ำทะเลมีอุณหภูมิ 100 องศาเซลเซียส (100°C)",
+   "ttft": 2.02,
+   "seconds": 8.5,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 37,
+    "prompt_ms": 2008.78,
+    "prompt_per_token_ms": 54.29135135135135,
+    "prompt_per_second": 18.419139975507523,
+    "predicted_n": 34,
+    "predicted_ms": 6484.533,
+    "predicted_per_token_ms": 196.501,
+    "predicted_per_second": 5.089032625788164
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nประเทศไทยมี 76 จังหวัด",
+   "ttft": 1.01,
+   "seconds": 2.52,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 16,
+    "prompt_ms": 998.019,
+    "prompt_per_token_ms": 62.3761875,
+    "prompt_per_second": 16.031758914409444,
+    "predicted_n": 9,
+    "predicted_ms": 1509.132,
+    "predicted_per_token_ms": 188.6415,
+    "predicted_per_second": 5.301060477148454
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์ คือ หลอดไส้ฟลูออเรสเซนต์ (Fluorescent Lamp) ที่คิดค้นโดย เอ็ดเวิร์ด แวนเดอร์เลก (Edwin Van de Kerkamp) และ เจฟเฟอร์สัน โรเจอร์ส (Jefferson Rogers) ในปี 1901 ในประเทศออสเตรเลีย แต่การพัฒนาและการใช้งานจริงนั้นถูกนำไปใช้อย่างแพร่หลายโดย เอ็ดเวิร์ด เวสทิงแฮม (Edwin Hewitt) และ แบร์รี ซูซิด (Barry Susid) ในสหรัฐอเมริกา ในปี 1924 และ 1925 ตามลำดับ",
+   "ttft": 2.17,
+   "seconds": 35.93,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 35,
+    "prompt_ms": 2157.659,
+    "prompt_per_token_ms": 61.647400000000005,
+    "prompt_per_second": 16.221284271518343,
+    "predicted_n": 176,
+    "predicted_ms": 33761.721,
+    "predicted_per_token_ms": 192.92412,
+    "predicted_per_second": 5.183385053149394
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nน้ำเป็นส่วนผสมของออกซิเจน (O₂) และไฮโดรเจน (H₂) ที่มีจำนวนโมเลกุลเท่ากัน คือ H₂O",
+   "ttft": 1.17,
+   "seconds": 9.85,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 20,
+    "prompt_ms": 1160.789,
+    "prompt_per_token_ms": 58.03945,
+    "prompt_per_second": 17.229660170797622,
+    "predicted_n": 46,
+    "predicted_ms": 8678.269,
+    "predicted_per_token_ms": 192.85042222222222,
+    "predicted_per_second": 5.185365883449799
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nดวงดาวที่ใหญ่ที่สุดในระบบสุริยะคือดาวกาเลเซีย หรือดาวเนปจูน (Neptune) แต่จริงๆ แล้ว ไม่มีดาวเคราะห์ในระบบสุริยะที่ใหญ่ที่สุดเท่ากับดาวนิวเมที่มีน้ำหนักที่สุด คือดาวเสาร์ (Saturn) ซึ่งมีน้ำหนักที่ใหญ่ที่สุดในระบบสุริยะ",
+   "ttft": 1.73,
+   "seconds": 21.81,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 28,
+    "prompt_ms": 1724.224,
+    "prompt_per_token_ms": 61.57942857142857,
+    "prompt_per_second": 16.239189339668165,
+    "predicted_n": 105,
+    "predicted_ms": 20079.976,
+    "predicted_per_token_ms": 193.0766923076923,
+    "predicted_per_second": 5.179289058911226
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nไม่ครับ สุโขทัยไม่ใช่ราชธานีแห่งแรกของไทย แต่เป็นราชธานีแห่งแรกในภาคเหนือของไทย และถือเป็นราชธานีหลวงของราชวงศ์ราชเสนาลักษณ์ในช่วงต้นราชวงศ์ศรีราชา แต่ราชธานีแรกของไทย คือเมืองอู่ทอง หรือปาก factura ที่อยู่ในกรุงเก่า ซึ่งปัจจุบันคือเมืองเพชรบุรี แต่ราชวงศ์ราชเสนาลักษณ์ยังทรงครองราชย์อยู่ในกรุงเก่า หรือกรุงศรีอยุธยาในขณะเดียวกัน และเรียกกรุงเก่าว่ากรุงสุโขทัย ซึ่งอาจทำให้เกิดความสับสนได้",
+   "ttft": 1.71,
+   "seconds": 36.21,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 29,
+    "prompt_ms": 1697.926,
+    "prompt_per_token_ms": 58.5491724137931,
+    "prompt_per_second": 17.079660715484657,
+    "predicted_n": 179,
+    "predicted_ms": 34505.008,
+    "predicted_per_token_ms": 193.8483595505618,
+    "predicted_per_second": 5.158671460096459
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nแม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำชิงหว่าง (Chao Phraya)",
+   "ttft": 1.67,
+   "seconds": 6.86,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 27,
+    "prompt_ms": 1656.896,
+    "prompt_per_token_ms": 61.36651851851852,
+    "prompt_per_second": 16.295530920468153,
+    "predicted_n": 28,
+    "predicted_ms": 5191.614,
+    "predicted_per_token_ms": 192.28199999999998,
+    "predicted_per_second": 5.2006948128269945
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "\nCPU ย่อมาจาก \"Central Processing Unit\" หรือ \"หน่วยประมวลผล\" มันทำหน้าที่เป็น \"หัวใจ\" ของคอมพิวเตอร์ โดยประมวลผลคำสั่งจากโปรแกรมต่าง ๆ และควบคุมการทำงานของอุปกรณ์อิเลกทรอนิกส์ภายในเครื่องคอมพิวเตอร์",
+   "ttft": 1.19,
+   "seconds": 15.9,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 731,
+    "prompt_n": 20,
+    "prompt_ms": 1182.005,
+    "prompt_per_token_ms": 59.10025,
+    "prompt_per_second": 16.920402197960243,
+    "predicted_n": 77,
+    "predicted_ms": 14704.261,
+    "predicted_per_token_ms": 193.47711842105264,
+    "predicted_per_second": 5.168569845162569
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 5,
+  "to_check": 4,
+  "cloud": 0,
+  "ttft_median": 1.71,
+  "seconds_total": 278.1,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 5,
+    "check": 4,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

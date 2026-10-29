@@ -1,0 +1,177 @@
+{
+ "label": "llama3.2-1b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T04:26",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 84.95,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 4.2,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 11.95,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 10.18,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 5.95,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 5.07,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 20.78,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 3.6,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": null,
+   "seconds": 49.77,
+   "finish": "",
+   "timings": {},
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 0,
+  "to_check": 9,
+  "cloud": 0,
+  "ttft_median": null,
+  "seconds_total": 196.5,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 0,
+    "check": 9,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": false
+  }
+ }
+}

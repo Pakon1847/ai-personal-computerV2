@@ -1,0 +1,257 @@
+{
+ "gemma3-1b": {
+  "tg": 13.22,
+  "tg_min": 13.12,
+  "pp": 32.6,
+  "ttft": 0.63,
+  "ttft_max": 13.38,
+  "vmhwm_mb": 1464,
+  "bench_rss_mb": 1309,
+  "states": {
+   "before-bench": "64.2°C 0xe0000",
+   "after-bench": "79.6°C 0xe0000",
+   "before-server": "64.2°C 0xe0000",
+   "after-exam": "82.3°C 0xe0008"
+  }
+ },
+ "gemma3-4b": {
+  "tg": 4.37,
+  "tg_min": 4.33,
+  "pp": 16.8,
+  "ttft": 1.4,
+  "ttft_max": 27.99,
+  "vmhwm_mb": 5445,
+  "bench_rss_mb": 4858,
+  "states": {
+   "before-bench": "59.8°C 0xe0000",
+   "after-bench": "78.5°C 0xe0000",
+   "before-server": "62.6°C 0xe0000",
+   "after-exam": "82.3°C 0xe0008"
+  }
+ },
+ "gemma4-e2b": {
+  "tg": 6.82,
+  "tg_min": 6.76,
+  "pp": 21.8,
+  "ttft": 1.1,
+  "ttft_max": 52.0,
+  "vmhwm_mb": 4581,
+  "bench_rss_mb": 4385,
+  "states": {
+   "before-bench": "62.0°C 0xe0000",
+   "after-bench": "76.8°C 0xe0000",
+   "before-server": "65.3°C 0xe0000",
+   "after-exam": "85.1°C 0xe0006"
+  }
+ },
+ "granite4.1-3b": {
+  "tg": 5.22,
+  "tg_min": 4.99,
+  "pp": 17.0,
+  "ttft": 4.65,
+  "ttft_max": 232.49,
+  "vmhwm_mb": 4696,
+  "bench_rss_mb": 4077,
+  "states": {
+   "before-bench": "64.8°C 0xe0000",
+   "after-bench": "78.5°C 0xe0000",
+   "before-server": "64.8°C 0xe0000",
+   "after-exam": "82.3°C 0xe0008"
+  }
+ },
+ "llama3.2-1b": {
+  "tg": 13.67,
+  "tg_min": 13.59,
+  "pp": 57.6,
+  "ttft": null,
+  "ttft_max": 0,
+  "vmhwm_mb": 1915,
+  "bench_rss_mb": 1615,
+  "states": {
+   "before-bench": "60.9°C 0xe0000",
+   "after-bench": "80.1°C 0xe0000",
+   "before-server": "63.1°C 0xe0000",
+   "after-exam": "82.3°C 0xe0008"
+  }
+ },
+ "llama3.2-3b": {
+  "tg": 5.44,
+  "tg_min": 5.41,
+  "pp": 19.5,
+  "ttft": 3.03,
+  "ttft_max": 102.18,
+  "vmhwm_mb": 4501,
+  "bench_rss_mb": 3945,
+  "states": {
+   "before-bench": "63.7°C 0xe0000",
+   "after-bench": "77.9°C 0xe0000",
+   "before-server": "64.2°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "ministral3-3b": {
+  "tg": 5.04,
+  "tg_min": 5.04,
+  "pp": 17.7,
+  "ttft": 1.96,
+  "ttft_max": 133.48,
+  "vmhwm_mb": 4774,
+  "bench_rss_mb": 4185,
+  "states": {
+   "before-bench": "60.9°C 0xe0000",
+   "after-bench": "77.4°C 0xe0000",
+   "before-server": "64.8°C 0xe0000",
+   "after-exam": "83.4°C 0xe0008"
+  }
+ },
+ "phi4-mini-reasoning": {
+  "tg": 4.39,
+  "tg_min": 4.38,
+  "pp": 16.2,
+  "ttft": 1.97,
+  "ttft_max": 54.34,
+  "vmhwm_mb": 5393,
+  "bench_rss_mb": 4838,
+  "states": {
+   "before-bench": "64.8°C 0xe0000",
+   "after-bench": "77.9°C 0xe0000",
+   "before-server": "59.8°C 0xe0000",
+   "after-exam": "84.5°C 0xe0008"
+  }
+ },
+ "qwen2.5-coder-1.5b": {
+  "tg": 11.2,
+  "tg_min": 11.08,
+  "pp": 42.0,
+  "ttft": 0.82,
+  "ttft_max": 50.33,
+  "vmhwm_mb": 2129,
+  "bench_rss_mb": 1954,
+  "states": {
+   "before-bench": "63.7°C 0xe0000",
+   "after-bench": "80.1°C 0xe0000",
+   "before-server": "63.7°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "qwen3-0.6b": {
+  "tg": 27.86,
+  "tg_min": 27.34,
+  "pp": 115.0,
+  "ttft": 0.6,
+  "ttft_max": 27.92,
+  "vmhwm_mb": 1355,
+  "bench_rss_mb": 841,
+  "states": {
+   "before-bench": "61.5°C 0xe0000",
+   "after-bench": "82.3°C 0xe0008",
+   "before-server": "63.7°C 0xe0000",
+   "after-exam": "84.0°C 0xe0008"
+  }
+ },
+ "qwen3-1.7b": {
+  "tg": 9.92,
+  "tg_min": 9.88,
+  "pp": 38.6,
+  "ttft": 1.15,
+  "ttft_max": 57.72,
+  "vmhwm_mb": 2711,
+  "bench_rss_mb": 2201,
+  "states": {
+   "before-bench": "59.8°C 0xe0000",
+   "after-bench": "80.7°C 0xe0000",
+   "before-server": "64.8°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "qwen3-vl-4b": {
+  "tg": 4.35,
+  "tg_min": 4.35,
+  "pp": 14.5,
+  "ttft": 2.57,
+  "ttft_max": 158.13,
+  "vmhwm_mb": 5587,
+  "bench_rss_mb": 4870,
+  "states": {
+   "before-bench": "63.7°C 0xe0000",
+   "after-bench": "79.0°C 0xe0000",
+   "before-server": "60.9°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "qwen3.5-0.8b": {
+  "tg": 15.93,
+  "tg_min": 15.62,
+  "pp": 78.6,
+  "ttft": 0.39,
+  "ttft_max": 16.52,
+  "vmhwm_mb": 1305,
+  "bench_rss_mb": 1126,
+  "states": {
+   "before-bench": "64.2°C 0xe0000",
+   "after-bench": "80.1°C 0xe0000",
+   "before-server": "64.2°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "qwen3.5-2b": {
+  "tg": 7.38,
+  "tg_min": 7.29,
+  "pp": 33.7,
+  "ttft": 0.84,
+  "ttft_max": 35.43,
+  "vmhwm_mb": 2740,
+  "bench_rss_mb": 2554,
+  "states": {
+   "before-bench": "64.8°C 0xe0000",
+   "after-bench": "79.6°C 0xe0000",
+   "before-server": "64.8°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "qwen3.5-4b": {
+  "tg": 3.33,
+  "tg_min": 3.31,
+  "pp": 12.8,
+  "ttft": 1.95,
+  "ttft_max": 94.32,
+  "vmhwm_mb": 5766,
+  "bench_rss_mb": 5385,
+  "states": {
+   "before-bench": "60.9°C 0xe0000",
+   "after-bench": "78.5°C 0xe0000",
+   "before-server": "64.8°C 0xe0000",
+   "after-exam": "82.9°C 0xe0008"
+  }
+ },
+ "r1-distill-1.5b": {
+  "tg": 11.03,
+  "tg_min": 10.91,
+  "pp": 42.5,
+  "ttft": 27.83,
+  "ttft_max": 53.53,
+  "vmhwm_mb": 2066,
+  "bench_rss_mb": 2062,
+  "states": {
+   "before-bench": "60.9°C 0xe0000",
+   "after-bench": "79.0°C 0xe0000",
+   "before-server": "63.7°C 0xe0000",
+   "after-exam": "83.4°C 0xe0008"
+  }
+ },
+ "smollm3-3b": {
+  "tg": 5.76,
+  "tg_min": 5.7,
+  "pp": 19.2,
+  "ttft": 1.71,
+  "ttft_max": 39.86,
+  "vmhwm_mb": 4086,
+  "bench_rss_mb": 3743,
+  "states": {
+   "before-bench": "63.7°C 0xe0000",
+   "after-bench": "79.0°C 0xe0000",
+   "before-server": "64.2°C 0xe0000",
+   "after-exam": "84.0°C 0xe0008"
+  }
+ }
+}

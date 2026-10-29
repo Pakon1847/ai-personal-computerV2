@@ -1,0 +1,267 @@
+{
+ "label": "qwen3.5-2b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T02:19",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "ท้องฟ้าเป็นสีฟ้าเพราะแก๊สในชั้นบรรยากาศที่ชื่อว่า \"โมเลกุลไนโตรเจน\" และ \"โมเลกุลออกซิเจน\" ดูเป็นสีฟ้าเข้ม แต่เมื่อแสงสีฟ้าจากดวงอาทิตย์ทะลุผ่านบรรยากาศและเกิดการกระเจิงด้วยแสง (scattering) แสงสีฟ้าจึงถูกเลี้ยวเบนและกระจายออกไปให้เราเห็นชัดเจนกว่าแสงสีอื่น เช่น สีแดงหรือเขียวที่กระเจิงน้อย จึงทำให้ท้องฟ้าดูเป็นสีฟ้า",
+   "ttft": 35.43,
+   "seconds": 49.12,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1192,
+    "prompt_ms": 35402.768,
+    "prompt_per_token_ms": 29.70030872483221,
+    "prompt_per_second": 33.6696836812308,
+    "predicted_n": 98,
+    "predicted_ms": 13689.954,
+    "predicted_per_token_ms": 141.1335463917526,
+    "predicted_per_second": 7.08548765028721
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "น้ำเดือดที่อุณหภูมิ 100 องศาเซลเซียส ที่ระดับน้ำทะเลมาตรฐาน (ความกดอากาศ 1 บรรยากาศ)",
+   "ttft": 1.07,
+   "seconds": 4.59,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 30,
+    "prompt_ms": 1058.336,
+    "prompt_per_token_ms": 35.27786666666667,
+    "prompt_per_second": 28.346385268950506,
+    "predicted_n": 26,
+    "predicted_ms": 3517.463,
+    "predicted_per_token_ms": 140.69852,
+    "predicted_per_second": 7.107395301670551
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมี 71 จังหวัด\n\n(ข้อมูลพื้นฐานทางภูมิศาสตร์)",
+   "ttft": 0.59,
+   "seconds": 2.57,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 16,
+    "prompt_ms": 580.473,
+    "prompt_per_token_ms": 36.2795625,
+    "prompt_per_second": 27.563728200967144,
+    "predicted_n": 15,
+    "predicted_ms": 1976.646,
+    "predicted_per_token_ms": 141.189,
+    "predicted_per_second": 7.0827047432873655
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "ผู้คิดค้นหลอดไฟเชิงพาณิชย์ที่ใช้งานได้จริงมีหลายท่าน แต่โดยทั่วไปแล้ว **วิลเลียม เคมส์ (William Kemp)** เป็นผู้คิดค้นหลอดไฟแบบปรอท (Mercury Vapor Lamp) ซึ่งเป็นพื้นฐานของหลอดไฟเชิงพาณิชย์ในยุคแรกๆ โดยเขาได้พัฒนาวิธีการผลิตหลอดไฟแบบปรอทเชิงพาณิชย์ครั้งแรกในปี ค.ศ. 1855 และเริ่มจำหน่ายในปี ค.ศ. 1859\n\nอย่างไรก็ตาม มีผู้คิดค้นอื่นๆ อีกมากเช่นกัน เช่น **วิลเลียม ทอมป์สัน (William Thomas)** ที่พัฒนาหลอดไฟแบบปรอท-นีออน (Tungsten Mercury Lamp) ในยุคแรกๆ และ **อัลเบิร์ต ไอน์สไตน์ (Albert Einstein)** ซึ่งได้รับการเสนอชื่อให้เป็นนักประดิษฐ์หลอดไฟ (Lamp Maker) ในรางวัลโนเบลปี ค.ศ. 1923 เนื่องจากมีบทบาทสำคัญในการพัฒนาหลอดไฟเชิงพาณิชย์ในยุคแรกๆ",
+   "ttft": 0.84,
+   "seconds": 27.85,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 23,
+    "prompt_ms": 822.23,
+    "prompt_per_token_ms": 35.74913043478261,
+    "prompt_per_second": 27.97270836627221,
+    "predicted_n": 192,
+    "predicted_ms": 27014.116,
+    "predicted_per_token_ms": 141.43516230366492,
+    "predicted_per_second": 7.070377575931042
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "สูตรเคมีของน้ำคือ H2O · 1/4",
+   "ttft": 0.66,
+   "seconds": 2.5,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 17,
+    "prompt_ms": 644.742,
+    "prompt_per_token_ms": 37.925999999999995,
+    "prompt_per_second": 26.3671360016875,
+    "predicted_n": 14,
+    "predicted_ms": 1839.081,
+    "predicted_per_token_ms": 141.46776923076922,
+    "predicted_per_second": 7.068747923555298
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงอาทิตย์",
+   "ttft": 0.85,
+   "seconds": 2.26,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 22,
+    "prompt_ms": 835.296,
+    "prompt_per_token_ms": 37.968,
+    "prompt_per_second": 26.337968815844917,
+    "predicted_n": 11,
+    "predicted_ms": 1415.194,
+    "predicted_per_token_ms": 141.5194,
+    "predicted_per_second": 7.066169019936489
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "ใช่ครับ สมัยสุโขทัยเป็นราชธานีแห่งแรกของไทย ตั้งอยู่บริเวณภาคกลางตอนล่าง มีพระมหากษัตริย์ 500 คน (500 รัชกาล) และมีการปกครองแบบกษัตริย์ปกครองประชาชนโดยไม่มีระบบราชการแบบตะวันตก",
+   "ttft": 0.85,
+   "seconds": 9.06,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 22,
+    "prompt_ms": 834.073,
+    "prompt_per_token_ms": 37.91240909090909,
+    "prompt_per_second": 26.37658814036661,
+    "predicted_n": 59,
+    "predicted_ms": 8203.263,
+    "predicted_per_token_ms": 141.43556896551726,
+    "predicted_per_second": 7.070357246866277
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำเจ้าพระยา ซึ่งมีเส้นความยาวประมาณ 764 กิโลเมตร\n\nข้อมูลทั่วไป:\n- เป็นแม่น้ำสายหลักไหลผ่านภาคกลางและภาคเหนือ\n- มีต้นกำเนิดที่แม่น้ำสายบุรีในภาคใต้\n- ไหลผ่านเมืองสำคัญ เช่น กรุงเทพฯ และปทุมธานี\n- เป็นแม่น้ำสายหลักของประเทศไทยและแม่น้ำสายหลักของภาคกลาง\n\nแหล่งข้อมูลอ้างอิง: ข้อมูลทางธรณีวิทยาและแผนที่ทางน้ำ",
+   "ttft": 0.75,
+   "seconds": 13.65,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 20,
+    "prompt_ms": 738.483,
+    "prompt_per_token_ms": 36.92415,
+    "prompt_per_second": 27.082546246833033,
+    "predicted_n": 92,
+    "predicted_ms": 12892.987,
+    "predicted_per_token_ms": 141.68117582417582,
+    "predicted_per_second": 7.058100655806137
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "CPU ย่อมาจาก Central Processing Unit หรือหน่วยประมวลผลกลาง ทำหน้าที่เป็น \"สมอง\" ของเครื่องจักรหรือคอมพิวเตอร์ โดยรับคำสั่งจากโปรแกรมและประมวลผลข้อมูลต่างๆ ให้ทำงานตามคำสั่งนั้นๆ",
+   "ttft": 0.75,
+   "seconds": 6.27,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 20,
+    "prompt_ms": 730.959,
+    "prompt_per_token_ms": 36.54795,
+    "prompt_per_second": 27.36131575095183,
+    "predicted_n": 40,
+    "predicted_ms": 5521.604,
+    "predicted_per_token_ms": 141.57958974358976,
+    "predicted_per_second": 7.063164978872081
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 5,
+  "to_check": 4,
+  "cloud": 0,
+  "ttft_median": 0.84,
+  "seconds_total": 117.9,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 5,
+    "check": 4,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

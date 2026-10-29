@@ -1,0 +1,267 @@
+{
+ "label": "llama3.2-3b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T03:33",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 102.18,
+   "seconds": 106.04,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1716,
+    "prompt_ms": 101019.088,
+    "prompt_per_token_ms": 58.8689324009324,
+    "prompt_per_second": 16.986888656132,
+    "predicted_n": 23,
+    "predicted_ms": 4976.312,
+    "predicted_per_token_ms": 226.196,
+    "predicted_per_second": 4.420944667456542
+   },
+   "route": "translate",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 3.44,
+   "seconds": 15.8,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 33,
+    "prompt_ms": 2317.661,
+    "prompt_per_token_ms": 70.23215151515151,
+    "prompt_per_second": 14.238493032415008,
+    "predicted_n": 60,
+    "predicted_ms": 13458.634,
+    "predicted_per_token_ms": 228.1124406779661,
+    "predicted_per_second": 4.383802992190739
+   },
+   "route": "translate",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 2.31,
+   "seconds": 7.79,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 12,
+    "prompt_ms": 905.537,
+    "prompt_per_token_ms": 75.46141666666666,
+    "prompt_per_second": 13.25180528239045,
+    "predicted_n": 31,
+    "predicted_ms": 6867.783,
+    "predicted_per_token_ms": 228.92610000000002,
+    "predicted_per_second": 4.368221884704278
+   },
+   "route": "machine-status",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 3.42,
+   "seconds": 11.43,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 31,
+    "prompt_ms": 2240.295,
+    "prompt_per_token_ms": 72.26758064516129,
+    "prompt_per_second": 13.837463369779426,
+    "predicted_n": 41,
+    "predicted_ms": 9159.242,
+    "predicted_per_token_ms": 228.98105,
+    "predicted_per_second": 4.367173615458571
+   },
+   "route": "translate",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 3.03,
+   "seconds": 6.03,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 16,
+    "prompt_ms": 1185.561,
+    "prompt_per_token_ms": 74.0975625,
+    "prompt_per_second": 13.495720591348737,
+    "predicted_n": 22,
+    "predicted_ms": 4822.715,
+    "predicted_per_token_ms": 229.65309523809523,
+    "predicted_per_second": 4.3543937387965075
+   },
+   "route": "summarize-text",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 2.86,
+   "seconds": 10.3,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 24,
+    "prompt_ms": 1706.388,
+    "prompt_per_token_ms": 71.09949999999999,
+    "prompt_per_second": 14.064796517556383,
+    "predicted_n": 39,
+    "predicted_ms": 8577.702,
+    "predicted_per_token_ms": 225.72899999999998,
+    "predicted_per_second": 4.430090949767199
+   },
+   "route": "translate",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 2.95,
+   "seconds": 12.36,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 25,
+    "prompt_ms": 1729.998,
+    "prompt_per_token_ms": 69.19992,
+    "prompt_per_second": 14.450883758247118,
+    "predicted_n": 47,
+    "predicted_ms": 10612.584,
+    "predicted_per_token_ms": 230.70834782608696,
+    "predicted_per_second": 4.334476881407958
+   },
+   "route": "translate",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 3.14,
+   "seconds": 9.99,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 23,
+    "prompt_ms": 1754.166,
+    "prompt_per_token_ms": 76.26808695652174,
+    "prompt_per_second": 13.111643937916938,
+    "predicted_n": 37,
+    "predicted_ms": 8213.128,
+    "predicted_per_token_ms": 228.14244444444446,
+    "predicted_per_second": 4.3832264637784775
+   },
+   "route": "machine-status",
+   "fabricated": false,
+   "auto": "wrong-route"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "",
+   "ttft": 2.58,
+   "seconds": 12.64,
+   "finish": "tool_calls",
+   "timings": {
+    "cache_n": 1699,
+    "prompt_n": 16,
+    "prompt_ms": 1188.407,
+    "prompt_per_token_ms": 74.2754375,
+    "prompt_per_second": 13.463401006557518,
+    "predicted_n": 51,
+    "predicted_ms": 11434.348,
+    "predicted_per_token_ms": 228.68696,
+    "predicted_per_second": 4.37278977340903
+   },
+   "route": "machine-status",
+   "fabricated": false,
+   "auto": "wrong-route"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 0,
+  "to_check": 0,
+  "cloud": 0,
+  "ttft_median": 3.03,
+  "seconds_total": 192.4,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 0,
+    "check": 0,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

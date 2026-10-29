@@ -1,0 +1,267 @@
+{
+ "label": "phi4-mini-reasoning",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T03:49",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\n\n</think>\n\nท้องฟ้าที่เป็นสีน้ำเงินได้นำไปทำให้ท้องฟ้าสีฟ้าจากคุณสมบัติทางจوسมิติของแสงขวัญมาสีเปล่งฟ้าคือที่มีอยู่มากที่สุดในระบบธรรมชาติ ท้องฟ้ามanamagraphie ซึ่งมีแสงฟ้าย่อมผิวดิน ทำให้แสงสีน้ำเงินได้นั้นถูกกระจายมาหลอนในหลากรูปและคุณสมบัติ เช่น scattered waves ซึ่งทำให้แสงสีน้ำเงินถูกมองเห็นเป็นแสงฟ้าโดยมนุษย์ ขยายและสะออ припาภัยที่มาของ ทำให้นวัตกรรมายเข้ามาเห็นท้องฟา\n\nนอกจากนี้ ท้องฟ้าย่อมผิวดินสามารถสะออพรและจดจำได้อย่างมีมากมาย ทำให้แสงสีน้ำเงินถูกกระจายอย่างหลากหลายทางคุณสมบัติ นอกจากนี้ยังมีผลจากคุณสมบัติของการเปลี่ยนแปลงสภาวะของอิเล็กทรอนिकที่ทำให้แสงสีน้ำเงินมีตื่นเต้นและสว่าง\n\nในการพิสูачिकมิตรกับมนุษย์ แสงสีน้ำเงินมีคุณสมบัติที่ถูกเลือกมาเพื่อทำให้เห็นได้ชัดช้นในระบบธรรมชาติที่มีมากมายและมีประโยชิكمในการสื่อสารกับกัน เช่น สัญลักษณ์ทางธรรมชาติและทำให้เชื่อมต่อกับระบบจوسมิติที่มีหมายความกับความสบายใจและสบายเจ้าในอากาศ",
+   "ttft": 54.34,
+   "seconds": 150.45,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 834,
+    "prompt_ms": 54295.27,
+    "prompt_per_token_ms": 65.102242206235,
+    "prompt_per_second": 15.360454050601463,
+    "predicted_n": 365,
+    "predicted_ms": 96108.02,
+    "predicted_per_token_ms": 264.03302197802196,
+    "predicted_per_second": 3.787405046946134
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\n\nOkay, so I need to figure out how many degrees Celsius are equivalent to 100°C when converted from Fahrenheit. Let me start by recalling the formula for converting Fahrenheit to Celsius. I think the standard formula is (F - 32) * 5/9. Let me make sure that's correct. Yes, that's right. So if the temperature is 100°C, but the question is asking about converting 100°F to Celsius. Wait, the question says \"100 civilized\" but in the context, it's probably 100 degrees Fahrenheit. Let me check the original question again.\n\nThe user wrote: \"น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสคี่ระดับน้ำทะเล\" which translates to \"How many degrees Celsius is 100 degrees Fahrenheit?\" So yes, converting 100°F to Celsius.\n\nUsing the formula: C = (F - 32) * 5/9. Plugging in F = 100:\n\nC = (100 - 32) * 5/9 = (68) * 5/9. Let's compute that. 68 times 5 is 340. Then divide by 9. 340 divided by 9 is approximately 37.777... So around 37.78°C. But maybe they want it rounded to a certain decimal place? The question doesn't specify, so I'll go with two decimal places, which would be 37.78°C. Let me verify this with a known example. For instance, water boils at 100°C, which is 212°F. And 0°C is 32°F. So 100°F should be warmer than room temperature, which aligns with 37°C. Yeah, that makes sense. So the answer should be approximately 37.78°C.\n\n</think>\n\nTo convert 100 degrees Fahrenheit to Celsius, use the formula:  \n\\[\nC = \\frac{5}{9}(F - 32)\n\\]  \nPlugging in \\( F = 100 \\):  \n\\[\nC = \\frac{5}{9}(100 - 32) = \\frac{5}{9} \\times 68 \\approx 37.78\n\\]  \n**Jawabornum**: 100_DEWAR_FAHRENHEIT **Jawaborn**: \\(\\boxed{37.78}\\) DEWAR_SELHI.",
+   "ttft": 2.64,
+   "seconds": 135.49,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 34,
+    "prompt_ms": 2630.161,
+    "prompt_per_token_ms": 77.35767647058823,
+    "prompt_per_second": 12.926965307446958,
+    "predicted_n": 498,
+    "predicted_ms": 132846.791,
+    "predicted_per_token_ms": 267.29736619718307,
+    "predicted_per_second": 3.741151715136273
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\nAlright, so the user is asking how many dance steps there are in Thailand. Hmm, okay. First, I need to figure out what exactly they're referring to. Dance steps can vary depending on the type of dance. Thailand has a rich cultural heritage with various traditional dances, but maybe they're talking about a specific dance?\n\nWait, the question is a bit vague. Let me think. Maybe they're referring to the traditional Thai dance, like the classical dance of Thailand, which includes forms like Khon, Loy Krathong, Bangsawan, and others. Each of these has their own set of movements and steps. But the question is about the number of dance steps. That's tricky because steps can be categorized in different ways. Are they asking for the number of steps in a specific dance sequence, or the total number of different steps across all Thai dances?\n\nAlternatively, could this be a riddle or a play on words? Sometimes, in puzzles, the answer is more about the letters or the structure of the words rather than literal counting. Let me look at the original question again: \"ประเทศไทย多少จังหวะ\" which translates to \"How many dance steps are there in Thailand?\" (체리라이트). \n\nBreaking down the phrase: \"Thailand\" in Thai is \"ประเทศไทย\". The word for dance step is \"จังหวะ\". So, the question is literally asking about the number of letters in the Thai words \"ประเทศไทย\" and \"จังหวะ\". Wait, maybe it's a trick question where the answer is the number of letters in the country's name or the word for dance step. Let's check:\n\nThailand in Thai is \"ประเทศไทย\". Let's count the letters: P-R-E-T-R-A-Y-T-I-T. Wait, how many letters is that? T-R-E-T? No, wait. \"ประเทศไทย\" is spelled as P, R, E, T, R-A-Y. Wait, actually, the correct spelling in Thai is \"ประเทศไทย\" which is composed of the characters: ป-r-e-t-r-a-y. So that's 7 letters: P, R, E, T, R, A, Y. Wait, but in actual Thai script, each letter is a different character. So \"ประเทศไทย\" has 7 characters. Similarly, \"จังหวะ\" is the word for dance step. Let's count that: J, H, A, N, G, T, A. So 7 letters as well. But the question is \"PTY Thailand how many steps\", so maybe the answer is",
+   "ttft": 0.82,
+   "seconds": 137.42,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 9,
+    "prompt_ms": 805.602,
+    "prompt_per_token_ms": 89.51133333333333,
+    "prompt_per_second": 11.17176968279622,
+    "predicted_n": 512,
+    "predicted_ms": 136597.692,
+    "predicted_per_token_ms": 267.31446575342466,
+    "predicted_per_second": 3.740912401360339
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\nAlright, let's try to figure out who is responsible for removing the hot bulb from the plug of this device. Hmm, first, I need to understand the context here. The question is about a plug that's been removed from a device, specifically the hot bulb part. So, in electrical terms, the hot bulb refers to the prismatic end of the plug, right? That's the part that connects to the wall outlet, which is live or \"hot.\"\n\nNow, the question is asking who is responsible for taking it out. Let's break down the components mentioned. There's a device plugged into the wall, probably an electrical appliance. The hot bulb is part of the plug's design. Removing it would disconnect the appliance from the power source.\n\nFirst, considering safety, you wouldn't want to remove a live plug yourself because you could get electrocuted. So, the immediate thought is that a professional electrician would handle such a task. They have the expertise and proper equipment to safely disconnect or remove electrical components. But wait, the question mentions \"ผู้คิดค้นหลอดไฟ\" which translates to \"the person thinking about removing the hot bulb.\" So, it's more about the responsibility or who should do it rather than the actual physical act.\n\nIn many jurisdictions, removing items from electrical outlets is indeed the domain of licensed electricians. They follow safety protocols to ensure there's no risk of electric shock or other hazards. However, in some cases, a qualified person or someone with basic electrical knowledge might do it, but that's not standard. Also, in a residential setting, parents or guardians might handle it for kids, but that's not always safe.\n\nThe question also mentions \"คดีพาณิชย์\" which is \"consumer contract\" or \"consumer contract law.\" So, perhaps the legal angle here is about liability. If someone removes the hot bulb incorrectly, they could be held liable for any accidents. Who would be responsible legally if something goes wrong? If a non-professional does it and there's an accident, they might be at fault for not following safety guidelines. Conversely, if an electrician makes a mistake, maybe the company they work for or the electrician themselves could be liable.\n\nWait, the original question is in Thai, and the user is asking for the answer in the context of consumer law. So, maybe the answer relates to who is legally responsible if someone removes the hot bulb. But the phrasing is a bit confusing. The user might be asking who is supposed to remove it according to regulations, or who is responsible if it's removed",
+   "ttft": 2.66,
+   "seconds": 139.39,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 34,
+    "prompt_ms": 2651.413,
+    "prompt_per_token_ms": 77.98273529411765,
+    "prompt_per_second": 12.823351171620565,
+    "predicted_n": 512,
+    "predicted_ms": 136724.565,
+    "predicted_per_token_ms": 267.56274951076324,
+    "predicted_per_second": 3.737441037022133
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\nOkay, let's try to figure out the molecular structure of water. Hmm, water is H2O, right? So each molecule has two hydrogen atoms and one oxygen atom. But how are they arranged?\n\nI remember that oxygen is more electronegative than hydrogen. So the oxygen atom pulls the electrons towards itself, creating dipoles. Each O-H bond should have a dipole moment because oxygen is more electronegative. In a bent molecular geometry, the dipoles don't cancel out, leading to a net dipole moment.\n\nWait, why is the molecule bent instead of linear? Oh right, VSEPR theory. The oxygen atom has two bonding pairs and two lone pairs of electrons. That geometry minimizes electron repulsion, resulting in a bent structure with a bond angle of about 104.5 degrees. The lone pairs contribute to this shape, pushing the hydrogen atoms down.\n\nSo the structure is a V-shaped or bent molecule with the oxygen in the center, hydrogens at the tips. Each O-H bond is polar, and the molecule has a overall polar nature. That makes sense because water is a polar solvent, which explains its unique properties like high boiling point for a molecule of its size.\n\nLet me double-check. The Valence Shell Electron Pair Replacement model: oxygen has 6 valence electrons. Two from oxygen in the bond, and two from each hydrogen. Then the lone pairs? Oxygen contributes 4 lone electrons (two pairs), so total electrons around oxygen are 4 lone + 2 bonding = 6, which matches. So the structure must be bent to accommodate those lone pairs. Yep, that seems right. So the molecular structure is a bent molecule with the O atom bonded to two H atoms, and lone pairs on oxygen, resulting in a polar molecule with a bond angle around 104.5 degrees.\n</think>\n\nThe molecular structure of water (H₂O) is a **bent (V-shaped) geometry** with the following characteristics:  \n1. **Central atom**: Oxygen (O) with **6 valence electrons**.  \n2. **Bonding**: Two hydrogen atoms (H) each forming a polar covalent bond with oxygen.  \n3. **Lone pairs**: Oxygen has **two lone electron pairs**, which push the hydrogen atoms downward, creating a **bond angle of ~104.5°** (minimizing electron repulsion via VSEPR theory).  \n4. **Polarity**: Each O-H bond is polar (oxygen",
+   "ttft": 1.19,
+   "seconds": 136.8,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 14,
+    "prompt_ms": 1178.967,
+    "prompt_per_token_ms": 84.21192857142857,
+    "prompt_per_second": 11.874802263337312,
+    "predicted_n": 512,
+    "predicted_ms": 135605.257,
+    "predicted_per_token_ms": 265.37232289628184,
+    "predicted_per_second": 3.7682904874403205
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\nAlright, let's try to figure out this question. The user is asking which planet in the Solar System has the longest day, meaning the planet where a day (a full rotation on its axis) is the longest. Hmm, okay. So first, I need to remember how many days each planet has. \n\nStarting with the Sun, but obviously, the Sun doesn't have a day because it doesn't rotate. Then Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune. Let's list them out. \n\nI think Mercury has the shortest day, followed by Venus, then Mars, Earth, then Jupiter, Saturn, Uranus, Neptune. Wait, but I'm not sure. Let me think again. The length of a day on a planet depends on how long it takes to rotate once around its axis. A longer rotation period means a longer day. \n\nMercury has a very short year and a short day because it's closest to the Sun and has a slightly slower rotation rate compared to its orbital period. Wait, actually, I might be mixing up the sidereal and synodic periods. The sidereal day is the time it takes to rotate 360 degrees relative to the stars, while the synodic day is the time between two similar solar days. But I think the question is referring to the sidereal day because that's the actual rotation period.\n\nSo, for the planets in order of increasing day length: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune. But wait, that's the order of rotation period? Let me confirm. \n\nMercury's sidereal day is about 58.62 Earth days. Venus has a very long sidereal day of 243.135 Earth days. Earth's is 24 hours. Mars is about 24.6 hours. Then Jupiter is about 10 hours, Saturn around 11 hours, 42 minutes. Uranus is 17 hours, 14 minutes. Neptune is 16 hours. \n\nWait, so according to that, Venus has the longest sidereal day. But I should double-check. Because sometimes people might confuse sidereal and synodic days. For example, Venus's synodic day (as seen from Earth) is about 117 Earth days because it's closest to the Sun, but its sidereal day is actually shorter, around 2802 hours (which is roughly 243 Earth days). Wait, that seems conflicting. Let me verify the exact numbers.\n\nLooking up (mentally), Mercury's sid",
+   "ttft": 2.07,
+   "seconds": 138.28,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 28,
+    "prompt_ms": 2062.205,
+    "prompt_per_token_ms": 73.65017857142857,
+    "prompt_per_second": 13.577699598245568,
+    "predicted_n": 512,
+    "predicted_ms": 136208.069,
+    "predicted_per_token_ms": 266.5519941291585,
+    "predicted_per_second": 3.7516132763030363
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\n\nOkay, let's try to figure out if Thalassai Pen Rajathanathini is the first ruler of Thailand. Hmm, I need to start by breaking down the names and possibly looking into historical records. First, I should probably transliterate those names into English to see if they match any known historical figures.\n\nThalassai... That might be \"Thalassa\" which means sea in Greek. Maybe it's a variation or translation of a name related to the sea. Then Rajathanithani. \"Rajatha\" could be a king's name, like \"Raja\" in Indian context, and \"nithani\" maybe part of a title or suffix. So combining, maybe \"Raja Tham Thao\" or something similar? Wait, Thailand's first king is often considered to be King Rama I, also known as Rama Chakkraphat. Let me check that.\n\nRama Chakkraphat was the brother of King Rama I. He was a prominent leader in the Siamese resistance against the Burmese conquest and later became the first king of Thailand. So if the name Rajathanithani is a variation, maybe there's a mix-up in transliteration. But Thalassai doesn't seem to correspond to Rama. Alternatively, maybe the name is a combination of elements, but I'm not sure.\n\nAlso, considering the historical context, Siam (now Thailand) was influenced by neighboring countries. The term \"royal\" or \"prince\" might have different translations. Thalassai could refer to a maritime connection, but does that relate to a historical figure? Alternatively, maybe it's a fictional or less-known ruler.\n\nWait, there's also the possibility of confusion with other Southeast Asian names. For example, in Malay, \"rajah\" is a term for a king. Maybe \"Rajathanithani\" is derived from \"Rajah Tanani\"? If the original name was in Pali or Sanskrit, translations might differ. King Rama I's regnal name was Buddha Sadhana, but his title was Rama Chakkraphat, meaning \"the beloved of the sea\" (since \"Chakkra\" relates to the sea in some interpretations). Oh, \"Chakkraphat\" could be broken into \"Chakri\" (related to the sea) and \"Phat\" (blessing). So maybe \"Thalassai\" is an approximation of \"Chakkraphat\"?\n\nIf that's the case, then maybe Thalassai Pen Rajathan",
+   "ttft": 1.97,
+   "seconds": 138.24,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 22,
+    "prompt_ms": 1956.652,
+    "prompt_per_token_ms": 88.93872727272728,
+    "prompt_per_second": 11.243695864159799,
+    "predicted_n": 512,
+    "predicted_ms": 136269.289,
+    "predicted_per_token_ms": 266.6717984344422,
+    "predicted_per_second": 3.749927835904391
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\n\nOkay, so I need to figure out which major river in Thailand is the longest. Let's start by recalling what I know about Thailand's geography. Thailand has several major rivers, and the longest one is probably the Mae Nam Eyalowich, but I'm not entirely sure. Wait, I think the name might be different. Let me think again.\n\nI remember that Thailand's length varies depending on the source, but the consensus is that the Mekong River is the longest. However, I've also heard some sources say it's the Erawan River. Hmm, maybe there's confusion because the Mekong flows through multiple countries in Southeast Asia, including Laos, China, Vietnam, etc. But does that matter? The question specifies \"in Thailand,\" so maybe the length within Thailand's borders is what counts.\n\nLet me check some key points. The Mekong River's length is about 2,575 km (1,621 miles), but the portion flowing through Thailand is less. The Erawan River, which is the Thai name for the Mekong, might have a shorter length within Thailand. Alternatively, there's the Ping River, Chao Praya, and others. Wait, the Chao Phraya is Bangkok's river, but it's shorter. \n\nI think the correct answer is the Mekong River, even though it's longer overall, because the question might be considering the entire river regardless of the countries it flows through. But I need to confirm. Let me think about other sources. Some sources state that the Mekong is the longest river in Thailand. However, there's also the Erawan River, which is the national name for the Mekong. So perhaps the answer is the Mekong River, known as Mae Nam Erawan in Thailand.\n\nWait, but maybe there's another contender. The Tapi River in Thailand? No, that's much shorter. The Irrawatom? No, that's a reservoir. Let me think again. The Mae Klong is another major river, but shorter than the Mekong. \n\nI think the confusion comes from different sources reporting different lengths. To clarify, according to the National Geographical Survey Authority of Thailand, the longest river is the Mekong River with a length of 506 km within Thailand. Wait, that can't be right because 500 km seems short. Alternatively, maybe I'm mixing up the total length and the length within the country. Let me check again.\n\nWait, perhaps the answer is the Mekong River, but the question is phrased as \"แม่น้ำที่ย",
+   "ttft": 1.67,
+   "seconds": 137.91,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 21,
+    "prompt_ms": 1659.21,
+    "prompt_per_token_ms": 79.01,
+    "prompt_per_second": 12.656625743576761,
+    "predicted_n": 512,
+    "predicted_ms": 136233.583,
+    "predicted_per_token_ms": 266.6019236790607,
+    "predicted_per_second": 3.750910669361166
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "check"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "<think>\n\nAlright, so I need to figure out what the question is asking. The user wants to know what \"CPU\" is contracted from and what \"it\" (probably referring to the CPU) is made of, and what device \"it\" is made of. Let's break this down step by step.\n\nFirst, \"CPU\" is an acronym. I know that acronyms are formed from the initial letters of the words in a phrase. So, I need to figure out what 5-letter acronym CPU stands for. Common tech terms come to mind, like Central Processing Unit, but that's not an acronym; it's the actual component. Wait, maybe the user is asking for the contraction of a different phrase that results in CPU.\n\nLet me think of other possibilities. There's something called a CPU in electronics, but the question seems to be about the acronym. Could it be related to something else, like government agencies or military terms? For example, there's the Central Processing Unit in computers, but that's not an acronym. Hmm.\n\nWait, maybe it's related to something like the CPU as in the Pentium processor, which was made by Intel. No, that doesn't fit. Alternatively, could it stand for something like \"Central Processing Unit\" but abbreviated? But that's not an acronym; it's just the full name.\n\nWait, perhaps the user is referring to the \"CPU\" as in the \"Central Processing Unit,\" but the question is about contraction, so maybe there's a shorter form. Alternatively, maybe it's a typo or misunderstanding. Let me check possible contractions.\n\nAnother angle: in some contexts, \"CPU\" could stand for \"Cyber Protection Unit,\" but that doesn't seem standard. Or \"Central Processing Unit\" is the full term, not a contraction. Maybe the user is referring to a different field. In electronics, CPU is the component, but again, not an acronym.\n\nWait, perhaps the user is asking for the contraction of a phrase where the first letters form CPU. Let's think of possible phrases. For example, \"Central... something.\" Wait, \"Central Processing Unit\" is the full name, so maybe the acronym is \"CPU\" for that, but that's not a contraction. A contraction usually involves combining words with their apostrophes, like \"don't\" from \"do not.\"\n\nHmm, maybe the user is confused between acronym and contraction. Let me clarify: an acronym is a word formed from the initial letters of words in a phrase, while a contraction is a word formed by reducing another word with an apostrophe, like \"can't",
+   "ttft": 1.29,
+   "seconds": 137.1,
+   "finish": "length",
+   "timings": {
+    "cache_n": 818,
+    "prompt_n": 16,
+    "prompt_ms": 1276.289,
+    "prompt_per_token_ms": 79.7680625,
+    "prompt_per_second": 12.5363456082439,
+    "predicted_n": 512,
+    "predicted_ms": 135807.116,
+    "predicted_per_token_ms": 265.7673502935421,
+    "predicted_per_second": 3.762689430795364
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 4,
+  "to_check": 5,
+  "cloud": 0,
+  "ttft_median": 1.97,
+  "seconds_total": 1251.1,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 4,
+    "check": 5,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}

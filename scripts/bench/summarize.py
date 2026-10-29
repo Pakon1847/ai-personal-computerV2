@@ -48,7 +48,8 @@ def criteria(d: dict, sp: dict | None) -> dict[str, bool | None]:
         "1 แต่ง ≤5%": s["fabricated"] <= 0.05 * len(rows),
         "2 บอกตรง ≥90%": honest[1] == 0 or honest[0] / honest[1] >= 0.9,
         "3 สกิล ≥80%": route[1] == 0 or route[0] / route[1] >= 0.8,
-        "4 เริ่มตอบ ≤15วิ": None if not sp else sp["ttft"] <= 15,
+        # ttft = None → ไม่เคยตอบเป็นข้อความเลย (เช่น Llama 3.2 1B) = ไม่ผ่าน
+        "4 เริ่มตอบ ≤15วิ": None if not sp else sp["ttft"] is not None and sp["ttft"] <= 15,
         "5 ≥4 tok/s": None if not sp else sp["tg"] >= 4,
         "6 RAM ≤3.5GB": None if not sp else sp["vmhwm_mb"] <= 3584,
     }

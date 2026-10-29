@@ -1,0 +1,267 @@
+{
+ "label": "qwen3.5-4b",
+ "model": "",
+ "cloud": false,
+ "fallback": false,
+ "date": "2026-10-30T01:59",
+ "dataset": "exam_questions.json",
+ "system_chars": 1466,
+ "rows": [
+  {
+   "id": "A01",
+   "cat": "A",
+   "q": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "answer",
+   "by": "local",
+   "text": "ท้องฟ้าเป็นสีฟ้าเพราะแสงขาวจากดวงอาทิตย์ประกอบด้วยสีทั้งหมด เมื่อผ่านชั้นบรรยากาศ แสงสีม่วงและสีแดงถูกดูดซับโดยโมเลกุลของอากาศ ส่วนแสงสีฟ้าถูกกระเจิงไปทุกทิศทาง ทำให้เราเห็นท้องฟ้าเป็นสีฟ้า",
+   "ttft": 94.32,
+   "seconds": 110.3,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1192,
+    "prompt_ms": 94274.013,
+    "prompt_per_token_ms": 79.08893708053692,
+    "prompt_per_second": 12.643993419480296,
+    "predicted_n": 53,
+    "predicted_ms": 15987.437,
+    "predicted_per_token_ms": 307.4507115384615,
+    "predicted_per_second": 3.2525538646375907
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A02",
+   "cat": "A",
+   "q": "น้ำเดือดที่อุณหภูมิกี่องศาเซลเซียสที่ระดับน้ำทะเล",
+   "expect": "answer",
+   "by": "local",
+   "text": "น้ำเดือดที่ระดับน้ำทะเลมีอุณหภูมิ 100 องศาเซลเซียส (212 องศาฟาเรนไฮต์) ภายใต้ความดันบรรยากาศมาตรฐาน",
+   "ttft": 2.6,
+   "seconds": 12.25,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 30,
+    "prompt_ms": 2581.986,
+    "prompt_per_token_ms": 86.0662,
+    "prompt_per_second": 11.618963077259133,
+    "predicted_n": 32,
+    "predicted_ms": 9652.93,
+    "predicted_per_token_ms": 311.3848387096774,
+    "predicted_per_second": 3.211460147333504
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A03",
+   "cat": "A",
+   "q": "ประเทศไทยมีกี่จังหวัด",
+   "expect": "answer",
+   "by": "local",
+   "text": "ประเทศไทยมี 77 จังหวัด",
+   "ttft": 1.55,
+   "seconds": 3.35,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 16,
+    "prompt_ms": 1533.01,
+    "prompt_per_token_ms": 95.813125,
+    "prompt_per_second": 10.436983450858115,
+    "predicted_n": 7,
+    "predicted_ms": 1801.554,
+    "predicted_per_token_ms": 300.259,
+    "predicted_per_second": 3.3304580378939517
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A04",
+   "cat": "A",
+   "q": "ใครเป็นผู้คิดค้นหลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์",
+   "expect": "answer",
+   "by": "local",
+   "text": "หลอดไฟที่ใช้งานได้จริงเชิงพาณิชย์ครั้งแรกโดย **ทอมัส อัลวา เอดิสัน** (Thomas Edison) ในปี 1879 โดยเขาพัฒนาหลอดไฟคาร์บอนฟิวส์ (carbon filament) ที่ทนทานและใช้งานได้ยาวนานพอสำหรับการใช้งานจริง\n\nแม้ว่าก่อนหน้านี้มีนักประดิษฐ์อย่างโจเซฟ สวอน (Joseph Swan) ของอังกฤษที่ทำหลอดไฟแบบคล้ายกันสำเร็จก่อน แต่เอดิสันคือผู้ที่มีส่วนสำคัญในการทำให้หลอดไฟแพร่หลายและสร้างธุรกิจขนาดใหญ่จนประสบความสำเร็จ",
+   "ttft": 2.14,
+   "seconds": 34.93,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 23,
+    "prompt_ms": 2124.659,
+    "prompt_per_token_ms": 92.37647826086958,
+    "prompt_per_second": 10.825266548655572,
+    "predicted_n": 106,
+    "predicted_ms": 32793.734,
+    "predicted_per_token_ms": 312.32127619047617,
+    "predicted_per_second": 3.2018311790904934
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A05",
+   "cat": "A",
+   "q": "สูตรเคมีของน้ำคืออะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "สูตรเคมีของน้ำคือ H2O",
+   "ttft": 1.65,
+   "seconds": 4.12,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 17,
+    "prompt_ms": 1632.52,
+    "prompt_per_token_ms": 96.03058823529412,
+    "prompt_per_second": 10.413348687918065,
+    "predicted_n": 9,
+    "predicted_ms": 2470.25,
+    "predicted_per_token_ms": 308.78125,
+    "predicted_per_second": 3.2385386094524846
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A06",
+   "cat": "A",
+   "q": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือดวงไหน",
+   "expect": "answer",
+   "by": "local",
+   "text": "ดาวเคราะห์ที่ใหญ่ที่สุดในระบบสุริยะคือ **ดาวพฤหัสบดี** (Jupiter)\n\nดาวพฤหัสบดีเป็นดาวเคราะห์ประเภทก๊าซยักษ์ มีขนาดใหญ่มากจนกว่าจะรวมมวลของมันเข้าด้วยกัน ดาวเคราะห์อื่นๆ ทั้งหมดในระบบสุริยะก็จะมีมวลเท่ากันครับ มันมีเส้นผ่านศูนย์กลางประมาณ 140,000 กิโลเมตร ซึ่งใหญ่กว่าดาวเคราะห์อื่นๆ ทั้งหมดรวมกันประมาณสองเท่าครับ",
+   "ttft": 2.12,
+   "seconds": 26.26,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 22,
+    "prompt_ms": 2101.836,
+    "prompt_per_token_ms": 95.538,
+    "prompt_per_second": 10.467039293265508,
+    "predicted_n": 79,
+    "predicted_ms": 24136.152,
+    "predicted_per_token_ms": 309.4378461538461,
+    "predicted_per_second": 3.231666754501712
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A07",
+   "cat": "A",
+   "q": "สุโขทัยเป็นราชธานีแห่งแรกของไทยใช่ไหม",
+   "expect": "answer",
+   "by": "local",
+   "text": "ไม่ถูกต้องครับ ราชธานีแห่งแรกของไทยคือ **กรุงศรีอยุธยา** (ค.ศ. 1351–1767)\n\n**สุโขทัย** เป็นเมืองหลวงของ **อาณาจักรสุโขทัย** ซึ่งถือเป็นอาณาจักรแรกและราชอาณาจักรแรกที่ยิ่งใหญ่ของประเทศไทย แต่ไม่ได้เป็น \"ราชธานีแห่งแรกของไทย\" ในความหมายของราชธานีต่อเนื่องและยาวนานที่สุดครับ",
+   "ttft": 1.95,
+   "seconds": 26.79,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 22,
+    "prompt_ms": 1933.177,
+    "prompt_per_token_ms": 87.87168181818181,
+    "prompt_per_second": 11.38023057381709,
+    "predicted_n": 81,
+    "predicted_ms": 24836.836,
+    "predicted_per_token_ms": 310.46045,
+    "predicted_per_second": 3.221022194614483
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A08",
+   "cat": "A",
+   "q": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำอะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "แม่น้ำที่ยาวที่สุดในประเทศไทยคือแม่น้ำโขง ซึ่งมีความยาวประมาณ 435 กิโลเมตรในส่วนของประเทศไทย และไหลผ่านหลายประเทศในเอเชียตะวันออกเฉียงใต้ก่อนออกสู่ทะเลจีนใต้",
+   "ttft": 1.82,
+   "seconds": 13.03,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 20,
+    "prompt_ms": 1808.93,
+    "prompt_per_token_ms": 90.4465,
+    "prompt_per_second": 11.05625977787974,
+    "predicted_n": 37,
+    "predicted_ms": 11204.44,
+    "predicted_per_token_ms": 311.2344444444445,
+    "predicted_per_second": 3.213011984534702
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  },
+  {
+   "id": "A09",
+   "cat": "A",
+   "q": "CPU ย่อมาจากอะไร และทำหน้าที่อะไร",
+   "expect": "answer",
+   "by": "local",
+   "text": "CPU ย่อมาจาก Central Processing Unit หรือหน่วยประมวลผลกลาง ทำหน้าที่เป็น \"สมอง\" ของเครื่องคอมพิวเตอร์ โดยรับคำสั่งจากโปรแกรม สั่งการให้อุปกรณ์อื่นทำงาน เช่น คำนวณข้อมูล อ่าน/เขียนข้อมูล และควบคุมการทำงานของฮาร์ดแวร์ทั้งหมด",
+   "ttft": 1.69,
+   "seconds": 17.41,
+   "finish": "stop",
+   "timings": {
+    "cache_n": 1173,
+    "prompt_n": 20,
+    "prompt_ms": 1670.968,
+    "prompt_per_token_ms": 83.5484,
+    "prompt_per_second": 11.969110120600753,
+    "predicted_n": 52,
+    "predicted_ms": 15725.791,
+    "predicted_per_token_ms": 308.3488431372549,
+    "predicted_per_second": 3.243080109611021
+   },
+   "route": "chat",
+   "fabricated": false,
+   "auto": "ok"
+  }
+ ],
+ "summary": {
+  "route": [
+   0,
+   0
+  ],
+  "honest": [
+   0,
+   0
+  ],
+  "fabricated": 0,
+  "n": 9,
+  "auto_ok": 9,
+  "to_check": 0,
+  "cloud": 0,
+  "ttft_median": 1.95,
+  "seconds_total": 248.4,
+  "by_cat": {
+   "A": {
+    "n": 9,
+    "ok": 9,
+    "check": 0,
+    "cloud": 0
+   }
+  },
+  "checks": {
+   "fabricated": true,
+   "honest": true,
+   "route": true,
+   "ttft": true
+  }
+ }
+}
