@@ -1,0 +1,145 @@
+{
+ "engine": "piper",
+ "model": "/opt/aipc-voice/th_TH-tsync2-medium.onnx",
+ "runs": 3,
+ "machine": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+ "python": "3.13.5",
+ "voices": {
+  "piper-th": {
+   "load_s": 2.68,
+   "peak_rss_mb": 1128.2,
+   "rows": [
+    {
+     "id": "T01",
+     "kind": "thai",
+     "chars": 10,
+     "synth_s": 0.28,
+     "synth_all": [
+      0.28,
+      0.285,
+      0.277
+     ],
+     "audio_s": 1.54,
+     "rtf": 0.181
+    },
+    {
+     "id": "T02",
+     "kind": "thai",
+     "chars": 41,
+     "synth_s": 0.705,
+     "synth_all": [
+      0.705,
+      0.748,
+      0.705
+     ],
+     "audio_s": 4.08,
+     "rtf": 0.173
+    },
+    {
+     "id": "T03",
+     "kind": "thai",
+     "chars": 88,
+     "synth_s": 1.126,
+     "synth_all": [
+      1.113,
+      1.126,
+      1.151
+     ],
+     "audio_s": 6.73,
+     "rtf": 0.167
+    },
+    {
+     "id": "T04",
+     "kind": "thai",
+     "chars": 165,
+     "synth_s": 2.678,
+     "synth_all": [
+      2.659,
+      2.685,
+      2.678
+     ],
+     "audio_s": 12.63,
+     "rtf": 0.212
+    },
+    {
+     "id": "T05",
+     "kind": "thai",
+     "chars": 256,
+     "synth_s": 3.675,
+     "synth_all": [
+      3.612,
+      3.675,
+      3.997
+     ],
+     "audio_s": 18.78,
+     "rtf": 0.196
+    },
+    {
+     "id": "M01",
+     "kind": "mixed",
+     "chars": 21,
+     "synth_s": 0.409,
+     "synth_all": [
+      0.411,
+      0.377,
+      0.409
+     ],
+     "audio_s": 1.67,
+     "rtf": 0.245
+    },
+    {
+     "id": "M02",
+     "kind": "mixed",
+     "chars": 53,
+     "synth_s": 0.853,
+     "synth_all": [
+      0.852,
+      0.853,
+      0.853
+     ],
+     "audio_s": 3.83,
+     "rtf": 0.223
+    },
+    {
+     "id": "M03",
+     "kind": "mixed",
+     "chars": 89,
+     "synth_s": 1.139,
+     "synth_all": [
+      1.172,
+      1.102,
+      1.139
+     ],
+     "audio_s": 5.28,
+     "rtf": 0.216
+    },
+    {
+     "id": "M04",
+     "kind": "mixed",
+     "chars": 135,
+     "synth_s": 1.765,
+     "synth_all": [
+      1.752,
+      1.848,
+      1.765
+     ],
+     "audio_s": 6.88,
+     "rtf": 0.256
+    },
+    {
+     "id": "M05",
+     "kind": "mixed",
+     "chars": 209,
+     "synth_s": 2.799,
+     "synth_all": [
+      2.796,
+      2.799,
+      2.821
+     ],
+     "audio_s": 13.35,
+     "rtf": 0.21
+    }
+   ]
+  }
+ }
+}

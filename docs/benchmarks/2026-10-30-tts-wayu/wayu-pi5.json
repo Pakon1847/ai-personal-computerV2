@@ -1,0 +1,417 @@
+{
+ "engine": "wayu",
+ "model": "/home/aipc2030/wayu-model",
+ "runs": 3,
+ "machine": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+ "python": "3.12.15",
+ "voices": {
+  "f_young_clear": {
+   "load_s": 7.56,
+   "peak_rss_mb": 2066.1,
+   "rows": [
+    {
+     "id": "T01",
+     "kind": "thai",
+     "chars": 10,
+     "synth_s": 2.08,
+     "synth_all": [
+      2.081,
+      2.08,
+      2.048
+     ],
+     "audio_s": 1.38,
+     "rtf": 1.512
+    },
+    {
+     "id": "T02",
+     "kind": "thai",
+     "chars": 41,
+     "synth_s": 3.661,
+     "synth_all": [
+      3.596,
+      3.667,
+      3.661
+     ],
+     "audio_s": 2.42,
+     "rtf": 1.509
+    },
+    {
+     "id": "T03",
+     "kind": "thai",
+     "chars": 88,
+     "synth_s": 6.866,
+     "synth_all": [
+      6.868,
+      6.865,
+      6.866
+     ],
+     "audio_s": 4.7,
+     "rtf": 1.461
+    },
+    {
+     "id": "T04",
+     "kind": "thai",
+     "chars": 165,
+     "synth_s": 11.953,
+     "synth_all": [
+      11.932,
+      12.021,
+      11.953
+     ],
+     "audio_s": 8.0,
+     "rtf": 1.494
+    },
+    {
+     "id": "T05",
+     "kind": "thai",
+     "chars": 256,
+     "synth_s": 17.149,
+     "synth_all": [
+      17.426,
+      17.149,
+      17.057
+     ],
+     "audio_s": 11.8,
+     "rtf": 1.453
+    },
+    {
+     "id": "M01",
+     "kind": "mixed",
+     "chars": 21,
+     "synth_s": 2.675,
+     "synth_all": [
+      2.75,
+      2.667,
+      2.675
+     ],
+     "audio_s": 1.6,
+     "rtf": 1.672
+    },
+    {
+     "id": "M02",
+     "kind": "mixed",
+     "chars": 53,
+     "synth_s": 4.79,
+     "synth_all": [
+      4.79,
+      5.111,
+      4.746
+     ],
+     "audio_s": 2.95,
+     "rtf": 1.624
+    },
+    {
+     "id": "M03",
+     "kind": "mixed",
+     "chars": 89,
+     "synth_s": 6.563,
+     "synth_all": [
+      6.686,
+      6.563,
+      6.54
+     ],
+     "audio_s": 4.4,
+     "rtf": 1.492
+    },
+    {
+     "id": "M04",
+     "kind": "mixed",
+     "chars": 135,
+     "synth_s": 10.612,
+     "synth_all": [
+      10.612,
+      10.58,
+      10.712
+     ],
+     "audio_s": 7.17,
+     "rtf": 1.479
+    },
+    {
+     "id": "M05",
+     "kind": "mixed",
+     "chars": 209,
+     "synth_s": 13.884,
+     "synth_all": [
+      14.04,
+      13.884,
+      13.8
+     ],
+     "audio_s": 9.4,
+     "rtf": 1.477
+    }
+   ]
+  },
+  "m_young_clear": {
+   "load_s": 1.65,
+   "peak_rss_mb": 2356.0,
+   "rows": [
+    {
+     "id": "T01",
+     "kind": "thai",
+     "chars": 10,
+     "synth_s": 2.176,
+     "synth_all": [
+      2.176,
+      2.169,
+      2.199
+     ],
+     "audio_s": 1.32,
+     "rtf": 1.642
+    },
+    {
+     "id": "T02",
+     "kind": "thai",
+     "chars": 41,
+     "synth_s": 4.085,
+     "synth_all": [
+      4.085,
+      4.397,
+      4.083
+     ],
+     "audio_s": 2.62,
+     "rtf": 1.556
+    },
+    {
+     "id": "T03",
+     "kind": "thai",
+     "chars": 88,
+     "synth_s": 7.147,
+     "synth_all": [
+      7.221,
+      7.141,
+      7.147
+     ],
+     "audio_s": 4.95,
+     "rtf": 1.444
+    },
+    {
+     "id": "T04",
+     "kind": "thai",
+     "chars": 165,
+     "synth_s": 12.597,
+     "synth_all": [
+      12.597,
+      12.445,
+      12.733
+     ],
+     "audio_s": 8.45,
+     "rtf": 1.491
+    },
+    {
+     "id": "T05",
+     "kind": "thai",
+     "chars": 256,
+     "synth_s": 18.832,
+     "synth_all": [
+      19.139,
+      18.832,
+      18.616
+     ],
+     "audio_s": 13.12,
+     "rtf": 1.435
+    },
+    {
+     "id": "M01",
+     "kind": "mixed",
+     "chars": 21,
+     "synth_s": 2.606,
+     "synth_all": [
+      3.029,
+      2.545,
+      2.606
+     ],
+     "audio_s": 1.52,
+     "rtf": 1.709
+    },
+    {
+     "id": "M02",
+     "kind": "mixed",
+     "chars": 53,
+     "synth_s": 5.034,
+     "synth_all": [
+      5.162,
+      4.991,
+      5.034
+     ],
+     "audio_s": 3.2,
+     "rtf": 1.573
+    },
+    {
+     "id": "M03",
+     "kind": "mixed",
+     "chars": 89,
+     "synth_s": 6.956,
+     "synth_all": [
+      6.974,
+      6.926,
+      6.956
+     ],
+     "audio_s": 4.7,
+     "rtf": 1.48
+    },
+    {
+     "id": "M04",
+     "kind": "mixed",
+     "chars": 135,
+     "synth_s": 10.468,
+     "synth_all": [
+      10.302,
+      10.57,
+      10.468
+     ],
+     "audio_s": 6.83,
+     "rtf": 1.534
+    },
+    {
+     "id": "M05",
+     "kind": "mixed",
+     "chars": 209,
+     "synth_s": 15.551,
+     "synth_all": [
+      15.547,
+      15.551,
+      15.648
+     ],
+     "audio_s": 10.72,
+     "rtf": 1.45
+    }
+   ]
+  },
+  "f_mid_clear": {
+   "load_s": 1.73,
+   "peak_rss_mb": 2425.6,
+   "rows": [
+    {
+     "id": "T01",
+     "kind": "thai",
+     "chars": 10,
+     "synth_s": 2.327,
+     "synth_all": [
+      2.327,
+      2.313,
+      2.412
+     ],
+     "audio_s": 1.43,
+     "rtf": 1.633
+    },
+    {
+     "id": "T02",
+     "kind": "thai",
+     "chars": 41,
+     "synth_s": 4.017,
+     "synth_all": [
+      4.017,
+      4.04,
+      3.984
+     ],
+     "audio_s": 2.58,
+     "rtf": 1.56
+    },
+    {
+     "id": "T03",
+     "kind": "thai",
+     "chars": 88,
+     "synth_s": 7.348,
+     "synth_all": [
+      7.417,
+      7.299,
+      7.348
+     ],
+     "audio_s": 5.1,
+     "rtf": 1.441
+    },
+    {
+     "id": "T04",
+     "kind": "thai",
+     "chars": 165,
+     "synth_s": 13.439,
+     "synth_all": [
+      13.41,
+      13.898,
+      13.439
+     ],
+     "audio_s": 9.18,
+     "rtf": 1.465
+    },
+    {
+     "id": "T05",
+     "kind": "thai",
+     "chars": 256,
+     "synth_s": 18.705,
+     "synth_all": [
+      19.067,
+      18.632,
+      18.705
+     ],
+     "audio_s": 12.88,
+     "rtf": 1.453
+    },
+    {
+     "id": "M01",
+     "kind": "mixed",
+     "chars": 21,
+     "synth_s": 2.662,
+     "synth_all": [
+      2.662,
+      2.613,
+      2.673
+     ],
+     "audio_s": 1.57,
+     "rtf": 1.69
+    },
+    {
+     "id": "M02",
+     "kind": "mixed",
+     "chars": 53,
+     "synth_s": 5.104,
+     "synth_all": [
+      5.104,
+      5.122,
+      5.048
+     ],
+     "audio_s": 3.23,
+     "rtf": 1.583
+    },
+    {
+     "id": "M03",
+     "kind": "mixed",
+     "chars": 89,
+     "synth_s": 7.02,
+     "synth_all": [
+      6.995,
+      7.02,
+      7.324
+     ],
+     "audio_s": 4.7,
+     "rtf": 1.494
+    },
+    {
+     "id": "M04",
+     "kind": "mixed",
+     "chars": 135,
+     "synth_s": 11.241,
+     "synth_all": [
+      11.386,
+      11.232,
+      11.241
+     ],
+     "audio_s": 7.65,
+     "rtf": 1.469
+    },
+    {
+     "id": "M05",
+     "kind": "mixed",
+     "chars": 209,
+     "synth_s": 15.191,
+     "synth_all": [
+      15.11,
+      15.672,
+      15.191
+     ],
+     "audio_s": 10.32,
+     "rtf": 1.471
+    }
+   ]
+  }
+ }
+}
