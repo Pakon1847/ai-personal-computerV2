@@ -1,0 +1,63 @@
+#!/bin/sh
+# เทียบ LLM ขั้น 2 (ตัวเข้ารอบ) บน Pi 5 · 2026-10-30 · docs/benchmarks/2026-10-29-llm-compare/README.md
+#   sh scripts/bench/run_stage2.sh <label> [<label> ...]
+# ต่อโมเดล: รอ < 65°C → llama-server ค่าเดียวกับแอป (TCP 127.0.0.1:18080 ชั่วคราว) →
+# ชุดเลือกสกิล 58 ประโยค (skill_select · rules-first = แบบแอป) → ชุดสอบเดิม 100 ข้อ (exam ทุกข้อ) → RAM สูงสุด → ปิด
+# ไม่แตะหน้า Login · service ของระบบ · /etc · /opt (อ่านอย่างเดียว) · ผลอยู่ใน OUT · ไม่ commit เอง
+set -u
+cd "$(dirname "$0")/../.."
+MODELS="$HOME/bench-models"
+USB=/mnt/bench-usb/bench-models
+OUT="docs/benchmarks/2026-10-29-llm-compare/stage2"
+PY="${PY:-$HOME/aipc-0025/.venv/bin/python}"
+SERVER=/opt/aipc-llm/bin/llama-server   # ตัวเดียวกับแอป
+export LD_LIBRARY_PATH=/opt/aipc-llm/lib PYTHONPATH=src AIPC_CLOUD=0
+mkdir -p "$OUT"
+
+file_of() {  # label → ชื่อไฟล์ใน models.json
+  python3 -c "import json,sys;print(next(r['file'] for r in json.load(open('docs/benchmarks/2026-10-29-llm-compare/models.json')) if r['label']==sys.argv[1]))" "$1"
+}
+temp() { vcgencmd measure_temp | tr -dc '0-9.'; }
+cool() {  # รอ < 65°C (สูงสุด 15 นาที)
+  for _ in $(seq 1 90); do
+    [ "$(temp | cut -d. -f1)" -lt 65 ] && return 0
+    sleep 10
+  done
+}
+state() { echo "$(date -Iseconds) temp=$(temp) $(vcgencmd get_throttled) avail_mb=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)"; }
+
+for LABEL in "$@"; do
+  F="$(file_of "$LABEL")"
+  M="$MODELS/$F"
+  [ -f "$M" ] || M="$USB/$F"
+  [ -f "$M" ] || M="/opt/aipc-models/$F"
+  [ -f "$M" ] || { echo "SKIP $LABEL: ไม่มีไฟล์ $F"; continue; }
+  LOG="$OUT/$LABEL.log"
+  echo "== $LABEL ($M) $(date +%T)" | tee "$LOG"
+  cool
+  echo "before-server $(state)" >> "$LOG"
+  "$SERVER" -m "$M" --host 127.0.0.1 --port 18080 -c 4096 -np 1 -t 3 -fa off -cram 512 \
+      --no-webui --no-slots --swa-full > "$OUT/$LABEL-server.log" 2>&1 &
+  PID=$!
+  READY=""
+  for _ in $(seq 1 150); do
+    curl -sf http://127.0.0.1:18080/health >/dev/null 2>&1 && { READY=1; break; }
+    kill -0 $PID 2>/dev/null || break
+    sleep 2
+  done
+  if [ -z "$READY" ]; then
+    echo "SERVER-FAIL $LABEL" | tee -a "$LOG"
+    kill $PID 2>/dev/null; wait $PID 2>/dev/null
+    continue
+  fi
+  $PY -m aipc.spikes.skill_select --label "$LABEL" --server http://127.0.0.1:18080 \
+      --out "$OUT/$LABEL-skill58.json" >> "$LOG" 2>&1 || echo "SKILL-FAIL $LABEL" | tee -a "$LOG"
+  echo "after-skill $(state)" >> "$LOG"
+  $PY -m aipc.spikes.exam --label "$LABEL" --model-name "" --server http://127.0.0.1:18080 \
+      --out "$OUT/$LABEL-exam100.json" >> "$LOG" 2>&1 || echo "EXAM-FAIL $LABEL" | tee -a "$LOG"
+  grep -E "^(VmHWM|VmRSS)" /proc/$PID/status | tr -s ' \t' ' ' | sed 's/^/server-/' >> "$LOG"
+  echo "after-exam $(state)" >> "$LOG"
+  kill $PID 2>/dev/null; wait $PID 2>/dev/null
+  echo "DONE $LABEL $(date +%T)" | tee -a "$LOG"
+done
+echo "ALL-DONE $(date +%T)"
