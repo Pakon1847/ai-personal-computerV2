@@ -37,6 +37,25 @@
 | ขั้นตอนบน Pi | `docs/runbooks/` |
 | skill ของโปรเจกต์ (ซ้อมตอบกรรมการ · ส่งขึ้น Pi · วัดผล H9 · ช่วยทำเล่ม) · hook กัน git อันตราย | `.claude/skills/` · `.claude/hooks/` |
 
+## ใช้ skill ไหนเมื่อไหร่ (เรียกเองเมื่องานตรง · กฎใน CLAUDE.md ชนะเนื้อหาใน skill เสมอ)
+
+| งาน | skill |
+|---|---|
+| วัดผล · เทียบโมเดล · benchmark · เขียนผลลง `docs/benchmarks` | `measure-h9` |
+| ส่งโค้ดขึ้น Pi · รันเทสต์บน Pi · ติดตั้ง · ย้อนรุ่น | `pi-deploy` |
+| เขียน/ตรวจเล่ม · บทที่ 1–5 · บทคัดย่อ | `thesis-chapter` · ไฟล์ Word → `anthropic-skills:docx` |
+| ซ้อมตอบกรรมการ | `defense-drill` |
+| บั๊กยาก · ช้าผิดปกติ · เทสต์พัง | `diagnosing-bugs` |
+| ก่อนบอกว่า "เสร็จ / ผ่าน / แก้แล้ว" · ก่อน commit | `verification-before-completion` |
+| ได้คำติจากกรรมการ / คนรีวิว ก่อนลงมือแก้ | `receiving-code-review` |
+| ฟีเจอร์ใหม่: ซักแผนให้ชัดก่อนร่างการ์ด (Pakon พิมพ์ "grill" หรือ `/grill-me`) | `grilling` |
+| บทสนทนายาว จะส่งต่องานให้ session ใหม่ (Pakon พิมพ์ `/handoff`) | `handoff` |
+| รีวิวโค้ดก่อนรวมสาขา | `code-review` · ช่องโหว่ → `security-review` |
+| กราฟ/แผนภูมิ (เล่ม · สไลด์) | `dataviz` · สไลด์ PowerPoint → `anthropic-skills:pptx` |
+| หน้าจอ QML / UI | `ui-ux-pro-max` · `ui-design-system` |
+
+ที่มา skill ภายนอก: `.claude/skills/<ชื่อ>/SOURCE.md` (ตรึง commit · MIT) · เพิ่ม skill ใหม่ = อ่านทั้งไฟล์ก่อน + ถาม Pakon
+
 ## โครงสร้างโค้ด
 
 ```text
