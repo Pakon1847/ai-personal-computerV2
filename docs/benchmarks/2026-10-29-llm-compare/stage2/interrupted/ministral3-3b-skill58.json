@@ -1,0 +1,912 @@
+{
+ "correct": 45,
+ "total": 58,
+ "false_calls": 2,
+ "none_total": 18,
+ "by_kind": {
+  "direct": [
+   23,
+   24
+  ],
+  "paraphrase": [
+   6,
+   16
+  ],
+  "general": [
+   12,
+   12
+  ],
+  "trap": [
+   4,
+   6
+  ]
+ },
+ "ai_asked": 30,
+ "ai_seconds_median": 14.87,
+ "ai_seconds_first": 160.22,
+ "ai_seconds_max": 160.22,
+ "mode": "rules-first",
+ "rows": [
+  {
+   "text": "สรุปข่าวนี้ให้หน่อย: ครม. อนุมัติงบซ่อมถนน 12 เส้นทางในภาคเหนือ เริ่มเดือนหน้า",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "by": "rule",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "ช่วยย่อความประกาศนี้ให้สั้นลง: ห้องสมุดปิดปรับปรุงสามสัปดาห์ ผู้ยืมหนังสือคืนที่ตู้หน้าอาคาร",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "by": "rule",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "ขอใจความสำคัญของอีเมลนี้: ทีมขอให้ส่งแบบฟอร์มลงทะเบียนและสำเนาบัตรภายในสัปดาห์นี้",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "by": "rule",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "สรุปเป็นข้อ ๆ ให้ที: บริษัทย้ายสำนักงาน ที่จอดรถลดลง พนักงานต้องลงชื่อเข้างานผ่านแอป",
+   "expect": "summarize-text",
+   "kind": "direct",
+   "by": "rule",
+   "got": "summarize-text",
+   "ok": true
+  },
+  {
+   "text": "อ่านไม่ไหวแล้ว ยาวมาก เล่าสั้น ๆ ทีว่าข้อความนี้พูดเรื่องอะไร: ชุมชนจัดตลาดนัดทุกเสาร์ รายได้เข้ากองทุนโรงเรียน",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "by": "rule",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "ช่วยเก็บประเด็นจากบทความนี้ให้หน่อย: การนอนน้อยทำให้ภูมิคุ้มกันต่ำและสมาธิสั้น",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 160.22,
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 2026,
+    "prompt_ms": 147444.0,
+    "prompt_per_token_ms": 72.77591312931885,
+    "prompt_per_second": 13.740810070263965,
+    "predicted_n": 48,
+    "predicted_ms": 12761.715,
+    "predicted_per_token_ms": 271.5258510638298,
+    "predicted_per_second": 3.682890583279755
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ขอแบบกระชับที่สุดของเนื้อหานี้: ร้านค้าออนไลน์ต้องแจ้งราคารวมภาษีและค่าส่งก่อนลูกค้ากดสั่ง",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 17.84,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 60,
+    "prompt_ms": 4998.872,
+    "prompt_per_token_ms": 83.31453333333334,
+    "prompt_per_second": 12.002707810882134,
+    "predicted_n": 48,
+    "predicted_ms": 12817.5,
+    "predicted_per_token_ms": 272.71276595744683,
+    "predicted_per_second": 3.6668617125024383
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "เนื้อหานี้ต้องการบอกอะไรเรา สั้น ๆ พอ: สภานักเรียนขอให้เพิ่มจุดกดน้ำดื่มในอาคารเรียน",
+   "expect": "summarize-text",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 17.81,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 56,
+    "prompt_ms": 4847.775,
+    "prompt_per_token_ms": 86.56741071428571,
+    "prompt_per_second": 11.551691239795577,
+    "predicted_n": 48,
+    "predicted_ms": 12939.628,
+    "predicted_per_token_ms": 275.3112340425532,
+    "predicted_per_second": 3.6322527973756276
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ช่วยร่างอีเมลลาป่วยถึงหัวหน้าให้หน่อย เป็นไข้ขอหยุดสองวัน",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "by": "rule",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "เขียนจดหมายขอบคุณอาจารย์ที่ช่วยแนะนำโครงงาน",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "by": "rule",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "ร่างจดหมายขอเลื่อนส่งรายงานวิชาฟิสิกส์ถึงอาจารย์ประจำวิชา",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "by": "rule",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "ช่วยเขียนอีเมลถึงฝ่ายบุคคลขอใบรับรองการทำงาน",
+   "expect": "letter-writer",
+   "kind": "direct",
+   "by": "rule",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "อยากส่งข้อความสุภาพ ๆ ถึงเจ้าของหอว่าแอร์เสีย ช่วยเรียบเรียงให้ที",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 16.25,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 39,
+    "prompt_ms": 3454.477,
+    "prompt_per_token_ms": 88.57633333333332,
+    "prompt_per_second": 11.289697398477397,
+    "predicted_n": 48,
+    "predicted_ms": 12778.455,
+    "predicted_per_token_ms": 271.88202127659576,
+    "predicted_per_second": 3.678065932070818
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ต้องแจ้งอาจารย์ที่ปรึกษาว่าขอเปลี่ยนหัวข้อโปรเจกต์ ช่วยเขียนให้เป็นทางการหน่อย",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 5.78,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 48,
+    "prompt_ms": 4112.492,
+    "prompt_per_token_ms": 85.67691666666667,
+    "prompt_per_second": 11.671755227730534,
+    "predicted_n": 7,
+    "predicted_ms": 1643.108,
+    "predicted_per_token_ms": 273.85133333333334,
+    "predicted_per_second": 3.6516163271069217
+   },
+   "raw_tool": "letter-writer",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "ช่วยเรียบเรียงคำขอโทษลูกค้าที่ส่งของช้า ให้ดูเป็นมืออาชีพ",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 5.0,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 38,
+    "prompt_ms": 3355.308,
+    "prompt_per_token_ms": 88.29757894736842,
+    "prompt_per_second": 11.325338836255867,
+    "predicted_n": 7,
+    "predicted_ms": 1632.37,
+    "predicted_per_token_ms": 272.06166666666667,
+    "predicted_per_second": 3.6756372636105787
+   },
+   "raw_tool": "letter-writer",
+   "got": "letter-writer",
+   "ok": true
+  },
+  {
+   "text": "อยากบอกหัวหน้าว่าขอทำงานที่บ้านวันศุกร์นี้ ช่วยเขียนข้อความส่งไปหน่อย",
+   "expect": "letter-writer",
+   "kind": "paraphrase",
+   "by": "rule",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "แปลประโยคนี้เป็นภาษาอังกฤษ: ขอบคุณที่มาร่วมงานวันนี้",
+   "expect": "translate",
+   "kind": "direct",
+   "by": "rule",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "translate this to Thai: The meeting has been moved to next week",
+   "expect": "translate",
+   "kind": "direct",
+   "by": "rule",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "คำว่า resilience ภาษาอังกฤษแปลว่าอะไร",
+   "expect": "translate",
+   "kind": "direct",
+   "by": "rule",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "ช่วยแปลป้ายนี้เป็นไทย: No parking in front of the gate",
+   "expect": "translate",
+   "kind": "direct",
+   "by": "rule",
+   "got": "translate",
+   "ok": true
+  },
+  {
+   "text": "ประโยค I'm running late, start without me พูดเป็นไทยว่าไง",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 9.98,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 23,
+    "prompt_ms": 2140.816,
+    "prompt_per_token_ms": 93.07895652173912,
+    "prompt_per_second": 10.743566938961592,
+    "predicted_n": 30,
+    "predicted_ms": 7820.001,
+    "predicted_per_token_ms": 269.6552068965517,
+    "predicted_per_second": 3.70843942347322
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "อยากบอกเพื่อนต่างชาติว่ายินดีต้อนรับสู่เชียงใหม่ ต้องพูดยังไง",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 16.14,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 38,
+    "prompt_ms": 3341.939,
+    "prompt_per_token_ms": 87.94576315789473,
+    "prompt_per_second": 11.370644407333586,
+    "predicted_n": 48,
+    "predicted_ms": 12780.9,
+    "predicted_per_token_ms": 271.9340425531915,
+    "predicted_per_second": 3.6773623140780383
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ความหมายของ break a leg ในภาษาไทยคืออะไร",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 14.61,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 18,
+    "prompt_ms": 1689.531,
+    "prompt_per_token_ms": 93.86283333333333,
+    "prompt_per_second": 10.65384417332384,
+    "predicted_n": 48,
+    "predicted_ms": 12906.277,
+    "predicted_per_token_ms": 274.60163829787234,
+    "predicted_per_second": 3.6416388707603287
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": false
+  },
+  {
+   "text": "ช่วยเปลี่ยนข้อความ ร้านปิดทุกวันจันทร์ ให้ฝรั่งอ่านเข้าใจ",
+   "expect": "translate",
+   "kind": "paraphrase",
+   "by": "rule",
+   "got": "reminder",
+   "ok": false
+  },
+  {
+   "text": "เตือนส่งรายงานพรุ่งนี้บ่ายสอง",
+   "expect": "reminder",
+   "kind": "direct",
+   "by": "rule",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "อย่าลืมโทรหาแม่สองทุ่ม",
+   "expect": "reminder",
+   "kind": "direct",
+   "by": "rule",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "พรุ่งนี้เก้าโมงประชุมทีม",
+   "expect": "reminder",
+   "kind": "direct",
+   "by": "rule",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "วันศุกร์หน้าบ่ายสามไปหาหมอฟัน",
+   "expect": "reminder",
+   "kind": "direct",
+   "by": "rule",
+   "got": "reminder",
+   "ok": true
+  },
+  {
+   "text": "ทำไมเครื่องช้าจัง",
+   "expect": "machine-status",
+   "kind": "direct",
+   "by": "rule",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "แรมเหลือเท่าไหร่",
+   "expect": "machine-status",
+   "kind": "direct",
+   "by": "rule",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "เครื่องร้อนไปไหม",
+   "expect": "machine-status",
+   "kind": "direct",
+   "by": "rule",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "พื้นที่เก็บข้อมูลเหลือเท่าไร",
+   "expect": "machine-status",
+   "kind": "direct",
+   "by": "rule",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "คอมหน่วงมาก เปิดอะไรก็รอนาน เป็นอะไร",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 3.86,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 26,
+    "prompt_ms": 2481.994,
+    "prompt_per_token_ms": 95.4613076923077,
+    "prompt_per_second": 10.4754483693353,
+    "predicted_n": 6,
+    "predicted_ms": 1361.153,
+    "predicted_per_token_ms": 272.2306,
+    "predicted_per_second": 3.6733563383396284
+   },
+   "raw_tool": "machine-status",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "จอกระตุกตลอดเลย ตัวเครื่องมีปัญหาอะไรหรือเปล่า",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 4.32,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 33,
+    "prompt_ms": 2940.689,
+    "prompt_per_token_ms": 89.11178787878788,
+    "prompt_per_second": 11.22185991106166,
+    "predicted_n": 6,
+    "predicted_ms": 1362.539,
+    "predicted_per_token_ms": 272.5078,
+    "predicted_per_second": 3.6696197319856534
+   },
+   "raw_tool": "machine-status",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "ตอนนี้ระบบทำงานหนักแค่ไหน ปกติดีไหม",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 3.46,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 24,
+    "prompt_ms": 2094.21,
+    "prompt_per_token_ms": 87.25875,
+    "prompt_per_second": 11.46016875098486,
+    "predicted_n": 6,
+    "predicted_ms": 1347.62,
+    "predicted_per_token_ms": 269.524,
+    "predicted_per_second": 3.7102447277422423
+   },
+   "raw_tool": "machine-status",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "ลงไฟล์เพิ่มได้อีกไหม กลัวที่เต็ม",
+   "expect": "machine-status",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 3.5,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 23,
+    "prompt_ms": 2140.755,
+    "prompt_per_token_ms": 93.0763043478261,
+    "prompt_per_second": 10.743873072817767,
+    "predicted_n": 6,
+    "predicted_ms": 1344.933,
+    "predicted_per_token_ms": 268.9866,
+    "predicted_per_second": 3.7176573108102784
+   },
+   "raw_tool": "machine-status",
+   "got": "machine-status",
+   "ok": true
+  },
+  {
+   "text": "เปิดยูทูบ",
+   "expect": "system-command",
+   "kind": "direct",
+   "by": "rule",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "ปรับเสียงสี่สิบ",
+   "expect": "system-command",
+   "kind": "direct",
+   "by": "rule",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "เปิดหน้าตั้งค่า",
+   "expect": "system-command",
+   "kind": "direct",
+   "by": "rule",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "ปิดเสียงหน่อย",
+   "expect": "system-command",
+   "kind": "direct",
+   "by": "rule",
+   "got": "system-command",
+   "ok": true
+  },
+  {
+   "text": "เมืองหลวงของญี่ปุ่นคือที่ไหน",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.34,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 18,
+    "prompt_ms": 1692.683,
+    "prompt_per_token_ms": 94.03794444444445,
+    "prompt_per_second": 10.634005304005534,
+    "predicted_n": 48,
+    "predicted_ms": 12634.363,
+    "predicted_per_token_ms": 268.81623404255316,
+    "predicted_per_second": 3.720013426873994
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "แนะนำวิธีนอนให้หลับง่ายขึ้นหน่อย",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.82,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 23,
+    "prompt_ms": 2145.542,
+    "prompt_per_token_ms": 93.2844347826087,
+    "prompt_per_second": 10.719902010773968,
+    "predicted_n": 48,
+    "predicted_ms": 12654.262,
+    "predicted_per_token_ms": 269.2396170212766,
+    "predicted_per_second": 3.714163654901408
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "เล่ามุกตลกให้ฟังสักเรื่อง",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.36,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 18,
+    "prompt_ms": 1687.409,
+    "prompt_per_token_ms": 93.74494444444446,
+    "prompt_per_second": 10.667241907563607,
+    "predicted_n": 48,
+    "predicted_ms": 12652.639,
+    "predicted_per_token_ms": 269.20508510638297,
+    "predicted_per_second": 3.714640084175325
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ทำไมท้องฟ้าถึงเป็นสีฟ้า",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.26,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 17,
+    "prompt_ms": 1592.13,
+    "prompt_per_token_ms": 93.65470588235294,
+    "prompt_per_second": 10.677520051754568,
+    "predicted_n": 48,
+    "predicted_ms": 12651.748,
+    "predicted_per_token_ms": 269.1861276595745,
+    "predicted_per_second": 3.714901687893246
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ต้มไข่ยางมะตูมต้องใช้เวลาเท่าไหร่",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 15.05,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 26,
+    "prompt_ms": 2359.434,
+    "prompt_per_token_ms": 90.74746153846155,
+    "prompt_per_second": 11.019591986891772,
+    "predicted_n": 48,
+    "predicted_ms": 12677.154,
+    "predicted_per_token_ms": 269.72668085106386,
+    "predicted_per_second": 3.7074567367407543
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ช่วยคิดชื่อร้านกาแฟเก๋ ๆ ให้ห้าชื่อ",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 15.19,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 28,
+    "prompt_ms": 2479.0,
+    "prompt_per_token_ms": 88.53571428571429,
+    "prompt_per_second": 11.294876966518757,
+    "predicted_n": 48,
+    "predicted_ms": 12698.233,
+    "predicted_per_token_ms": 270.175170212766,
+    "predicted_per_second": 3.7013023780552774
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ออกกำลังกายแบบไหนเหมาะกับคนทำงานนั่งโต๊ะ",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.89,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 25,
+    "prompt_ms": 2212.578,
+    "prompt_per_token_ms": 88.50312,
+    "prompt_per_second": 11.299036689328016,
+    "predicted_n": 48,
+    "predicted_ms": 12665.725,
+    "predicted_per_token_ms": 269.4835106382979,
+    "predicted_per_second": 3.7108021846360946
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "อธิบายเรื่องภาวะโลกร้อนแบบเข้าใจง่าย",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.72,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 22,
+    "prompt_ms": 2033.306,
+    "prompt_per_token_ms": 92.423,
+    "prompt_per_second": 10.819817577875638,
+    "predicted_n": 48,
+    "predicted_ms": 12666.169,
+    "predicted_per_token_ms": 269.49295744680853,
+    "predicted_per_second": 3.7106721061435386
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ปลูกกะเพราในกระถางต้องรดน้ำบ่อยแค่ไหน",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 15.04,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 26,
+    "prompt_ms": 2345.519,
+    "prompt_per_token_ms": 90.21226923076922,
+    "prompt_per_second": 11.084966696070252,
+    "predicted_n": 48,
+    "predicted_ms": 12673.656,
+    "predicted_per_token_ms": 269.65225531914894,
+    "predicted_per_second": 3.7084800155535227
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "สวัสดี วันนี้เป็นยังไงบ้าง",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.39,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 18,
+    "prompt_ms": 1704.028,
+    "prompt_per_token_ms": 94.66822222222223,
+    "prompt_per_second": 10.563206707870998,
+    "predicted_n": 48,
+    "predicted_ms": 12663.947,
+    "predicted_per_token_ms": 269.44568085106386,
+    "predicted_per_second": 3.711323175941908
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "มีหนังสือพัฒนาตัวเองเล่มไหนน่าอ่านบ้าง",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 14.99,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 25,
+    "prompt_ms": 2235.056,
+    "prompt_per_token_ms": 89.40224,
+    "prompt_per_second": 11.185402065988503,
+    "predicted_n": 48,
+    "predicted_ms": 12735.228,
+    "predicted_per_token_ms": 270.9622978723404,
+    "predicted_per_second": 3.690550338007298
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ถ้าจะเริ่มเรียนเขียนโปรแกรมควรเริ่มจากภาษาอะไร",
+   "expect": "none",
+   "kind": "general",
+   "by": "ai",
+   "seconds": 15.55,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 32,
+    "prompt_ms": 2785.156,
+    "prompt_per_token_ms": 87.036125,
+    "prompt_per_second": 11.489482097232615,
+    "predicted_n": 48,
+    "predicted_ms": 12743.652,
+    "predicted_per_token_ms": 271.1415319148936,
+    "predicted_per_second": 3.6881107550645607
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "สรุปแล้วโทรศัพท์รุ่นไหนคุ้มกว่ากันระหว่างสองรุ่นที่เพื่อนแนะนำ",
+   "expect": "none",
+   "kind": "trap",
+   "by": "rule",
+   "got": "summarize-text",
+   "ok": false
+  },
+  {
+   "text": "เครื่องบินลำแรกของโลกบินได้เมื่อไร",
+   "expect": "none",
+   "kind": "trap",
+   "by": "ai",
+   "seconds": 15.12,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 26,
+    "prompt_ms": 2353.625,
+    "prompt_per_token_ms": 90.52403846153847,
+    "prompt_per_second": 11.046789526793775,
+    "predicted_n": 48,
+    "predicted_ms": 12740.42,
+    "predicted_per_token_ms": 271.0727659574468,
+    "predicted_per_second": 3.6890463579693606
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "จดหมายรักที่ดังที่สุดในประวัติศาสตร์คือของใคร",
+   "expect": "none",
+   "kind": "trap",
+   "by": "ai",
+   "seconds": 15.19,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 27,
+    "prompt_ms": 2451.578,
+    "prompt_per_token_ms": 90.79918518518518,
+    "prompt_per_second": 11.013314689559133,
+    "predicted_n": 48,
+    "predicted_ms": 12722.145,
+    "predicted_per_token_ms": 270.6839361702128,
+    "predicted_per_second": 3.694345568298427
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ทำไมคนถึงชอบแปลชื่อหนังฝรั่งเป็นไทยแปลก ๆ",
+   "expect": "none",
+   "kind": "trap",
+   "by": "ai",
+   "seconds": 15.35,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 29,
+    "prompt_ms": 2581.083,
+    "prompt_per_token_ms": 89.00286206896553,
+    "prompt_per_second": 11.235593741076904,
+    "predicted_n": 48,
+    "predicted_ms": 12750.409,
+    "predicted_per_token_ms": 271.28529787234044,
+    "predicted_per_second": 3.6861562636931886
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "อาการนอนไม่พอทำให้สมองช้าลงจริงไหม",
+   "expect": "none",
+   "kind": "trap",
+   "by": "ai",
+   "seconds": 14.87,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 24,
+    "prompt_ms": 2128.041,
+    "prompt_per_token_ms": 88.66837500000001,
+    "prompt_per_second": 11.27797819684865,
+    "predicted_n": 48,
+    "predicted_ms": 12717.051,
+    "predicted_per_token_ms": 270.57555319148935,
+    "predicted_per_second": 3.695825392223402
+   },
+   "raw_tool": "",
+   "got": "none",
+   "ok": true
+  },
+  {
+   "text": "ห้องร้อนมาก มีวิธีคลายร้อนแบบไม่เปิดแอร์ไหม",
+   "expect": "none",
+   "kind": "trap",
+   "by": "ai",
+   "seconds": 4.07,
+   "timings": {
+    "cache_n": 1980,
+    "prompt_n": 30,
+    "prompt_ms": 2706.202,
+    "prompt_per_token_ms": 90.20673333333335,
+    "prompt_per_second": 11.085646969442783,
+    "predicted_n": 6,
+    "predicted_ms": 1346.699,
+    "predicted_per_token_ms": 269.3398,
+    "predicted_per_second": 3.712782143597047
+   },
+   "raw_tool": "machine-status",
+   "got": "machine-status",
+   "ok": false
+  }
+ ],
+ "label": "ministral3-3b",
+ "method": "rules + AI",
+ "skills": [
+  "letter-writer",
+  "machine-status",
+  "reminder",
+  "spotify-voice",
+  "summarize-text",
+  "system-command",
+  "translate",
+  "youtube-voice"
+ ],
+ "server": {
+  "supports_tools": true,
+  "template_chars": 7503,
+  "template_sha256": "a81fa42ad89f88c79d32f8f52c1cc7b1abfce90774437022e1cb22ce741ae86b",
+  "model": "/mnt/bench-usb/bench-models/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf"
+ },
+ "dataset": "skill_selection.json",
+ "machine": {
+  "board": "Raspberry Pi 5 Model B Rev 1.0",
+  "ram_mb": 8062,
+  "temp_c": 82.05,
+  "throttled": 917512,
+  "commit": "cb40c72340cbdb7dd7cef36d201f25254d1daa18",
+  "dirty": true
+ }
+}
