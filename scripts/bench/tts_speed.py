@@ -1,8 +1,10 @@
 """วัดเวลาสร้างเสียงของ TTS ทีละประโยค · 2026-10-30 · ไม่ import aipc (รันด้วย venv ของตัว TTS เอง)
 
-    python tts_speed.py --engine wayu --model D:/tools/wayu-model --voices f_young_clear m_young_clear \
-        --sentences tests/data/tts_wayu_sentences.json --out ผล.json --keep โฟลเดอร์เสียง
-    python tts_speed.py --engine piper --model /opt/aipc-voice/th_TH-tsync2-medium.onnx --voices piper-th ...
+    python tts_speed.py --engine wayu --model D:/tools/wayu-model \
+        --voices f_young_clear m_young_clear --sentences tests/data/tts_wayu_sentences.json \
+        --out ผล.json --keep โฟลเดอร์เสียง
+    python tts_speed.py --engine piper --model /opt/aipc-voice/th_TH-tsync2-medium.onnx \
+        --voices piper-th ...
 
 ต่อเสียง: โหลด (จับเวลา) → อุ่นเครื่อง 1 ครั้ง → ทุกประโยค N รอบ: เวลาสร้างทั้งประโยค · ความยาวเสียง ·
 RTF = เวลาสร้าง ÷ ความยาวเสียง (< 1 = สร้างเร็วกว่าพูด) · เก็บเสียงรอบแรกไว้ที่ --keep ให้คนฟัง (ไม่ใส่ git)
@@ -74,7 +76,8 @@ def main() -> int:
     a = ap.parse_args()
     items = json.loads(a.sentences.read_text(encoding="utf-8"))["items"]
     res = {"engine": a.engine, "model": str(a.model), "runs": a.runs,
-           "machine": platform.platform(), "python": sys.version.split()[0], "voices": {}}  # fmt: skip
+           "machine": platform.platform(), "python": sys.version.split()[0],
+           "voices": {}}  # fmt: skip
     for voice in a.voices:
         t0 = time.monotonic()
         say = (wayu if a.engine == "wayu" else piper)(a.model, voice)
@@ -93,12 +96,20 @@ def main() -> int:
                 audio_s = say(it["text"], keep)
                 times.append(time.monotonic() - t)
             med = statistics.median(times)
+            rtf = round(med / audio_s, 3) if audio_s else None
             rows.append({"id": it["id"], "kind": it["kind"], "chars": len(it["text"]),
                          "synth_s": round(med, 3), "synth_all": [round(x, 3) for x in times],
-                         "audio_s": round(audio_s, 2), "rtf": round(med / audio_s, 3) if audio_s else None})  # fmt: skip
-            print(f"{voice} {it['id']} {len(it['text']):4d} ตัวอักษร · สร้าง {med:6.2f} วิ · "
-                  f"เสียง {audio_s:6.2f} วิ · RTF {rows[-1]['rtf']}", flush=True)
-        res["voices"][voice] = {"load_s": round(load_s, 2), "peak_rss_mb": peak_rss_mb(), "rows": rows}
+                         "audio_s": round(audio_s, 2), "rtf": rtf})  # fmt: skip
+            print(
+                f"{voice} {it['id']} {len(it['text']):4d} ตัวอักษร · สร้าง {med:6.2f} วิ · "
+                f"เสียง {audio_s:6.2f} วิ · RTF {rtf}",
+                flush=True,
+            )
+        res["voices"][voice] = {
+            "load_s": round(load_s, 2),
+            "peak_rss_mb": peak_rss_mb(),
+            "rows": rows,
+        }
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")
     return 0
