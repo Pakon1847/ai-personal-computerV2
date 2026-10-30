@@ -51,7 +51,7 @@ Pakon ขอ (2026-10-30): ติดตั้ง Wayu-Paxa-TTS-Edge แล้ว
 - เครื่อง: Raspberry Pi 5 8GB (`ai-pc`) · ไม่มีงานอื่น (มีแค่หน้าเข้าสู่ระบบ) · `systemd-run` บัญชี `aipc2030` · ตัววัด commit `0310447` (`scripts/bench/run_tts.sh`)
 - อุณหภูมิ 59°C → 77°C (หลัง Wayu) → 78°C · `get_throttled` = `0xe0000` ก่อน/ระหว่าง/หลัง (เคยลดความเร็วตั้งแต่บูต · ไม่มีการลดความเร็วค้างอยู่ตอนตรวจ) → ยังไม่ใช่ระดับ 4
 - torch 2.15.0+cpu · numpy 2.5.4 · scikit-learn 1.9.1 · Python 3.12.15 · โมเดล sha256 `eb26ac6f…a4d7370` (ตรงกับโน้ตบุ๊ก)
-- ผลดิบ: [`wayu-pi5.json`](wayu-pi5.json) · [`piper-pi5.json`](piper-pi5.json) · [`run.log`](run.log) · ไฟล์เสียง 40 ไฟล์ให้ Pakon ฟัง: Pi `~/tts-wayu-wav` · โน้ตบุ๊ก `D:	ools	ts-wayu-wav` (ไม่ใส่ git)
+- ผลดิบ: [`wayu-pi5.json`](wayu-pi5.json) · [`piper-pi5.json`](piper-pi5.json) · [`run.log`](run.log) · ไฟล์เสียง 40 ไฟล์ให้ Pakon ฟัง: Pi `~/tts-wayu-wav` · โน้ตบุ๊ก `D:/tools/tts-wayu-wav` (ไม่ใส่ git)
 
 **เวลาสร้างเสียงต่อประโยค (วินาที · มัธยฐาน 3 รอบ · RTF = เวลาสร้าง ÷ ความยาวเสียง)**
 
