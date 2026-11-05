@@ -52,7 +52,13 @@ BROWSER_KEYS = set(
     "ctrl+w ctrl+shift+w ctrl+q ctrl+shift+q ctrl+t ctrl+shift+t ctrl+n ctrl+shift+n ctrl+l ctrl+p "
     "ctrl+s ctrl+o ctrl+h ctrl+j ctrl+u ctrl+shift+i ctrl+shift+j ctrl+shift+delete alt+f4".split()
 )
-_BAD_SELECTOR = re.compile(r"javascript:|[{};`]|passw|checkout|payment|credit|cvv|billing", re.I)
+# ช่องบัตร (การ์ด 0074 · S1 b10 หลุด: cardNumber · cc-exp · cc-csc ไม่มีคำที่ห้ามเดิม)
+# = ชื่อมาตรฐาน autocomplete ของ HTML
+_BAD_SELECTOR = re.compile(
+    r"javascript:|[{};`]|passw|checkout|payment|credit|cvv|cvc|billing"
+    r"|card[-_]?(number|num|holder)|cc-(number|name|exp|csc|type)|csc|security[-_]?code|(?<![a-z])otp",
+    re.I,
+)
 _LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|กดปุ่มที่เขียนว่า|คลิก|ทำคำสั่ง)\s+(.+?)\s*")
 # คำพ้อง (การ์ด 0066): คำสั่งของระบบที่สกิลเรียกได้ · ค้นเว็บ/ค้นในเว็บ (ส่งข้อความออก · H3) · ปิดทุกแท็บ (H2) ·
 # เข้าสู่ระบบ · ลิงก์ · กดคีย์/คลิก (ใช้บรรทัดของมันเอง) = ไม่ได้

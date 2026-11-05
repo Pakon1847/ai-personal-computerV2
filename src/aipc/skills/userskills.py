@@ -22,6 +22,9 @@ MAX_STRIKES = 2  # ผิด/ทำไม่สำเร็จติดกัน
 # สกิลที่ติดตั้งโดยไม่มีคนดูก่อน ห้ามทำสิ่งเหล่านี้ (ถึงตัวตรวจทั่วไปจะยอม):
 # เปิด URL ที่เขียนเอง (ลิงก์หลอกได้ · ใช้ได้เฉพาะเว็บในรายการของระบบ) · เปิดเทอร์มินัล (ช่องทางรันคำสั่ง)
 AUTO_DENY_APPS = frozenset({"terminal"})
+# ตัวทำงานที่ระบบมีให้สกิลของผู้ใช้ (การ์ด 0074): ขั้นตอน (code · code+llm) · งานภาษา (llm) · สกิลประจำเว็บ (code)
+# แบบอื่น (กล้อง+ภาพ · เสียง+llm) มีแต่สกิลในตัวที่มีโค้ดรองรับ · S1 b19 = สกิล "ถ่ายภาพเงียบ ๆ" ผ่านด่านเดิมได้
+USER_WORKERS = frozenset({"code", "code+llm", "llm"})
 
 
 def default_dir() -> Path:
@@ -44,17 +47,31 @@ def auto_policy(m: manifest.Manifest) -> list[str]:
             errors.append(f"สกิลอัตโนมัติเปิดได้เฉพาะเว็บในรายการของระบบ ไม่ใช่ลิงก์ {plan.params['url']}")
         if plan.action == "open_app" and plan.params.get("app") in AUTO_DENY_APPS:
             errors.append("สกิลอัตโนมัติเปิดเทอร์มินัลไม่ได้")
+    if m.worker not in USER_WORKERS:
+        errors.append(f"สกิลของผู้ใช้ใช้ worker “{m.worker}” ไม่ได้ (มีให้แค่ ขั้นตอน · งานภาษา · สกิลประจำเว็บ)")
+    # ขอได้เฉพาะสิทธิ์ที่ขั้นตอนใช้จริง (การ์ด 0074 · S1 b07 b17: ขอสั่งเครื่องทั้งที่ไม่มีขั้นสั่งเครื่อง
+    # = หน้าตรวจบอกสิทธิ์ไม่ตรงความจริง)
+    used = set()
+    if any(s.kind == "action" for s in m.steps):
+        used.add("run_actions")
+    if any(s.kind == "agenda" for s in m.steps):
+        used.add("read_agenda")
+    if m.commands:
+        used.add("page_actions")
+    if extra := [p for p in m.permissions if p not in used]:
+        labels = ", ".join(manifest.PERMISSIONS[p] for p in extra)
+        errors.append(f"ขอสิทธิ์ที่สกิลไม่ได้ใช้: {labels}")
     return errors
 
 
 def check_md(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
-    """ตัวตรวจเดียวกับ forge (mdskill + manifest + ขนาด) + นโยบายสกิลอัตโนมัติ."""
-    from aipc.skills import forge
+    """ตัวตรวจเดียวกับ forge (mdskill + manifest + ขนาด) + นโยบายสกิลอัตโนมัติ + เนื้อหา (การ์ด 0074)."""
+    from aipc.skills import contentcheck, forge
 
     m, errors = forge._validate(skill_md)
     if m is None:
         return None, errors
-    errors = auto_policy(m)
+    errors = auto_policy(m) + contentcheck.check(m, skill_md)
     return (None, errors) if errors else (m, [])
 
 
