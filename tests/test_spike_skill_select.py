@@ -11,11 +11,69 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from aipc.skills import manifest
+from aipc.skills import manifest, userskills
 from aipc.spikes import skill_select
 
 REPO = Path(__file__).resolve().parents[1]
 TEMPLATES = REPO / "scripts" / "pi" / "chat-templates"
+
+
+# สกิลผู้ใช้จำลองสำหรับเทสต์ (หัวข้อไม่ชนกันและไม่ชนสกิลในตัว) · มากกว่า 5 ตัว = ต้องผ่านตัวค้นของการ์ด 0018
+USER_SKILLS = [
+    (
+        "plant-care",
+        "ดูแลต้นไม้",
+        "แนะนำวิธีรดน้ำ ใส่ปุ๋ย และดูแลต้นไม้ในบ้าน",
+        ["รดน้ำต้นกระบองเพชรบ่อยแค่ไหน", "ต้นไม้ในห้องใบเหลืองทำยังไงดี", "ใส่ปุ๋ยมอนสเตอร่าตอนไหน"],
+    ),
+    (
+        "cat-care",
+        "เลี้ยงแมว",
+        "แนะนำการเลี้ยงแมว อาหาร การฝึกกระบะทราย",
+        ["แมวไม่ยอมกินข้าว", "ฝึกลูกแมวใช้กระบะทราย", "แมวอายุสามเดือนกินอะไรได้บ้าง"],
+    ),
+    (
+        "running-plan",
+        "ตารางวิ่ง",
+        "จัดตารางฝึกวิ่งสำหรับมือใหม่ถึงฮาล์ฟมาราธอน",
+        ["อยากวิ่งห้ากิโลให้ได้ในเดือนเดียว", "ตารางซ้อมวิ่งฮาล์ฟมาราธอน", "มือใหม่วิ่งสัปดาห์ละกี่วันดี"],
+    ),
+    (
+        "guitar-chords",
+        "คอร์ดกีตาร์",
+        "อธิบายวิธีจับคอร์ดกีตาร์และลำดับคอร์ดง่าย ๆ",
+        ["จับคอร์ด F ยังไงไม่ให้บอด", "คอร์ดง่าย ๆ สำหรับเพลงช้า", "เปลี่ยนคอร์ด G ไป C ให้เร็วขึ้น"],
+    ),
+    (
+        "coffee-brew",
+        "ชงกาแฟ",
+        "สอนชงกาแฟดริป สัดส่วนผงต่อน้ำ อุณหภูมิน้ำ",
+        ["ชงกาแฟดริปใช้ผงกี่กรัม", "น้ำร้อนกี่องศาถึงจะดีสำหรับดริป", "กาแฟเปรี้ยวเกินไปแก้ยังไง"],
+    ),
+    (
+        "trip-budget",
+        "งบเที่ยว",
+        "ประมาณค่าใช้จ่ายทริปเที่ยวในประเทศแบบประหยัด",
+        ["ไปเชียงใหม่สามวันใช้เงินเท่าไร", "เที่ยวทะเลแบบประหยัดต้องเตรียมงบเท่าไร", "แบ่งงบค่าที่พักกับค่ากิน"],
+    ),
+    (
+        "origami",
+        "พับกระดาษ",
+        "สอนพับกระดาษเป็นรูปสัตว์และดอกไม้ทีละขั้น",
+        ["พับนกกระเรียนกระดาษยังไง", "สอนพับดอกกุหลาบกระดาษ", "พับกบกระโดดได้ให้ลูกเล่น"],
+    ),
+]
+
+
+def user_skill(sid, name, desc, examples, md=False):
+    text = "\n".join(["---", f"id: {sid}", f"name: {name}", f"description: {desc}", "worker: llm",
+                      "needs: llm", "examples:", *[f"  - {e}" for e in examples], "---",
+                      "## คำสั่งให้ AI", f"{desc} ตอบสั้น ๆ เป็นข้อ ๆ"])  # fmt: skip
+    if md:
+        return text
+    m, errors = userskills.check_md(text)
+    assert m is not None, errors
+    return m
 
 
 def fake_urlopen(props):
@@ -134,6 +192,42 @@ class SkillSelectTest(unittest.TestCase):
                 self.assertEqual(code, 2)
                 self.assertFalse(out.exists(), "ไม่เขียนผลที่ใช้ไม่ได้")
             self.assertIn("chat-template-file", err.getvalue())
+
+    def test_without_user_skills_ai_sees_the_same_tools_as_before(self):
+        items = [{"text": "เล่ามุกหน่อย", "expect": "none", "kind": "general"}]
+        skill_select.evaluate(items, self.skills, self.ai({}))
+        before = {t["function"]["name"] for t in skill_select.catalog.tools(self.skills, {"llm"})}
+        self.assertEqual(self.asked[0][1], before, "ชุดเดิม (การ์ด 0074 ไม่เปลี่ยนผลเก่า)")
+
+    def test_user_skills_reach_rules_and_ai_like_the_app(self):
+        pool = [user_skill(*t) for t in USER_SKILLS]
+        items = [{"text": "ใบมอนสเตอร่าเหลืองเป็นจุด ๆ", "expect": "plant-care", "kind": "paraphrase"},
+                 {"text": "รดน้ำต้นกระบองเพชรบ่อยแค่ไหน", "expect": "plant-care",
+                  "kind": "direct"}]  # fmt: skip
+        res = skill_select.evaluate(
+            items, self.skills, self.ai({"ใบมอนสเตอร่าเหลืองเป็นจุด ๆ": "plant-care"}), "ai-first",
+            user=pool,
+        )  # fmt: skip
+        text, names = self.asked[0]
+        # ai-first = ทางของแอปเมื่อ AI พร้อม (backend._handle)
+        # ตรงตัวอย่างเป๊ะ = router.repeat_of เลือกเอง
+        self.assertEqual(len(self.asked), 1, "ประโยคที่ตรงตัวอย่างเป๊ะ = กฎเลือกสกิลผู้ใช้เอง ไม่ถาม AI")
+        self.assertIn("plant-care", names)
+        self.assertEqual(len(names & {s.id for s in pool}), 5, "สกิลผู้ใช้ส่งให้ AI ≤ 5 ตัว (การ์ด 0018)")
+        self.assertTrue({"translate", "summarize-text"} <= names, "สกิลในตัวส่งทุกครั้ง")
+        self.assertEqual(res["correct"], 2)
+
+    def test_load_pool_keeps_order_and_skips_what_the_import_gate_rejects(self):
+        items = [{"id": "p1", "md": user_skill(*USER_SKILLS[0], md=True)},
+                 {"id": "p2", "md": user_skill(*USER_SKILLS[0], md=True)},  # id ซ้ำตัวก่อน
+                 {"id": "p3", "md": "ไม่ใช่ไฟล์สกิล"},
+                 {"id": "p4", "md": user_skill(*USER_SKILLS[1], md=True)}]  # fmt: skip
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "pool.json"
+            path.write_text(json.dumps({"items": items}, ensure_ascii=False), encoding="utf-8")
+            ok, rejected = skill_select.load_pool(path, self.skills)
+        self.assertEqual([s.id for s in ok], ["plant-care", "cat-care"])
+        self.assertEqual([r["id"] for r in rejected], ["p2", "p3"])
 
     def test_dataset_is_well_formed(self):
         data = json.loads(skill_select.DATASET.read_text(encoding="utf-8"))
