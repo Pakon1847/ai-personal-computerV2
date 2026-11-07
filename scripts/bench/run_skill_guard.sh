@@ -1,10 +1,12 @@
 #!/bin/sh
 # การ์ด 0074 ขั้น 0 · S2 (เลือกสกิลเมื่อมีสกิลผู้ใช้มากขึ้น) บน Pi 5 · docs/benchmarks/2026-11-05-skill-guard/README.md
-#   sh scripts/bench/run_skill_guard.sh
+#   sh scripts/bench/run_skill_guard.sh              # ทั้ง 4 ชุด
+#   sh scripts/bench/run_skill_guard.sh s2b-user50   # เฉพาะชุดที่ระบุ (ต่อท้าย log เดิม ไม่ลบ)
 # llama-server ค่าเดียวกับแอป (อ่าน /etc/aipc/llm.conf อย่างเดียว) บน TCP 127.0.0.1:18080 ชั่วคราว
 # (แอปจริงคุยผ่าน Unix socket ในกล่องตัดเน็ต) · ai-first = ทางของแอปเมื่อ AI พร้อม · ทุกชุดถาม 3 รอบ
 # ไม่แตะหน้า Login · service ของระบบ · /etc · /opt · ผลอยู่ใน O · ไม่ commit เอง
 set -u
+RUNS="${*:-s2a-user0 s2a-user20 s2a-user50 s2b-user50}"
 cd "$(dirname "$0")/../.."
 . /etc/aipc/llm.conf
 O=docs/benchmarks/2026-11-05-skill-guard
@@ -23,7 +25,7 @@ cool() {  # รอ < 65°C (สูงสุด 15 นาที)
 }
 state() { echo "$(date -Iseconds) temp=$(temp) $(vcgencmd get_throttled) avail_mb=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)"; }
 
-echo "== S2 $(date -Iseconds) model=$MODEL threads=${THREADS:-4} ctx=${CTX:-4096} template=${TEMPLATE:-}" | tee "$LOG"
+echo "== S2 $(date -Iseconds) model=$MODEL threads=${THREADS:-4} ctx=${CTX:-4096} template=${TEMPLATE:-} runs=$RUNS" | tee -a "$LOG"
 cool
 echo "before-server $(state)" >> "$LOG"
 if [ -n "${TEMPLATE:-}" ]; then
@@ -44,6 +46,7 @@ done
 [ -n "$READY" ] || { echo "SERVER-FAIL" | tee -a "$LOG"; kill $PID 2>/dev/null; exit 1; }
 
 run() {  # <label> <ชุดประโยค> <จำนวนสกิลผู้ใช้>
+  case " $RUNS " in *" $1 "*) ;; *) return 0 ;; esac
   cool
   echo "start $1 $(state)" >> "$LOG"
   $PY -m aipc.spikes.skill_select --label "$1" --server http://127.0.0.1:18080 --mode ai-first \
