@@ -3831,6 +3831,26 @@ class SkillsController(QObject):
             return f"ส่งออกไม่ได้: {e.strerror or e}"
         return f"บันทึกแล้วที่ ไฟล์ของฉัน / สกิลที่ส่งออก / {dest.name}"
 
+    QR_SUFFIXES = (".png", ".jpg", ".jpeg")
+
+    @Slot(str, result="QVariantMap")
+    def shareSkillQr(self, skill_id: str) -> dict:  # noqa: N802
+        """รูป QR ของสกิล (การ์ด 0080) ใน ~/สกิลที่ส่งออก · เพื่อนถ่ายรูปหรือรับไฟล์ไปเปิดในไฟล์ของฉัน."""
+        from aipc.skills import share
+
+        if not self._is_user(skill_id):
+            return {"path": "", "message": "แชร์ได้เฉพาะสกิลที่ Claude สร้าง ที่สร้างเอง หรือที่นำเข้า"}
+        dest = Path.home() / "สกิลที่ส่งออก" / f"{skill_id}-qr.png"
+        try:
+            share.write_png(self._user.current_md(skill_id), dest)
+        except share.ShareError as e:
+            return {"path": "", "message": str(e)}
+        except OSError as e:
+            return {"path": "", "message": f"บันทึกรูปไม่ได้: {e.strerror or e}"}
+        return {"path": str(dest),
+                "message": f"บันทึกรูป QR แล้วที่ ไฟล์ของฉัน / สกิลที่ส่งออก / {dest.name} · "
+                           "เพื่อนเปิดรูปนี้ในไฟล์ของฉัน แล้วกด “ติดตั้งสกิลจาก QR”"}  # fmt: skip
+
     @Slot(str, bool, result=str)
     def importSkill(self, path: str, install: bool) -> str:  # noqa: N802
         """ไฟล์สกิลจากภายนอก: ตรวจด้วยประตูเดียวกับสกิลอัตโนมัติ (0017) · install=False = ดูก่อน · คืนข้อความ."""
@@ -3839,7 +3859,17 @@ class SkillsController(QObject):
         if self._user is None:
             return "บัญชีนี้ติดตั้งสกิลเพิ่มไม่ได้"
         try:
-            md = Path(path).read_text(encoding="utf-8")
+            if (
+                Path(path).suffix.lower() in self.QR_SUFFIXES
+            ):  # รูป QR (การ์ด 0080) → .md แล้วตรวจแบบเดียวกัน
+                from aipc.skills import share
+
+                try:
+                    md = share.read_image(Path(path))
+                except share.ShareError as e:
+                    return str(e)
+            else:
+                md = Path(path).read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError) as e:
             return f"อ่านไฟล์ไม่ได้: {e}"
         if not md.lstrip("\ufeff \r\n").startswith("---"):  # โน้ต .md ทั่วไป (ปุ่มขึ้นทุกไฟล์ .md)

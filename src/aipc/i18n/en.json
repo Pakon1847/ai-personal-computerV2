@@ -1134,5 +1134,8 @@
   "สุขภาพ": "Health",
   "บันเทิง": "Entertainment",
   "งาน": "Work",
-  "อื่น ๆ": "Other"
+  "อื่น ๆ": "Other",
+  "แชร์เป็น QR": "Share as QR",
+  "ติดตั้งสกิลจาก QR": "Install skill from QR",
+  "ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง · ไม่มีอะไรส่งออกทางอินเทอร์เน็ต": "The receiver installs it themselves, and it is always checked before installing · nothing goes over the internet"
 }
