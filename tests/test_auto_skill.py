@@ -276,7 +276,9 @@ class ControllerTest(unittest.TestCase):
         self.assertNotEqual(card["confirmToken"], "")  # ขั้นที่สั่งเครื่องยังถามยืนยันตามกติกาเดิม
         s.confirm(card["confirmToken"], True)
         self.assertEqual(len(self.calls), 2)  # ปิดเสียง + เปิด Gmail
-        self.assertIn("meeting-mode", [t["function"]["name"] for t in s.tool_catalog()])
+        # การ์ด 0074: สกิลผู้ใช้ส่งให้ AI เฉพาะเมื่อใกล้ข้อความ (retrieval.near)
+        names = [t["function"]["name"] for t in s.tool_catalog("เข้าโหมดประชุมให้หน่อย")]
+        self.assertIn("meeting-mode", names)
         self.assertTrue(any(k["byClaude"] for k in s.skills))
 
     def test_voice_create_asks_before_anything_goes_to_claude(self):

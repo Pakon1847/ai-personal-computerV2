@@ -281,8 +281,8 @@ def build(opts: Options, argv: list[str] | None = None):
     # AI เลือกสกิลได้ (อาจารย์ขอ · งานข้อ ④): รายการสกิลอ่านจาก SkillsController ตอนส่งทุกครั้ง
     holder: dict = {}
 
-    def tools(text: str = "") -> list:
-        return holder["skills"].tool_catalog(text) if "skills" in holder else []
+    def tools(text: str = "", user: bool = True) -> list:
+        return holder["skills"].tool_catalog(text, user=user) if "skills" in holder else []
 
     in_session = not opts.greeter_session
     budget = ledger = None

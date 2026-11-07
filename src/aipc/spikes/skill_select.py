@@ -59,11 +59,12 @@ def server_info(server: str, timeout: float = 30) -> dict:
     }
 
 
-def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300) -> dict:
+def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300,
+           choice: str = "auto") -> dict:  # fmt: skip
     """ถาม llama-server 1 ข้อพร้อมรายการสกิล · คืนชื่อเครื่องมือที่ AI เรียก ("" = ตอบเอง) + เวลา."""
     body = {"messages": [{"role": "system", "content": SYSTEM_PROMPT},
                          {"role": "user", "content": text}],
-            "tools": tools, "tool_choice": "auto", "stream": False, "cache_prompt": True,
+            "tools": tools, "tool_choice": choice, "stream": False, "cache_prompt": True,
             **SAMPLING}  # fmt: skip
     req = urllib.request.Request(server.rstrip("/") + "/v1/chat/completions",
                                  data=json.dumps(body).encode(),
@@ -111,16 +112,32 @@ def evaluate(items: list[dict], skills, ai=None, mode: str = "rules-first", user
     user = list(user)
     rows = []
     for it in items:
-        # ไม่มีสกิลผู้ใช้ = รายการเดิมทุกประโยค (retrieval.pick ของรายการว่าง = ว่าง)
-        tools = catalog.tools(list(skills) + retrieval.pick(user, it["text"]), avail)
+        # แบบเดียวกับ backend.tool_catalog + ChatController.send (การ์ด 0074 หัวข้อ 14):
+        # สกิลผู้ใช้ส่งเฉพาะตัวที่ใกล้ข้อความ (retrieval.near) · มี = บังคับเลือกก่อน ·
+        # เลือก "ตอบเอง" = ถามรอบ 2 ด้วยสกิลในตัว
+        base = catalog.tools(list(skills), avail)
+        tools = catalog.tools(list(skills) + retrieval.near(user, it["text"]), avail)
         known = {t["function"]["name"] for t in tools}
         row = {**it, "by": "rule"}
         got = by_rules(it["text"], list(skills) + user, avail, ai, mode) or "none"
         if got == "none" and ai is not None:
-            res = ai(it["text"], tools)
+            forced = len(tools) > len(base)
+            res = ai(it["text"], tools + [catalog.answer_tool()], "required") if forced else None
+            if res is None or res["tool"] in ("", catalog.ANSWER):
+                first, res = res, ai(it["text"], base)
+                if first is not None:  # เวลารวม 2 รอบ = เวลาที่ผู้ใช้รอ
+                    total = round(first["seconds"] + res["seconds"], 2)
+                    one = {"seconds": first["seconds"], "timings": first["timings"]}
+                    res = {**res, "seconds": total, "first": one}
             row.update(
-                by="ai", seconds=res["seconds"], timings=res["timings"], raw_tool=res["tool"]
+                by="ai",
+                seconds=res["seconds"],
+                timings=res["timings"],
+                raw_tool=res["tool"],
+                forced=forced,
             )
+            if "first" in res:
+                row["first"] = res["first"]
             # ชื่อที่ไม่มีในรายการ = แอปจริงตอบแบบคุยทั่วไป (SkillsController.handleAs)
             got = res["tool"] if res["tool"] in known else "none"
         row.update(got=got, ok=got == it["expect"])
@@ -187,8 +204,8 @@ def main(argv: list[str] | None = None) -> int:
                   file=sys.stderr)  # fmt: skip
             return 2
 
-        def ai(text, tools):
-            return ask_ai(a.server, text, tools)
+        def ai(text, tools, choice="auto"):
+            return ask_ai(a.server, text, tools, choice=choice)
 
     runs = [evaluate(data["items"], skills, ai, a.mode, user) for _ in range(max(a.repeat, 1))]
     # 1 รอบ = รูปแบบผลเดิม · หลายรอบ = รอบแรกอยู่ที่เดิม + ทุกรอบใน repeats

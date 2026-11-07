@@ -100,6 +100,16 @@ class UserPolicyTest(unittest.TestCase):
         self.assertIsNone(m)
         self.assertTrue(any("camera+vlm" in e for e in errors), errors)
 
+    def test_overlap_check_ignores_bare_time_words_and_thai_meaning_questions(self):
+        """การ์ด 0074 หัวข้อ 14 ข้อ 3: S1 g06 g07 และสกิลจำลอง 2 ตัวถูกปฏิเสธผิดเพราะสองข้อนี้."""
+        pick = userskills._pick
+        self.assertEqual(pick("พรุ่งนี้จะไปเที่ยว", self.builtin), "")
+        self.assertEqual(pick("เงินเฟ้อแปลว่าอะไร", self.builtin), "")
+        # ยังนับว่าแย่งเมื่อชัด: คำสำคัญของสกิลนัด · คำอังกฤษ · คำสั่งแปลอื่น
+        self.assertEqual(pick("ตั้งเตือนพรุ่งนี้เช้า", self.builtin), "reminder")
+        self.assertEqual(pick("serendipity แปลว่าอะไร", self.builtin), "translate")
+        self.assertEqual(pick("ช่วยแปลประโยคนี้เป็นอังกฤษ", self.builtin), "translate")
+
     def test_payment_field_selectors_are_rejected(self):
         md = "\n".join(["---", "id: shop-voice", "name: สั่งร้าน", "site: youtube",
                         "description: คำสั่งเสียงในเว็บ", "examples:", "  - กดช่องบัตร",
@@ -123,7 +133,9 @@ class UserPolicyTest(unittest.TestCase):
             for it in S1
             if it["label"] == "good" and check_import(it["md"], self.builtin)[0]
         ]
-        self.assertEqual(len(good), 19, "สกิลดีผ่านเท่าก่อนแก้ (ไม่ปฏิเสธผิดเพิ่ม)")
+        # 19 → 21: ด่านตรวจซ้ำงานไม่นับคำบอกเวลาเปล่า ๆ / "แปลว่าอะไร" ของคำไทย (การ์ด 0074 หัวข้อ 14 ข้อ 3)
+        # ที่ยังไม่ผ่าน: g16 ("error นี้แปลว่าอะไร" มีคำอังกฤษ = กำกวมจริง) · g23 (คีย์ "+")
+        self.assertEqual(len(good), 21, "สกิลดีผ่านเพิ่ม และสกิลเสียไม่หลุดเพิ่ม (บรรทัดบน)")
 
 
 if __name__ == "__main__":

@@ -3520,16 +3520,19 @@ class SkillsController(QObject):
         self.appInstallDone.emit(card)
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
-    def tool_catalog(self, text: str = "") -> list:
-        """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog."""
+    def tool_catalog(self, text: str = "", user: bool = True) -> list:
+        """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog.
+
+        user=False = สกิลในตัวอย่างเดียว (รอบตอบเองหลัง AI เลือก "ตอบเอง" · การ์ด 0074)
+        """
         from aipc.skills import catalog, retrieval
 
-        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง (ส่วนต้นคงที่ แคชใช้ได้) · สกิลของผู้ใช้เกิน 5 ตัว = ส่งเฉพาะที่ใกล้ข้อความ
-        user = [s for s in self._skills if self._is_user(s.id)]
+        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง (ส่วนต้นคงที่ แคชใช้ได้) · การ์ด 0074: สกิลของผู้ใช้ส่งเฉพาะตัวที่ใกล้ข้อความจริง
+        # (ไม่มีตัวใกล้ = รายการเท่าเดิมทุกประโยค แคชใช้ได้)
+        mine = [s for s in self._skills if self._is_user(s.id)] if user else []
         base = [s for s in self._skills if not self._is_user(s.id)]
-        return catalog.tools(
-            base + retrieval.pick(user, text), self.available(), forge=self.canForge
-        )
+        near = retrieval.near(mine, text)
+        return catalog.tools(base + near, self.available(), forge=self.canForge)
 
     # ---------- สกิลอัตโนมัติ (การ์ด 0017) ----------
     @Property(bool, notify=skillsChanged)
@@ -4783,16 +4786,19 @@ class ChatController(QObject):
         )
         return base + (self.TOOLS_HINT if tools else "")
 
-    def _all_tools(self, text: str = "") -> list:
+    def _all_tools(self, text: str = "", user: bool = True) -> list:
         """ask-cloud (ถ้ามี Claude) ไว้หน้าสุด + สกิล · ลำดับคงที่ แคชจึงใช้ได้
-        · text = ข้อความที่ใช้เลือกสกิล (0018)."""
+        · text = ข้อความที่ใช้เลือกสกิล (0018) · user=False = ไม่มีสกิลของผู้ใช้ (0074)."""
         from aipc.skills import catalog
 
         cloud = catalog.tools([], set(), cloud=True) if self._cloud_ok() else []
         try:
-            skills = self._tools(text)
-        except TypeError:  # ตัวให้รายการแบบเก่าที่ไม่รับข้อความ
-            skills = self._tools()
+            skills = self._tools(text, user=user)
+        except TypeError:  # ตัวให้รายการแบบเก่าที่ไม่รับ user / ข้อความ
+            try:
+                skills = self._tools(text)
+            except TypeError:
+                skills = self._tools()
         return cloud + list(skills)
 
     def _warm_up(self) -> None:
@@ -4833,6 +4839,9 @@ class ChatController(QObject):
             self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
         tools = self._all_tools(text) if (use_tools and not prompt) else []
+        # การ์ด 0074: มีสกิลของผู้ใช้ใกล้ข้อความ = บังคับให้ AI เลือก (สกิลไหน หรือ "ตอบเอง") ก่อนตอบ
+        base = self._all_tools(text, user=False) if tools else []
+        force = len(tools) > len(base)
         if self._conv["messages"][-1].get("file"):
             why = (f"ถามเกี่ยวกับไฟล์ “{self._file[0]}” · ตอบในเครื่องเท่านั้น "
                    "(เนื้อหาไฟล์ห้ามออกนอกเครื่อง)")  # fmt: skip
@@ -4855,13 +4864,33 @@ class ChatController(QObject):
             messages = [self._for_local(m) for m in messages]
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""
-        stream = self._stream = client.Stream(self._target, messages, tools=tools)
+        if force:
+            from aipc.skills import catalog
+
+            first = self._stream = client.Stream(self._target, messages, choice="required",
+                                                 tools=tools + [catalog.answer_tool()])  # fmt: skip
+            work = lambda: self._choose_then_answer(first, messages, base)  # noqa: E731
+        else:
+            stream = self._stream = client.Stream(self._target, messages, tools=tools)
+            work = lambda: stream.run(self._token.emit)  # noqa: E731
         self.changed.emit()
         self.streamChanged.emit()
-        threading.Thread(
-            target=lambda: self._done.emit(stream.run(self._token.emit)), daemon=True
-        ).start()
+        threading.Thread(target=lambda: self._done.emit(work()), daemon=True).start()
         return True
+
+    def _choose_then_answer(self, first, messages: list, base: list):
+        """รอบ 1 AI ต้องเลือกเครื่องมือ (ไม่มีข้อความออกจอ) · เลือก "ตอบเอง" = รอบ 2 ตอบตามปกติด้วยสกิลในตัว
+        (system prompt เดิม · รายการเครื่องมือเท่าตอนไม่มีสกิลผู้ใช้ แคชจึงใช้ได้) · การ์ด 0074 หัวข้อ 14."""
+        from aipc.chat import client
+        from aipc.skills import catalog
+
+        reply = first.run(lambda _token: None)
+        if reply.reason or (reply.tool_call and reply.tool_call != catalog.ANSWER):
+            return reply
+        second = self._stream = client.Stream(self._target, messages, tools=base)
+        if first._stopped.is_set():  # ผู้ใช้กดหยุดระหว่างสลับรอบ
+            return client.Reply(reason="stopped")
+        return second.run(self._token.emit)
 
     def _send_work(self, text: str) -> bool:
         """แชทงาน: ส่งให้ Claude ตรง ๆ ไม่ต้องรอ AI ในเครื่อง · สกิลภาษา (แปล/สรุป) ส่งแค่ข้อความของผู้ใช้."""

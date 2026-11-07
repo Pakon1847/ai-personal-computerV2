@@ -118,7 +118,30 @@ def _pick(text: str, skills: list[manifest.Manifest]) -> str:
     from aipc.skills import router
 
     r = router.route(text, skills, {"llm"})
-    return r.skill.id if r.skill and r.kind == "skill" else ""
+    if not (r.skill and r.kind == "skill"):
+        return ""
+    # ตัวคัดแบบกฎ (ทางสำรองตอนไม่มี AI) ส่งทุกประโยคที่บอกวัน/เวลาไปสกิลนัด และ "…แปลว่าอะไร" ไปสกิลแปล ·
+    # S1 สกิลดีถูกปฏิเสธเพราะสองข้อนี้ ("พรุ่งนี้จะไปเที่ยว" "เงินเฟ้อแปลว่าอะไร") → นับว่าแย่งเฉพาะเมื่อชัดจริง:
+    # นัด = มีคำสำคัญของสกิลนัด · แปล = มีคำต่างภาษา หรือคำสั่งแปลอื่นนอกจาก "แปลว่า" (การ์ด 0074 หัวข้อ 14 ข้อ 3)
+    # ไม่ใช้ทางเลือกของแอป (route_ai_first) แทน เพราะชุดพัฒนา S1 สกิลแย่งงานหลุดเพิ่ม 4 ตัว
+    if r.skill.id == "reminder" and not any(router.has_keyword(text, k) for k in r.skill.keywords):
+        return ""
+    if r.skill.id == "translate" and _meaning_question(text, r.skill):
+        return ""
+    return r.skill.id
+
+
+def _meaning_question(text: str, translate: manifest.Manifest) -> bool:
+    """ถามความหมายคำไทย ("เงินเฟ้อแปลว่าอะไร") ไม่ใช่ขอแปล.
+
+    มีตัวอักษรละติน ("serendipity แปลว่าอะไร") = ขอแปล
+    """
+    import re
+
+    from aipc.skills import router
+
+    hits = [k for k in translate.keywords if router.has_keyword(text, k)]
+    return hits == ["แปลว่า"] and not re.search(r"[A-Za-z]", text)
 
 
 class UserSkills:

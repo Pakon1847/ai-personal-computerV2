@@ -22,6 +22,7 @@ LABELED = ["[ข้อความนี้ Claude (cloud) ตอบโดยค
 class FakeLlama(BaseHTTPRequestHandler):
     mode = "ok"  # ok | slow | crash | loading | tool (AI เลือกสกิล tool_name)
     tool_name = "machine-status"
+    required_pick = ""  # คำขอแบบบังคับเลือก (tool_choice required · การ์ด 0074) ตอบด้วยเครื่องมือนี้
     seen: list = []
 
     def log_message(self, *a):
@@ -63,9 +64,12 @@ class FakeLlama(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
         self.end_headers()
-        if self.mode == "tool":  # รูปแบบ OpenAI ที่ llama-server ส่ง: ชื่อก่อน แล้วอาร์กิวเมนต์ทีละส่วน
+        forced = body.get("tool_choice") == "required" and self.required_pick
+        # รูปแบบ OpenAI ที่ llama-server ส่ง: ชื่อก่อน แล้วอาร์กิวเมนต์ทีละส่วน
+        if self.mode == "tool" or forced:
+            name = self.required_pick if forced else self.tool_name
             call = {"index": 0, "id": "c1", "type": "function",
-                    "function": {"name": self.tool_name, "arguments": ""}}  # fmt: skip
+                    "function": {"name": name, "arguments": ""}}  # fmt: skip
             for delta in (
                 {"tool_calls": [call]},
                 {"tool_calls": [{"index": 0, "function": {"arguments": '{"x": "ลบไฟล์"}'}}]},
@@ -96,6 +100,7 @@ class FakeLlama(BaseHTTPRequestHandler):
 class ServerCase(unittest.TestCase):
     def setUp(self):
         FakeLlama.mode, FakeLlama.seen, FakeLlama.slots, FakeLlama.slot_ok = "ok", [], [], False
+        FakeLlama.required_pick = ""
         self.srv = ThreadingHTTPServer(("127.0.0.1", 0), FakeLlama)
         threading.Thread(target=self.srv.serve_forever, daemon=True).start()
         self.addCleanup(self.srv.server_close)
@@ -351,6 +356,58 @@ class ControllerTest(ServerCase):
         c.send("คอมหน่วงมาก เป็นอะไร", "อธิบายสถานะเครื่อง")
         pump(lambda: done)
         self.assertNotIn("tools", FakeLlama.seen[-1])
+
+    def forced_tools(self):
+        """สกิลในตัว 1 ตัว + สกิลผู้ใช้ 1 ตัวเมื่อข้อความใกล้ (แบบ SkillsController.tool_catalog)."""
+
+        def fn(name):
+            empty = {"type": "object", "properties": {}}
+            fn = {"name": name, "description": name, "parameters": empty}
+            return {"type": "function", "function": fn}
+
+        def tools(text="", user=True):
+            return [fn("machine-status")] + ([fn("plant-care")] if user and "ต้นไม้" in text else [])
+
+        return tools
+
+    def test_near_user_skill_forces_a_choice_first(self):
+        """การ์ด 0074 หัวข้อ 14: มีสกิลผู้ใช้ใกล้ข้อความ → รอบแรกบังคับเลือก · เลือกสกิล = ไปทางสกิล."""
+        from aipc.skills import catalog
+
+        c, done, _ = self.make(tools=self.forced_tools())
+        picked = []
+        c.skillRequested.connect(lambda sid, text: picked.append((sid, text)))
+        FakeLlama.required_pick = "plant-care"
+        self.assertTrue(c.send("ต้นไม้ใบเหลือง", ""))
+        pump(lambda: picked, timeout=20)
+        self.assertEqual(picked, [("plant-care", "ต้นไม้ใบเหลือง")])
+        body = [b for b in FakeLlama.seen if b.get("stream") is not False][-1]
+        self.assertEqual(body["tool_choice"], "required")
+        self.assertEqual([t["function"]["name"] for t in body["tools"]],
+                         ["machine-status", "plant-care", catalog.ANSWER])  # fmt: skip
+        self.assertEqual(done, [])
+
+    def test_answer_directly_then_streams_with_builtin_tools_only(self):
+        from aipc.skills import catalog
+
+        c, done, _ = self.make(tools=self.forced_tools())
+        FakeLlama.required_pick = catalog.ANSWER
+        self.assertTrue(c.send("ต้นไม้สวยจัง", ""))
+        pump(lambda: done, timeout=20)
+        self.assertEqual(done[0][0], "สวัสดีครับ")
+        chats = [b for b in FakeLlama.seen if b.get("stream") is not False]
+        self.assertEqual([b["tool_choice"] for b in chats[-2:]], ["required", "auto"])
+        self.assertEqual([t["function"]["name"] for t in chats[-1]["tools"]], ["machine-status"],
+                         "รอบตอบเอง = รายการเท่าตอนไม่มีสกิลผู้ใช้ (แคชใช้ได้)")  # fmt: skip
+        self.assertEqual(chats[-1]["messages"][0], chats[-2]["messages"][0])
+
+    def test_no_near_user_skill_asks_once_as_before(self):
+        c, done, _ = self.make(tools=self.forced_tools())
+        FakeLlama.required_pick = "plant-care"
+        self.assertTrue(c.send("สวัสดี", ""))
+        pump(lambda: done, timeout=20)
+        chats = [b for b in FakeLlama.seen if b.get("stream") is not False]
+        self.assertEqual([b["tool_choice"] for b in chats], ["auto"])
 
     def test_warms_the_prompt_cache_when_ai_becomes_ready(self):
         """ข้อความแรกหลัง login ไม่ต้องรออ่านรายการสกิล ~1 นาที (Pi 5 2026-09-30: 68 วิ → 2.4 วิ)."""
