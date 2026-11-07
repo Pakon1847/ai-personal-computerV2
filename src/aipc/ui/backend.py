@@ -1244,6 +1244,10 @@ class SystemStatus(QObject):
         return thaidate.long_date(self._now)
 
     @Property(str, notify=changed)
+    def longDateEn(self) -> str:  # noqa: N802 · หน้า Login เลือก English (การ์ด 0075)
+        return thaidate.long_date(self._now, en=True)
+
+    @Property(str, notify=changed)
     def greeting(self) -> str:
         return thaidate.greeting(self._now)
 

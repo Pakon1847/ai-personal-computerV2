@@ -21,8 +21,15 @@ QtObject {
         if (lang !== "en" || !s || bridge === null) return s
         return bridge.text(s)
     }
+    // หน้าเข้าสู่ระบบเลือกภาษาเองได้ (การ์ด 0075): "both" = สองภาษา (ค่าเริ่ม) · "th" · "en" · ไม่จำข้ามการเปิดเครื่อง
+    // (หน้า Login ไม่มีเจ้าของบัญชี) · ภาษาหลังเข้าระบบยังเป็นของแต่ละบัญชี (uiSettings.language)
+    property string loginLang: "both"
     function both(s) {
         const v = table[s]
-        return v === undefined || v === s ? s : s + " · " + v
+        if (v === undefined || v === s || loginLang === "th") return s
+        return loginLang === "en" ? v : s + " · " + v
+    }
+    function nextLoginLang() {
+        loginLang = ({ both: "en", en: "th", th: "both" })[loginLang]
     }
 }
