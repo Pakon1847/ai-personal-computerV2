@@ -1097,5 +1097,14 @@
   "ของเว็บนี้": "This website's own",
   " เว็บ": " websites",
   "แตะชื่อเว็บเพื่อดูว่าพูดอะไรได้บ้าง · คำสั่งใน “ใช้ได้ทุกเว็บ” ใช้ได้กับทุกเว็บ": "Tap a website to see what you can say · commands under “Every website” work everywhere",
-  "Claude: ปิด": "Claude: off"
+  "Claude: ปิด": "Claude: off",
+  "ความจำ": "Memory",
+  "ยังไม่มี · พิมพ์ในแชทว่า “จำไว้ว่า …” แล้วผู้ช่วยจะจำไว้ใช้ในแชทต่อ ๆ ไป": "Nothing yet · type “remember that …” in chat and the assistant will keep it for later chats",
+  "จำไว้ ": "Remembering ",
+  " เรื่อง · อยู่ในเครื่องนี้ บัญชีของคุณเท่านั้น · ไม่จดรหัสผ่านหรือเลขบัตร": " things · on this computer, in your account only · passwords and card numbers are never stored",
+  "ส่งออก": "Export",
+  "ลบทั้งหมด": "Delete all",
+  "ค้นความจำ": "Search memory",
+  "ปักหมุดแล้ว": "Pinned",
+  "ปักหมุด": "Pin"
 }

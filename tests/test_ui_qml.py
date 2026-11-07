@@ -875,6 +875,26 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
+    def test_memory_card_lists_and_clears(self):
+        """การ์ด 0079: "จำไว้ว่า…" ในแชท → ขึ้นในการ์ดความจำ · ลบทั้งหมดต้องกดสองครั้ง · ไม่มี warning."""
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "privacy")
+        ctl = engine.rootContext().contextProperty("memoryCtl")
+        skills = engine.rootContext().contextProperty("skills")
+        self.assertTrue(find_items(win, "memoryCard")[0].property("visible"))
+        self.assertEqual(skills.handle("จำไว้ว่าฉันชอบกาแฟดำ")["title"], "จำไว้แล้ว")
+        ctl.search("")  # หน้าจอโหลดรายการใหม่
+        settle(50)
+        self.assertEqual(len(find_items(win, "memoryRow")), 1)
+        btn = find_items(win, "clearMemory")[0]
+        btn.clicked.emit()
+        settle(20)
+        self.assertEqual(ctl.count, 1, "กดครั้งแรก = ถามยืนยันเท่านั้น")
+        btn.clicked.emit()
+        settle(50)
+        self.assertEqual((ctl.count, len(find_items(win, "memoryRow"))), (0, 0))
+        self.assertEqual(warnings, [])
+
     def test_outbound_card_lists_what_left_the_machine(self):
         """บันทึกสิ่งที่ส่งออกนอกเครื่อง: การ์ดในหน้าตั้งค่าแสดงข้อความที่ส่งจริง · ล้างต้องกดสองครั้ง."""
         from datetime import datetime
