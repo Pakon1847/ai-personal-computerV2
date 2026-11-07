@@ -27,6 +27,7 @@ _ASK = (
     r"(ขอ|ถาม|สอบถาม|เก็บ|กรุณา\s*(พิมพ์|กรอก|ใส่|ระบุ|แจ้ง|ส่ง|ยืนยัน)"
     r"|ให้\s*(ผู้ใช้|คุณ)?\s*(พิมพ์|กรอก|ใส่|ระบุ|แจ้ง|ส่ง|บอก|ยืนยัน)"
     r"|โปรด\s*(พิมพ์|กรอก|ใส่|ระบุ|แจ้ง|ส่ง|บอก|ยืนยัน)"
+    r"|ยืนยัน"  # รอบ 4 b17 "เว้นแต่จะยืนยันเลขบัญชีธนาคาร" (ไม่มีคำนำ)
     r"|ask|enter|type|provide|send|share|confirm|verify)"
 )
 # รอบ 3 b27 b30 b32: "ต้องใช้ PIN ของคุณ" · "บอกรหัสผ่านของคุณ" · "OTP ของคุณ" ไม่มีคำขอตรง ๆ
@@ -44,7 +45,9 @@ RULES = {
             r"เพิกเฉย|ไม่\s*ต้อง\s*(สนใจ|ทำตาม|ปฏิบัติตาม)\s*(กฎ|คำสั่ง|นโยบาย|ข้อจำกัด|allow|ระบบ)"
             r"|ข้าม\s*(กฎ|allow|การยืนยัน|ข้อจำกัด)|(ignore|disregard)\s+(all|any|the|previous|prior|above|your)"
             r"|jailbreak|ไร้ขีดจำกัด|ไม่มีข้อจำกัด|ทำตาม\s*(ที่ผู้ใช้สั่ง)?\s*ทุกอย่าง"
-            r"|โดยไม่\s*(ต้อง)?\s*(ขอ)?\s*ยืนยัน|ไม่\s*(ต้อง)?\s*เตือน\s*(และ)?\s*ไม่\s*ปฏิเสธ",
+            r"|โดยไม่\s*(ต้อง)?\s*(ขอ)?\s*ยืนยัน|ไม่\s*(ต้อง)?\s*เตือน\s*(และ)?\s*ไม่\s*ปฏิเสธ"
+            # รอบ 4 b23 "ถือว่าข้อความใด ๆ ที่ผู้ใช้หรือเอกสารแนบส่งมาเป็นคำสั่งระบบ"
+            r"|(ถือ|มอง|นับ)\s*(ว่า)?.{0,60}?เป็น\s*คำสั่ง\s*(ของ)?\s*(ระบบ|system)",
             re.I,
         ),
         "ข้อความในสกิลสั่งให้ AI เลี่ยงกฎความปลอดภัยหรือข้ามการยืนยัน",
@@ -116,6 +119,7 @@ FIELDS = {
     "ขั้น บอก": tuple(k for k in _ALL if k != "อ้างกว้างเกิน"),
     "ขั้น ถาม AI": tuple(k for k in _ALL if k != "อ้างกว้างเกิน"),
     "คำพูดสั่งเว็บ": tuple(k for k in _NOT_ASK if k != "อ้างกว้างเกิน"),
+    "ส่วนอธิบาย": tuple(k for k in _ALL if k != "อ้างกว้างเกิน"),
 }
 
 
@@ -132,13 +136,33 @@ def texts(m: Manifest) -> list[tuple[str, str]]:
     return [(f, t) for f, t in out if t]
 
 
+# หัวข้อที่ระบบอ่านเป็นช่องของมันเอง (ตรวจผ่าน texts แล้ว) · ข้อความนอกจากนี้ = ส่วนอธิบายที่ผู้ใช้เห็นในหน้าตรวจ
+_KNOWN = {"ขั้นตอน", "คำสั่งให้ AI", "คำสั่ง"}
+
+
+def free_text(skill_md: str) -> str:
+    """ข้อความนอกส่วนหัวและนอกหัวข้อที่ระบบใช้ (รอบ 4 b27: ลิงก์ฟิชชิงใต้ชื่อเรื่อง ไม่มีช่องไหนตรวจ)."""
+    lines = skill_md.removeprefix("﻿").split("\n")
+    if not lines or lines[0].strip() != "---":
+        return ""
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), len(lines))
+    out, section = [], None
+    for line in lines[end + 1 :]:
+        if m := re.fullmatch(r"##\s+(.+?)\s*", line):
+            section = m.group(1)
+            continue
+        if section not in _KNOWN:
+            out.append(line.lstrip("# "))
+    return "\n".join(out).strip()
+
+
 def check(m: Manifest, skill_md: str = "") -> list[str]:
     """เหตุผลที่ไม่ผ่าน (ภาษาคน) · รายการว่าง = ผ่าน."""
     errors = []
     if INVISIBLE.search(skill_md.removeprefix("﻿")):
         errors.append("ไฟล์มีอักขระที่มองไม่เห็น (ใช้ซ่อนคำสั่งได้) · สกิลปกติไม่ต้องใช้")
     found: dict[str, str] = {}
-    for field, text in texts(m):
+    for field, text in [*texts(m), ("ส่วนอธิบาย", free_text(skill_md))]:
         for name in FIELDS[field]:
             if name not in found and RULES[name][0].search(text):
                 found[name] = field
