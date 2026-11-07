@@ -1,0 +1,12 @@
+start 2026-11-07 22:39:55 · temp=60.4'C · throttled=0xe0000
+round=1 key=gemma4-e2b ready=1 seconds=11.3 "id":"/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf" rss_gb=4.4
+round=1 key=qwen3.5-2b ready=1 seconds=23.8 "id":"/opt/aipc-models/Qwen3.5-2B-Q4_K_M.gguf" rss_gb=2.5
+round=1 key=qwen3.5-4b ready=1 seconds=60.5 "id":"/opt/aipc-models/Qwen3.5-4B-Q4_K_M.gguf" rss_gb=5.3
+round=2 key=gemma4-e2b ready=1 seconds=34.6 "id":"/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf" rss_gb=4.2
+round=2 key=qwen3.5-2b ready=1 seconds=20.8 "id":"/opt/aipc-models/Qwen3.5-2B-Q4_K_M.gguf" rss_gb=2.5
+round=2 key=qwen3.5-4b ready=1 seconds=27.2 "id":"/opt/aipc-models/Qwen3.5-4B-Q4_K_M.gguf" rss_gb=5.4
+round=3 key=gemma4-e2b ready=1 seconds=46.8 "id":"/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf" rss_gb=4.3
+round=3 key=qwen3.5-2b ready=1 seconds=18.7 "id":"/opt/aipc-models/Qwen3.5-2B-Q4_K_M.gguf" rss_gb=2.5
+round=3 key=qwen3.5-4b ready=1 seconds=35.3 "id":"/opt/aipc-models/Qwen3.5-4B-Q4_K_M.gguf" rss_gb=5.3
+oom_lines=0
+end 2026-11-07 22:44:35 · temp=66.4'C · throttled=0xe0000
