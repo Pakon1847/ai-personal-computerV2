@@ -13,7 +13,7 @@ R="${R:-}"
 cd "$(dirname "$0")/../.."
 . /etc/aipc/llm.conf
 if [ "$R" = r2 ]; then
-  O=docs/benchmarks/2026-11-07-skill-guard-r2 POOL=tests/data/skill_guard_r2_pool.json
+  O=docs/benchmarks/2026-11-07-skill-guard-r2 POOL=tests/data/skill_guard_r2_pool90.json
   S2A=tests/data/skill_guard_r2_s2a.json S2B=tests/data/skill_guard_r2_s2b.json
 else
   O=docs/benchmarks/2026-11-05-skill-guard POOL=tests/data/skill_guard_pool.json
