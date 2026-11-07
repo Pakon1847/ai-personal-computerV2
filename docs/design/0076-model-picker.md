@@ -64,4 +64,5 @@
   `aipc.chat.localmodels` · `LocalModels` ใน backend · การ์ดในหน้าตั้งค่า (ตัวที่ไม่ได้ติดตั้ง = กดไม่ได้ · ถามยืนยันก่อนเริ่มใหม่)
 - **เทสต์:** `tests/test_local_models.py` (M1 M2 + รันสคริปต์เริ่ม AI จริงด้วย sh โดยแทน llama-server) · `test_ui_qml` การ์ดเลือก
 - **โมเดล:** คัดไฟล์จาก `D:/bench-models` ขึ้น Pi ที่ `~/model-staging` แล้ว · sha256 ตรง (2B `aaf42c8b…` · 4B `00fe7986…`) · **ย้ายเข้า `/opt/aipc-models` แล้ว** (2026-11-07 · root:root 0644 · sha256 ตรวจซ้ำบน Pi ตรง · ลบสำเนาใน staging · ดิสก์ว่าง 11 GB)
-- **ยังไม่ทำ:** M3 M4 M5 บน Pi (ต้องติดตั้งสาขานี้ก่อน · ถามก่อน) · `install-llm.sh --add-model`
+- **ติดตั้งบน Pi 5 แล้ว (2026-11-07 · Pakon "อนุมัติ"):** รุ่น `5da239f3` · [ผล M3 M4](../benchmarks/2026-11-07-model-picker/README.md) · **M3 ✅** สลับ 9/9 ≤ 60.5 วิ OOM 0 · **M4 ✅** 4B + Chromium headless 3 แท็บ 10 นาที OOM 0 (RAM ว่าง ≥ 3.8 GB · headless อาจเบากว่าจริง) → เปิดให้เลือก 4B ได้
+- **ยังไม่ทำ:** M5 (S2a ของ 2 ตัวใหม่ · ใช้เครื่อง ~4–5 ชม.) · `install-llm.sh --add-model`
