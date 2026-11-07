@@ -141,7 +141,11 @@ def _meaning_question(text: str, translate: manifest.Manifest) -> bool:
     from aipc.skills import router
 
     hits = [k for k in translate.keywords if router.has_keyword(text, k)]
-    return hits == ["แปลว่า"] and not re.search(r"[A-Za-z]", text)
+    if hits != ["แปลว่า"]:
+        return False
+    # "error นี้แปลว่าอะไร" = ถามความหมายของสิ่งที่เห็น ไม่ใช่ขอแปลคำ
+    # (การ์ด 0074 รอบ 2 g14 · รอบแรก g16 เหมือนกัน)
+    return not re.search(r"[A-Za-z]", text) or bool(re.search(r"[A-Za-z]\s*(นี้|นั้น|นี่)", text))
 
 
 class UserSkills:

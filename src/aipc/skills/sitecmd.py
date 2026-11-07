@@ -45,7 +45,8 @@ RISKY = ("ลบ", "ยกเลิก", "ซื้อ", "จ่าย", "ชำ
 _SPECIAL = ("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Enter", "Escape", "Tab",
             "PageUp", "PageDown", "Home", "End")  # fmt: skip
 KEY_RE = re.compile(
-    r"(?:(?:Shift|Ctrl|Alt)\+)*(?:[A-Za-z0-9]|" + "|".join(_SPECIAL) + r"|[,./;'\[\]=<>?-])"
+    # "+" = ซูมแผนที่/ขยาย (การ์ด 0074 รอบ 2: ผู้เขียนอิสระ 2 คนใช้คีย์นี้ในสกิลดี · Google Maps)
+    r"(?:(?:Shift|Ctrl|Alt)\+)*(?:[A-Za-z0-9]|" + "|".join(_SPECIAL) + r"|[,./;'\[\]=<>?+-])"
 )
 # คีย์ของตัวเบราว์เซอร์ (ปิดแท็บ/หน้าต่าง เปิดหน้าต่างใหม่ พิมพ์ ที่อยู่) ไม่ใช่คีย์ลัดของเว็บ → ห้าม
 BROWSER_KEYS = set(
@@ -114,6 +115,7 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
     """บรรทัดในหัวข้อ "## คำสั่ง" → (คำสั่ง, ปัญหา)."""
     out: list[SiteCommand] = []
     errors: list[str] = []
+    known = []  # บรรทัดคำพ้องที่ระบบทำเองได้ทุกคำ (ตัดทิ้ง)
     for n, line in rows:
         if not line.strip():
             continue
@@ -161,16 +163,22 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
 
             live = tuple(p for p in phrases if not browse.parse(p))
             if not live:
-                errors.append(f"บรรทัด {n}: คำพูดทุกคำระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)")
-            else:
-                phrases = live
+                # ทั้งบรรทัดระบบทำเองอยู่แล้ว = ตัดบรรทัดทิ้ง ไม่ปฏิเสธทั้งสกิล (การ์ด 0074 รอบ 2 g22) ·
+                # ไม่เหลือคำสั่งเลย = ไม่รับ ด้านล่าง
+                known.append(n)
+                continue
+            phrases = live
         if not confirm and any(w in p.lower() for p in phrases for w in RISKY):
             errors.append(
                 f"บรรทัด {n}: คำสั่ง “{phrases[0]}” ย้อนไม่ได้หรือแตะบัญชี ต้องลงท้ายด้วย “· ยืนยันก่อน”"
             )
         out.append(SiteCommand(phrases, kind, arg, confirm))
     if not out and not errors:
-        errors.append("หัวข้อ “## คำสั่ง” ว่าง")
+        errors.append(
+            f"บรรทัด {known[0]}: คำพูดทุกคำระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)"
+            if known
+            else "หัวข้อ “## คำสั่ง” ว่าง"
+        )
     if len(out) > MAX_COMMANDS:
         errors.append(f"คำสั่งมากเกิน {MAX_COMMANDS} ข้อ")
     return out, errors
