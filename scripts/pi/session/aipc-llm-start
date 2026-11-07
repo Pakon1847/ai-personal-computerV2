@@ -13,6 +13,21 @@
 set -eu
 . /etc/aipc/llm.conf
 : "${MODEL:?ไม่มี MODEL ใน /etc/aipc/llm.conf}"
+# โมเดลที่ผู้ใช้เลือกเอง (การ์ด 0076): ไฟล์มีแค่ "ชื่อ" · ต้องอยู่ในรายการ และไฟล์ต้องมีใน /opt/aipc-models ·
+# ไม่ตรงข้อใดข้อหนึ่ง = ใช้ค่าของเครื่องข้างบน (H7: สคริปต์นี้ตัดสิน ไม่ใช่หน้าจอ · ผู้ใช้ชี้ path เองไม่ได้)
+CHOICE="${XDG_CONFIG_HOME:-$HOME/.config}/aipc/llm-model"
+LIST="$(dirname "$0")/llm-models.conf"
+if [ -r "$CHOICE" ] && [ -r "$LIST" ]; then
+  WANT="$(head -c 40 "$CHOICE" | tr -cd 'a-z0-9.-')"
+  [ -n "$WANT" ] || WANT="-"   # ว่าง = ไม่ตรงแถวไหน
+  ROW="$(awk -F'|' -v k="$WANT" '$1 == k && !/^#/ { print; exit }' "$LIST")"
+  FILE="$(printf '%s' "$ROW" | cut -d'|' -f2)"
+  TPL="$(printf '%s' "$ROW" | cut -d'|' -f3)"
+  if [ -n "$FILE" ] && [ -f "/opt/aipc-models/$FILE" ]; then
+    MODEL="/opt/aipc-models/$FILE"
+    TEMPLATE="${TPL:+/opt/aipc-models/$TPL}"
+  fi
+fi
 DIR="${XDG_RUNTIME_DIR:?ไม่มี XDG_RUNTIME_DIR}/aipc"
 mkdir -p "$DIR"
 chmod 0700 "$DIR"

@@ -509,6 +509,72 @@ ColumnLayout {
                 visible: page.section === "ai"
                 Layout.fillWidth: true
                 spacing: 16
+                // เลือก AI ในเครื่อง (การ์ด 0076 · กรรมการข้อ 1 และ 8) · ตัวเลขจากผลวัดจริง · ตัวที่ยังไม่ติดตั้ง = กดไม่ได้ + บอกเหตุผล (H5)
+                Card {
+                    objectName: "localModelCard"
+                    Layout.fillWidth: true
+                    implicitHeight: modelCol.implicitHeight + 40
+                    ColumnLayout {
+                        id: modelCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 12
+                        property string confirmKey: ""
+                        AppText { text: Tr.t("AI ในเครื่อง · เลือกได้ 3 ตัว"); strong: true }
+                        AppText {
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: Tr.t("ทุกตัวทำงานในเครื่อง ไม่ต้องใช้เน็ต · ตัวเลขวัดจริงบน Raspberry Pi 5 (แม่น = ตอบถูกจากชุดคำถาม 100 ข้อ) · เลือกแล้วมีผลกับบัญชีนี้เท่านั้น")
+                        }
+                        Repeater {
+                            model: localModels.models
+                            delegate: RowLayout {
+                                required property var modelData
+                                Layout.fillWidth: true
+                                spacing: 12
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 2
+                                    AppText { text: modelData.name + " · " + Tr.t(modelData.hint); strong: modelData.current }
+                                    AppText {
+                                        Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                                        text: modelData.installed ? Tr.t(modelData.stats)
+                                              : Tr.t(modelData.stats) + Tr.t(" · ยังไม่ได้ติดตั้งในเครื่องนี้")
+                                    }
+                                }
+                                Chip { visible: modelData.current; text: Tr.t("ใช้อยู่"); kind: "ok"; dot: true }
+                                AppButton {
+                                    objectName: "pickModel_" + modelData.key
+                                    visible: !modelData.current
+                                    enabled: modelData.installed
+                                    kind: "secondary"
+                                    text: Tr.t("ใช้ตัวนี้")
+                                    onClicked: modelCol.confirmKey = modelData.key
+                                }
+                            }
+                        }
+                        // ถามยืนยันก่อน (H2): AI เริ่มใหม่ราว 1 นาที · แชทที่บันทึกแล้วไม่หาย
+                        AppText {
+                            visible: modelCol.confirmKey !== ""
+                            Layout.fillWidth: true; color: Theme.warnInk
+                            text: Tr.t("AI จะเริ่มใหม่ราว 1 นาที · ระหว่างนั้นยังตอบไม่ได้ · แชทที่บันทึกแล้วไม่หาย")
+                        }
+                        RowLayout {
+                            visible: modelCol.confirmKey !== ""
+                            spacing: 8
+                            AppButton {
+                                objectName: "confirmModel"
+                                text: Tr.t("เริ่ม AI ใหม่ด้วยตัวนี้")
+                                onClicked: { localModels.pick(modelCol.confirmKey); modelCol.confirmKey = "" }
+                            }
+                            AppButton { kind: "secondary"; text: Tr.t("ยกเลิก"); onClicked: modelCol.confirmKey = "" }
+                        }
+                        AppText {
+                            visible: localModels.error !== ""
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.warnInk
+                            text: Tr.t(localModels.error)
+                        }
+                    }
+                }
                 // Claude (การ์ด 0061 รอบ 2 · Pakon 2026-10-24: "ผู้ใช้จะงงตรงที่บอกราคา · ทำให้เข้าใจง่าย"):
                 // รอบ 3 (Pakon: "ไม่ควรมีราคา · มีแค่ติ๊กให้ถาม Claude ก็พอ") · ตัวจำกัดค่าใช้ต่อวันยังทำงานใน backend ($1 ค่าเริ่มต้น)
                 Card {

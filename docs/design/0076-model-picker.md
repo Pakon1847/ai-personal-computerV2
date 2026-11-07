@@ -57,3 +57,11 @@
 ## 7. ไม่ทำในรอบนี้
 
 ดาวน์โหลดโมเดลจากหน้าจอ (ต้องใช้เน็ต + สิทธิ์ root) · โมเดลนอก 3 ตัว · ปรับ prompt แยกตามโมเดล
+
+## 8. ความคืบหน้า (2026-11-07)
+
+- **โค้ดแล้ว (ระดับ 3 · วินโดวส์):** รายการ `scripts/pi/session/llm-models.conf` (ที่เดียว) · `aipc-llm-start` อ่านชื่อจาก `~/.config/aipc/llm-model` ·
+  `aipc.chat.localmodels` · `LocalModels` ใน backend · การ์ดในหน้าตั้งค่า (ตัวที่ไม่ได้ติดตั้ง = กดไม่ได้ · ถามยืนยันก่อนเริ่มใหม่)
+- **เทสต์:** `tests/test_local_models.py` (M1 M2 + รันสคริปต์เริ่ม AI จริงด้วย sh โดยแทน llama-server) · `test_ui_qml` การ์ดเลือก
+- **โมเดล:** คัดไฟล์จาก `D:/bench-models` ขึ้น Pi ที่ `~/model-staging` แล้ว · sha256 ตรง (2B `aaf42c8b…` · 4B `00fe7986…`) · **ยังไม่ได้ย้ายเข้า `/opt/aipc-models`** (ต้องใช้ sudo)
+- **ยังไม่ทำ:** M3 M4 M5 บน Pi (ต้องติดตั้งสาขานี้ก่อน · ถามก่อน) · `install-llm.sh --add-model`

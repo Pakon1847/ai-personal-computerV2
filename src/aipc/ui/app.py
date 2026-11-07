@@ -21,6 +21,7 @@ from aipc.ui.backend import (
     FilesBrowser,
     GmailLink,
     I18nBridge,
+    LocalModels,
     LoginController,
     PowerController,
     PresenceStatus,
@@ -220,16 +221,13 @@ def _start_idle_lock(ui_settings, app):
 
 
 def _local_model_name() -> str:
-    """ชื่อโมเดลจาก /etc/aipc/llm.conf (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · อ่านไม่ได้ = ""."""
+    """ชื่อโมเดลที่ AI ในเครื่องใช้จริง (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · ตัวที่ผู้ใช้เลือก (การ์ด 0076)
+    หรือค่าของเครื่องใน /etc/aipc/llm.conf · อ่านไม่ได้ = ""."""
     from pathlib import Path
 
-    try:
-        for line in Path("/etc/aipc/llm.conf").read_text(encoding="utf-8").splitlines():
-            if line.startswith("MODEL="):
-                return Path(line.split("=", 1)[1].strip()).stem
-    except OSError:
-        pass
-    return ""
+    from aipc.chat import localmodels as lm
+
+    return Path(lm.effective(lm.load(), lm.chosen(), lm.machine_file())).stem
 
 
 def _remember_login(user: str) -> None:
@@ -333,8 +331,12 @@ def build(opts: Options, argv: list[str] | None = None):
         ui_settings.setUseClaude(True)
         return True
 
+    def _switched(name: str) -> None:
+        chat._model_name = name  # AI ตอบได้ว่าตอนนี้ใช้ตัวไหน
+
     engine._backends = {
         "uiSettings": ui_settings,
+        "localModels": LocalModels(in_session, on_switch=_switched),
         "system": SystemStatus(),
         # โหมด greeter ห้ามมีทางลัดของโหมดพัฒนาหรือสถานะสาธิตเด็ดขาด
         "login": LoginController(

@@ -1139,6 +1139,36 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(here.isVisible())
         self.assertEqual(warnings, [])
 
+    def test_local_model_picker(self):
+        """การ์ด 0076: การ์ดเลือก AI ในเครื่อง 3 ตัว · ตัวที่ไม่ได้ติดตั้ง = กดไม่ได้ · กดแล้วต้องยืนยันก่อนเริ่มใหม่."""
+        from aipc.chat import localmodels as lm
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        ctl = engine.rootContext().contextProperty("localModels")
+        tmp = Path(os.environ["XDG_DATA_HOME"]) / "models"
+        tmp.mkdir(exist_ok=True)
+        (tmp / "Qwen3.5-2B-Q4_K_M.gguf").write_bytes(b"x")
+        picked = []
+        ctl._dir, ctl._active, ctl._machine = tmp, True, "gemma-4-E2B-it-Q4_K_M.gguf"
+        ctl._choice_path = tmp / "llm-model"
+        ctl._restart = lambda: picked.append(lm.chosen(tmp / "llm-model")) or True
+        ctl.changed.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "localModelCard")[0].isVisible())
+        two = find_items(win, "pickModel_qwen3.5-2b")[0]
+        four = find_items(win, "pickModel_qwen3.5-4b")[0]
+        self.assertTrue(two.property("enabled"))
+        self.assertFalse(four.property("enabled"), "ยังไม่ติดตั้ง = กดไม่ได้ (H5)")
+        two.clicked.emit()
+        settle(50)
+        self.assertEqual(picked, [], "ต้องยืนยันก่อน")
+        find_items(win, "confirmModel")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(picked, ["qwen3.5-2b"])
+        self.assertTrue([m for m in ctl.models if m["key"] == "qwen3.5-2b"][0]["current"])
+        self.assertEqual(warnings, [])
+
     def test_claude_daily_level_without_money(self):
         """Pakon 2026-10-28: เลือกเพดานต่อวันได้อีก แต่เป็นระดับ ไม่แสดงเงิน · แสดง % ที่ใช้ไปวันนี้."""
         from aipc.cloud.budget import Budget
