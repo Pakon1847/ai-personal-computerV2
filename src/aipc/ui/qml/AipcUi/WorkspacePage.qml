@@ -1528,6 +1528,7 @@ Item {
                     root.showCard(skills.undo(t))
                 }
                 onRemoveSkill: (skillId) => root.showCard(skills.removeSkill(skillId))
+                onLikeSkill: (skillId) => skills.likeSkill(skillId)
                 onSummarizeFile: (path) => {
                     const err = chat.attachFile(path)
                     if (err !== "") { root.showCard({ kind: "chat", title: err, chips: [], lines: [], confirmToken: "", page: "", badge: {} }); return }

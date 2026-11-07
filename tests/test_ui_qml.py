@@ -854,6 +854,59 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(skills.userSkills, [])
         self.assertEqual(warnings, [])
 
+    def test_skill_manager_controls(self):
+        """การ์ด 0078: แก้เอง (ตรวจระหว่างพิมพ์) · เปลี่ยนชื่อ · หมวด · ฟอร์มสร้างในเครื่อง · ไม่มี warning."""
+        from aipc.skills import manifest, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        root = Path(__file__).resolve().parent.parent
+        md = (root / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md").read_text(
+            encoding="utf-8"
+        )
+        store = userskills.UserSkills(Path(os.environ["XDG_DATA_HOME"]) / "aipc" / "skills")
+        store.install(md, manifest.load_builtin(), request="คิดเมนูจากตู้เย็น")
+        skills._user = store
+        skills._reload()
+        settle(100)
+        find_items(win, "editSkillButton")[0].clicked.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "skillEditor")[0].property("visible"))
+        editor = find_items(win, "skillEditorText")[0]
+        self.assertEqual(editor.property("text"), md)
+        editor.setProperty("text", "ไม่ใช่ไฟล์สกิล")
+        settle(600)  # รอตัวตรวจหลังหยุดพิมพ์
+        self.assertFalse(find_items(win, "saveSkillEdit")[0].property("enabled"))
+        editor.setProperty("text", md.replace("2–3 อย่าง", "1 อย่าง"))
+        settle(600)
+        save = find_items(win, "saveSkillEdit")[0]
+        self.assertTrue(save.property("enabled"))
+        save.clicked.emit()
+        settle(50)
+        self.assertEqual(skills.userSkills[0]["version"], 2)
+        self.assertFalse(find_items(win, "skillEditor")[0].property("visible"))
+        find_items(win, "renameSkillButton")[0].clicked.emit()
+        settle(50)
+        find_items(win, "renameField")[0].setProperty("text", "เมนูเย็นนี้")
+        find_items(win, "renameSave")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(skills.userSkills[0]["name"], "เมนูเย็นนี้")
+        skills.setSkillCategory(skills.userSkills[0]["id"], "งานบ้าน")
+        settle(50)
+        self.assertTrue(find_items(win, "skillCat_งานบ้าน")[0].property("visible"))
+        find_items(win, "openSkillForm")[0].clicked.emit()
+        settle(50)
+        for name, text in (("formWhat", "ช่วยวางแผนออกกำลังกายที่บ้าน 20 นาที"),
+                           ("formEx1", "วันนี้ออกกำลังกายอะไรดี"), ("formEx2", "อยากเล่นท้องที่บ้าน"),
+                           ("formEx3", "จัดตารางวิ่งเบา ๆ ให้หน่อย")):  # fmt: skip
+            find_items(win, name)[0].setProperty("text", text)
+        settle(50)
+        find_items(win, "createFromForm")[0].clicked.emit()
+        settle(100)
+        self.assertEqual(len(skills.userSkills), 2)
+        self.assertFalse(find_items(win, "skillForm")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
     def test_backup_card_backs_up_to_a_drive(self):
         """ฟีเจอร์ข้อ 7: การ์ดสำรองในหน้าตั้งค่า · ไดรฟ์ปลอม (โฟลเดอร์) · สำรองในเธรด แล้วบอกผล."""
         engine, win, warnings = self.open_shell("settings")
