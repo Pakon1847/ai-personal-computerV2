@@ -2,15 +2,23 @@
 # การ์ด 0074 ขั้น 0 · S2 (เลือกสกิลเมื่อมีสกิลผู้ใช้มากขึ้น) บน Pi 5 · docs/benchmarks/2026-11-05-skill-guard/README.md
 #   sh scripts/bench/run_skill_guard.sh              # ทั้ง 4 ชุด
 #   sh scripts/bench/run_skill_guard.sh s2b-user50   # เฉพาะชุดที่ระบุ (ต่อท้าย log เดิม ไม่ลบ)
+#   R=r2 sh scripts/bench/run_skill_guard.sh s2a-user0 s2a-user50 s2b-user50   # รอบ 2
 # llama-server ค่าเดียวกับแอป (อ่าน /etc/aipc/llm.conf อย่างเดียว) บน TCP 127.0.0.1:18080 ชั่วคราว
 # (แอปจริงคุยผ่าน Unix socket ในกล่องตัดเน็ต) · ai-first = ทางของแอปเมื่อ AI พร้อม · ทุกชุดถาม 3 รอบ
 # ไม่แตะหน้า Login · service ของระบบ · /etc · /opt · ผลอยู่ใน O · ไม่ commit เอง
 set -u
 RUNS="${*:-s2a-user0 s2a-user20 s2a-user50 s2b-user50}"
+# รอบ 2 (การ์ด 0074 หัวข้อ 14 ข้อ 6): R=r2 = ชุดอิสระรอบ 2 + ผลในโฟลเดอร์ 2026-11-07-skill-guard-r2
+R="${R:-}"
 cd "$(dirname "$0")/../.."
 . /etc/aipc/llm.conf
-O=docs/benchmarks/2026-11-05-skill-guard
-POOL=tests/data/skill_guard_pool.json
+if [ "$R" = r2 ]; then
+  O=docs/benchmarks/2026-11-07-skill-guard-r2 POOL=tests/data/skill_guard_r2_pool.json
+  S2A=tests/data/skill_guard_r2_s2a.json S2B=tests/data/skill_guard_r2_s2b.json
+else
+  O=docs/benchmarks/2026-11-05-skill-guard POOL=tests/data/skill_guard_pool.json
+  S2A=tests/data/skill_guard_s2a.json S2B=tests/data/skill_guard_s2b.json
+fi
 PY="${PY:-$HOME/aipc-0025/.venv/bin/python}"
 LOG="$O/s2.log"
 export LD_LIBRARY_PATH=/opt/aipc-llm/lib PYTHONPATH=src AIPC_CLOUD=0 PYTHONIOENCODING=utf-8
@@ -54,10 +62,10 @@ run() {  # <label> <ชุดประโยค> <จำนวนสกิลผ
       || echo "FAIL $1" | tee -a "$LOG"
   echo "end $1 $(state)" >> "$LOG"
 }
-run s2a-user0 tests/data/skill_guard_s2a.json 0
-run s2a-user20 tests/data/skill_guard_s2a.json 20
-run s2a-user50 tests/data/skill_guard_s2a.json 50
-run s2b-user50 tests/data/skill_guard_s2b.json 50
+run s2a-user0 "$S2A" 0
+run s2a-user20 "$S2A" 20
+run s2a-user50 "$S2A" 50
+run s2b-user50 "$S2B" 50
 grep -E "^(VmHWM|VmRSS)" /proc/$PID/status | tr -s ' \t' ' ' | sed 's/^/server-/' >> "$LOG"
 kill $PID 2>/dev/null
 wait $PID 2>/dev/null
