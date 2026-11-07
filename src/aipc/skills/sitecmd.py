@@ -130,6 +130,9 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
         arg, confirm = m.group(3), False
         if c := _CONFIRM.fullmatch(arg):
             arg, confirm = c.group(1).strip(), True
+        # "Esc" = ชื่อที่คนเขียนบ่อย · เบราว์เซอร์รู้จักแค่ "Escape" (การ์ด 0074 รอบ 3 g21)
+        if m.group(2) == "กดคีย์":
+            arg = re.sub(r"(?i)(^|\+)esc$", r"\1Escape", arg)
         kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system",
                 "กดปุ่มที่เขียนว่า": "click_text"}[m.group(2)]  # fmt: skip
         if not phrases or any(len(p) > MAX_PHRASE for p in phrases):

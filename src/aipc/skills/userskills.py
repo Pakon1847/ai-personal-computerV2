@@ -61,7 +61,26 @@ def auto_policy(m: manifest.Manifest) -> list[str]:
     if extra := [p for p in m.permissions if p not in used]:
         labels = ", ".join(manifest.PERMISSIONS[p] for p in extra)
         errors.append(f"ขอสิทธิ์ที่สกิลไม่ได้ใช้: {labels}")
+    # สกิลประจำเว็บไม่เข้าตัวคัดสกิล จึงไม่ผ่านด่านแย่งงานใน gate · ตัวอย่างของมันต้องเป็นคำพูดของคำสั่งในสกิล
+    # หรือคำสั่งเว็บที่ระบบรู้จัก (การ์ด 0074 รอบ 3 b44: ตัวอย่างเป็นงานเตือน/สรุป · b45: "เลื่อน" ไม่มีคำสั่งรองรับ
+    # = หน้าตรวจบอกผู้ใช้ว่าสกิลทำสิ่งที่ทำไม่ได้)
+    if m.site and (odd := [e for e in m.examples if not _site_example(e, m)]):
+        errors.append(f"ตัวอย่าง “{odd[0]}” ไม่ตรงกับคำสั่งใดในหัวข้อ “## คำสั่ง” ของสกิลประจำเว็บ")
     return errors
+
+
+def _site_example(text: str, m: manifest.Manifest) -> bool:
+    """ตัวอย่างเป็นส่วนหนึ่งของคำพูดในคำสั่ง (หรือคำพูดเป็นส่วนหนึ่งของตัวอย่าง) หรือระบบทำเองได้.
+
+    "เปิด/ปิดคำบรรยาย" = คนเขียนใช้ / แทน "หรือ" → ดูทีละส่วนด้วย (รอบ 2 g18 ตัวอย่าง "เปิดคำบรรยาย")
+    """
+    from aipc.skills import browse, command
+
+    key = command.normalize(text)
+    parts = [x for c in m.commands for p in c.phrases for x in (p, *p.split("/"))]
+    phrases = [command.normalize(x) for x in parts]
+    near = any(p and (key in p or p in key) for p in phrases)
+    return bool(key) and (near or bool(browse.parse(text)))
 
 
 def check_md(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
