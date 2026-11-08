@@ -49,10 +49,12 @@ _RECORDER_JS = r"""(() => {
   window.__aipcDemoOn = true;
 
   const cut = (s, n) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, n);
-  const typing = (el) => !!el && el.nodeType === 1 &&
-    (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
-  const BAD = new RegExp('passw|card[-_]?(number|num|holder)|cc-|cvv|cvc|security[-_]?code|' +
-                         'otp|payment|billing|checkout', 'i');
+  // ช่องกาเครื่องหมายและปุ่มไม่ใช่ช่องพิมพ์ (เมนูของวิกิพีเดียเป็น checkbox · พบตอนลองบน Pi)
+  const NOT_TEXT = /^(button|checkbox|radio|submit|reset|image|range|color|file)$/i;
+  const typing = (el) => !!el && el.nodeType === 1 && (el.isContentEditable ||
+    /^(TEXTAREA|SELECT)$/.test(el.tagName) || (el.tagName === 'INPUT' && !NOT_TEXT.test(el.type)));
+  const BAD = new RegExp('passw|card[-_]?(number|num|holder)|cc-(number|name|exp|csc|type)|' +
+                         'cvv|cvc|security[-_]?code|(?<![a-z])otp|payment|billing|checkout', 'i');
   const secret = (el) => {
     for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
       const hints = [e.id, e.getAttribute('name'), e.getAttribute('autocomplete'),
@@ -82,8 +84,10 @@ _RECORDER_JS = r"""(() => {
 
   addEventListener('click', (e) => {
     const raw = e.target;
-    // isTrusted: สคริปต์ของหน้าเว็บปลอมการคลิกให้ถูกจดไม่ได้
-    if (!e.isTrusted || window.__aipcDemoOff || !raw || raw.nodeType !== 1) return;
+    // isTrusted: สคริปต์ของหน้าเว็บปลอมการคลิกให้ถูกจดไม่ได้ · detail 0: คลิกต่อเนื่องของ <label>
+    // หรือ Enter บนปุ่ม (จะจดซ้ำกับขั้นที่จดไปแล้ว)
+    if (!e.isTrusted || e.detail === 0 || window.__aipcDemoOff) return;
+    if (!raw || raw.nodeType !== 1) return;
     const el = button(raw);
     if (typing(raw) || typing(el) || secret(raw)) return;
     send({kind: 'click', tag: el.tagName.toLowerCase(), id: cut(el.id, 60),

@@ -29,6 +29,12 @@ ARGS = ["--headless=new", "--window-size=1280,800", "--lang=th-TH", "--mute-audi
         "--autoplay-policy=no-user-gesture-required"]  # fmt: skip
 SEARCH_BOX = {"youtube": "input[name=search_query]", "wikipedia": "input[name=search]",
               "maps": "#searchboxinput"}  # fmt: skip
+TEST_BOX_JS = r"""(() => {
+  const i = document.createElement('input');
+  i.id = 'aipc-test-box';
+  i.style.cssText = 'position:fixed;left:20px;bottom:20px;width:200px;height:30px;z-index:99999';
+  document.documentElement.appendChild(i);
+})()"""
 LOCATE_JS = r"""((sel, labels) => {
   const seen = (e) => { const r = e.getClientRects(); return r.length > 0 && r[0].width > 0; };
   let el = null;
@@ -40,9 +46,16 @@ LOCATE_JS = r"""((sel, labels) => {
                                       want.includes(e.getAttribute('aria-label'))) || null;
   }
   if (!el) return null;
-  el.scrollIntoView({block: 'center'});
+  const q = el.getBoundingClientRect();
+  if (q.top < 0 || q.left < 0 || q.bottom > innerHeight || q.right > innerWidth) {
+    el.scrollIntoView({block: 'center'});
+  }
   const r = el.getBoundingClientRect();
-  return {x: r.left + r.width / 2, y: r.top + r.height / 2};
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const hit = document.elementFromPoint(x, y);
+  if (!hit || !(hit === el || el.contains(hit))) return null;
+  return {x, y, tag: el.tagName.toLowerCase(), aria: el.getAttribute('aria-label') || '',
+          id: el.id || '', text: (el.innerText || '').trim().slice(0, 40)};
 })"""
 
 
@@ -53,6 +66,7 @@ def loads(path: Path = TASKS) -> dict:
 class Driver:
     def __init__(self, profile: Path):
         self.ctl = BrowserControl(profile=profile, extra_args=ARGS, load_timeout=30.0)
+        self.typed_where = ""
 
     def open(self, url: str) -> None:
         r = self.ctl.run(BrowseCommand("url", query=url))
@@ -90,9 +104,16 @@ class Driver:
         time.sleep(0.6)
 
     def type_secret(self, site: str, text: str) -> bool:
-        """คลิกช่องค้นหา แล้วพิมพ์ทีละตัว · ผ่านเมื่อเบราว์เซอร์รับข้อความจริง."""
+        """คลิกช่องพิมพ์ แล้วพิมพ์ทีละตัว · ผ่านเมื่อเบราว์เซอร์รับข้อความจริง."""
         box = SEARCH_BOX[site]
-        at = self.locate({"selector": box})
+        at = self.js(f"{LOCATE_JS}({json.dumps(box)}, null)")
+        if at is None:  # เว็บซ่อนช่องค้นหา (วิกิพีเดียที่จอกว้างเท่านี้) → ใส่ช่องทดสอบ
+            box = "#aipc-test-box"
+            self.js(TEST_BOX_JS)
+            self.typed_where = "ช่องทดสอบที่ตัววัดใส่"
+            at = self.locate({"selector": box})
+        else:
+            self.typed_where = "ช่องค้นหาของเว็บ"
         if at is None:
             return False
         self.mouse(at)
@@ -110,6 +131,8 @@ class Driver:
         self.js(
             f"((e) => {{ e.value = ''; e.blur(); }})(document.querySelector({json.dumps(box)}))"
         )
+        if box == "#aipc-test-box":
+            self.js("document.getElementById('aipc-test-box').remove()")
         return bool(got) and text[:6] in got
 
     def close(self) -> None:
@@ -117,12 +140,12 @@ class Driver:
 
 
 def do_steps(d: Driver, task: dict) -> list[str]:
-    """ทำตามขั้นของงาน · คืนชนิดของขั้นที่ทำจริง."""
+    """ทำตามขั้นของงาน · คืนสิ่งที่กดจริง (ชนิด + ลักษณะปุ่ม)."""
     done = []
     for step in task["steps"]:
         if step["do"] == "key":
             d.key(step["key"])
-            done.append("key")
+            done.append({"kind": "key", "key": step["key"]})
             continue
         at = d.locate(step)
         if at is None:
@@ -130,8 +153,21 @@ def do_steps(d: Driver, task: dict) -> list[str]:
                 continue
             raise RuntimeError(f"ไม่เจอปุ่ม: {step['what']}")
         d.mouse(at)
-        done.append("click")
+        done.append({"kind": "click", **at})
     return done
+
+
+def same_step(want: dict, got: demo.Step) -> bool:
+    """L1 "จดถูก": ปุ่มที่จดต้องเป็นปุ่มที่กดจริง ไม่ใช่แค่นับจำนวน."""
+    if want["kind"] != got.kind:
+        return False
+    if got.kind == "key":
+        return want["key"] == got.key
+    labels = [(want.get("aria"), got.aria), (want.get("id"), got.id), (want.get("text"), got.text)]
+    # แถวเมนูของ YouTube มีค่าปัจจุบันต่อท้าย ("Playback speed Normal") จึงเทียบแบบมีอยู่ในกัน
+    if any(a and b and (a in b or b in a) for a, b in labels):
+        return True
+    return not any(a for a, _ in labels) and want.get("tag") == got.tag and bool(got.css)
 
 
 def script_tasks(data: dict) -> list[dict]:
@@ -162,14 +198,17 @@ def cmd_record(a) -> int:
                     if not r.ok:
                         raise RuntimeError(r.say)
                     row["typed"] = d.type_secret(t["site"], secret)
+                    row["typed_where"] = d.typed_where
                     want = do_steps(d, t)
                     stop = d.ctl.run(BrowseCommand("demo_stop", query=t["say"]))
                     got = [s.kind for s in stop.steps]
                     dump = json.dumps([s.to_dict() for s in stop.steps], ensure_ascii=False)
+                    right = len(want) == len(got) and all(map(same_step, want, stop.steps))
                     row.update(want=want, got=got, steps=[s.to_dict() for s in stop.steps],
                                lines=[demo.describe(s) for s in stop.steps],
                                secret_leaked=secret[:6] in dump, url=stop.url)  # fmt: skip
-                    row["ok"] = got == want and not row["secret_leaked"] and bool(row["typed"])
+                    row["right"] = right
+                    row["ok"] = right and not row["secret_leaked"] and bool(row["typed"])
                 except Exception as e:  # noqa: BLE001 · บันทึกตามจริงแล้วไปงานถัดไป
                     row["error"] = f"{type(e).__name__}: {e}"
                     if d.ctl.demo_active:
@@ -242,12 +281,12 @@ def cmd_stop(a) -> int:
                 t = tasks[tid]
                 d.open(t["demo_url"])
                 before(d)
-                line = f"- ทดสอบ → กดปุ่มที่เขียนว่า {a.first} แล้ว คลิก {broken} แล้ว กดคีย์ m"
+                first = data["fail_cases"]["first_step"][tid]
+                line = f"- ทดสอบ → {first} แล้ว คลิก {broken} แล้ว กดคีย์ m"
                 cmds, errors = sitecmd.parse_section([(1, line)])
                 out = run_command(d, cmds[0], t["site"]) if cmds else []
-                muted = d.js("(document.querySelector('video') || {}).muted === true")
-                # ขั้นแรกหาไม่เจอก็หยุดเช่นกัน · สิ่งที่วัดคือไม่มีขั้นใดทำต่อหลังจากล้มเหลว
-                stopped = bool(out) and not out[-1][0] and len(out) <= 2 and not muted
+                # ขั้น 1 ทำได้ · ขั้น 2 ไม่เจอ · ขั้น 3 ต้องไม่ถูกทำ
+                stopped = len(out) == 2 and out[0][0] and not out[1][0]
                 rows.append({"id": tid, "errors": errors, "steps": out, "ok": stopped})
                 print(json.dumps(rows[-1], ensure_ascii=False)[:300], flush=True)
         finally:
@@ -271,7 +310,6 @@ def main(argv: list[str] | None = None) -> int:
     r.set_defaults(fn=cmd_replay)
     r = sub.add_parser("stop")
     r.add_argument("--out", required=True)
-    r.add_argument("--first", default="ไม่มีปุ่มนี้แน่นอน")
     r.set_defaults(fn=cmd_stop)
     a = p.parse_args(argv)
     return a.fn(a)

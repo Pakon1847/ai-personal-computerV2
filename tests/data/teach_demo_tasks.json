@@ -5,7 +5,7 @@
   "note": "ชุดงานตามการ์ด 0048 หัวข้อ 5 · commit ก่อนเขียนโค้ด (H9) · ผู้เขียนชุดงานคือคนเดียวกับคนเขียนโค้ด (เขียนกำกับในผล) · ก่อนรอบวัดจริงต้องลองบน Pi ว่า URL และ selector ยังใช้ได้ แก้ได้เฉพาะสองอย่างนี้จนกว่าจะเริ่มรอบวัด · ห้ามแก้งาน เกณฑ์ และ effect หลังเห็นผล",
   "secret_typing": {
     "text": "SECRET-0048-ห้ามจด",
-    "where": "ช่องค้นหาของเว็บ ระหว่างบันทึกทุกงานที่ how = script",
+    "where": "ช่องค้นหาของเว็บ ระหว่างบันทึกทุกงานที่ how = script · ถ้าเว็บซ่อนช่องค้นหา ตัววัดใส่ช่องพิมพ์ทดสอบลงหน้าเว็บแทน และจดไว้ในผล",
     "pass": "ข้อความนี้และค่าในช่องกรอกต้องไม่อยู่ในบันทึก (L1)"
   },
   "tasks": [
@@ -83,8 +83,8 @@
       "demo_url": "https://www.google.com/maps/@13.7563,100.5018,14z",
       "replay_url": "https://www.google.com/maps/@18.7883,98.9853,14z",
       "steps": [
-        {"do": "click", "selector": "#widget-zoom-in", "what": "ปุ่มซูมเข้า"},
-        {"do": "click", "selector": "#widget-zoom-in", "what": "ปุ่มซูมเข้า"}
+        {"do": "click", "selector": "button[aria-label=\"Zoom in\"]", "what": "ปุ่มซูมเข้า"},
+        {"do": "click", "selector": "button[aria-label=\"Zoom in\"]", "what": "ปุ่มซูมเข้า"}
       ],
       "effect": "parseFloat(location.href.match(/,([0-9.]+)z/)[1]) >= window.__before_zoom + 2"
     },
@@ -93,7 +93,7 @@
       "demo_url": "https://www.google.com/maps/@13.7563,100.5018,14z",
       "replay_url": "https://www.google.com/maps/@18.7883,98.9853,14z",
       "steps": [
-        {"do": "click", "text": "Layers|เลเยอร์|ดาวเทียม|Satellite", "what": "ปุ่มชั้นแผนที่"}
+        {"do": "click", "selector": "button[jsaction^=\"minimap.main\"]", "what": "ปุ่มชั้นแผนที่"}
       ],
       "effect": "location.href.includes('!1e3')"
     },
@@ -110,6 +110,13 @@
   "fail_cases": {
     "note": "L4: คำสั่งหลายขั้นที่ขั้นกลางหาปุ่มไม่เจอ ต้องหยุดและบอกตามจริง 100% ไม่กดอย่างอื่นแทน · ใช้งาน T01 T04 T05 T07 T08 แล้วเปลี่ยน selector ของขั้นที่ 2 เป็นตัวที่ไม่มีในหน้า",
     "use_tasks": ["T01", "T04", "T05", "T07", "T08"],
-    "broken_selector": "#aipc-0048-does-not-exist"
+    "broken_selector": "#aipc-0048-does-not-exist",
+    "first_step": {
+      "T01": "คลิก .ytp-settings-button",
+      "T04": "คลิก .ytp-settings-button",
+      "T05": "คลิก #vector-main-menu-dropdown-checkbox",
+      "T07": "คลิก #p-lang-btn-checkbox",
+      "T08": "คลิก button[aria-label=\"Zoom in\"]"
+    }
   }
 }
