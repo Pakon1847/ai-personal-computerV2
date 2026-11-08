@@ -2435,13 +2435,21 @@ class SkillsController(QObject):
     _app_done = Signal(object)
     _app_progress = Signal(object)
     _hol_done = Signal(object)
+    shareCodeDone = Signal("QVariantMap")  # noqa: N815 · แชร์ด้วยเลข 8 หลัก (การ์ด 0080 รอบ 2)
+    skillReceived = Signal("QVariantMap")  # noqa: N815 · รับสกิลด้วยเลขหรือกล้อง: ผลตรวจก่อนติดตั้ง
+    _share_done = Signal(object)
+    _receive_done = Signal(object)
 
     def __init__(self, executor=None, root: Path = Path("/"), reminders_path=None, clock=None,
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
                  gcal_alert_min=None, holidays=None, time_synced=None, chat_mode=None,
-                 chat_switch=None, installer=None, memory=None):  # fmt: skip
+                 chat_switch=None, installer=None, memory=None, ledger=None):  # fmt: skip
         super().__init__()
+        self._ledger = ledger  # สมุดบันทึกสิ่งที่ส่งออกนอกเครื่อง · None = ไม่มี (หน้า Login)
+        self._received = None  # (ไฟล์สกิล, ที่มา) ที่ตรวจแล้วรอกดติดตั้ง (การ์ด 0080 รอบ 2)
+        self._share_done.connect(self._on_share_done)
+        self._receive_done.connect(self._on_receive_done)
         self._memory = (
             memory  # ความจำของผู้ใช้ (การ์ด 0079 · aipc.chat.memory.Memory) · None = ไม่มี (หน้า Login)
         )
@@ -4003,11 +4011,138 @@ class SkillsController(QObject):
                 "message": f"บันทึกรูป QR แล้วที่ ไฟล์ของฉัน / สกิลที่ส่งออก / {dest.name} · "
                            "เพื่อนเปิดรูปนี้ในไฟล์ของฉัน แล้วกด “ติดตั้งสกิลจาก QR”"}  # fmt: skip
 
+    # ---------- แชร์ด้วยเลข 8 หลัก และรับด้วยเลข/กล้อง (การ์ด 0080 รอบ 2) ----------
+    @Property(bool, notify=skillsChanged)
+    def shareServerReady(self) -> bool:  # noqa: N802
+        """มีเซิร์ฟเวอร์ฝากสกิลไหม · ไม่มี = หน้าจอไม่โชว์ทางเลข (H5)."""
+        from aipc.skills import share
+
+        return self._user is not None and share.server_url() != ""
+
+    @Property(bool, notify=skillsChanged)
+    def cameraScanReady(self) -> bool:  # noqa: N802
+        from aipc.vision import client as vision_client
+
+        return self._user is not None and vision_client.available()
+
+    def _record_share(self, md: str, ok: bool, note: str) -> None:
+        if self._ledger is None:
+            return
+        try:
+            self._ledger.record("share", md, ok=ok, note=note)
+        except OSError:  # ดิสก์เต็ม ฯลฯ · ต้องไม่ทำให้ปุ่มค้าง
+            pass
+
+    @Slot(str)
+    def shareSkillCode(self, skill_id: str) -> None:  # noqa: N802
+        """ฝากสกิลแล้วได้เลข · หน้าจอถามยืนยันก่อนเรียกเสมอ (H3) · ผลมาทาง shareCodeDone."""
+        import threading
+
+        from aipc.skills import share
+
+        if not self._is_user(skill_id):
+            self._share_done.emit({"error": "แชร์ได้เฉพาะสกิลที่ Claude สร้าง ที่สร้างเอง หรือที่นำเข้า"})
+            return
+        md = self._user.current_md(skill_id)
+
+        def work():
+            try:
+                code = share.upload(md)
+            except share.NotSent as e:  # ยังไม่มีอะไรออกจากเครื่อง จึงไม่ต้องลงสมุด
+                self._share_done.emit({"error": str(e)})
+                return
+            except share.ShareError as e:  # อาจถึงเซิร์ฟเวอร์แล้ว จึงลงสมุดตามจริง
+                self._record_share(md, False, str(e))
+                self._share_done.emit({"error": str(e)})
+                return
+            self._record_share(md, True, share.pretty_code(code))
+            self._share_done.emit({"skill": skill_id, "code": code})
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(object)
+    def _on_share_done(self, r: dict) -> None:
+        from aipc.skills import share
+
+        if "error" in r:
+            self.shareCodeDone.emit({"code": "", "path": "", "message": r["error"]})
+            return
+        dest = Path.home() / "สกิลที่ส่งออก" / f"{r['skill']}-code-qr.png"
+        try:
+            share.write_code_png(r["code"], dest)
+            path = str(dest)
+        except (share.ShareError, OSError):  # ยังใช้เลขได้ แม้สร้างรูปไม่ได้
+            path = ""
+        self.shareCodeDone.emit({"code": share.pretty_code(r["code"]), "path": path,
+                                 "message": "ฝากไฟล์ไว้ 24 ชั่วโมงแล้ว"})  # fmt: skip
+
+    def _receive(self, fetch, source: str) -> None:
+        """โหลดในเธรด (เน็ตและกล้องช้า) แล้วเข้าด่านบนเธรดหน้าจอ."""
+        import threading
+
+        from aipc.skills import share
+
+        self._received = None
+
+        def work():
+            try:
+                self._receive_done.emit({"md": fetch(), "source": source})
+            except share.ShareError as e:
+                self._receive_done.emit({"error": str(e)})
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(str)
+    def receiveSkillCode(self, text: str) -> None:  # noqa: N802
+        """เลขจากเพื่อน → โหลด → ตรวจด้วยด่านเดียวกับไฟล์ · ผลมาทาง skillReceived · ยังไม่ติดตั้ง."""
+        from aipc.skills import share
+
+        try:
+            code = share.clean_code(text)
+        except share.ShareError as e:
+            self._receive_done.emit({"error": str(e)})
+            return
+        self._receive(lambda: share.download(code), f"เลข {share.pretty_code(code)}")
+
+    @Slot()
+    def scanSkillQr(self) -> None:  # noqa: N802
+        """เปิดกล้องอ่าน QR (visiond ส่งกลับแค่ข้อความ) → ตรวจด้วยด่านเดียวกับไฟล์."""
+        from aipc.skills import share
+        from aipc.vision import client as vision_client
+
+        def fetch() -> str:
+            r = vision_client.scan_qr(getpass.getuser())
+            if not r.get("ok"):
+                raise share.ShareError(
+                    "กล้องกำลังใช้งานอยู่ · ลองใหม่อีกครั้ง" if r.get("state") == "busy"
+                    else "ใช้กล้องไม่ได้ในตอนนี้ · ใส่เลขแทนได้"
+                )  # fmt: skip
+            if not r.get("text"):
+                raise share.ShareError("ไม่พบ QR ของสกิล · ถือให้เห็น QR ทั้งรูปแล้วลองใหม่")
+            return share.resolve(r["text"])
+
+        self._receive(fetch, "QR จากกล้อง")
+
+    @Slot(object)
+    def _on_receive_done(self, r: dict) -> None:
+        if "error" in r:
+            self.skillReceived.emit({"ready": False, "message": r["error"]})
+            return
+        ok, message = self._import_md(r["md"], r["source"], False)
+        self._received = (r["md"], r["source"]) if ok else None
+        self.skillReceived.emit({"ready": ok, "message": message})
+
+    @Slot(result=str)
+    def installReceivedSkill(self) -> str:  # noqa: N802
+        if self._received is None:
+            return "ยังไม่มีสกิลที่รับมา"
+        md, source = self._received
+        self._received = None
+        return self._import_md(md, source, True)[1]
+
     @Slot(str, bool, result=str)
     def importSkill(self, path: str, install: bool) -> str:  # noqa: N802
         """ไฟล์สกิลจากภายนอก: ตรวจด้วยประตูเดียวกับสกิลอัตโนมัติ (0017) · install=False = ดูก่อน · คืนข้อความ."""
-        from aipc.skills import manifest, userskills
-
         if self._user is None:
             return "บัญชีนี้ติดตั้งสกิลเพิ่มไม่ได้"
         try:
@@ -4024,25 +4159,31 @@ class SkillsController(QObject):
                 md = Path(path).read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError) as e:
             return f"อ่านไฟล์ไม่ได้: {e}"
+        ok, message = self._import_md(md, Path(path).name, install)
+        return message + " · กดอีกครั้งเพื่อติดตั้ง" if ok and not install else message
+
+    def _import_md(self, md: str, source: str, install: bool) -> tuple[bool, str]:
+        """ไฟล์สกิลจากภายนอกทุกทาง (ไฟล์ · QR · เลข) ผ่านด่านเดียวกัน · คืน (ผ่านไหม, ข้อความ)."""
+        from aipc.skills import manifest, userskills
+
+        if self._user is None:
+            return False, "บัญชีนี้ติดตั้งสกิลเพิ่มไม่ได้"
         if not md.lstrip("\ufeff \r\n").startswith("---"):  # โน้ต .md ทั่วไป (ปุ่มขึ้นทุกไฟล์ .md)
-            return "ไฟล์นี้เป็นโน้ตธรรมดา ไม่ใช่ไฟล์สกิล · ติดตั้งได้เฉพาะไฟล์ที่ส่งออกจากหน้า Skill"
+            return False, "ไฟล์นี้เป็นโน้ตธรรมดา ไม่ใช่ไฟล์สกิล · ติดตั้งได้เฉพาะไฟล์ที่ส่งออกจากหน้า Skill"
         m, errors = userskills.gate(md, self._skills)
         if m is None:
-            return "ติดตั้งไม่ได้: " + "; ".join(errors[:2])
+            return False, "ติดตั้งไม่ได้: " + "; ".join(errors[:2])
         detail = " → ".join(s.text for s in m.steps) if m.steps else "งานภาษาโดย AI ในเครื่อง"
         perms = ", ".join(m.permission_labels()) or "ไม่ขอสิทธิ์พิเศษ"
         if not install:
-            return (
-                f"สกิล “{m.name}”: {detail} · สิทธิ์: {perms} · "
-                "ไฟล์มาจากภายนอก ตรวจแล้วผ่าน · กดอีกครั้งเพื่อติดตั้ง"
-            )
+            return True, f"สกิล “{m.name}”: {detail} · สิทธิ์: {perms} · ไฟล์มาจากภายนอก ตรวจแล้วผ่าน"
         try:
-            self._user.install(md, self._skills, request=f"{self.IMPORT_TAG} {Path(path).name}",
+            self._user.install(md, self._skills, request=f"{self.IMPORT_TAG} {source}",
                                model=self.IMPORT_TAG)  # fmt: skip
         except (manifest.InvalidSkill, OSError) as e:
-            return f"ติดตั้งไม่ได้: {e}"
+            return False, f"ติดตั้งไม่ได้: {e}"
         self._reload()
-        return f"ติดตั้งสกิล “{m.name}” แล้ว · ดู/ปิด/ลบได้ที่หน้า Skill"
+        return True, f"ติดตั้งสกิล “{m.name}” แล้ว · ดู/ปิด/ลบได้ที่หน้า Skill"
 
     @Slot(str, int, result=str)
     def revertSkill(self, skill_id: str, version: int) -> str:  # noqa: N802

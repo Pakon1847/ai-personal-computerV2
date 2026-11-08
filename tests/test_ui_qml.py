@@ -907,6 +907,78 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(find_items(win, "skillForm")[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_share_by_number_asks_first_then_shows_number_and_qr(self):
+        """การ์ด 0080 รอบ 2: กดแชร์เป็นเลข → ถามก่อน ยังไม่ส่ง · ยืนยันแล้วเห็นเลขและ QR."""
+        from aipc.skills import manifest, share, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        md = (
+            Path(__file__).resolve().parent.parent
+            / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md"
+        ).read_text(encoding="utf-8")
+        store = userskills.UserSkills(tmp / "aipc" / "skills")
+        store.install(md, manifest.load_builtin(), request="คิดเมนู")
+        skills._user = store
+        self.enterContext(mock.patch.object(share, "server_url", return_value="https://share.test"))
+        upload = self.enterContext(mock.patch.object(share, "upload", return_value="12345678"))
+        self.enterContext(mock.patch.dict(os.environ, {"HOME": str(tmp), "USERPROFILE": str(tmp)}))
+        skills._reload()
+        settle(100)
+        find_items(win, "shareCodeButton")[0].clicked.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "shareConfirmCard")[0].property("visible"))
+        upload.assert_not_called()
+        find_items(win, "shareConfirmSend")[0].clicked.emit()
+        end = time.monotonic() + 5
+        code = find_items(win, "skillShareCode")[0]
+        while code.property("text") == "" and time.monotonic() < end:
+            settle(50)
+        self.assertEqual(code.property("text"), "1234 5678")
+        upload.assert_called_once()
+        self.assertTrue(find_items(win, "skillQrCard")[0].property("visible"))
+        self.assertFalse(find_items(win, "shareConfirmCard")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
+    def test_number_controls_are_hidden_without_a_server(self):
+        """H5: ยังไม่มีเซิร์ฟเวอร์ = ไม่โชว์ทางเลข."""
+        _, win, warnings = self.open_shell("skills")
+        self.assertFalse(find_items(win, "receiveSkillCard")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
+    def test_receive_by_number_shows_result_then_installs(self):
+        from aipc.skills import share, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        md = (
+            Path(__file__).resolve().parent.parent
+            / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md"
+        ).read_text(encoding="utf-8")
+        store = userskills.UserSkills(tmp / "aipc" / "skills")
+        skills._user = store
+        self.enterContext(mock.patch.object(share, "server_url", return_value="https://share.test"))
+        self.enterContext(mock.patch.object(share, "download", return_value=md))
+        skills._reload()
+        settle(100)
+        self.assertTrue(find_items(win, "receiveSkillCard")[0].property("visible"))
+        find_items(win, "receiveCodeField")[0].setProperty("text", "1234 5678")
+        settle(50)
+        find_items(win, "receiveCodeButton")[0].clicked.emit()
+        end = time.monotonic() + 5
+        install = find_items(win, "installReceivedButton")[0]
+        while not install.property("visible") and time.monotonic() < end:
+            settle(50)
+        self.assertTrue(install.property("visible"))
+        self.assertEqual(store.load_all(), [], "ตรวจก่อน ยังไม่ติดตั้ง")
+        install.clicked.emit()
+        settle(100)
+        self.assertEqual(len(store.load_all()), 1)
+        self.assertIn("ติดตั้งสกิล", find_items(win, "receiveMessage")[0].property("text"))
+        self.assertEqual(warnings, [])
+
     def test_share_skill_as_qr_shows_image(self):
         """การ์ด 0080: กด "แชร์เป็น QR" → รูป QR ขึ้นในหน้า Skill (โหลดได้จริง) · ไม่มี warning."""
         from aipc.skills import manifest, userskills

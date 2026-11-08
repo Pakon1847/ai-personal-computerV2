@@ -11,6 +11,7 @@ socket 2 ตัว · ข้อความ JSON บรรทัดละ 1 ก�
     watch {username, seconds}                 เจ้าของบัญชีเท่านั้น (ไม่ใช่หน้า Login) · ดูว่าเจ้าของยังนั่งอยู่
     unlock {username}                         เจ้าของบัญชีเท่านั้น · ปลดจอล็อกด้วยใบหน้า (การ์ด 0055)
                                               (การ์ด 0051 ก) ทุก 2 วิ: กี่หน้า/ใช่เจ้าของไหม · ไม่ส่งภาพ
+    scan_qr {username, timeout_s}             เจ้าของบัญชีเท่านั้น · อ่าน QR ของสกิล · ส่งกลับแค่ข้อความ
 - `/run/aipc-vision/visiond-root.sock` (0600 · เฉพาะ uid 0 = `aipc-face-pass` ที่ PAM เรียก):
     consume {username}    ใช้ตั๋ว → {"ok": true} = เข้าระบบได้เลย
     login-ok {}           เข้าระบบสำเร็จ (ด้วยวิธีใดก็ได้) → ปลดล็อกการสแกน
@@ -30,7 +31,7 @@ import threading
 from collections.abc import Callable
 from pathlib import Path
 
-from aipc.vision import service
+from aipc.vision import qr, service
 
 PUBLIC = Path("/run/aipc-vision/visiond.sock")
 ROOT = Path("/run/aipc-vision/visiond-root.sock")
@@ -42,6 +43,7 @@ IDENTIFY_MAX_S = 15.0
 WATCH_MAX_S = 60.0  # ตัวตรวจขอใหม่ทุก ≤ 60 วิ (กล้องไม่ค้างถ้าตัวตรวจตาย)
 FACING_MAX_S = 20.0  # การ์ด 0058: ฟังคำสั่งเสียงนานสุด 15 วิ (+ เผื่อ) · ตัวขอตาย = กล้องดับเอง
 UNLOCK_SECONDS = 5.0  # ปลดจอล็อกด้วยใบหน้า (การ์ด 0055) · สั้นกว่าหน้า Login (คนนั่งหน้าจออยู่แล้ว)
+SCAN_QR_MAX_S = 20.0  # การ์ด 0080: สแกน QR ของสกิล · หมดเวลาแล้วกล้องดับเอง
 
 
 def peer_uid(conn: socket.socket) -> int:
@@ -161,7 +163,7 @@ class Handler:
             return self._with_camera(
                 lambda: vars(self.face.identify(_tap(self.frames(secs), last), progress))
             )
-        if op in ("watch", "unlock", "facing"):
+        if op in ("watch", "unlock", "facing", "scan_qr"):
             # เจ้าของบัญชีเท่านั้น · หน้า Login/root ขอไม่ได้ (ไม่มีเหตุให้ดูว่าใครนั่งอยู่หน้าเครื่อง ·
             # ปลดจอล็อกของคนอื่นไม่ได้)
             owner = isinstance(user, str) and uid not in (0, self.greeter_uid)
@@ -174,6 +176,14 @@ class Handler:
             if op == "facing":
                 return self._with_camera(
                     lambda: vars(self.face.facing(self.frames(FACING_MAX_S), send))
+                )
+            if op == "scan_qr":
+                try:
+                    secs = max(1.0, min(float(req.get("timeout_s", SCAN_QR_MAX_S)), SCAN_QR_MAX_S))
+                except (TypeError, ValueError):
+                    secs = SCAN_QR_MAX_S
+                return self._with_camera(
+                    lambda: {"ok": True, "state": "scanned", "text": qr.scan(self.frames(secs))}
                 )
             try:
                 secs = max(1.0, min(float(req.get("seconds", WATCH_MAX_S)), WATCH_MAX_S))

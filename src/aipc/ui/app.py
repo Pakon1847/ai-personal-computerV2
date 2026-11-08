@@ -377,6 +377,7 @@ def build(opts: Options, argv: list[str] | None = None):
             chat_mode=lambda: chat.mode,
             chat_switch=_chat_switch(chat, ui_settings),
             memory=memory,
+            ledger=ledger,
         ),
         "memoryCtl": MemoryCtl(memory),
         "chat": chat,

@@ -5,6 +5,8 @@ import threading
 import unittest
 from pathlib import Path
 
+import numpy as np
+
 from aipc.vision import daemon, face_pass, service, store
 from tests.test_vision_service import FakeScanner, vec
 
@@ -35,6 +37,46 @@ class HandlerTest(unittest.TestCase):
         self.assertEqual(self.scanner.scans, 0)
         r = self.pub(GREETER, op="identify")
         self.assertEqual((r["ok"], r["user"]), (True, "namfon"))
+
+    def scan_handler(self, frames):
+        asked = []
+
+        def supply(seconds):
+            asked.append(seconds)
+            return iter(frames)
+
+        h = daemon.Handler(self.face, supply, GREETER, uid_of={"namfon": NAMFON, "boss": BOSS}.get)
+        return h, asked
+
+    def test_scan_qr_returns_only_text_of_a_skill_qr(self):
+        """การ์ด 0080 รอบ 2: ส่งกลับแค่ข้อความ · QR อื่นในห้องไม่ถึงโปรแกรมของผู้ใช้."""
+        from aipc.skills import share
+
+        blank = np.full((200, 200), 255, dtype=np.uint8)
+        other = share._qr_bitmap("WIFI:S:home;P:secret;;")
+        wanted = share._qr_bitmap("AIPC2:12345678")
+        h, asked = self.scan_handler([blank, other, wanted])
+        r = h.public(
+            {"op": "scan_qr", "username": "namfon", "timeout_s": 999}, NAMFON, self.sent.append
+        )
+        self.assertEqual(r, {"ok": True, "state": "scanned", "text": "AIPC2:12345678"})
+        self.assertEqual(asked, [daemon.SCAN_QR_MAX_S], "ขอนานแค่ไหน กล้องก็เปิดไม่เกินเพดาน")
+        self.assertEqual(self.sent, [], "ไม่มีสถานะหรือภาพส่งระหว่างทาง")
+
+    def test_scan_qr_ignores_other_qr_and_times_out_empty(self):
+        from aipc.skills import share
+
+        h, _ = self.scan_handler([share._qr_bitmap("https://example.com")])
+        r = h.public({"op": "scan_qr", "username": "namfon"}, NAMFON, self.sent.append)
+        self.assertEqual(r["text"], "")
+
+    def test_r6_only_the_account_owner_may_scan(self):
+        h, asked = self.scan_handler([])
+        for uid in (BOSS, GREETER, 0):
+            with self.subTest(uid=uid):
+                r = h.public({"op": "scan_qr", "username": "namfon"}, uid, self.sent.append)
+                self.assertFalse(r["ok"])
+        self.assertEqual(asked, [], "ไม่ใช่เจ้าของบัญชี = กล้องต้องไม่เปิด")
 
     def test_only_root_can_use_a_ticket(self):
         self.pub(GREETER, op="identify")

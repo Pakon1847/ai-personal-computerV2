@@ -1163,5 +1163,19 @@
   "ลบทั้งหมด": "Delete all",
   "ค้นความจำ": "Search memory",
   "ปักหมุดแล้ว": "Pinned",
-  "ปักหมุด": "Pin"
+  "ปักหมุด": "Pin",
+  "ให้เพื่อนพิมพ์เลขนี้หรือสแกน QR ในหน้า Skill ภายใน 24 ชั่วโมง · ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง": "Ask your friend to type this number or scan the QR on the Skills page within 24 hours · they must install it themselves, and it is always checked first",
+  "ส่งไฟล์สกิลนี้ออกจากเครื่องไหม": "Send this skill file off this machine?",
+  "ไฟล์จะไปฝากที่เซิร์ฟเวอร์ 24 ชั่วโมง ใครมีเลขก็โหลดได้ · ถ้าไม่อยากให้ไฟล์ออกจากเครื่อง ใช้ “แชร์เป็น QR” แทน": "The file is kept on a server for 24 hours, and anyone with the number can download it · to keep it on this machine, use “Share as QR” instead",
+  "กำลังส่ง…": "Sending…",
+  "ส่งและขอเลข": "Send and get a number",
+  "รับสกิลจากเพื่อน": "Get a skill from a friend",
+  "เลข 8 หลักจากเพื่อน": "8-digit number from your friend",
+  "ตรวจสกิล": "Check skill",
+  "กำลังโหลดและตรวจสกิล…": "Downloading and checking the skill…",
+  "สแกน QR ด้วยกล้อง": "Scan QR with camera",
+  "กล้องเปิดอยู่ · ถือ QR ให้เห็นทั้งรูป (ไม่เกิน 20 วินาที) · ระบบไม่เก็บภาพ": "Camera is on · hold the whole QR in view (up to 20 seconds) · no images are kept",
+  "ติดตั้งสกิลนี้": "Install this skill",
+  "แชร์เป็นเลข 8 หลัก": "Share as 8-digit number",
+  "ฝากไฟล์สกิลไว้ที่เซิร์ฟเวอร์ 24 ชม. (แชร์ด้วยเลข 8 หลัก)": "Skill file kept on a server for 24 hours (shared by 8-digit number)"
 }
