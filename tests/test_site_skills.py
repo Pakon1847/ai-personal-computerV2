@@ -317,7 +317,8 @@ class VoiceFlowTest(unittest.TestCase):
         s, _ = self.make()
         s._skills = [*s._skills, skill()]
         card = s.siteCommand("ถอยหลังสิบวิ", WATCH)
-        self.assertEqual(card["siteRun"], {"kind": "key", "arg": "j", "site": "youtube"})
+        want = {"kind": "key", "arg": "j", "site": "youtube", "words": "ถอยหลังสิบวิ|ย้อนสิบวิ"}
+        self.assertEqual(card["siteRun"], want)
         self.assertEqual(s.siteCommand("ถอยหลังสิบวิ", "https://www.netflix.com/"), {})
         risky = s.siteCommand("ยกเลิกสมัครสมาชิก", WATCH)
         self.assertNotIn("siteRun", risky)  # คำสั่งที่มี "ยืนยันก่อน" ไม่ทำเอง
@@ -355,6 +356,15 @@ class VoiceFlowTest(unittest.TestCase):
         pump(lambda: len(done) > 1)
         self.assertIsNotNone(self.seen[1][1]["revise"])
         self.assertIn("เพิ่มคำสั่งเสียง", self.seen[1][1]["revise"][1])
+
+    def test_gmail_never_asks_claude_for_a_site_skill(self):
+        """การ์ด 0071 (Pakon ใน Gmail พูด "เมลล่าสุด" · ledger 2026-10-28 11:14:55 · ล้ม 2 รอบ $0.10):
+        เว็บที่สกิลประจำเว็บไม่รับ = บอกตรง ๆ · ไม่ถาม ไม่ส่ง Claude."""
+        s, _ = self.make(YT)
+        said = s.siteLearn("เมลล่าสุด", "https://mail.google.com/mail/u/0/#inbox")
+        self.assertNotIn("confirmToken", said)
+        self.assertIn("อ่านเมลล่าสุด", said["say"])
+        self.assertEqual(self.seen, [])
 
     def test_claude_could_not_add_it_says_so_and_installs_nothing(self):
         """Pakon 2026-10-26: ขอ "เพิ่มอีกหนึ่งแถบ" → Claude ส่งสกิลที่ไม่มีคำนี้ (คีย์ลัดเปิดแท็บไม่ได้) ·

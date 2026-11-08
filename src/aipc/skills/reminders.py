@@ -171,6 +171,21 @@ class ReminderStore:
             raise
         return r
 
+    def move(self, rid: str, when: datetime, now: datetime | None = None) -> Reminder | None:
+        """เลื่อนนัดไปเวลาใหม่ (การ์ด 0068) · None = ไม่มีนัดนี้แล้ว · เวลาใหม่ = ยังไม่เคยเตือน ·
+        บันทึกไม่สำเร็จ = คืนเวลาเดิม นัดในหน่วยความจำตรงกับไฟล์ (H2)."""
+        r = next((x for x in self.items if x.id == rid), None)
+        if r is None:
+            return None
+        old = (r.when, r.fired)
+        r.when, r.fired = when, False
+        try:
+            self.save(now)
+        except Exception:
+            r.when, r.fired = old
+            raise
+        return r
+
     def delete(self, rid: str, now: datetime | None = None) -> bool:
         before = list(self.items)
         self.items = [r for r in self.items if r.id != rid]

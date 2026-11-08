@@ -1,0 +1,82 @@
+== S2 2026-11-06T18:43:39+07:00 model=/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf threads=3 ctx=4096 template=
+before-server 2026-11-06T18:43:39+07:00 temp=62.0 throttled=0xe0000 avail_mb=7402
+start s2a-user0 2026-11-06T18:43:55+07:00 temp=59.8 throttled=0xe0000 avail_mb=5853
+s2a-user0 (rules + AI · ai-first · สกิลผู้ใช้ 0 · รอบ 1/3): ถูก 97/120 = 81% · เรียกสกิลทั้งที่ไม่ควร 1/30 = 3%
+  general: 24/24
+  direct: 39/42
+  paraphrase: 24/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 7.72 วิ/ข้อ · ข้อแรก 58.14 วิ · ช้าสุด 58.14 วิ
+s2a-user0 (rules + AI · ai-first · สกิลผู้ใช้ 0 · รอบ 2/3): ถูก 96/120 = 80% · เรียกสกิลทั้งที่ไม่ควร 1/30 = 3%
+  general: 24/24
+  direct: 39/42
+  paraphrase: 23/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 7.15 วิ/ข้อ · ข้อแรก 5.73 วิ · ช้าสุด 13.52 วิ
+s2a-user0 (rules + AI · ai-first · สกิลผู้ใช้ 0 · รอบ 3/3): ถูก 97/120 = 81% · เรียกสกิลทั้งที่ไม่ควร 1/30 = 3%
+  general: 24/24
+  direct: 39/42
+  paraphrase: 24/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 7.27 วิ/ข้อ · ข้อแรก 6.0 วิ · ช้าสุด 13.61 วิ
+end s2a-user0 2026-11-06T19:15:20+07:00 temp=83.4 throttled=0xe0008 avail_mb=5825
+start s2a-user20 2026-11-06T19:15:30+07:00 temp=64.2 throttled=0xe0000 avail_mb=5831
+s2a-user20 (rules + AI · ai-first · สกิลผู้ใช้ 20 · รอบ 1/3): ถูก 96/120 = 80% · เรียกสกิลทั้งที่ไม่ควร 2/30 = 7%
+  general: 23/24
+  direct: 38/42
+  paraphrase: 25/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 27.4 วิ/ข้อ · ข้อแรก 26.09 วิ · ช้าสุด 32.09 วิ
+s2a-user20 (rules + AI · ai-first · สกิลผู้ใช้ 20 · รอบ 2/3): ถูก 96/120 = 80% · เรียกสกิลทั้งที่ไม่ควร 2/30 = 7%
+  general: 23/24
+  direct: 38/42
+  paraphrase: 25/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 27.51 วิ/ข้อ · ข้อแรก 27.14 วิ · ช้าสุด 32.06 วิ
+s2a-user20 (rules + AI · ai-first · สกิลผู้ใช้ 20 · รอบ 3/3): ถูก 97/120 = 81% · เรียกสกิลทั้งที่ไม่ควร 2/30 = 7%
+  general: 23/24
+  direct: 38/42
+  paraphrase: 26/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 27.58 วิ/ข้อ · ข้อแรก 29.25 วิ · ช้าสุด 32.04 วิ
+end s2a-user20 2026-11-06T21:13:18+07:00 temp=82.3 throttled=0xe0008 avail_mb=5802
+start s2a-user50 2026-11-06T21:13:28+07:00 temp=63.7 throttled=0xe0000 avail_mb=5823
+s2a-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 1/3): ถูก 96/120 = 80% · เรียกสกิลทั้งที่ไม่ควร 2/30 = 7%
+  general: 23/24
+  direct: 39/42
+  paraphrase: 24/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 27.1 วิ/ข้อ · ข้อแรก 26.96 วิ · ช้าสุด 33.7 วิ
+s2a-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 2/3): ถูก 96/120 = 80% · เรียกสกิลทั้งที่ไม่ควร 2/30 = 7%
+  general: 23/24
+  direct: 39/42
+  paraphrase: 24/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 26.93 วิ/ข้อ · ข้อแรก 26.97 วิ · ช้าสุด 33.49 วิ
+s2a-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 3/3): ถูก 96/120 = 80% · เรียกสกิลทั้งที่ไม่ควร 2/30 = 7%
+  general: 23/24
+  direct: 39/42
+  paraphrase: 24/42
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 27.24 วิ/ข้อ · ข้อแรก 26.13 วิ · ช้าสุด 33.62 วิ
+end s2a-user50 2026-11-06T23:08:58+07:00 temp=81.8 throttled=0xe0000 avail_mb=5771
+STOPPED-BY-REQUEST 2026-11-06T23:09:12+07:00 หยุดหลังจบ s2a-user50 · s2b-user50 ยังไม่เริ่ม เลื่อนไปวันถัดไป (Pakon สั่ง) · ค่า server-VmHWM ไม่ได้จด (ตัวหยุดอ่านพลาด)
+== S2 2026-11-07T11:38:04+07:00 model=/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf threads=3 ctx=4096 template= runs=s2b-user50
+before-server 2026-11-07T11:38:04+07:00 temp=59.8 throttled=0x0 avail_mb=7416
+start s2b-user50 2026-11-07T11:38:34+07:00 temp=62.0 throttled=0x0 avail_mb=5746
+s2b-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 1/3): ถูก 14/40 = 35% · เรียกสกิลทั้งที่ไม่ควร 0/0 = 0%
+  direct: 11/20
+  paraphrase: 3/20
+  ถาม AI 39 ข้อ · median 29.84 วิ/ข้อ · ข้อแรก 81.28 วิ · ช้าสุด 81.28 วิ
+s2b-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 2/3): ถูก 12/40 = 30% · เรียกสกิลทั้งที่ไม่ควร 0/0 = 0%
+  direct: 10/20
+  paraphrase: 2/20
+  ถาม AI 39 ข้อ · median 29.91 วิ/ข้อ · ข้อแรก 30.03 วิ · ช้าสุด 32.43 วิ
+s2b-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 3/3): ถูก 13/40 = 32% · เรียกสกิลทั้งที่ไม่ควร 0/0 = 0%
+  direct: 11/20
+  paraphrase: 2/20
+  ถาม AI 39 ข้อ · median 29.94 วิ/ข้อ · ข้อแรก 25.56 วิ · ช้าสุด 32.41 วิ
+end s2b-user50 2026-11-07T12:35:10+07:00 temp=82.9 throttled=0xe0008 avail_mb=5795
+server-VmHWM: 4703712 kB
+server-VmRSS: 4703712 kB
+ALL-DONE 2026-11-07T12:35:10+07:00

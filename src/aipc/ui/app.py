@@ -14,10 +14,12 @@ from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
 from aipc import i18n
 from aipc.ui.backend import (
+    AudioController,
     BackupController,
     ChatController,
     CloudUsage,
     FilesBrowser,
+    GmailLink,
     I18nBridge,
     LoginController,
     PowerController,
@@ -279,8 +281,8 @@ def build(opts: Options, argv: list[str] | None = None):
     # AI เลือกสกิลได้ (อาจารย์ขอ · งานข้อ ④): รายการสกิลอ่านจาก SkillsController ตอนส่งทุกครั้ง
     holder: dict = {}
 
-    def tools(text: str = "") -> list:
-        return holder["skills"].tool_catalog(text) if "skills" in holder else []
+    def tools(text: str = "", user: bool = True) -> list:
+        return holder["skills"].tool_catalog(text, user=user) if "skills" in holder else []
 
     in_session = not opts.greeter_session
     budget = ledger = None
@@ -316,6 +318,21 @@ def build(opts: Options, argv: list[str] | None = None):
                           cloud_model=lambda: ui_settings.cloudModel,
                           cloud_effort=lambda: ui_settings.cloudEffort,
                           auto_cloud=True)  # fmt: skip
+
+    def _on_claude_connected() -> bool:
+        """เชื่อมต่อ Claude ที่เครื่องนี้เสร็จ (การ์ด 0070 รอบ 3) · ใช้ได้เลยไม่ต้องออกจากระบบ:
+        เพิ่งติดตั้ง = สร้างตัวส่งต่อ + ตัวสร้างสกิลตอนนี้ · เปิด "ให้ถาม Claude" (ผู้ใช้เพิ่งเชื่อมต่อเอง)."""
+        if chat._cloud is None:
+            chat._cloud = _cloud_client(budget, ledger)
+        skills = engine._backends["skills"]
+        if skills._forge is None:
+            skills._forge = _skill_forge(budget, ledger)
+            chat._forge = skills._forge is not None
+        if chat._cloud is None:
+            return False
+        ui_settings.setUseClaude(True)
+        return True
+
     engine._backends = {
         "uiSettings": ui_settings,
         "system": SystemStatus(),
@@ -353,7 +370,13 @@ def build(opts: Options, argv: list[str] | None = None):
             chat_switch=_chat_switch(chat, ui_settings),
         ),
         "chat": chat,
-        "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
+        "gmailLink": GmailLink(active=in_session),  # การ์ด 0072: เชื่อม Gmail แบบอ่านอย่างเดียว
+        "cloudUsage": CloudUsage(
+            budget,
+            available=chat._cloud is not None,
+            ledger=ledger,
+            on_connected=_on_claude_connected if in_session else None,
+        ),  # fmt: skip
         # แผงความเป็นส่วนตัวแบบสด (2026-10-07) · หน้า Login ไม่มีเจ้าของข้อมูล → ไม่แสดง
         "privacyStatus": PrivacyStatus(
             ledger=ledger,
@@ -365,6 +388,8 @@ def build(opts: Options, argv: list[str] | None = None):
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session, face_to_speak=lambda: ui_settings.faceToSpeak),
+        # ระดับเสียงในหน้าตั้งค่า (2026-10-27) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่แตะเสียง
+        "audio": AudioController(active=in_session),
         "browser": browser_ctl,
         # เลือก Wi-Fi จากแถบบน (การ์ด 0063) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่เปิด
         "wifi": WifiController(active=in_session),

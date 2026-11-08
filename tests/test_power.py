@@ -22,6 +22,9 @@ NOT_POWER = [
     "รีสตาร์ตแล้วยังช้าอยู่", "ปิดคอมแล้วข้อมูลหายไหม", "ช่วยสรุปเรื่องการปิดเครื่อง", "ปิดกล้อง",
     "ทุกครั้งที่ปิดเครื่องให้สำรองไฟล์", "ปิดเครื่องได้ไหมตอนอัปเดต",
 ]  # fmt: skip
+# ประโยคที่มี "ออกจาก…" แต่ไม่ใช่สั่งออกจากระบบเครื่อง
+NOT_LOGOUT = ["ออกจากเต็มจอ", "ออกจากระบบ Gmail ยังไง", "ทำไมออกจากระบบเอง", "อย่าออกจากระบบนะ",
+              "ออกจากระบบแล้วข้อมูลหายไหม", "ออกจากระบบอีก 10 นาที"]  # fmt: skip
 
 
 class ParseTest(unittest.TestCase):
@@ -35,13 +38,23 @@ class ParseTest(unittest.TestCase):
             self.assertTrue(c.needs_confirmation, text)  # ความเสี่ยงสูง = ถามเสมอแม้ได้ยินชัด
 
     def test_p4_other_sentences_are_not_power(self):
-        parsed = [(t, command.parse(t)) for t in NOT_POWER]
-        wrong = [t for t, c in parsed if c and c.plan.action in ("power_off", "reboot")]
+        parsed = [(t, command.parse(t)) for t in NOT_POWER + NOT_LOGOUT]
+        wrong = [t for t, c in parsed if c and c.plan.action in ("power_off", "reboot", "logout")]
         self.assertEqual(wrong, [])
+
+    def test_logout_and_misheard_restart_need_confirmation(self):
+        """Pakon ที่จอ 2026-10-27: พูด "ออกจากระบบ" ไม่ได้ · "รีสตาร์ท" ถอดได้ "รีสตาส"."""
+        for text, action in (("ออกจากระบบ", "logout"), ("ออกจากระบบเลย", "logout"),
+                             ("ช่วยออกจากระบบให้หน่อย", "logout"), ("logout", "logout"),
+                             ("รีสตาส", "reboot"), ("รีสตาสเครื่อง", "reboot")):  # fmt: skip
+            c = command.parse(text)
+            self.assertEqual(c.plan.action, action, text)
+            self.assertTrue(c.needs_confirmation, text)
 
     def test_command_is_a_fixed_list(self):
         self.assertEqual(actions.command_for(actions.Plan("power_off")), ["systemctl", "poweroff"])
         self.assertEqual(actions.command_for(actions.Plan("reboot")), ["systemctl", "reboot"])
+        self.assertEqual(actions.command_for(actions.Plan("logout")), ["labwc", "--exit"])
 
 
 @unittest.skipIf(PowerController is None, "ไม่มี PySide6")
@@ -88,6 +101,14 @@ class VoiceCardTest(unittest.TestCase):
         card = self.s.handle("รีสตาร์ตเครื่อง")
         self.s.confirm(card["confirmToken"], True)
         self.assertEqual(self.calls, [["systemctl", "reboot"]])
+
+    def test_logout_asks_first_then_ends_the_session(self):
+        card = self.s.handle("ออกจากระบบ")
+        self.assertTrue(card["power"])
+        self.assertIn("ออกจากระบบ", card["title"])
+        self.assertEqual(self.calls, [])
+        self.s.confirm(card["confirmToken"], True)
+        self.assertEqual(self.calls, [["labwc", "--exit"]])
 
     def test_old_token_cannot_be_reused(self):
         card = self.s.handle("ปิดเครื่อง")

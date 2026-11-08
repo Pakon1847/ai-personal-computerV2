@@ -40,7 +40,7 @@ def tearDownModule():
 
 
 try:
-    from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer
+    from PySide6.QtCore import Q_ARG, QCoreApplication, QEventLoop, QMetaObject, QObject, QTimer
 
     from aipc.ui import app as uiapp
 except ImportError:  # pragma: no cover
@@ -140,6 +140,40 @@ class ChatInputTest(unittest.TestCase):
             # ข้อความของผู้ใช้ 1 + ประกาศจากระบบว่ายังไม่มีโมเดล 1
             self.assertEqual(chat_list.property("count"), 2, "Enter ต้องส่ง")
             self.assertEqual(chat_input.property("text"), "")
+            self.assertEqual(warnings, [])
+            win.close()
+            uiapp.shutdown(engine)
+
+    def test_arrow_keys_choose_and_enter_answers_the_confirm_card(self):
+        """Pakon 2026-10-27: การ์ดใช่/ไม่ใช่ เลือกด้วยลูกศร · Enter ยืนยัน (ช่องพิมพ์ว่าง)."""
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+
+        with tempfile.TemporaryDirectory() as tmp:
+            opts = uiapp.Options(screen="shell", software=True, settings_path=Path(tmp) / "ui.json")
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            win = engine.rootObjects()[0]
+            win.resize(1280, 800)  # ให้รายการแชทสูงพอ สร้างการ์ดจริง
+            chat_input = win.findChild(QObject, "chatInput")
+            page = find_all(win, "workspace")[0]
+            chat_input.forceActiveFocus()
+            settle(100)
+            chat_input.setProperty("text", "ปิดเครื่อง")  # การ์ดยืนยันเสมอ (หน้าต่างพัฒนาไม่ปิดจริง)
+            QTest.keyClick(win, Qt.Key.Key_Return)
+            settle(200)
+            self.assertTrue(page.property("keyToken"), "มีการ์ดรอตอบ")
+            self.assertEqual(page.property("keyChoice"), 0)  # เริ่มที่ "ใช่" (ปุ่มสีหลักเดิม)
+            QTest.keyClick(win, Qt.Key.Key_Right)
+            settle(100)
+            self.assertEqual(page.property("keyChoice"), 1)
+            no = [b.property("kind") for b in find_items(win, "confirmNo")]  # รวมการ์ดในรายการแชท
+            self.assertIn("primary", no, "ปุ่มที่เลือกต้องมีสี")
+            QTest.keyClick(win, Qt.Key.Key_Return)  # Enter = ตอบ "ไม่ใช่"
+            settle(200)
+            self.assertEqual(page.property("keyToken"), "", "ตอบแล้ว ไม่มีการ์ดรอ")
+            titles = [((i or {}).get("card") or {}).get("title", "") for i in items_of(page)]
+            self.assertIn("ยกเลิกแล้ว ไม่ได้ทำอะไร", titles)
             self.assertEqual(warnings, [])
             win.close()
             uiapp.shutdown(engine)
@@ -447,6 +481,71 @@ class ShellCardTest(unittest.TestCase):
             page.setProperty("items", items)
             settle(200)
             self.assertTrue(chat_list.property("atYEnd"), f"ข้อความที่ {i}: ต้องเห็นข้อความล่าสุด")
+        self.assertEqual(warnings, [])
+
+    def test_chat_stays_where_the_user_scrolled(self):
+        # พบบน Pi 5 2026-10-27 (Pakon): เลื่อนแชทขึ้นไม่ได้ ถูกดึงกลับล่างสุดทุกครั้ง ·
+        # สาเหตุ: ความสูงเนื้อหาเปลี่ยนระหว่างวาดข้อความเก่า → onContentHeightChanged เลื่อนลงล่างสุดเสมอ
+        _, win, warnings = self.open_shell()
+        win.resize(1280, 800)
+        page = find_all(win, "workspace")[0]
+        chat_list = find_all(win, "chatList")[0]
+        items = []
+        for i in range(12):
+            items += [
+                {"user": True, "text": f"ถาม {i} " + "คำถาม " * 30},
+                {"ai": True, "text": f"คำตอบ {i} " + "ข้อความ " * 150, "note": "", "done": True},
+            ]
+        page.setProperty("items", items)
+        settle(300)
+        self.assertTrue(chat_list.property("atYEnd"))
+        # ผู้ใช้ปัดขึ้น (ท่าเดียวกับนิ้ว/ล้อเมาส์ · เกิด movementStarted/Ended)
+        QMetaObject.invokeMethod(chat_list, "flick", Q_ARG(float, 0.0), Q_ARG(float, 6000.0))
+        settle(2500)
+        self.assertFalse(chat_list.property("atYEnd"), "เลื่อนขึ้นแล้วต้องอยู่ที่เดิม ไม่ถูกดึงลงล่างสุด")
+        # คำตอบกำลังพิมพ์ (จำนวนข้อความเท่าเดิม) ระหว่างผู้ใช้อ่านข้างบน → ไม่ดึงลง
+        items[-1] = {**items[-1], "text": items[-1]["text"] + " ต่อ"}
+        page.setProperty("items", items)
+        settle(300)
+        self.assertFalse(chat_list.property("atYEnd"), "อ่านข้างบนอยู่ คำตอบที่ยาวขึ้นต้องไม่ดึงลง")
+        page.setProperty("items", items + [{"user": True, "text": "ถามใหม่"}])  # ส่งข้อความใหม่
+        settle(300)
+        self.assertTrue(chat_list.property("atYEnd"), "ข้อความใหม่ = ไปล่างสุดเหมือนเดิม")
+        self.assertEqual(warnings, [])
+
+    def test_history_button_toggles_and_shows_the_open_chat(self):
+        # Pakon ที่จอ 2026-10-27: กดประวัติแล้วกดปิดไม่ได้ · อยากเห็นสีว่ากดอันไหน
+        engine, win, warnings = self.open_shell()
+        button = find_all(win, "historyButton")[0]
+        popup = find_all(win, "historyPopup")[0]
+        button.clicked.emit()
+        settle()
+        self.assertTrue(popup.property("opened"))
+        self.assertEqual(button.property("kind"), "primary")  # เปิดอยู่ = มีสี
+        button.clicked.emit()  # กดซ้ำ = ปิด
+        settle(400)
+        self.assertFalse(popup.property("opened"))
+        self.assertEqual(button.property("kind"), "secondary")
+        settle(400)
+        button.clicked.emit()
+        settle()
+        find_all(win, "historyClose")[0].clicked.emit()  # ปุ่ม ✕
+        settle(400)
+        self.assertFalse(popup.property("opened"))
+        # คลิกเมาส์จริงที่ปุ่ม (การกดนอกหน้าต่างปิดมันก่อน แล้วปุ่มเคยเปิดใหม่ทันที = ปิดไม่ได้)
+        from PySide6.QtCore import QPointF, Qt
+        from PySide6.QtTest import QTest
+
+        settle(400)
+        at = button.mapToScene(QPointF(button.width() / 2, button.height() / 2)).toPoint()
+        QTest.mouseClick(win, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, at)
+        settle(400)
+        self.assertTrue(popup.property("opened"))
+        QTest.mouseClick(win, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, at)
+        settle(400)
+        self.assertFalse(popup.property("opened"), "คลิกปุ่มประวัติซ้ำต้องปิด")
+        chat = engine.rootContext().contextProperty("chat")
+        self.assertTrue(chat.property("currentId"))  # บทสนทนาที่เปิดอยู่ให้หน้าประวัติไฮไลต์
         self.assertEqual(warnings, [])
 
     def test_ai_answers_draw_without_warnings(self):
@@ -994,6 +1093,166 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(find_items(win, "claudeGuide")[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_claude_logout_button(self):
+        """การ์ด 0070 L1: กดสองครั้ง · รัน claude auth logout · ออกแล้วปิดถาม Claude + เห็นปุ่มเชื่อมต่อ."""
+        import subprocess
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        ran = []
+
+        def fake_run(argv, **kw):
+            ran.append(argv)
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        usage._run, usage._find, usage._available = fake_run, lambda: "/x/claude", True
+        usage.changed.emit()
+        engine._backends["uiSettings"].setUseClaude(True)
+        settle(50)
+        btn = find_items(win, "claudeLogoutButton")[0]
+        self.assertTrue(btn.isVisible())
+        btn.clicked.emit()
+        settle(50)
+        self.assertEqual(ran, [])  # กดครั้งแรก = ถามยืนยัน
+        self.assertIn("อีกครั้ง", btn.property("text"))
+        btn.clicked.emit()
+        for _ in range(100):
+            settle(20)
+            if usage.logoutState != "busy":
+                break
+        self.assertEqual(ran, [["/x/claude", "auth", "logout"]])
+        self.assertEqual(usage.logoutState, "done")
+        self.assertFalse(engine._backends["uiSettings"].useClaude)
+        self.assertFalse(btn.isVisible())
+        self.assertTrue(find_items(win, "claudeGuideButton")[0].isVisible())
+        self.assertIn("ออกจาก Claude แล้ว", find_items(win, "claudeLogoutText")[0].property("text"))
+        # Pakon 2026-10-28: เข้าใหม่ผ่านหน้าต่างคำสั่งในเครื่องได้จากหน้าตั้งค่าเลย (มี lxterminal เท่านั้น)
+        here = find_items(win, "settingsConnectHere")[0]
+        usage._terminal = ""  # ไม่มี lxterminal (Pi มีจริง · วินโดวส์ไม่มี) = ไม่มีปุ่ม
+        usage.guideChanged.emit()
+        settle(50)
+        self.assertFalse(here.isVisible())
+        usage._terminal = "/usr/bin/lxterminal"
+        usage.guideChanged.emit()
+        settle(50)
+        self.assertTrue(here.isVisible())
+        self.assertEqual(warnings, [])
+
+    def test_claude_daily_level_without_money(self):
+        """Pakon 2026-10-28: เลือกเพดานต่อวันได้อีก แต่เป็นระดับ ไม่แสดงเงิน · แสดง % ที่ใช้ไปวันนี้."""
+        from aipc.cloud.budget import Budget
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._b = Budget(Path(os.environ["XDG_DATA_HOME"]) / "usage-level.json")
+        usage._b.record(0.25, "ask")
+        usage._available = True
+        engine._backends["uiSettings"].setUseClaude(True)
+        usage.changed.emit()
+        settle(50)
+        text = find_items(win, "cloudLevelText")[0].property("text")
+        self.assertIn("25%", text)
+        names = [b.property("text") for b in find_items(win, "cloudLevel_5")]
+        self.assertEqual(names, ["มากที่สุด"])
+        texts, stack = [], [find_items(win, "cloudUsageCard")[0]]
+        while stack:
+            item = stack.pop()
+            if item.isVisible() and isinstance(item.property("text"), str):
+                texts.append(item.property("text"))
+            stack.extend(item.childItems())
+        self.assertFalse([t for t in texts if "$" in t])
+        find_items(win, "cloudLevel_5")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(usage._b.limit, 5.0)
+        self.assertIn("5%", find_items(win, "cloudLevelText")[0].property("text"))
+        self.assertEqual(warnings, [])
+
+    def test_gmail_card_connects_read_only(self):
+        """การ์ด 0072 G1: ไม่มีไฟล์ OAuth client = บอกตรง ๆ ไม่มีปุ่ม · มี = กดเชื่อมต่อ (Google ปลอม) ·
+        เลิกเชื่อมต่อต้องกดสองครั้ง."""
+        from aipc.cloud import gmail_api
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        link = engine.rootContext().contextProperty("gmailLink")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        state = {"linked": False, "opened": []}
+
+        class Api:
+            GmailError = gmail_api.GmailError
+            client = tmp / "no-client.json"
+
+            def client_path(self):
+                return self.client
+
+            def connected(self):
+                return state["linked"]
+
+            def connect(self, opener):
+                opener("https://accounts.google.com/o/oauth2/auth?scope=gmail.readonly")
+                state["linked"] = True
+
+            def disconnect(self):
+                state["linked"] = False
+
+        api = Api()
+        link._api, link._active, link._open_url = api, True, state["opened"].append
+        link.changed.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "gmailMissing")[0].isVisible())
+        self.assertFalse(find_items(win, "gmailConnect")[0].isVisible())
+        api.client = tmp / "google_credentials.json"
+        api.client.write_text("{}", "utf-8")
+        link.changed.emit()
+        settle(50)
+        btn = find_items(win, "gmailConnect")[0]
+        self.assertTrue(btn.isVisible())
+        btn.clicked.emit()
+        for _ in range(100):
+            settle(20)
+            if not link.busy:
+                break
+        self.assertEqual(len(state["opened"]), 1)
+        self.assertIn("เชื่อมต่อ Gmail แล้ว", find_items(win, "gmailText")[0].property("text"))
+        off = find_items(win, "gmailDisconnect")[0]
+        self.assertTrue(off.isVisible())
+        off.clicked.emit()
+        settle(30)
+        self.assertTrue(state["linked"])  # กดครั้งแรก = ถามยืนยัน
+        off.clicked.emit()
+        settle(30)
+        self.assertFalse(state["linked"])
+        self.assertTrue(find_items(win, "gmailConnect")[0].isVisible())
+        self.assertEqual(warnings, [])
+
+    def test_claude_logout_failure_says_so(self):
+        """การ์ด 0070 L1: คำสั่งล้ม = บอกไม่สำเร็จ ไม่เปลี่ยนค่าอื่น (H5)."""
+        import subprocess
+
+        engine, win, warnings = self.open_shell("settings")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._find = lambda: "/x/claude"
+
+        def boom(argv, **kw):
+            raise subprocess.TimeoutExpired(argv, 20)
+
+        usage._run = boom
+        engine._backends["uiSettings"].setUseClaude(True)
+        usage.logout()
+        for _ in range(100):
+            settle(20)
+            if usage.logoutState != "busy":
+                break
+        self.assertEqual(usage.logoutState, "failed")
+        self.assertIn("ไม่สำเร็จ", usage.logoutText)
+        self.assertTrue(engine._backends["uiSettings"].useClaude)
+        usage._find = lambda: None
+        usage.logout()
+        self.assertIn("ไม่พบโปรแกรม Claude", usage.logoutText)
+        self.assertEqual(warnings, [])
+
     def test_claude_connect_card_on_assistant_page(self):
         """การ์ด 0021 เกณฑ์ข้อ 3ข: หน้าผู้ช่วยมีแถบเชื่อมต่อใต้คำทักทาย · กดแล้วขั้นตอนขึ้นกลางจอ ·
         "ไว้ทีหลัง" ซ่อน · มี claude แล้วไม่แสดง."""
@@ -1067,12 +1326,31 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(inner.endswith("-m aipc.cloud.connect"))
         self.assertIn(Path(sys.executable).name, inner)
         self.assertFalse(btn.property("enabled"))
+        import subprocess
+
         usage._find = lambda: "/home/pakon/.local/bin/claude"
+        status = []
+
+        def auth(argv, **kw):
+            status.append(argv)
+            return subprocess.CompletedProcess(argv, 0, f'{{"loggedIn": {logged}}}', "")
+
+        logged, usage._run = "false", auth  # ปิดหน้าต่างโดยยังไม่เข้า = ยังไม่เชื่อมต่อ (H5)
         proc.done = True
         usage._check_connect()
         settle(30)
+        self.assertFalse(usage.connectedNow)
+        self.assertEqual(status, [["/home/pakon/.local/bin/claude", "auth", "status"]])
+        usage._proc, logged = proc, "true"
+        # Pakon 2026-10-28: "เชื่อมต่อแล้วต้องใช้ได้เลย" · ไม่ต้องออกจากระบบ
+        made = []
+        usage._on_connected = lambda: made.append(1) or True
+        usage._check_connect()
+        settle(30)
         self.assertTrue(usage.connectedNow)
+        self.assertEqual((made, usage.available), ([1], True))
         self.assertTrue(find_items(win, "claudeConnectedNow")[0].isVisible())
+        self.assertIn("ใช้ได้เลย", find_items(win, "claudeConnectedNow")[0].property("text"))
         self.assertTrue(btn.property("enabled"))
         usage._terminal = ""  # ไม่มีเทอร์มินัล = เหลือทาง SSH
         usage.guideChanged.emit()

@@ -45,6 +45,8 @@ ACTIONS: dict[str, ActionSpec] = {
         # การ์ด 0052: ปิด/รีสตาร์ตเครื่อง = ความเสี่ยงสูง → ถามยืนยันเสมอ (Command.needs_confirmation)
         ActionSpec("power_off", "high", "ปิดเครื่อง"),
         ActionSpec("reboot", "high", "รีสตาร์ตเครื่อง"),
+        # ออกจากระบบด้วยคำสั่ง (Pakon อนุมัติ 2026-10-27) · ทางเดียวกับปุ่มออก · ถามยืนยันเสมอ
+        ActionSpec("logout", "high", "ออกจากระบบ"),
         ActionSpec("lock_screen", "low", "ล็อกหน้าจอ"),  # การ์ด 0051 · ปลดด้วยรหัสผ่าน · ไม่ออกจากระบบ
         # การ์ด 0051: ดึงปฏิทิน Google ใหม่ทันที · หน้าจอทำเอง (ไม่ใช่โปรแกรมภายนอก)
         ActionSpec("gcal_sync", "low", "ดึงปฏิทิน Google ใหม่", needs_network=True),
@@ -139,6 +141,9 @@ PAGE_SCREEN = {"privacy": "settings"}
 # การ์ด 0052: ผ่าน systemd-logind · polkit ของ Pi 5 ให้คนที่นั่งหน้าเครื่องทำได้เลย (implicit active: yes) ·
 # ทาง SSH ต้องใช้รหัสผู้ดูแล · systemd ปิดโปรแกรมและเขียนดิสก์ให้เสร็จก่อนดับ (ไม่ใช่ดึงปลั๊ก · H1)
 POWER_CMDS = {"power_off": ["systemctl", "poweroff"], "reboot": ["systemctl", "reboot"]}
+# เหมือนปุ่มออกจากระบบ (backend.SessionController.EXIT_CMD): จบ labwc →
+# aipc-session ปิดทุกโปรเซส → greetd กลับหน้า Login
+LOGOUT_CMD = ("labwc", "--exit")
 
 SINK = "@DEFAULT_AUDIO_SINK@"  # ลำโพงหลักของ PipeWire (ระบบเสียงของ Raspberry Pi OS)
 
@@ -271,6 +276,8 @@ def command_for(plan: Plan) -> list[str] | None:
         return ["wpctl", "set-mute", SINK, "1" if plan.action == "mute" else "0"]
     if plan.action in POWER_CMDS:
         return list(POWER_CMDS[plan.action])
+    if plan.action == "logout":
+        return list(LOGOUT_CMD)
     if plan.action == "lock_screen":
         # ตัวล็อกเดียวกับล็อกเมื่อไม่ได้ใช้ (aipc.ui.idle): gtklock รุ่น 2 (การ์ด 0055) หรือ swaylock รุ่น 1
         from aipc.ui import idle

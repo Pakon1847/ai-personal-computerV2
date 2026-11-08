@@ -149,9 +149,11 @@ class Stream:
     """ถาม 1 ครั้ง · on_token ถูกเรียกทุก token (จากเธรดที่เรียก run) · abort() เรียกจากเธรดไหนก็ได้."""
 
     def __init__(self, target: Target, messages: list[dict], timeout: float = 600,
-                 tools: list[dict] | None = None):  # fmt: skip
+                 tools: list[dict] | None = None, choice: str = "auto"):  # fmt: skip
         self.target, self.messages, self.timeout = target, messages, timeout
         self.tools = tools or []  # สกิลที่ AI เลือกได้ (tool calling ของ llama-server · --jinja)
+        # "required" = ต้องเรียกเครื่องมือ 1 ตัว (การ์ด 0074 · ใส่ catalog.ANSWER ไว้ในรายการ)
+        self.choice = choice
         self._conn: http.client.HTTPConnection | None = None
         self._sock: socket.socket | None = (
             None  # http.client ทิ้ง conn.sock เมื่อคำตอบเป็น stream จึงเก็บไว้เอง
@@ -172,7 +174,7 @@ class Stream:
                 "max_tokens": MAX_TOKENS, **SAMPLING}  # fmt: skip
         if self.tools:
             body["tools"] = self.tools
-            body["tool_choice"] = "auto"
+            body["tool_choice"] = self.choice
         reply = Reply()
         try:
             self._conn = self.target.connect(self.timeout)

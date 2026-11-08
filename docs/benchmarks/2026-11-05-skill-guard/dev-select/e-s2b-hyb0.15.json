@@ -1,0 +1,412 @@
+{
+ "variant": "hybrid",
+ "min_score": 0.15,
+ "n_user": 50,
+ "correct": 24,
+ "total": 40,
+ "false_calls": 0,
+ "none_total": 0,
+ "to_user_wrong": 0,
+ "rows": [
+  {
+   "id": "u001",
+   "text": "ทำบราวนี่อยู่แล้วเนยหมดพอดี ใช้อะไรแทนได้บ้างคะ",
+   "expect": "recipe-substitute",
+   "kind": "direct",
+   "got": "recipe-substitute",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u002",
+   "text": "ล้มตัวลงบนเตียงแล้วก็ตาค้างอยู่อย่างนั้นทุกคืน ตื่นมาก็มึนทั้งวัน ช่วงก่อนเข้าเตียงควรทำหรือเลิกทำอะไรบ้างครับ",
+   "expect": "sleep-hygiene",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u003",
+   "text": "ใน Excel อยากนับว่าคอลัมน์ B มีกี่ช่องที่เขียนว่า “ผ่าน” ต้องใช้สูตรอะไรครับ",
+   "expect": "excel-formula",
+   "kind": "direct",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u004",
+   "text": "เจ้าตูบตัวเล็กที่บ้าน เรียกชื่อแล้วไม่ยอมมาหา แถมกระโดดใส่แขกตลอด อยากสอนให้มันนั่งรอเป็น แล้วเรียกทีไรก็มาทันที ต้องเริ่มยังไง",
+   "expect": "dog-training",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u005",
+   "text": "จะไปเที่ยวญี่ปุ่นคนเดียวครั้งแรก เรื่องความปลอดภัยมีอะไรต้องระวังบ้างคะ กลัวโดนล้วงกระเป๋า",
+   "expect": "travel-safety",
+   "kind": "direct",
+   "got": "travel-safety",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u006",
+   "text": "เพิ่งชงลาเต้แก้วโปรดเสร็จ อยากได้อะไรหวาน ๆ ชิ้นเล็ก ๆ มาแกล้ม อะไรจะไปด้วยกันได้ดีที่สุดคะ",
+   "expect": "coffee-pairing",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u007",
+   "text": "เลิกงานแล้ว จะนั่งดูสตรีมเกมแบบจัดเต็ม เซ็ตให้ทีนะ",
+   "expect": "gaming-time",
+   "kind": "direct",
+   "got": "gaming-time",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u008",
+   "text": "วิชาสังคมสั่งงานให้เขียนเรื่องผลกระทบของขยะพลาสติกยาวห้าหน้า ยังนึกไม่ออกว่าจะขึ้นต้นยังไง ตรงกลางควรเล่าอะไร แล้วตอนจบควรเป็นแบบไหน ช่วยไล่ลำดับให้ก่อนลงมือเขียนหน่อยครับ",
+   "expect": "essay-outline",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u009",
+   "text": "ไม่เคยเล่นโยคะเลย อยากลองฝึกเองที่บ้าน ควรเริ่มจากท่าไหนก่อนดีคะ",
+   "expect": "yoga-beginner",
+   "kind": "direct",
+   "got": "yoga-beginner",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u010",
+   "text": "แม่กำลังจะเกษียณ อยากหาอะไรสักชิ้นไปมอบให้ท่านเป็นที่ระลึก งบไม่เกินสามพัน ซื้ออะไรดีคะ",
+   "expect": "gift-by-occasion",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u011",
+   "text": "เสื้อเชิ้ตขาวเลอะซอสแกงกะหรี่ ซักยังไงให้คราบออกครับ",
+   "expect": "stain-removal",
+   "kind": "direct",
+   "got": "stain-removal",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u012",
+   "text": "ต้องนั่งติวสอบอีกยาว ห้องเงียบจนเคว้ง อยากได้ดนตรีบรรเลงสบาย ๆ เป็นพื้นหลังระหว่างทวนบทเรียน",
+   "expect": "music-study",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": "ฉันไม่สามารถเปิดเพลงหรือสร้างเสียงดนตรีให้คุณได้ค่ะ แต่ฉันสามารถแนะนำแหล่งข้อมูลเพลงบรรเลงที่ช่วยให้คุณมีสมาธิในการทบทวน"
+  },
+  {
+   "id": "u013",
+   "text": "เหงา ๆ อยากดูหนังรักซึ้ง ๆ สักเรื่อง แนะนำหน่อยดิ",
+   "expect": "movie-recommend",
+   "kind": "direct",
+   "got": "movie-recommend",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u014",
+   "text": "ยางอินเดียที่ปลูกไว้ข้างหน้าต่าง ใบล่าง ๆ เริ่มเหลืองแล้วร่วงทีละใบ ขอบใบบางใบก็เป็นสีน้ำตาลกรอบ ๆ มันเป็นอะไรไปคะ",
+   "expect": "plant-problem",
+   "kind": "paraphrase",
+   "got": "plant-problem",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u015",
+   "text": "ใกล้จะไปสัมภาษณ์งานตำแหน่งบัญชีแล้ว ช่วยเล่นเป็นคนสัมภาษณ์แล้วถามผมทีละข้อแบบของจริงหน่อยครับ",
+   "expect": "interview-practice",
+   "kind": "direct",
+   "got": "interview-practice",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u016",
+   "text": "รายได้เข้ามาทีไรไม่ทันไรก็หมด อยากรู้ว่าควรกันไว้เป็นค่าใช้จ่ายจำเป็นกี่ส่วน เก็บออมกี่ส่วน ซื้อของที่อยากได้กี่ส่วน มีหลักง่าย ๆ ให้ทำตามไหม",
+   "expect": "budget-rule",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u017",
+   "text": "หน้าฝนแบบนี้ปลูกผักอะไรขึ้นบ้างอ่ะ",
+   "expect": "gardening-season",
+   "kind": "direct",
+   "got": "gardening-season",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u018",
+   "text": "นั่งหน้าจอมาทั้งวัน ต้นคอกับบ่าตึงเปรี๊ยะเหมือนมีอะไรทับอยู่ อยากรู้ว่าควรขยับตัวแบบไหนให้หายตึง",
+   "expect": "stretch-routine",
+   "kind": "paraphrase",
+   "got": "machine-status",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u019",
+   "text": "จะสอบชีวะบทเซลล์ ช่วยทำแฟลชการ์ดถามตอบจากคำพวกนี้ให้หน่อย: ไมโทคอนเดรีย ไรโบโซม คลอโรพลาสต์ นิวเคลียส",
+   "expect": "flashcard-maker",
+   "kind": "direct",
+   "got": "flashcard-maker",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u020",
+   "text": "ต้องไปนั่งโต๊ะเดียวกับญาติฝั่งแฟนที่ไม่เคยเจอกันมาก่อน กลัวนั่งเงียบกันทั้งโต๊ะ ควรยกเรื่องอะไรขึ้นมาพูดให้บรรยากาศไม่อึดอัด",
+   "expect": "conversation-starter",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u021",
+   "text": "กำลังจะขับรถไปทำงาน ขอเช็กหน่อยว่าทางไปออฟฟิศรถติดแค่ไหน",
+   "expect": "map-commute",
+   "kind": "direct",
+   "got": "map-commute",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u022",
+   "text": "ตู้เสื้อผ้าอัดแน่นจนล้น ห้องก็รกไปหมด หลายอย่างไม่ได้แตะมาเป็นปีแล้ว อยากเคลียร์ให้โล่งแต่ตัดใจไม่เป็น ควรเริ่มจากตรงไหนก่อนดี",
+   "expect": "declutter-steps",
+   "kind": "paraphrase",
+   "got": "declutter-steps",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u023",
+   "text": "กินสเต๊กเนื้อ ควรจิบไวน์ตัวไหนดีครับ",
+   "expect": "wine-pairing",
+   "kind": "direct",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u024",
+   "text": "ต้องรู้ชื่อดาวเคราะห์ 8 ดวงเรียงจากใกล้ไปไกลดวงอาทิตย์ให้ขึ้นใจ แต่สลับทุกที ช่วยแต่งประโยคสนุก ๆ ที่เอาพยางค์แรกของแต่ละดวงมาเรียงต่อกันให้หน่อย",
+   "expect": "mnemonic-maker",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u025",
+   "text": "ก๊อกน้ำในห้องน้ำหยดติ๋ง ๆ ทั้งคืน พอจะซ่อมเองได้มั้ย ต้องใช้อุปกรณ์อะไรบ้าง",
+   "expect": "diy-fix",
+   "kind": "direct",
+   "got": "diy-fix",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u026",
+   "text": "จะไปกางเต็นท์บนดอยสองคืน ไม่อยากไปถึงแล้วขาดโน่นขาดนี่ ช่วยไล่มาให้หน่อยว่าต้องขนอะไรใส่กระเป๋าไปบ้าง",
+   "expect": "packing-list",
+   "kind": "paraphrase",
+   "got": "packing-list",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u027",
+   "text": "ขอแคปชันกวน ๆ ไว้ลงรูปแมวหงายท้องโชว์พุงในไอจีหน่อย",
+   "expect": "caption-ideas",
+   "kind": "direct",
+   "got": "caption-ideas",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u028",
+   "text": "นั่งทำงานทีไรเผลอหยิบมือถือมาไถอยู่เรื่อย ได้ยินเพื่อนพูดถึงการจับนาฬิกาทำงานเป็นรอบสั้น ๆ สลับพัก แบบที่ตั้งชื่อตามมะเขือเทศ มันทำยังไงเหรอ",
+   "expect": "pomodoro-explain",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u029",
+   "text": "รบกวนสอบถามค่ะ เพิ่งซื้อมอนสเตอร่ามาวางในห้องนั่งเล่น ต้องรดน้ำบ่อยแค่ไหน และควรให้โดนแดดหรือไม่คะ",
+   "expect": "plant-care",
+   "kind": "direct",
+   "got": "plant-care",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u030",
+   "text": "ต้มยำกุ้งหม้อใหญ่เดือดอยู่บนเตาแล้ว แต่โต๊ะยังดูโล่ง ๆ ควรทำอะไรอีกสักจานมาเสริมดี",
+   "expect": "side-dish-suggest",
+   "kind": "paraphrase",
+   "got": "side-dish-suggest",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u031",
+   "text": "ซ้อมวิ่ง 10 กิโลอยู่ แต่ช่วงท้ายหอบทุกที ควรคุมเพซกับการหายใจยังไงดี",
+   "expect": "running-pace",
+   "kind": "direct",
+   "got": "running-pace",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u032",
+   "text": "ในประวัติย่อที่จะยื่นสมัครงาน ผมเขียนไว้แค่ว่า “เคยช่วยทำเพจขายเสื้อผ้าของที่บ้าน” อ่านแล้วธรรมดาไปหน่อย ช่วยเรียบเรียงใหม่ให้มีน้ำหนักและน่าจ้างกว่านี้ได้ไหมครับ",
+   "expect": "resume-bullet",
+   "kind": "paraphrase",
+   "got": "summarize-text",
+   "by": "rule",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u033",
+   "text": "เพิ่งซื้อสมุดไดอารี่มา แต่จับปากกาแล้วคิดไม่ออกว่าจะเขียนอะไร ขอหัวข้อสัก 5 ข้อได้ไหม",
+   "expect": "journaling-prompt",
+   "kind": "direct",
+   "got": "journaling-prompt",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u034",
+   "text": "อยู่คอนโดคนเดียว งานเก็บกวาดชอบกองไว้ทำรวดเดียวจนหมดแรง อยากเกลี่ยงานเช็ด ถู กวาด ซัก ให้กระจายไปแต่ละวันแทน ช่วยแจกงานให้หน่อยว่าวันไหนควรทำอะไร",
+   "expect": "cleaning-schedule",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  },
+  {
+   "id": "u035",
+   "text": "ไปเชียงใหม่ 3 วัน 2 คืน ช่วยไล่ให้หน่อยว่าแต่ละวันควรไปเที่ยวที่ไหนบ้าง",
+   "expect": "itinerary-ideas",
+   "kind": "direct",
+   "got": "itinerary-ideas",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u036",
+   "text": "ใกล้ถึงคิวขึ้นพูดหน้าห้องแล้ว ใจเต้นตึกตักมือเย็นเฉียบ มีวิธีสูดลมเข้าออกลึก ๆ ช้า ๆ ให้ใจสงบลงเร็ว ๆ ไหม",
+   "expect": "breathing-exercise",
+   "kind": "paraphrase",
+   "got": "breathing-exercise",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u037",
+   "text": "ไม่เคยดูแลหน้าเลย อยากเริ่มบ้าง ล้างหน้าเสร็จแล้วต้องทาอะไรต่อ เรียงยังไงคะ",
+   "expect": "skincare-basic",
+   "kind": "direct",
+   "got": "skincare-basic",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u038",
+   "text": "ติดนิยายสืบสวนแบบของอกาธา คริสตี้งอมแงม เล่มที่มีอยู่ก็จบหมดแล้ว มีเล่มไหนที่น่าจะถูกใจอีกบ้าง",
+   "expect": "book-recommend",
+   "kind": "paraphrase",
+   "got": "book-recommend",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u039",
+   "text": "ได้ญัตติโต้วาทีมาว่า “ควรให้นักเรียนใช้มือถือในห้องเรียนไหม” ช่วยหาข้อโต้แย้งทั้งฝั่งเห็นด้วยและฝั่งค้านให้หน่อย",
+   "expect": "debate-points",
+   "kind": "direct",
+   "got": "debate-points",
+   "by": "ai",
+   "ok": true,
+   "text_out": ""
+  },
+  {
+   "id": "u040",
+   "text": "เพิ่งหัดทำผัดไทยเป็นครั้งแรก อยากได้วิดีโอที่ให้เห็นกับตาว่าเขาผัดกันยังไง ตั้งไว้ข้างเตาแล้วทำตามไปด้วย",
+   "expect": "cooking-video",
+   "kind": "paraphrase",
+   "got": "none",
+   "by": "ai",
+   "ok": false,
+   "text_out": ""
+  }
+ ]
+}

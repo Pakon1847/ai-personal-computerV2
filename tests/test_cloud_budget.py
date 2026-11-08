@@ -23,6 +23,8 @@ class BudgetTest(unittest.TestCase):
         self.b.record(0.5, "skill")
         self.assertFalse(self.b.allow())
         self.assertIn("ครบเพดาน", self.b.blocked_message())
+        self.assertNotIn("$", self.b.blocked_message())  # Pakon 2026-10-28: ไม่แสดงเงิน
+        self.assertEqual(self.b.used_percent(), 100)
         self.assertEqual((self.b.spent(), self.b.calls()), (1.1, 2))
         self.day = date(2026, 10, 2)  # วันใหม่
         self.assertTrue(self.b.allow())

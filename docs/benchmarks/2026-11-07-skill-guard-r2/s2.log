@@ -1,0 +1,64 @@
+== S2 2026-11-07T15:04:15+07:00 model=/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf threads=3 ctx=4096 template= runs=s2a-user0 s2a-user50
+before-server 2026-11-07T15:04:15+07:00 temp=59.8 throttled=0xe0000 avail_mb=7353
+start s2a-user0 2026-11-07T15:04:21+07:00 temp=64.8 throttled=0xe0000 avail_mb=5786
+s2a-user0 (rules + AI · ai-first · สกิลผู้ใช้ 0 · รอบ 1/3): ถูก 103/120 = 86% · เรียกสกิลทั้งที่ไม่ควร 1/33 = 3%
+  direct: 40/42
+  paraphrase: 28/42
+  general: 24/24
+  trap: 11/12
+  ถาม AI 87 ข้อ · median 6.87 วิ/ข้อ · ข้อแรก 60.07 วิ · ช้าสุด 60.07 วิ
+s2a-user0 (rules + AI · ai-first · สกิลผู้ใช้ 0 · รอบ 2/3): ถูก 103/120 = 86% · เรียกสกิลทั้งที่ไม่ควร 1/33 = 3%
+  direct: 41/42
+  paraphrase: 27/42
+  general: 24/24
+  trap: 11/12
+  ถาม AI 87 ข้อ · median 6.62 วิ/ข้อ · ข้อแรก 8.39 วิ · ช้าสุด 12.21 วิ
+s2a-user0 (rules + AI · ai-first · สกิลผู้ใช้ 0 · รอบ 3/3): ถูก 104/120 = 87% · เรียกสกิลทั้งที่ไม่ควร 1/33 = 3%
+  direct: 41/42
+  paraphrase: 28/42
+  general: 24/24
+  trap: 11/12
+  ถาม AI 87 ข้อ · median 7.06 วิ/ข้อ · ข้อแรก 9.1 วิ · ช้าสุด 12.11 วิ
+end s2a-user0 2026-11-07T15:34:39+07:00 temp=82.9 throttled=0xe0008 avail_mb=5773
+start s2a-user50 2026-11-07T15:34:59+07:00 temp=59.8 throttled=0xe0000 avail_mb=5787
+s2a-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 1/3): ถูก 107/120 = 89% · เรียกสกิลทั้งที่ไม่ควร 4/33 = 12%
+  direct: 41/42
+  paraphrase: 34/42
+  general: 22/24
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 8.94 วิ/ข้อ · ข้อแรก 22.5 วิ · ช้าสุด 38.44 วิ
+s2a-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 2/3): ถูก 106/120 = 88% · เรียกสกิลทั้งที่ไม่ควร 4/33 = 12%
+  direct: 41/42
+  paraphrase: 33/42
+  general: 22/24
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 8.76 วิ/ข้อ · ข้อแรก 24.41 วิ · ช้าสุด 38.41 วิ
+s2a-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 3/3): ถูก 106/120 = 88% · เรียกสกิลทั้งที่ไม่ควร 4/33 = 12%
+  direct: 41/42
+  paraphrase: 33/42
+  general: 22/24
+  trap: 10/12
+  ถาม AI 87 ข้อ · median 8.74 วิ/ข้อ · ข้อแรก 23.38 วิ · ช้าสุด 38.4 วิ
+end s2a-user50 2026-11-07T16:26:51+07:00 temp=82.3 throttled=0xe0008 avail_mb=5745
+server-VmHWM: 4735840 kB
+server-VmRSS: 4735840 kB
+ALL-DONE 2026-11-07T16:26:51+07:00
+== S2 2026-11-07T16:27:32+07:00 model=/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf threads=3 ctx=4096 template= runs=s2b-user50
+before-server 2026-11-07T16:27:32+07:00 temp=59.3 throttled=0xe0000 avail_mb=7378
+start s2b-user50 2026-11-07T16:27:41+07:00 temp=63.1 throttled=0xe0000 avail_mb=5831
+s2b-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 1/3): ถูก 23/40 = 57% · เรียกสกิลทั้งที่ไม่ควร 0/0 = 0%
+  direct: 14/20
+  paraphrase: 9/20
+  ถาม AI 40 ข้อ · median 16.68 วิ/ข้อ · ข้อแรก 65.37 วิ · ช้าสุด 65.37 วิ
+s2b-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 2/3): ถูก 22/40 = 55% · เรียกสกิลทั้งที่ไม่ควร 0/0 = 0%
+  direct: 13/20
+  paraphrase: 9/20
+  ถาม AI 40 ข้อ · median 18.82 วิ/ข้อ · ข้อแรก 13.89 วิ · ช้าสุด 38.12 วิ
+s2b-user50 (rules + AI · ai-first · สกิลผู้ใช้ 50 · รอบ 3/3): ถูก 23/40 = 57% · เรียกสกิลทั้งที่ไม่ควร 0/0 = 0%
+  direct: 14/20
+  paraphrase: 9/20
+  ถาม AI 40 ข้อ · median 18.24 วิ/ข้อ · ข้อแรก 14.09 วิ · ช้าสุด 38.18 วิ
+end s2b-user50 2026-11-07T17:05:09+07:00 temp=84.0 throttled=0xe0008 avail_mb=5730
+server-VmHWM: 4827104 kB
+server-VmRSS: 4756672 kB
+ALL-DONE 2026-11-07T17:05:09+07:00

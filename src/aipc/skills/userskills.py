@@ -22,6 +22,9 @@ MAX_STRIKES = 2  # ผิด/ทำไม่สำเร็จติดกัน
 # สกิลที่ติดตั้งโดยไม่มีคนดูก่อน ห้ามทำสิ่งเหล่านี้ (ถึงตัวตรวจทั่วไปจะยอม):
 # เปิด URL ที่เขียนเอง (ลิงก์หลอกได้ · ใช้ได้เฉพาะเว็บในรายการของระบบ) · เปิดเทอร์มินัล (ช่องทางรันคำสั่ง)
 AUTO_DENY_APPS = frozenset({"terminal"})
+# ตัวทำงานที่ระบบมีให้สกิลของผู้ใช้ (การ์ด 0074): ขั้นตอน (code · code+llm) · งานภาษา (llm) · สกิลประจำเว็บ (code)
+# แบบอื่น (กล้อง+ภาพ · เสียง+llm) มีแต่สกิลในตัวที่มีโค้ดรองรับ · S1 b19 = สกิล "ถ่ายภาพเงียบ ๆ" ผ่านด่านเดิมได้
+USER_WORKERS = frozenset({"code", "code+llm", "llm"})
 
 
 def default_dir() -> Path:
@@ -44,17 +47,50 @@ def auto_policy(m: manifest.Manifest) -> list[str]:
             errors.append(f"สกิลอัตโนมัติเปิดได้เฉพาะเว็บในรายการของระบบ ไม่ใช่ลิงก์ {plan.params['url']}")
         if plan.action == "open_app" and plan.params.get("app") in AUTO_DENY_APPS:
             errors.append("สกิลอัตโนมัติเปิดเทอร์มินัลไม่ได้")
+    if m.worker not in USER_WORKERS:
+        errors.append(f"สกิลของผู้ใช้ใช้ worker “{m.worker}” ไม่ได้ (มีให้แค่ ขั้นตอน · งานภาษา · สกิลประจำเว็บ)")
+    # ขอได้เฉพาะสิทธิ์ที่ขั้นตอนใช้จริง (การ์ด 0074 · S1 b07 b17: ขอสั่งเครื่องทั้งที่ไม่มีขั้นสั่งเครื่อง
+    # = หน้าตรวจบอกสิทธิ์ไม่ตรงความจริง)
+    used = set()
+    if any(s.kind == "action" for s in m.steps):
+        used.add("run_actions")
+    if any(s.kind == "agenda" for s in m.steps):
+        used.add("read_agenda")
+    if m.commands:
+        used.add("page_actions")
+    if extra := [p for p in m.permissions if p not in used]:
+        labels = ", ".join(manifest.PERMISSIONS[p] for p in extra)
+        errors.append(f"ขอสิทธิ์ที่สกิลไม่ได้ใช้: {labels}")
+    # สกิลประจำเว็บไม่เข้าตัวคัดสกิล จึงไม่ผ่านด่านแย่งงานใน gate · ตัวอย่างของมันต้องเป็นคำพูดของคำสั่งในสกิล
+    # หรือคำสั่งเว็บที่ระบบรู้จัก (การ์ด 0074 รอบ 3 b44: ตัวอย่างเป็นงานเตือน/สรุป · b45: "เลื่อน" ไม่มีคำสั่งรองรับ
+    # = หน้าตรวจบอกผู้ใช้ว่าสกิลทำสิ่งที่ทำไม่ได้)
+    if m.site and (odd := [e for e in m.examples if not _site_example(e, m)]):
+        errors.append(f"ตัวอย่าง “{odd[0]}” ไม่ตรงกับคำสั่งใดในหัวข้อ “## คำสั่ง” ของสกิลประจำเว็บ")
     return errors
 
 
+def _site_example(text: str, m: manifest.Manifest) -> bool:
+    """ตัวอย่างเป็นส่วนหนึ่งของคำพูดในคำสั่ง (หรือคำพูดเป็นส่วนหนึ่งของตัวอย่าง) หรือระบบทำเองได้.
+
+    "เปิด/ปิดคำบรรยาย" = คนเขียนใช้ / แทน "หรือ" → ดูทีละส่วนด้วย (รอบ 2 g18 ตัวอย่าง "เปิดคำบรรยาย")
+    """
+    from aipc.skills import browse, command
+
+    key = command.normalize(text)
+    parts = [x for c in m.commands for p in c.phrases for x in (p, *p.split("/"))]
+    phrases = [command.normalize(x) for x in parts]
+    near = any(p and (key in p or p in key) for p in phrases)
+    return bool(key) and (near or bool(browse.parse(text)))
+
+
 def check_md(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
-    """ตัวตรวจเดียวกับ forge (mdskill + manifest + ขนาด) + นโยบายสกิลอัตโนมัติ."""
-    from aipc.skills import forge
+    """ตัวตรวจเดียวกับ forge (mdskill + manifest + ขนาด) + นโยบายสกิลอัตโนมัติ + เนื้อหา (การ์ด 0074)."""
+    from aipc.skills import contentcheck, forge
 
     m, errors = forge._validate(skill_md)
     if m is None:
         return None, errors
-    errors = auto_policy(m)
+    errors = auto_policy(m) + contentcheck.check(m, skill_md)
     return (None, errors) if errors else (m, [])
 
 
@@ -101,7 +137,34 @@ def _pick(text: str, skills: list[manifest.Manifest]) -> str:
     from aipc.skills import router
 
     r = router.route(text, skills, {"llm"})
-    return r.skill.id if r.skill and r.kind == "skill" else ""
+    if not (r.skill and r.kind == "skill"):
+        return ""
+    # ตัวคัดแบบกฎ (ทางสำรองตอนไม่มี AI) ส่งทุกประโยคที่บอกวัน/เวลาไปสกิลนัด และ "…แปลว่าอะไร" ไปสกิลแปล ·
+    # S1 สกิลดีถูกปฏิเสธเพราะสองข้อนี้ ("พรุ่งนี้จะไปเที่ยว" "เงินเฟ้อแปลว่าอะไร") → นับว่าแย่งเฉพาะเมื่อชัดจริง:
+    # นัด = มีคำสำคัญของสกิลนัด · แปล = มีคำต่างภาษา หรือคำสั่งแปลอื่นนอกจาก "แปลว่า" (การ์ด 0074 หัวข้อ 14 ข้อ 3)
+    # ไม่ใช้ทางเลือกของแอป (route_ai_first) แทน เพราะชุดพัฒนา S1 สกิลแย่งงานหลุดเพิ่ม 4 ตัว
+    if r.skill.id == "reminder" and not any(router.has_keyword(text, k) for k in r.skill.keywords):
+        return ""
+    if r.skill.id == "translate" and _meaning_question(text, r.skill):
+        return ""
+    return r.skill.id
+
+
+def _meaning_question(text: str, translate: manifest.Manifest) -> bool:
+    """ถามความหมายคำไทย ("เงินเฟ้อแปลว่าอะไร") ไม่ใช่ขอแปล.
+
+    มีตัวอักษรละติน ("serendipity แปลว่าอะไร") = ขอแปล
+    """
+    import re
+
+    from aipc.skills import router
+
+    hits = [k for k in translate.keywords if router.has_keyword(text, k)]
+    if hits != ["แปลว่า"]:
+        return False
+    # "error นี้แปลว่าอะไร" = ถามความหมายของสิ่งที่เห็น ไม่ใช่ขอแปลคำ
+    # (การ์ด 0074 รอบ 2 g14 · รอบแรก g16 เหมือนกัน)
+    return not re.search(r"[A-Za-z]", text) or bool(re.search(r"[A-Za-z]\s*(นี้|นั้น|นี่)", text))
 
 
 class UserSkills:

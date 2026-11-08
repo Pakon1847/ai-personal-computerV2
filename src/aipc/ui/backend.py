@@ -761,17 +761,98 @@ class VoiceController(QObject):
                 fast.close()
 
 
+class GmailLink(QObject):
+    """เชื่อมต่อ Gmail แบบอ่านอย่างเดียว (การ์ด 0072) · หน้าตั้งค่า หมวด AI ·
+    โทเค็นอยู่ใน ~/.local/share/aipc ของผู้ใช้."""
+
+    changed = Signal()
+    _finished = Signal(bool, str)
+
+    def __init__(self, api=None, open_url=None, active: bool = True):
+        super().__init__()
+        self._api, self._open_url, self._active = api, open_url, active
+        self._busy, self._text = False, ""
+        self._finished.connect(self._on_finished)
+
+    def _gmail(self):
+        if self._api is None:
+            from aipc.cloud import gmail_api
+
+            self._api = gmail_api
+        return self._api
+
+    @Property(bool, notify=changed)
+    def available(self) -> bool:
+        """มีไฟล์ OAuth client ของเครื่อง (google_credentials.json) · ไม่มี = บอกตามจริง ไม่มีปุ่ม (H5)."""
+        return self._active and self._gmail().client_path().is_file()
+
+    @Property(bool, notify=changed)
+    def connected(self) -> bool:
+        return self._active and self._gmail().connected()
+
+    @Property(bool, notify=changed)
+    def busy(self) -> bool:
+        return self._busy
+
+    @Property(str, notify=changed)
+    def text(self) -> str:
+        return self._text
+
+    @Slot()
+    def connect(self) -> None:
+        """เปิดหน้าขออนุญาตของ Google ในเบราว์เซอร์ แล้วรอ (เธรดแยก · จอไม่ค้าง)."""
+        import threading
+        import webbrowser
+
+        if self._busy or not self.available:
+            return
+        self._busy, self._text = True, "เปิดหน้าขออนุญาตของ Google แล้ว · เลือกบัญชี แล้วกด “อนุญาต” (Allow)"
+        self.changed.emit()
+        api, opener = self._gmail(), self._open_url or webbrowser.open
+
+        def work():
+            try:
+                api.connect(opener)
+                self._finished.emit(True, "เชื่อมต่อ Gmail แล้ว · พูด “สรุปเมล” หรือ “มีเมลใหม่ไหม” ได้เลย")
+            except api.GmailError as e:
+                self._finished.emit(False, str(e))
+            except Exception as e:  # noqa: BLE001
+                self._finished.emit(False, f"เชื่อมต่อ Gmail ไม่สำเร็จ ({type(e).__name__})")
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot()
+    def disconnect(self) -> None:
+        self._gmail().disconnect()
+        self._text = "เลิกเชื่อมต่อ Gmail แล้ว · ลบสิทธิ์ในเครื่องแล้ว"
+        self.changed.emit()
+
+    def _on_finished(self, ok: bool, text: str) -> None:
+        self._busy, self._text = False, text
+        self.changed.emit()
+
+
 class CloudUsage(QObject):
     """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget
     · ไม่มี Claude = available False."""
 
     changed = Signal()
     guideChanged = Signal()  # noqa: N815
+    _logoutFinished = Signal(bool, str)  # noqa: N815 · จากเธรดที่รัน claude auth logout → เธรดหน้าจอ
 
     def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None,
                  user: str | None = None, addresses=None, terminal=None, spawn=None,
-                 find=None):  # fmt: skip
+                 find=None, run=None, on_connected=None):  # fmt: skip
         super().__init__()
+        # เชื่อมต่อเสร็จ = ใช้ได้เลย ไม่ต้องออกแล้วเข้าใหม่ (Pakon 2026-10-28) ·
+        # on_connected() สร้างตัวส่งต่อ Claude ที่ยังไม่มี (เพิ่งติดตั้ง) + เปิด "ให้ถาม Claude" ·
+        # คืน True = แอปใช้ Claude ได้แล้ว
+        self._on_connected = on_connected
+        # ออกจาก Claude (การ์ด 0070) · run = ตัวรันคำสั่ง (เทสต์ใส่ของปลอม · None = subprocess.run)
+        self._run = run
+        self._logout_state = ""  # "" | busy | done | failed
+        self._logout_text = ""
+        self._logoutFinished.connect(self._logout_done)
         self._user = user or getpass.getuser()
         self._addresses = addresses  # ฟังก์ชันอ่าน IP (เทสต์ใส่ของปลอม) · None = setup_guide.addresses
         self._guide: list = []
@@ -851,11 +932,73 @@ class CloudUsage(QObject):
     def _check_connect(self) -> None:
         if self._proc is None or self._proc.poll() is None:
             return
+        import subprocess
+
+        from aipc.cloud import connect
         from aipc.cloud.ask import find_claude
 
         self._proc = None
         self._watch.stop()
-        self._connected_now = (self._find or find_claude)() is not None
+        exe = (self._find or find_claude)()
+        # เข้าสู่ระบบจริงไหม ถาม claude auth status (แค่มีโปรแกรม ≠ เข้าแล้ว · H5)
+        run = self._run or subprocess.run
+        self._connected_now = exe is not None and connect.logged_in(exe, run)
+        if self._connected_now:
+            if self._on_connected is not None:
+                self._available = bool(self._on_connected()) or self._available
+            self._logout_state, self._logout_text = "", ""
+        self.changed.emit()
+        self.guideChanged.emit()
+
+    # ---------- ออกจาก Claude (การ์ด 0070) ----------
+    @Property(str, notify=guideChanged)
+    def logoutState(self) -> str:  # noqa: N802
+        return self._logout_state
+
+    @Property(str, notify=guideChanged)
+    def logoutText(self) -> str:  # noqa: N802
+        return self._logout_text
+
+    @Slot()
+    def logout(self) -> None:
+        """รัน `claude auth logout` ของบัญชีนี้ (คำสั่งตายตัว ไม่ผ่าน shell · H7) ในเธรดแยก จอไม่ค้าง ·
+        ผลมาที่ logoutState / logoutText."""
+        import threading
+
+        from aipc.cloud.ask import find_claude
+
+        if self._logout_state == "busy":
+            return
+        exe = (self._find or find_claude)()
+        if exe is None:
+            self._logout_done(False, "ไม่พบโปรแกรม Claude ในบัญชีนี้")
+            return
+        self._logout_state, self._logout_text = "busy", ""
+        self.guideChanged.emit()
+        threading.Thread(target=self._do_logout, args=(exe,), daemon=True).start()
+
+    def _do_logout(self, exe: str) -> None:
+        import subprocess
+
+        try:
+            r = (self._run or subprocess.run)(
+                [exe, "auth", "logout"], stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                timeout=20,
+            )  # fmt: skip
+            ok, detail = r.returncode == 0, (r.stderr or r.stdout or "").strip()
+        except subprocess.TimeoutExpired:
+            ok, detail = False, "คำสั่งไม่ตอบใน 20 วินาที"
+        except OSError as e:
+            ok, detail = False, str(e)
+        self._logoutFinished.emit(ok, detail[:120])
+
+    def _logout_done(self, ok: bool, detail: str) -> None:
+        self._logout_state = "done" if ok else "failed"
+        self._logout_text = (
+            'ออกจาก Claude แล้ว · ปิด "ให้ถาม Claude" ให้แล้ว · จะใช้อีกครั้ง กด "เชื่อมต่อที่เครื่องนี้"'
+            if ok
+            else f"ออกจาก Claude ไม่สำเร็จ · {detail or 'ไม่ทราบสาเหตุ'} · ยังเข้าอยู่เหมือนเดิม"
+        )
         self.guideChanged.emit()
 
     @Property(float, notify=changed)
@@ -875,6 +1018,17 @@ class CloudUsage(QObject):
         from aipc.cloud.budget import LIMITS
 
         return list(LIMITS)
+
+    @Property("QVariantList", constant=True)
+    def levels(self) -> list:
+        """ตัวเลือกเพดานต่อวันแบบไม่แสดงเงิน [{value, name}] เรียงน้อยไปมาก."""
+        from aipc.cloud.budget import LEVELS
+
+        return [{"value": v, "name": n} for v, n in LEVELS.items()]
+
+    @Property(int, notify=changed)
+    def usedPercent(self) -> int:  # noqa: N802
+        return self._b.used_percent() if self._b else 0
 
     @Slot(float)
     def setLimit(self, usd: float) -> None:  # noqa: N802
@@ -1529,7 +1683,88 @@ def _display_name(user: str) -> str:
         return user
 
 
-POWER_ACTIONS = ("power_off", "reboot")  # การ์ด 0052
+POWER_ACTIONS = ("power_off", "reboot", "logout")  # การ์ด 0052 · ออกจากระบบ (2026-10-27) ถามเหมือนกัน
+
+
+class AudioController(QObject):
+    """ระดับเสียงในหน้าตั้งค่า (Pakon ขอ 2026-10-27 · พบหูฟังถูกปิดเสียงค้างแล้วหาไม่เจอ).
+
+    ใช้คำสั่ง wpctl ชุดเดียวกับคำสั่งเสียง "เพิ่มเสียง/ลดเสียง/ปิดเสียง" (actions.command_for) · ไม่มีคำสั่งใหม่ ·
+    แสดงชื่อช่องที่เสียงออก (หูฟัง/HDMI) เพื่อให้รู้ว่าเสียงไปไหน · หน้าต่างพัฒนา/หน้า Login = ไม่แตะเสียงจริง
+    """
+
+    changed = Signal()
+    STEP = 10
+
+    def __init__(self, active: bool, runner=None, reader=None):
+        super().__init__()
+        from aipc.skills import actions
+
+        self._active = active
+        self._run = runner or actions.run_process
+        self._read = reader or actions.read_output
+        self._percent, self._muted, self._device, self._error = 0, False, "", ""
+
+    @Property(bool, constant=True)
+    def available(self) -> bool:
+        return self._active
+
+    @Property(int, notify=changed)
+    def percent(self) -> int:
+        return self._percent
+
+    @Property(bool, notify=changed)
+    def muted(self) -> bool:
+        return self._muted
+
+    @Property(str, notify=changed)
+    def device(self) -> str:
+        return self._device
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Slot()
+    def refresh(self) -> None:
+        from aipc.skills import actions
+
+        if not self._active:
+            return
+        now = actions.parse_volume(self._read(["wpctl", "get-volume", actions.SINK]))
+        info = self._read(["wpctl", "inspect", actions.SINK]) or ""
+        m = re.search(r'node\.description = "([^"]*)"', info)
+        old = (self._percent, self._muted, self._device, self._error)
+        if now is None:
+            self._error = "อ่านระดับเสียงไม่ได้ (ไม่พบลำโพงหรือหูฟัง)"
+        else:
+            (self._percent, self._muted), self._error = now, ""
+        self._device = m[1] if m else ""
+        if (self._percent, self._muted, self._device, self._error) != old:
+            self.changed.emit()
+
+    def _do(self, plan) -> None:
+        from aipc.skills import actions
+
+        if not self._active:
+            return
+        if self._run(actions.command_for(plan)) != 0:
+            self._error = "ปรับเสียงไม่สำเร็จ · ลองอีกครั้ง"
+            self.changed.emit()
+            return
+        self.refresh()
+
+    @Slot(int)
+    def step(self, direction: int) -> None:
+        from aipc.skills.actions import Plan
+
+        self._do(Plan("change_volume", {"step": self.STEP if direction > 0 else -self.STEP}))
+
+    @Slot(bool)
+    def setMuted(self, muted: bool) -> None:  # noqa: N802
+        from aipc.skills.actions import Plan
+
+        self._do(Plan("mute" if muted else "unmute"))
 
 
 class PowerController(QObject):
@@ -1725,8 +1960,9 @@ class PrivacyStatus(QObject):
         self._publish()
 
     def _publish(self) -> None:
-        all_off = not self._claude_on() and not self._weather_on()
-        state = (self._llm, self._sent, all_off, self._clock() < self._flash_until)
+        claude_off = not self._claude_on()
+        all_off = claude_off and not self._weather_on()
+        state = (self._llm, self._sent, all_off, self._clock() < self._flash_until, claude_off)
         if state != self._state:
             self._state = state
             self.changed.emit()
@@ -1751,13 +1987,17 @@ class PrivacyStatus(QObject):
     def flash(self) -> bool:
         return bool(self._state and self._state[3])
 
+    @Property(bool, notify=changed)
+    def claudeOff(self) -> bool:  # noqa: N802
+        return bool(self._state and self._state[4])
+
     @Property(str, notify=changed)
     def text(self) -> str:
-        return privacy.panel_text(self.llmState, self.sentToday, self.allOff)
+        return privacy.panel_text(self.llmState, self.sentToday, self.allOff, self.claudeOff)
 
     @Property(str, notify=changed)
     def kind(self) -> str:
-        return privacy.panel_kind(self.llmState, self.allOff, self.flash)
+        return privacy.panel_kind(self.llmState, self.allOff, self.flash, self.claudeOff)
 
 
 def _run_quiet(args: list[str]) -> int:
@@ -2702,23 +2942,94 @@ class SkillsController(QObject):
         )
 
     def _move_card(self, text: str) -> dict | None:
-        """ "เลื่อนนัดประชุมไปบ่ายสาม" → ยังเลื่อนเองไม่ได้ บอกวิธีทำด้วยสองคำสั่ง (ไม่จดนัดใหม่ผิด ๆ)."""
+        """ "เลื่อนนัดประชุมไปบ่ายสาม" (การ์ด 0068) · นัดในเครื่องที่ชื่อตรง 1 นัด = การ์ดยืนยัน แล้วโค้ดเลื่อนให้ ·
+        นัดจาก Google (iCal อ่านอย่างเดียว) · นัดซ้ำ · ชื่อตรงหลายนัด · เวลาใหม่ไม่ชัด = ไม่เปลี่ยนและบอกเหตุผล ·
+        ทุกกรณีไม่จดนัดใหม่ (เดิม 2026-10-12: กลายเป็นนัดชื่อ "เลื่อนนัดประชุมไป")."""
         from aipc.skills import agenda
+        from aipc.skills.reminders import aware
 
         rest = agenda.move_target(text)
         if rest is None:
             return None
+        # ชื่อนัด = ก่อน "ไป"/"เป็น" ตัวสุดท้าย ("ไปหาหมอไปพรุ่งนี้" ยังแยกถูก) · เวลาใหม่ = หลังจากนั้น
+        m = re.fullmatch(r"(.*)(?:ไป|เป็น)(.+)", rest)
+        name, target = (m.group(1), m.group(2)) if m else (rest, "")
+        target = re.sub(r"(?:แทน|ครับ|ค่ะ|คะ|นะ|หน่อย)+$", "", target)
         hits = [r for r in self._store.items
-                if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
-        lines = ["ทำได้ 2 ขั้น: พิมพ์ “ยกเลิกนัด…” แล้วจดนัดใหม่ เช่น “พรุ่งนี้บ่ายสามประชุม”"]
-        lines += [self._reminder_line(r) for r in hits[:5]]
+                if not r.fired and r.what.replace(" ", "").removeprefix("นัด") in name]  # fmt: skip
         google = [e for e in self._gcal_upcoming(self._now())
-                  if e.what.replace(" ", "").removeprefix("นัด") in rest]  # fmt: skip
-        if google:  # การ์ด 0014: นัดจาก Google แก้ได้ในแอป Google Calendar เท่านั้น
-            lines.append("นัดจากปฏิทิน Google เลื่อนได้ในแอป Google Calendar เท่านั้น:")
+                  if e.what.replace(" ", "").removeprefix("นัด") in name]  # fmt: skip
+        if not hits and not google and (day := self._move_day(name)):  # "วันที่ 30 ตุลาเลื่อนไป…"
+            hits = [r for r in self._store.items if not r.fired and aware(r.when).date() == day]
+            google = [e for e in self._gcal_upcoming(self._now()) if aware(e.when).date() == day]
+            if len(hits) + len(google) > 1:  # นัดในเครื่องปนนัด Google วันเดียวกัน = ให้บอกชื่อ
+                hits = hits + google
+        why = "ขอเลื่อนนัด · ยืนยันก่อนเปลี่ยน · ไม่จดนัดใหม่"
+        if len(hits) > 1:
+            title = f"มีนัดที่ตรง {len(hits)} นัด"
+            lines = ["ระบุชื่อให้ชัดขึ้น หรือยกเลิกแล้วจดใหม่"] + [self._reminder_line(x) for x in hits[:5]]
+        elif hits and not target:
+            title = f"เลื่อนนัด “{hits[0].what}” ไปเมื่อไหร่ครับ"
+            lines = ["บอกเวลาใหม่ด้วย เช่น “เลื่อนนัดประชุมไปพรุ่งนี้บ่ายสาม”"]
+        elif hits and hits[0].repeat:
+            title = "นัดซ้ำยังเลื่อนไม่ได้"
+            lines = ["ใช้ “ยกเลิกนัด…” แล้วจดนัดซ้ำใหม่", self._reminder_line(hits[0])]
+        elif hits:
+            r = hits[0]
+            new, problem = self._move_when(r, target)
+            if new is not None:
+                self._counter += 1
+                token = f"c{self._counter}"
+                self._pending[token] = ("move", r.id, new)
+                card = self._plain("reminder", f"เลื่อนนัด “{r.what}” ใช่ไหม",
+                                   [f"เดิม: {self._when_text(aware(r.when))}",
+                                    f"ใหม่: {self._when_text(new)}"])  # fmt: skip
+                card["confirmToken"] = token
+                return self._with_reminder_badge(card, why)
+            title, lines = f"ยังเลื่อนนัด “{r.what}” ไม่ได้", [problem]
+        elif google:  # การ์ด 0014: ลิงก์ iCal อ่านอย่างเดียว · แก้ได้ในแอป Google Calendar เท่านั้น
+            title = "นัดจากปฏิทิน Google เลื่อนในระบบนี้ไม่ได้"
+            lines = ["แก้ได้ในแอป Google Calendar แล้วพูด “อัปเดตปฏิทิน”"]
             lines += [self._reminder_line(e) for e in google[:5]]
-        card = self._plain("reminder", "ยังเลื่อนนัดให้ไม่ได้", lines)
-        return self._with_reminder_badge(card, "ขอเลื่อนนัด · ยังไม่รองรับ จึงไม่จดนัดใหม่")
+        else:
+            title = "ไม่พบนัดชื่อนี้ในเครื่อง"
+            lines = ["ดูนัดที่มีได้ด้วย “นัดถัดไป” หรือหน้าปฏิทิน"]
+        return self._with_reminder_badge(self._plain("reminder", title, lines), why)
+
+    def _move_day(self, name: str):
+        """นัดเดิมบอกเป็นวัน ("วันที่30ตุลา" · "พุธที่11") → วันที่ · ไม่ใช่วัน = None."""
+        from aipc.skills import when
+
+        w = when.parse(name, self._now().replace(tzinfo=None))
+        if w.at is None or w.repeat or not re.search(r"\d|พรุ่งนี้|มะรืน|วันนี้", name):
+            return None
+        return w.at.date()
+
+    def _move_when(self, r, target: str) -> tuple[datetime | None, str]:
+        """เวลาใหม่ของนัด r จากข้อความหลัง "ไป" · ตัวแปลงตัวเดียวกับจดนัด (H6) · ไม่ได้ = (None, เหตุผล)."""
+        from aipc.skills import when
+        from aipc.skills.reminders import aware
+
+        # บอกวันมาไหม · ไม่บอก = คงวันเดิมของนัด ("เลื่อนนัดประชุมไปบ่ายสาม")
+        date_words = re.compile(
+            r"วันที่|วันนี้|พรุ่งนี้|มะรืน|วัน(?:จันทร์|อังคาร|พุธ|พฤหัส|ศุกร์|เสาร์|อาทิตย์)|สัปดาห์|"
+            r"อาทิตย์หน้า|เดือน|\d+/\d+|"
+            + "|".join(re.escape(k) for k in sorted(when.MONTHS, key=len, reverse=True))
+        )
+        now = self._now()
+        old = aware(r.when)
+        w = when.parse(target, now.replace(tzinfo=None))
+        if w.at is None or not w.confident or w.repeat:
+            return None, w.problem or "ไม่เข้าใจเวลาใหม่ · ลองพิมพ์ เช่น “พรุ่งนี้บ่ายสาม” หรือ “วันที่ 12 บ่ายโมง”"
+        at = w.at
+        if any(a.startswith("ไม่ได้บอกเวลา") for a in w.assumptions):  # บอกแค่วัน = คงเวลาเดิม
+            at = at.replace(hour=old.hour, minute=old.minute)
+        elif not date_words.search(target):  # บอกแค่เวลา = คงวันเดิม
+            at = datetime.combine(old.date(), at.time())
+        new = aware(at)
+        if new <= now:
+            return None, f"เวลาใหม่ ({self._when_text(new)}) ผ่านไปแล้ว"
+        return new, ""
 
     def _until_card(self, text: str) -> dict | None:
         """ "อีกกี่วันจะถึงปีใหม่" → นับจากวันที่ของเครื่อง · None = ไม่ใช่คำถามนี้."""
@@ -3209,16 +3520,19 @@ class SkillsController(QObject):
         self.appInstallDone.emit(card)
 
     # ---------- AI ในเครื่องเลือกสกิล (อาจารย์ขอ · ADR-007 ข้อ 6 · ข้อเสนอ 2026-09-29 งานข้อ ④) ----------
-    def tool_catalog(self, text: str = "") -> list:
-        """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog."""
+    def tool_catalog(self, text: str = "", user: bool = True) -> list:
+        """สกิลที่ AI ในเครื่องเลือกได้ (อาจารย์ขอ · ADR-007 ข้อ 6 · งานข้อ ④) · ดู aipc.skills.catalog.
+
+        user=False = สกิลในตัวอย่างเดียว (รอบตอบเองหลัง AI เลือก "ตอบเอง" · การ์ด 0074)
+        """
         from aipc.skills import catalog, retrieval
 
-        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง (ส่วนต้นคงที่ แคชใช้ได้) · สกิลของผู้ใช้เกิน 5 ตัว = ส่งเฉพาะที่ใกล้ข้อความ
-        user = [s for s in self._skills if self._is_user(s.id)]
+        # การ์ด 0018: สกิลในตัวส่งทุกครั้ง (ส่วนต้นคงที่ แคชใช้ได้) · การ์ด 0074: สกิลของผู้ใช้ส่งเฉพาะตัวที่ใกล้ข้อความจริง
+        # (ไม่มีตัวใกล้ = รายการเท่าเดิมทุกประโยค แคชใช้ได้)
+        mine = [s for s in self._skills if self._is_user(s.id)] if user else []
         base = [s for s in self._skills if not self._is_user(s.id)]
-        return catalog.tools(
-            base + retrieval.pick(user, text), self.available(), forge=self.canForge
-        )
+        near = retrieval.near(mine, text)
+        return catalog.tools(base + near, self.available(), forge=self.canForge)
 
     # ---------- สกิลอัตโนมัติ (การ์ด 0017) ----------
     @Property(bool, notify=skillsChanged)
@@ -3728,7 +4042,7 @@ class SkillsController(QObject):
         skill, cmd, exact = sitecmd.match(text, self._skills, url)
         if skill is None or exact == near:
             return {}
-        run = {"kind": cmd.kind, "arg": cmd.arg, "site": skill.site}
+        run = {"kind": cmd.kind, "arg": cmd.arg, "site": skill.site, "words": "|".join(cmd.phrases)}
         phrase = cmd.phrases[0]
         if exact and not cmd.confirm:
             return {
@@ -3764,6 +4078,13 @@ class SkillsController(QObject):
             return {}
         if len(re.sub(r"\s+", "", text)) < 3:
             return {}
+        if site in sitecmd.NO_SITE_SKILL:
+            # Gmail ปฏิทิน ไดรฟ์ เอกสาร: สกิลประจำเว็บไม่รับอยู่แล้ว · เดิมยังถามแล้วส่งให้ Claude จนล้ม 2 รอบ
+            # (Pakon ใน Gmail พูด "เมลล่าสุด" 2026-10-28 · ledger 11:14:55 · $0.10) → บอกตรง ๆ
+            # ไม่ส่งอะไรออก
+            name = SITES[site][0]
+            return {"say": f"ยังเพิ่มคำสั่งเสียงให้ {name} ไม่ได้ (เว็บที่มีข้อมูลส่วนตัว) · "
+                           "ในจีเมลพูดได้ เช่น “อ่านเมลล่าสุด” “มีเมลใหม่ไหม” “ค้นในจีเมลว่า …”"}  # fmt: skip
         if NEEDS_TYPING.match(text.strip()):
             # การ์ด 0057: สกิลประจำเว็บพิมพ์ไม่ได้ (H8) → Claude ได้แค่สกิลที่วางเคอร์เซอร์แล้วบอกว่าทำแล้ว · ไม่ถาม
             name = SITES[site][0]
@@ -3790,7 +4111,9 @@ class SkillsController(QObject):
         ask = (f"ผู้ใช้เปิดเว็บ {SITES[site][0]} อยู่ แล้วสั่งด้วยเสียงว่า “{text}” · "
                f"ทำเป็นสกิลประจำเว็บ (site: {site} · หัวข้อ ## คำสั่ง) ที่มีคำสั่งนี้ "
                "(ใส่คำพูดแบบอื่นที่คนไทยพูดบ่อยด้วย) "
-               "ด้วยคีย์ลัดของเว็บ หรือคลิกปุ่มด้วยตัวเลือก CSS ที่มั่นใจว่ามีจริง · "
+               "ด้วยคีย์ลัดของเว็บ หรือ “→ กดปุ่มที่เขียนว่า <ป้ายบนปุ่ม>|<ป้ายภาษาอังกฤษ>” "
+               "(ระบบหาปุ่มที่มองเห็นบนหน้าจริงจากป้าย · การ์ด 0069 · ใช้ทางนี้เป็นหลัก เพราะคุณไม่เห็นหน้าเว็บ) · "
+               "ใช้ “→ คลิก <ตัวเลือก CSS>” เฉพาะปุ่มที่ไม่มีป้ายและมั่นใจว่าตัวเลือกมีจริง · "
                "ถ้าต้องพิมพ์ข้อความ (ค้นหา/เปิดสิ่งที่ต้องค้นก่อน) ให้ตอบว่าทำไม่ได้ "
                "ห้ามทำคำสั่งที่แค่วางเคอร์เซอร์หรือเปิดช่องพิมพ์แทน (การ์ด 0057) · "
                "ถ้าคำนี้หมายถึงงานของตัวเบราว์เซอร์หรือคำสั่งที่ระบบมีอยู่แล้ว (แท็บใหม่ ปิดแท็บ ย้อนกลับ หยุด เล่นต่อ …) "
@@ -3855,7 +4178,7 @@ class SkillsController(QObject):
            "forge-ask": "ขอโหมด/งานประจำที่ยังไม่มีสกิล (กฎ) · ส่งออกต้องยืนยันก่อน (การ์ด 0030)",
            "files": "ตรงรูปประโยคหาไฟล์ (กฎ) · AI ในเครื่องเปิดไฟล์เองไม่ได้",
            "forging": "ขอตั้งโหมด/งานประจำที่ยังไม่มีสกิล",
-           "weather-off": "ถามอากาศ แต่ปิดสวิตช์อากาศในหน้าตั้งค่า",
+           "weather-off": "ถามอากาศ แต่บัญชีนี้ปิดการส่งข้อมูลอากาศไว้ (ตั้งไว้ก่อนเอาสวิตช์ออก)",
            "clock": "ตรงรูปประโยคถามเวลา (กฎ) · AI ในเครื่องไม่รู้เวลาตอนนี้"}  # fmt: skip
 
     def _why(self, card: dict, t0: float) -> dict:
@@ -3974,9 +4297,11 @@ class SkillsController(QObject):
     def _weather_off_card(self) -> dict:
         return {"kind": "weather-off", "badge": {}, "chips": [], "confirmToken": "", "page": "",
                 "title": "ปิดการถามพยากรณ์อากาศอยู่",
-                "lines": ["ตอนนี้ไม่ส่งชื่อเมืองไป Open-Meteo ตามที่ตั้งไว้",
-                          "เปิดได้ที่หน้าตั้งค่า › ส่งออกนอกเครื่อง"],
-                "_outbound": "ไม่มี · ปิดสวิตช์อากาศอยู่"}  # fmt: skip
+                # การ์ด 0061 รอบ 3 เอาสวิตช์อากาศออก · บัญชีที่ปิดไว้ก่อนหน้ายังปิดอยู่ (ไม่เปิดคืนเอง · H3) ·
+                # เดิมบอก "เปิดได้ที่หน้าตั้งค่า" ซึ่งไม่มีแล้ว (แก้ 2026-10-27 · H5)
+                "lines": ["ตอนนี้ไม่ส่งชื่อเมืองไป Open-Meteo ตามที่บัญชีนี้ตั้งไว้ในรุ่นก่อน",
+                          "รุ่นนี้ไม่มีสวิตช์อากาศในหน้าตั้งค่าแล้ว · ถ้าต้องการเปิดคืน แจ้งผู้ดูแลเครื่อง"],
+                "_outbound": "ไม่มี · บัญชีนี้ปิดการส่งข้อมูลอากาศไว้"}  # fmt: skip
 
     def _weather_card(self, day: str, city: str) -> dict:
         from aipc.skills.weather import Ask, answer
@@ -4159,6 +4484,20 @@ class SkillsController(QObject):
                 return card
             self.remindersChanged.emit()
             card["title"] = f"ลบนัดแล้ว {n} รายการ"
+        elif isinstance(plan, tuple) and plan[0] == "move":  # การ์ด 0068: เลื่อนนัดในเครื่อง
+            _, rid, new = plan
+            card["kind"] = "reminder"
+            try:
+                r = self._store.move(rid, new, self._now())
+            except (OSError, reminders.Unreadable) as e:
+                card["title"] = f"เลื่อนไม่สำเร็จ: {e}"
+                return card
+            if r is None:
+                card["title"] = "ไม่พบนัดนี้แล้ว (อาจถูกลบไปก่อน)"
+                return card
+            self.remindersChanged.emit()
+            card["title"] = f"เลื่อนแล้ว: {r.what}"
+            card["chips"] = [{"text": self._when_text(new), "kind": "ok"}]
         elif isinstance(plan, tuple) and plan[0] == "steps":
             _, skill, text = plan
             card.update(kind="steps", badge=self._badge(skill, "ยืนยันแล้ว"))
@@ -4362,6 +4701,11 @@ class ChatController(QObject):
         except OSError:
             return []
 
+    @Property(str, notify=changed)
+    def currentId(self) -> str:  # noqa: N802
+        """บทสนทนาที่เปิดอยู่ · หน้าประวัติไฮไลต์อันนี้ (Pakon ขอ 2026-10-27: กดแล้วต้องรู้ว่าเลือกอันไหน)."""
+        return self._conv.get("id", "")
+
     # ---------- สถานะ AI ----------
     @Slot()
     def refresh(self) -> None:
@@ -4442,16 +4786,19 @@ class ChatController(QObject):
         )
         return base + (self.TOOLS_HINT if tools else "")
 
-    def _all_tools(self, text: str = "") -> list:
+    def _all_tools(self, text: str = "", user: bool = True) -> list:
         """ask-cloud (ถ้ามี Claude) ไว้หน้าสุด + สกิล · ลำดับคงที่ แคชจึงใช้ได้
-        · text = ข้อความที่ใช้เลือกสกิล (0018)."""
+        · text = ข้อความที่ใช้เลือกสกิล (0018) · user=False = ไม่มีสกิลของผู้ใช้ (0074)."""
         from aipc.skills import catalog
 
         cloud = catalog.tools([], set(), cloud=True) if self._cloud_ok() else []
         try:
-            skills = self._tools(text)
-        except TypeError:  # ตัวให้รายการแบบเก่าที่ไม่รับข้อความ
-            skills = self._tools()
+            skills = self._tools(text, user=user)
+        except TypeError:  # ตัวให้รายการแบบเก่าที่ไม่รับ user / ข้อความ
+            try:
+                skills = self._tools(text)
+            except TypeError:
+                skills = self._tools()
         return cloud + list(skills)
 
     def _warm_up(self) -> None:
@@ -4492,6 +4839,9 @@ class ChatController(QObject):
             self._conv["messages"].append({"role": "user", "content": text})
         # คุยทั่วไป = ให้ AI เลือกสกิลได้ · สกิลที่ถูกเลือกแล้ว (มี prompt) = ไม่ส่งเครื่องมือ จึงไม่วนเลือกซ้ำ
         tools = self._all_tools(text) if (use_tools and not prompt) else []
+        # การ์ด 0074: มีสกิลของผู้ใช้ใกล้ข้อความ = บังคับให้ AI เลือก (สกิลไหน หรือ "ตอบเอง") ก่อนตอบ
+        base = self._all_tools(text, user=False) if tools else []
+        force = len(tools) > len(base)
         if self._conv["messages"][-1].get("file"):
             why = (f"ถามเกี่ยวกับไฟล์ “{self._file[0]}” · ตอบในเครื่องเท่านั้น "
                    "(เนื้อหาไฟล์ห้ามออกนอกเครื่อง)")  # fmt: skip
@@ -4514,13 +4864,33 @@ class ChatController(QObject):
             messages = [self._for_local(m) for m in messages]
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""
-        stream = self._stream = client.Stream(self._target, messages, tools=tools)
+        if force:
+            from aipc.skills import catalog
+
+            first = self._stream = client.Stream(self._target, messages, choice="required",
+                                                 tools=tools + [catalog.answer_tool()])  # fmt: skip
+            work = lambda: self._choose_then_answer(first, messages, base)  # noqa: E731
+        else:
+            stream = self._stream = client.Stream(self._target, messages, tools=tools)
+            work = lambda: stream.run(self._token.emit)  # noqa: E731
         self.changed.emit()
         self.streamChanged.emit()
-        threading.Thread(
-            target=lambda: self._done.emit(stream.run(self._token.emit)), daemon=True
-        ).start()
+        threading.Thread(target=lambda: self._done.emit(work()), daemon=True).start()
         return True
+
+    def _choose_then_answer(self, first, messages: list, base: list):
+        """รอบ 1 AI ต้องเลือกเครื่องมือ (ไม่มีข้อความออกจอ) · เลือก "ตอบเอง" = รอบ 2 ตอบตามปกติด้วยสกิลในตัว
+        (system prompt เดิม · รายการเครื่องมือเท่าตอนไม่มีสกิลผู้ใช้ แคชจึงใช้ได้) · การ์ด 0074 หัวข้อ 14."""
+        from aipc.chat import client
+        from aipc.skills import catalog
+
+        reply = first.run(lambda _token: None)
+        if reply.reason or (reply.tool_call and reply.tool_call != catalog.ANSWER):
+            return reply
+        second = self._stream = client.Stream(self._target, messages, tools=base)
+        if first._stopped.is_set():  # ผู้ใช้กดหยุดระหว่างสลับรอบ
+            return client.Reply(reason="stopped")
+        return second.run(self._token.emit)
 
     def _send_work(self, text: str) -> bool:
         """แชทงาน: ส่งให้ Claude ตรง ๆ ไม่ต้องรอ AI ในเครื่อง · สกิลภาษา (แปล/สรุป) ส่งแค่ข้อความของผู้ใช้."""

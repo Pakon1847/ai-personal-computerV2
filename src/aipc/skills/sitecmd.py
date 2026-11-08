@@ -11,11 +11,13 @@
     ## คำสั่ง
     - ถอยหลังสิบวิ | ย้อนสิบวิ → กดคีย์ j
     - กดไลก์ → คลิก like-button-view-model button
+    - เข้าสู่ระบบ | ล็อกอิน → กดปุ่มที่เขียนว่า เข้าสู่ระบบ|Log in|Sign in   ← การ์ด 0069
     - ยกเลิกสมัครสมาชิก → คลิก … · ยืนยันก่อน
     - เพิ่มอีกหนึ่งแถบ | ขออีกแท็บ → ทำคำสั่ง เปิดยูทูบอีกแท็บ
 
 กติกา (โค้ดตรวจ · ไฟล์เป็นข้อมูลจาก Claude ไม่ใช่คำสั่ง · H8 · ADR-011):
 - ทำได้แค่ "กดคีย์" (คีย์ลัดในรายการ ไม่พิมพ์ข้อความ) กับ "คลิก" (ตัวเลือก CSS เขียนตายตัว) ·
+  "กดปุ่มที่เขียนว่า" (การ์ด 0069: ป้ายบนปุ่ม คั่น | · โค้ดหาปุ่มที่มองเห็นบนหน้าจริง · ไม่ต้องเดา CSS) ·
   ทำงานเฉพาะเมื่อหน้าที่เปิดอยู่เป็นเว็บของสกิล
 - "ทำคำสั่ง" (การ์ด 0066): ประโยคคำสั่งเว็บของระบบ แปลด้วยตัวแปลเดียวกับเสียง (browse.parse) ได้ 1–3 คำสั่ง ·
   ทุกคำสั่งต้องอยู่ใน ALIAS_KINDS (ไม่ส่งข้อความออก ไม่ปิดทุกแท็บ) · ตรวจซ้ำตอนทำ (handsfree.runSite · H7)
@@ -43,15 +45,22 @@ RISKY = ("ลบ", "ยกเลิก", "ซื้อ", "จ่าย", "ชำ
 _SPECIAL = ("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Enter", "Escape", "Tab",
             "PageUp", "PageDown", "Home", "End")  # fmt: skip
 KEY_RE = re.compile(
-    r"(?:(?:Shift|Ctrl|Alt)\+)*(?:[A-Za-z0-9]|" + "|".join(_SPECIAL) + r"|[,./;'\[\]=<>?-])"
+    # "+" = ซูมแผนที่/ขยาย (การ์ด 0074 รอบ 2: ผู้เขียนอิสระ 2 คนใช้คีย์นี้ในสกิลดี · Google Maps)
+    r"(?:(?:Shift|Ctrl|Alt)\+)*(?:[A-Za-z0-9]|" + "|".join(_SPECIAL) + r"|[,./;'\[\]=<>?+-])"
 )
 # คีย์ของตัวเบราว์เซอร์ (ปิดแท็บ/หน้าต่าง เปิดหน้าต่างใหม่ พิมพ์ ที่อยู่) ไม่ใช่คีย์ลัดของเว็บ → ห้าม
 BROWSER_KEYS = set(
     "ctrl+w ctrl+shift+w ctrl+q ctrl+shift+q ctrl+t ctrl+shift+t ctrl+n ctrl+shift+n ctrl+l ctrl+p "
     "ctrl+s ctrl+o ctrl+h ctrl+j ctrl+u ctrl+shift+i ctrl+shift+j ctrl+shift+delete alt+f4".split()
 )
-_BAD_SELECTOR = re.compile(r"javascript:|[{};`]|passw|checkout|payment|credit|cvv|billing", re.I)
-_LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|คลิก|ทำคำสั่ง)\s+(.+?)\s*")
+# ช่องบัตร (การ์ด 0074 · S1 b10 หลุด: cardNumber · cc-exp · cc-csc ไม่มีคำที่ห้ามเดิม)
+# = ชื่อมาตรฐาน autocomplete ของ HTML
+_BAD_SELECTOR = re.compile(
+    r"javascript:|[{};`]|passw|checkout|payment|credit|cvv|cvc|billing"
+    r"|card[-_]?(number|num|holder)|cc-(number|name|exp|csc|type)|csc|security[-_]?code|(?<![a-z])otp",
+    re.I,
+)
+_LINE = re.compile(r"\s*-\s+(.+?)\s*(?:→|->)\s*(กดคีย์|กดปุ่มที่เขียนว่า|คลิก|ทำคำสั่ง)\s+(.+?)\s*")
 # คำพ้อง (การ์ด 0066): คำสั่งของระบบที่สกิลเรียกได้ · ค้นเว็บ/ค้นในเว็บ (ส่งข้อความออก · H3) · ปิดทุกแท็บ (H2) ·
 # เข้าสู่ระบบ · ลิงก์ · กดคีย์/คลิก (ใช้บรรทัดของมันเอง) = ไม่ได้
 ALIAS_KINDS = frozenset(
@@ -77,7 +86,7 @@ _CONFIRM = re.compile(r"(.*?)\s*·\s*ยืนยันก่อน")
 @dataclass(frozen=True)
 class SiteCommand:
     phrases: tuple[str, ...]
-    kind: str  # key | click | system (การ์ด 0066)
+    kind: str  # key | click | system (การ์ด 0066) | click_text (การ์ด 0069)
     arg: str  # คีย์ เช่น "Shift+N" · ตัวเลือก CSS · ประโยคคำสั่งของระบบ เช่น "เปิดยูทูบอีกแท็บ"
     confirm: bool = False
 
@@ -106,6 +115,7 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
     """บรรทัดในหัวข้อ "## คำสั่ง" → (คำสั่ง, ปัญหา)."""
     out: list[SiteCommand] = []
     errors: list[str] = []
+    known = []  # บรรทัดคำพ้องที่ระบบทำเองได้ทุกคำ (ตัดทิ้ง)
     for n, line in rows:
         if not line.strip():
             continue
@@ -120,7 +130,11 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
         arg, confirm = m.group(3), False
         if c := _CONFIRM.fullmatch(arg):
             arg, confirm = c.group(1).strip(), True
-        kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system"}[m.group(2)]
+        # "Esc" = ชื่อที่คนเขียนบ่อย · เบราว์เซอร์รู้จักแค่ "Escape" (การ์ด 0074 รอบ 3 g21)
+        if m.group(2) == "กดคีย์":
+            arg = re.sub(r"(?i)(^|\+)esc$", r"\1Escape", arg)
+        kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system",
+                "กดปุ่มที่เขียนว่า": "click_text"}[m.group(2)]  # fmt: skip
         if not phrases or any(len(p) > MAX_PHRASE for p in phrases):
             errors.append(f"บรรทัด {n}: คำพูดต้องมีและยาวไม่เกิน {MAX_PHRASE} ตัวอักษร")
         if kind == "key" and arg.lower() in BROWSER_KEYS:
@@ -134,24 +148,40 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
             errors.append(
                 f"บรรทัด {n}: ตัวเลือก “{arg[:60]}” ใช้ไม่ได้ (ยาวเกิน/มีอักขระต้องห้าม/แตะรหัสผ่านหรือชำระเงิน)"
             )
+        words = [w.strip() for w in arg.split("|")]
+        if kind == "click_text" and (
+            not all(words) or any(len(w) > MAX_PHRASE or _BAD_SELECTOR.search(w) for w in words)
+        ):
+            why = f"ว่าง/ยาวเกิน {MAX_PHRASE}/มีอักขระต้องห้าม"
+            errors.append(f"บรรทัด {n}: ป้ายปุ่ม “{arg[:60]}” ใช้ไม่ได้ ({why})")
         if kind == "system":
             _cmds, why = alias_commands(arg)
             if why:
                 errors.append(f"บรรทัด {n}: {why}")
-            # เฉพาะบรรทัดคำพ้อง: สกิลเดิมที่มีคำแบบนี้ (กดคีย์) ไม่ถูกปิด (H2)
+            # คำที่ระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ) ไม่มีวันถึงสกิล → ตัดออก แสดงเฉพาะคำที่ใช้ได้ (H5) ·
+            # เดิมปฏิเสธทั้งสกิล: ชุดพัฒนา A3 (2026-10-27) Claude ใส่คำพ้องถูก แต่แถม "โหลดใหม่"
+            # "กลับหน้าเมื่อกี้" "ขอคลิปต่อไป" (ระบบรู้จักแล้ว) → ตก 3/9 · Claude เดาไม่ได้ว่าตัวแปลรู้จักคำไหน (H6) ·
+            # ตัดแล้วไม่เหลือ = ไม่รับ · เฉพาะบรรทัดคำพ้อง (สกิลเดิมแบบกดคีย์ไม่ถูกแตะ · H2)
             from aipc.skills import browse
 
-            if dead := [p for p in phrases if browse.parse(p)]:
-                errors.append(
-                    f"บรรทัด {n}: คำพูด “{dead[0]}” ระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)"
-                )
+            live = tuple(p for p in phrases if not browse.parse(p))
+            if not live:
+                # ทั้งบรรทัดระบบทำเองอยู่แล้ว = ตัดบรรทัดทิ้ง ไม่ปฏิเสธทั้งสกิล (การ์ด 0074 รอบ 2 g22) ·
+                # ไม่เหลือคำสั่งเลย = ไม่รับ ด้านล่าง
+                known.append(n)
+                continue
+            phrases = live
         if not confirm and any(w in p.lower() for p in phrases for w in RISKY):
             errors.append(
                 f"บรรทัด {n}: คำสั่ง “{phrases[0]}” ย้อนไม่ได้หรือแตะบัญชี ต้องลงท้ายด้วย “· ยืนยันก่อน”"
             )
         out.append(SiteCommand(phrases, kind, arg, confirm))
     if not out and not errors:
-        errors.append("หัวข้อ “## คำสั่ง” ว่าง")
+        errors.append(
+            f"บรรทัด {known[0]}: คำพูดทุกคำระบบรู้จักอยู่แล้ว (ทำเองก่อนเสมอ · ไม่ต้องใส่เป็นคำพ้อง)"
+            if known
+            else "หัวข้อ “## คำสั่ง” ว่าง"
+        )
     if len(out) > MAX_COMMANDS:
         errors.append(f"คำสั่งมากเกิน {MAX_COMMANDS} ข้อ")
     return out, errors

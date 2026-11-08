@@ -1,0 +1,77 @@
+{
+ "summary": {
+  "rounds": 3,
+  "one_tab_median_mb": 745.3,
+  "three_tabs_median_mb": 899.5,
+  "per_extra_tab_mb": 77.1,
+  "settle_s": 15
+ },
+ "rows": [
+  {
+   "mem_available_before_mb": 5252.2,
+   "mem_available_3tabs_mb": 4349.5,
+   "one_tab": {
+    "pss_mb": 710.5,
+    "tabs": 1,
+    "say": "เปิด YouTube แล้ว"
+   },
+   "three_tabs": {
+    "pss_mb": 891.2,
+    "tabs": 3,
+    "say": [
+     "เปิด วิกิพีเดีย แล้ว",
+     "เปิด ข่าว Thai PBS แล้ว"
+    ],
+    "urls": [
+     "https://www.youtube.com/",
+     "https://th.wikipedia.org/wiki/%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81",
+     "https://www.thaipbs.or.th/home"
+    ]
+   }
+  },
+  {
+   "mem_available_before_mb": 5124.3,
+   "mem_available_3tabs_mb": 4300.7,
+   "one_tab": {
+    "pss_mb": 758.3,
+    "tabs": 1,
+    "say": "เปิด YouTube แล้ว"
+   },
+   "three_tabs": {
+    "pss_mb": 899.5,
+    "tabs": 3,
+    "say": [
+     "เปิด วิกิพีเดีย แล้ว",
+     "เปิด ข่าว Thai PBS แล้ว"
+    ],
+    "urls": [
+     "https://www.youtube.com/",
+     "https://th.wikipedia.org/wiki/%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81",
+     "https://www.thaipbs.or.th/home"
+    ]
+   }
+  },
+  {
+   "mem_available_before_mb": 5155.1,
+   "mem_available_3tabs_mb": 4282.0,
+   "one_tab": {
+    "pss_mb": 745.3,
+    "tabs": 1,
+    "say": "เปิด YouTube แล้ว"
+   },
+   "three_tabs": {
+    "pss_mb": 902.6,
+    "tabs": 3,
+    "say": [
+     "เปิด วิกิพีเดีย แล้ว",
+     "เปิด ข่าว Thai PBS แล้ว"
+    ],
+    "urls": [
+     "https://www.youtube.com/",
+     "https://th.wikipedia.org/wiki/%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81",
+     "https://www.thaipbs.or.th/home"
+    ]
+   }
+  }
+ ]
+}

@@ -397,6 +397,62 @@ ColumnLayout {
                 visible: page.section === "voice"
                 Layout.fillWidth: true
                 spacing: 16
+                // ระดับเสียง (2026-10-27): ปุ่มเดียวกับคำสั่งเสียง เพิ่ม/ลด/ปิดเสียง · บอกว่าเสียงออกช่องไหน
+                Card {
+                    objectName: "volumeCard"
+                    Layout.fillWidth: true
+                    implicitHeight: volCol.implicitHeight + 40
+                    Timer {   // คำสั่งเสียง "เพิ่มเสียง" เปลี่ยนจากที่อื่นได้ → อ่านใหม่ระหว่างเปิดหมวดนี้
+                        interval: 3000; repeat: true; triggeredOnStart: true
+                        running: page.visible && page.section === "voice" && audio.available
+                        onTriggered: audio.refresh()
+                    }
+                    ColumnLayout {
+                        id: volCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 8
+                        AppText { text: Tr.t("ระดับเสียง"); strong: true }
+                        AppText {
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: !audio.available ? Tr.t("ปรับได้เมื่อใช้งานบนเครื่องจริง")
+                                  : audio.error !== "" ? Tr.t(audio.error)
+                                  : Tr.t("เสียงออกทาง: ") + (audio.device || Tr.t("ไม่ทราบ"))
+                        }
+                        RowLayout {
+                            visible: audio.available
+                            spacing: 12
+                            AppButton {
+                                objectName: "volumeDown"
+                                text: "−"
+                                kind: "secondary"
+                                Accessible.name: Tr.t("ลดเสียง")
+                                onClicked: audio.step(-1)
+                            }
+                            AppText {
+                                objectName: "volumeText"
+                                Layout.preferredWidth: Math.round(120 * Theme.fontScale)
+                                horizontalAlignment: Text.AlignHCenter
+                                strong: true
+                                text: audio.muted ? Tr.t("ปิดเสียงอยู่") : audio.percent + "%"
+                                color: audio.muted ? Theme.danger : Theme.ink
+                            }
+                            AppButton {
+                                objectName: "volumeUp"
+                                text: "+"
+                                kind: "secondary"
+                                Accessible.name: Tr.t("เพิ่มเสียง")
+                                onClicked: audio.step(1)
+                            }
+                            AppButton {
+                                objectName: "volumeMute"
+                                text: audio.muted ? Tr.t("เปิดเสียง") : Tr.t("ปิดเสียง")
+                                kind: audio.muted ? "primary" : "secondary"
+                                onClicked: audio.setMuted(!audio.muted)
+                            }
+                        }
+                    }
+                }
                 // เสียง (การ์ด 0019): อ่านออกเสียงในเครื่อง · ตั้งให้อ่านเตือนนัดได้
                 Card {
                     objectName: "voiceCard"
@@ -478,9 +534,10 @@ ColumnLayout {
                                 }
                             }
                             Chip {
-                                visible: cloudUsage.available
-                                text: uiSettings.useClaude ? Tr.t("เปิดอยู่") : Tr.t("ปิดอยู่")
-                                kind: uiSettings.useClaude ? "ok" : "neutral"
+                                visible: cloudUsage.available && cloudUsage.logoutState !== "done"
+                                text: !uiSettings.useClaude ? Tr.t("ปิดอยู่")
+                                      : cloudUsage.usedPercent >= 100 ? Tr.t("ครบวันนี้แล้ว") : Tr.t("เปิดอยู่")
+                                kind: !uiSettings.useClaude ? "neutral" : cloudUsage.usedPercent >= 100 ? "warn" : "ok"
                                 dot: true
                             }
                         }
@@ -495,14 +552,34 @@ ColumnLayout {
                             id: guideButton
                             objectName: "claudeGuideButton"
                             property bool open: false
-                            visible: !cloudUsage.available
+                            visible: !cloudUsage.available || cloudUsage.logoutState === "done"
                             kind: "secondary"
-                            text: open ? Tr.t("ซ่อนวิธีเชื่อมต่อ") : Tr.t("วิธีเชื่อมต่อ Claude")
+                            text: open ? Tr.t("ซ่อนวิธีเชื่อมต่อ") : Tr.t("วิธีเชื่อมต่อจากคอมพิวเตอร์อีกเครื่อง")
                             onClicked: {
                                 if (!open)
                                     cloudUsage.refreshGuide()
                                 open = !open
                             }
+                        }
+                        // เชื่อมต่อที่เครื่องนี้ (การ์ด 0021 หัวข้อ 10 · Pakon 2026-10-28: "ทำให้เข้าผ่านเทอร์มินัลในเครื่องได้เลย")
+                        // หน้าต่างคำสั่งรัน claude auth login ให้เอง · ไม่ใช่เทอร์มินัลเปล่า (การ์ด 0004 ไม่มี shell ทั่วไป)
+                        AppText {
+                            visible: guideButton.visible && cloudUsage.canConnectHere
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: Tr.t("ง่ายที่สุด: กดปุ่มนี้ หน้าต่างคำสั่งจะเปิดและเข้าสู่ระบบ Claude ให้เอง · ถ้าหน้าเว็บให้รหัสมา กด Copy Code แล้วกลับไปหน้าต่างคำสั่ง กด Ctrl+Shift+V แล้วกด Enter")
+                        }
+                        AppButton {
+                            objectName: "settingsConnectHere"
+                            visible: guideButton.visible && cloudUsage.canConnectHere
+                            enabled: !cloudUsage.connecting
+                            iconPath: Icons.terminal
+                            text: cloudUsage.connecting ? Tr.t("หน้าต่างเชื่อมต่อเปิดอยู่…") : Tr.t("เชื่อมต่อที่เครื่องนี้")
+                            onClicked: cloudUsage.connectHere()
+                        }
+                        AppText {
+                            visible: cloudUsage.connectedNow
+                            Layout.fillWidth: true; strong: true; color: Theme.okInk
+                            text: Tr.t("เชื่อมต่อ Claude แล้ว · ใช้ได้เลย")
                         }
                         ClaudeGuide {
                             objectName: "claudeGuide"
@@ -511,13 +588,158 @@ ColumnLayout {
                         }
                         AppCheck {
                             objectName: "useClaudeCheck"
-                            visible: cloudUsage.available
+                            visible: cloudUsage.available && cloudUsage.logoutState !== "done"
                             text: Tr.t("ให้ถาม Claude เมื่อ AI ในเครื่องตอบไม่ได้")
                             detail: uiSettings.useClaude
                                     ? Tr.t("ส่งไปแค่คำถามกับข้อความล่าสุด (ไม่เกิน 4 ข้อความ) · ไม่ส่งไฟล์ นัด หรือใบหน้า · ดูทุกอย่างที่ส่งไปได้ที่หมวด \"ความเป็นส่วนตัว\"")
                                     : Tr.t("ปิดอยู่: ใช้แค่ AI ในเครื่อง · ไม่มีอะไรส่งออกไป")
                             checked: uiSettings.useClaude
                             onClicked: uiSettings.setUseClaude(checked)
+                        }
+                        // ใช้ได้วันละเท่าไหร่ (Pakon 2026-10-28: เอาตัวเลือกกลับมา แต่ไม่ใช้เงิน) · เป็นระดับ + % ที่ใช้ไปวันนี้
+                        ColumnLayout {
+                            objectName: "cloudLevel"
+                            visible: cloudUsage.available && uiSettings.useClaude && cloudUsage.logoutState !== "done"
+                            Layout.fillWidth: true
+                            spacing: 6
+                            AppText {
+                                objectName: "cloudLevelText"
+                                Layout.fillWidth: true
+                                text: Tr.t("วันนี้ถาม Claude ไป ") + cloudUsage.callsToday + Tr.t(" ครั้ง · ใช้ไปแล้ว ")
+                                      + cloudUsage.usedPercent + Tr.t("% ของที่ตั้งไว้")
+                            }
+                            Rectangle {   // แถบที่ใช้วันนี้ (ครบ = สีเตือน · มีข้อความกำกับ ไม่ใช้สีอย่างเดียว)
+                                Layout.fillWidth: true
+                                implicitHeight: 8
+                                radius: 4
+                                color: Theme.surface2
+                                Rectangle {
+                                    height: parent.height
+                                    radius: 4
+                                    width: parent.width * cloudUsage.usedPercent / 100
+                                    color: cloudUsage.usedPercent >= 100 ? Theme.warn : Theme.accent
+                                }
+                            }
+                            RowLayout {
+                                spacing: 8
+                                AppText { text: Tr.t("ใช้ได้วันละ"); size: Theme.fontSmall; color: Theme.inkMuted }
+                                Repeater {
+                                    model: cloudUsage.levels
+                                    AppButton {
+                                        required property var modelData
+                                        objectName: "cloudLevel_" + modelData.value
+                                        text: Tr.t(modelData.name)
+                                        kind: cloudUsage.limit === modelData.value ? "primary" : "secondary"
+                                        onClicked: cloudUsage.setLimit(modelData.value)
+                                    }
+                                }
+                            }
+                            AppText {
+                                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                                text: Tr.t("ระดับมากขึ้น = ถาม Claude ได้มากขึ้นต่อวัน และใช้โควตาบัญชี Claude ของคุณมากขึ้น · ใช้ครบแล้วเครื่องจะหยุดถาม Claude จนถึงพรุ่งนี้ และตอบด้วย AI ในเครื่องแทน")
+                            }
+                        }
+                        // ออกจาก Claude (การ์ด 0070 · Pakon 2026-10-28) · กดสองครั้ง · ออกแล้วปิด "ให้ถาม Claude" ให้ (H2)
+                        Connections {
+                            target: cloudUsage
+                            function onGuideChanged() {
+                                if (cloudUsage.logoutState === "done" && uiSettings.useClaude)
+                                    uiSettings.setUseClaude(false)
+                            }
+                        }
+                        RowLayout {
+                            visible: cloudUsage.available
+                            Layout.fillWidth: true
+                            spacing: 12
+                            AppButton {
+                                id: claudeLogout
+                                objectName: "claudeLogoutButton"
+                                property bool confirm: false
+                                visible: cloudUsage.logoutState !== "done"
+                                enabled: cloudUsage.logoutState !== "busy"
+                                kind: confirm ? "danger" : "ghost"
+                                text: cloudUsage.logoutState === "busy" ? Tr.t("กำลังออกจาก Claude…")
+                                      : confirm ? Tr.t("กดอีกครั้งเพื่อออกจาก Claude") : Tr.t("ออกจาก Claude")
+                                onClicked: {
+                                    if (confirm) { confirm = false; cloudUsage.logout() }
+                                    else confirm = true
+                                }
+                            }
+                            AppText {
+                                objectName: "claudeLogoutText"
+                                visible: cloudUsage.logoutText !== ""
+                                Layout.fillWidth: true; size: Theme.fontSmall
+                                color: cloudUsage.logoutState === "failed" ? Theme.warnInk : Theme.inkMuted
+                                text: cloudUsage.logoutText
+                            }
+                        }
+                    }
+                }
+
+                // Gmail แบบอ่านอย่างเดียว (การ์ด 0072 · Pakon 2026-10-28) · สรุปด้วย AI ในเครื่อง · เนื้อหาเมลไม่ไป Claude (H3)
+                // ไม่มีไฟล์ OAuth client ของเครื่อง = บอกตามจริง ไม่มีปุ่ม (H5) · เลิกเชื่อมต่อต้องกดสองครั้ง
+                Card {
+                    id: gmailCard
+                    objectName: "gmailCard"
+                    Layout.fillWidth: true
+                    implicitHeight: gmailCol.implicitHeight + 40
+                    property bool confirmOff: false
+                    ColumnLayout {
+                        id: gmailCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 10
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 16
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+                                AppText { text: Tr.t("Gmail · อ่านและสรุปเมลด้วยเสียง"); strong: true }
+                                AppText {
+                                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                                    text: Tr.t("ขอสิทธิ์อ่านอย่างเดียวจาก Google (ส่ง ลบ หรือแก้เมลไม่ได้) · พูด “สรุปเมล” “มีเมลใหม่ไหม” · สรุปด้วย AI ในเครื่อง เนื้อหาเมลไม่ส่งไป Claude")
+                                }
+                            }
+                            Chip {
+                                visible: gmailLink.available
+                                text: gmailLink.connected ? Tr.t("เชื่อมต่อแล้ว") : Tr.t("ยังไม่เชื่อมต่อ")
+                                kind: gmailLink.connected ? "ok" : "neutral"
+                                dot: true
+                            }
+                        }
+                        AppText {
+                            objectName: "gmailMissing"
+                            visible: !gmailLink.available
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.warnInk
+                            text: Tr.t("เครื่องนี้ยังไม่มีไฟล์ google_credentials.json ของบัญชีนี้ · ผู้ดูแลต้องใส่ไว้ที่ ~/.local/share/aipc ก่อน")
+                        }
+                        RowLayout {
+                            visible: gmailLink.available
+                            spacing: 12
+                            AppButton {
+                                objectName: "gmailConnect"
+                                visible: !gmailLink.connected
+                                enabled: !gmailLink.busy
+                                text: gmailLink.busy ? Tr.t("รอการอนุญาตจาก Google…") : Tr.t("เชื่อมต่อ Gmail")
+                                onClicked: gmailLink.connect()
+                            }
+                            AppButton {
+                                objectName: "gmailDisconnect"
+                                visible: gmailLink.connected
+                                kind: gmailCard.confirmOff ? "danger" : "ghost"
+                                text: gmailCard.confirmOff ? Tr.t("กดอีกครั้งเพื่อเลิกเชื่อมต่อ") : Tr.t("เลิกเชื่อมต่อ Gmail")
+                                onClicked: {
+                                    if (gmailCard.confirmOff) { gmailCard.confirmOff = false; gmailLink.disconnect() }
+                                    else gmailCard.confirmOff = true
+                                }
+                            }
+                        }
+                        AppText {
+                            objectName: "gmailText"
+                            visible: gmailLink.text !== ""
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                            text: gmailLink.text
                         }
                     }
                 }
