@@ -1112,7 +1112,7 @@
   "เลือกได้เฉพาะตอนเข้าใช้เครื่องจริง": "Only available in a real session",
   "บันทึกไม่สำเร็จ": "Could not save",
   "บันทึกแล้ว แต่เริ่ม AI ใหม่ไม่สำเร็จ · ออกจากระบบแล้วเข้าใหม่ AI จะใช้ตัวนี้": "Saved, but the AI could not restart · sign out and back in to use this model",
-  "แม่น 83/100 · 6.8 token/วิ · RAM 4.5 GB": "Accuracy 83/100 · 6.8 token/s · RAM 4.5 GB",
-  "แม่น 77/100 · 7.4 token/วิ · RAM 2.7 GB": "Accuracy 77/100 · 7.4 token/s · RAM 2.7 GB",
-  "แม่น 88/100 · 3.3 token/วิ · RAM 5.6 GB": "Accuracy 88/100 · 3.3 token/s · RAM 5.6 GB"
+  "แม่น 83/100 · เลือกสกิลถูก 86% · 6.8 token/วิ · RAM 4.5 GB": "Accuracy 83/100 · picks skills right 86% · 6.8 token/s · RAM 4.5 GB",
+  "แม่น 77/100 · เลือกสกิลถูก 78% (พลาดบ่อยกว่าตัวอื่น) · 7.4 token/วิ · RAM 2.7 GB": "Accuracy 77/100 · picks skills right 78% (misses more than the others) · 7.4 token/s · RAM 2.7 GB",
+  "แม่น 88/100 · เลือกสกิลถูก 90% · 3.3 token/วิ · RAM 5.6 GB · ถ้ามีสกิลที่สร้างเองเยอะ สั่งงานช้ามาก (~2 นาที)": "Accuracy 88/100 · picks skills right 90% · 3.3 token/s · RAM 5.6 GB · with many self-made skills, commands are very slow (~2 min)"
 }

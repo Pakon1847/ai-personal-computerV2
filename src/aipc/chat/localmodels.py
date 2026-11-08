@@ -15,11 +15,26 @@ from pathlib import Path
 LIST = Path(__file__).resolve().parents[3] / "scripts" / "pi" / "session" / "llm-models.conf"
 MODELS_DIR = Path("/opt/aipc-models")
 
-# คำบรรยายบนหน้าจอ · ตัวเลขจากผลวัดจริง (docs/benchmarks/2026-10-29-llm-compare · ตอน Pi ร้อน)
+# คำบรรยายบนหน้าจอ · ตัวเลขจากผลวัดจริงตอน Pi ร้อน
+# แม่น / token / RAM = docs/benchmarks/2026-10-29-llm-compare
+# เลือกสกิลถูก (S2a ไม่มีสกิลผู้ใช้) + คำเตือน = docs/benchmarks/2026-11-08-model-picker-m5 (M5)
 INFO = {
-    "gemma4-e2b": ("Gemma 4 E2B", "ค่าเริ่มต้น · สมดุล", "แม่น 83/100 · 6.8 token/วิ · RAM 4.5 GB"),
-    "qwen3.5-2b": ("Qwen3.5 2B", "เร็วและเบาที่สุด", "แม่น 77/100 · 7.4 token/วิ · RAM 2.7 GB"),
-    "qwen3.5-4b": ("Qwen3.5 4B", "แม่นที่สุด แต่ช้า", "แม่น 88/100 · 3.3 token/วิ · RAM 5.6 GB"),
+    "gemma4-e2b": (
+        "Gemma 4 E2B",
+        "ค่าเริ่มต้น · สมดุล",
+        "แม่น 83/100 · เลือกสกิลถูก 86% · 6.8 token/วิ · RAM 4.5 GB",
+    ),
+    "qwen3.5-2b": (
+        "Qwen3.5 2B",
+        "เร็วและเบาที่สุด",
+        "แม่น 77/100 · เลือกสกิลถูก 78% (พลาดบ่อยกว่าตัวอื่น) · 7.4 token/วิ · RAM 2.7 GB",
+    ),
+    "qwen3.5-4b": (
+        "Qwen3.5 4B",
+        "แม่นที่สุด แต่ช้า",
+        "แม่น 88/100 · เลือกสกิลถูก 90% · 3.3 token/วิ · RAM 5.6 GB"
+        " · ถ้ามีสกิลที่สร้างเองเยอะ สั่งงานช้ามาก (~2 นาที)",
+    ),
 }
 
 
