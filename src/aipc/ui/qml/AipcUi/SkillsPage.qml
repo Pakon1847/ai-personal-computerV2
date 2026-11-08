@@ -19,6 +19,12 @@ ColumnLayout {
     property string renameId: ""
     property bool formOpen: false
     property string catFilter: ""       // "" = ทุกหมวด
+    property string qrPath: ""          // รูป QR ที่เพิ่งสร้าง (การ์ด 0080)
+    function showQr(id) {
+        const r = skills.shareSkillQr(id)
+        page.message = r.message
+        page.qrPath = r.path
+    }
     readonly property var shownUserSkills: skills.userSkills.filter(
         u => u.site === "" && (page.catFilter === "" || u.category === page.catFilter))
     function openEditor(id) {
@@ -265,6 +271,37 @@ ColumnLayout {
         text: page.message
         Layout.fillWidth: true
         size: Theme.fontSmall; color: Theme.warnInk
+    }
+    // ---------- QR ของสกิล (การ์ด 0080) · เพื่อนถ่ายรูปจอนี้ หรือรับไฟล์ PNG ไปเปิดในไฟล์ของฉัน ----------
+    Card {
+        objectName: "skillQrCard"
+        visible: page.qrPath !== ""
+        Layout.fillWidth: true
+        Layout.preferredHeight: qcol.implicitHeight + 28
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: qcol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 14
+            spacing: 8
+            Image {
+                objectName: "skillQrImage"
+                source: page.qrPath === "" ? "" : "file:///" + page.qrPath.replace(/\\/g, "/").replace(/^\/+/, "")
+                cache: false
+                fillMode: Image.PreserveAspectFit
+                smooth: false   // จุด QR ต้องคม
+                Layout.preferredWidth: Theme.px(320)
+                Layout.preferredHeight: Theme.px(320)
+                Layout.alignment: Qt.AlignHCenter
+            }
+            AppText {
+                text: Tr.t("ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง · ไม่มีอะไรส่งออกทางอินเทอร์เน็ต")
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+            }
+            AppButton { text: Tr.t("ปิด"); kind: "ghost"; onClicked: page.qrPath = "" }
+        }
     }
     // ---------- ตัวแก้ไฟล์สกิล (การ์ด 0078) · ตรวจด้วยด่านเดียวกับตอนบันทึก (backend ตัดสิน · H7) ----------
     Card {
@@ -574,6 +611,11 @@ ColumnLayout {
                             const card = skills.regenerateSkill(uc.modelData.id)
                             page.message = card.title + Tr.t(" · ผลจะขึ้นในหน้าแชท · ย้อนรุ่นได้")
                         }
+                    }
+                    AppButton {
+                        objectName: "shareQrButton"
+                        text: Tr.t("แชร์เป็น QR"); kind: "secondary"
+                        onClicked: page.showQr(uc.modelData.id)
                     }
                     AppButton {
                         objectName: "deleteSkillButton"

@@ -907,6 +907,34 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(find_items(win, "skillForm")[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_share_skill_as_qr_shows_image(self):
+        """การ์ด 0080: กด "แชร์เป็น QR" → รูป QR ขึ้นในหน้า Skill (โหลดได้จริง) · ไม่มี warning."""
+        from aipc.skills import manifest, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        md = (
+            Path(__file__).resolve().parent.parent
+            / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md"
+        ).read_text(encoding="utf-8")
+        store = userskills.UserSkills(tmp / "aipc" / "skills")
+        store.install(md, manifest.load_builtin(), request="คิดเมนู")
+        skills._user = store
+        skills._reload()
+        settle(100)
+        self.enterContext(mock.patch.dict(os.environ, {"HOME": str(tmp), "USERPROFILE": str(tmp)}))
+        find_items(win, "shareQrButton")[0].clicked.emit()
+        end = time.monotonic() + 5
+        img = find_items(win, "skillQrImage")[0]
+        # (PySide อ่าน Image.status ไม่ได้ → ดูขนาดรูปที่โหลดแล้วแทน)
+        while img.property("implicitWidth") <= 0 and time.monotonic() < end:
+            settle(50)
+        self.assertTrue(find_items(win, "skillQrCard")[0].property("visible"))
+        self.assertGreater(img.property("implicitWidth"), 100, img.property("source"))
+        self.assertTrue((tmp / "สกิลที่ส่งออก" / "fridge-menu-qr.png").exists())
+        self.assertEqual(warnings, [])
+
     def test_backup_card_backs_up_to_a_drive(self):
         """ฟีเจอร์ข้อ 7: การ์ดสำรองในหน้าตั้งค่า · ไดรฟ์ปลอม (โฟลเดอร์) · สำรองในเธรด แล้วบอกผล."""
         engine, win, warnings = self.open_shell("settings")

@@ -142,8 +142,11 @@ ColumnLayout {
                         // ไฟล์สกิล .md จากภายนอก (ฟีเจอร์ข้อ 9): กดแรก = ตรวจและบอกว่าทำอะไร · กดอีกครั้ง = ติดตั้ง
                         AppButton {
                             objectName: "installSkillButton"
-                            visible: !row.modelData.is_dir && row.modelData.name.toLowerCase().endsWith(".md")
-                            text: page.pendingSkill === row.modelData.name ? Tr.t("ยืนยันติดตั้ง") : Tr.t("ติดตั้งเป็นสกิล")
+                            // รูป QR ของสกิล (การ์ด 0080) ใช้ปุ่มเดียวกัน · รูปทั่วไปกดแล้วบอกว่าไม่พบ QR
+                            readonly property bool qr: /\.(png|jpe?g)$/i.test(row.modelData.name)
+                            visible: !row.modelData.is_dir && (qr || row.modelData.name.toLowerCase().endsWith(".md"))
+                            text: page.pendingSkill === row.modelData.name ? Tr.t("ยืนยันติดตั้ง")
+                                  : qr ? Tr.t("ติดตั้งสกิลจาก QR") : Tr.t("ติดตั้งเป็นสกิล")
                             kind: page.pendingSkill === row.modelData.name ? "primary" : "secondary"
                             onClicked: {
                                 const path = filesBrowser.pathOf(row.modelData.name)
