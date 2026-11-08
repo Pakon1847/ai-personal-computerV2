@@ -1853,6 +1853,71 @@ class SessionController(QObject):
         return True
 
 
+class LocalModels(QObject):
+    """เลือก AI ในเครื่อง 3 ตัว (การ์ด 0076) · หน้าตั้งค่า → AI และอินเทอร์เน็ต.
+
+    เก็บแค่ชื่อต่อบัญชี (~/.config/aipc/llm-model) · aipc-llm-start ตัดสินว่าใช้ได้จริงไหม (H7) ·
+    ตัวที่ยังไม่ได้ติดตั้งในเครื่อง = เลือกไม่ได้ + บอกเหตุผล (H5) · สลับ = เริ่ม AI ใหม่ แชทที่บันทึกแล้วไม่หาย
+    """
+
+    changed = Signal()
+
+    def __init__(self, active: bool, models=None, models_dir=None, choice=None, machine=None,
+                 restart=None, on_switch=None):  # fmt: skip
+        super().__init__()
+        from aipc.chat import localmodels as lm
+
+        self._lm = lm
+        self._active = active
+        self._models = lm.load() if models is None else models
+        self._dir = models_dir or lm.MODELS_DIR
+        self._choice_path = choice
+        self._machine = lm.machine_file() if machine is None else machine
+        self._restart = restart or lm.restart
+        self._on_switch = on_switch
+        self._error = ""
+
+    def _current_file(self) -> str:
+        choice = self._lm.chosen(self._choice_path)
+        return self._lm.effective(self._models, choice, self._machine, self._dir)
+
+    @Property("QVariantList", notify=changed)
+    def models(self) -> list:
+        cur = self._current_file()
+        out = []
+        for m in self._models:
+            name, hint, stats = self._lm.INFO.get(m.key, (m.key, "", ""))
+            ok = self._lm.installed(m, self._dir)
+            out.append({"key": m.key, "name": name, "hint": hint, "stats": stats,
+                        "installed": ok, "current": m.file == cur})  # fmt: skip
+        return out
+
+    @Property(str, notify=changed)
+    def error(self) -> str:
+        return self._error
+
+    @Slot(str, result=bool)
+    def pick(self, key: str) -> bool:
+        """บันทึกแล้วเริ่ม AI ใหม่ · ชื่อนอกรายการ / ยังไม่ติดตั้ง / ไม่อยู่ในเซสชันจริง = False + error."""
+        self._error = ""
+        model = next((m for m in self._models if m.key == key), None)
+        if model is None or not self._lm.installed(model, self._dir):
+            self._error = "โมเดลนี้ยังไม่ได้ติดตั้งในเครื่อง · ผู้ดูแลต้องติดตั้งก่อน"
+        elif not self._active:
+            self._error = "เลือกได้เฉพาะตอนเข้าใช้เครื่องจริง"
+        elif not self._lm.save(key, self._models, self._choice_path):
+            self._error = "บันทึกไม่สำเร็จ"
+        elif not self._restart():
+            self._error = "บันทึกแล้ว แต่เริ่ม AI ใหม่ไม่สำเร็จ · ออกจากระบบแล้วเข้าใหม่ AI จะใช้ตัวนี้"
+        else:
+            if self._on_switch:
+                self._on_switch(Path(model.file).stem)
+            self.changed.emit()
+            return True
+        self.changed.emit()
+        return False
+
+
 class PresenceStatus(QObject):
     """สถานะของตัวตรวจด้วยกล้อง (ขั้น C) จากไฟล์ที่ตัวตรวจเขียน · อ่านทุก 2 วิ เฉพาะในเซสชันจริง."""
 

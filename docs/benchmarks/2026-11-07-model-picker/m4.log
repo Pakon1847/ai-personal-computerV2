@@ -1,0 +1,14 @@
+T0=2026-11-07 23:39:54
+model "id":"/opt/aipc-models/Qwen3.5-4B-Q4_K_M.gguf"
+start 2026-11-07 23:40:06 · temp=69.2'C
+t=0s avail_mb=4253 swap_used_mb=287 llama=1 chromium_procs=14 tabs=4 chromium_rss_gb=1.34
+t=60s avail_mb=3986 swap_used_mb=299 llama=1 chromium_procs=14 tabs=4 chromium_rss_gb=1.70
+t=120s avail_mb=3848 swap_used_mb=299 llama=1 chromium_procs=14 tabs=4 chromium_rss_gb=1.71
+t=180s avail_mb=3830 swap_used_mb=299 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.81
+t=240s avail_mb=3849 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.80
+t=300s avail_mb=3841 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.81
+t=360s avail_mb=3845 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.80
+t=420s avail_mb=3849 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.80
+t=480s avail_mb=3841 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.81
+t=540s avail_mb=3841 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.80
+t=600s avail_mb=3848 swap_used_mb=298 llama=1 chromium_procs=15 tabs=4 chromium_rss_gb=1.80

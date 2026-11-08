@@ -1,0 +1,15 @@
+T0=2026-11-07 22:58:18
+start 2026-11-07 22:58:28 · temp=66.4'C
+t=0s avail_mb=4501 swap_used_mb=294 llama=1 chromium_procs=1
+t=60s avail_mb=4580 swap_used_mb=294 llama=1 chromium_procs=0
+t=120s avail_mb=4577 swap_used_mb=294 llama=1 chromium_procs=0
+t=180s avail_mb=4583 swap_used_mb=294 llama=1 chromium_procs=0
+t=240s avail_mb=4585 swap_used_mb=294 llama=1 chromium_procs=0
+t=300s avail_mb=4584 swap_used_mb=294 llama=1 chromium_procs=0
+t=360s avail_mb=4589 swap_used_mb=294 llama=1 chromium_procs=0
+t=420s avail_mb=4581 swap_used_mb=294 llama=1 chromium_procs=0
+t=480s avail_mb=4589 swap_used_mb=294 llama=1 chromium_procs=0
+t=540s avail_mb=4578 swap_used_mb=294 llama=1 chromium_procs=0
+t=600s avail_mb=4584 swap_used_mb=294 llama=1 chromium_procs=0
+min_avail_mb=4501 · llama_alive=1 · chromium_procs=0 · answer="content":""
+end 2026-11-07 23:09:50 · temp=75.2'C · throttled=0xe0000

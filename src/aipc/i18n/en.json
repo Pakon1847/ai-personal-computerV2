@@ -1137,5 +1137,22 @@
   "อื่น ๆ": "Other",
   "แชร์เป็น QR": "Share as QR",
   "ติดตั้งสกิลจาก QR": "Install skill from QR",
-  "ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง · ไม่มีอะไรส่งออกทางอินเทอร์เน็ต": "The receiver installs it themselves, and it is always checked before installing · nothing goes over the internet"
+  "ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง · ไม่มีอะไรส่งออกทางอินเทอร์เน็ต": "The receiver installs it themselves, and it is always checked before installing · nothing goes over the internet",
+  "AI ในเครื่อง · เลือกได้ 3 ตัว": "On-device AI · choose 1 of 3",
+  "ทุกตัวทำงานในเครื่อง ไม่ต้องใช้เน็ต · ตัวเลขวัดจริงบน Raspberry Pi 5 (แม่น = ตอบถูกจากชุดคำถาม 100 ข้อ) · เลือกแล้วมีผลกับบัญชีนี้เท่านั้น": "All run on this machine without internet · numbers measured on a Raspberry Pi 5 (accuracy = correct answers out of 100 questions) · applies to this account only",
+  " · ยังไม่ได้ติดตั้งในเครื่องนี้": " · not installed on this machine",
+  "ใช้อยู่": "In use",
+  "ใช้ตัวนี้": "Use this",
+  "AI จะเริ่มใหม่ราว 1 นาที · ระหว่างนั้นยังตอบไม่ได้ · แชทที่บันทึกแล้วไม่หาย": "The AI will restart (about 1 minute) and can't answer meanwhile · saved chats are kept",
+  "เริ่ม AI ใหม่ด้วยตัวนี้": "Restart AI with this model",
+  "ค่าเริ่มต้น · สมดุล": "Default · balanced",
+  "เร็วและเบาที่สุด": "Fastest and lightest",
+  "แม่นที่สุด แต่ช้า": "Most accurate, but slow",
+  "โมเดลนี้ยังไม่ได้ติดตั้งในเครื่อง · ผู้ดูแลต้องติดตั้งก่อน": "This model isn't installed · an administrator must install it first",
+  "เลือกได้เฉพาะตอนเข้าใช้เครื่องจริง": "Only available in a real session",
+  "บันทึกไม่สำเร็จ": "Could not save",
+  "บันทึกแล้ว แต่เริ่ม AI ใหม่ไม่สำเร็จ · ออกจากระบบแล้วเข้าใหม่ AI จะใช้ตัวนี้": "Saved, but the AI could not restart · sign out and back in to use this model",
+  "แม่น 83/100 · เลือกสกิลถูก 86% · 6.8 token/วิ · RAM 4.5 GB": "Accuracy 83/100 · picks skills right 86% · 6.8 token/s · RAM 4.5 GB",
+  "แม่น 77/100 · เลือกสกิลถูก 78% (พลาดบ่อยกว่าตัวอื่น) · 7.4 token/วิ · RAM 2.7 GB": "Accuracy 77/100 · picks skills right 78% (misses more than the others) · 7.4 token/s · RAM 2.7 GB",
+  "แม่น 88/100 · เลือกสกิลถูก 90% · 3.3 token/วิ · RAM 5.6 GB · ถ้ามีสกิลที่สร้างเองเยอะ สั่งงานช้ามาก (~2 นาที)": "Accuracy 88/100 · picks skills right 90% · 3.3 token/s · RAM 5.6 GB · with many self-made skills, commands are very slow (~2 min)"
 }
