@@ -21,6 +21,7 @@ from aipc.ui.backend import (
     FilesBrowser,
     GmailLink,
     I18nBridge,
+    JobsCtl,
     LocalModels,
     LoginController,
     MemoryCtl,
@@ -379,6 +380,7 @@ def build(opts: Options, argv: list[str] | None = None):
             memory=memory,
         ),
         "memoryCtl": MemoryCtl(memory),
+        "jobs": JobsCtl(active=in_session, chat=chat),  # งานข้ามคืน (การ์ด 0081)
         "chat": chat,
         "gmailLink": GmailLink(active=in_session),  # การ์ด 0072: เชื่อม Gmail แบบอ่านอย่างเดียว
         "cloudUsage": CloudUsage(

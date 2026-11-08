@@ -1918,6 +1918,172 @@ class LocalModels(QObject):
         return False
 
 
+class JobsCtl(QObject):
+    """งานข้ามคืน (การ์ด 0081) · หน้าไฟล์ของฉัน: ดูแผน เริ่ม พัก ทำต่อ · หน้าแรก: แจ้งงานค้างหรืองานเสร็จ."""
+
+    changed = Signal()
+    planReady = Signal("QVariantMap")  # noqa: N815
+    _planned = Signal(object)
+    _tick = Signal()
+
+    def __init__(self, active: bool = True, root=None, output=None, home=None, chat=None, ai=None,
+                 temp=None):  # fmt: skip
+        super().__init__()
+        from aipc.jobs import overnight
+
+        self._o = overnight
+        self._active = active
+        self._root = root or overnight.default_root()
+        self._output = output
+        self._home = home or Path.home()
+        self._chat = chat
+        self._ai = ai
+        self._temp = temp or (lambda: skill_machine.cpu_temp_c(Path("/")))
+        self._runner = None
+        self._plan = None
+        self._folder = ""
+        self._job = overnight.find_open(self._root, output) if active else None
+        self._planned.connect(self._on_planned)
+        self._tick.connect(self.changed)
+        if chat is not None:
+            chat.changed.connect(self._chat_changed)
+
+    @Slot()
+    def _chat_changed(self) -> None:
+        if self._chat.busy and self._running:
+            self._runner.preempt()  # แชทได้ก่อนเสมอ (ก้อนนี้จะทำใหม่)
+
+    @property
+    def _running(self) -> bool:
+        return self._runner is not None and self._runner.alive
+
+    @Property(bool, constant=True)
+    def available(self) -> bool:
+        return self._active
+
+    def _line(self, done: int, total: int) -> str:
+        job, r = self._job, self._runner
+        if job.data["state"] == "done":
+            return f"เสร็จแล้ว · ผลอยู่ที่ ไฟล์ของฉัน / งานข้ามคืน / {Path(job.data['result']).name}"
+        if self._running:
+            return {
+                "resting": f"เครื่องร้อน {r.note} · พักก่อน แล้วจะทำต่อเอง ({done} จาก {total} ก้อน)",
+                "waiting-chat": f"รอแชทตอบเสร็จก่อน ({done} จาก {total} ก้อน)",
+                "waiting-ai": f"รอ AI ในเครื่องพร้อม ({done} จาก {total} ก้อน)",
+            }.get(r.status, f"กำลังทำ {done} จาก {total} ก้อน · ล็อกเครื่องได้ · อย่าออกจากระบบ")
+        why = f" · {r.note}" if r is not None and r.note else ""
+        return f"ค้างที่ {done} จาก {total} ก้อน{why} · กด “ทำต่อ” ได้"
+
+    @Property("QVariantMap", notify=changed)
+    def current(self) -> dict:
+        job = self._job
+        if job is None:
+            return {"exists": False, "running": False}
+        done, total = job.counts()
+        return {"exists": True, "name": job.data["name"], "state": job.data["state"],
+                "running": self._running, "done": done, "total": total,
+                "line": self._line(done, total)}  # fmt: skip
+
+    @Property(str, notify=changed)
+    def notice(self) -> str:
+        """ข้อความบนหน้าแรก (H2): เข้าเครื่องครั้งหน้าต้องรู้ว่างานเสร็จหรือค้าง."""
+        job = self._job
+        if job is None or self._running or job.data.get("seen"):
+            return ""
+        done, total = job.counts()
+        return f"งานข้ามคืน “{job.data['name']}”: {self._line(done, total)}"
+
+    @Slot(str)
+    def planFolder(self, folder: str) -> None:  # noqa: N802
+        """ดูว่าโฟลเดอร์นี้มีไฟล์ที่อ่านได้กี่ไฟล์ · อ่าน PDF อาจช้า จึงทำในเธรด · ผลมาทาง planReady."""
+        import threading
+
+        def work():
+            try:
+                real = files.inside(self._home, Path(folder))
+                self._planned.emit((real, self._o.plan_folder(real)))
+            except (OSError, files.OutsideHome) as e:
+                self._planned.emit((None, str(e)))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(object)
+    def _on_planned(self, r: tuple) -> None:
+        folder, plan = r
+        if folder is None:
+            self._plan = None
+            self.planReady.emit({"files": 0, "chunks": 0, "time": "", "skipped": [],
+                                 "problem": f"เปิดโฟลเดอร์นี้ไม่ได้: {plan}"})  # fmt: skip
+            return
+        self._plan, self._folder = plan, str(folder)
+        low, high = round(plan.chunks * 1.5), plan.chunks * 2
+        self.planReady.emit({"files": len(plan.files), "chunks": plan.chunks,
+                             "time": f"ประมาณ {low}–{high} นาที (ยังไม่ได้วัดจริง)",
+                             "skipped": [f"{s['name']}: {s['why']}" for s in plan.skipped],
+                             "problem": plan.problem})  # fmt: skip
+
+    def _launch(self, job) -> None:
+        self._job = job
+        chat = self._chat
+        self._runner = self._o.Runner(
+            job, self._ai or self._o.LocalAi(), temp=self._temp,
+            chat_busy=(lambda: chat.busy) if chat is not None else None,
+            on_change=self._tick.emit,
+        )  # fmt: skip
+        self._runner.start()
+        self.changed.emit()
+
+    @Slot(result=str)
+    def start(self) -> str:
+        """เริ่มตามแผนล่าสุด · คืนเหตุผลเมื่อเริ่มไม่ได้ ("" = เริ่มแล้ว)."""
+        if not self._active or self._plan is None:
+            return "ยังไม่มีแผนงาน"
+        if self._job is not None and self._job.data["state"] in self._o.OPEN_STATES:
+            return "มีงานข้ามคืนค้างอยู่ · ทำต่อหรือยกเลิกงานเดิมก่อน"
+        if self._plan.problem:
+            return self._plan.problem
+        name = Path(self._folder).name
+        try:
+            self._launch(self._o.Job.create(self._root, name, self._plan, self._output))
+        except OSError as e:
+            return f"เริ่มงานไม่ได้: {e.strerror or e}"
+        self._plan = None
+        return ""
+
+    @Slot()
+    def pause(self) -> None:
+        if self._running:
+            self._runner.pause()
+
+    @Slot()
+    def resume(self) -> None:
+        if self._job is not None and not self._running and self._job.data["state"] != "done":
+            self._launch(self._job)
+
+    @Slot()
+    def cancel(self) -> None:
+        """ยกเลิกงานที่ค้าง · ลบเฉพาะสถานะของงาน ไม่แตะไฟล์ต้นฉบับ."""
+        if self._running:
+            self._runner.pause()
+            self._runner._thread.join(timeout=5)
+        if self._job is not None:
+            shutil.rmtree(self._job.folder, ignore_errors=True)
+        self._job, self._runner = None, None
+        self.changed.emit()
+
+    @Slot()
+    def dismiss(self) -> None:
+        """รับทราบงานที่เสร็จแล้ว · งานที่ยังค้างยังอยู่."""
+        job = self._job
+        if job is None or self._running:
+            return
+        job.data["seen"] = True
+        job.save()
+        if job.data["state"] == "done":
+            self._job, self._runner = None, None
+        self.changed.emit()
+
+
 class MemoryCtl(QObject):
     """การ์ด "ความจำ" ในหน้าตั้งค่า (การ์ด 0079) · ดู · ค้น · ลบ · ปักหมุด · ลบทั้งหมด · ส่งออก."""
 

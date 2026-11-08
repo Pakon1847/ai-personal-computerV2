@@ -1163,5 +1163,18 @@
   "ลบทั้งหมด": "Delete all",
   "ค้นความจำ": "Search memory",
   "ปักหมุดแล้ว": "Pinned",
-  "ปักหมุด": "Pin"
+  "ปักหมุด": "Pin",
+  "กำลังดูไฟล์…": "Checking files…",
+  "สรุปไฟล์ในโฟลเดอร์นี้ข้ามคืน": "Summarize this folder overnight",
+  "สรุปโฟลเดอร์นี้ข้ามคืน": "Summarize this folder overnight",
+  " ไฟล์ · ": " files · ",
+  " ก้อน · ": " parts · ",
+  "อ่านไม่ได้: ": "Can't read: ",
+  "เนื้อหาไฟล์ไม่ออกนอกเครื่อง · ล็อกเครื่องได้ แต่ถ้าออกจากระบบ งานจะหยุดแล้วทำต่อได้ตอนเข้าครั้งหน้า": "File contents stay on this machine · you can lock the screen, but signing out pauses the job until you sign in again",
+  "เริ่มเลย": "Start now",
+  "งานข้ามคืน: ": "Overnight job: ",
+  "ความคืบหน้างานข้ามคืน": "Overnight job progress",
+  "พักไว้ก่อน": "Pause",
+  "ทำต่อ": "Continue",
+  "ยกเลิกงาน": "Cancel job"
 }

@@ -1024,7 +1024,7 @@ Item {
         readonly property string missedText: skills.missed.length === 0 ? ""
             : Tr.t("พลาดการเตือน ") + skills.missed.length + Tr.t(" รายการขณะไม่ได้ใช้เครื่อง: ")
               + skills.missed.map(r => r.what + " (" + r.when + ")").join(" · ")
-        readonly property string message: [missedText, skills.reminderWarning].filter(t => t !== "").join("\n")
+        readonly property string message: [missedText, skills.reminderWarning, Tr.x(jobs.notice)].filter(t => t !== "").join("\n")
         visible: message !== "" && !dismissed
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: tools.bottom
@@ -1040,7 +1040,7 @@ Item {
             spacing: 10
             Icon { path: Icons.alert; color: Theme.warnInk; Layout.alignment: Qt.AlignTop }
             AppText { text: notice.message; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
-            AppButton { text: Tr.t("รับทราบ"); kind: "secondary"; onClicked: notice.dismissed = true }
+            AppButton { text: Tr.t("รับทราบ"); kind: "secondary"; onClicked: { notice.dismissed = true; jobs.dismiss() } }
         }
     }
 
