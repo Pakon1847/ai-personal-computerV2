@@ -23,6 +23,7 @@ from aipc.ui.backend import (
     I18nBridge,
     LocalModels,
     LoginController,
+    MemoryCtl,
     PowerController,
     PresenceStatus,
     PrivacyStatus,
@@ -297,6 +298,11 @@ def build(opts: Options, argv: list[str] | None = None):
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
+    memory = None
+    if in_session:
+        from aipc.chat.memory import Memory
+
+        memory = Memory()  # ~/.local/share/aipc/memory.db ของผู้ใช้คนนี้ (การ์ด 0079)
     theme = opts.theme
     if opts.greeter_session and theme is None:
         from aipc.ui.backend import greeter_theme
@@ -315,7 +321,7 @@ def build(opts: Options, argv: list[str] | None = None):
                           forge=skill_forge is not None, claude_on=claude_on,
                           cloud_model=lambda: ui_settings.cloudModel,
                           cloud_effort=lambda: ui_settings.cloudEffort,
-                          auto_cloud=True)  # fmt: skip
+                          auto_cloud=True, memory=memory)  # fmt: skip
 
     def _on_claude_connected() -> bool:
         """เชื่อมต่อ Claude ที่เครื่องนี้เสร็จ (การ์ด 0070 รอบ 3) · ใช้ได้เลยไม่ต้องออกจากระบบ:
@@ -370,7 +376,9 @@ def build(opts: Options, argv: list[str] | None = None):
             # แชท 2 แบบ (การ์ด 0053): ตัวเลือกสกิลรู้ว่าอยู่แชทงาน · คำสั่งเสียงสลับแชท/โมเดล
             chat_mode=lambda: chat.mode,
             chat_switch=_chat_switch(chat, ui_settings),
+            memory=memory,
         ),
+        "memoryCtl": MemoryCtl(memory),
         "chat": chat,
         "gmailLink": GmailLink(active=in_session),  # การ์ด 0072: เชื่อม Gmail แบบอ่านอย่างเดียว
         "cloudUsage": CloudUsage(

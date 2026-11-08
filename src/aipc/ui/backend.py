@@ -1918,6 +1918,90 @@ class LocalModels(QObject):
         return False
 
 
+class MemoryCtl(QObject):
+    """การ์ด "ความจำ" ในหน้าตั้งค่า (การ์ด 0079) · ดู · ค้น · ลบ · ปักหมุด · ลบทั้งหมด · ส่งออก."""
+
+    changed = Signal()
+
+    def __init__(self, memory=None, export_dir: Path | None = None):
+        super().__init__()
+        self._mem = memory  # None = ไม่มี (หน้า Login)
+        self._query = ""
+        self._message = ""
+        self._export_dir = export_dir or Path.home() / "ความจำที่ส่งออก"
+
+    def _rows(self) -> list:
+        if self._mem is None:
+            return []
+        facts = self._mem.search(self._query, k=50) if self._query else self._mem.recent(50)
+        return [{"id": f.id, "text": f.text, "created": f.created[:10], "pinned": f.pinned}
+                for f in facts]  # fmt: skip
+
+    @Property("QVariantList", notify=changed)
+    def facts(self) -> list:
+        try:
+            return self._rows()
+        except Exception as e:  # noqa: BLE001 · ไฟล์เสีย = บอกตรง ๆ ไม่ให้หน้าตั้งค่าเปิดไม่ขึ้น
+            self._message = f"อ่านความจำไม่ได้: {e}"
+            return []
+
+    @Property(int, notify=changed)
+    def count(self) -> int:
+        try:
+            return self._mem.count() if self._mem is not None else 0
+        except Exception:  # noqa: BLE001
+            return 0
+
+    @Property(bool, constant=True)
+    def available(self) -> bool:
+        return self._mem is not None
+
+    @Property(str, notify=changed)
+    def message(self) -> str:
+        return self._message
+
+    def _done(self, message: str = "") -> None:
+        self._message = message
+        self.changed.emit()
+
+    @Slot(str)
+    def search(self, query: str) -> None:
+        self._query = query.strip()
+        self._done()
+
+    @Slot(int)
+    def remove(self, fact_id: int) -> None:
+        if self._mem is not None and self._mem.delete(fact_id):
+            self._done("ลบแล้ว")
+
+    @Slot(int, bool)
+    def pin(self, fact_id: int, on: bool) -> None:
+        if self._mem is not None:
+            self._mem.pin(fact_id, on)
+            self._done()
+
+    @Slot()
+    def clearAll(self) -> None:  # noqa: N802 · หน้าจอถามยืนยันก่อน (กดสองครั้ง)
+        if self._mem is not None:
+            self._mem.clear()
+            self._query = ""
+            self._done("ลบความจำทั้งหมดแล้ว (ลบออกจากไฟล์จริง)")
+
+    @Slot()
+    def exportFile(self) -> None:  # noqa: N802
+        """เขียนเป็นไฟล์ข้อความใน ~/ความจำที่ส่งออก (ไฟล์ของฉัน) ไว้อ่าน/คัดลอกเอง."""
+        if self._mem is None:
+            return
+        dest = self._export_dir / f"ความจำ-{datetime.now():%Y%m%d-%H%M}.txt"
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(self._mem.export_text(), encoding="utf-8", newline="\n")
+        except OSError as e:
+            self._done(f"ส่งออกไม่ได้: {e.strerror or e}")
+            return
+        self._done(f"บันทึกแล้วที่ ไฟล์ของฉัน / {dest.parent.name} / {dest.name}")
+
+
 class PresenceStatus(QObject):
     """สถานะของตัวตรวจด้วยกล้อง (ขั้น C) จากไฟล์ที่ตัวตรวจเขียน · อ่านทุก 2 วิ เฉพาะในเซสชันจริง."""
 
@@ -2356,8 +2440,11 @@ class SkillsController(QObject):
                  run_timer: bool = True, llm_ready=None, forge=None, user_skills=None,
                  weather=None, claude_on=None, weather_on=None, gcal=None,
                  gcal_alert_min=None, holidays=None, time_synced=None, chat_mode=None,
-                 chat_switch=None, installer=None):  # fmt: skip
+                 chat_switch=None, installer=None, memory=None):  # fmt: skip
         super().__init__()
+        self._memory = (
+            memory  # ความจำของผู้ใช้ (การ์ด 0079 · aipc.chat.memory.Memory) · None = ไม่มี (หน้า Login)
+        )
         # นาฬิกาตั้งจากเน็ตแล้วไหม (ตรวจทั้งระบบ 1.1: แบต RTC 0.00V → บูตไม่มีเน็ต = เวลาค้างที่ตอนปิดเครื่อง) ·
         # ไม่ได้ตั้ง = การ์ดเวลา/นัดบอกว่าเวลาอาจไม่ตรง (H5) · เทสต์ที่ใส่นาฬิกาปลอม = ถือว่าตั้งแล้ว
         self._time_synced = time_synced or ((lambda: True) if clock is not None else _ntp_synced)
@@ -4442,10 +4529,24 @@ class SkillsController(QObject):
         return self._plain("command", f"ระบบนี้ไม่มี {name}",
                            ["ตั้งใจไม่รวมไว้ในผู้ช่วย · เปิดเองได้จากเบราว์เซอร์"])  # fmt: skip
 
+    def _memory_card(self, text: str) -> dict | None:
+        from aipc.chat import memory
+
+        if self._memory is None or not (fact := memory.parse_remember(text)):
+            return None
+        fid, why = self._memory.add(fact, source="แชท")
+        if not fid:
+            return self._plain("command", "ไม่ได้จำเรื่องนี้", [why])
+        return self._plain("command", "จำไว้แล้ว", [f"“{fact}”",
+                           "เก็บในเครื่องนี้ในบัญชีของคุณเท่านั้น · ดู/ลบได้ที่หน้าตั้งค่า › ความจำ"],
+                           [{"text": "ไม่ส่งออกนอกเครื่อง", "kind": "ok"}])  # fmt: skip
+
     def _handle(self, text: str) -> dict:
         from aipc.skills import router
 
         if card := self._unsupported_card(text):
+            return card
+        if card := self._memory_card(text):  # "จำไว้ว่า …" = จดด้วยโค้ด ไม่ผ่าน AI (การ์ด 0079)
             return card
 
         if card := self._agenda_card(text):  # ถามตารางนัด = ตอบจากไฟล์นัดด้วยโค้ด ไม่ใช่จดนัดใหม่
@@ -4779,8 +4880,9 @@ class ChatController(QObject):
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
                  claude_on=None, meter=None, auto_cloud=False, cloud_model=None,
-                 cloud_effort=None):  # fmt: skip
+                 cloud_effort=None, memory=None):  # fmt: skip
         super().__init__()
+        self._memory = memory  # การ์ด 0079: ข้อที่เกี่ยวกับข้อความล่าสุด ต่อท้าย system prompt
         # cloud(คำถาม, บทสนทนา[, model=]) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
         self._auto_cloud = auto_cloud
@@ -4994,6 +5096,15 @@ class ChatController(QObject):
         )
         return base + (self.TOOLS_HINT if tools else "")
 
+    def _memory_block(self, text: str) -> str:
+        """ความจำที่เกี่ยว (≤ 5 ข้อ) · ต่อท้าย system prompt ส่วนต้นจึงคงที่ แคชยังใช้ได้ · พัง = ตอบได้ตามปกติ."""
+        if self._memory is None or not text:
+            return ""
+        try:
+            return self._memory.prompt_block(text)
+        except Exception:  # noqa: BLE001 · ไฟล์ความจำเสีย/ถูกล็อก ต้องไม่ทำให้แชทตอบไม่ได้
+            return ""
+
     def _all_tools(self, text: str = "", user: bool = True) -> list:
         """ask-cloud (ถ้ามี Claude) ไว้หน้าสุด + สกิล · ลำดับคงที่ แคชจึงใช้ได้
         · text = ข้อความที่ใช้เลือกสกิล (0018) · user=False = ไม่มีสกิลของผู้ใช้ (0074)."""
@@ -5067,7 +5178,7 @@ class ChatController(QObject):
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
             messages, trimmed = client.fit_context(
-                self._system(tools, text), self._conv["messages"]
+                self._system(tools, text) + self._memory_block(text), self._conv["messages"]
             )
             messages = [self._for_local(m) for m in messages]
         self._trimmed = trimmed and not prompt

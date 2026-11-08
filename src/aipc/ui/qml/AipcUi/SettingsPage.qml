@@ -1098,7 +1098,87 @@ ColumnLayout {
                     }
                 }
 
-                
+                // ความจำของผู้ใช้ (การ์ด 0079): จดเฉพาะที่สั่ง "จำไว้ว่า…" · อยู่ในเครื่อง บัญชีนี้เท่านั้น · ลบหมดได้
+                Card {
+                    id: memCard
+                    objectName: "memoryCard"
+                    visible: memoryCtl.available
+                    Layout.fillWidth: true
+                    implicitHeight: memCol.implicitHeight + 40
+                    property bool confirmClear: false
+                    ColumnLayout {
+                        id: memCol
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 10
+                        RowLayout {
+                            Layout.fillWidth: true
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+                                AppText { text: Tr.t("ความจำ"); strong: true }
+                                AppText {
+                                    objectName: "memorySummary"
+                                    Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                                    text: memoryCtl.count === 0
+                                          ? Tr.t("ยังไม่มี · พิมพ์ในแชทว่า “จำไว้ว่า …” แล้วผู้ช่วยจะจำไว้ใช้ในแชทต่อ ๆ ไป")
+                                          : Tr.t("จำไว้ ") + memoryCtl.count + Tr.t(" เรื่อง · อยู่ในเครื่องนี้ บัญชีของคุณเท่านั้น · ไม่จดรหัสผ่านหรือเลขบัตร")
+                                }
+                            }
+                            AppButton {
+                                objectName: "exportMemory"
+                                visible: memoryCtl.count > 0
+                                kind: "secondary"
+                                text: Tr.t("ส่งออก")
+                                onClicked: memoryCtl.exportFile()
+                            }
+                            AppButton {
+                                objectName: "clearMemory"
+                                visible: memoryCtl.count > 0
+                                kind: memCard.confirmClear ? "danger" : "ghost"
+                                text: memCard.confirmClear ? Tr.t("กดอีกครั้งเพื่อลบทั้งหมด") : Tr.t("ลบทั้งหมด")
+                                onClicked: {
+                                    if (memCard.confirmClear) { memoryCtl.clearAll(); memCard.confirmClear = false }
+                                    else memCard.confirmClear = true
+                                }
+                            }
+                        }
+                        AppField {
+                            objectName: "memorySearch"
+                            visible: memoryCtl.count > 0
+                            Layout.fillWidth: true
+                            placeholder: Tr.t("ค้นความจำ")
+                            field.onTextChanged: memoryCtl.search(field.text)
+                        }
+                        AppText {
+                            visible: memoryCtl.message !== ""
+                            text: memoryCtl.message
+                            Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+                        }
+                        Repeater {
+                            model: memoryCtl.facts
+                            delegate: RowLayout {
+                                id: memRow
+                                required property var modelData
+                                objectName: "memoryRow"
+                                Layout.fillWidth: true
+                                spacing: 8
+                                AppText { Layout.fillWidth: true; text: memRow.modelData.text }
+                                AppText { text: memRow.modelData.created; size: Theme.fontCaption; color: Theme.inkFaint }
+                                AppButton {
+                                    kind: memRow.modelData.pinned ? "primary" : "ghost"
+                                    text: memRow.modelData.pinned ? Tr.t("ปักหมุดแล้ว") : Tr.t("ปักหมุด")
+                                    onClicked: memoryCtl.pin(memRow.modelData.id, !memRow.modelData.pinned)
+                                }
+                                AppButton {
+                                    objectName: "deleteMemory"
+                                    kind: "ghost"; text: Tr.t("ลบ")
+                                    onClicked: memoryCtl.remove(memRow.modelData.id)
+                                }
+                            }
+                        }
+                    }
+                }
             }
             ColumnLayout {
                 objectName: "settingsSection_backup"
