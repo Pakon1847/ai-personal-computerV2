@@ -1163,5 +1163,6 @@
   "ลบทั้งหมด": "Delete all",
   "ค้นความจำ": "Search memory",
   "ปักหมุดแล้ว": "Pinned",
-  "ปักหมุด": "Pin"
+  "ปักหมุด": "Pin",
+  "กำลังบันทึก · ทำให้ดูได้เลย · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …": "Recording · show me now · when done say: finished, name it …"
 }

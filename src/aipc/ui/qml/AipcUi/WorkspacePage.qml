@@ -179,6 +179,13 @@ Item {
             if (voice.available) voice.speak(i.length - 1, say)
         }
     }
+    // จบการสาธิต (การ์ด 0048) → การ์ดแสดงขั้นที่จด + ถามก่อนส่งให้ Claude
+    Connections {
+        target: browser
+        function onDemoReady(name, steps, site) {
+            root.voiceDispatch(skills.siteDemo(name, steps, site), root.vc.heard || name)
+        }
+    }
     // เปิดเว็บจากปุ่ม/พิมพ์/สกิล (การ์ด 0031) เสร็จทีหลัง · ไม่แก้ข้อความล่าสุดในแชท (ต่างจาก onFinished ของคำสั่งเสียง) ·
     // ไม่สำเร็จต้องบอก (H5): หน้าแรก = ใต้ปุ่ม · ในแชท = เพิ่มข้อความใหม่
     Connections {
@@ -343,6 +350,10 @@ Item {
         }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
         if (browser.busy) { voiceSay(t, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")); return }
+        // การ์ด 0048: "เริ่มบันทึก" · "เสร็จแล้ว ตั้งชื่อว่า …" (โค้ดตัดสิน · ผลมาทาง onFinished และ onDemoReady)
+        const demo = browser.demoCommand(t)
+        if (demo.started) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
+        if (demo.say) { voiceSay(t, demo.say); return }
         // การ์ด 0071: "อ่านเมลล่าสุด" / "มีเมลใหม่ไหม" = อ่านกล่องจดหมาย Gmail ในเครื่อง (ไม่ผ่าน AI · ผลมาทาง onFinished)
         const mail = browser.mailRead(t)
         if (mail.started) { voiceShow(t, null, Tr.t("กำลังอ่านกล่องจดหมาย…"), true); return }

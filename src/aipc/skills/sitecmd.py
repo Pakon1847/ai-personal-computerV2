@@ -81,12 +81,18 @@ ALIAS_KINDS = frozenset(
 MAX_ALIAS = 60
 MAX_ALIAS_STEPS = 3
 _CONFIRM = re.compile(r"(.*?)\s*·\s*ยืนยันก่อน")
+# คำสั่งหลายขั้น (การ์ด 0048): "คลิก A แล้ว กดคีย์ k" · ทำทีละขั้น ขั้นไหนไม่สำเร็จ = หยุด
+MAX_STEPS = 5
+_VERBS = "กดคีย์|กดปุ่มที่เขียนว่า|คลิก"
+_STEP = re.compile(rf"({_VERBS})\s+(.+)")
+_THEN = re.compile(rf"\s+แล้ว\s+(?=(?:{_VERBS})\s)")
+_KINDS = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system", "กดปุ่มที่เขียนว่า": "click_text"}
 
 
 @dataclass(frozen=True)
 class SiteCommand:
     phrases: tuple[str, ...]
-    kind: str  # key | click | system (การ์ด 0066) | click_text (การ์ด 0069)
+    kind: str  # key | click | system (การ์ด 0066) | click_text (การ์ด 0069) | steps (การ์ด 0048)
     arg: str  # คีย์ เช่น "Shift+N" · ตัวเลือก CSS · ประโยคคำสั่งของระบบ เช่น "เปิดยูทูบอีกแท็บ"
     confirm: bool = False
 
@@ -111,6 +117,48 @@ def alias_commands(arg: str) -> tuple[list, str]:
     return cmds, ""
 
 
+def _check_action(kind: str, arg: str) -> list[str]:
+    """ปัญหาของการกระทำ 1 อย่าง (กดคีย์ · คลิก · กดปุ่มที่เขียนว่า)."""
+    errors = []
+    if " แล้ว ทำคำสั่ง " in f" {arg} ":
+        errors.append("คำสั่งหลายขั้นใช้ “ทำคำสั่ง” ไม่ได้")
+    if kind == "key" and arg.lower() in BROWSER_KEYS:
+        errors.append(f"คีย์ “{arg}” เป็นคีย์ของตัวเบราว์เซอร์ (ปิดแท็บ เปิดหน้าต่างใหม่ ฯลฯ) ใช้ไม่ได้")
+    elif kind == "key" and not KEY_RE.fullmatch(arg):
+        errors.append(
+            f"คีย์ “{arg}” ไม่อยู่ในรายการ (ตัวอักษร ตัวเลข ลูกศร Space Enter Escape Tab + Shift/Ctrl/Alt)"
+        )
+    if kind == "click" and (len(arg) > MAX_SELECTOR or _BAD_SELECTOR.search(arg) or not arg):
+        errors.append(f"ตัวเลือก “{arg[:60]}” ใช้ไม่ได้ (ยาวเกิน/มีอักขระต้องห้าม/แตะรหัสผ่านหรือชำระเงิน)")
+    words = [w.strip() for w in arg.split("|")]
+    if kind == "click_text" and (
+        not all(words) or any(len(w) > MAX_PHRASE or _BAD_SELECTOR.search(w) for w in words)
+    ):
+        why = f"ว่าง/ยาวเกิน {MAX_PHRASE}/มีอักขระต้องห้าม"
+        errors.append(f"ป้ายปุ่ม “{arg[:60]}” ใช้ไม่ได้ ({why})")
+    return errors
+
+
+def parse_steps(arg: str) -> tuple[list[tuple[str, str]], list[str]]:
+    """ "คลิก A แล้ว กดคีย์ k" → ([("click", "A"), ("key", "k")], ปัญหา) · ตรวจทุกขั้นเหมือนคำสั่งขั้นเดียว."""
+    parts = [p.strip() for p in _THEN.split(arg.strip())]
+    steps: list[tuple[str, str]] = []
+    errors: list[str] = []
+    for part in parts:
+        m = _STEP.fullmatch(part)
+        if not m:
+            errors.append(f"ขั้น “{part[:40]}” ไม่ถูกรูป (ใช้ได้: คลิก · กดคีย์ · กดปุ่มที่เขียนว่า)")
+            continue
+        kind, value = _KINDS[m.group(1)], m.group(2).strip()
+        if kind == "key":
+            value = re.sub(r"(?i)(^|\+)esc$", r"\1Escape", value)
+        steps.append((kind, value))
+        errors += _check_action(kind, value)
+    if len(parts) > MAX_STEPS:
+        errors.append(f"มี {len(parts)} ขั้น · ได้ไม่เกิน {MAX_STEPS} ขั้น")
+    return steps, errors
+
+
 def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[str]]:
     """บรรทัดในหัวข้อ "## คำสั่ง" → (คำสั่ง, ปัญหา)."""
     out: list[SiteCommand] = []
@@ -133,27 +181,16 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
         # "Esc" = ชื่อที่คนเขียนบ่อย · เบราว์เซอร์รู้จักแค่ "Escape" (การ์ด 0074 รอบ 3 g21)
         if m.group(2) == "กดคีย์":
             arg = re.sub(r"(?i)(^|\+)esc$", r"\1Escape", arg)
-        kind = {"กดคีย์": "key", "คลิก": "click", "ทำคำสั่ง": "system",
-                "กดปุ่มที่เขียนว่า": "click_text"}[m.group(2)]  # fmt: skip
+        kind = _KINDS[m.group(2)]
+        whole = f"{m.group(2)} {arg}"
+        if kind != "system" and _THEN.search(whole):  # คำสั่งหลายขั้น (การ์ด 0048)
+            kind, arg = "steps", whole
         if not phrases or any(len(p) > MAX_PHRASE for p in phrases):
             errors.append(f"บรรทัด {n}: คำพูดต้องมีและยาวไม่เกิน {MAX_PHRASE} ตัวอักษร")
-        if kind == "key" and arg.lower() in BROWSER_KEYS:
-            errors.append(f"บรรทัด {n}: คีย์ “{arg}” เป็นคีย์ของตัวเบราว์เซอร์ ไม่ใช่คีย์ลัดของเว็บ")
-        elif kind == "key" and not KEY_RE.fullmatch(arg):
-            errors.append(
-                f"บรรทัด {n}: คีย์ “{arg}” ไม่อยู่ในรายการ "
-                "(ตัวอักษร ตัวเลข ลูกศร Space Enter Escape Tab + Shift/Ctrl/Alt)"
-            )
-        if kind == "click" and (len(arg) > MAX_SELECTOR or _BAD_SELECTOR.search(arg) or not arg):
-            errors.append(
-                f"บรรทัด {n}: ตัวเลือก “{arg[:60]}” ใช้ไม่ได้ (ยาวเกิน/มีอักขระต้องห้าม/แตะรหัสผ่านหรือชำระเงิน)"
-            )
-        words = [w.strip() for w in arg.split("|")]
-        if kind == "click_text" and (
-            not all(words) or any(len(w) > MAX_PHRASE or _BAD_SELECTOR.search(w) for w in words)
-        ):
-            why = f"ว่าง/ยาวเกิน {MAX_PHRASE}/มีอักขระต้องห้าม"
-            errors.append(f"บรรทัด {n}: ป้ายปุ่ม “{arg[:60]}” ใช้ไม่ได้ ({why})")
+        if kind == "steps":
+            errors += [f"บรรทัด {n}: {e}" for e in parse_steps(arg)[1]]
+        else:
+            errors += [f"บรรทัด {n}: {e}" for e in _check_action(kind, arg)]
         if kind == "system":
             _cmds, why = alias_commands(arg)
             if why:
@@ -171,7 +208,9 @@ def parse_section(rows: list[tuple[int, str]]) -> tuple[list[SiteCommand], list[
                 known.append(n)
                 continue
             phrases = live
-        if not confirm and any(w in p.lower() for p in phrases for w in RISKY):
+        # คำสั่งหลายขั้นดูคำเสี่ยงในป้าย/ตัวเลือกของทุกขั้นด้วย (ตัวเลือกมาจากหน้าเว็บที่บันทึก)
+        said = [*phrases, arg] if kind == "steps" else phrases
+        if not confirm and any(w in p.lower() for p in said for w in RISKY):
             errors.append(
                 f"บรรทัด {n}: คำสั่ง “{phrases[0]}” ย้อนไม่ได้หรือแตะบัญชี ต้องลงท้ายด้วย “· ยืนยันก่อน”"
             )
@@ -216,7 +255,11 @@ def check_site(site: str) -> list[str]:
 def on_site(site: str, url: str) -> bool:
     """หน้าที่เปิดอยู่เป็นเว็บของสกิลไหม (โดเมนเดียวกันหรือโดเมนย่อย เช่น m.youtube.com)."""
     want = site_host(site)
-    host = (urlsplit(url).hostname or "").removeprefix("www.")
+    parts = urlsplit(url)
+    host = (parts.hostname or "").removeprefix("www.")
+    # maps.google.com ส่งต่อไป www.google.com/maps (การ์ด 0048)
+    if site == "maps" and host == "google.com" and parts.path.startswith("/maps"):
+        return True
     return bool(want) and (host == want or host.endswith("." + want))
 
 
