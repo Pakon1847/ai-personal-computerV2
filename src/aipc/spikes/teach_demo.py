@@ -296,6 +296,68 @@ def cmd_stop(a) -> int:
     return 0
 
 
+def command_line(c: sitecmd.SiteCommand) -> str:
+    verb = {"key": "กดคีย์ ", "click": "คลิก ", "click_text": "กดปุ่มที่เขียนว่า ", "steps": ""}[c.kind]
+    return f"- {' | '.join(c.phrases)} → {verb}{c.arg}"
+
+
+def cmd_forge(a) -> int:
+    """L2: ให้ Claude จริงเขียนคำสั่งจากขั้นที่จด (เสียเงิน · Pakon ตกลงแล้ว 2026-11-08)."""
+    from PySide6.QtCore import QCoreApplication
+
+    from aipc.cloud.ask import find_claude
+    from aipc.skills import forge, manifest, userskills
+    from aipc.ui.backend import SkillsController
+
+    QCoreApplication.instance() or QCoreApplication([])
+    exe = find_claude()
+    if exe is None:
+        print("ไม่มีคำสั่ง claude")
+        return 2
+    tasks = {t["id"]: t for t in loads()["tasks"]}
+    builtin = manifest.load_builtin()
+    rows, written, literal = [], {}, {}
+    with tempfile.TemporaryDirectory(prefix="aipc-demo-") as tmp:
+        s = SkillsController(
+            run_timer=False, reminders_path=Path(tmp) / "r.json", llm_ready=lambda: True
+        )
+    for rec in json.loads(Path(a.l1).read_text(encoding="utf-8")):
+        if not rec.get("steps"):
+            continue
+        t = tasks[rec["id"]]
+        steps = tuple(x for x in map(demo.parse_step, rec["steps"]) if x is not None)
+        literal[t["id"]] = demo.literal_command(t["say"], steps)
+        request = s._demo_request(t["site"], t["say"], list(steps), "")
+        p = forge.forge(request, skills=builtin, claude=exe, model="sonnet",
+                        check=lambda md: userskills.gate(md, builtin)[1])  # fmt: skip
+        m, errors = userskills.gate(p.skill_md, builtin) if p.skill_md else (None, p.errors)
+        key = sitecmd._norm(t["say"])
+        cmd = next((c for c in (m.commands if m else [])
+                    if any(sitecmd._norm(ph) == key for ph in c.phrases)), None)  # fmt: skip
+        row = {"id": t["id"], "ok": m is not None and cmd is not None, "errors": list(errors),
+               "attempts": p.attempts, "cost_usd": round(p.cost_usd, 4), "request": request,
+               "skill_md": p.skill_md, "line": command_line(cmd) if cmd else "",
+               "note": p.note}  # fmt: skip
+        rows.append(row)
+        if cmd:
+            written[t["id"]] = row["line"]
+        print(json.dumps({k: row[k] for k in ("id", "ok", "attempts", "cost_usd", "line")},
+                         ensure_ascii=False)[:300], flush=True)  # fmt: skip
+    folder = Path(a.out)
+    folder.mkdir(parents=True, exist_ok=True)
+    for name, data in (
+        ("l2.json", rows),
+        ("skills-claude.json", written),
+        ("skills-literal.json", literal),
+    ):
+        (folder / name).write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(
+        f"L2: {sum(r['ok'] for r in rows)}/{len(rows)} · "
+        f"รวม {sum(r['cost_usd'] for r in rows):.3f} USD"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         prog="python -m aipc.spikes.teach_demo", description=__doc__.splitlines()[0]
@@ -308,6 +370,10 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--skills", required=True)
     r.add_argument("--out", required=True)
     r.set_defaults(fn=cmd_replay)
+    r = sub.add_parser("forge")
+    r.add_argument("--l1", required=True)
+    r.add_argument("--out", required=True)
+    r.set_defaults(fn=cmd_forge)
     r = sub.add_parser("stop")
     r.add_argument("--out", required=True)
     r.set_defaults(fn=cmd_stop)
