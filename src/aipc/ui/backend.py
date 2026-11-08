@@ -3675,6 +3675,8 @@ class SkillsController(QObject):
     @Property("QVariantList", notify=skillsChanged)
     def userSkills(self) -> list:  # noqa: N802
         """สกิลที่ Claude สร้างให้ผู้ใช้คนนี้ ทั้งที่เปิดและปิดอยู่ (หน้า Skill · จัดการ/ย้อนรุ่น/ลบ)."""
+        from aipc.skills import userskills
+
         if self._user is None:
             return []
         out = []
@@ -3698,8 +3700,119 @@ class SkillsController(QObject):
                 "request": e.get("request") or m.extra.get("request", ""),
                 "created": (e.get("created") or m.extra.get("created", ""))[:10],
                 "site": m.site,  # การ์ด 0067 รอบ 2: สกิลประจำเว็บไปอยู่ในแถวของเว็บนั้น
+                # การ์ด 0078: หมวดที่ผู้ใช้เลือก · ตรงใจ/ไม่ตรงใจ · รุ่นนี้ผู้ใช้แก้เองไหม
+                "category": e.get("category", ""), "likes": e.get("likes", 0),
+                "downs": e.get("downs", 0), "edited": e.get("edited_by") == userskills.EDIT_TAG,
+                "form": e.get("model") == self.FORM_TAG,
             })  # fmt: skip
         return out
+
+    # ---------- จัดการสกิล (การ์ด 0078) ----------
+    FORM_TAG = "สร้างจากฟอร์ม"
+
+    @Property("QVariantList", constant=True)
+    def skillCategories(self) -> list:  # noqa: N802
+        from aipc.skills import userskills
+
+        return list(userskills.CATEGORIES)
+
+    @Slot(str, result=str)
+    def skillSource(self, skill_id: str) -> str:  # noqa: N802
+        """ไฟล์ .md ของรุ่นที่ใช้อยู่ (ตัวแก้ในหน้า Skill)."""
+        return self._user.current_md(skill_id) if self._is_user(skill_id) else ""
+
+    @Slot(str, str, result="QVariantMap")
+    def checkSkillEdit(self, skill_id: str, md: str) -> dict:  # noqa: N802
+        """ตรวจระหว่างพิมพ์ (ยังไม่บันทึก) · ด่านเดียวกับตอนบันทึก (H7) · added = สิทธิ์ที่ขอเพิ่ม (ต้องยืนยัน)."""
+        from aipc.skills import manifest, userskills
+
+        if not self._is_user(skill_id):
+            return {"ok": False, "errors": ["ไม่ใช่สกิลของผู้ใช้"], "added": []}
+        others = [s for s in self._skills if s.id != skill_id]
+        m, errors = userskills.gate(md, others, skill_id)
+        added = self._user.added_permissions(skill_id, md) if m else []
+        labels = [manifest.PERMISSIONS.get(p, p) for p in added]
+        return {"ok": m is not None, "errors": errors[:5], "added": labels}
+
+    @Slot(str, str, bool, result=str)
+    def saveSkillEdit(self, skill_id: str, md: str, approved: bool) -> str:  # noqa: N802
+        """บันทึกที่แก้เอง = รุ่นใหม่ · คืน "" = สำเร็จ · ไม่ผ่าน = รุ่นเดิมไม่เปลี่ยน (H2)."""
+        from aipc.skills import manifest
+
+        if not self._is_user(skill_id):
+            return "แก้ได้เฉพาะสกิลของผู้ใช้"
+        try:
+            self._user.edit(skill_id, md, self._skills, approved=approved)
+        except manifest.InvalidSkill as e:
+            return "ยังไม่ได้บันทึก: " + "; ".join(e.errors[:2])
+        except OSError as e:
+            return f"บันทึกไม่ได้: {e.strerror or e}"
+        self._reload()
+        return ""
+
+    @Slot(str, str, result=str)
+    def renameSkill(self, skill_id: str, name: str) -> str:  # noqa: N802
+        from aipc.skills import manifest
+
+        if not self._is_user(skill_id):
+            return "เปลี่ยนชื่อได้เฉพาะสกิลของผู้ใช้"
+        try:
+            self._user.rename(skill_id, name, self._skills)
+        except manifest.InvalidSkill as e:
+            return "เปลี่ยนชื่อไม่ได้: " + "; ".join(e.errors[:2])
+        except OSError as e:
+            return f"บันทึกไม่ได้: {e.strerror or e}"
+        self._reload()
+        return ""
+
+    @Slot(str, str)
+    def setSkillCategory(self, skill_id: str, category: str) -> None:  # noqa: N802
+        if self._is_user(skill_id) and self._user.set_category(skill_id, category):
+            self.skillsChanged.emit()
+
+    @Slot(str)
+    def likeSkill(self, skill_id: str) -> None:  # noqa: N802
+        """ปุ่ม "ตรงใจ" ใต้คำตอบของสกิล (การ์ด 0078)."""
+        if self._is_user(skill_id):
+            self._user.liked(skill_id)
+            self.skillsChanged.emit()
+
+    @Slot(str, result="QVariantMap")
+    def regenerateSkill(self, skill_id: str) -> dict:  # noqa: N802
+        """ให้ Claude สร้างใหม่ทั้งตัวจากคำขอเดิม · เก็บเป็นรุ่นใหม่ ย้อนได้ (ด่านเดียวกับครั้งแรก)."""
+        if not self._is_user(skill_id):
+            return self._plain("command", "สร้างใหม่ไม่ได้: ไม่ใช่สกิลของผู้ใช้")
+        request = self._user.info(skill_id).get("request", "")
+        if not request or request.startswith((self.IMPORT_TAG, self.FORM_TAG)):
+            why = "สกิลที่นำเข้าหรือสร้างจากฟอร์ม · ใช้ “แก้เอง” หรือ “ให้ Claude แก้” แทน"
+            return self._plain("command", "สร้างใหม่ไม่ได้: สกิลนี้ไม่มีคำขอเดิม", [why])
+        return self._start_forge(request, skill_id, "สร้างใหม่ทั้งตัวจากคำขอเดิม · ไม่ต้องยึดรุ่นเดิม")
+
+    @Slot(str, "QVariantList", str, bool, result="QVariantMap")
+    def createSkillFromForm(self, what: str, examples, style: str, use_claude: bool) -> dict:  # noqa: N802
+        """ฟอร์ม 3 ช่อง · use_claude = ส่งให้ Claude สร้าง · ไม่ใช้ = สร้างงานภาษาในเครื่อง (local-first)."""
+        from aipc.skills import manifest, userskills
+
+        if self._user is None:
+            return self._plain("command", "บัญชีนี้ติดตั้งสกิลเพิ่มไม่ได้")
+        examples = [str(e) for e in examples or [] if str(e).strip()]
+        if not what.strip() or len(examples) < 3:
+            return self._plain("command", "ยังสร้างไม่ได้", ["ต้องบอกว่าอยากให้ทำอะไร และตัวอย่างคำขอ 3 ข้อ"])
+        if use_claude:
+            ask = f"{what.strip()} · ตัวอย่างคำขอ: " + " | ".join(examples)
+            return self._start_forge(ask + (f" · ตอบแบบ: {style.strip()}" if style.strip() else ""))
+        md = userskills.from_form(what, examples, style)
+        try:
+            request = f"{self.FORM_TAG}: {what.strip()[:80]}"
+            m = self._user.install(md, self._skills, request=request, model=self.FORM_TAG)
+        except manifest.InvalidSkill as e:
+            return self._plain("command", "สร้างสกิลไม่ได้", [*e.errors[:2], "ไม่ได้ติดตั้งอะไร"])
+        except OSError as e:
+            return self._plain("command", "บันทึกไม่ได้", [str(e.strerror or e)])
+        self._reload()
+        return self._plain("command", f"สร้างสกิล “{m.name}” แล้ว (สร้างในเครื่อง ไม่ใช้ Claude)",
+                           ["ลองพิมพ์ตัวอย่างคำขอในแชทได้เลย · แก้หรือลบได้ที่หน้า Skill"],
+                           [{"text": "AI ในเครื่องตอบ", "kind": "ok"}])  # fmt: skip
 
     # ---------- แชร์สกิลเป็นไฟล์ (ฟีเจอร์ข้อ 9 · ADR-011 ข้อเสนอ) ----------
     IMPORT_TAG = "นำเข้าจากไฟล์"

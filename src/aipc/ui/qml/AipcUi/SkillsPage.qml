@@ -13,6 +13,27 @@ ColumnLayout {
     property string filter: "all"       // ตัวกรองสกิลในเครื่อง: all | ready | notReady (การ์ด 0041)
     property string openId: ""          // ไทล์ที่แตะเปิดดูรายละเอียดอยู่
     property string openWeb: ""         // แถวเว็บที่กางอยู่ (การ์ด 0067 รอบ 2)
+    // การ์ด 0078: จัดการสกิล · แก้เอง (ตัวแก้ไฟล์ + ตรวจระหว่างพิมพ์) · เปลี่ยนชื่อ · หมวด · ฟอร์มสร้าง
+    property string editId: ""          // สกิลที่เปิดตัวแก้อยู่ ("" = ปิด)
+    property var editCheck: ({ ok: true, errors: [], added: [] })
+    property string renameId: ""
+    property bool formOpen: false
+    property string catFilter: ""       // "" = ทุกหมวด
+    readonly property var shownUserSkills: skills.userSkills.filter(
+        u => u.site === "" && (page.catFilter === "" || u.category === page.catFilter))
+    function openEditor(id) {
+        page.renameId = ""
+        page.editId = id
+        editor.text = skills.skillSource(id)
+        approveMore.checked = false
+        page.editCheck = skills.checkSkillEdit(id, editor.text)
+    }
+    // ทำที่ระดับหน้า: บันทึกแล้วรายการโหลดใหม่ การ์ดที่กดถูกสร้างใหม่กลางคัน (โค้ดในการ์ดหา page ไม่เจอ)
+    function rename(id, name) {
+        const err = skills.renameSkill(id, name)
+        page.message = err
+        if (err === "") page.renameId = ""
+    }
     // ไอคอนประจำเว็บ (ชุดไอคอนเส้นเดิม · ไม่ใช้อีโมจิ) · เว็บอื่น = ลูกโลก
     readonly property var webIcons: ({
         "all": Icons.sparkle, "youtube": Icons.play, "gmail": Icons.mail, "google": Icons.search,
@@ -166,11 +187,149 @@ ColumnLayout {
               ? Tr.t("ยังไม่มี · สั่งงานใหม่ในแชท เช่น “เปิดโหมดทำงานให้หน่อย” แล้ว Claude จะสร้างสกิลให้ ครั้งหน้า AI ในเครื่องทำเองได้")
               : Tr.t("ยังไม่มี · ต้องติดตั้งและเข้าสู่ระบบ Claude Code ในบัญชีนี้ก่อน จึงจะให้ Claude สร้างสกิลได้ · ดูวิธีที่หน้าผู้ช่วย › \"ดูวิธีเชื่อมต่อ\"")
     }
+    // ---------- สร้างสกิลเองด้วยฟอร์ม 3 ช่อง (การ์ด 0078) · ไม่มี Claude = สร้างงานภาษาในเครื่อง ----------
+    Flow {
+        Layout.fillWidth: true
+        spacing: 8
+        AppButton {
+            objectName: "openSkillForm"
+            text: page.formOpen ? Tr.t("ปิดฟอร์ม") : Tr.t("สร้างสกิลเอง (กรอกฟอร์ม)")
+            kind: "secondary"
+            onClicked: page.formOpen = !page.formOpen
+        }
+        // หมวดที่ผู้ใช้เลือกเอง · กรองการ์ดด้านล่าง · ยังไม่มีสกิลไหนมีหมวด = ไม่แสดง
+        Repeater {
+            model: ["", ...skills.skillCategories]
+            AppButton {
+                required property string modelData
+                objectName: "skillCat_" + (modelData === "" ? "all" : modelData)
+                visible: skills.userSkills.some(u => u.category !== "")
+                text: modelData === "" ? Tr.t("ทุกหมวด") : Tr.t(modelData)
+                kind: page.catFilter === modelData ? "primary" : "ghost"
+                onClicked: page.catFilter = modelData
+            }
+        }
+    }
+    Card {
+        objectName: "skillForm"
+        visible: page.formOpen
+        Layout.fillWidth: true
+        Layout.preferredHeight: fcol.implicitHeight + 28
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: fcol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 14
+            spacing: 10
+            AppField { id: formWhat; objectName: "formWhat"; Layout.fillWidth: true
+                       label: Tr.t("อยากให้สกิลนี้ทำอะไร"); placeholder: Tr.t("เช่น ช่วยคิดเมนูอาหารเย็นจากของในตู้เย็น") }
+            AppText { text: Tr.t("ตัวอย่างคำขอ 3 ข้อ (ประโยคที่คุณจะพิมพ์จริง)"); strong: true }
+            AppField { id: formEx1; objectName: "formEx1"; Layout.fillWidth: true; placeholder: Tr.t("ตัวอย่างที่ 1") }
+            AppField { id: formEx2; objectName: "formEx2"; Layout.fillWidth: true; placeholder: Tr.t("ตัวอย่างที่ 2") }
+            AppField { id: formEx3; objectName: "formEx3"; Layout.fillWidth: true; placeholder: Tr.t("ตัวอย่างที่ 3") }
+            AppField { id: formStyle; objectName: "formStyle"; Layout.fillWidth: true
+                       label: Tr.t("อยากให้ตอบแบบไหน (ไม่ใส่ก็ได้)"); placeholder: Tr.t("เช่น สั้น ๆ เป็นข้อ ๆ") }
+            AppCheck {
+                id: formClaude
+                objectName: "formClaude"
+                enabled: skills.canForge
+                checked: false
+                text: Tr.t("ให้ Claude สร้าง (ส่งข้อความในฟอร์มออกนอกเครื่อง)")
+                detail: skills.canForge ? Tr.t("ไม่ติ๊ก = สร้างในเครื่อง เป็นสกิลงานภาษาที่ AI ในเครื่องตอบ")
+                                        : Tr.t("เครื่องนี้ยังไม่มี Claude · สร้างในเครื่องได้เลย")
+            }
+            AppButton {
+                objectName: "createFromForm"
+                text: Tr.t("สร้างสกิล")
+                kind: "primary"
+                enabled: formWhat.text.trim() !== "" && formEx1.text.trim() !== ""
+                         && formEx2.text.trim() !== "" && formEx3.text.trim() !== ""
+                onClicked: {
+                    const card = skills.createSkillFromForm(formWhat.text,
+                        [formEx1.text, formEx2.text, formEx3.text], formStyle.text,
+                        formClaude.checked && skills.canForge)
+                    page.message = [card.title, ...card.lines].join(" · ")
+                    if (card.kind === "command" && card.chips.length > 0) {   // สร้างในเครื่องสำเร็จ
+                        page.formOpen = false
+                        for (const f of [formWhat, formEx1, formEx2, formEx3, formStyle]) f.text = ""
+                    }
+                }
+            }
+        }
+    }
     AppText {
+        objectName: "skillsMessage"
         visible: page.message !== ""
         text: page.message
         Layout.fillWidth: true
         size: Theme.fontSmall; color: Theme.warnInk
+    }
+    // ---------- ตัวแก้ไฟล์สกิล (การ์ด 0078) · ตรวจด้วยด่านเดียวกับตอนบันทึก (backend ตัดสิน · H7) ----------
+    Card {
+        objectName: "skillEditor"
+        visible: page.editId !== ""
+        Layout.fillWidth: true
+        Layout.preferredHeight: ecol.implicitHeight + 28
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: ecol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 14
+            spacing: 8
+            AppText { text: Tr.t("แก้สกิลเอง · บันทึกแล้วเป็นรุ่นใหม่ ย้อนกลับได้"); strong: true; Layout.fillWidth: true }
+            ScrollView {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Theme.px(300)
+                TextArea {
+                    id: editor
+                    objectName: "skillEditorText"
+                    font.family: Theme.mono
+                    font.pixelSize: Theme.fontSmall
+                    color: Theme.ink
+                    wrapMode: TextEdit.Wrap
+                    background: Rectangle { color: Theme.surface; border.color: Theme.lineStrong; radius: 8 }
+                    onTextChanged: if (page.editId !== "") checkTimer.restart()
+                }
+            }
+            Timer {   // ตรวจหลังหยุดพิมพ์ครู่หนึ่ง ไม่ตรวจทุกตัวอักษร
+                id: checkTimer
+                interval: 400
+                onTriggered: page.editCheck = skills.checkSkillEdit(page.editId, editor.text)
+            }
+            AppText {
+                objectName: "skillEditorStatus"
+                Layout.fillWidth: true
+                size: Theme.fontSmall
+                color: page.editCheck.ok ? Theme.okInk : Theme.dangerInk
+                text: page.editCheck.ok ? Tr.t("ผ่านการตรวจ") : page.editCheck.errors.join("\n")
+            }
+            AppCheck {
+                id: approveMore
+                objectName: "approveMorePermissions"
+                visible: page.editCheck.ok && page.editCheck.added.length > 0
+                text: Tr.t("รุ่นนี้ขอสิทธิ์เพิ่ม: ") + page.editCheck.added.join(", ") + Tr.t(" · ฉันอ่านแล้วและยอม")
+            }
+            Flow {
+                Layout.fillWidth: true
+                spacing: 8
+                AppButton {
+                    objectName: "saveSkillEdit"
+                    text: Tr.t("บันทึกเป็นรุ่นใหม่")
+                    kind: "primary"
+                    enabled: page.editCheck.ok && (page.editCheck.added.length === 0 || approveMore.checked)
+                    onClicked: {
+                        const err = skills.saveSkillEdit(page.editId, editor.text, approveMore.checked)
+                        page.message = err === "" ? Tr.t("บันทึกแล้ว") : err
+                        if (err === "") page.editId = ""
+                    }
+                }
+                AppButton { text: Tr.t("ยกเลิก"); kind: "ghost"; onClicked: page.editId = "" }
+            }
+        }
     }
     GridLayout {
         objectName: "userSkillsGrid"
@@ -179,7 +338,7 @@ ColumnLayout {
         columnSpacing: 12
         rowSpacing: 12
         Repeater {
-            model: skills.userSkills.filter(u => u.site === "")   // สกิลประจำเว็บอยู่ในแถวของเว็บนั้น
+            model: page.shownUserSkills   // สกิลประจำเว็บอยู่ในแถวของเว็บนั้น
             delegate: userCard
         }
     }
@@ -330,7 +489,41 @@ ColumnLayout {
                     spacing: 6
                     Chip { text: (uc.modelData.imported ? Tr.t("นำเข้าจากไฟล์") : Tr.t("Claude สร้าง")) + Tr.t(" · รุ่น ") + uc.modelData.version; kind: "accent" }
                     Chip { text: Tr.t("ใช้แล้ว ") + uc.modelData.uses + Tr.t(" ครั้ง") }
+                    // การ์ด 0078: ผู้ใช้บอกเองว่าใช้ได้จริงไหม (ไม่ใช้ AI ตัดสิน · H5)
+                    Chip { objectName: "skillVotes"; visible: uc.modelData.likes + uc.modelData.downs > 0
+                           text: Tr.t("ตรงใจ ") + uc.modelData.likes + Tr.t(" · ไม่ตรงใจ ") + uc.modelData.downs
+                           kind: uc.modelData.downs > uc.modelData.likes ? "warn" : "neutral" }
+                    Chip { visible: uc.modelData.category !== ""; text: Tr.t(uc.modelData.category) }
+                    Chip { visible: uc.modelData.edited; text: Tr.t("แก้เอง") }
                     Chip { visible: uc.modelData.created !== ""; text: uc.modelData.created }
+                }
+                // เปลี่ยนชื่อ (แก้แค่ชื่อ · id และประวัติเดิม)
+                RowLayout {
+                    visible: page.renameId === uc.modelData.id
+                    Layout.fillWidth: true
+                    spacing: 6
+                    AppField { id: newName; objectName: "renameField"; Layout.fillWidth: true; text: uc.modelData.name }
+                    AppButton {
+                        objectName: "renameSave"
+                        text: Tr.t("บันทึกชื่อ"); kind: "primary"
+                        onClicked: page.rename(uc.modelData.id, newName.text)
+                    }
+                }
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 6
+                    AppText { text: Tr.t("หมวด:"); size: Theme.fontSmall; color: Theme.inkMuted }
+                    Repeater {
+                        model: skills.skillCategories
+                        AppButton {
+                            required property string modelData
+                            text: Tr.t(modelData)
+                            kind: uc.modelData.category === modelData ? "primary" : "ghost"
+                            // กดหมวดเดิมซ้ำ = เอาหมวดออก
+                            onClicked: skills.setSkillCategory(uc.modelData.id,
+                                                               uc.modelData.category === modelData ? "" : modelData)
+                        }
+                    }
                 }
                 Repeater {
                     model: uc.modelData.detail
@@ -361,6 +554,26 @@ ColumnLayout {
                     AppButton {
                         text: Tr.t("ส่งออกเป็นไฟล์"); kind: "secondary"
                         onClicked: page.message = skills.exportSkill(uc.modelData.id)
+                    }
+                    AppButton {
+                        objectName: "renameSkillButton"
+                        text: Tr.t("เปลี่ยนชื่อ"); kind: "secondary"
+                        onClicked: { page.editId = ""; page.renameId = page.renameId === uc.modelData.id ? "" : uc.modelData.id }
+                    }
+                    AppButton {
+                        objectName: "editSkillButton"
+                        text: Tr.t("แก้เอง"); kind: "secondary"
+                        onClicked: page.openEditor(uc.modelData.id)
+                    }
+                    AppButton {
+                        objectName: "regenerateSkillButton"
+                        // สร้างใหม่ทั้งตัวจากคำขอเดิม · ต้องมี Claude และมีคำขอเดิม (ไม่ใช่สกิลนำเข้า/จากฟอร์ม)
+                        visible: skills.canForge && !uc.modelData.imported && !uc.modelData.form && uc.modelData.request !== ""
+                        text: Tr.t("ให้ Claude สร้างใหม่"); kind: "secondary"
+                        onClicked: {
+                            const card = skills.regenerateSkill(uc.modelData.id)
+                            page.message = card.title + Tr.t(" · ผลจะขึ้นในหน้าแชท · ย้อนรุ่นได้")
+                        }
                     }
                     AppButton {
                         objectName: "deleteSkillButton"

@@ -16,9 +16,11 @@ Rectangle {
     // สกิลที่ Claude สร้าง (การ์ด 0017 ชั้นที่ 2): ลบทิ้ง หรือบอกว่าผิดตรงไหนให้ Claude แก้
     signal removeSkill(string skillId)
     signal wrongSkill(string skillId, string name)
+    signal likeSkill(string skillId)  // การ์ด 0078: "ตรงใจ" = นับว่าสกิลใช้ได้จริง
     signal askFile(string path)  // การ์ดผลค้นไฟล์: ส่งไฟล์ให้ AI ในเครื่อง
     signal summarizeFile(string path)  // แนบไฟล์แล้วสั่งสรุปทันที
     readonly property bool forged: hasBadge && (info.badge.forgedId || "") !== ""
+    property bool liked: false  // กดตรงใจแล้ว (การ์ดนี้ใบเดียว · กดซ้ำไม่นับเพิ่ม)
 
     readonly property bool hasBadge: info.badge !== undefined && info.badge.name !== undefined
     implicitHeight: col.implicitHeight + 28
@@ -127,6 +129,12 @@ Rectangle {
             AppText {
                 text: card.forged ? Tr.t("สกิลที่ Claude สร้าง · รุ่น ") + card.info.badge.forgedVersion : ""
                 size: Theme.fontSmall; color: Theme.inkMuted; oneLine: true; Layout.fillWidth: true
+            }
+            AppButton {
+                objectName: "likeSkillButton"
+                text: card.liked ? Tr.t("ขอบคุณ") : Tr.t("ตรงใจ"); kind: "ghost"
+                enabled: !card.liked
+                onClicked: { card.liked = true; card.likeSkill(card.info.badge.forgedId) }
             }
             AppButton {
                 text: Tr.t("ไม่ใช่แบบนี้"); kind: "ghost"

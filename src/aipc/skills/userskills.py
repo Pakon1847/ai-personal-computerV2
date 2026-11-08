@@ -25,6 +25,32 @@ AUTO_DENY_APPS = frozenset({"terminal"})
 # ตัวทำงานที่ระบบมีให้สกิลของผู้ใช้ (การ์ด 0074): ขั้นตอน (code · code+llm) · งานภาษา (llm) · สกิลประจำเว็บ (code)
 # แบบอื่น (กล้อง+ภาพ · เสียง+llm) มีแต่สกิลในตัวที่มีโค้ดรองรับ · S1 b19 = สกิล "ถ่ายภาพเงียบ ๆ" ผ่านด่านเดิมได้
 USER_WORKERS = frozenset({"code", "code+llm", "llm"})
+# หมวดที่ผู้ใช้เลือกเองในหน้า Skill (การ์ด 0078) · "" = ยังไม่เลือก
+CATEGORIES = ("งานเรียน", "งานบ้าน", "สุขภาพ", "บันเทิง", "งาน", "อื่น ๆ")
+EDIT_TAG = "แก้เอง"  # ที่มาของรุ่นที่ผู้ใช้แก้เอง (index.json "edited_by")
+
+
+class NeedsReview(manifest.InvalidSkill):
+    """รุ่นแก้ขอสิทธิ์เพิ่ม → ยังไม่ติดตั้ง จนกว่าผู้ใช้ดูหน้าตรวจแล้วกดยืนยัน (การ์ด 0078 K2)."""
+
+    def __init__(self, added: list[str]):
+        labels = ", ".join(manifest.PERMISSIONS.get(p, p) for p in added)
+        super().__init__([f"รุ่นนี้ขอสิทธิ์เพิ่ม: {labels} · ต้องดูและยืนยันก่อนติดตั้ง"])
+        self.added = added
+
+
+def with_name(skill_md: str, name: str) -> str:
+    """เปลี่ยนเฉพาะบรรทัด name: ในส่วนหัว · ไม่มีส่วนหัว/ไม่มีบรรทัดนี้ = คืนข้อความเดิม (ตัวตรวจจะบอกเอง)."""
+    lines = skill_md.split("\n")
+    if not lines or lines[0].strip().lstrip("﻿") != "---":
+        return skill_md
+    for i, line in enumerate(lines[1:], 1):
+        if line.strip() == "---":
+            break
+        if line.startswith("name:"):
+            lines[i] = "name: " + " ".join(name.split())
+            break
+    return "\n".join(lines)
 
 
 def default_dir() -> Path:
@@ -240,6 +266,8 @@ class UserSkills:
             "enabled": True,
             "uses": old.get("uses", 0),
             "strikes": old.get("strikes", 0) if replacing else 0,
+            # การ์ด 0078: นับตรงใจ/ไม่ตรงใจ + หมวด ติดไปทุกรุ่น
+            **{k: old[k] for k in ("likes", "downs", "category") if k in old},
             "request": request,
             "model": model,
             "cost_usd": round(cost_usd, 4),
@@ -281,7 +309,55 @@ class UserSkills:
 
     def wrong(self, skill_id: str) -> bool:
         """ผู้ใช้กด "ไม่ใช่แบบนี้" · คืน True ถ้าปิดสกิลแล้ว."""
+        e = self.info(skill_id)
+        self._index[skill_id] = {**e, "downs": e.get("downs", 0) + 1}
         return self.record(skill_id, ok=False)
+
+    def liked(self, skill_id: str) -> None:
+        """ผู้ใช้กด "ตรงใจ" หลังสกิลตอบ (การ์ด 0078) · ล้างนับผิดติดกันด้วย."""
+        e = self.info(skill_id)
+        self._index[skill_id] = {**e, "likes": e.get("likes", 0) + 1, "strikes": 0}
+        self._save_index()
+
+    def set_category(self, skill_id: str, category: str) -> bool:
+        if category and category not in CATEGORIES or not (self.folder / f"{skill_id}.md").exists():
+            return False
+        self._index[skill_id] = {**self.info(skill_id), "category": category}
+        self._save_index()
+        return True
+
+    def added_permissions(self, skill_id: str, skill_md: str) -> list[str]:
+        """สิทธิ์ที่รุ่นใหม่ขอเกินรุ่นที่ใช้อยู่ (อ่านไม่ได้ = ไม่มีสิทธิ์เพิ่ม · ตัวตรวจจะบอกเหตุเอง)."""
+        new, _ = check_md(skill_md)
+        try:
+            old = manifest.load(self.folder / f"{skill_id}.md").permissions
+        except manifest.InvalidSkill:
+            old = ()
+        return [p for p in new.permissions if p not in old] if new else []
+
+    def edit(
+        self, skill_id: str, skill_md: str, existing: list[manifest.Manifest], *, approved=False
+    ) -> manifest.Manifest:
+        """ผู้ใช้แก้เอง/เปลี่ยนชื่อ = รุ่นใหม่ ย้อนได้ (การ์ด 0078 K1) · ไม่ผ่าน = รุ่นเดิมไม่เปลี่ยน (H2) ·
+        ขอสิทธิ์เพิ่มโดยยังไม่ยืนยัน = NeedsReview (K2)."""
+        if not (self.folder / f"{skill_id}.md").exists():
+            raise manifest.InvalidSkill([f"ไม่มีสกิล {skill_id}"])
+        if (added := self.added_permissions(skill_id, skill_md)) and not approved:
+            raise NeedsReview(added)
+        e = self.info(skill_id)
+        m = self.install(skill_md, existing, request=e.get("request", ""), model=e.get("model", ""),
+                         cost_usd=e.get("cost_usd", 0.0), replacing=skill_id)  # fmt: skip
+        self._index[skill_id]["edited_by"] = EDIT_TAG
+        self._save_index()
+        return m
+
+    def rename(
+        self, skill_id: str, name: str, existing: list[manifest.Manifest]
+    ) -> manifest.Manifest:
+        """แก้แค่ name: (id เดิม · ประวัติเดิม) · ผ่านด่านเต็มเหมือนแก้เอง (ชื่อก็หลอกได้)."""
+        if not name.strip():
+            raise manifest.InvalidSkill(["ชื่อว่างไม่ได้"])
+        return self.edit(skill_id, with_name(self.current_md(skill_id), name), existing)
 
     def versions(self, skill_id: str) -> list[int]:
         d = self.folder / ".versions" / skill_id
@@ -316,3 +392,26 @@ class UserSkills:
             return (self.folder / f"{skill_id}.md").read_text(encoding="utf-8")
         except OSError:
             return ""
+
+
+def from_form(what: str, examples: list[str], style: str = "") -> str:
+    """ฟอร์ม 3 ช่อง → ไฟล์สกิลงานภาษา โดยไม่ต้องมี Claude (การ์ด 0078 · local-first) · ไฟล์ที่ได้ยังต้องผ่าน gate.
+
+    ทำเฉพาะงานภาษา (AI ในเครื่องตอบตามคำสั่ง) ·
+    สกิลสั่งเครื่องต้องให้ Claude สร้าง เพราะต้องเลือกขั้นตอนจาก allow-list
+    """
+    import hashlib
+
+    def one_line(t: str, n: int) -> str:
+        return " ".join(t.split())[:n]
+
+    what = one_line(what, 200)
+    ex = [one_line(e, 120).replace("|", " ") for e in examples if e.strip()]
+    sid = "form-" + hashlib.sha1(what.encode("utf-8")).hexdigest()[:8]
+    head = ["---", f"id: {sid}", f"name: {one_line(what, 40)}", f"description: {what}",
+            "worker: llm", "needs: llm", "examples:", *[f"  - {e}" for e in ex],
+            f"created: {datetime.now().isoformat(timespec='seconds')}", "---"]  # fmt: skip
+    body = ["## คำสั่งให้ AI", f"งาน: {what}"]
+    if style := one_line(style, 200):
+        body.append(f"ตอบแบบ: {style}")
+    return "\n".join([*head, "", *body, ""])
