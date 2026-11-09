@@ -45,11 +45,20 @@
 | ส่งโค้ดขึ้น Pi · รันเทสต์บน Pi · ติดตั้ง · ย้อนรุ่น | `pi-deploy` |
 | เขียน/ตรวจเล่ม · บทที่ 1–5 · บทคัดย่อ | `thesis-chapter` · ไฟล์ Word → `anthropic-skills:docx` |
 | ซ้อมตอบกรรมการ | `defense-drill` |
-| บั๊กยาก · ช้าผิดปกติ · เทสต์พัง | `diagnosing-bugs` |
+| บั๊กยาก · ช้าผิดปกติ · เทสต์พัง | `diagnosing-bugs` เป็นหลัก · `systematic-debugging` เสริมเมื่อหาต้นเหตุไม่เจอ (root-cause-tracing · condition-based-waiting) · แก้ไม่สำเร็จ **2 ครั้ง** หยุดตามหัวข้อ "เมื่อติด" (skill บอก 3 ครั้ง = ไม่ใช้) |
 | ก่อนบอกว่า "เสร็จ / ผ่าน / แก้แล้ว" · ก่อน commit | `verification-before-completion` |
 | ได้คำติจากกรรมการ / คนรีวิว ก่อนลงมือแก้ | `receiving-code-review` |
 | ฟีเจอร์ใหม่ · แผน · การตัดสินใจออกแบบ: ซักให้ชัดก่อนร่างการ์ด | `grilling` (เรียกเองได้) · `/grill-me` = Pakon พิมพ์เอง |
-| การ์ดอนุมัติแล้ว งานหลายขั้น: แตกเป็นแผนย่อยก่อนเขียนโค้ด | `writing-plans` · เก็บแผนที่ `docs/plans/` · ทำเองใน session ไม่ใช้ subagent ถ้า Pakon ไม่สั่ง · skill อื่นที่ไฟล์นี้อ้างถึงแต่ไม่ได้ลง = ข้าม |
+| ฟีเจอร์ใหม่ที่ยังไม่ชัดว่าอยากได้อะไร: คุยหาความต้องการ + เทียบทางเลือก | `brainstorming` · ผลลงการ์ดใน `docs/design/` (ไม่ใช่ `docs/superpowers/`) · ไม่ใช้กับงานเล็กที่สั่งชัดแล้ว · หน้า visual companion: ตั้ง `DISABLE_TELEMETRY=1` กันโหลดโลโก้จากเว็บนอก · ห้าม `--host 0.0.0.0` · ไม่รันบน Pi |
+| การ์ดอนุมัติแล้ว งานหลายขั้น: แตกเป็นแผนย่อยก่อนเขียนโค้ด | `writing-plans` · เก็บแผนที่ `docs/plans/` · ทำเองใน session ไม่ใช้ subagent ถ้า Pakon ไม่สั่ง |
+| ทำตามแผนใน `docs/plans/` | `executing-plans` · skill บอกให้ทำรวดเดียว แต่ต้องหยุดถาม Pakon ตามกฎเหล็กและหัวข้อ "เมื่อติด" เสมอ |
+| เขียนโค้ดฟีเจอร์ที่การ์ดอนุมัติแล้ว · แก้บั๊ก | `test-driven-development` · เห็นเทสต์ fail ก่อนแล้วค่อยเขียนโค้ด · **"Delete means delete" ใช้ไม่ได้กับโค้ดหรือ commit ที่มีอยู่แล้ว** (H2 · ห้ามลบงานเดิม) |
+| เริ่มงานที่ต้องแยกจาก checkout หลัก | `using-git-worktrees` · ที่ตั้ง `D:/aipc-<การ์ด>` (ไม่ใช้ `.worktrees/`) · ไม่ติดตั้ง dependency เอง ใช้ venv หลัก |
+| งานบนสาขาเสร็จ จะรวมหรือส่ง | `finishing-a-development-branch` · เสนอตัวเลือกเท่านั้น · merge push ลบสาขา ทำเมื่อ Pakon สั่ง (กฎเหล็กข้อ 2 · หัวข้อ git) |
+| เขียน/แก้ skill ของ Claude ใน `.claude/skills/` (ไม่ใช่สกิล .md ของระบบใน `src/aipc/skills/`) | `writing-skills` · ทดสอบกับ subagent เมื่อ Pakon สั่งเท่านั้น · ไม่ push |
+| งานที่ใช้ subagent (**เฉพาะเมื่อ Pakon สั่ง** · มีค่าใช้จ่าย) | `subagent-driven-development` · `dispatching-parallel-agents` · `requesting-code-review` |
+| Pakon อยากรู้ว่า session ที่ใช้ superpowers ผิดพลาดตรงไหน | `diagnosing-superpowers` · ใช้ subagent 7 ตัว ถาม Pakon ก่อน · ห้ามเปิด issue บน GitHub หรือแพ็กบันทึกสนทนา โดย Pakon ไม่เห็นข้อความจริงก่อน |
+| skill อ้างถึง `superpowers:<ชื่อ>` | = skill `<ชื่อ>` ในโปรเจกต์นี้ · `using-superpowers` และ hook เริ่ม session **ไม่ได้ลงโดยตั้งใจ** (บังคับเรียก skill แม้โอกาสตรงงาน 1%) · ที่อ้างถึงแล้วไม่มี = ข้าม |
 | บทสนทนายาว จะส่งต่องานให้ session ใหม่ (Pakon พิมพ์ `/handoff`) | `handoff` |
 | ทำโปรเจกต์นี้ทุกครั้ง: ตอบกระชับ ประหยัด token · ปิดด้วย "stop caveman" | `caveman` เปิดตลอด (hook เตือนทุกข้อความ) · ยังตอบภาษาไทย · การสอนและรายงานจบงานตามกติกานี้ยังต้องครบ · `ultra` `wenyan` ไม่ได้ลง |
 | Pakon ขอให้หา skill จากภายนอก | `find-skills` · ค้นด้วย `DISABLE_TELEMETRY=1 npx skills find …` · ห้ามติดตั้งด้วย `npx skills add … -g -y` · โหลดมาอ่านทั้งไฟล์ก่อน + ถาม Pakon ตามกติกาด้านล่าง |
