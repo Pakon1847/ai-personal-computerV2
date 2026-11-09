@@ -122,6 +122,25 @@ def run(url: str, out: Path) -> None:
     save()
     state["h3"] = h3(url, next(r["code"] for r in rows if "code" in r))
     save()
+    finish(url, items, rows, state, save)
+
+
+def resume(url: str, out: Path) -> None:
+    """ทำต่อจากตัวที่ 10 หลังที่อยู่เซิร์ฟเวอร์เปลี่ยนกลางรอบ (Worker และ KV ยังเป็นชุดเดิม)."""
+    state = json.loads((out / "run.json").read_text(encoding="utf-8"))
+    rows = state["rows"]
+
+    def save() -> None:
+        (out / "run.json").write_text(
+            json.dumps(state, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
+
+    state["resumed"] = {"at": now(), "reason": "subdomain changed after item 9 and H3"}
+    save()
+    finish(url, picks(), rows, state, save)
+
+
+def finish(url: str, items: list[dict], rows: list[dict], state: dict, save) -> None:
     wait_next_hour()
     for k in range(9, 19):
         put(url, items[k], rows[k])
@@ -170,7 +189,7 @@ def expiry(url: str, out: Path) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["probe", "run", "expiry"])
+    ap.add_argument("cmd", choices=["probe", "run", "resume", "expiry"])
     ap.add_argument("--out", type=Path, default=ROOT / "docs/benchmarks/2026-11-09-share-real")
     args = ap.parse_args()
     url = os.environ["AIPC_SHARE_URL"].rstrip("/")
@@ -178,6 +197,8 @@ def main() -> None:
         probe(url)
     elif args.cmd == "run":
         run(url, args.out)
+    elif args.cmd == "resume":
+        resume(url, args.out)
     else:
         expiry(url, args.out)
 
