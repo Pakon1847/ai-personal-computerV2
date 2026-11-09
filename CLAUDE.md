@@ -49,6 +49,7 @@
 | ก่อนบอกว่า "เสร็จ / ผ่าน / แก้แล้ว" · ก่อน commit | `verification-before-completion` |
 | ได้คำติจากกรรมการ / คนรีวิว ก่อนลงมือแก้ | `receiving-code-review` |
 | ฟีเจอร์ใหม่: ซักแผนให้ชัดก่อนร่างการ์ด (Pakon พิมพ์ "grill" หรือ `/grill-me`) | `grilling` |
+| การ์ดอนุมัติแล้ว งานหลายขั้น: แตกเป็นแผนย่อยก่อนเขียนโค้ด | `writing-plans` · เก็บแผนที่ `docs/plans/` · ทำเองใน session ไม่ใช้ subagent ถ้า Pakon ไม่สั่ง · skill อื่นที่ไฟล์นี้อ้างถึงแต่ไม่ได้ลง = ข้าม |
 | บทสนทนายาว จะส่งต่องานให้ session ใหม่ (Pakon พิมพ์ `/handoff`) | `handoff` |
 | รีวิวโค้ดก่อนรวมสาขา | `code-review` · ช่องโหว่ → `security-review` |
 | กราฟ/แผนภูมิ (เล่ม · สไลด์) | `dataviz` · สไลด์ PowerPoint → `anthropic-skills:pptx` |
