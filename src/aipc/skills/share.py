@@ -28,6 +28,7 @@ MAX_MD = 64 * 1024  # แตกไฟล์ได้ไม่เกินนี�
 MAX_UPLOAD = 16 * 1024  # เท่าที่เซิร์ฟเวอร์รับ
 SCALE = 8  # 1 จุดของ QR = 8 พิกเซล
 TIMEOUT_S = 15
+USER_AGENT = "aipc-skill-share/1"  # Cloudflare ปฏิเสธชื่อเริ่มต้นของ Python-urllib (error 1010)
 # ที่อยู่เซิร์ฟเวอร์ฝากสกิล · ว่าง = ยังไม่ได้ตั้ง (หน้าจอซ่อนทางเลข · QR ทั้งไฟล์ยังใช้ได้)
 SERVER_URL = ""
 
@@ -179,7 +180,7 @@ def upload(md: str, url: str | None = None, opener=None) -> str:
         raise NotSent("สกิลนี้ใหญ่เกินกว่าจะฝากได้ · ใช้ “ส่งออก” เป็นไฟล์แทน")
     request = urllib.request.Request(
         base + "/v1/skills", data=body, method="POST",
-        headers={"Content-Type": "text/markdown; charset=utf-8"},
+        headers={"Content-Type": "text/markdown; charset=utf-8", "User-Agent": USER_AGENT},
     )  # fmt: skip
     try:
         with (opener or urllib.request.urlopen)(request, timeout=TIMEOUT_S) as reply:
@@ -197,7 +198,9 @@ def download(code: str, url: str | None = None, opener=None) -> str:
     base = server_url() if url is None else url.rstrip("/")
     if not base:
         raise NotSent("ยังไม่ได้ตั้งเซิร์ฟเวอร์ฝากสกิล")
-    request = urllib.request.Request(f"{base}/v1/skills/{code}", method="GET")
+    request = urllib.request.Request(
+        f"{base}/v1/skills/{code}", method="GET", headers={"User-Agent": USER_AGENT}
+    )
     try:
         with (opener or urllib.request.urlopen)(request, timeout=TIMEOUT_S) as reply:
             raw = reply.read(MAX_UPLOAD + 1)

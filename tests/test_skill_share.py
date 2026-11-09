@@ -197,6 +197,16 @@ class NumberTest(unittest.TestCase):
         self.assertGreaterEqual(exact, 20, f"ไม่ถูกส่ง {refused}")
         self.assertEqual(exact, len(GOOD) - len(refused))
 
+    def test_requests_do_not_use_the_default_python_identity(self):
+        # Cloudflare ตอบ 403 (error 1010) ถ้าไม่บอกชื่อ เพราะ urllib ใส่ "Python-urllib" ให้เอง
+        server = FakeServer()
+        code = share.upload("---\nid: x\n---\n", URL, server)
+        share.download(code, URL, server)
+        self.assertEqual(len(server.requests), 2)
+        for request in server.requests:
+            agent = request.get_header("User-agent") or "python-urllib (default)"
+            self.assertNotIn("python", agent.lower())
+
     def test_r4_skill_with_a_secret_is_never_sent(self):
         server = FakeServer()
         for word in ("รหัสผ่านคือ abc", "OTP 123456", "เลขบัตร 1234567890123"):

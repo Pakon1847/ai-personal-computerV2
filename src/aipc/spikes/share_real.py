@@ -71,7 +71,10 @@ def guess(url: str, code: str, deadline: float) -> tuple[int, bool]:
     if time.time() > deadline:
         return -1, False
     try:
-        with urllib.request.urlopen(f"{url}/v1/skills/{code}", timeout=15) as reply:
+        request = urllib.request.Request(
+            f"{url}/v1/skills/{code}", headers={"User-Agent": share.USER_AGENT}
+        )
+        with urllib.request.urlopen(request, timeout=15) as reply:
             reply.read(share.MAX_UPLOAD + 1)
             return reply.status, True
     except urllib.error.HTTPError as e:
