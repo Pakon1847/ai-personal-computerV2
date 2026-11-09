@@ -48,10 +48,10 @@
 | บั๊กยาก · ช้าผิดปกติ · เทสต์พัง | `diagnosing-bugs` |
 | ก่อนบอกว่า "เสร็จ / ผ่าน / แก้แล้ว" · ก่อน commit | `verification-before-completion` |
 | ได้คำติจากกรรมการ / คนรีวิว ก่อนลงมือแก้ | `receiving-code-review` |
-| ฟีเจอร์ใหม่: ซักแผนให้ชัดก่อนร่างการ์ด (Pakon พิมพ์ "grill" หรือ `/grill-me`) | `grilling` |
+| ฟีเจอร์ใหม่ · แผน · การตัดสินใจออกแบบ: ซักให้ชัดก่อนร่างการ์ด | `grilling` (เรียกเองได้) · `/grill-me` = Pakon พิมพ์เอง |
 | การ์ดอนุมัติแล้ว งานหลายขั้น: แตกเป็นแผนย่อยก่อนเขียนโค้ด | `writing-plans` · เก็บแผนที่ `docs/plans/` · ทำเองใน session ไม่ใช้ subagent ถ้า Pakon ไม่สั่ง · skill อื่นที่ไฟล์นี้อ้างถึงแต่ไม่ได้ลง = ข้าม |
 | บทสนทนายาว จะส่งต่องานให้ session ใหม่ (Pakon พิมพ์ `/handoff`) | `handoff` |
-| ตอบสั้นประหยัด token (เฉพาะเมื่อ Pakon พิมพ์ `/caveman` · เลิกด้วย "stop caveman") | `caveman` · ยังตอบภาษาไทย · การสอนและรายงานจบงานตามกติกานี้ยังต้องครบ · `ultra` `wenyan` ไม่ได้ลง |
+| ทำโปรเจกต์นี้ทุกครั้ง: ตอบกระชับ ประหยัด token · ปิดด้วย "stop caveman" | `caveman` เปิดตลอด (hook เตือนทุกข้อความ) · ยังตอบภาษาไทย · การสอนและรายงานจบงานตามกติกานี้ยังต้องครบ · `ultra` `wenyan` ไม่ได้ลง |
 | Pakon ขอให้หา skill จากภายนอก | `find-skills` · ค้นด้วย `DISABLE_TELEMETRY=1 npx skills find …` · ห้ามติดตั้งด้วย `npx skills add … -g -y` · โหลดมาอ่านทั้งไฟล์ก่อน + ถาม Pakon ตามกติกาด้านล่าง |
 | รีวิวโค้ดก่อนรวมสาขา | `code-review` · ช่องโหว่ → `security-review` |
 | กราฟ/แผนภูมิ (เล่ม · สไลด์) | `dataviz` · สไลด์ PowerPoint → `anthropic-skills:pptx` |
