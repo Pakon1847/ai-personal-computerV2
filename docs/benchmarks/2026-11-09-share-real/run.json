@@ -1,0 +1,128 @@
+{
+ "started": "2026-11-09T12:37:57+00:00",
+ "n": 20,
+ "rows": [
+  {
+   "id": "g01",
+   "code": "11193007",
+   "exact": true
+  },
+  {
+   "id": "g02",
+   "code": "94144488",
+   "exact": true
+  },
+  {
+   "id": "g03",
+   "code": "35178278",
+   "exact": true
+  },
+  {
+   "id": "g04",
+   "code": "05643885",
+   "exact": true
+  },
+  {
+   "id": "g05",
+   "code": "10654287",
+   "exact": true
+  },
+  {
+   "id": "g06",
+   "code": "85801970",
+   "exact": true
+  },
+  {
+   "id": "g07",
+   "code": "83163016",
+   "exact": true
+  },
+  {
+   "id": "g08",
+   "code": "71947579",
+   "exact": true
+  },
+  {
+   "id": "g09",
+   "code": "55910024",
+   "exact": true
+  },
+  {
+   "id": "g10",
+   "code": "66485567",
+   "exact": true
+  },
+  {
+   "id": "g11",
+   "code": "89011896",
+   "exact": true
+  },
+  {
+   "id": "g12",
+   "code": "69747466",
+   "exact": true
+  },
+  {
+   "id": "g13",
+   "code": "57920702",
+   "exact": true
+  },
+  {
+   "id": "g14",
+   "code": "13065549",
+   "exact": true
+  },
+  {
+   "id": "g15",
+   "code": "35179356",
+   "exact": true
+  },
+  {
+   "id": "g16",
+   "code": "24738032",
+   "exact": true
+  },
+  {
+   "id": "g17",
+   "code": "48719797",
+   "exact": true
+  },
+  {
+   "id": "g18",
+   "code": "52359814",
+   "exact": true
+  },
+  {
+   "id": "g19",
+   "code": "06827687",
+   "exact": true
+  },
+  {
+   "id": "g20",
+   "code": "25343545",
+   "exact": true
+  }
+ ],
+ "h3": {
+  "started": "2026-11-09T12:38:27+00:00",
+  "seconds": 434.1,
+  "requested": 10000,
+  "statuses": {
+   "404": 29,
+   "429": 9971
+  },
+  "found_200": 0,
+  "worker_json_429": 9971,
+  "first_429_index": 24,
+  "real_code_spots": {
+   "5000": 429,
+   "9999": 429
+  }
+ },
+ "resumed": {
+  "at": "2026-11-09T12:49:27+00:00",
+  "reason": "subdomain changed after item 9 and H3"
+ },
+ "finished": "2026-11-09T14:00:48+00:00",
+ "r1_exact": 20
+}

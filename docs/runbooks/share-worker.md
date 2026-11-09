@@ -13,6 +13,16 @@
 5. ผูกที่เก็บข้อมูล: หน้า Worker → **Settings → Bindings → Add → KV namespace** · Variable name = `SKILLS` (ตัวใหญ่ตามนี้) · เลือก `aipc-skill-share` · กด Deploy
 6. คัดลอกที่อยู่ เช่น `https://aipc-skill-share.ชื่อบัญชี.workers.dev` ส่งให้ผู้ช่วยใส่ใน `SERVER_URL` ของ `src/aipc/skills/share.py`
 
+## ทางที่ใช้จริง (2026-11-09 · wrangler)
+
+ใช้แทนขั้นตอน 4–5 ได้ · ค่าทั้งหมดอยู่ใน [`server/share-worker/wrangler.toml`](../../server/share-worker/wrangler.toml)
+
+1. สร้าง Worker เปล่าจากหน้าเว็บก่อน 1 ครั้ง (**Workers & Pages → Create application**) เพื่อให้บัญชีมี subdomain · ชื่อ Worker ต้องตรงกับ `name` ใน `wrangler.toml`
+2. `npx --yes wrangler login` (Pakon ทำเอง · token เก็บในเครื่อง ห้าม commit)
+3. `cd server/share-worker && npx --yes wrangler deploy`
+
+subdomain ที่ Cloudflare ตั้งให้อัตโนมัติอาจมีชื่อบัญชี · เปลี่ยนได้ที่หน้า Workers & Pages แต่ที่อยู่เดิมและใหม่จะใช้ไม่ได้ชั่วครู่ (พบ TLS error ระหว่างรอ)
+
 ## ตรวจว่าใช้ได้
 
 ```bash
