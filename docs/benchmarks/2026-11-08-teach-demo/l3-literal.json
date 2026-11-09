@@ -1,0 +1,101 @@
+[
+ {
+  "id": "T01",
+  "line": "- ตั้งความเร็วหนึ่งจุดห้า → คลิก #movie_player > div:nth-of-type(26) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(4) แล้ว คลิก #ytp-id-5 > div:nth-of-type(2) > div > div > div:nth-of-type(5) แล้ว คลิก div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(3) > button",
+  "errors": [],
+  "ok": false,
+  "steps": [
+   [
+    false,
+    "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร"
+   ]
+  ],
+  "effect": false
+ },
+ {
+  "id": "T02",
+  "line": "- จอกว้างแบบคลิก → คลิก #movie_player > div:nth-of-type(26) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > button:nth-of-type(1)",
+  "errors": [],
+  "ok": false,
+  "steps": [
+   [
+    false,
+    "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร"
+   ]
+  ],
+  "effect": false
+ },
+ {
+  "id": "T03",
+  "line": "- สลับคำบรรยาย → กดคีย์ c",
+  "errors": [],
+  "ok": true,
+  "steps": [
+   [
+    true,
+    "กดปุ่ม c แล้ว"
+   ]
+  ],
+  "effect": true
+ },
+ {
+  "id": "T05",
+  "line": "- สุ่มบทความ → คลิก #vector-main-menu-dropdown-checkbox แล้ว คลิก #n-randompage > a",
+  "errors": [],
+  "ok": true,
+  "steps": [
+   [
+    true,
+    "ทำแล้ว"
+   ],
+   [
+    true,
+    "ทำแล้ว"
+   ]
+  ],
+  "effect": true
+ },
+ {
+  "id": "T06",
+  "line": "- ดูประวัติหน้านี้ → คลิก #ca-history > a",
+  "errors": [],
+  "ok": true,
+  "steps": [
+   [
+    true,
+    "ทำแล้ว"
+   ]
+  ],
+  "effect": true
+ },
+ {
+  "id": "T08",
+  "line": "- ซูมเข้าสองที → คลิก div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div > div:nth-of-type(1) > button แล้ว คลิก div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div > div:nth-of-type(1) > button",
+  "errors": [],
+  "ok": true,
+  "steps": [
+   [
+    true,
+    "ทำแล้ว"
+   ],
+   [
+    true,
+    "ทำแล้ว"
+   ]
+  ],
+  "effect": true
+ },
+ {
+  "id": "T09",
+  "line": "- ดูภาพดาวเทียม → คลิก div:nth-of-type(9) > div:nth-of-type(18) > div:nth-of-type(4) > div > div > button",
+  "errors": [],
+  "ok": true,
+  "steps": [
+   [
+    true,
+    "ทำแล้ว"
+   ]
+  ],
+  "effect": true
+ }
+]
