@@ -51,11 +51,12 @@
 | ฟีเจอร์ใหม่: ซักแผนให้ชัดก่อนร่างการ์ด (Pakon พิมพ์ "grill" หรือ `/grill-me`) | `grilling` |
 | การ์ดอนุมัติแล้ว งานหลายขั้น: แตกเป็นแผนย่อยก่อนเขียนโค้ด | `writing-plans` · เก็บแผนที่ `docs/plans/` · ทำเองใน session ไม่ใช้ subagent ถ้า Pakon ไม่สั่ง · skill อื่นที่ไฟล์นี้อ้างถึงแต่ไม่ได้ลง = ข้าม |
 | บทสนทนายาว จะส่งต่องานให้ session ใหม่ (Pakon พิมพ์ `/handoff`) | `handoff` |
+| ตอบสั้นประหยัด token (เฉพาะเมื่อ Pakon พิมพ์ `/caveman` · เลิกด้วย "stop caveman") | `caveman` · ยังตอบภาษาไทย · การสอนและรายงานจบงานตามกติกานี้ยังต้องครบ · `ultra` `wenyan` ไม่ได้ลง |
 | รีวิวโค้ดก่อนรวมสาขา | `code-review` · ช่องโหว่ → `security-review` |
 | กราฟ/แผนภูมิ (เล่ม · สไลด์) | `dataviz` · สไลด์ PowerPoint → `anthropic-skills:pptx` |
 | หน้าจอ QML / UI | `ui-ux-pro-max` · `ui-design-system` |
 
-ที่มา skill ภายนอก: `.claude/skills/<ชื่อ>/SOURCE.md` (ตรึง commit · MIT) · เพิ่ม skill ใหม่ = อ่านทั้งไฟล์ก่อน + ถาม Pakon
+ที่มา skill ภายนอก: `.claude/skills/<ชื่อ>/SOURCE.md` (ตรึง commit · ไลเซนส์ตาม SOURCE.md) · เพิ่ม skill ใหม่ = อ่านทั้งไฟล์ก่อน + ถาม Pakon
 
 ## โครงสร้างโค้ด
 
