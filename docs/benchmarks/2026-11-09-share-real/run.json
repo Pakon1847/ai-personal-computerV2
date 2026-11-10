@@ -124,5 +124,9 @@
   "reason": "subdomain changed after item 9 and H3"
  },
  "finished": "2026-11-09T14:00:48+00:00",
- "r1_exact": 20
+ "r1_exact": 20,
+ "expiry": {
+  "checked": "2026-11-10T13:33:11+00:00",
+  "result": "ไม่พบเลขนี้ หรือหมดอายุแล้ว (เก็บไว้ 24 ชั่วโมง)"
+ }
 }
