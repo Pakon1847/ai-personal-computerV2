@@ -1,0 +1,240 @@
+{
+ "date": "2026-11-18T11:04",
+ "server": "http://127.0.0.1:18080",
+ "data": "tests/data/skill_loop_dev.txt",
+ "data_sha256": "aa554c9219fc7eacb356c1e5bd9d2a4b12eec49ae5146f379482fbb28a61167d",
+ "fake_claude": true,
+ "user_count": 0,
+ "user_pool": [],
+ "rows": [
+  {
+   "id": "1",
+   "text": "โหมดดูหนัง ปรับเสียงเป็น 60 แล้วเปิด Netflix ให้หน่อย",
+   "expect": "ปรับเสียงเป็น 60 และเปิด Netflix (ถามยืนยันก่อนทำ)",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "local",
+   "first_plans": [],
+   "first_text": "ฉันไม่สามารถควบคุมการตั้งค่าของอุปกรณ์หรือเปิดแอปพลิเคชันภายนอกได้ค่ะ",
+   "first_seconds": 71.96,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "2",
+   "text": "เตรียมเครื่องสำหรับนอน ลดเสียงเหลือ 10 แล้วตั้งเตือนตื่น 6 โมงเช้า",
+   "expect": "ลดเสียงเป็น 10 และตั้งเตือน 06:00 (ถามยืนยันก่อนทำ)",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "skill:reminder",
+   "first_plans": [],
+   "first_text": "บันทึกนัด “เตรียมเครื่องสำหรับนอน ลดเสียงเหลือ 10 แล้ว ตื่น” ใช่ไหม",
+   "first_seconds": 5.15,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "3",
+   "text": "ช่วยเปลี่ยนข้อความนี้ให้เป็นภาษาทางการสำหรับส่งอาจารย์ หนูขอเลื่อนส่งงานไปวันศุกร์นะคะ",
+   "expect": "ได้ข้อความภาษาไทยทางการ สุภาพ ใจความเลื่อนส่งงานเป็นวันศุกร์",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "skill:letter-writer",
+   "first_plans": [],
+   "first_text": "เรื่อง: ขอเลื่อนกำหนดส่งงาน\nเรียน อาจารย์[ชื่อ]\nข้าพเจ้ามีความประสงค์ขอเลื่อนกำหนดส่งงานไปเป็นวันศุกร์ค่ะ เนื่องจาก[ระบุเหตุผลสั้น ๆ หากมี หรือเว้นว่างไว้] จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ และข้าพเจ้าขอขอบพระคุณเป็นอย่างสูงค่ะ\nขอแสดงความนับถือ\n[ชื่อผู้ส่ง]",
+   "first_seconds": 31.2,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "4",
+   "text": "ทำรายการของที่ต้องซื้อจากเมนูต้มยำกุ้ง",
+   "expect": "ได้รายการวัตถุดิบต้มยำกุ้งเป็นข้อ ๆ เช่น กุ้ง ข่า ตะไคร้ ใบมะกรูด พริก มะนาว น้ำปลา",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "local",
+   "first_plans": [],
+   "first_text": "เพื่อให้ฉันช่วยคุณทำรายการของที่ต้องซื้อจากเมนูต้มยำกุ้งได้ กรุณาบอกฉันก่อนว่าคุณต้องการทำต้มยำกุ้งสูตรไหน หรือมีส่วนผสมอะไรที่ต้องการเป็นพิเศษหรือไม่คะ",
+   "first_seconds": 8.85,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "5",
+   "text": "เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs",
+   "expect": "ปิดเสียงและเปิด Google Docs (ถามยืนยันก่อนทำ)",
+   "asked_create": true,
+   "installed": true,
+   "skill_id": "loop-fake-1",
+   "skill_md": "---\nid: loop-fake-1\nname: เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go\ndescription: สกิลทดลองของตัววัด (Claude ปลอม) สำหรับคำขอ เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\nkeywords: เปิดโหมดเรียนออนไลน์\nexamples:\n  - เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\n  - ช่วยเปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\n  - เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs หน่อย\nworker: llm\nneeds: llm\nversion: 1.0\nauthor: Claude (พี่ใหญ่) · fake\ngenerator: claude -p · fake\ncreated: 2026-11-18\nrequest: เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\n---\n# เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go\n\n## คำสั่งให้ AI\nตอบสั้น ๆ ว่ารับคำขอนี้แล้ว\n",
+   "forge": [
+    {
+     "ok": true,
+     "request": "เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs",
+     "skill_md": "---\nid: loop-fake-1\nname: เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go\ndescription: สกิลทดลองของตัววัด (Claude ปลอม) สำหรับคำขอ เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\nkeywords: เปิดโหมดเรียนออนไลน์\nexamples:\n  - เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\n  - ช่วยเปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\n  - เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs หน่อย\nworker: llm\nneeds: llm\nversion: 1.0\nauthor: Claude (พี่ใหญ่) · fake\ngenerator: claude -p · fake\ncreated: 2026-11-18\nrequest: เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs\n---\n# เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go\n\n## คำสั่งให้ AI\nตอบสั้น ๆ ว่ารับคำขอนี้แล้ว\n",
+     "skill_id": "loop-fake-1",
+     "errors": [],
+     "trial": {
+      "trigger_fail": [],
+      "not_trigger_fail": [],
+      "stolen": [],
+      "should_trigger": [
+       "เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs"
+      ],
+      "should_not_trigger": [
+       "เปิดยูทูบ"
+      ]
+     },
+     "note": "Claude ปลอม",
+     "attempts": 1,
+     "cost_usd": 0.0,
+     "model": "fake",
+     "claude_version": "fake",
+     "pinned_changed": []
+    }
+   ],
+   "first_route": "rule:chat:เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go",
+   "first_plans": [],
+   "first_text": "รับคำขอนี้แล้ว",
+   "first_seconds": 2.65,
+   "first_ledger_added": 1,
+   "unconfirmed": 0,
+   "again_route": "rule:chat:เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go",
+   "again_plans": [],
+   "again_text": "รับคำขอนี้แล้ว",
+   "again_seconds": 1.05,
+   "again_ledger_added": 0,
+   "again_new_skill": true
+  },
+  {
+   "id": "6",
+   "text": "เขียนแคปชันขายเสื้อมือสองสั้น ๆ 3 แบบ",
+   "expect": "ได้แคปชันภาษาไทย 3 แบบ เกี่ยวกับขายเสื้อมือสอง",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "local",
+   "first_plans": [],
+   "first_text": "แน่นอนครับ นี่คือ 3 แคปชันสั้นๆ สำหรับขายเสื้อมือสองครับ:\n\n1. **สไตล์ไม่ซ้ำใคร! ✨ เสื้อวินเทจ/มือสองสภาพดี ราคาเบาๆ ช้าหมดอดนะ!** (เน้นสไตล์และกระตุ้นความเร่งด่วน)\n2. **ช้อปปิ้งอย่างมีสไตล์ ในราคาที่คุณเอื้อมถึง 🛍️ เสื้อสวยๆ รอคุณอยู่!** (เน้นความคุ้มค่าและสไตล์)\n3. **เสื้อตัวโปรดมือสอง... คุณภาพดี ราคาโดน! 💖 ทักมาดูรายละเอียดเลย!** (เน้นคุณภาพและความเป็นส่วนตัว)",
+   "first_seconds": 29.65,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "7",
+   "text": "เตือนให้กินยาหลังอาหารเย็นทุกวัน 1 ทุ่ม",
+   "expect": "ตั้งเตือนกินยาทุกวัน 19:00 (ถามยืนยันก่อนทำ)",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "skill:reminder",
+   "first_plans": [],
+   "first_text": "บันทึกนัด “กินยาหลังอาหารเย็น” ใช่ไหม",
+   "first_seconds": 5.3,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "8",
+   "text": "สรุปข่าวที่ฉันพิมพ์ให้เหลือ 3 บรรทัด ราคาน้ำมันดีเซลขึ้นลิตรละ 50 สตางค์ มีผลพรุ่งนี้เช้า กระทรวงพลังงานบอกว่าเป็นไปตามราคาตลาดโลก",
+   "expect": "ได้สรุปไม่เกิน 3 บรรทัด มีดีเซลขึ้น 50 สตางค์ และมีผลพรุ่งนี้",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "rule:chat:สรุปข้อความ",
+   "first_plans": [],
+   "first_text": "- ราคาน้ำมันดีเซลขึ้นลิตรละ 50 สตางค์\n- การขึ้นราคานี้จะมีผลในวันพรุ่งนี้เช้า\n- กระทรวงพลังงานระบุว่าเป็นไปตามราคาตลาดโลก",
+   "first_seconds": 19.05,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "9",
+   "text": "โหมดฟังเพลงทำงาน เปิด Spotify แล้วปรับเสียงเป็น 30",
+   "expect": "เปิด Spotify และปรับเสียงเป็น 30 (ถามยืนยันก่อนทำ)",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "local",
+   "first_plans": [],
+   "first_text": "ฉันไม่พบเครื่องมือที่สามารถควบคุมแอปพลิเคชันภายนอก เช่น Spotify ได้ค่ะ",
+   "first_seconds": 9.8,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  },
+  {
+   "id": "10",
+   "text": "แปลงหน่วยสูตรขนมนี้จากถ้วยเป็นกรัม แป้ง 2 ถ้วย น้ำตาล 1 ถ้วย",
+   "expect": "ได้ปริมาณเป็นกรัมโดยประมาณของแป้งและน้ำตาล พร้อมบอกว่าเป็นค่าประมาณ",
+   "asked_create": false,
+   "installed": false,
+   "skill_id": "",
+   "skill_md": "",
+   "forge": [],
+   "first_route": "local",
+   "first_plans": [],
+   "first_text": "ในการแปลงหน่วยจากถ้วยเป็นกรัมนั้น ต้องทราบความหนาแน่นของส่วนผสมนั้น ๆ ด้วยค่ะ\n\n*   **แป้ง 2 ถ้วย:** ขึ้นอยู่กับชนิดของแป้ง (เช่น แป้งสาลีอเนกประสงค์) แต่โดยประมาณ แป้งสาลี 1 ถ้วยตวงจะอยู่ที่ประมาณ 120-150 กรัม ดังนั้น แป้ง 2 ถ้วยจะอยู่ที่ประมาณ 240-300 กรัม\n*   **น้ำตาล 1 ถ้วย:** น้ำตาลทราย 1 ถ้วยจะอยู่ที่ประมาณ 200-220 กรัม\n\n**สรุปโดยประมาณ:**\n\n*   **แป้ง:** ประมาณ 240 - 300 กรัม\n*   **น้ำตาล:** ประมาณ 200 - 220 กรัม\n\nหากต้องการความแม่นยำสูง ควรใช้เครื่องชั่งน้ำหนักในการตวงค่ะ",
+   "first_seconds": 34.2,
+   "first_ledger_added": 0,
+   "unconfirmed": 0
+  }
+ ],
+ "ledger": [
+  {
+   "time": "2026-11-18T11:06:47",
+   "kind": "skill",
+   "sent": "เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Google Docs",
+   "chars": 49,
+   "cost_usd": 0.0,
+   "ok": true,
+   "note": "Claude ปลอม (ตัววัด 0083)"
+  }
+ ],
+ "summary": {
+  "L1": [
+   1,
+   10
+  ],
+  "steps": {
+   "asked_create": 1,
+   "installed": 1
+  },
+  "L2": null,
+  "L2_route_ledger": [
+   1,
+   1
+  ],
+  "again_ledger_total": 0,
+  "L4": 0,
+  "pass": {
+   "L1": false,
+   "L2": null,
+   "L4": true,
+   "L3": true
+  }
+ },
+ "L3": {
+  "changed": [],
+  "commands": 80
+ }
+}
