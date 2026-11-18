@@ -832,15 +832,18 @@ class GmailLink(QObject):
         self.changed.emit()
 
 
+CLAUDE_KINDS = ("ask", "skill", "web-agent")  # ชนิดใน ledger ที่ส่งไป Claude (ledger.KINDS)
+
+
 class CloudUsage(QObject):
-    """ค่าใช้จ่าย Claude วันนี้ + เพดานต่อวัน (หน้าตั้งค่า) · ข้อมูลจาก aipc.cloud.budget
-    · ไม่มี Claude = available False."""
+    """การ์ด Claude ในหน้าตั้งค่า: เชื่อมต่อ · ออก · ถามไปกี่ครั้งวันนี้ (นับจาก ledger) · สิ่งที่ส่งออก
+    · ไม่มี Claude = available False · ไม่มีเพดานของระบบ ใช้ขีดจำกัดของบัญชี Claude (การ์ด 0084)."""
 
     changed = Signal()
     guideChanged = Signal()  # noqa: N815
     _logoutFinished = Signal(bool, str)  # noqa: N815 · จากเธรดที่รัน claude auth logout → เธรดหน้าจอ
 
-    def __init__(self, budget=None, available: bool = False, poll_ms: int = 15000, ledger=None,
+    def __init__(self, available: bool = False, poll_ms: int = 15000, ledger=None,
                  user: str | None = None, addresses=None, terminal=None, spawn=None,
                  find=None, run=None, on_connected=None):  # fmt: skip
         super().__init__()
@@ -864,9 +867,8 @@ class CloudUsage(QObject):
         self._proc = None
         self._connected_now = False
         self._watch = QTimer(self, interval=1000, timeout=self._check_connect)
-        self._b = budget
         self._ledger = ledger  # aipc.cloud.ledger.Ledger · ไม่มี = ไม่แสดงรายการ
-        self._available = available and budget is not None
+        self._available = available
         self._timer = QTimer(
             self, interval=poll_ms, timeout=self.changed.emit
         )  # อ่านซ้ำ: บันทึกจากเธรดอื่น
@@ -1001,40 +1003,15 @@ class CloudUsage(QObject):
         )
         self.guideChanged.emit()
 
-    @Property(float, notify=changed)
-    def spentToday(self) -> float:  # noqa: N802
-        return self._b.spent() if self._b else 0.0
-
     @Property(int, notify=changed)
     def callsToday(self) -> int:  # noqa: N802
-        return self._b.calls() if self._b else 0
-
-    @Property(float, notify=changed)
-    def limit(self) -> float:
-        return self._b.limit if self._b else 0.0
-
-    @Property("QVariantList", constant=True)
-    def limits(self) -> list:
-        from aipc.cloud.budget import LIMITS
-
-        return list(LIMITS)
-
-    @Property("QVariantList", constant=True)
-    def levels(self) -> list:
-        """ตัวเลือกเพดานต่อวันแบบไม่แสดงเงิน [{value, name}] เรียงน้อยไปมาก."""
-        from aipc.cloud.budget import LEVELS
-
-        return [{"value": v, "name": n} for v, n in LEVELS.items()]
-
-    @Property(int, notify=changed)
-    def usedPercent(self) -> int:  # noqa: N802
-        return self._b.used_percent() if self._b else 0
-
-    @Slot(float)
-    def setLimit(self, usd: float) -> None:  # noqa: N802
-        if self._b is not None:
-            self._b.set_limit(usd)
-            self.changed.emit()
+        """ครั้งที่ส่งไป Claude วันนี้ = รายการ ledger ชนิดที่ไปหา Claude และเวลาเป็นวันนี้ (เวลาเครื่อง)
+        · อากาศ/ปฏิทิน/Gmail/ค้นเว็บไม่นับ · ไม่มี ledger = 0."""
+        if self._ledger is None:
+            return 0
+        today = datetime.now().strftime("%Y-%m-%d")
+        claude = (e for e in self._ledger.entries() if e.get("kind") in CLAUDE_KINDS)
+        return sum(1 for e in claude if str(e.get("time", "")).startswith(today))
 
     # ---------- สิ่งที่ส่งออกนอกเครื่อง (ledger) ----------
     @Property("QVariantList", notify=changed)

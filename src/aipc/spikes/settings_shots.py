@@ -20,8 +20,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--theme", default="dark")
     ap.add_argument("--scale", type=float, default=1.0)
     ap.add_argument("--size", default="1920x1080")
-    # การ์ด 0061 รอบ 2: ภาพการ์ด Claude ตอนเชื่อมต่อแล้ว (ใช้ไป $spent วันนี้ · ไม่เรียก Claude จริง)
-    ap.add_argument("--cloud-spent", type=float)
+    # การ์ด 0061 รอบ 2: ภาพการ์ด Claude ตอนเชื่อมต่อแล้ว (ไม่เรียก Claude จริง · การ์ด 0084 ไม่มีเพดานแล้ว)
+    ap.add_argument("--cloud-connected", action="store_true")
     a = ap.parse_args(argv)
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
     os.environ.setdefault("AIPC_CLOUD", "0")
@@ -42,12 +42,10 @@ def main(argv: list[str] | None = None) -> int:
     win.setWidth(w)
     win.setHeight(h)
     page = win.findChild(object, "settingsPage")
-    if a.cloud_spent is not None:
+    if a.cloud_connected:
         usage = engine._backends["cloudUsage"]
-        if usage._b is not None:
-            usage._b.record(a.cloud_spent, "chat")
-            usage._available = True
-            usage.changed.emit()
+        usage._available = True
+        usage.changed.emit()
     a.out.mkdir(parents=True, exist_ok=True)
     report = {}
     for sid in ("look", "face", "voice", "ai", "privacy", "backup"):

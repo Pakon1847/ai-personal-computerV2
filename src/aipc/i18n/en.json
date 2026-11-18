@@ -97,7 +97,7 @@
   "กดอีกครั้งเพื่อลบทั้งหมด": "Press again to delete all",
   "Claude · AI ออนไลน์ที่เก่งกว่า": "Claude · a smarter online AI",
   "ปกติเครื่องตอบเองด้วย AI ในเครื่อง (ฟรี · ไม่ต้องใช้เน็ต) · เรื่องที่ตอบเองไม่ได้ เช่น ข่าววันนี้ ราคาทอง หรือให้สร้างสกิลใหม่ จะถาม Claude ทางอินเทอร์เน็ตแทน": "Normally the on-device AI answers (free · no internet) · things it cannot answer, like today's news, gold prices or making a new skill, go to Claude over the internet",
-  "ครบวันนี้แล้ว": "Today's limit reached",
+  "เครื่องไม่จำกัดจำนวนครั้งเอง · ใช้ได้ตามโควตาบัญชี Claude ของคุณ · ถ้าบัญชีใช้ครบ เครื่องจะบอก และตอบด้วย AI ในเครื่องแทน": "This computer sets no limit of its own · you can use Claude up to your Claude account's quota · if the account runs out, it tells you and the on-device AI answers instead",
   "บัญชีนี้ยังไม่ได้เชื่อมต่อ Claude · ตอนนี้ใช้ได้แค่ AI ในเครื่อง": "This account is not connected to Claude · only the on-device AI works now",
   "ให้ถาม Claude เมื่อ AI ในเครื่องตอบไม่ได้": "Ask Claude when the on-device AI cannot answer",
   "ส่งไปแค่คำถามกับข้อความล่าสุด (ไม่เกิน 4 ข้อความ) · ไม่ส่งไฟล์ นัด หรือใบหน้า · ดูทุกอย่างที่ส่งไปได้ที่หมวด \"ความเป็นส่วนตัว\"": "Only the question and the latest messages (up to 4) are sent · never files, appointments or faces · see everything sent under \"Privacy\"",

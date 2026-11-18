@@ -601,9 +601,8 @@ ColumnLayout {
                             }
                             Chip {
                                 visible: cloudUsage.available && cloudUsage.logoutState !== "done"
-                                text: !uiSettings.useClaude ? Tr.t("ปิดอยู่")
-                                      : cloudUsage.usedPercent >= 100 ? Tr.t("ครบวันนี้แล้ว") : Tr.t("เปิดอยู่")
-                                kind: !uiSettings.useClaude ? "neutral" : cloudUsage.usedPercent >= 100 ? "warn" : "ok"
+                                text: uiSettings.useClaude ? Tr.t("เปิดอยู่") : Tr.t("ปิดอยู่")
+                                kind: uiSettings.useClaude ? "ok" : "neutral"
                                 dot: true
                             }
                         }
@@ -662,47 +661,20 @@ ColumnLayout {
                             checked: uiSettings.useClaude
                             onClicked: uiSettings.setUseClaude(checked)
                         }
-                        // ใช้ได้วันละเท่าไหร่ (Pakon 2026-10-28: เอาตัวเลือกกลับมา แต่ไม่ใช้เงิน) · เป็นระดับ + % ที่ใช้ไปวันนี้
+                        // การ์ด 0084: ไม่มีเพดานของเครื่อง · ใช้ขีดจำกัดของบัญชี Claude · นับครั้งจาก ledger
                         ColumnLayout {
-                            objectName: "cloudLevel"
+                            objectName: "cloudCalls"
                             visible: cloudUsage.available && uiSettings.useClaude && cloudUsage.logoutState !== "done"
                             Layout.fillWidth: true
                             spacing: 6
                             AppText {
-                                objectName: "cloudLevelText"
+                                objectName: "cloudCallsText"
                                 Layout.fillWidth: true
-                                text: Tr.t("วันนี้ถาม Claude ไป ") + cloudUsage.callsToday + Tr.t(" ครั้ง · ใช้ไปแล้ว ")
-                                      + cloudUsage.usedPercent + Tr.t("% ของที่ตั้งไว้")
-                            }
-                            Rectangle {   // แถบที่ใช้วันนี้ (ครบ = สีเตือน · มีข้อความกำกับ ไม่ใช้สีอย่างเดียว)
-                                Layout.fillWidth: true
-                                implicitHeight: 8
-                                radius: 4
-                                color: Theme.surface2
-                                Rectangle {
-                                    height: parent.height
-                                    radius: 4
-                                    width: parent.width * cloudUsage.usedPercent / 100
-                                    color: cloudUsage.usedPercent >= 100 ? Theme.warn : Theme.accent
-                                }
-                            }
-                            RowLayout {
-                                spacing: 8
-                                AppText { text: Tr.t("ใช้ได้วันละ"); size: Theme.fontSmall; color: Theme.inkMuted }
-                                Repeater {
-                                    model: cloudUsage.levels
-                                    AppButton {
-                                        required property var modelData
-                                        objectName: "cloudLevel_" + modelData.value
-                                        text: Tr.t(modelData.name)
-                                        kind: cloudUsage.limit === modelData.value ? "primary" : "secondary"
-                                        onClicked: cloudUsage.setLimit(modelData.value)
-                                    }
-                                }
+                                text: Tr.t("วันนี้ถาม Claude ไป ") + cloudUsage.callsToday + Tr.t(" ครั้ง")
                             }
                             AppText {
                                 Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
-                                text: Tr.t("ระดับมากขึ้น = ถาม Claude ได้มากขึ้นต่อวัน และใช้โควตาบัญชี Claude ของคุณมากขึ้น · ใช้ครบแล้วเครื่องจะหยุดถาม Claude จนถึงพรุ่งนี้ และตอบด้วย AI ในเครื่องแทน")
+                                text: Tr.t("เครื่องไม่จำกัดจำนวนครั้งเอง · ใช้ได้ตามโควตาบัญชี Claude ของคุณ · ถ้าบัญชีใช้ครบ เครื่องจะบอก และตอบด้วย AI ในเครื่องแทน")
                             }
                         }
                         // ออกจาก Claude (การ์ด 0070 · Pakon 2026-10-28) · กดสองครั้ง · ออกแล้วปิด "ให้ถาม Claude" ให้ (H2)

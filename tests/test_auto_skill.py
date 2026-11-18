@@ -402,7 +402,7 @@ class ForgeLedgerTest(unittest.TestCase):
         with mock.patch("aipc.cloud.ask.find_claude", return_value="claude"), \
              mock.patch.object(forge, "run_process", return_value=(0, "2.1 (Claude Code)", "")), \
              mock.patch.object(forge, "forge", return_value=proposal):  # fmt: skip
-            run = app._skill_forge(None, ledger)
+            run = app._skill_forge(ledger)
             run("ทำโหมดประชุม", skills=[])
         return ledger.entries()[0]
 

@@ -980,7 +980,6 @@ class ShellCardTest(unittest.TestCase):
         """บันทึกสิ่งที่ส่งออกนอกเครื่อง: การ์ดในหน้าตั้งค่าแสดงข้อความที่ส่งจริง · ล้างต้องกดสองครั้ง."""
         from datetime import datetime
 
-        from aipc.cloud.budget import Budget
         from aipc.cloud.ledger import Ledger
 
         engine, win, warnings = self.open_shell("settings")
@@ -989,7 +988,7 @@ class ShellCardTest(unittest.TestCase):
         tmp = Path(os.environ["XDG_DATA_HOME"])
         led = Ledger(tmp / "outbound-test.json", now=lambda: datetime(2026, 10, 1, 14, 5))
         led.record("ask", "คำถาม:\nอากาศเชียงใหม่วันนี้", 0.021)
-        usage._b, usage._ledger, usage._available = Budget(tmp / "usage-test.json"), led, True
+        usage._ledger, usage._available = led, True
         usage.changed.emit()
         settle(50)
         card = find_items(win, "outboundCard")[0]
@@ -1270,35 +1269,63 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue([m for m in ctl.models if m["key"] == "qwen3.5-2b"][0]["current"])
         self.assertEqual(warnings, [])
 
-    def test_claude_daily_level_without_money(self):
-        """Pakon 2026-10-28: เลือกเพดานต่อวันได้อีก แต่เป็นระดับ ไม่แสดงเงิน · แสดง % ที่ใช้ไปวันนี้."""
-        from aipc.cloud.budget import Budget
+    def test_claude_card_has_no_daily_limit(self):
+        """การ์ด 0084 C3: ไม่มีเพดานรายวัน (ระดับ/แถบ %) · นับครั้งวันนี้จาก ledger · การ์ด Claude ยังแสดง.
+
+        แทนเทสต์ระดับต่อวันของ Pakon 2026-10-28 (Pakon ตัดสินให้ลบ 2026-11-18 · บัญชี Pro)."""
+        from datetime import datetime, timedelta
+
+        from aipc.cloud.ledger import Ledger
 
         engine, win, warnings = self.open_shell("settings")
         show_section(win, "ai")
         usage = engine.rootContext().contextProperty("cloudUsage")
-        usage._b = Budget(Path(os.environ["XDG_DATA_HOME"]) / "usage-level.json")
-        usage._b.record(0.25, "ask")
-        usage._available = True
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        now = datetime.now()
+        when = iter([now, now, now - timedelta(days=1), now])
+        led = Ledger(tmp / "outbound-calls.json", now=lambda: next(when))
+        led.record("ask", "คำถาม", 3.0)  # "ค่าใช้จ่าย" สูงก็ไม่มีผลอะไรแล้ว
+        led.record("skill", "สร้างสกิล", 3.0)
+        led.record("ask", "เมื่อวาน", 3.0)  # เมื่อวาน = ไม่นับ
+        led.record("weather", "เชียงใหม่")  # ไม่ได้ไปหา Claude = ไม่นับ
+        usage._ledger, usage._available = led, True
         engine._backends["uiSettings"].setUseClaude(True)
         usage.changed.emit()
         settle(50)
-        text = find_items(win, "cloudLevelText")[0].property("text")
-        self.assertIn("25%", text)
-        names = [b.property("text") for b in find_items(win, "cloudLevel_5")]
-        self.assertEqual(names, ["มากที่สุด"])
-        texts, stack = [], [find_items(win, "cloudUsageCard")[0]]
+        self.assertEqual(usage.callsToday, 2)
+        self.assertTrue(find_items(win, "cloudUsageCard")[0].isVisible())
+        self.assertIn("2 ครั้ง", find_items(win, "cloudCallsText")[0].property("text"))
+        self.assertEqual(find_items(win, "cloudLevelText"), [])
+        names, stack = [], [win.contentItem()]
         while stack:
             item = stack.pop()
-            if item.isVisible() and isinstance(item.property("text"), str):
-                texts.append(item.property("text"))
+            names.append(item.objectName())
             stack.extend(item.childItems())
-        self.assertFalse([t for t in texts if "$" in t])
-        find_items(win, "cloudLevel_5")[0].clicked.emit()
-        settle(50)
-        self.assertEqual(usage._b.limit, 5.0)
-        self.assertIn("5%", find_items(win, "cloudLevelText")[0].property("text"))
+        self.assertFalse([n for n in names if n.startswith("cloudLevel")], "ไม่มีปุ่มระดับ/แถบ % แล้ว")
         self.assertEqual(warnings, [])
+
+    def test_calls_today_without_ledger_is_zero(self):
+        """หน้า Login ไม่มี ledger → 0 ไม่ล้ม (การ์ด 0084)."""
+        from aipc.ui.backend import CloudUsage
+
+        self.assertEqual(CloudUsage(available=True).callsToday, 0)
+
+    def test_old_usage_file_is_left_alone(self):
+        """การ์ด 0084 C4 (H2): ไฟล์เพดานเดิมของผู้ใช้ไม่ถูกลบหรือแก้เมื่อเปิดแอป."""
+        old = Path(os.environ["XDG_DATA_HOME"]) / "aipc" / "cloud-usage.json"
+        old.parent.mkdir(parents=True, exist_ok=True)
+        body = b'{"limit_usd": 1.0, "days": {"2026-11-17": {"usd": 0.3, "calls": 2}}}'
+        old.write_bytes(body)
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        settle(50)
+        self.assertEqual(old.read_bytes(), body)
+
+    def test_budget_module_is_gone(self):
+        """การ์ด 0084: ระบบไม่มีเพดานของตัวเอง (ขีดจำกัดเดียว = ของบัญชี Claude)."""
+        import importlib.util
+
+        self.assertIsNone(importlib.util.find_spec("aipc.cloud.budget"))
 
     def test_gmail_card_connects_read_only(self):
         """การ์ด 0072 G1: ไม่มีไฟล์ OAuth client = บอกตรง ๆ ไม่มีปุ่ม · มี = กดเชื่อมต่อ (Google ปลอม) ·

@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
-from aipc.cloud import ask, budget, ledger
+from aipc.cloud import ask, ledger
 
 
 class LedgerTest(unittest.TestCase):
@@ -51,27 +51,31 @@ class LedgerTest(unittest.TestCase):
     def test_cloud_client_records_exact_text_sent(self):
         from aipc.ui import app
 
-        b = budget.Budget(self.dir / "usage.json")
         history = [{"role": "user", "content": "สวัสดี"}, {"role": "assistant", "content": "สวัสดีครับ"}]
         reply = ask.CloudReply(True, text="ตอบ", cost_usd=0.03)
         with mock.patch("aipc.cloud.ask.find_claude", return_value="claude"), \
              mock.patch("aipc.cloud.ask.ask", return_value=reply):  # fmt: skip
-            run = app._cloud_client(b, self.l)
+            run = app._cloud_client(self.l)
             run("อากาศวันนี้", history)
         e = self.l.entries()[0]
         self.assertEqual(e["sent"], ask.build_input("อากาศวันนี้", history))  # ตรงกับที่ส่งจริง
         self.assertEqual((e["kind"], e["cost_usd"], e["ok"]), ("ask", 0.03, True))
 
-    def test_over_budget_sends_and_records_nothing(self):
+    def test_no_system_limit_however_much_is_used(self):
+        """การ์ด 0084 C1: ค่าใช้จ่ายอ้างอิงเกิน $5 ในวันเดียว ยังถาม Claude และสร้างสกิลได้ทุกครั้ง."""
+        from aipc.skills import forge
         from aipc.ui import app
 
-        b = budget.Budget(self.dir / "usage.json")
-        b.record(5.0, "ask")
+        reply = ask.CloudReply(True, text="ตอบ", cost_usd=3.0)
+        made = forge.Proposal(True, "สกิล", cost_usd=3.0)
         with mock.patch("aipc.cloud.ask.find_claude", return_value="claude"), \
-             mock.patch("aipc.cloud.ask.ask") as real:  # fmt: skip
-            app._cloud_client(b, self.l)("อากาศ", [])
-        real.assert_not_called()
-        self.assertEqual(self.l.entries(), [])
+             mock.patch("aipc.cloud.ask.ask", return_value=reply) as real, \
+             mock.patch("aipc.skills.forge.forge", return_value=made) as real_forge, \
+             mock.patch("aipc.skills.forge.run_process", return_value=(0, "2.1", "")):  # fmt: skip
+            run, make = app._cloud_client(self.l), app._skill_forge(self.l)
+            results = [run("อากาศ", []).ok for _ in range(3)] + [make("สกิล").ok for _ in range(3)]
+        self.assertEqual(results, [True] * 6)
+        self.assertEqual((real.call_count, real_forge.call_count), (3, 3))
 
 
 if __name__ == "__main__":

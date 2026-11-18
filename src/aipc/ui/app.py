@@ -71,10 +71,10 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
-def _cloud_client(budget=None, ledger=None):
+def _cloud_client(ledger=None):
     """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0.
 
-    budget (aipc.cloud.budget.Budget): ครบเพดานต่อวัน = ไม่เรียก Claude บอกผู้ใช้ตรง ๆ
+    ไม่มีเพดานของระบบ · บัญชี Claude ใช้ครบ = ask บอกผู้ใช้ตรง ๆ (การ์ด 0084)
     ledger (aipc.cloud.ledger.Ledger): บันทึกข้อความที่ส่งออกจริงทุกครั้ง (หน้าตั้งค่าแสดงให้ผู้ใช้ตรวจ)
     """
     import os
@@ -85,11 +85,7 @@ def _cloud_client(budget=None, ledger=None):
         return None
 
     def run(question, history, model=ask.MODEL, effort=None):
-        if budget is not None and not budget.allow():
-            return ask.CloudReply(False, error=budget.blocked_message())
         r = ask.ask(question, history, model=model, effort=effort)
-        if budget is not None:
-            budget.record(r.cost_usd, "ask")
         if ledger is not None:
             # โมเดลที่ตอบจริง (จากผลของ claude) ไม่ใช่แค่ที่เลือก (การ์ด 0053 เกณฑ์ M2 · H5)
             ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok,
@@ -118,7 +114,7 @@ def _chat_switch(chat, ui_settings):
     return run
 
 
-def _skill_forge(budget=None, ledger=None):
+def _skill_forge(ledger=None):
     """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้.
 
     ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0
@@ -133,12 +129,8 @@ def _skill_forge(budget=None, ledger=None):
     from aipc.skills import forge
 
     def run(request, **kw):  # เธรดแยก · อ่านรุ่นของ claude ตอนใช้ (ไม่ให้เปิดแอปช้าลง)
-        if budget is not None and not budget.allow():
-            return forge.Proposal(False, request, errors=[budget.blocked_message()])
         version = forge.run_process([exe, "--version"], "", ".", 30)[1].strip()
         p = forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
-        if budget is not None:
-            budget.record(p.cost_usd, "skill")
         if ledger is not None:
             revise = kw.get("revise")
             sent = request + (f"\nคำติ: {revise[1]}" if revise else "")
@@ -284,15 +276,12 @@ def build(opts: Options, argv: list[str] | None = None):
         return holder["skills"].tool_catalog(text, user=user) if "skills" in holder else []
 
     in_session = not opts.greeter_session
-    budget = ledger = None
+    ledger = None
     if in_session:
-        from aipc.cloud.budget import Budget
-
-        budget = Budget()  # เพดานค่าใช้จ่าย Claude ต่อวันของผู้ใช้คนนี้
         from aipc.cloud.ledger import Ledger
 
         ledger = Ledger()  # บันทึกสิ่งที่ส่งออกนอกเครื่อง
-    skill_forge = _skill_forge(budget, ledger) if in_session else None
+    skill_forge = _skill_forge(ledger) if in_session else None
     user_skills = None
     if in_session:
         from aipc.skills.userskills import UserSkills
@@ -316,7 +305,7 @@ def build(opts: Options, argv: list[str] | None = None):
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
     # แชททั่วไปคงไฮบริด: AI ในเครื่องไม่รู้ = ส่งต่อ Claude เอง (Pakon 2026-10-22 · การ์ด 0053 หัวข้อ 8)
     chat = ChatController(active=in_session, tools=tools,
-                          cloud=_cloud_client(budget, ledger) if in_session else None,
+                          cloud=_cloud_client(ledger) if in_session else None,
                           model_name=_local_model_name(),
                           forge=skill_forge is not None, claude_on=claude_on,
                           cloud_model=lambda: ui_settings.cloudModel,
@@ -327,10 +316,10 @@ def build(opts: Options, argv: list[str] | None = None):
         """เชื่อมต่อ Claude ที่เครื่องนี้เสร็จ (การ์ด 0070 รอบ 3) · ใช้ได้เลยไม่ต้องออกจากระบบ:
         เพิ่งติดตั้ง = สร้างตัวส่งต่อ + ตัวสร้างสกิลตอนนี้ · เปิด "ให้ถาม Claude" (ผู้ใช้เพิ่งเชื่อมต่อเอง)."""
         if chat._cloud is None:
-            chat._cloud = _cloud_client(budget, ledger)
+            chat._cloud = _cloud_client(ledger)
         skills = engine._backends["skills"]
         if skills._forge is None:
-            skills._forge = _skill_forge(budget, ledger)
+            skills._forge = _skill_forge(ledger)
             chat._forge = skills._forge is not None
         if chat._cloud is None:
             return False
@@ -382,7 +371,6 @@ def build(opts: Options, argv: list[str] | None = None):
         "chat": chat,
         "gmailLink": GmailLink(active=in_session),  # การ์ด 0072: เชื่อม Gmail แบบอ่านอย่างเดียว
         "cloudUsage": CloudUsage(
-            budget,
             available=chat._cloud is not None,
             ledger=ledger,
             on_connected=_on_claude_connected if in_session else None,

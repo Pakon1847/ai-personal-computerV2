@@ -64,16 +64,14 @@ def main(argv: list[str] | None = None) -> int:
     items = [i for i in data["items"] if i["id"].startswith(a.only)]
 
     from aipc.cloud.ask import CloudReply
-    from aipc.cloud.budget import Budget
     from aipc.cloud.ledger import Ledger
     from aipc.skills.userskills import UserSkills
     from aipc.spikes.app_driver import AppDriver
     from aipc.ui import app
 
     work = Path(tempfile.mkdtemp(prefix="aipc-skill-intent-"))
-    budget, ledger = Budget(work / "usage.json"), Ledger(work / "outbound.json")
-    budget.set_limit(5.0)
-    forge = app._skill_forge(budget, ledger)
+    ledger = Ledger(work / "outbound.json")
+    forge = app._skill_forge(ledger)
     if forge is None:
         print("ไม่พบ claude")
         return 1
