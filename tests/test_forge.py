@@ -82,8 +82,9 @@ class ForgeTest(unittest.TestCase):
         self.assertEqual((p.skill_id, p.attempts, p.model), ("summarize", 1, "claude-opus-5-5"))
         call = fake.calls[0]
         # กติกาข้อ 2: ข้อความล้วน · ไม่เก็บบทสนทนา · โฟลเดอร์ว่าง · prompt ทาง stdin ไม่ใช่ argv
-        for flag in ("-p", "--no-session-persistence", "--max-budget-usd"):
+        for flag in ("-p", "--no-session-persistence"):
             self.assertIn(flag, call["args"])
+        self.assertNotIn("--max-budget-usd", call["args"])  # การ์ด 0084: ไม่มีเพดานต่อครั้งของระบบ
         self.assertEqual(call["args"][call["args"].index("--tools") + 1], "")
         self.assertEqual(call["args"][call["args"].index("--permission-prompts") + 1], "none")
         self.assertEqual(call["cwd_files"], [])
@@ -119,6 +120,13 @@ class ForgeTest(unittest.TestCase):
     def test_claude_failures_are_reported(self):
         self.assertIn("ไม่สำเร็จ", run(FakeClaude("x", is_error=True)).errors[0])
         self.assertIn("ล้ม", run(FakeClaude(raw="not json", code=1)).errors[0])
+
+    def test_account_limit_is_told_plainly(self):
+        """การ์ด 0084: บัญชี Claude ใช้ครบ → ข้อความบอกตรง ๆ · ไม่ติดตั้งอะไร."""
+        p = run(FakeClaude("API Error: Rate limit reached", is_error=True))
+        self.assertFalse(p.ok)
+        self.assertEqual(p.skill_md, "")
+        self.assertTrue(p.errors[0].startswith("บัญชี Claude ใช้ครบโควตาแล้ว"), p.errors)
 
     def test_duplicate_id_is_refused(self):
         dup = SUMMARY_MD.replace("id: summarize", "id: translate")

@@ -33,13 +33,15 @@ from pathlib import Path
 from string import Template
 
 from aipc import fsutil
+from aipc.cloud.limits import account_limit_message
 from aipc.skills import manifest, mdskill, router
 from aipc.skills.actions import APPS, PAGES, SITES
 
 MAX_ATTEMPTS = 2
 TIMEOUT_S = 300
 MAX_SKILL_BYTES = 8000
-BUDGET_USD = "1.00"  # เพดานต่อครั้ง (--max-budget-usd) · บัญชี subscription ไม่เสียเงินเพิ่ม แต่กันวนไม่รู้จบ
+# ไม่มีเพดานต่อครั้ง (--max-budget-usd) แล้ว · ใช้ขีดจำกัดของบัญชี Claude (การ์ด 0084) ·
+# กันวนไม่รู้จบด้วย --tools "" (ไม่มีเครื่องมือ) และ TIMEOUT_S
 
 # runner(args, prompt, cwd, timeout) → (รหัสจบ, stdout, stderr) · เทสต์ใส่ตัวปลอมแทนได้ ไม่ต้องต่อเน็ต
 Runner = Callable[[list[str], str, str, int], tuple[int, str, str]]
@@ -63,12 +65,13 @@ class Reply:
     error: str = ""
     cost_usd: float = 0.0
     model: str = ""
+    limited: bool = False  # บัญชี Claude ใช้ครบโควตา (การ์ด 0084)
 
 
 def ask_claude(prompt: str, *, claude: str, model: str | None, runner: Runner) -> Reply:
     """เรียก `claude -p` แบบข้อความล้วน จากโฟลเดอร์ว่าง · prompt ส่งทาง stdin (ไม่อยู่ใน argv)."""
     args = [claude, "-p", "--output-format", "json", "--tools", "", "--permission-prompts", "none",
-            "--no-session-persistence", "--max-budget-usd", BUDGET_USD,
+            "--no-session-persistence",
             "--strict-mcp-config", "--disable-slash-commands"]  # fmt: skip
     # --strict-mcp-config --disable-slash-commands: ไม่โหลด MCP/สกิลของบัญชี (การ์ด 0016)
     if model:
@@ -83,7 +86,10 @@ def ask_claude(prompt: str, *, claude: str, model: str | None, runner: Runner) -
     ok = not data.get("is_error") and code == 0
     cost = float(data.get("total_cost_usd") or 0)
     reply = Reply(ok, text=data.get("result") or "", cost_usd=cost, model=",".join(models))
-    if not reply.ok:
+    limited = account_limit_message(data)
+    if limited:
+        reply.error, reply.limited = limited, True
+    elif not reply.ok:
         reply.error = f"Claude ตอบไม่สำเร็จ ({data.get('subtype')}): {reply.text[:300]}"
     return reply
 
