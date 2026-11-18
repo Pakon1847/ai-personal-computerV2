@@ -161,5 +161,92 @@ class RunItemTest(unittest.TestCase):
         self.assertEqual(row["unconfirmed"], 0)
 
 
+def row(i, asked=True, installed=True, new_skill=True, ledger=0, unconfirmed=0):
+    r = {"id": str(i), "text": f"คำสั่ง {i}", "expect": f"ผล {i}", "asked_create": asked,
+         "installed": installed, "unconfirmed": unconfirmed}  # fmt: skip
+    if installed:
+        r.update(again_route="skill:s", again_plans=[], again_text="ทำแล้ว",
+                 again_new_skill=new_skill, again_ledger_added=ledger)  # fmt: skip
+    return r
+
+
+class SummaryTest(unittest.TestCase):
+    ROWS = [row(1), row(2), row(3, new_skill=False), row(4, ledger=1),
+            row(5, asked=False, installed=False)]  # fmt: skip
+
+    def test_summary_l1_l2_l4(self):
+        s = ev.summarize(self.ROWS, {"1": True, "2": False, "3": True, "4": True})
+        self.assertEqual(s["L1"], [4, 5])
+        self.assertEqual(s["steps"], {"asked_create": 4, "installed": 4})
+        self.assertEqual(s["L2"], [1, 4])  # ข้อ 1 เท่านั้น: 2 Pakon ว่าไม่ถูก · 3 ไปสกิลอื่น · 4 เรียก Claude
+        self.assertEqual(s["L4"], 0)
+        self.assertEqual(s["pass"], {"L1": True, "L2": False, "L4": True})
+
+    def test_l2_waits_for_pakon(self):
+        s = ev.summarize(self.ROWS, None)
+        self.assertIsNone(s["L2"])
+        self.assertEqual(s["L2_route_ledger"], [2, 4])
+        self.assertIsNone(s["pass"]["L2"])
+
+    def test_sheet_round_trip(self):
+        sheet = ev.review_sheet(self.ROWS)
+        self.assertIn("คำสั่ง 1", sheet)
+        self.assertNotIn("คำสั่ง 5", sheet)  # ติดตั้งไม่ได้ = ไม่มีครั้งที่สองให้ตรวจ
+        filled = sheet.replace("- ตัดสิน: \n", "- ตัดสิน: ถูก\n", 2).replace(
+            "- ตัดสิน: \n", "- ตัดสิน: ไม่ถูก\n", 1
+        )
+        self.assertEqual(ev.read_sheet(filled), {"1": True, "2": True, "3": False})
+
+
+class HRouteTest(unittest.TestCase):
+    ITEMS = [{"id": "h1", "text": "เปิดยูทูบ", "expect": [{"kind": "site"}]},
+             {"id": "h2", "text": "สวัสดี", "expect": []}]  # fmt: skip
+
+    def test_h_route_change_is_counted(self):
+        before = {"h1": "browser", "h2": "unknown"}
+        after = {"h1": "skill", "h2": "skill"}
+        # h2 ไม่ใช่คำสั่ง → ไม่นับใน L3
+        self.assertEqual(ev.l3_changes(before, after, self.ITEMS), ["h1"])
+
+    def test_routes_use_skill_matchers(self):
+        class Skills:
+            def voiceSkill(self, text):  # noqa: N802
+                return "s1" if text == "สวัสดี" else ""
+
+            def voiceIntent(self, text):  # noqa: N802
+                return ""
+
+        got = ev.h_routes(Skills(), self.ITEMS)
+        self.assertEqual(got["h2"], "skill")
+        self.assertNotEqual(got["h1"], "skill")
+
+
+class FakeClaudeTest(unittest.TestCase):
+    def test_fake_claude_skill_passes_the_gate(self):
+        from aipc.skills import manifest
+
+        make = ev.fake_forge()
+        p = make("โหมดดูหนังให้หน่อย", skills=manifest.load_builtin())
+        self.assertTrue(p.skill_md, p.errors)
+        self.assertFalse(p.errors, p.errors)
+
+
+class CliTest(unittest.TestCase):
+    def test_empty_test_file_stops_cli(self):
+        import io
+        import tempfile
+        from contextlib import redirect_stderr
+
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "empty.txt"
+            f.write_text("ข้อ 1\nคำสั่ง:\nผลที่ถูก:\n", encoding="utf-8")
+            err = io.StringIO()
+            with redirect_stderr(err):
+                rc = ev.main(["--server", "http://127.0.0.1:9", "--data", str(f),
+                              "--out", str(Path(d) / "out.json")])  # fmt: skip
+        self.assertEqual(rc, 2)
+        self.assertIn("ยังไม่ได้กรอก", err.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()
