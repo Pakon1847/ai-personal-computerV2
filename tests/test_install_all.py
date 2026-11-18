@@ -53,6 +53,9 @@ class InstallAllTest(unittest.TestCase):
         self.write(fake / "curl", f'echo "curl" >> "{log}"\n'
                    'while [ "$1" != "-o" ]; do shift; done\necho model > "$2"\n')  # fmt: skip
         self.write(fake / "sha256sum", f'echo "${{FAKE_SHA:-{SHA}}}  $1"\n')
+        # df ปลอม: ผลไม่ขึ้นกับดิสก์ของเครื่องที่รันเทสต์ (Pi 5: /tmp เป็น tmpfs 4 GB · 2026-11-18)
+        self.write(fake / "df", 'echo "Filesystem 1024-blocks Used Available Capacity Mounted"\n'
+                   'echo "fake 1 1 ${FAKE_FREE_KB:-104857600} 1% /"\n')  # fmt: skip
         self.fake = fake
 
     def tearDown(self):
@@ -111,6 +114,12 @@ class InstallAllTest(unittest.TestCase):
         self.assertIn("sha256 ไม่ตรง", r.stdout)
         self.assertFalse((self.root / "build" / "models" / "gemma-4-E2B-it-Q4_K_M.gguf").exists())
         self.assertFalse(any(c.startswith("install-") for c in self.calls()))
+
+    def test_low_disk_is_refused_before_changing_anything(self):
+        r = self.run_it("--apply", FAKE_FREE_KB=str(3 * 1024 * 1024))
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("หยุด: ดิสก์ว่าง 3 GB · ต้องมีอย่างน้อย 15 GB", r.stdout)
+        self.assertEqual(self.calls(), [])
 
     def test_wrong_machine_is_refused_before_changing_anything(self):
         self.write(self.fake / "uname", "echo x86_64\n")
