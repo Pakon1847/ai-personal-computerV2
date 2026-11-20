@@ -3988,12 +3988,16 @@ class SkillsController(QObject):
         card["turnId"] = self._turns.add(turn)
         return card
 
+    def _live_user_skill(self, skill_id: str) -> bool:
+        """สกิลของผู้ใช้ที่ยังมีไฟล์อยู่ · รอบที่ไม่ใช้สกิล ("") หรือสกิลที่ลบไปแล้ว = ไม่นับ ไม่แก้."""
+        return bool(skill_id) and self._is_user(skill_id) and bool(self._user.current_md(skill_id))
+
     @Slot(str, bool, result="QVariantMap")
     def rateResult(self, turn_id: str, liked: bool) -> dict:  # noqa: N802
         """ชอบ = นับ (สกิลผู้ใช้) ไม่มีงานอื่น · ไม่ชอบ = ส่งรอบนั้นให้ Claude ตรวจ (ถามก่อนถ้ามีข้อมูลส่วนตัว)."""
         turn = self._turns.get(turn_id)
         if liked:
-            if turn is not None and self._is_user(turn.skill_id):
+            if turn is not None and self._live_user_skill(turn.skill_id):
                 self._user.liked(turn.skill_id)
                 self.skillsChanged.emit()
             return {"kind": "rated"}
@@ -4025,7 +4029,8 @@ class SkillsController(QObject):
         turn = self._turns.take(turn_id)
         if turn is None:
             return self._plain("command", "ตรวจไม่ได้: รอบนี้เก่าเกินไปหรือส่งตรวจไปแล้ว")
-        revise_id = turn.skill_id if self._is_user(turn.skill_id) else ""  # สกิลในตัว: Claude ไม่แก้
+        # สกิลในตัว: Claude ไม่แก้ (สร้างสกิลผู้ใช้แทนได้) · สกิลผู้ใช้ที่ลบไปแล้ว = สร้างใหม่
+        revise_id = turn.skill_id if self._live_user_skill(turn.skill_id) else ""
         if revise_id:
             self._user.disliked(revise_id)
         return self._start_forge(turn.request, revise_id, "ผู้ใช้กดไม่ชอบผลนี้",

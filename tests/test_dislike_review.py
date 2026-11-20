@@ -210,6 +210,23 @@ class RateResultTest(unittest.TestCase):
         s.rateResult(result["turnId"], True)
         self.assertEqual(self.store.info("meeting-mode")["likes"], 1)
 
+    def test_like_on_turn_without_skill_writes_nothing(self):
+        s = self.make()
+        s.rateResult(s.handle("กี่โมงแล้ว")["turnId"], True)
+        self.assertNotIn("", self.store._index, "รอบที่ไม่ใช้สกิล = ไม่มีอะไรให้นับ")
+
+    def test_deleted_user_skill_becomes_create(self):
+        s = self.make(self.made(GOOD_LLM))
+        self.store.install(GOOD, s._skills, request="ทำโหมดประชุม")
+        s._reload()
+        steps = s.handleAs("meeting-mode", "เข้าโหมดประชุม")
+        tid = s.confirm(steps["confirmToken"], True)["turnId"]
+        s.removeSkill("meeting-mode")
+        s.rateResult(tid, False)
+        pump(lambda: self.done)
+        self.assertIsNone(self.seen[0][1]["revise"], "สกิลถูกลบแล้ว = สร้างใหม่ ไม่ใช่แก้ไฟล์ที่ไม่มี")
+        self.assertNotIn("meeting-mode", self.store._index)
+
 
 class DislikedCounterTest(unittest.TestCase):
     def test_disliked_counts_without_disabling(self):
