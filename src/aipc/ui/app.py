@@ -131,7 +131,13 @@ def _skill_forge(ledger=None):
     def run(request, **kw):  # เธรดแยก · อ่านรุ่นของ claude ตอนใช้ (ไม่ให้เปิดแอปช้าลง)
         version = forge.run_process([exe, "--version"], "", ".", 30)[1].strip()
         p = forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
-        if ledger is not None:
+        if ledger is not None and kw.get("review"):
+            # การ์ด 0085: ผู้ใช้กดไม่ชอบ → ส่งรอบนั้นให้ Claude ตรวจ · จดข้อความที่ส่งจริงตามตัวอักษร
+            note = {"none": "Claude บอกว่าไม่ต้องแก้", "revise": "Claude แก้สกิล",
+                    "create": "Claude สร้างสกิลใหม่"}.get(p.outcome, "ตรวจไม่สำเร็จ")  # fmt: skip
+            note += " · พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง"
+            ledger.record("review", kw["review"], p.cost_usd, ok=not p.errors, note=note)
+        elif ledger is not None:
             revise = kw.get("revise")
             sent = request + (f"\nคำติ: {revise[1]}" if revise else "")
             note = "พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง · ไม่มีแชท นัด หรือไฟล์"

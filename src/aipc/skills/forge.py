@@ -111,7 +111,7 @@ PROMPT_FILE = Path(__file__).parent / "forge_prompt.md"
 
 
 def build_prompt(request: str, skills: list[manifest.Manifest], fix: list[str] | None = None,
-                 previous: str = "") -> str:  # fmt: skip
+                 previous: str = "", review: str = "") -> str:  # fmt: skip
     """คำขอที่ส่งให้ Claude = แม่แบบ forge_prompt.md + ของที่ระบบมีจริง · ไม่มีข้อมูลผู้ใช้."""
     existing = "\n".join(
         f"- {s.id}: {s.description} · คำสำคัญ: {', '.join(s.keywords) or '—'}" for s in skills
@@ -133,6 +133,11 @@ def build_prompt(request: str, skills: list[manifest.Manifest], fix: list[str] |
             "ไฟล์รอบก่อน:",
             previous,
         ]
+    if review:  # การ์ด 0085: ผู้ใช้กด "ไม่ชอบ" ผลของ AI ในเครื่อง → Claude ตัดสิน แก้ / สร้าง / ไม่ต้องแก้
+        parts += ["", '## ผู้ใช้กด "ไม่ชอบ" ผลของ AI ในเครื่อง', "", review.strip(), "",
+                  "ดูว่าพลาดเพราะอะไร แล้วเลือก 1 อย่าง: แก้สกิลที่ให้มา (ใช้ id เดิม) · สร้างสกิลใหม่ที่ทำงานนี้ได้ · "
+                  "หรือไม่ต้องแก้ (ผลถูกแล้ว หรือสกิลช่วยไม่ได้)",
+                  'ไม่ต้องแก้ → ตอบ {"outcome": "none", "note": "<เหตุผลสั้น ๆ>"} อย่างเดียว']  # fmt: skip
     parts += ["", "## คำขอ", "", request.strip()]
     return "\n".join(parts)
 
@@ -225,6 +230,8 @@ class Proposal:
     model: str = ""
     claude_version: str = ""
     pinned_changed: list[str] = field(default_factory=list)  # คีย์สิทธิ์ที่ Claude ใส่ต่างไป (ระบบแทนแล้ว)
+    # โหมดตรวจ (การ์ด 0085): "" = สร้างแบบเดิม · revise / create / none (Claude บอกว่าไม่ต้องแก้ · ไม่ติดตั้ง)
+    outcome: str = ""
 
 
 def _validate(skill_md: str) -> tuple[manifest.Manifest | None, list[str]]:
@@ -244,7 +251,7 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
           today: date | None = None, extra_sentences: list[str] = (),
           revise: tuple[str, str] | None = None,
           check: Callable[[str], list[str]] | None = None,
-          pin: dict[str, str] | None = None) -> Proposal:  # fmt: skip
+          pin: dict[str, str] | None = None, review: str | None = None) -> Proposal:  # fmt: skip
     """revise = (ไฟล์รุ่นที่ใช้อยู่, คำติของผู้ใช้) → รุ่นใหม่ id เดิม (การ์ด 0017 ชั้นที่ 2) · skills ต้องไม่มีสกิลตัวที่แก้."""
     p = Proposal(False, request, claude_version=claude_version)
     fix: list[str] = []
@@ -259,14 +266,18 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
     ids = {s.id for s in skills}
     for attempt in range(1, MAX_ATTEMPTS + 1):
         p.attempts = attempt
-        reply = ask_claude(build_prompt(request, skills, fix, previous), claude=claude, model=model,
-                           runner=runner)  # fmt: skip
+        prompt = build_prompt(request, skills, fix, previous, review or "")
+        reply = ask_claude(prompt, claude=claude, model=model, runner=runner)
         p.cost_usd += reply.cost_usd
         p.model = reply.model or p.model
         if not reply.ok:
             p.errors = [reply.error]
             return p
         data = extract_json(reply.text)
+        if review and data is not None and data.get("outcome") == "none":
+            # เหตุผลของ Claude = ข้อความแสดงบนจอเท่านั้น (H8) · ไม่ติดตั้งอะไร
+            p.outcome, p.note, p.errors = "none", str(data.get("note", ""))[:500], []
+            return p
         if data is None or not isinstance(data.get("skill_md"), str):
             fix, previous = ["ตอบกลับต้องเป็น JSON object ที่มี skill_md เป็นข้อความ"], reply.text[:2000]
             p.errors = fix
@@ -297,6 +308,8 @@ def forge(request: str, *, skills: list[manifest.Manifest], runner: Runner = run
         p.skill_md = stamp(previous, request=request, claude_version=claude_version, model=p.model,
                            today=today or date.today())  # fmt: skip
         p.skill_id, p.note, p.errors = new.id, str(data.get("note", ""))[:500], []
+        if review:
+            p.outcome = "revise" if revise is not None else "create"
         p.trial = {**asdict(t), "should_trigger": should, "should_not_trigger": should_not}
         p.ok = t.ok
         # อัตโนมัติ: เรียกผิด/แย่งประโยค = ให้ Claude แก้อีกรอบ · "ควรเรียกแต่ไม่เรียก" ไม่แก้ (วัดด้วยตัวคัดแบบกฎ

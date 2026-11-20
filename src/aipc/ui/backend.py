@@ -832,7 +832,7 @@ class GmailLink(QObject):
         self.changed.emit()
 
 
-CLAUDE_KINDS = ("ask", "skill", "web-agent")  # ชนิดใน ledger ที่ส่งไป Claude (ledger.KINDS)
+CLAUDE_KINDS = ("ask", "skill", "web-agent", "review")  # ชนิดใน ledger ที่ส่งไป Claude (ledger.KINDS)
 
 
 class CloudUsage(QObject):

@@ -77,6 +77,25 @@ class LedgerTest(unittest.TestCase):
         self.assertEqual(results, [True] * 6)
         self.assertEqual((real.call_count, real_forge.call_count), (3, 3))
 
+    def test_review_kind_is_counted_as_claude(self):
+        """การ์ด 0085: ให้ Claude ตรวจ = ส่งไป Claude → นับใน "วันนี้ถาม Claude ไป N ครั้ง"."""
+        from aipc.ui.backend import CLAUDE_KINDS
+
+        self.assertIn("review", ledger.KINDS)
+        self.assertIn("review", CLAUDE_KINDS)
+
+    def test_forge_with_review_records_review_kind_and_exact_text(self):
+        from aipc.skills import forge
+        from aipc.ui import app
+
+        made = forge.Proposal(False, "สรุปข่าวนี้", outcome="none", note="ตอบถูกแล้ว", cost_usd=0.1)
+        with mock.patch("aipc.cloud.ask.find_claude", return_value="claude"), \
+             mock.patch("aipc.skills.forge.forge", return_value=made), \
+             mock.patch("aipc.skills.forge.run_process", return_value=(0, "2.1", "")):  # fmt: skip
+            app._skill_forge(self.l)("สรุปข่าวนี้", review="ข้อความที่ส่งตรวจ")
+        e = self.l.entries()[0]
+        self.assertEqual((e["kind"], e["sent"]), ("review", "ข้อความที่ส่งตรวจ"))
+
 
 if __name__ == "__main__":
     unittest.main()

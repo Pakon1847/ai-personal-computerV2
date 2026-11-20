@@ -20,7 +20,8 @@ KINDS = {"ask": "ถาม Claude", "skill": "ให้ Claude สร้าง�
          "web": "ค้นเว็บด้วยเสียง (Google/DuckDuckGo)",
          "web-agent": "ผู้ช่วยเว็บส่งหน้าเว็บให้ Claude ช่วย",
          "calendar": "ดึงปฏิทิน Google (อ่านอย่างเดียว)",
-         "gmail": "อ่าน Gmail ผ่าน Gmail API (อ่านอย่างเดียว)"}  # fmt: skip
+         "gmail": "อ่าน Gmail ผ่าน Gmail API (อ่านอย่างเดียว)",
+         "review": "ให้ Claude ตรวจผลที่ผู้ใช้กดไม่ชอบ (การ์ด 0085)"}  # fmt: skip
 
 
 def default_path() -> Path:
