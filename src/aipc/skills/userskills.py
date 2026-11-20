@@ -313,6 +313,12 @@ class UserSkills:
         self._index[skill_id] = {**e, "downs": e.get("downs", 0) + 1}
         return self.record(skill_id, ok=False)
 
+    def disliked(self, skill_id: str) -> None:
+        """ผู้ใช้กด "ไม่ชอบ" ใต้ผล (การ์ด 0085) · นับอย่างเดียว ไม่ปิดสกิล (Claude เป็นคนตรวจแก้)."""
+        e = self.info(skill_id)
+        self._index[skill_id] = {**e, "downs": e.get("downs", 0) + 1}
+        self._save_index()
+
     def liked(self, skill_id: str) -> None:
         """ผู้ใช้กด "ตรงใจ" หลังสกิลตอบ (การ์ด 0078) · ล้างนับผิดติดกันด้วย."""
         e = self.info(skill_id)
