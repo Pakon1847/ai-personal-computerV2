@@ -1163,5 +1163,20 @@
   "ลบทั้งหมด": "Delete all",
   "ค้นความจำ": "Search memory",
   "ปักหมุดแล้ว": "Pinned",
-  "ปักหมุด": "Pin"
+  "ปักหมุด": "Pin",
+  "ผลนี้ตรงใจไหม": "Was this helpful?",
+  "ชอบ": "Like",
+  "ไม่ชอบ": "Dislike",
+  "ส่งรอบนี้ให้ Claude ตรวจและแก้สกิล": "Send this turn to Claude to review and fix skills",
+  "กำลังให้ Claude ตรวจผลนี้…": "Asking Claude to review this result…",
+  "Claude ตรวจแล้ว: ไม่ต้องแก้สกิล": "Claude reviewed it: no skill change needed",
+  "ตรวจแล้วแต่แก้สกิลไม่สำเร็จ": "Reviewed, but the skill could not be fixed",
+  "ไม่ได้ติดตั้งอะไร (สกิลเดิมไม่เปลี่ยน)": "Nothing was installed (the old skill is unchanged)",
+  "ส่งรอบนี้ให้ Claude ตรวจ ใช่ไหม": "Send this turn to Claude for review?",
+  "ไม่ได้ส่งอะไร · รอบนี้ยังกดไม่ชอบใหม่ได้": "Nothing was sent · you can still tap Dislike on this turn",
+  "ตรวจไม่ได้: รอบนี้เก่าเกินไปหรือส่งตรวจไปแล้ว": "Can't review: this turn is too old or was already sent",
+  "ให้ Claude ตรวจไม่ได้: ปิดการใช้ Claude ไว้": "Can't ask Claude to review: Claude is turned off",
+  "ให้ Claude ตรวจไม่ได้: เครื่องนี้ยังไม่มี Claude": "Can't ask Claude to review: Claude isn't set up on this machine",
+  "กำลังให้ Claude ทำงานอื่นอยู่ รอสักครู่แล้วกดใหม่": "Claude is busy with another task · wait a moment and tap again",
+  "ใช้ได้ทันที": "Ready to use"
 }

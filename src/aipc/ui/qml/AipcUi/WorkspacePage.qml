@@ -19,6 +19,9 @@ Item {
     property var answered: ({})   // token ของการ์ดที่ตอบ "ใช่/ไม่ใช่" ไปแล้ว
     // กด "ไม่ใช่แบบนี้" ที่สกิลที่ Claude สร้าง → ข้อความถัดไปคือคำติ ส่งให้ Claude แก้สกิล (การ์ด 0017) · null = แชทปกติ
     property var feedbackFor: null
+    // ปุ่มชอบ/ไม่ชอบใต้ผลของ AI ในเครื่อง (การ์ด 0085): ขึ้น 15 วินาที · รอบที่กดแล้ว (turnId → true) ไม่ขึ้นอีก
+    readonly property int rateMs: 15000
+    property var rated: ({})
     property int copiedRow: -1    // คำตอบ AI ที่เพิ่งกดคัดลอก (ปุ่มขึ้นว่า "คัดลอกแล้ว")
     property int speakRow: -1     // คำตอบที่กดอ่านออกเสียงล่าสุด (แสดงข้อความผิดพลาดของตัวอ่านใต้แถวนี้)
     // สั่งด้วยคีย์ลัด F9 (การ์ด 0024): ผู้ใช้อาจไม่ได้มองจอ (เบราว์เซอร์เต็มจอ) → อ่านผลให้ฟังเสมอ
@@ -97,9 +100,17 @@ Item {
         items = items.concat([item])
     }
     function showCard(card) {
-        push({ user: false, card: card })
+        push({ user: false, card: card, rateUntil: card.turnId ? Date.now() + rateMs : 0 })
         if (card.appInstall) installPopup.openFor(card.appInstall, card.appName)   // การ์ด 0054: ผู้ดูแลใส่รหัส
         if (card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
+    }
+    // ชอบ = นับเท่านั้น (ไม่มีอะไรขึ้นจอ) · ไม่ชอบ = การ์ดจาก Python (กำลังให้ Claude ตรวจ / ต้องเปิด Claude / ถามก่อนส่ง)
+    function rate(turnId, liked) {
+        const r = Object.assign({}, rated)
+        r[turnId] = true
+        rated = r
+        const card = skills.rateResult(turnId, liked)
+        if (!liked) showCard(card)
     }
     function send() {
         const text = input.text.trim()
@@ -435,7 +446,8 @@ Item {
         function onFinished(text, note) {
             const i = root.items.slice()
             if (i.length === 0 || !i[i.length - 1].ai) return
-            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace })
+            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace,
+                                                                  turnId: chat.lastTurnId, rateUntil: Date.now() + root.rateMs })
             root.items = i
             // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
             const spoken = root.speakNext
@@ -1422,7 +1434,8 @@ Item {
             required property var modelData
             required property int index
             width: ListView.view.width
-            height: modelData.user ? bubble.height : modelData.ai ? aiBox.height : card.height
+            height: modelData.user ? bubble.height : modelData.ai ? aiBox.height
+                    : card.height + (cardRate.visible ? cardRate.implicitHeight + 6 : 0)
 
             Rectangle {
                 id: bubble
@@ -1496,6 +1509,12 @@ Item {
                             }
                         }
                     }
+                    RateBar {
+                        turnId: row.modelData.turnId || ""
+                        until: row.modelData.rateUntil || 0
+                        done: !!root.rated[row.modelData.turnId || ""]
+                        onRated: (liked) => root.rate(row.modelData.turnId, liked)
+                    }
                     WhyPanel {
                         visible: !!row.modelData.done && (row.modelData.why || []).length > 0
                         rows: row.modelData.why || []
@@ -1544,6 +1563,14 @@ Item {
                     root.feedbackFor = { id: skillId, name: name }
                     input.forceActiveFocus()
                 }
+            }
+            RateBar {
+                id: cardRate
+                y: card.height + 6
+                turnId: card.visible ? ((row.modelData.card || {}).turnId || "") : ""
+                until: row.modelData.rateUntil || 0
+                done: !!root.rated[turnId]
+                onRated: (liked) => root.rate(turnId, liked)
             }
         }
     }

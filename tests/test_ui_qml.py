@@ -778,6 +778,44 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(banner[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_rate_bar_shows_for_local_results_and_hides(self):
+        """การ์ด 0085 D1: ปุ่มชอบ/ไม่ชอบใต้ผลของ AI ในเครื่อง (คำตอบ + การ์ด) · ไม่ใต้คำตอบ Claude /
+        การ์ดกำลังสร้าง · กดแล้วหาย · ไม่กด = หายเองเมื่อหมดเวลา."""
+        _, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        base = {"chips": [], "lines": ["x"], "confirmToken": "", "page": "", "badge": {}}
+        far = time.time() * 1000 + 60_000
+        page.setProperty("items", [
+            {"ai": True, "text": "ตอบในเครื่อง", "note": "", "done": True, "skill": "",
+             "turnId": "t1", "rateUntil": far},
+            {"ai": True, "text": "Claude ตอบ", "note": "ตอบโดย Claude (cloud) · …", "done": True,
+             "skill": ""},
+            {"user": False, "card": {**base, "kind": "clock", "title": "ตอนนี้ 10:00 น.",
+                                     "turnId": "t2"}, "rateUntil": far},
+            {"user": False, "card": {**base, "kind": "forging", "title": "กำลังให้ Claude ตรวจ…"}},
+        ])  # fmt: skip
+        settle(150)
+
+        def shown(name):
+            return [b for b in find_items(win, name) if b.property("visible")]
+
+        self.assertEqual(len(shown("dislikeResult")), 2)
+        self.assertEqual(len(shown("likeResult")), 2)
+        shown("dislikeResult")[0].clicked.emit()
+        settle(150)
+        self.assertEqual(len(shown("dislikeResult")), 1, "กดแล้วแถวนั้นหาย ไม่ให้กดซ้ำ")
+        self.assertEqual(find_all(win, "chatList")[0].property("count"), 5)  # การ์ดผลต่อท้าย
+        soon = time.time() * 1000 + 200
+        page.setProperty("items", [
+            {"ai": True, "text": "ตอบ", "note": "", "done": True, "skill": "", "turnId": "t9",
+             "rateUntil": soon},
+        ])  # fmt: skip
+        settle(100)
+        self.assertEqual(len(shown("dislikeResult")), 1)
+        settle(500)
+        self.assertEqual(shown("dislikeResult"), [], "หมดเวลา = หายเอง")
+        self.assertEqual(warnings, [])
+
     def test_undo_button_shows_once_and_reports(self):
         """ปุ่มย้อนกลับ (ข้อเสนอ 2026-10-03): ขึ้นเฉพาะการ์ดที่มี undoToken · กดแล้วหาย และขึ้นการ์ดผล."""
         _, win, warnings = self.open_shell()
