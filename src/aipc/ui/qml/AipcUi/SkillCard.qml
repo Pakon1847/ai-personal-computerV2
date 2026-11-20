@@ -132,6 +132,7 @@ Rectangle {
             }
             AppButton {
                 objectName: "likeSkillButton"
+                visible: !card.info.turnId   // การ์ด 0085: มีแถบชอบ/ไม่ชอบใต้การ์ดแล้ว ไม่ซ้ำ
                 text: card.liked ? Tr.t("ขอบคุณ") : Tr.t("ตรงใจ"); kind: "ghost"
                 enabled: !card.liked
                 onClicked: { card.liked = true; card.likeSkill(card.info.badge.forgedId) }

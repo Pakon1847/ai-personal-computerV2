@@ -814,6 +814,16 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(len(shown("dislikeResult")), 1)
         settle(500)
         self.assertEqual(shown("dislikeResult"), [], "หมดเวลา = หายเอง")
+        # สกิลที่ Claude สร้าง: ปุ่ม "ตรงใจ" เดิม (การ์ด 0078) ซ้ำกับ "ชอบ" → ซ่อนเมื่อการ์ดมีแถบใหม่
+        forged = {"name": "โหมดทำงาน", "reason": "r", "worker": "โค้ด", "forgedId": "work-mode",
+                  "forgedVersion": 1}  # fmt: skip
+        page.setProperty("items", [
+            {"user": False, "card": {**base, "kind": "steps", "title": "ทำแล้ว", "badge": forged,
+                                     "turnId": "t5"}, "rateUntil": far},
+        ])  # fmt: skip
+        settle(150)
+        self.assertEqual(shown("likeSkillButton"), [])
+        self.assertEqual(len(shown("likeResult")), 1)
         self.assertEqual(warnings, [])
 
     def test_undo_button_shows_once_and_reports(self):
