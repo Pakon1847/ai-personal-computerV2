@@ -4988,8 +4988,14 @@ class ChatController(QObject):
     def __init__(self, active: bool = True, target=None, store=None, poll_ms: int = 5000,
                  tools=None, cloud=None, model_name: str = "", forge: bool = False,
                  claude_on=None, meter=None, auto_cloud=False, cloud_model=None,
-                 cloud_effort=None, memory=None):  # fmt: skip
+                 cloud_effort=None, memory=None, turns=None):  # fmt: skip
         super().__init__()
+        from aipc.skills import feedback
+
+        # ปุ่มชอบ/ไม่ชอบ (การ์ด 0085): คำตอบของ AI ในเครื่องจำรอบไว้ · ตัวเดียวกับ SkillsController (app.py)
+        self._turns = turns if turns is not None else feedback.TurnLog()
+        self._turn_req: dict | None = None  # รอบที่กำลังตอบ (send ตั้ง · _on_done ใช้)
+        self._last_turn_id = ""
         self._memory = memory  # การ์ด 0079: ข้อที่เกี่ยวกับข้อความล่าสุด ต่อท้าย system prompt
         # cloud(คำถาม, บทสนทนา[, model=]) → CloudReply · None = ไม่มี Claude ในเครื่องนี้
         self._cloud = cloud
@@ -5282,13 +5288,18 @@ class ChatController(QObject):
         self._meter = self._meter_factory()
         if self._meter is not None:
             self._meter.start()
+        memory = ""
         if prompt:  # สกิล (เช่น แปล): งานเดียวจบ ไม่ต้องใช้บทสนทนาก่อนหน้า
             messages, trimmed = client.fit_context(prompt, self._conv["messages"][-1:])
         else:
+            memory = self._memory_block(text)
             messages, trimmed = client.fit_context(
-                self._system(tools, text) + self._memory_block(text), self._conv["messages"]
+                self._system(tools, text) + memory, self._conv["messages"]
             )
             messages = [self._for_local(m) for m in messages]
+        # การ์ด 0085: ไฟล์แนบ / ความจำของผู้ใช้อยู่ในบริบท = รอบนี้มีข้อมูลส่วนตัว (ถามก่อนส่งให้ Claude ตรวจ)
+        private = bool(self._conv["messages"][-1].get("file") or memory)
+        self._turn_req = {"text": text, "skill": self._turns.pop_skill(text), "private": private}
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""
         if force:
@@ -5324,6 +5335,7 @@ class ChatController(QObject):
         if self._busy or not text.strip() or not self.workReady:
             return False
         self._conv["messages"].append({"role": "user", "content": text})
+        self._turn_req = None  # คำตอบของ Claude ไม่มีปุ่มชอบ/ไม่ชอบ (การ์ด 0085)
         self._trace = {"t0": time.monotonic(), "why": "แชทงาน: ทุกข้อความส่งให้ Claude"}
         effort = self._work_effort()
         why = f"โมเดลที่เลือก: {self._work_model()}" + (f" · ความคิด {effort}" if effort else "")
@@ -5369,6 +5381,9 @@ class ChatController(QObject):
 
     @Slot(object)
     def _on_done(self, reply) -> None:
+        # รอบที่กำลังตอบ (การ์ด 0085) · ใช้ครั้งเดียว: ส่งต่อ Claude แล้ว _on_done รอบถัดไป = คำตอบ Claude ไม่จำ
+        req, self._turn_req = self._turn_req, None
+        self._last_turn_id = ""
         parroted = False  # ตอบมาแค่ป้ายที่มาของ Claude ที่ลอกจากประวัติ (การ์ด 0022 ชุดพัฒนา D1)
         if not getattr(reply, "cloud", False) and reply.text:
             text = self._FAKE_LABEL.sub("", reply.text)  # ป้ายที่มาจริงอยู่ใน "ทำไมได้คำตอบนี้"
@@ -5430,6 +5445,14 @@ class ChatController(QObject):
                 self._save_error = f"บันทึกประวัติไม่สำเร็จ ({e.strerror or e})"
         self._stream_text = ""
         self._last_trace = self._explain(reply)
+        local = not getattr(reply, "cloud", False) and not reply.reason and not parroted
+        if req is not None and local and reply.text:
+            from aipc.skills import feedback
+
+            sid = req["skill"]
+            self._last_turn_id = self._turns.add(feedback.Turn(
+                request=req["text"], answer=reply.text, route=f"skill:{sid}" if sid else "chat",
+                skill_id=sid, private=req["private"]))  # fmt: skip
         self.changed.emit()
         self.streamChanged.emit()
         self.finished.emit(reply.text, note)
@@ -5447,6 +5470,11 @@ class ChatController(QObject):
 
         off = self._cloud is not None and not self._claude_on() and not with_file
         return off and not reply.reason and not reply.tool_call and local_gave_up(reply.text)
+
+    @Property(str, notify=changed)
+    def lastTurnId(self) -> str:  # noqa: N802
+        """รอบของคำตอบล่าสุด (การ์ด 0085) · "" = ไม่มีปุ่มชอบ/ไม่ชอบ (คำตอบ Claude · หยุด · ล่ม)."""
+        return self._last_turn_id
 
     @Property("QVariantList", notify=changed)
     def lastTrace(self) -> list:  # noqa: N802

@@ -223,5 +223,70 @@ class DislikedCounterTest(unittest.TestCase):
         self.assertTrue(store.info("meeting-mode")["enabled"])
 
 
+try:
+    from aipc.chat import store
+    from aipc.ui.backend import ChatController
+    from tests.test_chat import FakeLlama, ServerCase
+except ImportError:  # pragma: no cover
+    ChatController = None
+    ServerCase = unittest.TestCase
+
+
+@unittest.skipIf(ChatController is None, "ไม่มี PySide6")
+class ChatTurnTest(ServerCase):
+    """การ์ด 0085 D1: คำตอบของ AI ในเครื่องจำรอบ · คำตอบของ Claude ไม่จำ (ไม่มีปุ่ม)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QGuiApplication.instance() or QGuiApplication([])
+
+    def make(self, **kw):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        self.dir = Path(d.name)
+        self.turns = feedback.TurnLog()
+        c = ChatController(target=self.target, store=store.ChatStore(self.dir / "chats"),
+                           poll_ms=100000, turns=self.turns, **kw)  # fmt: skip
+        self.addCleanup(c.shutdown)
+        pump(lambda: c.ready)
+        self.done = []
+        c.finished.connect(lambda text, note: self.done.append((text, c.lastTurnId)))
+        return c
+
+    def test_local_answer_gets_turn(self):
+        c = self.make()
+        self.assertTrue(c.send("สวัสดี", ""))
+        pump(lambda: self.done)
+        text, tid = self.done[0]
+        turn = self.turns.get(tid)
+        self.assertEqual((turn.request, turn.answer, turn.route, turn.private),
+                         ("สวัสดี", "สวัสดีครับ", "chat", False))  # fmt: skip
+
+    def test_cloud_answer_gets_none(self):
+        from aipc.cloud.ask import CloudReply
+
+        FakeLlama.mode = "dunno"
+        c = self.make(auto_cloud=True, cloud=lambda q, h: CloudReply(True, "Claude ตอบ"))
+        c.send("ข่าวเด่นวันนี้มีอะไร", "")
+        pump(lambda: self.done)
+        self.assertEqual(self.done[0], ("Claude ตอบ", ""), "คำตอบ Claude ไม่มีปุ่มชอบ/ไม่ชอบ")
+
+    def test_file_question_is_private(self):
+        c = self.make()
+        f = self.dir / "note.txt"
+        f.write_text("รหัสตู้ 1234", encoding="utf-8")
+        self.assertEqual(c.attachFile(str(f)), "")
+        c.send("ไฟล์นี้มีอะไร", "")
+        pump(lambda: self.done)
+        self.assertTrue(self.turns.get(self.done[0][1]).private)
+
+    def test_skill_prompt_route(self):
+        c = self.make()
+        self.turns.note_skill("แปลว่า hi", "translate")
+        c.send("แปลว่า hi", "แปลเป็นภาษาอังกฤษ")
+        pump(lambda: self.done)
+        self.assertEqual(self.turns.get(self.done[0][1]).route, "skill:translate")
+
+
 if __name__ == "__main__":
     unittest.main()

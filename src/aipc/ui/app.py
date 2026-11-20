@@ -309,8 +309,11 @@ def build(opts: Options, argv: list[str] | None = None):
     # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
     browser_ctl = BrowserController(active=in_session, ledger=ledger)
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
+    from aipc.skills.feedback import TurnLog
+
+    turns = TurnLog()  # ปุ่มชอบ/ไม่ชอบ (การ์ด 0085): แชทกับสกิลจำรอบที่เดียวกัน · อยู่ในหน่วยความจำเท่านั้น
     # แชททั่วไปคงไฮบริด: AI ในเครื่องไม่รู้ = ส่งต่อ Claude เอง (Pakon 2026-10-22 · การ์ด 0053 หัวข้อ 8)
-    chat = ChatController(active=in_session, tools=tools,
+    chat = ChatController(active=in_session, tools=tools, turns=turns,
                           cloud=_cloud_client(ledger) if in_session else None,
                           model_name=_local_model_name(),
                           forge=skill_forge is not None, claude_on=claude_on,
@@ -372,6 +375,7 @@ def build(opts: Options, argv: list[str] | None = None):
             chat_mode=lambda: chat.mode,
             chat_switch=_chat_switch(chat, ui_settings),
             memory=memory,
+            turns=turns,
         ),
         "memoryCtl": MemoryCtl(memory),
         "chat": chat,
