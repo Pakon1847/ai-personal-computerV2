@@ -15,6 +15,25 @@ GOOD = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/s2.md").read_text
 GOOD_LLM = (ROOT / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md").read_text(
     encoding="utf-8"
 )
+DAYPLAN = """---
+id: day-plan
+name: แผนวันนี้
+description: อ่านนัดของวันนี้ให้ฟังพร้อมคำให้กำลังใจ · ไม่ใช้จดนัดใหม่หรือลบนัด
+keywords: แผนวันนี้, ตารางวันนี้
+examples:
+  - แผนวันนี้มีอะไร
+  - ขอแผนวันนี้หน่อย
+  - วันนี้มีแผนอะไรบ้าง
+worker: code
+permissions: read_agenda
+version: 1.0
+---
+# แผนวันนี้
+
+## ขั้นตอน
+1. บอกนัดวันนี้
+2. บอก: สู้ ๆ นะ
+"""
 QUOTA = "บัญชี Claude ใช้ครบโควตาแล้ว · AI ในเครื่องยังใช้ได้ · Claude แจ้งว่า: “limit”"
 
 try:
@@ -227,6 +246,72 @@ class RateResultTest(unittest.TestCase):
         self.assertIsNone(self.seen[0][1]["revise"], "สกิลถูกลบแล้ว = สร้างใหม่ ไม่ใช่แก้ไฟล์ที่ไม่มี")
         self.assertNotIn("meeting-mode", self.store._index)
 
+    # ---------- จากรีวิวโค้ด 2026-11-22 ----------
+    def test_agenda_step_skill_turn_is_private(self):
+        """ข้อ 1: สกิลที่มีขั้น "บอกนัด" = ผลมีนัดของผู้ใช้ → ถามก่อนส่ง."""
+        s = self.make()
+        self.store.install(DAYPLAN, s._skills, request="แผนวันนี้")
+        s._reload()
+        card = s.handleAs("day-plan", "แผนวันนี้มีอะไร")
+        self.assertTrue(s._turns.get(card["turnId"]).private)
+
+    def test_review_of_user_skill_may_create_a_separate_skill(self):
+        """ข้อ 2: Claude ตัดสินว่าควรเป็นสกิลใหม่ (id ใหม่) → ติดตั้งเพิ่ม · สกิลเดิมไม่ถูกแทน."""
+        s = self.make(self.made(GOOD_LLM, "create"))
+        self.store.install(GOOD, s._skills, request="ทำโหมดประชุม")
+        s._reload()
+        steps = s.handleAs("meeting-mode", "เข้าโหมดประชุม")
+        tid = s.confirm(steps["confirmToken"], True)["turnId"]
+        s.rateResult(tid, False)
+        pump(lambda: self.done)
+        self.assertIn("สร้างสกิลใหม่", self.done[0][0]["title"])
+        ids = {m.id for m in self.store.load_all()}
+        self.assertEqual(len(ids), 2)
+        self.assertEqual(self.store.info("meeting-mode")["version"], 1, "สกิลเดิมไม่เปลี่ยน")
+
+    def test_refusal_keeps_turn_and_says_retry_possible(self):
+        """ข้อ 3–4: ส่งไม่ได้ตอนนี้ = รอบยังอยู่ · การ์ดบอกหน้าจอว่ายังกดใหม่ได้ (rateDone false)."""
+        s = self.make()
+        tid = s.handle("มีนัดอะไรบ้าง")["turnId"]
+        ask = s.rateResult(tid, False)
+        self.assertFalse(ask.get("rateDone"))
+        s._claude_on = lambda: False
+        self.assertEqual(s.confirm(ask["confirmToken"], True)["kind"], "needs")
+        self.assertIsNotNone(s._turns.get(tid), "ปิด Claude ระหว่างรอยืนยัน = รอบไม่หาย")
+        self.assertEqual(self.seen, [])
+        self.assertFalse(s.rateResult(tid, False).get("rateDone"))
+        s._claude_on = lambda: True
+        sent = s.confirm(s.rateResult(tid, False)["confirmToken"], True)
+        self.assertTrue(sent.get("rateDone"))
+        self.assertTrue(s.rateResult("t999", False).get("rateDone"))
+
+    def test_busy_at_confirm_keeps_turn_and_count(self):
+        s = self.make()
+        self.store.install(GOOD, s._skills, request="ทำโหมดประชุม")
+        s._reload()
+        steps = s.handleAs("meeting-mode", "เข้าโหมดประชุม")
+        tid = s.confirm(steps["confirmToken"], True)["turnId"]
+        s._forging = True
+        s._send_review(tid)
+        self.assertIsNotNone(s._turns.get(tid))
+        self.assertEqual(self.store.info("meeting-mode").get("downs", 0), 0)
+
+    def test_pending_skill_note_cleared_by_next_message(self):
+        """ข้อ 8: บันทึกสกิลภาษาที่แชทไม่ได้ส่ง ต้องไม่ค้างไปติดรอบอื่น."""
+        s = self.make()
+        s.handle("แปลว่า good morning")
+        s.handle("กี่โมงแล้ว")
+        self.assertEqual(s._turns.pop_skill("แปลว่า good morning"), "")
+
+    def test_unanswered_confirm_texts_are_bounded(self):
+        """ข้อ 10: การ์ดยืนยันที่ไม่ตอบ ไม่สะสมข้อความผู้ใช้ไม่จำกัด."""
+        s = self.make()
+        self.store.install(GOOD, s._skills, request="ทำโหมดประชุม")
+        s._reload()
+        for _ in range(30):
+            s.handleAs("meeting-mode", "เข้าโหมดประชุม")
+        self.assertLessEqual(len(s._token_text), feedback.KEEP)
+
 
 class DislikedCounterTest(unittest.TestCase):
     def test_disliked_counts_without_disabling(self):
@@ -296,6 +381,19 @@ class ChatTurnTest(ServerCase):
         c.send("ไฟล์นี้มีอะไร", "")
         pump(lambda: self.done)
         self.assertTrue(self.turns.get(self.done[0][1]).private)
+
+    def test_followup_after_file_question_is_private(self):
+        """ข้อ 6: เนื้อหาไฟล์ยังอยู่ในบทสนทนา → คำตอบถัดไปก็ถือว่ามีข้อมูลส่วนตัว."""
+        c = self.make()
+        f = self.dir / "note.txt"
+        f.write_text("รหัสตู้ 1234", encoding="utf-8")
+        c.attachFile(str(f))
+        c.send("ไฟล์นี้มีอะไร", "")
+        pump(lambda: self.done)
+        c.detachFile()
+        c.send("แล้วอะไรอีก", "")
+        pump(lambda: len(self.done) > 1)
+        self.assertTrue(self.turns.get(self.done[1][1]).private)
 
     def test_skill_prompt_route(self):
         c = self.make()
