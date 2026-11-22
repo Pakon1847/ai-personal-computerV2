@@ -103,6 +103,69 @@ class EnglishPagesTest(unittest.TestCase):
                 self.assertEqual(masked(back), masked(thai_before), page)
                 self.assertEqual(warnings, [])
 
+    def find(self, win, name):
+        return [o for o in win.findChildren(object) if o.objectName() == name][0]
+
+    def test_sidebar_button_switches_language_from_any_page(self):
+        """การ์ด 0075 เกณฑ์ L1: กดปุ่มที่แถบข้าง 1 ครั้ง = ทั้งหน้าเป็นอังกฤษ · กดอีกครั้ง = กลับไทย.
+
+        จำในค่าตั้งของบัญชี (ui.json) แบบเดียวกับหน้าตั้งค่า
+        """
+        engine, win, warnings = self.open_page("calendar")
+        ui = engine._backends["uiSettings"]
+        thai = visible_texts(win.contentItem(), [])
+        button = self.find(win, "langToggle")
+        self.assertEqual(button.property("text"), "EN")
+        button.clicked.emit()
+        settle(300)
+        self.assertEqual(ui.language, "en")
+        left = [
+            t for t in visible_texts(win.contentItem(), []) if THAI.search(t) and t not in ALLOWED
+        ]
+        self.assertEqual(left, [])
+        self.assertEqual(button.property("text"), "ไทย")
+        self.assertIn('"language": "en"', (Path(self.tmp) / "ui.json").read_text(encoding="utf-8"))
+        button.clicked.emit()
+        settle(300)
+        self.assertEqual(ui.language, "th")
+        self.assertEqual(masked(visible_texts(win.contentItem(), [])), masked(thai))
+        self.assertEqual(warnings, [])
+
+    def test_login_language_button_cycles_both_english_thai(self):
+        """การ์ด 0075 เกณฑ์ L2: หน้า Login สองภาษา → English → ไทย → สองภาษา.
+
+        English = ไม่มีไทยค้าง · ไทย = ไม่มีอังกฤษปน · กลับสองภาษา = เหมือนเดิม
+        """
+        opts = uiapp.Options(
+            screen="login", software=True, settings_path=Path(self.tmp) / "ui.json"
+        )
+        app, engine, warnings = uiapp.build(opts)
+        settle(300)
+        win = engine.rootObjects()[0]
+
+        def close():
+            win.close()
+            uiapp.shutdown(engine)
+            QCoreApplication.processEvents()
+
+        self.addCleanup(close)
+        both = visible_texts(win.contentItem(), [])
+        self.assertTrue(any(" · " in t and THAI.search(t) for t in both))
+        button = self.find(win, "loginLang")
+        button.clicked.emit()
+        settle(200)
+        allowed = ALLOWED | {"ภาษาไทย"}
+        en = visible_texts(win.contentItem(), [])
+        self.assertEqual([t for t in en if THAI.search(t) and t not in allowed], [])
+        button.clicked.emit()
+        settle(200)
+        th = visible_texts(win.contentItem(), [])
+        self.assertFalse([t for t in th if "Sign" in t or "Restart" in t], th)
+        button.clicked.emit()
+        settle(200)
+        self.assertEqual(masked(visible_texts(win.contentItem(), [])), masked(both))
+        self.assertEqual(warnings, [])
+
     def test_answer_cards_follow_language_and_keep_user_data(self):
         """การ์ดคำตอบ (สร้างตอนทำงาน) แปลตอนแสดง · ชื่อนัดของผู้ใช้คงเดิม · สลับกลับไทย = การ์ดเดิมทุกตัวอักษร."""
         engine, win, warnings = self.open_page("workspace")

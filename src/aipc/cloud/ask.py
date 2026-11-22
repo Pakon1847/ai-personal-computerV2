@@ -16,6 +16,7 @@ import time
 from dataclasses import dataclass
 from datetime import date
 
+from aipc.cloud.limits import account_limit_message
 from aipc.skills import forge
 from aipc.skills.catalog import ABOUT, is_english
 
@@ -25,7 +26,7 @@ MODELS = ("haiku", "sonnet", "opus")
 # ระดับความคิดของแชทงาน (Pakon 2026-10-22) · ค่าที่ claude -p --effort รับ
 # (ตรวจกับ claude 2.1.294 บน Pi 5 · ลองจริงแล้ว haiku/sonnet + max ไม่ error) · ค่าอื่น = ไม่ส่ง
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
-BUDGET_USD = "0.50"
+# ไม่มี --max-budget-usd: ระบบไม่ตั้งเพดานเอง ใช้ขีดจำกัดของบัญชี Claude (การ์ด 0084)
 TIMEOUT_S = 120
 CONTEXT_TURNS = 4
 
@@ -53,6 +54,7 @@ class CloudReply:
     seconds: float = 0.0
     cost_usd: float = 0.0
     model: str = ""
+    limited: bool = False  # บัญชี Claude ใช้ครบโควตา (การ์ด 0084)
 
 
 def instructions(today: date | None = None, english: bool = False) -> str:
@@ -155,8 +157,6 @@ def ask(
         "--permission-prompts",
         "none",
         "--no-session-persistence",
-        "--max-budget-usd",
-        BUDGET_USD,
         "--model",
         model,
         *(["--effort", effort] if effort else []),
@@ -182,6 +182,10 @@ def _call(args: list[str], text: str, runner) -> CloudReply:
         detail = (err or out or f"รหัส {code}")[:200]
         return CloudReply(False, error=f"ติดต่อ Claude ไม่ได้ (ไม่มีอินเทอร์เน็ต?) · {detail}", seconds=secs)
     text = str(data.get("result") or "")
+    limited = account_limit_message(data)
+    if limited:
+        cost = float(data.get("total_cost_usd") or 0)
+        return CloudReply(False, error=limited, seconds=secs, cost_usd=cost, limited=True)
     ok = code == 0 and not data.get("is_error") and bool(text.strip())
     return CloudReply(
         ok,
@@ -209,7 +213,7 @@ def ask_plain(
         return CloudReply(False, error="ยังไม่ได้ติดตั้งหรือเข้าสู่ระบบ Claude ในเครื่องนี้")
     args = [exe, "-p", "--output-format", "json", "--tools", "",
             "--permission-prompts", "none",
-            "--no-session-persistence", "--max-budget-usd", BUDGET_USD, "--model", model,
+            "--no-session-persistence", "--model", model,
             "--system-prompt", system, "--strict-mcp-config",
             "--disable-slash-commands"]  # fmt: skip
     return _call(args, text, runner)

@@ -16,6 +16,9 @@ from collections import Counter
 from aipc.skills.manifest import Manifest
 
 TOP_K = 5
+# คะแนนต่ำกว่านี้ = ไม่ใกล้ข้อความ ไม่ส่งให้ AI (การ์ด 0074 หัวข้อ 14) · ชุดพัฒนา S2b: สกิลที่ถูกคะแนนต่ำสุด 0.148 ·
+# ไม่มีสกิลผู้ใช้ใกล้เคียง = รายการเครื่องมือเท่าเดิมทุกประโยค แคชของ llama-server ใช้ได้ (Pi 5: ~7 วิ แทน ~27 วิ)
+NEAR_MIN = 0.15
 
 
 def grams(text: str, n=(2, 3)) -> Counter:
@@ -40,11 +43,15 @@ class Index:
         norm = math.sqrt(sum(x * x for x in v.values())) or 1
         return {g: x / norm for g, x in v.items()}
 
-    def top(self, text: str, k: int) -> list[Manifest]:
-        """k สกิลที่ใกล้ข้อความที่สุด (คะแนนเท่ากัน = ลำดับเดิม)."""
+    def scores(self, text: str) -> list[float]:
+        """ความใกล้ (cosine 0–1) ของข้อความกับแต่ละสกิล ตามลำดับ self.skills."""
         q = self._vec(grams(text))
-        scored = [(-sum(w * v.get(g, 0) for g, w in q.items()), i) for i, v in enumerate(self.vecs)]
-        return [self.skills[i] for _, i in sorted(scored)[:k]]
+        return [sum(w * v.get(g, 0) for g, w in q.items()) for v in self.vecs]
+
+    def top(self, text: str, k: int, min_score: float = 0.0) -> list[Manifest]:
+        """k สกิลที่ใกล้ข้อความที่สุด (คะแนนเท่ากัน = ลำดับเดิม) · ตัดตัวที่คะแนน < min_score."""
+        scored = sorted((-x, i) for i, x in enumerate(self.scores(text)))
+        return [self.skills[i] for x, i in scored[:k] if -x >= min_score]
 
 
 def pick(user_skills: list[Manifest], text: str, k: int = TOP_K) -> list[Manifest]:
@@ -54,6 +61,16 @@ def pick(user_skills: list[Manifest], text: str, k: int = TOP_K) -> list[Manifes
     if not text.strip():
         return []
     return _index_for(user_skills).top(text, k)
+
+
+def near(user_skills: list[Manifest], text: str, k: int = TOP_K) -> list[Manifest]:
+    """สกิลของผู้ใช้ที่ใกล้ข้อความจริง (≤ k ตัว · คะแนน ≥ NEAR_MIN) · ว่าง = AI ไม่ต้องเห็นสกิลผู้ใช้เลย.
+
+    ต่างจาก pick: มีสกิลน้อยก็ยังกรองด้วยคะแนน · ใช้คู่กับการบังคับให้ AI เลือก (catalog.ANSWER) ในแชท
+    """
+    if not user_skills or not text.strip():
+        return []
+    return _index_for(user_skills).top(text, k, NEAR_MIN)
 
 
 _cache: dict = {}

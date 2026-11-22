@@ -5,7 +5,10 @@
     python -m aipc.spikes.skill_select --label typhoon25-4b-q4km --server http://127.0.0.1:8080 \
         --out docs/benchmarks/$(date +%F)-skill-select-pi5/typhoon25-4b-q4km.json
 
---mode rules-first (ค่าเริ่มต้น = แอปตอนนี้): ตัวคัดสกิลแบบกฎก่อน (router.route) ·
+**แอปตอนนี้ใช้ ai-first เมื่อ AI ในเครื่องพร้อม** (backend._handle · ตั้งแต่ 0a4d3b2 2026-09-30) ·
+rules-first ใช้ตอน AI ไม่พร้อม ·
+(แก้ 2026-11-05: เดิมบรรทัดถัดไปเขียนว่า rules-first = "แอปตอนนี้" ซึ่งเก่าแล้ว · การ์ด 0074 ใช้ --mode ai-first)
+--mode rules-first (ค่าเริ่มต้นของตัววัด): ตัวคัดสกิลแบบกฎก่อน (router.route) ·
 ถ้ากฎไม่ตรงสกิลใด → ส่งให้ llama-server พร้อมรายการสกิล
 (aipc.skills.catalog · system prompt ชุดเดียวกับ ChatController) แล้วดูว่า AI เรียกเครื่องมือไหน
 --mode ai-first (แบบที่ลองเทียบ): ตัวแปลคำสั่งเครื่องก่อน (ชื่อแอป/เว็บต้องแน่นอน) · ที่เหลือให้ AI เลือกทุกข้อ ·
@@ -13,6 +16,11 @@
 ชุดประโยค tests/data/skill_selection.json เขียนและ commit ก่อนวัด (H9) · ห้ามแก้หลังเริ่มวัด
 ก่อนวัดถาม /props ว่า chat template รับรายการเครื่องมือไหม · ไม่รับ = หยุด (llama-server ทิ้งรายการเงียบ ๆ ·
 รอบแรก 2026-09-29 ของ Typhoon เป็นแบบนี้ ผลจึงใช้ไม่ได้)
+
+สกิลของผู้ใช้ (การ์ด 0074 S2): --user-skills <ไฟล์ JSON> --user-count N =
+ติดตั้ง N ตัวแรกที่ผ่านประตูเดียวกับปุ่มนำเข้า · ตัวคัดแบบกฎเห็นทุกตัว ·
+AI เห็นสกิลในตัวทุกตัว + สกิลผู้ใช้ที่ค้นได้ ≤ 5 ตัวต่อประโยค (แบบเดียวกับ backend.tool_catalog · การ์ด 0018) ·
+--repeat R = ถามซ้ำทั้งชุด R รอบ (AI สุ่มคำตอบ · temperature 0.6 ค่าเดียวกับแอป)
 """
 
 from __future__ import annotations
@@ -26,7 +34,7 @@ import urllib.request
 from collections import OrderedDict
 from pathlib import Path
 
-from aipc.skills import catalog, manifest, router
+from aipc.skills import catalog, manifest, retrieval, router, userskills
 
 REPO = Path(__file__).resolve().parents[3]
 DATASET = REPO / "tests" / "data" / "skill_selection.json"
@@ -51,11 +59,12 @@ def server_info(server: str, timeout: float = 30) -> dict:
     }
 
 
-def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300) -> dict:
+def ask_ai(server: str, text: str, tools: list[dict], timeout: float = 300,
+           choice: str = "auto") -> dict:  # fmt: skip
     """ถาม llama-server 1 ข้อพร้อมรายการสกิล · คืนชื่อเครื่องมือที่ AI เรียก ("" = ตอบเอง) + เวลา."""
     body = {"messages": [{"role": "system", "content": SYSTEM_PROMPT},
                          {"role": "user", "content": text}],
-            "tools": tools, "tool_choice": "auto", "stream": False, "cache_prompt": True,
+            "tools": tools, "tool_choice": choice, "stream": False, "cache_prompt": True,
             **SAMPLING}  # fmt: skip
     req = urllib.request.Request(server.rstrip("/") + "/v1/chat/completions",
                                  data=json.dumps(body).encode(),
@@ -83,22 +92,52 @@ def by_rules(text: str, skills, avail: set[str], ai, mode: str) -> str:
     return r.skill.id if r.skill is not None else ""
 
 
-def evaluate(items: list[dict], skills, ai=None, mode: str = "rules-first") -> dict:
-    """ai(text) → ชื่อเครื่องมือ · None = วัดกฎอย่างเดียว."""
+def load_pool(path: Path, builtin: list) -> tuple[list, list[dict]]:
+    """สกิลผู้ใช้จำลองตามลำดับในไฟล์ · ตัวที่ไม่ผ่านประตู (แบบปุ่มนำเข้า) ถูกข้ามและจดเหตุผล · คืน (ที่ผ่าน, ที่ไม่ผ่าน)."""
+    ok, rejected = [], []
+    for it in json.loads(path.read_text(encoding="utf-8"))["items"]:
+        m, errors = userskills.gate(it["md"], builtin + ok)
+        if m is None:
+            rejected.append({"id": it["id"], "errors": errors})
+        else:
+            ok.append(m)
+    return ok, rejected
+
+
+def evaluate(items: list[dict], skills, ai=None, mode: str = "rules-first", user=()) -> dict:
+    """ai(text) → ชื่อเครื่องมือ · None = วัดกฎอย่างเดียว · user = สกิลของผู้ใช้ที่ติดตั้งไว้."""
     if mode not in MODES:
         raise ValueError(f"mode ต้องเป็น {MODES}")
     avail = {"llm"}
-    tools = catalog.tools(skills, avail)
-    known = {t["function"]["name"] for t in tools}
+    user = list(user)
     rows = []
     for it in items:
+        # แบบเดียวกับ backend.tool_catalog + ChatController.send (การ์ด 0074 หัวข้อ 14):
+        # สกิลผู้ใช้ส่งเฉพาะตัวที่ใกล้ข้อความ (retrieval.near) · มี = บังคับเลือกก่อน ·
+        # เลือก "ตอบเอง" = ถามรอบ 2 ด้วยสกิลในตัว
+        base = catalog.tools(list(skills), avail)
+        tools = catalog.tools(list(skills) + retrieval.near(user, it["text"]), avail)
+        known = {t["function"]["name"] for t in tools}
         row = {**it, "by": "rule"}
-        got = by_rules(it["text"], skills, avail, ai, mode) or "none"
+        got = by_rules(it["text"], list(skills) + user, avail, ai, mode) or "none"
         if got == "none" and ai is not None:
-            res = ai(it["text"], tools)
+            forced = len(tools) > len(base)
+            res = ai(it["text"], tools + [catalog.answer_tool()], "required") if forced else None
+            if res is None or res["tool"] in ("", catalog.ANSWER):
+                first, res = res, ai(it["text"], base)
+                if first is not None:  # เวลารวม 2 รอบ = เวลาที่ผู้ใช้รอ
+                    total = round(first["seconds"] + res["seconds"], 2)
+                    one = {"seconds": first["seconds"], "timings": first["timings"]}
+                    res = {**res, "seconds": total, "first": one}
             row.update(
-                by="ai", seconds=res["seconds"], timings=res["timings"], raw_tool=res["tool"]
+                by="ai",
+                seconds=res["seconds"],
+                timings=res["timings"],
+                raw_tool=res["tool"],
+                forced=forced,
             )
+            if "first" in res:
+                row["first"] = res["first"]
             # ชื่อที่ไม่มีในรายการ = แอปจริงตอบแบบคุยทั่วไป (SkillsController.handleAs)
             got = res["tool"] if res["tool"] in known else "none"
         row.update(got=got, ok=got == it["expect"])
@@ -123,14 +162,15 @@ def evaluate(items: list[dict], skills, ai=None, mode: str = "rules-first") -> d
     }  # fmt: skip
 
 
-def verdict(res: dict, criteria: dict) -> str:
+def verdict(res: dict, criteria: dict | None) -> str:
     c = res["correct"] / res["total"]
     f = res["false_calls"] / max(res["none_total"], 1)
-    ok = c >= criteria["correct_min"] and f <= criteria["false_call_max"]
-    result = "ผ่าน" if ok else "ไม่ผ่าน"
     wrong = f"{res['false_calls']}/{res['none_total']} = {f:.0%}"
-    return (f"ถูก {res['correct']}/{res['total']} = {c:.0%} · เรียกสกิลทั้งที่ไม่ควร {wrong}"
-            f" → {result}เกณฑ์ ADR-007 ข้อ 6")  # fmt: skip
+    text = f"ถูก {res['correct']}/{res['total']} = {c:.0%} · เรียกสกิลทั้งที่ไม่ควร {wrong}"
+    if not criteria:  # ชุดที่เกณฑ์อยู่ใน README ของผลวัด (เช่น การ์ด 0074)
+        return text
+    ok = c >= criteria["correct_min"] and f <= criteria["false_call_max"]
+    return f"{text} → {'ผ่าน' if ok else 'ไม่ผ่าน'}เกณฑ์ ADR-007 ข้อ 6"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -140,11 +180,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--mode", choices=MODES, default="rules-first")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--dataset", type=Path, default=DATASET, help="ชุดประโยค (ค่าเริ่มต้น = ชุด 58)")
+    ap.add_argument("--user-skills", type=Path, help="สกิลผู้ใช้จำลอง (JSON · items[].md)")
+    ap.add_argument("--user-count", type=int, default=0, help="ติดตั้งกี่ตัวแรกที่ผ่านประตู")
+    ap.add_argument("--repeat", type=int, default=1, help="ถามซ้ำทั้งชุดกี่รอบ")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     data = json.loads(a.dataset.read_text(encoding="utf-8"))
     skills = manifest.load_builtin()
+    user, rejected = load_pool(a.user_skills, skills) if a.user_skills else ([], [])
+    if len(user) < a.user_count:
+        print(f"หยุด: สกิลผู้ใช้ผ่านประตู {len(user)} ตัว น้อยกว่าที่ขอ {a.user_count}", file=sys.stderr)
+        return 2
+    user = user[: a.user_count]
     ai = None
     info = {}
     if a.server:
@@ -156,13 +204,16 @@ def main(argv: list[str] | None = None) -> int:
                   file=sys.stderr)  # fmt: skip
             return 2
 
-        def ai(text, tools):
-            return ask_ai(a.server, text, tools)
+        def ai(text, tools, choice="auto"):
+            return ask_ai(a.server, text, tools, choice=choice)
 
-    res = evaluate(data["items"], skills, ai, a.mode)
+    runs = [evaluate(data["items"], skills, ai, a.mode, user) for _ in range(max(a.repeat, 1))]
+    # 1 รอบ = รูปแบบผลเดิม · หลายรอบ = รอบแรกอยู่ที่เดิม + ทุกรอบใน repeats
+    res = {**runs[0], "repeats": runs} if len(runs) > 1 else runs[0]
     res.update(
         label=a.label, method="rules + AI" if ai else "rules only", skills=[s.id for s in skills],
         server=info, dataset=a.dataset.name,
+        user_skills=[s.id for s in user], user_pool_rejected=rejected,
     )  # fmt: skip
     from aipc.bench import machine
 
@@ -173,12 +224,14 @@ def main(argv: list[str] | None = None) -> int:
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(res, ensure_ascii=False, indent=1, default=str), encoding="utf-8",
                      newline="\n")  # fmt: skip
-    print(f"{a.label} ({res['method']} · {a.mode}): {verdict(res, data['criteria'])}")
-    for k, (c, n) in res["by_kind"].items():
-        print(f"  {k}: {c}/{n}")
-    if ai:
-        print(f"  ถาม AI {res['ai_asked']} ข้อ · median {res['ai_seconds_median']} วิ/ข้อ"
-              f" · ข้อแรก {res['ai_seconds_first']} วิ · ช้าสุด {res['ai_seconds_max']} วิ")  # fmt: skip
+    for n, r in enumerate(runs, 1):
+        head = f"{a.label} ({res['method']} · {a.mode} · สกิลผู้ใช้ {len(user)} · รอบ {n}/{len(runs)})"
+        print(f"{head}: {verdict(r, data.get('criteria'))}")
+        for k, (c, total) in r["by_kind"].items():
+            print(f"  {k}: {c}/{total}")
+        if ai:
+            print(f"  ถาม AI {r['ai_asked']} ข้อ · median {r['ai_seconds_median']} วิ/ข้อ"
+                  f" · ข้อแรก {r['ai_seconds_first']} วิ · ช้าสุด {r['ai_seconds_max']} วิ")  # fmt: skip
     return 0
 
 

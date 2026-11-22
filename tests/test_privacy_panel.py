@@ -139,6 +139,19 @@ class PanelTest(unittest.TestCase):
         p.refresh()
         self.assertFalse(p.allOff)
 
+    def test_claude_off_badge_now_that_weather_has_no_switch(self):
+        """การ์ด 0061 รอบ 3 เอาสวิตช์อากาศออก → ปิด Claude อย่างเดียวต้องเห็นบนป้าย (เดิมไม่ขึ้นเลย ·
+        บทสาธิตสั่งปิดสวิตช์อากาศที่ไม่มีแล้ว · แก้ 2026-10-27)."""
+        self.claude, self.weather = False, True
+        p = self.panel()
+        self.assertFalse(p.allOff)
+        self.assertTrue(p.claudeOff)
+        self.assertEqual(p.text, "AI ในเครื่อง: ต่อเน็ตไม่ได้ · Claude: ปิด · ส่งออกวันนี้ 0 ครั้ง")
+        self.assertEqual(p.kind, "ok")
+        self.claude = True
+        p.refresh()
+        self.assertEqual(p.text, "AI ในเครื่อง: ต่อเน็ตไม่ได้ · ส่งออกวันนี้ 0 ครั้ง")
+
     def test_llm_states(self):
         self.llm = "open"
         p = self.panel()
@@ -179,7 +192,9 @@ class WeatherSwitchTest(unittest.TestCase):
             card = self.s.handle(q)
             self.assertEqual(card["kind"], "weather-off")
             self.assertIn("ปิด", card["title"])
-            self.assertEqual(self.why(card)["ข้อมูลออกนอกเครื่อง"], "ไม่มี · ปิดสวิตช์อากาศอยู่")
+            self.assertEqual(self.why(card)["ข้อมูลออกนอกเครื่อง"], "ไม่มี · บัญชีนี้ปิดการส่งข้อมูลอากาศไว้")
+            # ไม่บอกให้ไปหาสวิตช์ที่ไม่มีแล้ว (การ์ด 0061 รอบ 3 · H5)
+            self.assertFalse(any("หน้าตั้งค่า ›" in line for line in card["lines"]))
         self.assertEqual(self.calls, [])
         self.assertEqual(self.ledger.entries(), [])
 

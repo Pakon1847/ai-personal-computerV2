@@ -246,16 +246,25 @@ class BrowserController(QObject):
     pageRequested = Signal(str)  # noqa: N815 · "กลับไปหน้าผู้ช่วย" = ย่อเบราว์เซอร์แล้วให้แอปไปหน้านั้น
     busyChanged = Signal()  # noqa: N815
     _done = Signal(str, bool, bool)
+    # การ์ด 0048: จบการสาธิต (ชื่อคำสั่ง, ขั้นที่จด, เว็บ) · หน้าจอส่งต่อให้ skills.siteDemo
+    demoReady = Signal(str, "QVariantList", str)  # noqa: N815
+    _demo_done = Signal(object)
 
     def __init__(self, active: bool = True, control=None, ledger=None, skill_match=None,
-                 profile=None):  # fmt: skip
+                 profile=None, gmail=None, summarize=None):  # fmt: skip
         super().__init__()
+        # การ์ด 0072: Gmail API (aipc.cloud.gmail_api · เทสต์ใส่ของปลอม) ·
+        # summarize(messages) = AI ในเครื่องสรุป
+        self._gmail = gmail
+        self._summarize = summarize
         self._active = active
         self._control = control
         # โฟลเดอร์โปรไฟล์ของเบราว์เซอร์ของผู้ช่วย · None = ค่าเริ่มต้น (เทสต์ใส่โฟลเดอร์ชั่วคราว)
         self._profile = profile
         self._ledger = ledger
         self._skill_match = skill_match  # การ์ด 0028: SkillsController.voiceSkill (app.py ต่อให้)
+        self._demo_site = ""  # เว็บของการสาธิตที่กำลังจด (การ์ด 0048)
+        self._demo_done.connect(self._on_demo_done)
         self._intent = None  # การ์ด 0042: SkillsController.voiceIntent (app.py ต่อให้)
         self._busy = False
         self._queued = None  # การ์ด 0057 รอบ 2: คำสั่งที่พูดระหว่างกำลังทำคำสั่งก่อนหน้า
@@ -315,21 +324,180 @@ class BrowserController(QObject):
         except Exception:  # noqa: BLE001 · อ่านไม่ได้ = ไม่มีสกิลประจำเว็บ (ไม่ทำให้คีย์ลัดพัง)
             return ""
 
-    @Slot(str, str, str, result=bool)
-    def runSite(self, kind: str, arg: str, site: str) -> bool:  # noqa: N802
-        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก · คำพ้องของคำสั่งระบบ การ์ด 0066) ·
+    @Slot(str, str, str, str, result=bool)
+    def runSite(self, kind: str, arg: str, site: str, words: str = "") -> bool:  # noqa: N802
+        """ทำคำสั่งของสกิลประจำเว็บ (กดคีย์/คลิก · คำพ้องของคำสั่งระบบ การ์ด 0066 · กดปุ่มตามป้าย การ์ด 0069) ·
+        words = คำพูดของคำสั่ง (คั่น "|") ใช้หาปุ่มด้วยป้ายเมื่อตัวเลือก CSS หาไม่เจอ ·
         ผลมาทางสัญญาณ finished เหมือนคำสั่งเว็บอื่น."""
         from aipc.skills import sitecmd
         from aipc.skills.browse import BrowseCommand
 
-        if not self._active or self._busy or kind not in ("key", "click", "system"):
+        allowed = ("key", "click", "click_text", "system", "steps")
+        if not self._active or self._busy or kind not in allowed:
             return False
         if self._control is None or not self._control.running:
             return False
+        if kind == "steps":  # การ์ด 0048: ตรวจซ้ำตอนทำ · n=1 = รอปุ่มของขั้นนี้ขึ้นก่อน · ไม่ลองปุ่มอื่นแทน
+            steps, problems = sitecmd.parse_steps(arg)
+            if problems or not steps:
+                return False
+            return self._start([BrowseCommand(k, query=a, site=site, n=1) for k, a in steps])
         if kind == "system":  # ตรวจซ้ำตอนทำ ไม่เชื่อไฟล์อย่างเดียว (H7) · แปลด้วยตัวเดียวกับเสียง (H6)
             cmds, why = sitecmd.alias_commands(arg)
             return self._start(cmds) if not why else False
-        return self._start([BrowseCommand(kind, query=arg, site=site)])
+        back = words if kind in ("click", "click_text") else ""
+        return self._start([BrowseCommand(kind, query=arg, site=site, direction=back)])
+
+    @Slot(str, result="QVariantMap")
+    def demoCommand(self, text: str) -> dict:  # noqa: N802
+        """สอนด้วยการทำให้ดู (การ์ด 0048): "เริ่มบันทึก" · "เสร็จแล้ว ตั้งชื่อว่า …" · "ยกเลิกการบันทึก".
+        {"started": True} = กำลังทำ (ผลมาทาง finished/demoReady) · {"say": …} = เหตุผล · {} = ไม่ใช่."""
+        from aipc.browser import demo
+        from aipc.skills.browse import BrowseCommand
+
+        what, name = demo.intent(text)
+        if not what or not self._active or self._control is None or not self._control.running:
+            return {}
+        recording = self._control.demo_active
+        if what == "start":
+            if recording:
+                return {"say": "กำลังบันทึกอยู่แล้ว · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …"}
+            site = demo.site_of(str(self._control.current().get("url", "")))
+            if not site:
+                return {"say": "บันทึกได้เฉพาะเว็บในรายการที่ผู้ช่วยคุมได้"}
+            self._demo_site = site
+            self._start([BrowseCommand("demo_start", site=site)])
+            return {"started": True}
+        if not recording:  # "เสร็จแล้ว" ตอนไม่ได้บันทึก = คำพูดธรรมดา
+            return {}
+        if what == "done":
+            return {"say": "ตั้งชื่อคำสั่งด้วย เช่น พูดว่า เสร็จแล้ว ตั้งชื่อว่า ซูมเข้าสองที"}
+        if what == "stop":
+            self._start([BrowseCommand("demo_stop", query=name[:40])])
+            return {"started": True}
+        if what == "cancel":
+            self._start([BrowseCommand("demo_stop", direction="cancel")])
+            return {"started": True}
+        return {}
+
+    @Slot(object)
+    def _on_demo_done(self, r: tuple) -> None:
+        name, steps = r
+        self.demoReady.emit(name, steps, self._demo_site)
+
+    @Slot(str, result="QVariantMap")
+    def clickText(self, text: str) -> dict:  # noqa: N802
+        """การ์ด 0069: คำพูดตรงกับป้ายของปุ่มที่มองเห็นบนหน้าที่เปิดอยู่ → กด (ผลมาทาง finished) ·
+        {"started": True} = กำลังกด · {"say": …} = ไม่กดและบอกเหตุผล · {} = ไม่ใช่ชื่อปุ่ม (ทางเสียงอื่นทำต่อ) ·
+        หน้าจอเรียกเมื่อทางเดิมไม่รู้จักประโยคนี้ ก่อนขอให้ Claude สร้างสกิล."""
+        from aipc.browser import textclick
+        from aipc.skills.browse import BrowseCommand
+
+        if not self._active or self._busy or self._control is None or not self._control.running:
+            return {}
+        words, said_press = textclick.spoken_target(text)
+        if not words:
+            return {}
+        try:
+            pick = textclick.choose(words, self._control.buttons())
+        except Exception:  # noqa: BLE001 · อ่านหน้าไม่ได้ = ไม่ใช่ทางนี้ (ไม่ทำให้คีย์ลัดพัง)
+            return {}
+        if pick.item is None and not pick.choices:
+            # ไม่เจอ: พูดว่า "กด…" = บอกตรง ๆ · พูดแค่ชื่อ = อาจเป็นคำสั่งอื่น ให้ทางเดิมทำต่อ
+            return {"say": textclick.refuse_text(words, pick)} if said_press else {}
+        if why := textclick.refuse_text(words, pick):
+            return {"say": why}
+        self._start([BrowseCommand("click_text", query=pick.item["label"])])
+        return {"started": True}
+
+    @Slot(str, result="QVariantMap")
+    def mailRead(self, text: str) -> dict:  # noqa: N802
+        """การ์ด 0071/0072: "อ่านเมลล่าสุด" / "มีเมลใหม่ไหม" / "มีเมลจาก … ไหม" / "สรุปเมล" ·
+        เชื่อม Gmail API แล้ว = อ่านผ่าน API (สรุปด้วย AI ในเครื่อง) ·
+        ยังไม่เชื่อม = อ่านจากหน้า Gmail ในเบราว์เซอร์ของผู้ช่วย
+        (เปิดให้ก่อนถ้ายังไม่เปิด) · {"started": True} = ผลมาทาง finished · {"say": …} = บอกเลย ·
+        {} = ไม่ใช่เรื่องอ่านเมล."""
+        from aipc.skills import mailread
+        from aipc.skills.browse import BrowseCommand
+
+        asked = mailread.parse(text)
+        if not self._active or self._busy or asked is None:
+            return {}
+        kind, who = asked
+        api = self._gmail_api()
+        if api is not None and api.connected():
+            self._start_job(lambda: self._mail_by_api(api, kind, who))
+            return {"started": True}
+        if kind.startswith("summary"):
+            return {"say": "สรุปเมลต้องเชื่อมต่อ Gmail ก่อน · ไปที่หน้าตั้งค่า → หมวด AI → “เชื่อมต่อ Gmail” · "
+                           "ตอนนี้พูด “อ่านเมลล่าสุด” ได้"}  # fmt: skip
+        cmds = [BrowseCommand("mail_read", query=kind, direction=who)]
+        if "mail.google.com" not in self.currentUrl():
+            cmds.insert(0, BrowseCommand("site", site="gmail"))
+        self._start(cmds)
+        return {"started": True}
+
+    def _gmail_api(self):
+        if self._gmail is None:
+            from aipc.cloud import gmail_api
+
+            self._gmail = gmail_api
+        return self._gmail
+
+    def _mail_by_api(self, api, kind: str, who: str) -> tuple[str, bool]:
+        """เธรดแยก (การ์ด 0072) · อ่านผ่าน Gmail API แบบอ่านอย่างเดียว ·
+        สรุป = AI ในเครื่อง (เนื้อหาเมลไม่ไป Claude · H3)."""
+        from aipc.skills import mailread
+
+        summary = kind.startswith("summary")
+        want = "unread" if kind == "summary_unread" else ("latest" if summary else kind)
+        try:
+            token = api.access_token()
+            rows = api.mails(want, who, n=3 if summary else 10, body=summary, token=token)
+        except api.GmailError as e:
+            self._record_gmail(0, summary, ok=False)
+            return str(e), False
+        self._record_gmail(len(rows), summary, ok=True)
+        if not summary:
+            return mailread.answer(want, who, rows).replace(
+                "ในหน้าแรกของกล่องจดหมาย", "ในกล่องจดหมาย"
+            ), True
+        if not rows:
+            return (
+                "ไม่มีเมลที่ยังไม่อ่านในกล่องจดหมาย" if want == "unread" else "ไม่มีเมลในกล่องจดหมาย"
+            ), True
+        try:
+            text = (self._summarize or _local_summary)(api.summary_messages(rows))
+        except Exception as e:  # noqa: BLE001 · AI ในเครื่องไม่พร้อม = บอกตามจริง แล้วอ่านหัวเรื่องแทน
+            head = mailread.answer(want, who, rows).replace("ในหน้าแรกของกล่องจดหมาย", "ในกล่องจดหมาย")
+            return f"AI ในเครื่องสรุปไม่ได้ ({e}) · {head}", False
+        return f"สรุปเมล{'ที่ยังไม่อ่าน' if want == 'unread' else 'ล่าสุด'} {len(rows)} ฉบับ: {text}", True
+
+    def _record_gmail(self, n: int, body: bool, ok: bool) -> None:
+        if self._ledger is None:
+            return
+        what = f"{n} ฉบับ" + (" · ดึงเนื้อหามาสรุปด้วย AI ในเครื่อง" if body else " · ผู้ส่ง หัวเรื่อง เวลา")
+        try:
+            sent = f"อ่าน Gmail ผ่าน Gmail API ({what}) · เนื้อหาเมลไม่ได้ส่งไปที่ไหน"
+            self._ledger.record("gmail", sent, ok=ok, note="สั่งด้วยเสียง · scope gmail.readonly")
+        except OSError:
+            pass
+
+    def _start_job(self, job) -> None:
+        """งานที่ไม่ใช่คำสั่งเบราว์เซอร์ (การ์ด 0072) · ผลมาทาง finished เหมือนคำสั่งเว็บ."""
+        self._busy = True
+        self.busyChanged.emit()
+
+        def work():
+            say, ok = "ทำไม่สำเร็จ", False
+            try:
+                say, ok = job()
+            except Exception as e:  # noqa: BLE001 · ต้องจบด้วยการบอกผู้ใช้เสมอ (ไม่ค้าง busy)
+                say = f"ทำไม่สำเร็จ: {type(e).__name__}"
+            finally:
+                self._done.emit(say, ok, False)
+
+        threading.Thread(target=work, daemon=True).start()
 
     @Slot(str, str, result=bool)
     def siteSearch(self, text: str, url: str) -> bool:  # noqa: N802
@@ -428,9 +596,14 @@ class BrowserController(QObject):
         # try/finally: เกิดข้อผิดพลาดกลางทางก็ต้องส่ง _done เสมอ · เดิมไม่ส่ง → busy ค้าง ทุกคำสั่งเสียงตอบ
         # "ยังทำคำสั่งก่อนหน้าอยู่" จนออกจากระบบ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.8)
         says, ok = [], True
+        multi = len(cmds) > 1 and all(c.n == 1 for c in cmds)  # คำสั่งหลายขั้น (การ์ด 0048)
         try:
-            for c in cmds:
+            for i, c in enumerate(cmds, start=1):
                 r = self._ctl().run(c)
+                if c.kind == "demo_stop" and r.ok and c.direction != "cancel":
+                    self._demo_done.emit((c.query, [s.to_dict() for s in r.steps]))
+                    says.append(f"จดคำสั่ง “{c.query}” แล้ว {len(r.steps)} ขั้น")
+                    continue
                 if c.kind in ("search", "site_search") and self._ledger is not None:
                     # คำค้นออกไป Google/DuckDuckGo หรือบริการที่พูดชื่อ (การ์ด 0036) = ส่งออกนอกเครื่อง
                     where = "ค้นเว็บ" if c.kind == "search" else f"ค้นใน {SITES[c.site][0]}"
@@ -445,7 +618,11 @@ class BrowserController(QObject):
                     self._page_next = c.query
                 if not r.ok:
                     ok = False
+                    if multi:  # H5: บอกตรง ๆ ว่าหยุดที่ขั้นไหน
+                        says = [f"ขั้นที่ {i} จาก {len(cmds)} ไม่สำเร็จ จึงหยุด ไม่ทำขั้นถัดไป · {r.say}"]
                     break
+            if multi and ok:
+                says = [f"ทำครบ {len(cmds)} ขั้นแล้ว"]
         except Exception as e:  # noqa: BLE001 · ทุกแบบต้องจบด้วยการบอกผู้ใช้ ไม่ค้างเงียบ
             ok = False
             says.append(f"ทำไม่สำเร็จ: {type(e).__name__}")
@@ -468,3 +645,13 @@ class BrowserController(QObject):
     def close(self) -> None:
         if self._control is not None:
             self._control.close()
+
+
+def _local_summary(messages: list[dict]) -> str:
+    """ให้ AI ในเครื่อง (llama-server) สรุป · ไม่มี/ไม่พร้อม = ยกข้อผิดพลาด (ผู้เรียกบอกผู้ใช้)."""
+    from aipc.chat.client import Stream, Target
+
+    r = Stream(Target.from_env(), messages, timeout=240).run(lambda token: None)
+    if r.reason or not r.text.strip():
+        raise RuntimeError(r.reason or "ไม่มีคำตอบ")
+    return r.text.strip()

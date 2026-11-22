@@ -111,13 +111,11 @@ def main(argv: list[str] | None = None) -> int:
     if a.stub_cloud:
         cloud = stub_cloud
     else:
-        from aipc.cloud.budget import Budget
         from aipc.cloud.ledger import Ledger
         from aipc.ui import app
 
-        budget, ledger = Budget(work / "usage.json"), Ledger(work / "outbound.json")
-        budget.set_limit(5.0)
-        real = app._cloud_client(budget, ledger)
+        ledger = Ledger(work / "outbound.json")
+        real = app._cloud_client(ledger)
         if real is None:
             print("ไม่พบ claude")
             return 1

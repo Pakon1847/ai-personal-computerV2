@@ -102,6 +102,19 @@ def system_prompt(
 TOOLS_HINT = " · ถ้าคำขอตรงกับเครื่องมือที่มี ให้เรียกเครื่องมือนั้นโดยไม่ต้องตอบเอง ถ้าไม่ตรงให้ตอบเองตามปกติ"
 
 
+# ตัวเลือก "ตอบเอง" ตอนบังคับให้ AI เลือก (การ์ด 0074 หัวข้อ 14): มีสกิลผู้ใช้ใกล้ข้อความ → tool_choice "required"
+# ชุดพัฒนา S2b (Gemma 4 E2B): ปล่อยให้ AI เลือกเองว่าจะเรียกไหม เรียกสกิลผู้ใช้ถูก 30% · บังคับเลือก 60% ·
+# AI มักตอบเองทั้งที่มีสกิลตรง เพราะสกิลผู้ใช้เป็นงานภาษาที่มันตอบได้อยู่แล้ว · llama.cpp บังคับรูปคำตอบด้วย grammar
+ANSWER = "answer-directly"
+ANSWER_DESC = "ไม่มีเครื่องมือไหนตรงกับคำขอ: ตอบเองแบบคุยทั่วไป"
+
+
+def answer_tool() -> dict:
+    empty = {"type": "object", "properties": {}}
+    fn = {"name": ANSWER, "description": ANSWER_DESC, "parameters": empty}
+    return {"type": "function", "function": fn}
+
+
 def tools(skills: list[Manifest], available: set[str], cloud: bool = False,
           forge: bool = False) -> list[dict]:  # fmt: skip
     out = []

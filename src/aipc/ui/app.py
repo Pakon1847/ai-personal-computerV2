@@ -14,12 +14,17 @@ from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 
 from aipc import i18n
 from aipc.ui.backend import (
+    AudioController,
     BackupController,
     ChatController,
     CloudUsage,
     FilesBrowser,
+    GmailLink,
     I18nBridge,
+    JobsCtl,
+    LocalModels,
     LoginController,
+    MemoryCtl,
     PowerController,
     PresenceStatus,
     PrivacyStatus,
@@ -67,10 +72,10 @@ def load_fonts() -> list[str]:
     return sorted(set(families))
 
 
-def _cloud_client(budget=None, ledger=None):
+def _cloud_client(ledger=None):
     """ไฮบริด (การ์ด 0016): มีคำสั่ง claude ในเครื่อง = ส่งต่อได้ · ปิดได้ด้วย AIPC_CLOUD=0.
 
-    budget (aipc.cloud.budget.Budget): ครบเพดานต่อวัน = ไม่เรียก Claude บอกผู้ใช้ตรง ๆ
+    ไม่มีเพดานของระบบ · บัญชี Claude ใช้ครบ = ask บอกผู้ใช้ตรง ๆ (การ์ด 0084)
     ledger (aipc.cloud.ledger.Ledger): บันทึกข้อความที่ส่งออกจริงทุกครั้ง (หน้าตั้งค่าแสดงให้ผู้ใช้ตรวจ)
     """
     import os
@@ -81,11 +86,7 @@ def _cloud_client(budget=None, ledger=None):
         return None
 
     def run(question, history, model=ask.MODEL, effort=None):
-        if budget is not None and not budget.allow():
-            return ask.CloudReply(False, error=budget.blocked_message())
         r = ask.ask(question, history, model=model, effort=effort)
-        if budget is not None:
-            budget.record(r.cost_usd, "ask")
         if ledger is not None:
             # โมเดลที่ตอบจริง (จากผลของ claude) ไม่ใช่แค่ที่เลือก (การ์ด 0053 เกณฑ์ M2 · H5)
             ledger.record("ask", ask.build_input(question, history or []), r.cost_usd, ok=r.ok,
@@ -114,7 +115,7 @@ def _chat_switch(chat, ui_settings):
     return run
 
 
-def _skill_forge(budget=None, ledger=None):
+def _skill_forge(ledger=None):
     """สกิลอัตโนมัติ (การ์ด 0017): มีคำสั่ง claude = ให้ Claude สร้างสกิลได้.
 
     ปิดได้ด้วย AIPC_CLOUD=0 หรือ AIPC_FORGE=0
@@ -129,13 +130,19 @@ def _skill_forge(budget=None, ledger=None):
     from aipc.skills import forge
 
     def run(request, **kw):  # เธรดแยก · อ่านรุ่นของ claude ตอนใช้ (ไม่ให้เปิดแอปช้าลง)
-        if budget is not None and not budget.allow():
-            return forge.Proposal(False, request, errors=[budget.blocked_message()])
         version = forge.run_process([exe, "--version"], "", ".", 30)[1].strip()
         p = forge.forge(request, claude=exe, model="sonnet", claude_version=version, **kw)
-        if budget is not None:
-            budget.record(p.cost_usd, "skill")
-        if ledger is not None:
+        if ledger is not None and kw.get("review"):
+            # การ์ด 0085: ผู้ใช้กดไม่ชอบ → ส่งรอบนั้นให้ Claude ตรวจ · จดข้อความที่ส่งจริงตามตัวอักษร
+            note = {"none": "Claude บอกว่าไม่ต้องแก้", "revise": "Claude แก้สกิล",
+                    "create": "Claude สร้างสกิลใหม่"}.get(p.outcome, "ตรวจไม่สำเร็จ")  # fmt: skip
+            note += " · พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง"
+            sent = kw["review"]
+            revise = kw.get("revise")
+            if revise and revise[0]:  # ไฟล์สกิลของผู้ใช้ที่ส่งไปให้ Claude แก้ = ข้อมูลของผู้ใช้ จดตามตัวอักษร
+                sent += "\n--- ไฟล์สกิลที่ส่งไปด้วย ---\n" + revise[0]
+            ledger.record("review", sent, p.cost_usd, ok=not p.errors, note=note)
+        elif ledger is not None:
             revise = kw.get("revise")
             sent = request + (f"\nคำติ: {revise[1]}" if revise else "")
             note = "พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง · ไม่มีแชท นัด หรือไฟล์"
@@ -218,16 +225,13 @@ def _start_idle_lock(ui_settings, app):
 
 
 def _local_model_name() -> str:
-    """ชื่อโมเดลจาก /etc/aipc/llm.conf (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · อ่านไม่ได้ = ""."""
+    """ชื่อโมเดลที่ AI ในเครื่องใช้จริง (ให้ AI ตอบได้ว่าใช้โมเดลอะไร) · ตัวที่ผู้ใช้เลือก (การ์ด 0076)
+    หรือค่าของเครื่องใน /etc/aipc/llm.conf · อ่านไม่ได้ = ""."""
     from pathlib import Path
 
-    try:
-        for line in Path("/etc/aipc/llm.conf").read_text(encoding="utf-8").splitlines():
-            if line.startswith("MODEL="):
-                return Path(line.split("=", 1)[1].strip()).stem
-    except OSError:
-        pass
-    return ""
+    from aipc.chat import localmodels as lm
+
+    return Path(lm.effective(lm.load(), lm.chosen(), lm.machine_file())).stem
 
 
 def _remember_login(user: str) -> None:
@@ -279,24 +283,26 @@ def build(opts: Options, argv: list[str] | None = None):
     # AI เลือกสกิลได้ (อาจารย์ขอ · งานข้อ ④): รายการสกิลอ่านจาก SkillsController ตอนส่งทุกครั้ง
     holder: dict = {}
 
-    def tools(text: str = "") -> list:
-        return holder["skills"].tool_catalog(text) if "skills" in holder else []
+    def tools(text: str = "", user: bool = True) -> list:
+        return holder["skills"].tool_catalog(text, user=user) if "skills" in holder else []
 
     in_session = not opts.greeter_session
-    budget = ledger = None
+    ledger = None
     if in_session:
-        from aipc.cloud.budget import Budget
-
-        budget = Budget()  # เพดานค่าใช้จ่าย Claude ต่อวันของผู้ใช้คนนี้
         from aipc.cloud.ledger import Ledger
 
         ledger = Ledger()  # บันทึกสิ่งที่ส่งออกนอกเครื่อง
-    skill_forge = _skill_forge(budget, ledger) if in_session else None
+    skill_forge = _skill_forge(ledger) if in_session else None
     user_skills = None
     if in_session:
         from aipc.skills.userskills import UserSkills
 
         user_skills = UserSkills()  # ~/.local/share/aipc/skills ของผู้ใช้คนนี้ (การ์ด 0017)
+    memory = None
+    if in_session:
+        from aipc.chat.memory import Memory
+
+        memory = Memory()  # ~/.local/share/aipc/memory.db ของผู้ใช้คนนี้ (การ์ด 0079)
     theme = opts.theme
     if opts.greeter_session and theme is None:
         from aipc.ui.backend import greeter_theme
@@ -308,16 +314,38 @@ def build(opts: Options, argv: list[str] | None = None):
     # สั่งเว็บด้วยเสียง (การ์ด 0024) · เบราว์เซอร์ของผู้ช่วย เปิดเมื่อสั่งครั้งแรก · ใช้ร่วมกับปุ่มและสกิล (การ์ด 0031)
     browser_ctl = BrowserController(active=in_session, ledger=ledger)
     claude_on = lambda: ui_settings.useClaude  # noqa: E731 · สวิตช์ Claude ในหน้าตั้งค่า (การ์ด 0016)
+    from aipc.skills.feedback import TurnLog
+
+    turns = TurnLog()  # ปุ่มชอบ/ไม่ชอบ (การ์ด 0085): แชทกับสกิลจำรอบที่เดียวกัน · อยู่ในหน่วยความจำเท่านั้น
     # แชททั่วไปคงไฮบริด: AI ในเครื่องไม่รู้ = ส่งต่อ Claude เอง (Pakon 2026-10-22 · การ์ด 0053 หัวข้อ 8)
-    chat = ChatController(active=in_session, tools=tools,
-                          cloud=_cloud_client(budget, ledger) if in_session else None,
+    chat = ChatController(active=in_session, tools=tools, turns=turns,
+                          cloud=_cloud_client(ledger) if in_session else None,
                           model_name=_local_model_name(),
                           forge=skill_forge is not None, claude_on=claude_on,
                           cloud_model=lambda: ui_settings.cloudModel,
                           cloud_effort=lambda: ui_settings.cloudEffort,
-                          auto_cloud=True)  # fmt: skip
+                          auto_cloud=True, memory=memory)  # fmt: skip
+
+    def _on_claude_connected() -> bool:
+        """เชื่อมต่อ Claude ที่เครื่องนี้เสร็จ (การ์ด 0070 รอบ 3) · ใช้ได้เลยไม่ต้องออกจากระบบ:
+        เพิ่งติดตั้ง = สร้างตัวส่งต่อ + ตัวสร้างสกิลตอนนี้ · เปิด "ให้ถาม Claude" (ผู้ใช้เพิ่งเชื่อมต่อเอง)."""
+        if chat._cloud is None:
+            chat._cloud = _cloud_client(ledger)
+        skills = engine._backends["skills"]
+        if skills._forge is None:
+            skills._forge = _skill_forge(ledger)
+            chat._forge = skills._forge is not None
+        if chat._cloud is None:
+            return False
+        ui_settings.setUseClaude(True)
+        return True
+
+    def _switched(name: str) -> None:
+        chat._model_name = name  # AI ตอบได้ว่าตอนนี้ใช้ตัวไหน
+
     engine._backends = {
         "uiSettings": ui_settings,
+        "localModels": LocalModels(in_session, on_switch=_switched),
         "system": SystemStatus(),
         # โหมด greeter ห้ามมีทางลัดของโหมดพัฒนาหรือสถานะสาธิตเด็ดขาด
         "login": LoginController(
@@ -351,9 +379,19 @@ def build(opts: Options, argv: list[str] | None = None):
             # แชท 2 แบบ (การ์ด 0053): ตัวเลือกสกิลรู้ว่าอยู่แชทงาน · คำสั่งเสียงสลับแชท/โมเดล
             chat_mode=lambda: chat.mode,
             chat_switch=_chat_switch(chat, ui_settings),
+            memory=memory,
+            turns=turns,
+            ledger=ledger,
         ),
+        "memoryCtl": MemoryCtl(memory),
+        "jobs": JobsCtl(active=in_session, chat=chat),  # งานข้ามคืน (การ์ด 0081)
         "chat": chat,
-        "cloudUsage": CloudUsage(budget, available=chat._cloud is not None, ledger=ledger),
+        "gmailLink": GmailLink(active=in_session),  # การ์ด 0072: เชื่อม Gmail แบบอ่านอย่างเดียว
+        "cloudUsage": CloudUsage(
+            available=chat._cloud is not None,
+            ledger=ledger,
+            on_connected=_on_claude_connected if in_session else None,
+        ),  # fmt: skip
         # แผงความเป็นส่วนตัวแบบสด (2026-10-07) · หน้า Login ไม่มีเจ้าของข้อมูล → ไม่แสดง
         "privacyStatus": PrivacyStatus(
             ledger=ledger,
@@ -365,6 +403,8 @@ def build(opts: Options, argv: list[str] | None = None):
         "presenceStatus": PresenceStatus(active=opts.session and not opts.greeter_session),
         # อ่านคำตอบออกเสียง (การ์ด 0019) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่มีปุ่ม
         "voice": VoiceController(active=in_session, face_to_speak=lambda: ui_settings.faceToSpeak),
+        # ระดับเสียงในหน้าตั้งค่า (2026-10-27) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่แตะเสียง
+        "audio": AudioController(active=in_session),
         "browser": browser_ctl,
         # เลือก Wi-Fi จากแถบบน (การ์ด 0063) · หน้า Login ไม่มีเจ้าของเซสชัน → ไม่เปิด
         "wifi": WifiController(active=in_session),

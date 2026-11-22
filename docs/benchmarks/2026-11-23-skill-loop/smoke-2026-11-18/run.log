@@ -1,0 +1,33 @@
+== skill-loop 2026-11-18T11:04:43+07:00 commit=b1e8d11 spike(0083): ตัววัดวงจรสกิลทั้งชุด · สรุป L1 L2 L4 + L3 (ชุด H ทางคีย์ลัด) · ใบตรวจให้ Pakon · --fake-claude ลองโดยไม่ใช้โควตา · สคริปต์รันบน Pi สองสภาพ (0/50 สกิลผู้ใช้) data=tests/data/skill_loop_dev.txt sha256=aa554c9219fc7eac model=/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf runs=user0 user50 fake=1
+before-server 2026-11-18T11:04:43+07:00 temp=59.3 throttled=0xe0000 avail_mb=7407
+start user0 2026-11-18T11:04:49+07:00 temp=64.8 throttled=0xe0000 avail_mb=5866
+ข้อ 1 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 2 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 3 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 4 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 5 ถามClaude=True ติดตั้ง=True ครั้งที่สอง=rule:chat:เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go ledger+0 ไม่ยืนยัน=0
+ข้อ 6 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 7 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 8 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 9 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 10 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+{"L1": [1, 10], "steps": {"asked_create": 1, "installed": 1}, "L2": null, "L2_route_ledger": [1, 1], "again_ledger_total": 0, "L4": 0, "pass": {"L1": false, "L2": null, "L4": true, "L3": true}}
+ใบตรวจให้ Pakon: /home/aipc2030/loop-smoke/user0.sheet.md
+end user0 2026-11-18T11:08:29+07:00 temp=81.8 throttled=0xe0000 avail_mb=5767
+start user50 2026-11-18T11:08:39+07:00 temp=62.6 throttled=0xe0000 avail_mb=5786
+ข้อ 1 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 2 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 3 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 4 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 5 ถามClaude=True ติดตั้ง=True ครั้งที่สอง=rule:chat:เปิดโหมดเรียนออนไลน์ ปิดเสียงแล้วเปิด Go ledger+0 ไม่ยืนยัน=0
+ข้อ 6 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 7 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 8 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 9 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+ข้อ 10 ถามClaude=False ติดตั้ง=False ครั้งที่สอง=- ledger+- ไม่ยืนยัน=0
+{"L1": [1, 10], "steps": {"asked_create": 1, "installed": 1}, "L2": null, "L2_route_ledger": [1, 1], "again_ledger_total": 0, "L4": 0, "pass": {"L1": false, "L2": null, "L4": true, "L3": true}}
+ใบตรวจให้ Pakon: /home/aipc2030/loop-smoke/user50.sheet.md
+end user50 2026-11-18T11:11:23+07:00 temp=82.3 throttled=0xe0008 avail_mb=5770
+server-VmHWM: 4736736 kB
+server-VmRSS: 4736736 kB
+ALL-DONE 2026-11-18T11:11:23+07:00

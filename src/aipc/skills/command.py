@@ -135,12 +135,20 @@ LOCK_PHRASES = tuple(
 _ENDS = ("", "เลย", "ที", "ได้เลย")
 _OFF = ("ปิดเครื่อง", "ปิดคอม", "ปิดคอมพิวเตอร์", "ชัตดาวน์", "ชัทดาวน์", "shutdown",
         "shutdownthecomputer", "poweroff", "turnoffthecomputer")  # fmt: skip
+# "รีสตาส" "รีสตาท" = Zipformer ถอด "รีสตาร์ท" แบบนี้ (Pakon ที่จอ 2026-10-27) · ยังถามยืนยันเหมือนเดิม
 _REBOOT = ("รีสตาร์ต", "รีสตาร์ท", "รีสตาร์ทเครื่อง", "รีสตาร์ตเครื่อง", "รีบูต", "รีบูท", "รีบูตเครื่อง",
+           "รีสตาส", "รีสตาท", "รีสตาสเครื่อง", "รีสตาทเครื่อง",
            "เริ่มเครื่องใหม่", "restart", "reboot", "restartthecomputer")  # fmt: skip
+# ออกจากระบบด้วยคำสั่ง (Pakon อนุมัติ 2026-10-27) · ทั้งประโยคเท่านั้น และถามยืนยันเหมือนปิดเครื่อง
+# ("ออกจากระบบ Gmail" ไม่ตรงทั้งประโยค = ไม่ใช่คำสั่งนี้)
+_LOGOUT = ("ออกจากระบบ", "ออกระบบ", "ล็อกเอาท์", "ล็อกเอ้าท์", "ล็อกเอาต์", "ลงชื่อออก",
+           "logout", "logoff", "signout")  # fmt: skip
 POWER_PHRASES = {
     "power_off": tuple(v + o for v in _OFF for o in _ENDS),
     "reboot": tuple(v + o for v in _REBOOT for o in _ENDS),
+    "logout": tuple(v + o for v in _LOGOUT for o in _ENDS),
 }
+POWER_SAY = {"power_off": "ปิดเครื่อง", "reboot": "รีสตาร์ตเครื่อง", "logout": "ออกจากระบบ"}
 # ดูอุปกรณ์ที่ต่ออยู่ (การ์ด 0051) · ต้องมีคำว่าต่อ/เสียบ ("อุปกรณ์อะไรดี" = ถามความเห็น ไม่ใช่คำสั่ง)
 DEVICES = re.compile(
     r"^(มี|ดู|เช็[คก]|ตรวจ|เปิด(หน้า)?|แสดง)?อุปกรณ์(อะไร)?(ที่)?(ต่อ|เสียบ)(อยู่)?(บ้าง)?(อะไรบ้าง)?(ไหม|มั้ย)?$"
@@ -343,8 +351,7 @@ def parse(text: str) -> Command | None:
 
     for action, phrases in POWER_PHRASES.items():
         if t in phrases:
-            say = "ปิดเครื่อง" if action == "power_off" else "รีสตาร์ตเครื่อง"
-            return Command(Plan(action, {}, say), SURE, heard)
+            return Command(Plan(action, {}, POWER_SAY[action]), SURE, heard)
     if t in LOCK_PHRASES:
         return Command(Plan("lock_screen", {}, "ล็อกหน้าจอแล้ว · ปลดด้วยรหัสผ่าน"), SURE, heard)
     if t in GCAL_SYNC_PHRASES:

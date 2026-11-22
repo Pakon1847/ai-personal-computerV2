@@ -52,8 +52,22 @@ class PickTest(unittest.TestCase):
         names = [t["function"]["name"] for t in s.tool_catalog("คิดเมนูจากของในตู้เย็นหน่อย")]
         self.assertIn("fridge-menu", names)
         self.assertIn("translate", names)  # สกิลในตัวส่งเสมอ
-        user_names = [n for n in names if n in {m.id for m in store.load()}]
-        self.assertEqual(len(user_names), retrieval.TOP_K)
+        mine = {m.id for m in store.load()}
+        user_names = [n for n in names if n in mine]
+        self.assertTrue(1 <= len(user_names) <= retrieval.TOP_K, user_names)
+        # การ์ด 0074: ไม่มีสกิลผู้ใช้ใกล้ข้อความ = รายการเท่ากับไม่มีสกิลผู้ใช้ (แคชของ llama-server ใช้ได้)
+        far = [t["function"]["name"] for t in s.tool_catalog("12345")]
+        self.assertEqual(far, [t["function"]["name"] for t in s.tool_catalog("12345", user=False)])
+        self.assertFalse(set(far) & mine)
+
+    def test_near_keeps_only_skills_close_to_the_text(self):
+        got = retrieval.near(self.pool, "คิดเมนูจากของในตู้เย็นหน่อย")
+        self.assertTrue(1 <= len(got) <= retrieval.TOP_K)
+        values = retrieval.Index(self.pool).scores("คิดเมนูจากของในตู้เย็นหน่อย")
+        scores = dict(zip((s.id for s in self.pool), values, strict=True))
+        self.assertTrue(all(scores[s.id] >= retrieval.NEAR_MIN for s in got))
+        self.assertEqual(retrieval.near(self.pool, ""), [])
+        self.assertEqual(retrieval.near([], "อะไรก็ได้"), [])
 
 
 if __name__ == "__main__":

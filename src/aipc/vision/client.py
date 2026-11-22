@@ -47,6 +47,12 @@ def request(req: dict, on_progress: Callable[[dict], None] | None = None, path: 
         return dict(UNAVAILABLE)
 
 
+def scan_qr(user: str, seconds: float = 20.0, path: Path = PUBLIC) -> dict:
+    """เปิดกล้องอ่าน QR ของสกิล (การ์ด 0080) · text ว่าง = หมดเวลาแล้วไม่เจอ · ไม่มีภาพส่งกลับ."""
+    req = {"op": "scan_qr", "username": user, "timeout_s": seconds}
+    return request(req, path=path, timeout=seconds + 10)
+
+
 def facing(user: str, on_seen: Callable[[dict], None], stop, path: Path = PUBLIC) -> dict:
     """การ์ด 0058: หันหน้าเข้าจอไหม ทุก ~0.2 วิ ระหว่างฟังคำสั่งเสียง · stop ตั้ง = กล้องดับ."""
     return watch(user, on_seen, stop, path=path, op="facing")

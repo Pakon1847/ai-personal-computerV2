@@ -60,14 +60,15 @@ class StepsTest(unittest.TestCase):
 class ConnectTest(unittest.TestCase):
     """เกณฑ์ข้อ 8: python -m aipc.cloud.connect (คำสั่งปลอมทั้งหมด)."""
 
-    def go(self, finds, install_rc=0):
+    def go(self, finds, install_rc=0, logged_in=True):
         from aipc.cloud import connect
 
         finds, calls, lines = list(finds), [], []
 
         def run(cmd, **k):
             calls.append(cmd)
-            return SimpleNamespace(returncode=install_rc if cmd[0] == "bash" else 0)
+            status = '{"loggedIn": %s}' % ("true" if logged_in else "false")
+            return SimpleNamespace(returncode=install_rc if cmd[0] == "bash" else 0, stdout=status)
 
         rc = connect.main(find=lambda: finds.pop(0) if len(finds) > 1 else finds[0],
                           run=run, out=lines.append, ask=lambda p: "")  # fmt: skip
@@ -76,8 +77,16 @@ class ConnectTest(unittest.TestCase):
     def test_already_installed_skips_installer(self):
         rc, calls, text = self.go(["/home/p/.local/bin/claude"])
         self.assertEqual(rc, 0)
-        self.assertEqual(calls, [["/home/p/.local/bin/claude"]])
-        self.assertIn("ออกจากระบบแล้วเข้าใหม่", text)
+        exe = "/home/p/.local/bin/claude"
+        self.assertEqual(calls, [[exe, "auth", "login"], [exe, "auth", "status"]])
+        self.assertIn("เข้าสู่ระบบ Claude แล้ว", text)
+        self.assertIn("Ctrl+Shift+V", text)
+
+    def test_login_not_finished_says_so(self):
+        """Pakon 2026-10-28: เข้าผ่านเทอร์มินัลในเครื่อง · ปิดกลางทาง = บอกว่ายังไม่ได้เข้า ไม่บอกว่าเสร็จ (H5)."""
+        rc, _, text = self.go(["/home/p/.local/bin/claude"], logged_in=False)
+        self.assertEqual(rc, 1)
+        self.assertIn("ยังไม่ได้เข้าสู่ระบบ", text)
 
     def test_installs_then_logs_in(self):
         rc, calls, _ = self.go([None, "/home/p/.local/bin/claude"])
@@ -85,7 +94,7 @@ class ConnectTest(unittest.TestCase):
         self.assertEqual(calls[0][:2], ["bash", "-c"])
         self.assertIn("pipefail", calls[0][2])
         self.assertIn(setup_guide.INSTALL, calls[0][2])
-        self.assertEqual(calls[1], ["/home/p/.local/bin/claude"])
+        self.assertEqual(calls[1], ["/home/p/.local/bin/claude", "auth", "login"])
 
     def test_failed_install_never_runs_claude(self):
         rc, calls, text = self.go([None, None], install_rc=1)

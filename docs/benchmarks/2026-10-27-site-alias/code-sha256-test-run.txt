@@ -1,0 +1,3 @@
+4fb7b458be84ab6274edc3b40e82cce48e3718c666efb3b0f110bd81640736e2  src/aipc/skills/sitecmd.py
+77522c643562790136dd57b70132e41fe283d368a0da8c6ec5be2d6d172a1214  src/aipc/skills/forge_prompt.md
+19b4a7d49ea15b068012caa4971c0b61a1d9d53c81a18c2ca8a680766cff0b9e  src/aipc/ui/backend.py

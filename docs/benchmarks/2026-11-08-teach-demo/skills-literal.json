@@ -1,0 +1,9 @@
+{
+ "T01": "- ตั้งความเร็วหนึ่งจุดห้า → คลิก #movie_player > div:nth-of-type(26) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(4) แล้ว คลิก #ytp-id-5 > div:nth-of-type(2) > div > div > div:nth-of-type(5) แล้ว คลิก div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(3) > button",
+ "T02": "- จอกว้างแบบคลิก → คลิก #movie_player > div:nth-of-type(26) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > button:nth-of-type(1)",
+ "T03": "- สลับคำบรรยาย → กดคีย์ c",
+ "T05": "- สุ่มบทความ → คลิก #vector-main-menu-dropdown-checkbox แล้ว คลิก #n-randompage > a",
+ "T06": "- ดูประวัติหน้านี้ → คลิก #ca-history > a",
+ "T08": "- ซูมเข้าสองที → คลิก div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div > div:nth-of-type(1) > button แล้ว คลิก div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div > div:nth-of-type(1) > button",
+ "T09": "- ดูภาพดาวเทียม → คลิก div:nth-of-type(9) > div:nth-of-type(18) > div:nth-of-type(4) > div > div > button"
+}

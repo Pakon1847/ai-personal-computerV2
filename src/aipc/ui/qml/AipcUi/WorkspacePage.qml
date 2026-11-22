@@ -19,6 +19,9 @@ Item {
     property var answered: ({})   // token ของการ์ดที่ตอบ "ใช่/ไม่ใช่" ไปแล้ว
     // กด "ไม่ใช่แบบนี้" ที่สกิลที่ Claude สร้าง → ข้อความถัดไปคือคำติ ส่งให้ Claude แก้สกิล (การ์ด 0017) · null = แชทปกติ
     property var feedbackFor: null
+    // ปุ่มชอบ/ไม่ชอบใต้ผลของ AI ในเครื่อง (การ์ด 0085): ขึ้น 15 วินาที · รอบที่กดแล้ว (turnId → true) ไม่ขึ้นอีก
+    readonly property int rateMs: 15000
+    property var rated: ({})
     property int copiedRow: -1    // คำตอบ AI ที่เพิ่งกดคัดลอก (ปุ่มขึ้นว่า "คัดลอกแล้ว")
     property int speakRow: -1     // คำตอบที่กดอ่านออกเสียงล่าสุด (แสดงข้อความผิดพลาดของตัวอ่านใต้แถวนี้)
     // สั่งด้วยคีย์ลัด F9 (การ์ด 0024): ผู้ใช้อาจไม่ได้มองจอ (เบราว์เซอร์เต็มจอ) → อ่านผลให้ฟังเสมอ
@@ -97,9 +100,20 @@ Item {
         items = items.concat([item])
     }
     function showCard(card) {
-        push({ user: false, card: card })
+        push({ user: false, card: card, rateUntil: card.turnId ? Date.now() + rateMs : 0 })
         if (card.appInstall) installPopup.openFor(card.appInstall, card.appName)   // การ์ด 0054: ผู้ดูแลใส่รหัส
         if (card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
+    }
+    // ชอบ = นับเท่านั้น (ไม่มีอะไรขึ้นจอ) · ไม่ชอบ = การ์ดจาก Python (กำลังให้ Claude ตรวจ / ต้องเปิด Claude / ถามก่อนส่ง)
+    // ซ่อนปุ่มเมื่อ Python บอกว่ารอบนี้จบแล้ว (rateDone) · ส่งไม่ได้ตอนนี้ (ปิด Claude · กำลังทำงานอื่น · รอยืนยัน) = ปุ่มยังอยู่
+    function rate(turnId, liked) {
+        const card = skills.rateResult(turnId, liked)
+        if (liked || card.rateDone === true) {
+            const r = Object.assign({}, rated)
+            r[turnId] = true
+            rated = r
+        }
+        if (!liked) showCard(card)
     }
     function send() {
         const text = input.text.trim()
@@ -179,6 +193,13 @@ Item {
             if (voice.available) voice.speak(i.length - 1, say)
         }
     }
+    // จบการสาธิต (การ์ด 0048) → การ์ดแสดงขั้นที่จด + ถามก่อนส่งให้ Claude
+    Connections {
+        target: browser
+        function onDemoReady(name, steps, site) {
+            root.voiceDispatch(skills.siteDemo(name, steps, site), root.vc.heard || name)
+        }
+    }
     // เปิดเว็บจากปุ่ม/พิมพ์/สกิล (การ์ด 0031) เสร็จทีหลัง · ไม่แก้ข้อความล่าสุดในแชท (ต่างจาก onFinished ของคำสั่งเสียง) ·
     // ไม่สำเร็จต้องบอก (H5): หน้าแรก = ใต้ปุ่ม · ในแชท = เพิ่มข้อความใหม่
     Connections {
@@ -195,6 +216,26 @@ Item {
             if (items[k].user) break   // การ์ดเก่ากว่าข้อความล่าสุดของผู้ใช้ไม่นับ
         }
         return ""
+    }
+    // ตอบการ์ดยืนยันด้วยคีย์บอร์ด (Pakon 2026-10-27): ลูกศร = สลับ ใช่/ไม่ใช่ · Enter = ยืนยันอันที่เลือก ·
+    // การ์ดใหม่เริ่มที่ "ใช่" เหมือนปุ่มสีหลักเดิม (กด Enter ทันที = เหมือนกดปุ่มสีหลัก)
+    property int keyChoice: 0
+    readonly property string keyToken: voiceToken() || pendingConfirm()
+    onKeyTokenChanged: keyChoice = 0
+    function keyConfirm(key) {
+        const token = keyToken
+        if (token === "") return false
+        if (key === Qt.Key_Left || key === Qt.Key_Right || key === Qt.Key_Up || key === Qt.Key_Down) {
+            keyChoice = keyChoice === 0 ? 1 : 0
+            return true
+        }
+        if (key === Qt.Key_Return || key === Qt.Key_Enter) {
+            const yes = keyChoice === 0
+            if (token === voiceToken()) answerVoice(token, yes, vc.heard)
+            else answer(token, yes)
+            return true
+        }
+        return false
     }
     // การ์ดยืนยันที่เด้งจากคำสั่งเสียงและยังไม่ตอบ (มาก่อนการ์ดในแชท)
     function voiceToken() {
@@ -295,7 +336,7 @@ Item {
     // คำสั่งของสกิลประจำเว็บ (การ์ด 0046): กดคีย์/คลิกในเบราว์เซอร์ของผู้ช่วย · ผลมาทาง onFinished
     function siteRun(card, heard) {
         const r = card.siteRun
-        if (browser.runSite(r.kind, r.arg, r.site)) voiceShow(heard, null, Tr.t("กำลังทำ…"), true)
+        if (browser.runSite(r.kind, r.arg, r.site, r.words || "")) voiceShow(heard, null, Tr.t("กำลังทำ…"), true)
         else voiceSay(heard, Tr.t("ยังสั่งในเว็บไม่ได้ · เปิดเว็บนั้นในเบราว์เซอร์ของผู้ช่วยก่อน"))
     }
     function voiceSay(heard, say) {   // บอกว่าทำไม่ได้/ไม่รู้จัก (กล่องสีส้ม)
@@ -323,6 +364,14 @@ Item {
         }
         // เบราว์เซอร์ยังทำคำสั่งก่อนอยู่ → บอกให้รอ (เดิมหลุดไปแชท: "ย้อนกลับ" กลายเป็นคำสั่งของแอป · พบใน 0025)
         if (browser.busy) { voiceSay(t, Tr.t("ยังทำคำสั่งก่อนหน้าอยู่ รอสักครู่แล้วสั่งใหม่")); return }
+        // การ์ด 0048: "เริ่มบันทึก" · "เสร็จแล้ว ตั้งชื่อว่า …" (โค้ดตัดสิน · ผลมาทาง onFinished และ onDemoReady)
+        const demo = browser.demoCommand(t)
+        if (demo.started) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
+        if (demo.say) { voiceSay(t, demo.say); return }
+        // การ์ด 0071: "อ่านเมลล่าสุด" / "มีเมลใหม่ไหม" = อ่านกล่องจดหมาย Gmail ในเครื่อง (ไม่ผ่าน AI · ผลมาทาง onFinished)
+        const mail = browser.mailRead(t)
+        if (mail.started) { voiceShow(t, null, Tr.t("กำลังอ่านกล่องจดหมาย…"), true); return }
+        if (mail.say) { voiceSay(t, mail.say); return }
         // การ์ด 0027: คีย์ลัด = สั่งงานอย่างเดียว ไม่ส่งให้ AI ในเครื่องคุย (BRIEF 5.6 ข้อ 1) · ทางตัดสินใน handsfree.route
         const way = browser.route(t)
         if (way === "skill") {          // การ์ด 0028: ตรงเป๊ะกับสกิลที่ทำด้วยโค้ด = การ์ดสกิลเดียวกับตอนพิมพ์ (ยืนยันตามกติกาเดิม)
@@ -369,6 +418,10 @@ Item {
             if (near.confirmToken) { voiceDispatch(near, t); return }
             // การ์ด 0057: อยู่ใน YouTube (เว็บที่ค้นได้) + "เปิดช่อง 8" = ค้นในเว็บนั้น (ไม่ส่งให้ Claude ทำสกิล)
             if (url !== "" && browser.siteSearch(t, url)) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
+            // การ์ด 0069: ป้ายของปุ่มที่มองเห็นบนหน้าตรงกับคำพูด = กด (โค้ดหาจากหน้าจริง · ไม่ต้องให้ Claude สร้างสกิล)
+            const tap = url !== "" ? browser.clickText(t) : ({})
+            if (tap.started) { voiceShow(t, null, Tr.t("กำลังทำ…"), true); return }
+            if (tap.say) { voiceSay(t, tap.say); return }
             // การ์ด 0028 ทาง ก: ได้ยินใกล้เคียงสกิล = ถาม "หมายถึง … ใช่ไหม" ไม่ทำเองจนตอบ "ใช่"
             const ask = skills.voiceConfirm(t)
             if (ask.confirmToken) { voiceDispatch(ask, t); return }
@@ -407,7 +460,8 @@ Item {
         function onFinished(text, note) {
             const i = root.items.slice()
             if (i.length === 0 || !i[i.length - 1].ai) return
-            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace })
+            i[i.length - 1] = Object.assign({}, i[i.length - 1], { text: text, note: note, done: true, why: chat.lastTrace,
+                                                                  turnId: chat.lastTurnId, rateUntil: Date.now() + root.rateMs })
             root.items = i
             // อ่านคำตอบเองเมื่อเปิดในหน้าตั้งค่า (การ์ด 0019) · ตอบไม่จบ/หยุด (มีหมายเหตุ) ไม่อ่าน
             const spoken = root.speakNext
@@ -473,8 +527,14 @@ Item {
             }
             AppButton {
                 id: historyButton
-                text: Tr.t("ประวัติ"); kind: "secondary"; iconPath: Icons.chat
-                onClicked: historyPopup.open()
+                objectName: "historyButton"
+                // เปิดอยู่ = สีหลัก · กดซ้ำ = ปิด (Pakon 2026-10-27: กดแล้วปิดไม่ได้) · การกดนอกหน้าต่างปิดมันก่อน
+                // แล้วปุ่มเปิดใหม่ทันที → จำเวลาที่เพิ่งปิด ไม่เปิดซ้ำภายใน 300 ms
+                text: Tr.t("ประวัติ"); kind: historyPopup.opened ? "primary" : "secondary"; iconPath: Icons.chat
+                onClicked: {
+                    if (historyPopup.opened) historyPopup.close()
+                    else if (Date.now() - historyPopup.closedAt > 300) historyPopup.open()
+                }
             }
             // อ่านคำตอบออกเสียง เปิด/ปิด (Pakon เลือกไว้แถวบน 2026-10-02) · สถานะเขียนเป็นคำ ไม่ใช่แค่สี · ค่าเริ่มต้นเปิด
             AppButton {
@@ -561,6 +621,17 @@ Item {
         readonly property bool failed: !listening && !working && !root.vc.card && root.vc.ok === false
         readonly property color tone: listening || working || !!root.vc.card ? Theme.accent : failed ? Theme.warn : Theme.ok
         Shortcut { sequence: "Esc"; onActivated: voicePopup.close() }  // labwc ให้กล่องรับคีย์บอร์ดตอนเปิด · กลับเบราว์เซอร์เมื่อปิด
+        // การ์ดยืนยันในกล่องนี้: ลูกศรเลือก · Enter ยืนยัน (Pakon 2026-10-27)
+        Shortcut {
+            sequences: ["Left", "Right", "Up", "Down"]
+            enabled: root.voiceToken() !== ""
+            onActivated: root.keyConfirm(Qt.Key_Left)
+        }
+        Shortcut {
+            sequences: ["Return", "Enter"]
+            enabled: root.voiceToken() !== ""
+            onActivated: root.keyConfirm(Qt.Key_Return)
+        }
         Rectangle {
             anchors.fill: parent
             radius: 22
@@ -721,6 +792,7 @@ Item {
                 visible: !!root.vc.card
                 Layout.fillWidth: true
                 info: root.vc.card || ({})
+                keyChoice: (root.vc.card || {}).confirmToken === root.keyToken ? root.keyChoice : -1
                 answered: !!root.answered[(root.vc.card || {}).confirmToken]
                 onAnswer: (yes) => root.answerVoice(root.vc.card.confirmToken, yes, root.vc.heard)
                 undone: !!root.answered[(root.vc.card || {}).undoToken]
@@ -831,10 +903,21 @@ Item {
         background: Rectangle { radius: Theme.radiusLarge; color: Theme.surface; border.width: 1; border.color: Theme.line }
         // ประวัติอยู่หน้านี้ทั้งหมด (Pakon 2026-10-24: ลบได้เลยไม่ต้องไปที่ตั้งค่า) · ลบทีละอัน = ปุ่มถังขยะ ·
         // ลบทั้งหมด = กดสองครั้ง (กันพลาด · H2) · ลบบทสนทนาที่เปิดอยู่ = เริ่มแชทใหม่
-        onClosed: clearAll.armed = false
+        objectName: "historyPopup"
+        property real closedAt: 0
+        onClosed: { clearAll.armed = false; closedAt = Date.now() }
         contentItem: ColumnLayout {
             spacing: 6
-            AppText { text: Tr.t("ประวัติบทสนทนา"); strong: true }
+            RowLayout {
+                Layout.fillWidth: true
+                AppText { Layout.fillWidth: true; text: Tr.t("ประวัติบทสนทนา"); strong: true }
+                AppButton {
+                    objectName: "historyClose"
+                    kind: "ghost"; text: "✕"
+                    Accessible.name: Tr.t("ปิดหน้าต่างประวัติ")
+                    onClicked: historyPopup.close()
+                }
+            }
             AppText {
                 Layout.fillWidth: true
                 text: chat.history.length === 0 ? Tr.t("ยังไม่มีบทสนทนาที่บันทึกไว้")
@@ -848,8 +931,10 @@ Item {
                     Layout.fillWidth: true
                     spacing: 4
                     AppButton {
+                        objectName: "openChat_" + modelData.id
                         Layout.fillWidth: true
-                        kind: "ghost"
+                        // บทสนทนาที่เปิดอยู่ = สีหลัก (เห็นว่ากดอันไหนไปแล้ว)
+                        kind: modelData.id === chat.currentId ? "primary" : "ghost"
                         text: modelData.title || Tr.t("(ไม่มีชื่อ)")
                         onClicked: { root.loadChat(chat.openChat(modelData.id)); historyPopup.close() }
                     }
@@ -945,7 +1030,7 @@ Item {
                             objectName: "claudeConnectedNow"
                             visible: cloudUsage.connectedNow
                             Layout.fillWidth: true; strong: true; color: Theme.okInk
-                            text: Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
+                            text: Tr.t("เชื่อมต่อ Claude แล้ว · ใช้ได้เลย")
                         }
                     }
                 }
@@ -965,7 +1050,7 @@ Item {
         readonly property string missedText: skills.missed.length === 0 ? ""
             : Tr.t("พลาดการเตือน ") + skills.missed.length + Tr.t(" รายการขณะไม่ได้ใช้เครื่อง: ")
               + skills.missed.map(r => r.what + " (" + r.when + ")").join(" · ")
-        readonly property string message: [missedText, skills.reminderWarning].filter(t => t !== "").join("\n")
+        readonly property string message: [missedText, skills.reminderWarning, Tr.x(jobs.notice)].filter(t => t !== "").join("\n")
         visible: message !== "" && !dismissed
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: tools.bottom
@@ -981,7 +1066,7 @@ Item {
             spacing: 10
             Icon { path: Icons.alert; color: Theme.warnInk; Layout.alignment: Qt.AlignTop }
             AppText { text: notice.message; color: Theme.warnInk; size: Theme.fontSmall; Layout.fillWidth: true }
-            AppButton { text: Tr.t("รับทราบ"); kind: "secondary"; onClicked: notice.dismissed = true }
+            AppButton { text: Tr.t("รับทราบ"); kind: "secondary"; onClicked: { notice.dismissed = true; jobs.dismiss() } }
         }
     }
 
@@ -1273,7 +1358,7 @@ Item {
                     AppText {
                         Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
                         text: cloudUsage.connectedNow
-                              ? Tr.t("เชื่อมต่อแล้ว · ออกจากระบบแล้วเข้าใหม่ เพื่อเริ่มใช้ Claude")
+                              ? Tr.t("เชื่อมต่อ Claude แล้ว · ใช้ได้เลย")
                               : Tr.t("ตอนนี้ตอบได้เฉพาะ AI ในเครื่อง · เชื่อมต่อครั้งเดียวต่อบัญชี แล้ว Claude ช่วยสร้างสกิลใหม่ได้ด้วย")
                     }
                 }
@@ -1337,16 +1422,34 @@ Item {
         spacing: 14
         clip: true
         model: root.items
-        // ความสูงของการ์ดรู้หลังวาดเสร็จ จึงเลื่อนลงล่างสุดทุกครั้งที่เนื้อหายาวขึ้น
+        // ความสูงของการ์ดรู้หลังวาดเสร็จ จึงเลื่อนลงล่างสุดเมื่อเนื้อหายาวขึ้น
         // · เลื่อนหลังวาดรอบนี้เสร็จ (callLater): พบ 2026-10-12 วางข้อความยาวมาก → ค้างบนสุด ไม่เห็นคำตอบใหม่
-        onContentHeightChanged: Qt.callLater(positionViewAtEnd)
-        onCountChanged: Qt.callLater(positionViewAtEnd)
+        // · ตามล่างสุดเฉพาะเมื่อผู้ใช้อยู่ล่างสุด (stick): พบ 2026-10-27 เลื่อนขึ้นไม่ได้ เพราะความสูงเปลี่ยน
+        //   ระหว่างวาดข้อความเก่าแล้วถูกดึงลงทุกครั้ง · ผู้ใช้เลื่อนเอง (ลาก/ปัด/ล้อเมาส์) เท่านั้นที่เปลี่ยน stick
+        property bool stick: true
+        property real keepY: 0
+        function nearEnd() { return contentY + height >= originY + contentHeight - 80 }
+        onMovementStarted: stick = false  // ระหว่างปัด ความสูงเปลี่ยนได้ (วาดข้อความเก่า) → ห้ามดึงลง
+        onMovementEnded: { stick = nearEnd(); keepY = contentY }
+        onContentHeightChanged: if (stick) Qt.callLater(positionViewAtEnd)
+        onCountChanged: if (stick) Qt.callLater(positionViewAtEnd)
+        // ทุกการเปลี่ยนแปลงแทนที่ทั้งรายการ · ข้อความเพิ่มขึ้นจริง = ไปล่างสุด ·
+        // คำตอบที่กำลังพิมพ์ (จำนวนเท่าเดิม) ขณะผู้ใช้อ่านข้างบน = คืนตำแหน่งเดิม
+        property int seen: 0
+        onModelChanged: {
+            const n = model ? model.length : 0
+            if (n > seen)
+                stick = true
+            seen = n
+            Qt.callLater(() => { if (stick) positionViewAtEnd(); else contentY = keepY })
+        }
         delegate: Item {
             id: row
             required property var modelData
             required property int index
             width: ListView.view.width
-            height: modelData.user ? bubble.height : modelData.ai ? aiBox.height : card.height
+            height: modelData.user ? bubble.height : modelData.ai ? aiBox.height
+                    : card.height + (cardRate.visible ? cardRate.implicitHeight + 6 : 0)
 
             Rectangle {
                 id: bubble
@@ -1420,6 +1523,12 @@ Item {
                             }
                         }
                     }
+                    RateBar {
+                        turnId: row.modelData.turnId || ""
+                        until: row.modelData.rateUntil || 0
+                        done: !!root.rated[row.modelData.turnId || ""]
+                        onRated: (liked) => root.rate(row.modelData.turnId, liked)
+                    }
                     WhyPanel {
                         visible: !!row.modelData.done && (row.modelData.why || []).length > 0
                         rows: row.modelData.why || []
@@ -1440,6 +1549,7 @@ Item {
                 width: parent.width
                 height: visible ? implicitHeight : 0
                 info: row.modelData.card || ({})
+                keyChoice: (row.modelData.card || {}).confirmToken === root.keyToken ? root.keyChoice : -1
                 answered: !!root.answered[(row.modelData.card || {}).confirmToken]
                 onAnswer: (yes) => root.answer(row.modelData.card.confirmToken, yes)
                 undone: !!root.answered[(row.modelData.card || {}).undoToken]
@@ -1451,6 +1561,7 @@ Item {
                     root.showCard(skills.undo(t))
                 }
                 onRemoveSkill: (skillId) => root.showCard(skills.removeSkill(skillId))
+                onLikeSkill: (skillId) => skills.likeSkill(skillId)
                 onSummarizeFile: (path) => {
                     const err = chat.attachFile(path)
                     if (err !== "") { root.showCard({ kind: "chat", title: err, chips: [], lines: [], confirmToken: "", page: "", badge: {} }); return }
@@ -1466,6 +1577,14 @@ Item {
                     root.feedbackFor = { id: skillId, name: name }
                     input.forceActiveFocus()
                 }
+            }
+            RateBar {
+                id: cardRate
+                y: card.height + 6
+                turnId: card.visible ? ((row.modelData.card || {}).turnId || "") : ""
+                until: row.modelData.rateUntil || 0
+                done: !!root.rated[turnId]
+                onRated: (liked) => root.rate(turnId, liked)
             }
         }
     }
@@ -1507,6 +1626,11 @@ Item {
                     background: null
                     Accessible.name: Tr.t("ข้อความ")
                     Keys.onPressed: (event) => {
+                        // ช่องพิมพ์ว่าง + มีการ์ดรอตอบ: ลูกศร/Enter ตอบการ์ด (มีข้อความ = ลูกศรเลื่อนเคอร์เซอร์ Enter ส่งตามเดิม)
+                        if (input.text.trim() === "" && !input.inputMethodComposing && root.keyConfirm(event.key)) {
+                            event.accepted = true
+                            return
+                        }
                         const enter = event.key === Qt.Key_Return || event.key === Qt.Key_Enter
                         // inputMethodComposing = กำลังพิมพ์ผ่าน IME และคำยังไม่เสร็จ → ห้ามส่ง
                         if (enter && !(event.modifiers & Qt.ShiftModifier) && !input.inputMethodComposing) {

@@ -75,6 +75,24 @@ REPEAT_UNSUPPORTED = re.compile(
     r"|ทุก\s*(ต้น|กลาง|สิ้น|ปลาย)\s*เดือน|รายเดือน"
 )
 REPEAT_NAMES = {"daily": "ทุกวัน", "weekdays": "ทุกวันจันทร์–ศุกร์", "weekends": "ทุกเสาร์–อาทิตย์"}
+# วันที่เป็นคำอ่าน (Pakon พูดที่จอ 2026-10-28: ระบบถอดเสียงให้ "วันที่สามสิบเอ็ด" แทน "31" →
+# เดิมตัวแปลงไม่เห็นวันที่ นัดลงวันนี้) · แปลงเป็นเลขเฉพาะหลัง "วันที่" หรือหน้าชื่อเดือน และต้องเป็น 1–31
+_NUMWORD = "(?:หนึ่ง|เอ็ด|สอง|ยี่|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)+"
+_DAY_WORDS = re.compile(
+    rf"(วันที่\s*)({_NUMWORD})|({_NUMWORD})(?=\s*(?:"
+    + "|".join(re.escape(k) for k in sorted(MONTHS, key=len, reverse=True))
+    + "))"
+)
+
+
+def _day_digits(text: str) -> str:
+    def to_digits(m: re.Match) -> str:
+        n = words_to_int(m[2] or m[3])
+        return m[0] if n is None or not 1 <= n <= 31 else f"{m[1] or ''}{n}"
+
+    return _DAY_WORDS.sub(to_digits, text)
+
+
 _DAYNAMES = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"]
 
 
@@ -314,6 +332,7 @@ def _date(t: _Text, now: datetime, notes: list[str]) -> tuple[date | None, str, 
 
 
 def parse(text: str, now: datetime) -> WhenResult:
+    text = _day_digits(text)
     if REPEAT_UNSUPPORTED.search(text):
         why = "รองรับนัดซ้ำแค่ ทุกวัน · ทุกวัน<จันทร์–อาทิตย์> · วันธรรมดา · เสาร์อาทิตย์"
         return WhenResult(None, text.strip(), confident=False, problem=why)

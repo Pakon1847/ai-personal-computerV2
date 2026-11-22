@@ -192,3 +192,19 @@ class TitleKeepsWordsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SpokenDayNumberTest(unittest.TestCase):
+    """Pakon พูดที่จอ 2026-10-28: ระบบถอดเสียงให้ "วันที่สามสิบเอ็ด" (คำอ่าน) · เดิมนัดลงวันนี้."""
+
+    def test_day_said_as_words(self):
+        now = datetime(2026, 10, 28, 2, 32)
+        cases = {"วันที่สามสิบเอ็ด มีนัดคุยกับเพื่อนเวลาบ่ายโมง": (10, 31, 13, "มีนัดคุยกับเพื่อน"),
+                 "สามสิบเอ็ดตุลา บ่ายโมงคุยกับเพื่อน": (10, 31, 13, "คุยกับเพื่อน"),
+                 "วันที่ยี่สิบห้าธันวา 10 โมง ไปเที่ยว": (12, 25, 10, "ไปเที่ยว")}  # fmt: skip
+        for text, (month, day, hour, what) in cases.items():
+            r = when.parse(text, now)
+            got = (r.at.month, r.at.day, r.at.hour, r.what)
+            self.assertEqual(got, (month, day, hour, what), text)
+        self.assertIsNone(when.parse("วันที่สี่สิบ ประชุม", now).at)  # ไม่มีวันที่ 40 = ไม่เดา
+        self.assertEqual(when.parse("ห้าโมงเย็นประชุม", now).at, datetime(2026, 10, 28, 17, 0))

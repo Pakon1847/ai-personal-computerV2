@@ -1,0 +1,4845 @@
+{
+ "correct": 23,
+ "total": 40,
+ "false_calls": 0,
+ "none_total": 0,
+ "by_kind": {
+  "direct": [
+   14,
+   20
+  ],
+  "paraphrase": [
+   9,
+   20
+  ]
+ },
+ "ai_asked": 40,
+ "ai_seconds_median": 16.68,
+ "ai_seconds_first": 65.37,
+ "ai_seconds_max": 65.37,
+ "mode": "ai-first",
+ "rows": [
+  {
+   "id": "u001",
+   "text": "ในตู้เย็นเหลือไข่ 3 ฟอง หมูสับนิดหน่อย กับผักกาดขาว ทำอะไรกินได้บ้าง",
+   "expect": "recipe-idea",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 65.37,
+   "timings": {
+    "cache_n": 0,
+    "prompt_n": 1219,
+    "prompt_ms": 59604.249,
+    "prompt_per_token_ms": 48.89602050861362,
+    "prompt_per_second": 20.45156210256084,
+    "predicted_n": 37,
+    "predicted_ms": 5755.392,
+    "predicted_per_token_ms": 159.87199999999999,
+    "predicted_per_second": 6.255004003202562
+   },
+   "raw_tool": "recipe-idea",
+   "forced": true,
+   "got": "recipe-idea",
+   "ok": true
+  },
+  {
+   "id": "u002",
+   "text": "สูตรเค้กบอกให้ใส่บัตเตอร์มิลค์ แต่บ้านไม่มี ใช้อะไรแทนได้ครับ",
+   "expect": "recipe-substitute",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 11.9,
+   "timings": {
+    "cache_n": 1067,
+    "prompt_n": 141,
+    "prompt_ms": 7536.243,
+    "prompt_per_token_ms": 53.44853191489362,
+    "prompt_per_second": 18.709587787973398,
+    "predicted_n": 28,
+    "predicted_ms": 4345.684,
+    "predicted_per_token_ms": 160.95125925925927,
+    "predicted_per_second": 6.213061050918567
+   },
+   "raw_tool": "recipe-substitute",
+   "forced": true,
+   "got": "recipe-substitute",
+   "ok": true
+  },
+  {
+   "id": "u003",
+   "text": "ข้าวมันไก่หนึ่งจานกี่แคลอรี่ประมาณ",
+   "expect": "calorie-estimate",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 11.43,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 142,
+    "prompt_ms": 7529.761,
+    "prompt_per_token_ms": 53.02648591549296,
+    "prompt_per_second": 18.85850028971703,
+    "predicted_n": 25,
+    "predicted_ms": 3888.402,
+    "predicted_per_token_ms": 162.01675,
+    "predicted_per_second": 6.172201331035216
+   },
+   "raw_tool": "calorie-estimate",
+   "forced": true,
+   "got": "calorie-estimate",
+   "ok": true
+  },
+  {
+   "id": "u004",
+   "text": "เพิ่งซื้อ moka pot มา ต้องใส่ผงกาแฟกี่กรัม น้ำเท่าไหร่ ทำยังไงคะ",
+   "expect": "coffee-brew",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 25.28,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 35,
+    "prompt_ms": 1991.598,
+    "prompt_per_token_ms": 56.9028,
+    "prompt_per_second": 17.57382764995747,
+    "predicted_n": 48,
+    "predicted_ms": 7586.894,
+    "predicted_per_token_ms": 161.42327659574468,
+    "predicted_per_second": 6.194893457058976
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 15.69,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 152,
+     "prompt_ms": 8128.297,
+     "prompt_per_token_ms": 53.475638157894736,
+     "prompt_per_second": 18.700104093145217,
+     "predicted_n": 48,
+     "predicted_ms": 7550.768,
+     "predicted_per_token_ms": 160.65463829787234,
+     "predicted_per_second": 6.22453239193682
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u005",
+   "text": "ช่วยจัดตารางออกกำลังกายลดไขมันให้หน่อย ว่างวันละ 30 นาที สัปดาห์ละ 4 วัน",
+   "expect": "workout-plan",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 18.96,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 227,
+    "prompt_ms": 12403.768,
+    "prompt_per_token_ms": 54.64214977973568,
+    "prompt_per_second": 18.300890503595358,
+    "predicted_n": 41,
+    "predicted_ms": 6545.768,
+    "predicted_per_token_ms": 163.6442,
+    "predicted_per_second": 6.110818470804342
+   },
+   "raw_tool": "workout-plan",
+   "forced": true,
+   "got": "workout-plan",
+   "ok": true
+  },
+  {
+   "id": "u006",
+   "text": "นั่งทำงานทั้งวันจนบ่ากับคอตึงมาก มีท่ายืดอะไรแนะนำบ้าง",
+   "expect": "stretch-routine",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 11.78,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 135,
+    "prompt_ms": 7270.711,
+    "prompt_per_token_ms": 53.85711851851852,
+    "prompt_per_second": 18.56764764821487,
+    "predicted_n": 29,
+    "predicted_ms": 4499.474,
+    "predicted_per_token_ms": 160.6955,
+    "predicted_per_second": 6.222949615888435
+   },
+   "raw_tool": "stretch-routine",
+   "forced": true,
+   "got": "stretch-routine",
+   "ok": true
+  },
+  {
+   "id": "u007",
+   "text": "โดนน้ำมันร้อนลวกมือ ต้องปฐมพยาบาลยังไงก่อน",
+   "expect": "first-aid-info",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 13.67,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 157,
+    "prompt_ms": 8388.28,
+    "prompt_per_token_ms": 53.42853503184714,
+    "prompt_per_second": 18.716590290262126,
+    "predicted_n": 34,
+    "predicted_ms": 5268.946,
+    "predicted_per_token_ms": 159.6650303030303,
+    "predicted_per_second": 6.263112204983692
+   },
+   "raw_tool": "first-aid-info",
+   "forced": true,
+   "got": "first-aid-info",
+   "ok": true
+  },
+  {
+   "id": "u008",
+   "text": "พาฝึกหายใจคลายเครียดสัก 5 นาทีหน่อย",
+   "expect": "meditation-guide",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 10.4,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 129,
+    "prompt_ms": 6857.684,
+    "prompt_per_token_ms": 53.16034108527132,
+    "prompt_per_second": 18.811015497360334,
+    "predicted_n": 23,
+    "predicted_ms": 3527.451,
+    "predicted_per_token_ms": 160.3386818181818,
+    "predicted_per_second": 6.23679818656588
+   },
+   "raw_tool": "meditation-guide",
+   "forced": true,
+   "got": "meditation-guide",
+   "ok": true
+  },
+  {
+   "id": "u009",
+   "text": "เงินเดือน 18,000 ควรแบ่งเป็นค่ากิน ค่าเช่า ค่าเดินทาง แล้วเก็บเท่าไหร่ดี",
+   "expect": "budget-advice",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 29.67,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 35,
+    "prompt_ms": 1981.689,
+    "prompt_per_token_ms": 56.619685714285716,
+    "prompt_per_second": 17.66170171000596,
+    "predicted_n": 48,
+    "predicted_ms": 7579.938,
+    "predicted_per_token_ms": 161.27527659574469,
+    "predicted_per_second": 6.2005784216176965
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 20.1,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 228,
+     "prompt_ms": 12399.983,
+     "prompt_per_token_ms": 54.38589035087719,
+     "prompt_per_second": 18.387121982344652,
+     "predicted_n": 48,
+     "predicted_ms": 7687.534,
+     "predicted_per_token_ms": 163.56455319148935,
+     "predicted_per_second": 6.113794098341549
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u010",
+   "text": "อยากเก็บเงินให้ได้ 60,000 บาทภายในปีครึ่ง ต้องออมเดือนละเท่าไหร่",
+   "expect": "saving-goal",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 16.68,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 231,
+    "prompt_ms": 12552.555,
+    "prompt_per_token_ms": 54.34006493506494,
+    "prompt_per_second": 18.402627990875164,
+    "predicted_n": 26,
+    "predicted_ms": 4113.336,
+    "predicted_per_token_ms": 164.53344,
+    "predicted_per_second": 6.07779184583997
+   },
+   "raw_tool": "saving-goal",
+   "forced": true,
+   "got": "saving-goal",
+   "ok": true
+  },
+  {
+   "id": "u011",
+   "text": "จะไปซื้อมอเตอร์ไซค์มือสอง ควรพูดต่อราคากับคนขายยังไงให้ไม่เสียมารยาท",
+   "expect": "negotiation-tip",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 9.05,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 142,
+    "prompt_ms": 7603.097,
+    "prompt_per_token_ms": 53.54293661971831,
+    "prompt_per_second": 18.676599811892444,
+    "predicted_n": 10,
+    "predicted_ms": 1435.529,
+    "predicted_per_token_ms": 159.50322222222223,
+    "predicted_per_second": 6.269465820613864
+   },
+   "raw_tool": "negotiation-tip",
+   "forced": true,
+   "got": "negotiation-tip",
+   "ok": true
+  },
+  {
+   "id": "u012",
+   "text": "วางแผนเที่ยวเชียงใหม่ 3 วัน 2 คืนให้หน่อย แยกเป็นรายวัน",
+   "expect": "travel-itinerary",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 19.4,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 294,
+    "prompt_ms": 15927.266,
+    "prompt_per_token_ms": 54.17437414965986,
+    "prompt_per_second": 18.458911906161422,
+    "predicted_n": 22,
+    "predicted_ms": 3458.111,
+    "predicted_per_token_ms": 164.67195238095238,
+    "predicted_per_second": 6.072679564074143
+   },
+   "raw_tool": "travel-itinerary",
+   "forced": true,
+   "got": "travel-itinerary",
+   "ok": true
+  },
+  {
+   "id": "u013",
+   "text": "ลูกหมาอายุ 2 เดือน ควรให้อาหารวันละกี่มื้อ ต้องฉีดวัคซีนอะไรบ้าง",
+   "expect": "dog-care",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 33.36,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 36,
+    "prompt_ms": 1980.458,
+    "prompt_per_token_ms": 55.01272222222222,
+    "prompt_per_second": 18.177613461128686,
+    "predicted_n": 48,
+    "predicted_ms": 7596.332,
+    "predicted_per_token_ms": 161.62408510638298,
+    "predicted_per_second": 6.187196662810419
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 23.77,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 296,
+     "prompt_ms": 16085.774,
+     "prompt_per_token_ms": 54.34383108108108,
+     "prompt_per_second": 18.40135264861983,
+     "predicted_n": 48,
+     "predicted_ms": 7667.252,
+     "predicted_per_token_ms": 163.13302127659574,
+     "predicted_per_second": 6.129966772971593
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u014",
+   "text": "แมวที่บ้านชอบข่วนโซฟา แก้ยังไงดีครับ",
+   "expect": "cat-care",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 9.11,
+   "timings": {
+    "cache_n": 1067,
+    "prompt_n": 19,
+    "prompt_ms": 1144.007,
+    "prompt_per_token_ms": 60.21089473684211,
+    "prompt_per_second": 16.608289984239605,
+    "predicted_n": 48,
+    "predicted_ms": 7958.537,
+    "predicted_per_token_ms": 169.3305744680851,
+    "predicted_per_second": 5.905608028209204
+   },
+   "raw_tool": "",
+   "forced": false,
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u015",
+   "text": "ต้นมอนสเตอร่าใบเหลือง ต้องรดน้ำบ่อยแค่ไหน วางตรงไหนดี",
+   "expect": "plant-care",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 24.96,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 33,
+    "prompt_ms": 1884.224,
+    "prompt_per_token_ms": 57.09769696969697,
+    "prompt_per_second": 17.513841241805647,
+    "predicted_n": 48,
+    "predicted_ms": 7490.808,
+    "predicted_per_token_ms": 159.37889361702128,
+    "predicted_per_second": 6.274356518015146
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 15.57,
+    "timings": {
+     "cache_n": 1062,
+     "prompt_n": 149,
+     "prompt_ms": 7986.982,
+     "prompt_per_token_ms": 53.603906040268456,
+     "prompt_per_second": 18.65535692956363,
+     "predicted_n": 48,
+     "predicted_ms": 7569.804,
+     "predicted_per_token_ms": 161.0596595744681,
+     "predicted_per_second": 6.208879384459624
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u016",
+   "text": "ช่วยคิดของขวัญวันเกิดให้แม่ งบไม่เกิน 1,500 บาท",
+   "expect": "gift-idea",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 12.87,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 154,
+    "prompt_ms": 8274.08,
+    "prompt_per_token_ms": 53.727792207792206,
+    "prompt_per_second": 18.612341190803086,
+    "predicted_n": 28,
+    "predicted_ms": 4580.189,
+    "predicted_per_token_ms": 169.63662962962965,
+    "predicted_per_second": 5.894953243195859
+   },
+   "raw_tool": "gift-idea",
+   "forced": true,
+   "got": "gift-idea",
+   "ok": true
+  },
+  {
+   "id": "u017",
+   "text": "git rebase กับ git merge ต่างกันยังไง ควรใช้ตอนไหน",
+   "expect": "git-command-help",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 11.72,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 132,
+    "prompt_ms": 7042.56,
+    "prompt_per_token_ms": 53.35272727272728,
+    "prompt_per_second": 18.74318429661941,
+    "predicted_n": 30,
+    "predicted_ms": 4668.504,
+    "predicted_per_token_ms": 160.98289655172414,
+    "predicted_per_second": 6.2118400241276435
+   },
+   "raw_tool": "git-command-help",
+   "forced": true,
+   "got": "git-command-help",
+   "ok": true
+  },
+  {
+   "id": "u018",
+   "text": "ฟังก์ชันที่คำนวณภาษีจากยอดขายรวม ควรตั้งชื่อว่าอะไรดี",
+   "expect": "var-naming",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 24.53,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 29,
+    "prompt_ms": 1634.014,
+    "prompt_per_token_ms": 56.34531034482758,
+    "prompt_per_second": 17.747705956007724,
+    "predicted_n": 48,
+    "predicted_ms": 7595.496,
+    "predicted_per_token_ms": 161.60629787234043,
+    "predicted_per_second": 6.187877658022597
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 15.29,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 143,
+     "prompt_ms": 7695.59,
+     "prompt_per_token_ms": 53.81531468531469,
+     "prompt_per_second": 18.582071030291374,
+     "predicted_n": 48,
+     "predicted_ms": 7577.226,
+     "predicted_per_token_ms": 161.2175744680851,
+     "predicted_per_second": 6.202797699316346
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u019",
+   "text": "ขอแบบฝึกหัด present perfect 10 ข้อพร้อมเฉลย",
+   "expect": "grammar-practice",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 9.17,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 129,
+    "prompt_ms": 6750.57,
+    "prompt_per_token_ms": 52.33,
+    "prompt_per_second": 19.10949742021785,
+    "predicted_n": 16,
+    "predicted_ms": 2408.989,
+    "predicted_per_token_ms": 160.59926666666667,
+    "predicted_per_second": 6.226678494588393
+   },
+   "raw_tool": "grammar-practice",
+   "forced": true,
+   "got": "grammar-practice",
+   "ok": true
+  },
+  {
+   "id": "u020",
+   "text": "สอนผูกเงื่อนบ่วงสายธนูหน่อย",
+   "expect": "knot-tying",
+   "kind": "direct",
+   "by": "ai",
+   "seconds": 10.74,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 131,
+    "prompt_ms": 7031.94,
+    "prompt_per_token_ms": 53.67893129770992,
+    "prompt_per_second": 18.629282957476885,
+    "predicted_n": 24,
+    "predicted_ms": 3696.023,
+    "predicted_per_token_ms": 160.69665217391304,
+    "predicted_per_second": 6.222904998156126
+   },
+   "raw_tool": "knot-tying",
+   "forced": true,
+   "got": "knot-tying",
+   "ok": true
+  },
+  {
+   "id": "u021",
+   "text": "คืนนี้หลานจะมานอนค้าง อยากได้เรื่องเล่าก่อนนอนเกี่ยวกับกระต่ายที่ไม่ยอมแบ่งแครอทให้เพื่อน สอนให้รู้จักแบ่งปัน",
+   "expect": "kids-story",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 21.75,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 314,
+    "prompt_ms": 16972.304,
+    "prompt_per_token_ms": 54.05192356687898,
+    "prompt_per_second": 18.500729187975892,
+    "predicted_n": 30,
+    "predicted_ms": 4762.59,
+    "predicted_per_token_ms": 164.22724137931036,
+    "predicted_per_second": 6.089123775088765
+   },
+   "raw_tool": "kids-story",
+   "forced": true,
+   "got": "kids-story",
+   "ok": true
+  },
+  {
+   "id": "u022",
+   "text": "เสาร์นี้จะเล่นเกมทายกันในวงเพื่อน ขอสัก 10 ข้อเรื่องอวกาศ แล้วบอกคำตอบไว้ด้วย",
+   "expect": "trivia-quiz",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 28.62,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 38,
+    "prompt_ms": 2108.981,
+    "prompt_per_token_ms": 55.499500000000005,
+    "prompt_per_second": 18.01818034396706,
+    "predicted_n": 48,
+    "predicted_ms": 7608.56,
+    "predicted_per_token_ms": 161.88425531914893,
+    "predicted_per_second": 6.177252988738999
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 18.89,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 213,
+     "prompt_ms": 11215.755,
+     "prompt_per_token_ms": 52.656126760563374,
+     "prompt_per_second": 18.991142370709774,
+     "predicted_n": 48,
+     "predicted_ms": 7664.597,
+     "predicted_per_token_ms": 163.07653191489362,
+     "predicted_per_second": 6.132090180344773
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u023",
+   "text": "การบ้านลูกถามว่า รถไฟวิ่ง 80 กิโลต่อชั่วโมง ไป 240 กิโลใช้กี่ชั่วโมง ช่วยไล่ให้ดูหน่อยว่าคิดยังไง ลูกจะได้เข้าใจ",
+   "expect": "math-explain",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 10.05,
+   "timings": {
+    "cache_n": 1067,
+    "prompt_n": 48,
+    "prompt_ms": 2495.042,
+    "prompt_per_token_ms": 51.980041666666665,
+    "prompt_per_second": 19.238153105238307,
+    "predicted_n": 48,
+    "predicted_ms": 7541.106,
+    "predicted_per_token_ms": 160.44906382978724,
+    "predicted_per_second": 6.2325075393450255
+   },
+   "raw_tool": "",
+   "forced": false,
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u024",
+   "text": "อาทิตย์หน้าต้องขึ้นเวทีถกกันเรื่องควรยกเลิกชุดนักเรียนไหม ยังไม่รู้ว่าจะได้ข้างไหน อยากได้เหตุผลไว้ทั้งสองทาง",
+   "expect": "debate-points",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 26.51,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 45,
+    "prompt_ms": 2500.535,
+    "prompt_per_token_ms": 55.56744444444444,
+    "prompt_per_second": 17.996148824151632,
+    "predicted_n": 48,
+    "predicted_ms": 7490.059,
+    "predicted_per_token_ms": 159.3629574468085,
+    "predicted_per_second": 6.27498394872457
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 16.51,
+    "timings": {
+     "cache_n": 1062,
+     "prompt_n": 167,
+     "prompt_ms": 9018.43,
+     "prompt_per_token_ms": 54.0025748502994,
+     "prompt_per_second": 18.51763555297319,
+     "predicted_n": 48,
+     "predicted_ms": 7481.648,
+     "predicted_per_token_ms": 159.184,
+     "predicted_per_second": 6.282038395818675
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u025",
+   "text": "พรุ่งนี้ต้องออกไปพรีเซนต์งานกลุ่มเรื่องขยะพลาสติกต่อหน้าเพื่อนประมาณ 3 นาที ช่วยเขียนสิ่งที่จะพูดให้หน่อย",
+   "expect": "speech-draft",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 23.11,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 309,
+    "prompt_ms": 16801.563,
+    "prompt_per_token_ms": 54.37399029126213,
+    "prompt_per_second": 18.39114610944232,
+    "predicted_n": 40,
+    "predicted_ms": 6294.303,
+    "predicted_per_token_ms": 161.3923846153846,
+    "predicted_per_second": 6.196079216396161
+   },
+   "raw_tool": "speech-draft",
+   "forced": true,
+   "got": "speech-draft",
+   "ok": true
+  },
+  {
+   "id": "u026",
+   "text": "อยากทำนกกระเรียนจากกระดาษสี่เหลี่ยมให้ลูกดู ทำทีละสเต็ปยังไง",
+   "expect": "origami-guide",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 10.72,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 146,
+    "prompt_ms": 7864.415,
+    "prompt_per_token_ms": 53.86585616438356,
+    "prompt_per_second": 18.564635767568216,
+    "predicted_n": 19,
+    "predicted_ms": 2846.688,
+    "predicted_per_token_ms": 158.14933333333335,
+    "predicted_per_second": 6.323137625198125
+   },
+   "raw_tool": "origami-guide",
+   "forced": true,
+   "got": "origami-guide",
+   "ok": true
+  },
+  {
+   "id": "u027",
+   "text": "ทำไมบางวันฟ้าแลบแต่ไม่มีเสียงฟ้าร้องตามมาเลย",
+   "expect": "weather-explain",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 8.97,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 26,
+    "prompt_ms": 1455.565,
+    "prompt_per_token_ms": 55.98326923076923,
+    "prompt_per_second": 17.862479518262667,
+    "predicted_n": 48,
+    "predicted_ms": 7497.623,
+    "predicted_per_token_ms": 159.52389361702126,
+    "predicted_per_second": 6.268653411888009
+   },
+   "raw_tool": "",
+   "forced": false,
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u028",
+   "text": "เพิ่งซื้อโปร่งตัวแรกมา นิ้วยังกดไม่เป็นเลย อยากเล่นเพลงง่าย ๆ ได้สักเพลง เริ่มจากตรงไหนดี",
+   "expect": "guitar-chord",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 21.21,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 38,
+    "prompt_ms": 2118.957,
+    "prompt_per_token_ms": 55.76202631578947,
+    "prompt_per_second": 17.933351172298448,
+    "predicted_n": 27,
+    "predicted_ms": 4191.969,
+    "predicted_per_token_ms": 161.22957692307693,
+    "predicted_per_second": 6.202335942846906
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 14.89,
+    "timings": {
+     "cache_n": 1062,
+     "prompt_n": 134,
+     "prompt_ms": 7291.354,
+     "prompt_per_token_ms": 54.41308955223881,
+     "prompt_per_second": 18.37793090281997,
+     "predicted_n": 48,
+     "predicted_ms": 7580.166,
+     "predicted_per_token_ms": 161.28012765957448,
+     "predicted_per_second": 6.200391917538482
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u029",
+   "text": "ครูบอกว่าตัวหนังสือในสมุดผมอ่านไม่ออก อยากเขียนให้เป็นระเบียบกว่านี้ ต้องซ้อมแบบไหน",
+   "expect": "handwriting-tips",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 9.34,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 149,
+    "prompt_ms": 7863.517,
+    "prompt_per_token_ms": 52.77528187919463,
+    "prompt_per_second": 18.948264497933938,
+    "predicted_n": 10,
+    "predicted_ms": 1464.291,
+    "predicted_per_token_ms": 162.69899999999998,
+    "predicted_per_second": 6.146319276701148
+   },
+   "raw_tool": "handwriting-tips",
+   "forced": true,
+   "got": "handwriting-tips",
+   "ok": true
+  },
+  {
+   "id": "u030",
+   "text": "คอนโดห้องเดียว 24 ตารางเมตร มีเตียง โต๊ะทำงาน ตู้เสื้อผ้า วางยังไงให้ดูโล่งไม่อึดอัด",
+   "expect": "interior-decor",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 38.12,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 45,
+    "prompt_ms": 2435.849,
+    "prompt_per_token_ms": 54.12997777777778,
+    "prompt_per_second": 18.474051552456658,
+    "predicted_n": 48,
+    "predicted_ms": 7569.845,
+    "predicted_per_token_ms": 161.06053191489363,
+    "predicted_per_second": 6.2088457557585395
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 28.1,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 381,
+     "prompt_ms": 20420.259,
+     "prompt_per_token_ms": 53.59648031496062,
+     "prompt_per_second": 18.65794160593164,
+     "predicted_n": 48,
+     "predicted_ms": 7661.188,
+     "predicted_per_token_ms": 163.004,
+     "predicted_per_second": 6.134818777453313
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u031",
+   "text": "ป้ายเสื้อตัวใหม่มีรูปถังน้ำกับมือจุ่มอยู่ แล้วก็สามเหลี่ยมโดนกากบาท แปลว่าห้ามทำอะไร",
+   "expect": "laundry-guide",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 23.18,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 41,
+    "prompt_ms": 2177.53,
+    "prompt_per_token_ms": 53.110487804878055,
+    "prompt_per_second": 18.82867285410534,
+    "predicted_n": 33,
+    "predicted_ms": 5090.294,
+    "predicted_per_token_ms": 159.0716875,
+    "predicted_per_second": 6.286473826462676
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 15.9,
+    "timings": {
+     "cache_n": 1062,
+     "prompt_n": 151,
+     "prompt_ms": 8325.565,
+     "prompt_per_token_ms": 55.136192052980135,
+     "prompt_per_second": 18.136907224915063,
+     "predicted_n": 48,
+     "predicted_ms": 7560.706,
+     "predicted_per_token_ms": 160.86608510638297,
+     "predicted_per_second": 6.216350695292212
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u032",
+   "text": "กระดุมเสื้อเชิ้ตหลุด แล้วตะเข็บกางเกงตรงเป้าก็ปริ มีแค่เข็มกับด้ายในบ้าน จัดการเองได้ไหม",
+   "expect": "sewing-basic",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 30.46,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 47,
+    "prompt_ms": 2588.204,
+    "prompt_per_token_ms": 55.06817021276596,
+    "prompt_per_second": 18.159310471662973,
+    "predicted_n": 48,
+    "predicted_ms": 7529.533,
+    "predicted_per_token_ms": 160.20282978723404,
+    "predicted_per_second": 6.242086992646157
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 20.33,
+    "timings": {
+     "cache_n": 1062,
+     "prompt_n": 230,
+     "prompt_ms": 12725.345,
+     "prompt_per_token_ms": 55.327586956521735,
+     "prompt_per_second": 18.074166162096194,
+     "predicted_n": 48,
+     "predicted_ms": 7592.43,
+     "predicted_per_token_ms": 161.54106382978725,
+     "predicted_per_second": 6.190376467086295
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u033",
+   "text": "ปั่นไปแล้วโซ่หลุดบ่อยมาก แถมเวลาเปลี่ยนเกียร์มีเสียงแกรก ๆ ต้องปรับตรงไหน",
+   "expect": "bike-repair",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 7.37,
+   "timings": {
+    "cache_n": 1067,
+    "prompt_n": 31,
+    "prompt_ms": 1730.505,
+    "prompt_per_token_ms": 55.822741935483876,
+    "prompt_per_second": 17.913845958260737,
+    "predicted_n": 36,
+    "predicted_ms": 5624.779,
+    "predicted_per_token_ms": 160.70797142857145,
+    "predicted_per_second": 6.222466696024856
+   },
+   "raw_tool": "",
+   "forced": false,
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u034",
+   "text": "วันหยุดจะไปนั่งริมบ่อเช็กอินหวังได้ปลานิลกลับบ้าน ควรใช้อะไรล่อ แล้วใช้คันแบบไหน",
+   "expect": "fishing-tips",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 12.88,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 161,
+    "prompt_ms": 8545.348,
+    "prompt_per_token_ms": 53.07669565217391,
+    "prompt_per_second": 18.840660438872707,
+    "predicted_n": 28,
+    "predicted_ms": 4319.028,
+    "predicted_per_token_ms": 159.964,
+    "predicted_per_second": 6.251406566477456
+   },
+   "raw_tool": "fishing-tips",
+   "forced": true,
+   "got": "fishing-tips",
+   "ok": true
+  },
+  {
+   "id": "u035",
+   "text": "ไปงานแต่งเพื่อนตอนกลางวัน อยากให้หน้าดูใส ๆ ฉ่ำ ๆ แบบสาวเกาหลี ไล่ลงเครื่องสำอางทีละอย่างยังไงดีคะ",
+   "expect": "makeup-look",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 25.79,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 47,
+    "prompt_ms": 2572.573,
+    "prompt_per_token_ms": 54.73559574468085,
+    "prompt_per_second": 18.26964676998476,
+    "predicted_n": 48,
+    "predicted_ms": 7585.244,
+    "predicted_per_token_ms": 161.38817021276594,
+    "predicted_per_second": 6.196241017428048
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 15.62,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 153,
+     "prompt_ms": 8071.201,
+     "prompt_per_token_ms": 52.7529477124183,
+     "prompt_per_second": 18.95628667902088,
+     "predicted_n": 48,
+     "predicted_ms": 7536.567,
+     "predicted_per_token_ms": 160.35248936170214,
+     "predicted_per_second": 6.236261151794975
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u036",
+   "text": "หน้ากลมแก้มเยอะ ไว้ผมยาวประบ่า จะไปสัมภาษณ์งาน ควรเซ็ตผมแบบไหนให้หน้าดูเรียว",
+   "expect": "hairstyle-idea",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 17.67,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 220,
+    "prompt_ms": 11784.484,
+    "prompt_per_token_ms": 53.565836363636365,
+    "prompt_per_second": 18.668615443832756,
+    "predicted_n": 37,
+    "predicted_ms": 5868.735,
+    "predicted_per_token_ms": 163.02041666666665,
+    "predicted_per_second": 6.134200981983341
+   },
+   "raw_tool": "hairstyle-idea",
+   "forced": true,
+   "got": "hairstyle-idea",
+   "ok": true
+  },
+  {
+   "id": "u037",
+   "text": "อยากสเก็ตช์คนให้สัดส่วนไม่เพี้ยน เป็นมือใหม่มาก ๆ ต้องฝึกจับดินสอยังไง เริ่มจากรูปทรงอะไรก่อน",
+   "expect": "drawing-basic",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 15.88,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 228,
+    "prompt_ms": 12268.424,
+    "prompt_per_token_ms": 53.80887719298246,
+    "prompt_per_second": 18.5842941196033,
+    "predicted_n": 23,
+    "predicted_ms": 3598.636,
+    "predicted_per_token_ms": 163.57436363636364,
+    "predicted_per_second": 6.113427420833894
+   },
+   "raw_tool": "drawing-basic",
+   "forced": true,
+   "got": "drawing-basic",
+   "ok": true
+  },
+  {
+   "id": "u038",
+   "text": "เพื่อนชวนไปงานชิมเหล้าองุ่น ไม่รู้เรื่องเลยว่าแดงกับขาวต่างกันยังไง ต้องดม ต้องจิบยังไงไม่ให้เปิ่น",
+   "expect": "wine-basic",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 9.63,
+   "timings": {
+    "cache_n": 1065,
+    "prompt_n": 158,
+    "prompt_ms": 8327.666,
+    "prompt_per_token_ms": 52.706746835443035,
+    "prompt_per_second": 18.972903091934764,
+    "predicted_n": 9,
+    "predicted_ms": 1292.373,
+    "predicted_per_token_ms": 161.546625,
+    "predicted_per_second": 6.190163366148937
+   },
+   "raw_tool": "wine-basic",
+   "forced": true,
+   "got": "wine-basic",
+   "ok": true
+  },
+  {
+   "id": "u039",
+   "text": "สิ้นเดือนจะเลี้ยงวันเกิดแฟนที่ห้อง คนมาราว 8 คน ต้องเตรียมกินอะไร เล่นอะไร ซื้ออะไรมาบ้าง ช่วยไล่ให้ทีครับ",
+   "expect": "party-plan",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 40.85,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 42,
+    "prompt_ms": 2304.967,
+    "prompt_per_token_ms": 54.88016666666667,
+    "prompt_per_second": 18.221519006562783,
+    "predicted_n": 48,
+    "predicted_ms": 7530.237,
+    "predicted_per_token_ms": 160.2178085106383,
+    "predicted_per_second": 6.2415034214726575
+   },
+   "raw_tool": "",
+   "forced": true,
+   "first": {
+    "seconds": 31.0,
+    "timings": {
+     "cache_n": 1065,
+     "prompt_n": 436,
+     "prompt_ms": 23331.818,
+     "prompt_per_token_ms": 53.51334403669725,
+     "prompt_per_second": 18.68692786820127,
+     "predicted_n": 48,
+     "predicted_ms": 7652.981,
+     "predicted_per_token_ms": 162.8293829787234,
+     "predicted_per_second": 6.141397711558412
+    }
+   },
+   "got": "none",
+   "ok": false
+  },
+  {
+   "id": "u040",
+   "text": "วันนี้เศร้า ๆ เหงา ๆ อยากดูอะไรที่ทำให้ร้องไห้ได้เต็มที่แล้วรู้สึกดีขึ้น มีเรื่องไหนบ้าง",
+   "expect": "movie-by-mood",
+   "kind": "paraphrase",
+   "by": "ai",
+   "seconds": 11.77,
+   "timings": {
+    "cache_n": 1062,
+    "prompt_n": 158,
+    "prompt_ms": 8392.907,
+    "prompt_per_token_ms": 53.11966455696202,
+    "prompt_per_second": 18.8254200838875,
+    "predicted_n": 22,
+    "predicted_ms": 3363.253,
+    "predicted_per_token_ms": 160.15490476190476,
+    "predicted_per_second": 6.243954885344635
+   },
+   "raw_tool": "movie-by-mood",
+   "forced": true,
+   "got": "movie-by-mood",
+   "ok": true
+  }
+ ],
+ "repeats": [
+  {
+   "correct": 23,
+   "total": 40,
+   "false_calls": 0,
+   "none_total": 0,
+   "by_kind": {
+    "direct": [
+     14,
+     20
+    ],
+    "paraphrase": [
+     9,
+     20
+    ]
+   },
+   "ai_asked": 40,
+   "ai_seconds_median": 16.68,
+   "ai_seconds_first": 65.37,
+   "ai_seconds_max": 65.37,
+   "mode": "ai-first",
+   "rows": [
+    {
+     "id": "u001",
+     "text": "ในตู้เย็นเหลือไข่ 3 ฟอง หมูสับนิดหน่อย กับผักกาดขาว ทำอะไรกินได้บ้าง",
+     "expect": "recipe-idea",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 65.37,
+     "timings": {
+      "cache_n": 0,
+      "prompt_n": 1219,
+      "prompt_ms": 59604.249,
+      "prompt_per_token_ms": 48.89602050861362,
+      "prompt_per_second": 20.45156210256084,
+      "predicted_n": 37,
+      "predicted_ms": 5755.392,
+      "predicted_per_token_ms": 159.87199999999999,
+      "predicted_per_second": 6.255004003202562
+     },
+     "raw_tool": "recipe-idea",
+     "forced": true,
+     "got": "recipe-idea",
+     "ok": true
+    },
+    {
+     "id": "u002",
+     "text": "สูตรเค้กบอกให้ใส่บัตเตอร์มิลค์ แต่บ้านไม่มี ใช้อะไรแทนได้ครับ",
+     "expect": "recipe-substitute",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.9,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 141,
+      "prompt_ms": 7536.243,
+      "prompt_per_token_ms": 53.44853191489362,
+      "prompt_per_second": 18.709587787973398,
+      "predicted_n": 28,
+      "predicted_ms": 4345.684,
+      "predicted_per_token_ms": 160.95125925925927,
+      "predicted_per_second": 6.213061050918567
+     },
+     "raw_tool": "recipe-substitute",
+     "forced": true,
+     "got": "recipe-substitute",
+     "ok": true
+    },
+    {
+     "id": "u003",
+     "text": "ข้าวมันไก่หนึ่งจานกี่แคลอรี่ประมาณ",
+     "expect": "calorie-estimate",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.43,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 142,
+      "prompt_ms": 7529.761,
+      "prompt_per_token_ms": 53.02648591549296,
+      "prompt_per_second": 18.85850028971703,
+      "predicted_n": 25,
+      "predicted_ms": 3888.402,
+      "predicted_per_token_ms": 162.01675,
+      "predicted_per_second": 6.172201331035216
+     },
+     "raw_tool": "calorie-estimate",
+     "forced": true,
+     "got": "calorie-estimate",
+     "ok": true
+    },
+    {
+     "id": "u004",
+     "text": "เพิ่งซื้อ moka pot มา ต้องใส่ผงกาแฟกี่กรัม น้ำเท่าไหร่ ทำยังไงคะ",
+     "expect": "coffee-brew",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 25.28,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 35,
+      "prompt_ms": 1991.598,
+      "prompt_per_token_ms": 56.9028,
+      "prompt_per_second": 17.57382764995747,
+      "predicted_n": 48,
+      "predicted_ms": 7586.894,
+      "predicted_per_token_ms": 161.42327659574468,
+      "predicted_per_second": 6.194893457058976
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.69,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 152,
+       "prompt_ms": 8128.297,
+       "prompt_per_token_ms": 53.475638157894736,
+       "prompt_per_second": 18.700104093145217,
+       "predicted_n": 48,
+       "predicted_ms": 7550.768,
+       "predicted_per_token_ms": 160.65463829787234,
+       "predicted_per_second": 6.22453239193682
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u005",
+     "text": "ช่วยจัดตารางออกกำลังกายลดไขมันให้หน่อย ว่างวันละ 30 นาที สัปดาห์ละ 4 วัน",
+     "expect": "workout-plan",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 18.96,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 227,
+      "prompt_ms": 12403.768,
+      "prompt_per_token_ms": 54.64214977973568,
+      "prompt_per_second": 18.300890503595358,
+      "predicted_n": 41,
+      "predicted_ms": 6545.768,
+      "predicted_per_token_ms": 163.6442,
+      "predicted_per_second": 6.110818470804342
+     },
+     "raw_tool": "workout-plan",
+     "forced": true,
+     "got": "workout-plan",
+     "ok": true
+    },
+    {
+     "id": "u006",
+     "text": "นั่งทำงานทั้งวันจนบ่ากับคอตึงมาก มีท่ายืดอะไรแนะนำบ้าง",
+     "expect": "stretch-routine",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.78,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 135,
+      "prompt_ms": 7270.711,
+      "prompt_per_token_ms": 53.85711851851852,
+      "prompt_per_second": 18.56764764821487,
+      "predicted_n": 29,
+      "predicted_ms": 4499.474,
+      "predicted_per_token_ms": 160.6955,
+      "predicted_per_second": 6.222949615888435
+     },
+     "raw_tool": "stretch-routine",
+     "forced": true,
+     "got": "stretch-routine",
+     "ok": true
+    },
+    {
+     "id": "u007",
+     "text": "โดนน้ำมันร้อนลวกมือ ต้องปฐมพยาบาลยังไงก่อน",
+     "expect": "first-aid-info",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 13.67,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 157,
+      "prompt_ms": 8388.28,
+      "prompt_per_token_ms": 53.42853503184714,
+      "prompt_per_second": 18.716590290262126,
+      "predicted_n": 34,
+      "predicted_ms": 5268.946,
+      "predicted_per_token_ms": 159.6650303030303,
+      "predicted_per_second": 6.263112204983692
+     },
+     "raw_tool": "first-aid-info",
+     "forced": true,
+     "got": "first-aid-info",
+     "ok": true
+    },
+    {
+     "id": "u008",
+     "text": "พาฝึกหายใจคลายเครียดสัก 5 นาทีหน่อย",
+     "expect": "meditation-guide",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.4,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 129,
+      "prompt_ms": 6857.684,
+      "prompt_per_token_ms": 53.16034108527132,
+      "prompt_per_second": 18.811015497360334,
+      "predicted_n": 23,
+      "predicted_ms": 3527.451,
+      "predicted_per_token_ms": 160.3386818181818,
+      "predicted_per_second": 6.23679818656588
+     },
+     "raw_tool": "meditation-guide",
+     "forced": true,
+     "got": "meditation-guide",
+     "ok": true
+    },
+    {
+     "id": "u009",
+     "text": "เงินเดือน 18,000 ควรแบ่งเป็นค่ากิน ค่าเช่า ค่าเดินทาง แล้วเก็บเท่าไหร่ดี",
+     "expect": "budget-advice",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 29.67,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 35,
+      "prompt_ms": 1981.689,
+      "prompt_per_token_ms": 56.619685714285716,
+      "prompt_per_second": 17.66170171000596,
+      "predicted_n": 48,
+      "predicted_ms": 7579.938,
+      "predicted_per_token_ms": 161.27527659574469,
+      "predicted_per_second": 6.2005784216176965
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 20.1,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 228,
+       "prompt_ms": 12399.983,
+       "prompt_per_token_ms": 54.38589035087719,
+       "prompt_per_second": 18.387121982344652,
+       "predicted_n": 48,
+       "predicted_ms": 7687.534,
+       "predicted_per_token_ms": 163.56455319148935,
+       "predicted_per_second": 6.113794098341549
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u010",
+     "text": "อยากเก็บเงินให้ได้ 60,000 บาทภายในปีครึ่ง ต้องออมเดือนละเท่าไหร่",
+     "expect": "saving-goal",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 16.68,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 231,
+      "prompt_ms": 12552.555,
+      "prompt_per_token_ms": 54.34006493506494,
+      "prompt_per_second": 18.402627990875164,
+      "predicted_n": 26,
+      "predicted_ms": 4113.336,
+      "predicted_per_token_ms": 164.53344,
+      "predicted_per_second": 6.07779184583997
+     },
+     "raw_tool": "saving-goal",
+     "forced": true,
+     "got": "saving-goal",
+     "ok": true
+    },
+    {
+     "id": "u011",
+     "text": "จะไปซื้อมอเตอร์ไซค์มือสอง ควรพูดต่อราคากับคนขายยังไงให้ไม่เสียมารยาท",
+     "expect": "negotiation-tip",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 9.05,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 142,
+      "prompt_ms": 7603.097,
+      "prompt_per_token_ms": 53.54293661971831,
+      "prompt_per_second": 18.676599811892444,
+      "predicted_n": 10,
+      "predicted_ms": 1435.529,
+      "predicted_per_token_ms": 159.50322222222223,
+      "predicted_per_second": 6.269465820613864
+     },
+     "raw_tool": "negotiation-tip",
+     "forced": true,
+     "got": "negotiation-tip",
+     "ok": true
+    },
+    {
+     "id": "u012",
+     "text": "วางแผนเที่ยวเชียงใหม่ 3 วัน 2 คืนให้หน่อย แยกเป็นรายวัน",
+     "expect": "travel-itinerary",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 19.4,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 294,
+      "prompt_ms": 15927.266,
+      "prompt_per_token_ms": 54.17437414965986,
+      "prompt_per_second": 18.458911906161422,
+      "predicted_n": 22,
+      "predicted_ms": 3458.111,
+      "predicted_per_token_ms": 164.67195238095238,
+      "predicted_per_second": 6.072679564074143
+     },
+     "raw_tool": "travel-itinerary",
+     "forced": true,
+     "got": "travel-itinerary",
+     "ok": true
+    },
+    {
+     "id": "u013",
+     "text": "ลูกหมาอายุ 2 เดือน ควรให้อาหารวันละกี่มื้อ ต้องฉีดวัคซีนอะไรบ้าง",
+     "expect": "dog-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 33.36,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 36,
+      "prompt_ms": 1980.458,
+      "prompt_per_token_ms": 55.01272222222222,
+      "prompt_per_second": 18.177613461128686,
+      "predicted_n": 48,
+      "predicted_ms": 7596.332,
+      "predicted_per_token_ms": 161.62408510638298,
+      "predicted_per_second": 6.187196662810419
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 23.77,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 296,
+       "prompt_ms": 16085.774,
+       "prompt_per_token_ms": 54.34383108108108,
+       "prompt_per_second": 18.40135264861983,
+       "predicted_n": 48,
+       "predicted_ms": 7667.252,
+       "predicted_per_token_ms": 163.13302127659574,
+       "predicted_per_second": 6.129966772971593
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u014",
+     "text": "แมวที่บ้านชอบข่วนโซฟา แก้ยังไงดีครับ",
+     "expect": "cat-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 9.11,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 19,
+      "prompt_ms": 1144.007,
+      "prompt_per_token_ms": 60.21089473684211,
+      "prompt_per_second": 16.608289984239605,
+      "predicted_n": 48,
+      "predicted_ms": 7958.537,
+      "predicted_per_token_ms": 169.3305744680851,
+      "predicted_per_second": 5.905608028209204
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u015",
+     "text": "ต้นมอนสเตอร่าใบเหลือง ต้องรดน้ำบ่อยแค่ไหน วางตรงไหนดี",
+     "expect": "plant-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 24.96,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 33,
+      "prompt_ms": 1884.224,
+      "prompt_per_token_ms": 57.09769696969697,
+      "prompt_per_second": 17.513841241805647,
+      "predicted_n": 48,
+      "predicted_ms": 7490.808,
+      "predicted_per_token_ms": 159.37889361702128,
+      "predicted_per_second": 6.274356518015146
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.57,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 149,
+       "prompt_ms": 7986.982,
+       "prompt_per_token_ms": 53.603906040268456,
+       "prompt_per_second": 18.65535692956363,
+       "predicted_n": 48,
+       "predicted_ms": 7569.804,
+       "predicted_per_token_ms": 161.0596595744681,
+       "predicted_per_second": 6.208879384459624
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u016",
+     "text": "ช่วยคิดของขวัญวันเกิดให้แม่ งบไม่เกิน 1,500 บาท",
+     "expect": "gift-idea",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 12.87,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 154,
+      "prompt_ms": 8274.08,
+      "prompt_per_token_ms": 53.727792207792206,
+      "prompt_per_second": 18.612341190803086,
+      "predicted_n": 28,
+      "predicted_ms": 4580.189,
+      "predicted_per_token_ms": 169.63662962962965,
+      "predicted_per_second": 5.894953243195859
+     },
+     "raw_tool": "gift-idea",
+     "forced": true,
+     "got": "gift-idea",
+     "ok": true
+    },
+    {
+     "id": "u017",
+     "text": "git rebase กับ git merge ต่างกันยังไง ควรใช้ตอนไหน",
+     "expect": "git-command-help",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.72,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 132,
+      "prompt_ms": 7042.56,
+      "prompt_per_token_ms": 53.35272727272728,
+      "prompt_per_second": 18.74318429661941,
+      "predicted_n": 30,
+      "predicted_ms": 4668.504,
+      "predicted_per_token_ms": 160.98289655172414,
+      "predicted_per_second": 6.2118400241276435
+     },
+     "raw_tool": "git-command-help",
+     "forced": true,
+     "got": "git-command-help",
+     "ok": true
+    },
+    {
+     "id": "u018",
+     "text": "ฟังก์ชันที่คำนวณภาษีจากยอดขายรวม ควรตั้งชื่อว่าอะไรดี",
+     "expect": "var-naming",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 24.53,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 29,
+      "prompt_ms": 1634.014,
+      "prompt_per_token_ms": 56.34531034482758,
+      "prompt_per_second": 17.747705956007724,
+      "predicted_n": 48,
+      "predicted_ms": 7595.496,
+      "predicted_per_token_ms": 161.60629787234043,
+      "predicted_per_second": 6.187877658022597
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.29,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 143,
+       "prompt_ms": 7695.59,
+       "prompt_per_token_ms": 53.81531468531469,
+       "prompt_per_second": 18.582071030291374,
+       "predicted_n": 48,
+       "predicted_ms": 7577.226,
+       "predicted_per_token_ms": 161.2175744680851,
+       "predicted_per_second": 6.202797699316346
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u019",
+     "text": "ขอแบบฝึกหัด present perfect 10 ข้อพร้อมเฉลย",
+     "expect": "grammar-practice",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 9.17,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 129,
+      "prompt_ms": 6750.57,
+      "prompt_per_token_ms": 52.33,
+      "prompt_per_second": 19.10949742021785,
+      "predicted_n": 16,
+      "predicted_ms": 2408.989,
+      "predicted_per_token_ms": 160.59926666666667,
+      "predicted_per_second": 6.226678494588393
+     },
+     "raw_tool": "grammar-practice",
+     "forced": true,
+     "got": "grammar-practice",
+     "ok": true
+    },
+    {
+     "id": "u020",
+     "text": "สอนผูกเงื่อนบ่วงสายธนูหน่อย",
+     "expect": "knot-tying",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.74,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 131,
+      "prompt_ms": 7031.94,
+      "prompt_per_token_ms": 53.67893129770992,
+      "prompt_per_second": 18.629282957476885,
+      "predicted_n": 24,
+      "predicted_ms": 3696.023,
+      "predicted_per_token_ms": 160.69665217391304,
+      "predicted_per_second": 6.222904998156126
+     },
+     "raw_tool": "knot-tying",
+     "forced": true,
+     "got": "knot-tying",
+     "ok": true
+    },
+    {
+     "id": "u021",
+     "text": "คืนนี้หลานจะมานอนค้าง อยากได้เรื่องเล่าก่อนนอนเกี่ยวกับกระต่ายที่ไม่ยอมแบ่งแครอทให้เพื่อน สอนให้รู้จักแบ่งปัน",
+     "expect": "kids-story",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 21.75,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 314,
+      "prompt_ms": 16972.304,
+      "prompt_per_token_ms": 54.05192356687898,
+      "prompt_per_second": 18.500729187975892,
+      "predicted_n": 30,
+      "predicted_ms": 4762.59,
+      "predicted_per_token_ms": 164.22724137931036,
+      "predicted_per_second": 6.089123775088765
+     },
+     "raw_tool": "kids-story",
+     "forced": true,
+     "got": "kids-story",
+     "ok": true
+    },
+    {
+     "id": "u022",
+     "text": "เสาร์นี้จะเล่นเกมทายกันในวงเพื่อน ขอสัก 10 ข้อเรื่องอวกาศ แล้วบอกคำตอบไว้ด้วย",
+     "expect": "trivia-quiz",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 28.62,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 38,
+      "prompt_ms": 2108.981,
+      "prompt_per_token_ms": 55.499500000000005,
+      "prompt_per_second": 18.01818034396706,
+      "predicted_n": 48,
+      "predicted_ms": 7608.56,
+      "predicted_per_token_ms": 161.88425531914893,
+      "predicted_per_second": 6.177252988738999
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 18.89,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 213,
+       "prompt_ms": 11215.755,
+       "prompt_per_token_ms": 52.656126760563374,
+       "prompt_per_second": 18.991142370709774,
+       "predicted_n": 48,
+       "predicted_ms": 7664.597,
+       "predicted_per_token_ms": 163.07653191489362,
+       "predicted_per_second": 6.132090180344773
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u023",
+     "text": "การบ้านลูกถามว่า รถไฟวิ่ง 80 กิโลต่อชั่วโมง ไป 240 กิโลใช้กี่ชั่วโมง ช่วยไล่ให้ดูหน่อยว่าคิดยังไง ลูกจะได้เข้าใจ",
+     "expect": "math-explain",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 10.05,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 48,
+      "prompt_ms": 2495.042,
+      "prompt_per_token_ms": 51.980041666666665,
+      "prompt_per_second": 19.238153105238307,
+      "predicted_n": 48,
+      "predicted_ms": 7541.106,
+      "predicted_per_token_ms": 160.44906382978724,
+      "predicted_per_second": 6.2325075393450255
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u024",
+     "text": "อาทิตย์หน้าต้องขึ้นเวทีถกกันเรื่องควรยกเลิกชุดนักเรียนไหม ยังไม่รู้ว่าจะได้ข้างไหน อยากได้เหตุผลไว้ทั้งสองทาง",
+     "expect": "debate-points",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 26.51,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 45,
+      "prompt_ms": 2500.535,
+      "prompt_per_token_ms": 55.56744444444444,
+      "prompt_per_second": 17.996148824151632,
+      "predicted_n": 48,
+      "predicted_ms": 7490.059,
+      "predicted_per_token_ms": 159.3629574468085,
+      "predicted_per_second": 6.27498394872457
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 16.51,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 167,
+       "prompt_ms": 9018.43,
+       "prompt_per_token_ms": 54.0025748502994,
+       "prompt_per_second": 18.51763555297319,
+       "predicted_n": 48,
+       "predicted_ms": 7481.648,
+       "predicted_per_token_ms": 159.184,
+       "predicted_per_second": 6.282038395818675
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u025",
+     "text": "พรุ่งนี้ต้องออกไปพรีเซนต์งานกลุ่มเรื่องขยะพลาสติกต่อหน้าเพื่อนประมาณ 3 นาที ช่วยเขียนสิ่งที่จะพูดให้หน่อย",
+     "expect": "speech-draft",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 23.11,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 309,
+      "prompt_ms": 16801.563,
+      "prompt_per_token_ms": 54.37399029126213,
+      "prompt_per_second": 18.39114610944232,
+      "predicted_n": 40,
+      "predicted_ms": 6294.303,
+      "predicted_per_token_ms": 161.3923846153846,
+      "predicted_per_second": 6.196079216396161
+     },
+     "raw_tool": "speech-draft",
+     "forced": true,
+     "got": "speech-draft",
+     "ok": true
+    },
+    {
+     "id": "u026",
+     "text": "อยากทำนกกระเรียนจากกระดาษสี่เหลี่ยมให้ลูกดู ทำทีละสเต็ปยังไง",
+     "expect": "origami-guide",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 10.72,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 146,
+      "prompt_ms": 7864.415,
+      "prompt_per_token_ms": 53.86585616438356,
+      "prompt_per_second": 18.564635767568216,
+      "predicted_n": 19,
+      "predicted_ms": 2846.688,
+      "predicted_per_token_ms": 158.14933333333335,
+      "predicted_per_second": 6.323137625198125
+     },
+     "raw_tool": "origami-guide",
+     "forced": true,
+     "got": "origami-guide",
+     "ok": true
+    },
+    {
+     "id": "u027",
+     "text": "ทำไมบางวันฟ้าแลบแต่ไม่มีเสียงฟ้าร้องตามมาเลย",
+     "expect": "weather-explain",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 8.97,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 26,
+      "prompt_ms": 1455.565,
+      "prompt_per_token_ms": 55.98326923076923,
+      "prompt_per_second": 17.862479518262667,
+      "predicted_n": 48,
+      "predicted_ms": 7497.623,
+      "predicted_per_token_ms": 159.52389361702126,
+      "predicted_per_second": 6.268653411888009
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u028",
+     "text": "เพิ่งซื้อโปร่งตัวแรกมา นิ้วยังกดไม่เป็นเลย อยากเล่นเพลงง่าย ๆ ได้สักเพลง เริ่มจากตรงไหนดี",
+     "expect": "guitar-chord",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 21.21,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 38,
+      "prompt_ms": 2118.957,
+      "prompt_per_token_ms": 55.76202631578947,
+      "prompt_per_second": 17.933351172298448,
+      "predicted_n": 27,
+      "predicted_ms": 4191.969,
+      "predicted_per_token_ms": 161.22957692307693,
+      "predicted_per_second": 6.202335942846906
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 14.89,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 134,
+       "prompt_ms": 7291.354,
+       "prompt_per_token_ms": 54.41308955223881,
+       "prompt_per_second": 18.37793090281997,
+       "predicted_n": 48,
+       "predicted_ms": 7580.166,
+       "predicted_per_token_ms": 161.28012765957448,
+       "predicted_per_second": 6.200391917538482
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u029",
+     "text": "ครูบอกว่าตัวหนังสือในสมุดผมอ่านไม่ออก อยากเขียนให้เป็นระเบียบกว่านี้ ต้องซ้อมแบบไหน",
+     "expect": "handwriting-tips",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.34,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 149,
+      "prompt_ms": 7863.517,
+      "prompt_per_token_ms": 52.77528187919463,
+      "prompt_per_second": 18.948264497933938,
+      "predicted_n": 10,
+      "predicted_ms": 1464.291,
+      "predicted_per_token_ms": 162.69899999999998,
+      "predicted_per_second": 6.146319276701148
+     },
+     "raw_tool": "handwriting-tips",
+     "forced": true,
+     "got": "handwriting-tips",
+     "ok": true
+    },
+    {
+     "id": "u030",
+     "text": "คอนโดห้องเดียว 24 ตารางเมตร มีเตียง โต๊ะทำงาน ตู้เสื้อผ้า วางยังไงให้ดูโล่งไม่อึดอัด",
+     "expect": "interior-decor",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 38.12,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 45,
+      "prompt_ms": 2435.849,
+      "prompt_per_token_ms": 54.12997777777778,
+      "prompt_per_second": 18.474051552456658,
+      "predicted_n": 48,
+      "predicted_ms": 7569.845,
+      "predicted_per_token_ms": 161.06053191489363,
+      "predicted_per_second": 6.2088457557585395
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 28.1,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 381,
+       "prompt_ms": 20420.259,
+       "prompt_per_token_ms": 53.59648031496062,
+       "prompt_per_second": 18.65794160593164,
+       "predicted_n": 48,
+       "predicted_ms": 7661.188,
+       "predicted_per_token_ms": 163.004,
+       "predicted_per_second": 6.134818777453313
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u031",
+     "text": "ป้ายเสื้อตัวใหม่มีรูปถังน้ำกับมือจุ่มอยู่ แล้วก็สามเหลี่ยมโดนกากบาท แปลว่าห้ามทำอะไร",
+     "expect": "laundry-guide",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 23.18,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 41,
+      "prompt_ms": 2177.53,
+      "prompt_per_token_ms": 53.110487804878055,
+      "prompt_per_second": 18.82867285410534,
+      "predicted_n": 33,
+      "predicted_ms": 5090.294,
+      "predicted_per_token_ms": 159.0716875,
+      "predicted_per_second": 6.286473826462676
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.9,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 151,
+       "prompt_ms": 8325.565,
+       "prompt_per_token_ms": 55.136192052980135,
+       "prompt_per_second": 18.136907224915063,
+       "predicted_n": 48,
+       "predicted_ms": 7560.706,
+       "predicted_per_token_ms": 160.86608510638297,
+       "predicted_per_second": 6.216350695292212
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u032",
+     "text": "กระดุมเสื้อเชิ้ตหลุด แล้วตะเข็บกางเกงตรงเป้าก็ปริ มีแค่เข็มกับด้ายในบ้าน จัดการเองได้ไหม",
+     "expect": "sewing-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 30.46,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 47,
+      "prompt_ms": 2588.204,
+      "prompt_per_token_ms": 55.06817021276596,
+      "prompt_per_second": 18.159310471662973,
+      "predicted_n": 48,
+      "predicted_ms": 7529.533,
+      "predicted_per_token_ms": 160.20282978723404,
+      "predicted_per_second": 6.242086992646157
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 20.33,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 230,
+       "prompt_ms": 12725.345,
+       "prompt_per_token_ms": 55.327586956521735,
+       "prompt_per_second": 18.074166162096194,
+       "predicted_n": 48,
+       "predicted_ms": 7592.43,
+       "predicted_per_token_ms": 161.54106382978725,
+       "predicted_per_second": 6.190376467086295
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u033",
+     "text": "ปั่นไปแล้วโซ่หลุดบ่อยมาก แถมเวลาเปลี่ยนเกียร์มีเสียงแกรก ๆ ต้องปรับตรงไหน",
+     "expect": "bike-repair",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 7.37,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 31,
+      "prompt_ms": 1730.505,
+      "prompt_per_token_ms": 55.822741935483876,
+      "prompt_per_second": 17.913845958260737,
+      "predicted_n": 36,
+      "predicted_ms": 5624.779,
+      "predicted_per_token_ms": 160.70797142857145,
+      "predicted_per_second": 6.222466696024856
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u034",
+     "text": "วันหยุดจะไปนั่งริมบ่อเช็กอินหวังได้ปลานิลกลับบ้าน ควรใช้อะไรล่อ แล้วใช้คันแบบไหน",
+     "expect": "fishing-tips",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 12.88,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 161,
+      "prompt_ms": 8545.348,
+      "prompt_per_token_ms": 53.07669565217391,
+      "prompt_per_second": 18.840660438872707,
+      "predicted_n": 28,
+      "predicted_ms": 4319.028,
+      "predicted_per_token_ms": 159.964,
+      "predicted_per_second": 6.251406566477456
+     },
+     "raw_tool": "fishing-tips",
+     "forced": true,
+     "got": "fishing-tips",
+     "ok": true
+    },
+    {
+     "id": "u035",
+     "text": "ไปงานแต่งเพื่อนตอนกลางวัน อยากให้หน้าดูใส ๆ ฉ่ำ ๆ แบบสาวเกาหลี ไล่ลงเครื่องสำอางทีละอย่างยังไงดีคะ",
+     "expect": "makeup-look",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 25.79,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 47,
+      "prompt_ms": 2572.573,
+      "prompt_per_token_ms": 54.73559574468085,
+      "prompt_per_second": 18.26964676998476,
+      "predicted_n": 48,
+      "predicted_ms": 7585.244,
+      "predicted_per_token_ms": 161.38817021276594,
+      "predicted_per_second": 6.196241017428048
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.62,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 153,
+       "prompt_ms": 8071.201,
+       "prompt_per_token_ms": 52.7529477124183,
+       "prompt_per_second": 18.95628667902088,
+       "predicted_n": 48,
+       "predicted_ms": 7536.567,
+       "predicted_per_token_ms": 160.35248936170214,
+       "predicted_per_second": 6.236261151794975
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u036",
+     "text": "หน้ากลมแก้มเยอะ ไว้ผมยาวประบ่า จะไปสัมภาษณ์งาน ควรเซ็ตผมแบบไหนให้หน้าดูเรียว",
+     "expect": "hairstyle-idea",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 17.67,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 220,
+      "prompt_ms": 11784.484,
+      "prompt_per_token_ms": 53.565836363636365,
+      "prompt_per_second": 18.668615443832756,
+      "predicted_n": 37,
+      "predicted_ms": 5868.735,
+      "predicted_per_token_ms": 163.02041666666665,
+      "predicted_per_second": 6.134200981983341
+     },
+     "raw_tool": "hairstyle-idea",
+     "forced": true,
+     "got": "hairstyle-idea",
+     "ok": true
+    },
+    {
+     "id": "u037",
+     "text": "อยากสเก็ตช์คนให้สัดส่วนไม่เพี้ยน เป็นมือใหม่มาก ๆ ต้องฝึกจับดินสอยังไง เริ่มจากรูปทรงอะไรก่อน",
+     "expect": "drawing-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 15.88,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 228,
+      "prompt_ms": 12268.424,
+      "prompt_per_token_ms": 53.80887719298246,
+      "prompt_per_second": 18.5842941196033,
+      "predicted_n": 23,
+      "predicted_ms": 3598.636,
+      "predicted_per_token_ms": 163.57436363636364,
+      "predicted_per_second": 6.113427420833894
+     },
+     "raw_tool": "drawing-basic",
+     "forced": true,
+     "got": "drawing-basic",
+     "ok": true
+    },
+    {
+     "id": "u038",
+     "text": "เพื่อนชวนไปงานชิมเหล้าองุ่น ไม่รู้เรื่องเลยว่าแดงกับขาวต่างกันยังไง ต้องดม ต้องจิบยังไงไม่ให้เปิ่น",
+     "expect": "wine-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.63,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 158,
+      "prompt_ms": 8327.666,
+      "prompt_per_token_ms": 52.706746835443035,
+      "prompt_per_second": 18.972903091934764,
+      "predicted_n": 9,
+      "predicted_ms": 1292.373,
+      "predicted_per_token_ms": 161.546625,
+      "predicted_per_second": 6.190163366148937
+     },
+     "raw_tool": "wine-basic",
+     "forced": true,
+     "got": "wine-basic",
+     "ok": true
+    },
+    {
+     "id": "u039",
+     "text": "สิ้นเดือนจะเลี้ยงวันเกิดแฟนที่ห้อง คนมาราว 8 คน ต้องเตรียมกินอะไร เล่นอะไร ซื้ออะไรมาบ้าง ช่วยไล่ให้ทีครับ",
+     "expect": "party-plan",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 40.85,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 42,
+      "prompt_ms": 2304.967,
+      "prompt_per_token_ms": 54.88016666666667,
+      "prompt_per_second": 18.221519006562783,
+      "predicted_n": 48,
+      "predicted_ms": 7530.237,
+      "predicted_per_token_ms": 160.2178085106383,
+      "predicted_per_second": 6.2415034214726575
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 31.0,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 436,
+       "prompt_ms": 23331.818,
+       "prompt_per_token_ms": 53.51334403669725,
+       "prompt_per_second": 18.68692786820127,
+       "predicted_n": 48,
+       "predicted_ms": 7652.981,
+       "predicted_per_token_ms": 162.8293829787234,
+       "predicted_per_second": 6.141397711558412
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u040",
+     "text": "วันนี้เศร้า ๆ เหงา ๆ อยากดูอะไรที่ทำให้ร้องไห้ได้เต็มที่แล้วรู้สึกดีขึ้น มีเรื่องไหนบ้าง",
+     "expect": "movie-by-mood",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 11.77,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 158,
+      "prompt_ms": 8392.907,
+      "prompt_per_token_ms": 53.11966455696202,
+      "prompt_per_second": 18.8254200838875,
+      "predicted_n": 22,
+      "predicted_ms": 3363.253,
+      "predicted_per_token_ms": 160.15490476190476,
+      "predicted_per_second": 6.243954885344635
+     },
+     "raw_tool": "movie-by-mood",
+     "forced": true,
+     "got": "movie-by-mood",
+     "ok": true
+    }
+   ]
+  },
+  {
+   "correct": 22,
+   "total": 40,
+   "false_calls": 0,
+   "none_total": 0,
+   "by_kind": {
+    "direct": [
+     13,
+     20
+    ],
+    "paraphrase": [
+     9,
+     20
+    ]
+   },
+   "ai_asked": 40,
+   "ai_seconds_median": 18.82,
+   "ai_seconds_first": 13.89,
+   "ai_seconds_max": 38.12,
+   "mode": "ai-first",
+   "rows": [
+    {
+     "id": "u001",
+     "text": "ในตู้เย็นเหลือไข่ 3 ฟอง หมูสับนิดหน่อย กับผักกาดขาว ทำอะไรกินได้บ้าง",
+     "expect": "recipe-idea",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 13.89,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 154,
+      "prompt_ms": 8098.305,
+      "prompt_per_token_ms": 52.58639610389611,
+      "prompt_per_second": 19.016325021100094,
+      "predicted_n": 37,
+      "predicted_ms": 5775.291,
+      "predicted_per_token_ms": 160.42475000000002,
+      "predicted_per_second": 6.233452132541892
+     },
+     "raw_tool": "recipe-idea",
+     "forced": true,
+     "got": "recipe-idea",
+     "ok": true
+    },
+    {
+     "id": "u002",
+     "text": "สูตรเค้กบอกให้ใส่บัตเตอร์มิลค์ แต่บ้านไม่มี ใช้อะไรแทนได้ครับ",
+     "expect": "recipe-substitute",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.33,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 141,
+      "prompt_ms": 7760.45,
+      "prompt_per_token_ms": 55.038652482269505,
+      "prompt_per_second": 18.169049475223733,
+      "predicted_n": 23,
+      "predicted_ms": 3557.484,
+      "predicted_per_token_ms": 161.70381818181818,
+      "predicted_per_second": 6.184145873881653
+     },
+     "raw_tool": "recipe-substitute",
+     "forced": true,
+     "got": "recipe-substitute",
+     "ok": true
+    },
+    {
+     "id": "u003",
+     "text": "ข้าวมันไก่หนึ่งจานกี่แคลอรี่ประมาณ",
+     "expect": "calorie-estimate",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.36,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 142,
+      "prompt_ms": 7496.63,
+      "prompt_per_token_ms": 52.793169014084505,
+      "prompt_per_second": 18.94184453547794,
+      "predicted_n": 25,
+      "predicted_ms": 3848.415,
+      "predicted_per_token_ms": 160.350625,
+      "predicted_per_second": 6.236333659441614
+     },
+     "raw_tool": "calorie-estimate",
+     "forced": true,
+     "got": "calorie-estimate",
+     "ok": true
+    },
+    {
+     "id": "u004",
+     "text": "เพิ่งซื้อ moka pot มา ต้องใส่ผงกาแฟกี่กรัม น้ำเท่าไหร่ ทำยังไงคะ",
+     "expect": "coffee-brew",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 22.86,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 35,
+      "prompt_ms": 1951.511,
+      "prompt_per_token_ms": 55.75745714285714,
+      "prompt_per_second": 17.934820761963422,
+      "predicted_n": 34,
+      "predicted_ms": 5318.896,
+      "predicted_per_token_ms": 161.17866666666666,
+      "predicted_per_second": 6.204295026637107
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.58,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 152,
+       "prompt_ms": 8008.214,
+       "prompt_per_token_ms": 52.68561842105263,
+       "prompt_per_second": 18.980511759550883,
+       "predicted_n": 48,
+       "predicted_ms": 7553.981,
+       "predicted_per_token_ms": 160.72299999999998,
+       "predicted_per_second": 6.2218848577988215
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u005",
+     "text": "ช่วยจัดตารางออกกำลังกายลดไขมันให้หน่อย ว่างวันละ 30 นาที สัปดาห์ละ 4 วัน",
+     "expect": "workout-plan",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 18.82,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 227,
+      "prompt_ms": 12321.886,
+      "prompt_per_token_ms": 54.28143612334802,
+      "prompt_per_second": 18.42250447699321,
+      "predicted_n": 41,
+      "predicted_ms": 6485.222,
+      "predicted_per_token_ms": 162.13055,
+      "predicted_per_second": 6.167869041337367
+     },
+     "raw_tool": "workout-plan",
+     "forced": true,
+     "got": "workout-plan",
+     "ok": true
+    },
+    {
+     "id": "u006",
+     "text": "นั่งทำงานทั้งวันจนบ่ากับคอตึงมาก มีท่ายืดอะไรแนะนำบ้าง",
+     "expect": "stretch-routine",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.84,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 135,
+      "prompt_ms": 7172.947,
+      "prompt_per_token_ms": 53.13294074074074,
+      "prompt_per_second": 18.820716227235472,
+      "predicted_n": 30,
+      "predicted_ms": 4655.718,
+      "predicted_per_token_ms": 160.542,
+      "predicted_per_second": 6.228899602596205
+     },
+     "raw_tool": "stretch-routine",
+     "forced": true,
+     "got": "stretch-routine",
+     "ok": true
+    },
+    {
+     "id": "u007",
+     "text": "โดนน้ำมันร้อนลวกมือ ต้องปฐมพยาบาลยังไงก่อน",
+     "expect": "first-aid-info",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 13.6,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 157,
+      "prompt_ms": 8276.099,
+      "prompt_per_token_ms": 52.714006369426755,
+      "prompt_per_second": 18.97029022973263,
+      "predicted_n": 34,
+      "predicted_ms": 5311.227,
+      "predicted_per_token_ms": 160.9462727272727,
+      "predicted_per_second": 6.213253547626565
+     },
+     "raw_tool": "first-aid-info",
+     "forced": true,
+     "got": "first-aid-info",
+     "ok": true
+    },
+    {
+     "id": "u008",
+     "text": "พาฝึกหายใจคลายเครียดสัก 5 นาทีหน่อย",
+     "expect": "meditation-guide",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.73,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 129,
+      "prompt_ms": 6779.266,
+      "prompt_per_token_ms": 52.552449612403095,
+      "prompt_per_second": 19.028608701886014,
+      "predicted_n": 23,
+      "predicted_ms": 3933.654,
+      "predicted_per_token_ms": 178.80245454545454,
+      "predicted_per_second": 5.5927643864966265
+     },
+     "raw_tool": "meditation-guide",
+     "forced": true,
+     "got": "meditation-guide",
+     "ok": true
+    },
+    {
+     "id": "u009",
+     "text": "เงินเดือน 18,000 ควรแบ่งเป็นค่ากิน ค่าเช่า ค่าเดินทาง แล้วเก็บเท่าไหร่ดี",
+     "expect": "budget-advice",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 29.63,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 35,
+      "prompt_ms": 2004.014,
+      "prompt_per_token_ms": 57.25754285714285,
+      "prompt_per_second": 17.464947849665723,
+      "predicted_n": 48,
+      "predicted_ms": 7643.837,
+      "predicted_per_token_ms": 162.63482978723405,
+      "predicted_per_second": 6.148744406768485
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 19.97,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 228,
+       "prompt_ms": 12268.204,
+       "prompt_per_token_ms": 53.80791228070175,
+       "prompt_per_second": 18.58462738311166,
+       "predicted_n": 48,
+       "predicted_ms": 7687.766,
+       "predicted_per_token_ms": 163.56948936170213,
+       "predicted_per_second": 6.113609597378485
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u010",
+     "text": "อยากเก็บเงินให้ได้ 60,000 บาทภายในปีครึ่ง ต้องออมเดือนละเท่าไหร่",
+     "expect": "saving-goal",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 16.62,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 231,
+      "prompt_ms": 12668.773,
+      "prompt_per_token_ms": 54.84317316017316,
+      "prompt_per_second": 18.233810014592574,
+      "predicted_n": 25,
+      "predicted_ms": 3940.02,
+      "predicted_per_token_ms": 164.1675,
+      "predicted_per_second": 6.091339637869858
+     },
+     "raw_tool": "saving-goal",
+     "forced": true,
+     "got": "saving-goal",
+     "ok": true
+    },
+    {
+     "id": "u011",
+     "text": "จะไปซื้อมอเตอร์ไซค์มือสอง ควรพูดต่อราคากับคนขายยังไงให้ไม่เสียมารยาท",
+     "expect": "negotiation-tip",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 9.07,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 142,
+      "prompt_ms": 7605.645,
+      "prompt_per_token_ms": 53.560880281690146,
+      "prompt_per_second": 18.67034288347668,
+      "predicted_n": 10,
+      "predicted_ms": 1453.219,
+      "predicted_per_token_ms": 161.46877777777777,
+      "predicted_per_second": 6.193147763688749
+     },
+     "raw_tool": "negotiation-tip",
+     "forced": true,
+     "got": "negotiation-tip",
+     "ok": true
+    },
+    {
+     "id": "u012",
+     "text": "วางแผนเที่ยวเชียงใหม่ 3 วัน 2 คืนให้หน่อย แยกเป็นรายวัน",
+     "expect": "travel-itinerary",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 19.43,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 294,
+      "prompt_ms": 15972.821,
+      "prompt_per_token_ms": 54.3293231292517,
+      "prompt_per_second": 18.406266494816414,
+      "predicted_n": 22,
+      "predicted_ms": 3437.687,
+      "predicted_per_token_ms": 163.69938095238095,
+      "predicted_per_second": 6.10875859262347
+     },
+     "raw_tool": "travel-itinerary",
+     "forced": true,
+     "got": "travel-itinerary",
+     "ok": true
+    },
+    {
+     "id": "u013",
+     "text": "ลูกหมาอายุ 2 เดือน ควรให้อาหารวันละกี่มื้อ ต้องฉีดวัคซีนอะไรบ้าง",
+     "expect": "dog-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 32.1,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 36,
+      "prompt_ms": 1971.802,
+      "prompt_per_token_ms": 54.772277777777774,
+      "prompt_per_second": 18.257411241088104,
+      "predicted_n": 40,
+      "predicted_ms": 6306.857,
+      "predicted_per_token_ms": 161.71428205128205,
+      "predicted_per_second": 6.183745723107405
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 23.81,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 296,
+       "prompt_ms": 16091.936,
+       "prompt_per_token_ms": 54.36464864864865,
+       "prompt_per_second": 18.39430631590879,
+       "predicted_n": 48,
+       "predicted_ms": 7704.952,
+       "predicted_per_token_ms": 163.9351489361702,
+       "predicted_per_second": 6.099973108203659
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u014",
+     "text": "แมวที่บ้านชอบข่วนโซฟา แก้ยังไงดีครับ",
+     "expect": "cat-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 8.77,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 19,
+      "prompt_ms": 1132.215,
+      "prompt_per_token_ms": 59.59026315789473,
+      "prompt_per_second": 16.781265042416855,
+      "predicted_n": 48,
+      "predicted_ms": 7621.545,
+      "predicted_per_token_ms": 162.16053191489362,
+      "predicted_per_second": 6.166728661970769
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u015",
+     "text": "ต้นมอนสเตอร่าใบเหลือง ต้องรดน้ำบ่อยแค่ไหน วางตรงไหนดี",
+     "expect": "plant-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 25.1,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 33,
+      "prompt_ms": 1838.191,
+      "prompt_per_token_ms": 55.70275757575757,
+      "prompt_per_second": 17.952432581815494,
+      "predicted_n": 48,
+      "predicted_ms": 7624.064,
+      "predicted_per_token_ms": 162.21412765957447,
+      "predicted_per_second": 6.164691167335427
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.63,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 149,
+       "prompt_ms": 8033.415,
+       "prompt_per_token_ms": 53.915536912751676,
+       "prompt_per_second": 18.547529288602668,
+       "predicted_n": 48,
+       "predicted_ms": 7582.393,
+       "predicted_per_token_ms": 161.32751063829787,
+       "predicted_per_second": 6.19857082058395
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u016",
+     "text": "ช่วยคิดของขวัญวันเกิดให้แม่ งบไม่เกิน 1,500 บาท",
+     "expect": "gift-idea",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 16.59,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 154,
+      "prompt_ms": 8223.797,
+      "prompt_per_token_ms": 53.40127922077922,
+      "prompt_per_second": 18.726143167201233,
+      "predicted_n": 48,
+      "predicted_ms": 8349.106,
+      "predicted_per_token_ms": 177.64055319148935,
+      "predicted_per_second": 5.629345225704405
+     },
+     "raw_tool": "gift-idea",
+     "forced": true,
+     "got": "gift-idea",
+     "ok": true
+    },
+    {
+     "id": "u017",
+     "text": "git rebase กับ git merge ต่างกันยังไง ควรใช้ตอนไหน",
+     "expect": "git-command-help",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 23.62,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 24,
+      "prompt_ms": 1334.987,
+      "prompt_per_token_ms": 55.62445833333334,
+      "prompt_per_second": 17.97770315366367,
+      "predicted_n": 48,
+      "predicted_ms": 7630.416,
+      "predicted_per_token_ms": 162.3492765957447,
+      "predicted_per_second": 6.159559321536336
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 14.64,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 132,
+       "prompt_ms": 7040.633,
+       "prompt_per_token_ms": 53.33812878787879,
+       "prompt_per_second": 18.748314249585228,
+       "predicted_n": 48,
+       "predicted_ms": 7588.142,
+       "predicted_per_token_ms": 161.44982978723405,
+       "predicted_per_second": 6.19387460065982
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u018",
+     "text": "ฟังก์ชันที่คำนวณภาษีจากยอดขายรวม ควรตั้งชื่อว่าอะไรดี",
+     "expect": "var-naming",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 24.66,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 29,
+      "prompt_ms": 1636.169,
+      "prompt_per_token_ms": 56.419620689655176,
+      "prompt_per_second": 17.724330432858707,
+      "predicted_n": 48,
+      "predicted_ms": 7600.992,
+      "predicted_per_token_ms": 161.7232340425532,
+      "predicted_per_second": 6.183403429447103
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.41,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 146,
+       "prompt_ms": 7837.523,
+       "prompt_per_token_ms": 53.681664383561646,
+       "prompt_per_second": 18.628334487822237,
+       "predicted_n": 48,
+       "predicted_ms": 7560.889,
+       "predicted_per_token_ms": 160.86997872340424,
+       "predicted_per_second": 6.216200237829176
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u019",
+     "text": "ขอแบบฝึกหัด present perfect 10 ข้อพร้อมเฉลย",
+     "expect": "grammar-practice",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 9.35,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 129,
+      "prompt_ms": 6919.41,
+      "prompt_per_token_ms": 53.638837209302324,
+      "prompt_per_second": 18.643208019180825,
+      "predicted_n": 16,
+      "predicted_ms": 2419.754,
+      "predicted_per_token_ms": 161.31693333333334,
+      "predicted_per_second": 6.198977251406548
+     },
+     "raw_tool": "grammar-practice",
+     "forced": true,
+     "got": "grammar-practice",
+     "ok": true
+    },
+    {
+     "id": "u020",
+     "text": "สอนผูกเงื่อนบ่วงสายธนูหน่อย",
+     "expect": "knot-tying",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.71,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 131,
+      "prompt_ms": 6969.921,
+      "prompt_per_token_ms": 53.20550381679389,
+      "prompt_per_second": 18.795048035695096,
+      "predicted_n": 24,
+      "predicted_ms": 3725.848,
+      "predicted_per_token_ms": 161.99339130434782,
+      "predicted_per_second": 6.173091333838633
+     },
+     "raw_tool": "knot-tying",
+     "forced": true,
+     "got": "knot-tying",
+     "ok": true
+    },
+    {
+     "id": "u021",
+     "text": "คืนนี้หลานจะมานอนค้าง อยากได้เรื่องเล่าก่อนนอนเกี่ยวกับกระต่ายที่ไม่ยอมแบ่งแครอทให้เพื่อน สอนให้รู้จักแบ่งปัน",
+     "expect": "kids-story",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 21.81,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 314,
+      "prompt_ms": 17058.692,
+      "prompt_per_token_ms": 54.32704458598726,
+      "prompt_per_second": 18.407038476338048,
+      "predicted_n": 30,
+      "predicted_ms": 4734.734,
+      "predicted_per_token_ms": 163.26668965517243,
+      "predicted_per_second": 6.12494809634501
+     },
+     "raw_tool": "kids-story",
+     "forced": true,
+     "got": "kids-story",
+     "ok": true
+    },
+    {
+     "id": "u022",
+     "text": "เสาร์นี้จะเล่นเกมทายกันในวงเพื่อน ขอสัก 10 ข้อเรื่องอวกาศ แล้วบอกคำตอบไว้ด้วย",
+     "expect": "trivia-quiz",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 28.67,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 38,
+      "prompt_ms": 2116.819,
+      "prompt_per_token_ms": 55.70576315789474,
+      "prompt_per_second": 17.951463965506733,
+      "predicted_n": 48,
+      "predicted_ms": 7596.737,
+      "predicted_per_token_ms": 161.63270212765957,
+      "predicted_per_second": 6.186866808736435
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 18.94,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 213,
+       "prompt_ms": 11298.732,
+       "prompt_per_token_ms": 53.04569014084507,
+       "prompt_per_second": 18.851672913385325,
+       "predicted_n": 48,
+       "predicted_ms": 7631.863,
+       "predicted_per_token_ms": 162.38006382978725,
+       "predicted_per_second": 6.15839147007749
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u023",
+     "text": "การบ้านลูกถามว่า รถไฟวิ่ง 80 กิโลต่อชั่วโมง ไป 240 กิโลใช้กี่ชั่วโมง ช่วยไล่ให้ดูหน่อยว่าคิดยังไง ลูกจะได้เข้าใจ",
+     "expect": "math-explain",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 10.25,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 48,
+      "prompt_ms": 2619.069,
+      "prompt_per_token_ms": 54.5639375,
+      "prompt_per_second": 18.327123111304054,
+      "predicted_n": 48,
+      "predicted_ms": 7618.735,
+      "predicted_per_token_ms": 162.10074468085105,
+      "predicted_per_second": 6.169003121909346
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u024",
+     "text": "อาทิตย์หน้าต้องขึ้นเวทีถกกันเรื่องควรยกเลิกชุดนักเรียนไหม ยังไม่รู้ว่าจะได้ข้างไหน อยากได้เหตุผลไว้ทั้งสองทาง",
+     "expect": "debate-points",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 26.87,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 45,
+      "prompt_ms": 2389.972,
+      "prompt_per_token_ms": 53.110488888888895,
+      "prompt_per_second": 18.828672469802992,
+      "predicted_n": 48,
+      "predicted_ms": 7618.62,
+      "predicted_per_token_ms": 162.09829787234042,
+      "predicted_per_second": 6.1690962405265
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 16.85,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 167,
+       "prompt_ms": 8936.555,
+       "prompt_per_token_ms": 53.51230538922156,
+       "prompt_per_second": 18.687290572261904,
+       "predicted_n": 48,
+       "predicted_ms": 7899.0,
+       "predicted_per_token_ms": 168.06382978723406,
+       "predicted_per_second": 5.950120268388404
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u025",
+     "text": "พรุ่งนี้ต้องออกไปพรีเซนต์งานกลุ่มเรื่องขยะพลาสติกต่อหน้าเพื่อนประมาณ 3 นาที ช่วยเขียนสิ่งที่จะพูดให้หน่อย",
+     "expect": "speech-draft",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 23.73,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 309,
+      "prompt_ms": 16554.854,
+      "prompt_per_token_ms": 53.575579288025885,
+      "prompt_per_second": 18.665220484578118,
+      "predicted_n": 45,
+      "predicted_ms": 7162.344,
+      "predicted_per_token_ms": 162.78054545454546,
+      "predicted_per_second": 6.1432402576586655
+     },
+     "raw_tool": "speech-draft",
+     "forced": true,
+     "got": "speech-draft",
+     "ok": true
+    },
+    {
+     "id": "u026",
+     "text": "อยากทำนกกระเรียนจากกระดาษสี่เหลี่ยมให้ลูกดู ทำทีละสเต็ปยังไง",
+     "expect": "origami-guide",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 10.6,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 146,
+      "prompt_ms": 7732.092,
+      "prompt_per_token_ms": 52.95953424657534,
+      "prompt_per_second": 18.882341286161626,
+      "predicted_n": 19,
+      "predicted_ms": 2858.567,
+      "predicted_per_token_ms": 158.80927777777777,
+      "predicted_per_second": 6.2968613294703255
+     },
+     "raw_tool": "origami-guide",
+     "forced": true,
+     "got": "origami-guide",
+     "ok": true
+    },
+    {
+     "id": "u027",
+     "text": "ทำไมบางวันฟ้าแลบแต่ไม่มีเสียงฟ้าร้องตามมาเลย",
+     "expect": "weather-explain",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.02,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 26,
+      "prompt_ms": 1453.327,
+      "prompt_per_token_ms": 55.89719230769231,
+      "prompt_per_second": 17.889986217829847,
+      "predicted_n": 48,
+      "predicted_ms": 7551.19,
+      "predicted_per_token_ms": 160.6636170212766,
+      "predicted_per_second": 6.2241845325041485
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u028",
+     "text": "เพิ่งซื้อโปร่งตัวแรกมา นิ้วยังกดไม่เป็นเลย อยากเล่นเพลงง่าย ๆ ได้สักเพลง เริ่มจากตรงไหนดี",
+     "expect": "guitar-chord",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 22.1,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 38,
+      "prompt_ms": 2056.633,
+      "prompt_per_token_ms": 54.12192105263157,
+      "prompt_per_second": 18.47680164618578,
+      "predicted_n": 34,
+      "predicted_ms": 5297.645,
+      "predicted_per_token_ms": 160.534696969697,
+      "predicted_per_second": 6.22918296714861
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 14.73,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 134,
+       "prompt_ms": 7254.088,
+       "prompt_per_token_ms": 54.13498507462686,
+       "prompt_per_second": 18.47234276727826,
+       "predicted_n": 48,
+       "predicted_ms": 7466.209,
+       "predicted_per_token_ms": 158.85551063829786,
+       "predicted_per_second": 6.2950287086793315
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u029",
+     "text": "ครูบอกว่าตัวหนังสือในสมุดผมอ่านไม่ออก อยากเขียนให้เป็นระเบียบกว่านี้ ต้องซ้อมแบบไหน",
+     "expect": "handwriting-tips",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.34,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 149,
+      "prompt_ms": 7896.783,
+      "prompt_per_token_ms": 52.99854362416107,
+      "prompt_per_second": 18.86844301027393,
+      "predicted_n": 10,
+      "predicted_ms": 1434.642,
+      "predicted_per_token_ms": 159.40466666666669,
+      "predicted_per_second": 6.273342060249177
+     },
+     "raw_tool": "handwriting-tips",
+     "forced": true,
+     "got": "handwriting-tips",
+     "ok": true
+    },
+    {
+     "id": "u030",
+     "text": "คอนโดห้องเดียว 24 ตารางเมตร มีเตียง โต๊ะทำงาน ตู้เสื้อผ้า วางยังไงให้ดูโล่งไม่อึดอัด",
+     "expect": "interior-decor",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 38.12,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 45,
+      "prompt_ms": 2415.493,
+      "prompt_per_token_ms": 53.67762222222222,
+      "prompt_per_second": 18.62973728344483,
+      "predicted_n": 48,
+      "predicted_ms": 7542.701,
+      "predicted_per_token_ms": 160.483,
+      "predicted_per_second": 6.23118959640585
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 28.15,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 381,
+       "prompt_ms": 20507.447,
+       "prompt_per_token_ms": 53.82532020997375,
+       "prompt_per_second": 18.578616831241842,
+       "predicted_n": 48,
+       "predicted_ms": 7626.759,
+       "predicted_per_token_ms": 162.2714680851064,
+       "predicted_per_second": 6.162512805242699
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u031",
+     "text": "ป้ายเสื้อตัวใหม่มีรูปถังน้ำกับมือจุ่มอยู่ แล้วก็สามเหลี่ยมโดนกากบาท แปลว่าห้ามทำอะไร",
+     "expect": "laundry-guide",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 25.41,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 41,
+      "prompt_ms": 2229.089,
+      "prompt_per_token_ms": 54.3680243902439,
+      "prompt_per_second": 18.39316420295466,
+      "predicted_n": 48,
+      "predicted_ms": 7592.923,
+      "predicted_per_token_ms": 161.55155319148935,
+      "predicted_per_second": 6.189974532864353
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.58,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 151,
+       "prompt_ms": 8023.401,
+       "prompt_per_token_ms": 53.1351059602649,
+       "prompt_per_second": 18.819949295816077,
+       "predicted_n": 48,
+       "predicted_ms": 7545.396,
+       "predicted_per_token_ms": 160.54034042553192,
+       "predicted_per_second": 6.228963993407371
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u032",
+     "text": "กระดุมเสื้อเชิ้ตหลุด แล้วตะเข็บกางเกงตรงเป้าก็ปริ มีแค่เข็มกับด้ายในบ้าน จัดการเองได้ไหม",
+     "expect": "sewing-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 30.25,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 47,
+      "prompt_ms": 2610.98,
+      "prompt_per_token_ms": 55.55276595744681,
+      "prompt_per_second": 18.000903875173307,
+      "predicted_n": 48,
+      "predicted_ms": 7558.158,
+      "predicted_per_token_ms": 160.81187234042554,
+      "predicted_per_second": 6.218446346318772
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 20.07,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 230,
+       "prompt_ms": 12407.972,
+       "prompt_per_token_ms": 53.94770434782608,
+       "prompt_per_second": 18.536469940454413,
+       "predicted_n": 48,
+       "predicted_ms": 7651.413,
+       "predicted_per_token_ms": 162.79602127659572,
+       "predicted_per_second": 6.1426562649277985
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u033",
+     "text": "ปั่นไปแล้วโซ่หลุดบ่อยมาก แถมเวลาเปลี่ยนเกียร์มีเสียงแกรก ๆ ต้องปรับตรงไหน",
+     "expect": "bike-repair",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.32,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 31,
+      "prompt_ms": 1753.026,
+      "prompt_per_token_ms": 56.54922580645162,
+      "prompt_per_second": 17.68370805681148,
+      "predicted_n": 48,
+      "predicted_ms": 7558.977,
+      "predicted_per_token_ms": 160.82929787234042,
+      "predicted_per_second": 6.217772590126945
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u034",
+     "text": "วันหยุดจะไปนั่งริมบ่อเช็กอินหวังได้ปลานิลกลับบ้าน ควรใช้อะไรล่อ แล้วใช้คันแบบไหน",
+     "expect": "fishing-tips",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 13.88,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 161,
+      "prompt_ms": 8554.255,
+      "prompt_per_token_ms": 53.13201863354037,
+      "prompt_per_second": 18.82104286112584,
+      "predicted_n": 34,
+      "predicted_ms": 5307.444,
+      "predicted_per_token_ms": 160.83163636363636,
+      "predicted_per_second": 6.217682183740422
+     },
+     "raw_tool": "fishing-tips",
+     "forced": true,
+     "got": "fishing-tips",
+     "ok": true
+    },
+    {
+     "id": "u035",
+     "text": "ไปงานแต่งเพื่อนตอนกลางวัน อยากให้หน้าดูใส ๆ ฉ่ำ ๆ แบบสาวเกาหลี ไล่ลงเครื่องสำอางทีละอย่างยังไงดีคะ",
+     "expect": "makeup-look",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 25.52,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 47,
+      "prompt_ms": 2593.992,
+      "prompt_per_token_ms": 55.191319148936174,
+      "prompt_per_second": 18.11879142264124,
+      "predicted_n": 46,
+      "predicted_ms": 7260.758,
+      "predicted_per_token_ms": 161.3501777777778,
+      "predicted_per_second": 6.197700019750004
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.65,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 153,
+       "prompt_ms": 8087.05,
+       "prompt_per_token_ms": 52.856535947712416,
+       "prompt_per_second": 18.91913614977031,
+       "predicted_n": 48,
+       "predicted_ms": 7549.799,
+       "predicted_per_token_ms": 160.63402127659575,
+       "predicted_per_second": 6.2253312968994265
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u036",
+     "text": "หน้ากลมแก้มเยอะ ไว้ผมยาวประบ่า จะไปสัมภาษณ์งาน ควรเซ็ตผมแบบไหนให้หน้าดูเรียว",
+     "expect": "hairstyle-idea",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 17.32,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 220,
+      "prompt_ms": 11773.897,
+      "prompt_per_token_ms": 53.51771363636364,
+      "prompt_per_second": 18.6854021230184,
+      "predicted_n": 35,
+      "predicted_ms": 5528.044,
+      "predicted_per_token_ms": 162.58952941176472,
+      "predicted_per_second": 6.150457557863143
+     },
+     "raw_tool": "hairstyle-idea",
+     "forced": true,
+     "got": "hairstyle-idea",
+     "ok": true
+    },
+    {
+     "id": "u037",
+     "text": "อยากสเก็ตช์คนให้สัดส่วนไม่เพี้ยน เป็นมือใหม่มาก ๆ ต้องฝึกจับดินสอยังไง เริ่มจากรูปทรงอะไรก่อน",
+     "expect": "drawing-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 19.94,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 228,
+      "prompt_ms": 12266.79,
+      "prompt_per_token_ms": 53.801710526315794,
+      "prompt_per_second": 18.586769643892165,
+      "predicted_n": 48,
+      "predicted_ms": 7659.812,
+      "predicted_per_token_ms": 162.97472340425531,
+      "predicted_per_second": 6.135920829388502
+     },
+     "raw_tool": "drawing-basic",
+     "forced": true,
+     "got": "drawing-basic",
+     "ok": true
+    },
+    {
+     "id": "u038",
+     "text": "เพื่อนชวนไปงานชิมเหล้าองุ่น ไม่รู้เรื่องเลยว่าแดงกับขาวต่างกันยังไง ต้องดม ต้องจิบยังไงไม่ให้เปิ่น",
+     "expect": "wine-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.64,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 158,
+      "prompt_ms": 8339.901,
+      "prompt_per_token_ms": 52.784183544303794,
+      "prompt_per_second": 18.945069012210098,
+      "predicted_n": 9,
+      "predicted_ms": 1287.217,
+      "predicted_per_token_ms": 160.902125,
+      "predicted_per_second": 6.214958317051437
+     },
+     "raw_tool": "wine-basic",
+     "forced": true,
+     "got": "wine-basic",
+     "ok": true
+    },
+    {
+     "id": "u039",
+     "text": "สิ้นเดือนจะเลี้ยงวันเกิดแฟนที่ห้อง คนมาราว 8 คน ต้องเตรียมกินอะไร เล่นอะไร ซื้ออะไรมาบ้าง ช่วยไล่ให้ทีครับ",
+     "expect": "party-plan",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 27.62,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 436,
+      "prompt_ms": 23668.289,
+      "prompt_per_token_ms": 54.28506651376147,
+      "prompt_per_second": 18.421272446014157,
+      "predicted_n": 25,
+      "predicted_ms": 3931.828,
+      "predicted_per_token_ms": 163.82616666666667,
+      "predicted_per_second": 6.104031000338773
+     },
+     "raw_tool": "party-plan",
+     "forced": true,
+     "got": "party-plan",
+     "ok": true
+    },
+    {
+     "id": "u040",
+     "text": "วันนี้เศร้า ๆ เหงา ๆ อยากดูอะไรที่ทำให้ร้องไห้ได้เต็มที่แล้วรู้สึกดีขึ้น มีเรื่องไหนบ้าง",
+     "expect": "movie-by-mood",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 25.56,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 39,
+      "prompt_ms": 2159.628,
+      "prompt_per_token_ms": 55.375076923076925,
+      "prompt_per_second": 18.05866565908573,
+      "predicted_n": 48,
+      "predicted_ms": 7576.879,
+      "predicted_per_token_ms": 161.2101914893617,
+      "predicted_per_second": 6.2030817702117185
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.81,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 155,
+       "prompt_ms": 8289.096,
+       "prompt_per_token_ms": 53.47803870967741,
+       "prompt_per_second": 18.699264672528827,
+       "predicted_n": 48,
+       "predicted_ms": 7511.612,
+       "predicted_per_token_ms": 159.82153191489363,
+       "predicted_per_second": 6.256979194346034
+      }
+     },
+     "got": "none",
+     "ok": false
+    }
+   ]
+  },
+  {
+   "correct": 23,
+   "total": 40,
+   "false_calls": 0,
+   "none_total": 0,
+   "by_kind": {
+    "direct": [
+     14,
+     20
+    ],
+    "paraphrase": [
+     9,
+     20
+    ]
+   },
+   "ai_asked": 40,
+   "ai_seconds_median": 18.24,
+   "ai_seconds_first": 14.09,
+   "ai_seconds_max": 38.18,
+   "mode": "ai-first",
+   "rows": [
+    {
+     "id": "u001",
+     "text": "ในตู้เย็นเหลือไข่ 3 ฟอง หมูสับนิดหน่อย กับผักกาดขาว ทำอะไรกินได้บ้าง",
+     "expect": "recipe-idea",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 14.09,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 157,
+      "prompt_ms": 8289.798,
+      "prompt_per_token_ms": 52.80126114649682,
+      "prompt_per_second": 18.93894157613973,
+      "predicted_n": 37,
+      "predicted_ms": 5786.8,
+      "predicted_per_token_ms": 160.74444444444444,
+      "predicted_per_second": 6.221054814405197
+     },
+     "raw_tool": "recipe-idea",
+     "forced": true,
+     "got": "recipe-idea",
+     "ok": true
+    },
+    {
+     "id": "u002",
+     "text": "สูตรเค้กบอกให้ใส่บัตเตอร์มิลค์ แต่บ้านไม่มี ใช้อะไรแทนได้ครับ",
+     "expect": "recipe-substitute",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.33,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 141,
+      "prompt_ms": 7465.26,
+      "prompt_per_token_ms": 52.94510638297872,
+      "prompt_per_second": 18.887486839038424,
+      "predicted_n": 25,
+      "predicted_ms": 3848.232,
+      "predicted_per_token_ms": 160.343,
+      "predicted_per_second": 6.236630223957391
+     },
+     "raw_tool": "recipe-substitute",
+     "forced": true,
+     "got": "recipe-substitute",
+     "ok": true
+    },
+    {
+     "id": "u003",
+     "text": "ข้าวมันไก่หนึ่งจานกี่แคลอรี่ประมาณ",
+     "expect": "calorie-estimate",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.33,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 142,
+      "prompt_ms": 7481.427,
+      "prompt_per_token_ms": 52.68610563380282,
+      "prompt_per_second": 18.9803362379931,
+      "predicted_n": 25,
+      "predicted_ms": 3836.816,
+      "predicted_per_token_ms": 159.86733333333333,
+      "predicted_per_second": 6.255186592216046
+     },
+     "raw_tool": "calorie-estimate",
+     "forced": true,
+     "got": "calorie-estimate",
+     "ok": true
+    },
+    {
+     "id": "u004",
+     "text": "เพิ่งซื้อ moka pot มา ต้องใส่ผงกาแฟกี่กรัม น้ำเท่าไหร่ ทำยังไงคะ",
+     "expect": "coffee-brew",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 25.04,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 35,
+      "prompt_ms": 1963.012,
+      "prompt_per_token_ms": 56.08605714285714,
+      "prompt_per_second": 17.82974327207373,
+      "predicted_n": 48,
+      "predicted_ms": 7522.078,
+      "predicted_per_token_ms": 160.04421276595747,
+      "predicted_per_second": 6.248273415936394
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.54,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 152,
+       "prompt_ms": 7994.554,
+       "prompt_per_token_ms": 52.59575,
+       "prompt_per_second": 19.012943060988768,
+       "predicted_n": 48,
+       "predicted_ms": 7536.568,
+       "predicted_per_token_ms": 160.35251063829787,
+       "predicted_per_second": 6.236260324327997
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u005",
+     "text": "ช่วยจัดตารางออกกำลังกายลดไขมันให้หน่อย ว่างวันละ 30 นาที สัปดาห์ละ 4 วัน",
+     "expect": "workout-plan",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 19.2,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 227,
+      "prompt_ms": 12240.457,
+      "prompt_per_token_ms": 53.92271806167401,
+      "prompt_per_second": 18.545059224504442,
+      "predicted_n": 43,
+      "predicted_ms": 6942.19,
+      "predicted_per_token_ms": 165.2902380952381,
+      "predicted_per_second": 6.049964060332546
+     },
+     "raw_tool": "workout-plan",
+     "forced": true,
+     "got": "workout-plan",
+     "ok": true
+    },
+    {
+     "id": "u006",
+     "text": "นั่งทำงานทั้งวันจนบ่ากับคอตึงมาก มีท่ายืดอะไรแนะนำบ้าง",
+     "expect": "stretch-routine",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 23.85,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 29,
+      "prompt_ms": 1605.522,
+      "prompt_per_token_ms": 55.3628275862069,
+      "prompt_per_second": 18.062661240394092,
+      "predicted_n": 48,
+      "predicted_ms": 7562.822,
+      "predicted_per_token_ms": 160.91110638297872,
+      "predicted_per_second": 6.214611424148288
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 14.67,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 135,
+       "prompt_ms": 7149.152,
+       "prompt_per_token_ms": 52.95668148148148,
+       "prompt_per_second": 18.883358473844172,
+       "predicted_n": 48,
+       "predicted_ms": 7506.938,
+       "predicted_per_token_ms": 159.722085106383,
+       "predicted_per_second": 6.260874939955545
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u007",
+     "text": "โดนน้ำมันร้อนลวกมือ ต้องปฐมพยาบาลยังไงก่อน",
+     "expect": "first-aid-info",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.06,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 160,
+      "prompt_ms": 8441.089,
+      "prompt_per_token_ms": 52.75680625,
+      "prompt_per_second": 18.954900250429773,
+      "predicted_n": 11,
+      "predicted_ms": 1604.533,
+      "predicted_per_token_ms": 160.45329999999998,
+      "predicted_per_second": 6.2323429932572285
+     },
+     "raw_tool": "first-aid-info",
+     "forced": true,
+     "got": "first-aid-info",
+     "ok": true
+    },
+    {
+     "id": "u008",
+     "text": "พาฝึกหายใจคลายเครียดสัก 5 นาทีหน่อย",
+     "expect": "meditation-guide",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.63,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 129,
+      "prompt_ms": 6755.539,
+      "prompt_per_token_ms": 52.36851937984496,
+      "prompt_per_second": 19.095441533236652,
+      "predicted_n": 25,
+      "predicted_ms": 3861.527,
+      "predicted_per_token_ms": 160.89695833333334,
+      "predicted_per_second": 6.215157889612062
+     },
+     "raw_tool": "meditation-guide",
+     "forced": true,
+     "got": "meditation-guide",
+     "ok": true
+    },
+    {
+     "id": "u009",
+     "text": "เงินเดือน 18,000 ควรแบ่งเป็นค่ากิน ค่าเช่า ค่าเดินทาง แล้วเก็บเท่าไหร่ดี",
+     "expect": "budget-advice",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 29.43,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 35,
+      "prompt_ms": 1953.996,
+      "prompt_per_token_ms": 55.82845714285715,
+      "prompt_per_second": 17.912012102378917,
+      "predicted_n": 48,
+      "predicted_ms": 7544.12,
+      "predicted_per_token_ms": 160.5131914893617,
+      "predicted_per_second": 6.230017550091992
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 19.92,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 228,
+       "prompt_ms": 12282.144,
+       "prompt_per_token_ms": 53.869052631578946,
+       "prompt_per_second": 18.563534184259687,
+       "predicted_n": 48,
+       "predicted_ms": 7620.374,
+       "predicted_per_token_ms": 162.1356170212766,
+       "predicted_per_second": 6.167676284654795
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u010",
+     "text": "อยากเก็บเงินให้ได้ 60,000 บาทภายในปีครึ่ง ต้องออมเดือนละเท่าไหร่",
+     "expect": "saving-goal",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 16.41,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 231,
+      "prompt_ms": 12470.704,
+      "prompt_per_token_ms": 53.9857316017316,
+      "prompt_per_second": 18.52341295246844,
+      "predicted_n": 25,
+      "predicted_ms": 3929.064,
+      "predicted_per_token_ms": 163.71099999999998,
+      "predicted_per_second": 6.108325036191825
+     },
+     "raw_tool": "saving-goal",
+     "forced": true,
+     "got": "saving-goal",
+     "ok": true
+    },
+    {
+     "id": "u011",
+     "text": "จะไปซื้อมอเตอร์ไซค์มือสอง ควรพูดต่อราคากับคนขายยังไงให้ไม่เสียมารยาท",
+     "expect": "negotiation-tip",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 8.97,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 142,
+      "prompt_ms": 7490.986,
+      "prompt_per_token_ms": 52.753422535211264,
+      "prompt_per_second": 18.95611605735213,
+      "predicted_n": 10,
+      "predicted_ms": 1463.289,
+      "predicted_per_token_ms": 162.58766666666668,
+      "predicted_per_second": 6.15052802283076
+     },
+     "raw_tool": "negotiation-tip",
+     "forced": true,
+     "got": "negotiation-tip",
+     "ok": true
+    },
+    {
+     "id": "u012",
+     "text": "วางแผนเที่ยวเชียงใหม่ 3 วัน 2 คืนให้หน่อย แยกเป็นรายวัน",
+     "expect": "travel-itinerary",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 20.3,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 294,
+      "prompt_ms": 15755.532,
+      "prompt_per_token_ms": 53.59024489795918,
+      "prompt_per_second": 18.660112524286706,
+      "predicted_n": 29,
+      "predicted_ms": 4533.828,
+      "predicted_per_token_ms": 161.92242857142858,
+      "predicted_per_second": 6.175796699830695
+     },
+     "raw_tool": "travel-itinerary",
+     "forced": true,
+     "got": "travel-itinerary",
+     "ok": true
+    },
+    {
+     "id": "u013",
+     "text": "ลูกหมาอายุ 2 เดือน ควรให้อาหารวันละกี่มื้อ ต้องฉีดวัคซีนอะไรบ้าง",
+     "expect": "dog-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 18.24,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 296,
+      "prompt_ms": 15855.055,
+      "prompt_per_token_ms": 53.564375,
+      "prompt_per_second": 18.669124768094463,
+      "predicted_n": 14,
+      "predicted_ms": 2365.13,
+      "predicted_per_token_ms": 181.93307692307692,
+      "predicted_per_second": 5.496526617987172
+     },
+     "raw_tool": "dog-care",
+     "forced": true,
+     "got": "dog-care",
+     "ok": true
+    },
+    {
+     "id": "u014",
+     "text": "แมวที่บ้านชอบข่วนโซฟา แก้ยังไงดีครับ",
+     "expect": "cat-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 8.78,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 24,
+      "prompt_ms": 1299.613,
+      "prompt_per_token_ms": 54.15054166666667,
+      "prompt_per_second": 18.467035956088466,
+      "predicted_n": 48,
+      "predicted_ms": 7473.23,
+      "predicted_per_token_ms": 159.00489361702128,
+      "predicted_per_second": 6.28911461309233
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u015",
+     "text": "ต้นมอนสเตอร่าใบเหลือง ต้องรดน้ำบ่อยแค่ไหน วางตรงไหนดี",
+     "expect": "plant-care",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 24.72,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 33,
+      "prompt_ms": 1783.412,
+      "prompt_per_token_ms": 54.04278787878788,
+      "prompt_per_second": 18.503856652304684,
+      "predicted_n": 48,
+      "predicted_ms": 7547.115,
+      "predicted_per_token_ms": 160.57691489361702,
+      "predicted_per_second": 6.227545227547216
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.38,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 149,
+       "prompt_ms": 7832.264,
+       "prompt_per_token_ms": 52.565530201342284,
+       "prompt_per_second": 19.023873556866825,
+       "predicted_n": 48,
+       "predicted_ms": 7538.947,
+       "predicted_per_token_ms": 160.40312765957447,
+       "predicted_per_second": 6.234292401843387
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u016",
+     "text": "ช่วยคิดของขวัญวันเกิดให้แม่ งบไม่เกิน 1,500 บาท",
+     "expect": "gift-idea",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.87,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 154,
+      "prompt_ms": 8068.138,
+      "prompt_per_token_ms": 52.39050649350649,
+      "prompt_per_second": 19.087427607212472,
+      "predicted_n": 24,
+      "predicted_ms": 3783.945,
+      "predicted_per_token_ms": 164.51934782608697,
+      "predicted_per_second": 6.0783124490445815
+     },
+     "raw_tool": "gift-idea",
+     "forced": true,
+     "got": "gift-idea",
+     "ok": true
+    },
+    {
+     "id": "u017",
+     "text": "git rebase กับ git merge ต่างกันยังไง ควรใช้ตอนไหน",
+     "expect": "git-command-help",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 11.76,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 132,
+      "prompt_ms": 7137.781,
+      "prompt_per_token_ms": 54.074098484848484,
+      "prompt_per_second": 18.49314233653288,
+      "predicted_n": 30,
+      "predicted_ms": 4613.405,
+      "predicted_per_token_ms": 159.08293103448275,
+      "predicted_per_second": 6.2860295161599735
+     },
+     "raw_tool": "git-command-help",
+     "forced": true,
+     "got": "git-command-help",
+     "ok": true
+    },
+    {
+     "id": "u018",
+     "text": "ฟังก์ชันที่คำนวณภาษีจากยอดขายรวม ควรตั้งชื่อว่าอะไรดี",
+     "expect": "var-naming",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 24.51,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 29,
+      "prompt_ms": 1613.122,
+      "prompt_per_token_ms": 55.62489655172414,
+      "prompt_per_second": 17.977561523554943,
+      "predicted_n": 48,
+      "predicted_ms": 7586.548,
+      "predicted_per_token_ms": 161.415914893617,
+      "predicted_per_second": 6.1951759878142205
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.29,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 143,
+       "prompt_ms": 7691.842,
+       "prompt_per_token_ms": 53.78910489510489,
+       "prompt_per_second": 18.591125506738177,
+       "predicted_n": 48,
+       "predicted_ms": 7587.796,
+       "predicted_per_token_ms": 161.44246808510638,
+       "predicted_per_second": 6.194157038486538
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u019",
+     "text": "ขอแบบฝึกหัด present perfect 10 ข้อพร้อมเฉลย",
+     "expect": "grammar-practice",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 9.28,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 129,
+      "prompt_ms": 6876.68,
+      "prompt_per_token_ms": 53.307596899224805,
+      "prompt_per_second": 18.759052333393438,
+      "predicted_n": 16,
+      "predicted_ms": 2391.772,
+      "predicted_per_token_ms": 159.45146666666668,
+      "predicted_per_second": 6.271500795226301
+     },
+     "raw_tool": "grammar-practice",
+     "forced": true,
+     "got": "grammar-practice",
+     "ok": true
+    },
+    {
+     "id": "u020",
+     "text": "สอนผูกเงื่อนบ่วงสายธนูหน่อย",
+     "expect": "knot-tying",
+     "kind": "direct",
+     "by": "ai",
+     "seconds": 10.67,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 131,
+      "prompt_ms": 6972.621,
+      "prompt_per_token_ms": 53.226114503816795,
+      "prompt_per_second": 18.78777005088904,
+      "predicted_n": 24,
+      "predicted_ms": 3683.489,
+      "predicted_per_token_ms": 160.1516956521739,
+      "predicted_per_second": 6.244080001324831
+     },
+     "raw_tool": "knot-tying",
+     "forced": true,
+     "got": "knot-tying",
+     "ok": true
+    },
+    {
+     "id": "u021",
+     "text": "คืนนี้หลานจะมานอนค้าง อยากได้เรื่องเล่าก่อนนอนเกี่ยวกับกระต่ายที่ไม่ยอมแบ่งแครอทให้เพื่อน สอนให้รู้จักแบ่งปัน",
+     "expect": "kids-story",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 22.01,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 314,
+      "prompt_ms": 16945.096,
+      "prompt_per_token_ms": 53.96527388535032,
+      "prompt_per_second": 18.530435000191204,
+      "predicted_n": 32,
+      "predicted_ms": 5047.551,
+      "predicted_per_token_ms": 162.82422580645164,
+      "predicted_per_second": 6.141592229578264
+     },
+     "raw_tool": "kids-story",
+     "forced": true,
+     "got": "kids-story",
+     "ok": true
+    },
+    {
+     "id": "u022",
+     "text": "เสาร์นี้จะเล่นเกมทายกันในวงเพื่อน ขอสัก 10 ข้อเรื่องอวกาศ แล้วบอกคำตอบไว้ด้วย",
+     "expect": "trivia-quiz",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 28.69,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 38,
+      "prompt_ms": 2124.438,
+      "prompt_per_token_ms": 55.90626315789474,
+      "prompt_per_second": 17.887083548684405,
+      "predicted_n": 48,
+      "predicted_ms": 7594.157,
+      "predicted_per_token_ms": 161.5778085106383,
+      "predicted_per_second": 6.188968703175348
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 18.96,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 213,
+       "prompt_ms": 11239.432,
+       "prompt_per_token_ms": 52.76728638497653,
+       "prompt_per_second": 18.951135608988068,
+       "predicted_n": 48,
+       "predicted_ms": 7701.693,
+       "predicted_per_token_ms": 163.8658085106383,
+       "predicted_per_second": 6.102554334482041
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u023",
+     "text": "การบ้านลูกถามว่า รถไฟวิ่ง 80 กิโลต่อชั่วโมง ไป 240 กิโลใช้กี่ชั่วโมง ช่วยไล่ให้ดูหน่อยว่าคิดยังไง ลูกจะได้เข้าใจ",
+     "expect": "math-explain",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 10.23,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 48,
+      "prompt_ms": 2627.951,
+      "prompt_per_token_ms": 54.748979166666665,
+      "prompt_per_second": 18.26518074347657,
+      "predicted_n": 48,
+      "predicted_ms": 7594.486,
+      "predicted_per_token_ms": 161.58480851063828,
+      "predicted_per_second": 6.188700591455432
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u024",
+     "text": "อาทิตย์หน้าต้องขึ้นเวทีถกกันเรื่องควรยกเลิกชุดนักเรียนไหม ยังไม่รู้ว่าจะได้ข้างไหน อยากได้เหตุผลไว้ทั้งสองทาง",
+     "expect": "debate-points",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 26.6,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 45,
+      "prompt_ms": 2463.097,
+      "prompt_per_token_ms": 54.735488888888895,
+      "prompt_per_second": 18.269682436379888,
+      "predicted_n": 48,
+      "predicted_ms": 7570.722,
+      "predicted_per_token_ms": 161.0791914893617,
+      "predicted_per_second": 6.208126516863253
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 16.55,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 167,
+       "prompt_ms": 8953.604,
+       "prompt_per_token_ms": 53.614395209580834,
+       "prompt_per_second": 18.651707178472492,
+       "predicted_n": 48,
+       "predicted_ms": 7578.251,
+       "predicted_per_token_ms": 161.2393829787234,
+       "predicted_per_second": 6.2019587369170015
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u025",
+     "text": "พรุ่งนี้ต้องออกไปพรีเซนต์งานกลุ่มเรื่องขยะพลาสติกต่อหน้าเพื่อนประมาณ 3 นาที ช่วยเขียนสิ่งที่จะพูดให้หน่อย",
+     "expect": "speech-draft",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 24.23,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 309,
+      "prompt_ms": 16681.416,
+      "prompt_per_token_ms": 53.98516504854369,
+      "prompt_per_second": 18.523607348440922,
+      "predicted_n": 47,
+      "predicted_ms": 7531.172,
+      "predicted_per_token_ms": 163.7211304347826,
+      "predicted_per_second": 6.107947076497522
+     },
+     "raw_tool": "speech-draft",
+     "forced": true,
+     "got": "speech-draft",
+     "ok": true
+    },
+    {
+     "id": "u026",
+     "text": "อยากทำนกกระเรียนจากกระดาษสี่เหลี่ยมให้ลูกดู ทำทีละสเต็ปยังไง",
+     "expect": "origami-guide",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 10.67,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 146,
+      "prompt_ms": 7756.436,
+      "prompt_per_token_ms": 53.12627397260274,
+      "prompt_per_second": 18.823078021916253,
+      "predicted_n": 19,
+      "predicted_ms": 2894.952,
+      "predicted_per_token_ms": 160.83066666666667,
+      "predicted_per_second": 6.217719672036012
+     },
+     "raw_tool": "origami-guide",
+     "forced": true,
+     "got": "origami-guide",
+     "ok": true
+    },
+    {
+     "id": "u027",
+     "text": "ทำไมบางวันฟ้าแลบแต่ไม่มีเสียงฟ้าร้องตามมาเลย",
+     "expect": "weather-explain",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.03,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 26,
+      "prompt_ms": 1449.296,
+      "prompt_per_token_ms": 55.74215384615385,
+      "prompt_per_second": 17.93974453803778,
+      "predicted_n": 48,
+      "predicted_ms": 7568.49,
+      "predicted_per_token_ms": 161.03170212765957,
+      "predicted_per_second": 6.209957336271833
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u028",
+     "text": "เพิ่งซื้อโปร่งตัวแรกมา นิ้วยังกดไม่เป็นเลย อยากเล่นเพลงง่าย ๆ ได้สักเพลง เริ่มจากตรงไหนดี",
+     "expect": "guitar-chord",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 21.94,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 38,
+      "prompt_ms": 2089.001,
+      "prompt_per_token_ms": 54.97371052631579,
+      "prompt_per_second": 18.190513072995177,
+      "predicted_n": 33,
+      "predicted_ms": 5162.011,
+      "predicted_per_token_ms": 161.31284375,
+      "predicted_per_second": 6.199134407113816
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 14.68,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 134,
+       "prompt_ms": 7136.781,
+       "prompt_per_token_ms": 53.259559701492535,
+       "prompt_per_second": 18.77597196831457,
+       "predicted_n": 48,
+       "predicted_ms": 7530.849,
+       "predicted_per_token_ms": 160.23082978723406,
+       "predicted_per_second": 6.240996201092334
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u029",
+     "text": "ครูบอกว่าตัวหนังสือในสมุดผมอ่านไม่ออก อยากเขียนให้เป็นระเบียบกว่านี้ ต้องซ้อมแบบไหน",
+     "expect": "handwriting-tips",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 11.28,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 149,
+      "prompt_ms": 7904.577,
+      "prompt_per_token_ms": 53.05085234899329,
+      "prompt_per_second": 18.849838517608216,
+      "predicted_n": 22,
+      "predicted_ms": 3362.089,
+      "predicted_per_token_ms": 160.0994761904762,
+      "predicted_per_second": 6.24611662570503
+     },
+     "raw_tool": "handwriting-tips",
+     "forced": true,
+     "got": "handwriting-tips",
+     "ok": true
+    },
+    {
+     "id": "u030",
+     "text": "คอนโดห้องเดียว 24 ตารางเมตร มีเตียง โต๊ะทำงาน ตู้เสื้อผ้า วางยังไงให้ดูโล่งไม่อึดอัด",
+     "expect": "interior-decor",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 38.18,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 45,
+      "prompt_ms": 2441.305,
+      "prompt_per_token_ms": 54.25122222222222,
+      "prompt_per_second": 18.432764443607006,
+      "predicted_n": 48,
+      "predicted_ms": 7555.158,
+      "predicted_per_token_ms": 160.7480425531915,
+      "predicted_per_second": 6.220915565233712
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 28.17,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 381,
+       "prompt_ms": 20490.152,
+       "prompt_per_token_ms": 53.779926509186346,
+       "prompt_per_second": 18.59429837318923,
+       "predicted_n": 48,
+       "predicted_ms": 7665.467,
+       "predicted_per_token_ms": 163.0950425531915,
+       "predicted_per_second": 6.1313942125117755
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u031",
+     "text": "ป้ายเสื้อตัวใหม่มีรูปถังน้ำกับมือจุ่มอยู่ แล้วก็สามเหลี่ยมโดนกากบาท แปลว่าห้ามทำอะไร",
+     "expect": "laundry-guide",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 24.85,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 41,
+      "prompt_ms": 2266.728,
+      "prompt_per_token_ms": 55.2860487804878,
+      "prompt_per_second": 18.08774586099435,
+      "predicted_n": 44,
+      "predicted_ms": 6939.629,
+      "predicted_per_token_ms": 161.38672093023254,
+      "predicted_per_second": 6.1962966608157295
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.63,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 151,
+       "prompt_ms": 8075.708,
+       "prompt_per_token_ms": 53.48150993377483,
+       "prompt_per_second": 18.698050994414363,
+       "predicted_n": 48,
+       "predicted_ms": 7541.787,
+       "predicted_per_token_ms": 160.46355319148935,
+       "predicted_per_second": 6.231944763223888
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u032",
+     "text": "กระดุมเสื้อเชิ้ตหลุด แล้วตะเข็บกางเกงตรงเป้าก็ปริ มีแค่เข็มกับด้ายในบ้าน จัดการเองได้ไหม",
+     "expect": "sewing-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 30.57,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 47,
+      "prompt_ms": 2761.041,
+      "prompt_per_token_ms": 58.745553191489364,
+      "prompt_per_second": 17.022565039780286,
+      "predicted_n": 48,
+      "predicted_ms": 7592.422,
+      "predicted_per_token_ms": 161.54089361702125,
+      "predicted_per_second": 6.190382989775858
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 20.2,
+      "timings": {
+       "cache_n": 1062,
+       "prompt_n": 230,
+       "prompt_ms": 12521.62,
+       "prompt_per_token_ms": 54.441826086956524,
+       "prompt_per_second": 18.368230308857797,
+       "predicted_n": 48,
+       "predicted_ms": 7667.772,
+       "predicted_per_token_ms": 163.144085106383,
+       "predicted_per_second": 6.129551061246995
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u033",
+     "text": "ปั่นไปแล้วโซ่หลุดบ่อยมาก แถมเวลาเปลี่ยนเกียร์มีเสียงแกรก ๆ ต้องปรับตรงไหน",
+     "expect": "bike-repair",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.13,
+     "timings": {
+      "cache_n": 1067,
+      "prompt_n": 31,
+      "prompt_ms": 1722.13,
+      "prompt_per_token_ms": 55.55258064516129,
+      "prompt_per_second": 18.00096392258424,
+      "predicted_n": 48,
+      "predicted_ms": 7392.43,
+      "predicted_per_token_ms": 157.28574468085108,
+      "predicted_per_second": 6.357855265453984
+     },
+     "raw_tool": "",
+     "forced": false,
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u034",
+     "text": "วันหยุดจะไปนั่งริมบ่อเช็กอินหวังได้ปลานิลกลับบ้าน ควรใช้อะไรล่อ แล้วใช้คันแบบไหน",
+     "expect": "fishing-tips",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 12.51,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 161,
+      "prompt_ms": 8183.902,
+      "prompt_per_token_ms": 50.83168944099379,
+      "prompt_per_second": 19.67276734252194,
+      "predicted_n": 28,
+      "predicted_ms": 4315.99,
+      "predicted_per_token_ms": 159.85148148148147,
+      "predicted_per_second": 6.255806894825985
+     },
+     "raw_tool": "fishing-tips",
+     "forced": true,
+     "got": "fishing-tips",
+     "ok": true
+    },
+    {
+     "id": "u035",
+     "text": "ไปงานแต่งเพื่อนตอนกลางวัน อยากให้หน้าดูใส ๆ ฉ่ำ ๆ แบบสาวเกาหลี ไล่ลงเครื่องสำอางทีละอย่างยังไงดีคะ",
+     "expect": "makeup-look",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 24.84,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 47,
+      "prompt_ms": 2499.259,
+      "prompt_per_token_ms": 53.17572340425532,
+      "prompt_per_second": 18.805573972125337,
+      "predicted_n": 45,
+      "predicted_ms": 6991.873,
+      "predicted_per_token_ms": 158.90620454545453,
+      "predicted_per_second": 6.293020482494462
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.34,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 153,
+       "prompt_ms": 7828.659,
+       "prompt_per_token_ms": 51.16770588235294,
+       "prompt_per_second": 19.543577003417827,
+       "predicted_n": 48,
+       "predicted_ms": 7497.078,
+       "predicted_per_token_ms": 159.51229787234044,
+       "predicted_per_second": 6.269109111576537
+      }
+     },
+     "got": "none",
+     "ok": false
+    },
+    {
+     "id": "u036",
+     "text": "หน้ากลมแก้มเยอะ ไว้ผมยาวประบ่า จะไปสัมภาษณ์งาน ควรเซ็ตผมแบบไหนให้หน้าดูเรียว",
+     "expect": "hairstyle-idea",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 17.74,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 220,
+      "prompt_ms": 12082.121,
+      "prompt_per_token_ms": 54.91873181818181,
+      "prompt_per_second": 18.208723451784667,
+      "predicted_n": 36,
+      "predicted_ms": 5647.149,
+      "predicted_per_token_ms": 161.3471142857143,
+      "predicted_per_second": 6.197817695265345
+     },
+     "raw_tool": "hairstyle-idea",
+     "forced": true,
+     "got": "hairstyle-idea",
+     "ok": true
+    },
+    {
+     "id": "u037",
+     "text": "อยากสเก็ตช์คนให้สัดส่วนไม่เพี้ยน เป็นมือใหม่มาก ๆ ต้องฝึกจับดินสอยังไง เริ่มจากรูปทรงอะไรก่อน",
+     "expect": "drawing-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 19.8,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 228,
+      "prompt_ms": 12183.511,
+      "prompt_per_token_ms": 53.43645175438596,
+      "prompt_per_second": 18.713817388107582,
+      "predicted_n": 48,
+      "predicted_ms": 7601.669,
+      "predicted_per_token_ms": 161.73763829787234,
+      "predicted_per_second": 6.1828527393129065
+     },
+     "raw_tool": "drawing-basic",
+     "forced": true,
+     "got": "drawing-basic",
+     "ok": true
+    },
+    {
+     "id": "u038",
+     "text": "เพื่อนชวนไปงานชิมเหล้าองุ่น ไม่รู้เรื่องเลยว่าแดงกับขาวต่างกันยังไง ต้องดม ต้องจิบยังไงไม่ให้เปิ่น",
+     "expect": "wine-basic",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 9.62,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 158,
+      "prompt_ms": 8328.281,
+      "prompt_per_token_ms": 52.71063924050633,
+      "prompt_per_second": 18.971502042258177,
+      "predicted_n": 9,
+      "predicted_ms": 1276.358,
+      "predicted_per_token_ms": 159.54475,
+      "predicted_per_second": 6.267833946275261
+     },
+     "raw_tool": "wine-basic",
+     "forced": true,
+     "got": "wine-basic",
+     "ok": true
+    },
+    {
+     "id": "u039",
+     "text": "สิ้นเดือนจะเลี้ยงวันเกิดแฟนที่ห้อง คนมาราว 8 คน ต้องเตรียมกินอะไร เล่นอะไร ซื้ออะไรมาบ้าง ช่วยไล่ให้ทีครับ",
+     "expect": "party-plan",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 27.19,
+     "timings": {
+      "cache_n": 1065,
+      "prompt_n": 436,
+      "prompt_ms": 23274.43,
+      "prompt_per_token_ms": 53.38172018348624,
+      "prompt_per_second": 18.733004417294,
+      "predicted_n": 25,
+      "predicted_ms": 3897.607,
+      "predicted_per_token_ms": 162.40029166666667,
+      "predicted_per_second": 6.157624409028411
+     },
+     "raw_tool": "party-plan",
+     "forced": true,
+     "got": "party-plan",
+     "ok": true
+    },
+    {
+     "id": "u040",
+     "text": "วันนี้เศร้า ๆ เหงา ๆ อยากดูอะไรที่ทำให้ร้องไห้ได้เต็มที่แล้วรู้สึกดีขึ้น มีเรื่องไหนบ้าง",
+     "expect": "movie-by-mood",
+     "kind": "paraphrase",
+     "by": "ai",
+     "seconds": 25.35,
+     "timings": {
+      "cache_n": 1062,
+      "prompt_n": 39,
+      "prompt_ms": 2112.385,
+      "prompt_per_token_ms": 54.16371794871795,
+      "prompt_per_second": 18.46254352307936,
+      "predicted_n": 48,
+      "predicted_ms": 7539.597,
+      "predicted_per_token_ms": 160.4169574468085,
+      "predicted_per_second": 6.233754934116505
+     },
+     "raw_tool": "",
+     "forced": true,
+     "first": {
+      "seconds": 15.69,
+      "timings": {
+       "cache_n": 1065,
+       "prompt_n": 155,
+       "prompt_ms": 8154.684,
+       "prompt_per_token_ms": 52.610864516129034,
+       "prompt_per_second": 19.00748085394848,
+       "predicted_n": 48,
+       "predicted_ms": 7523.367,
+       "predicted_per_token_ms": 160.07163829787234,
+       "predicted_per_second": 6.247202881369471
+      }
+     },
+     "got": "none",
+     "ok": false
+    }
+   ]
+  }
+ ],
+ "label": "s2b-user50",
+ "method": "rules + AI",
+ "skills": [
+  "letter-writer",
+  "machine-status",
+  "reminder",
+  "spotify-voice",
+  "summarize-text",
+  "system-command",
+  "translate",
+  "youtube-voice"
+ ],
+ "server": {
+  "supports_tools": true,
+  "template_chars": 18807,
+  "template_sha256": "74a88f94c57c14e22dcdbe08e94127f42b87c6f584cb73838e73e32126f3f6b3",
+  "model": "/opt/aipc-models/gemma-4-E2B-it-Q4_K_M.gguf"
+ },
+ "dataset": "skill_guard_r2_s2b.json",
+ "user_skills": [
+  "recipe-idea",
+  "recipe-substitute",
+  "calorie-estimate",
+  "coffee-brew",
+  "food-pairing",
+  "workout-plan",
+  "stretch-routine",
+  "first-aid-info",
+  "sleep-tips",
+  "meditation-guide",
+  "budget-advice",
+  "saving-goal",
+  "negotiation-tip",
+  "travel-itinerary",
+  "dog-care",
+  "cat-care",
+  "plant-care",
+  "gift-idea",
+  "party-plan",
+  "outfit-suggest",
+  "movie-by-mood",
+  "git-command-help",
+  "var-naming",
+  "grammar-practice",
+  "kids-story",
+  "trivia-quiz",
+  "math-explain",
+  "debate-points",
+  "speech-draft",
+  "cleaning-mode",
+  "gaming-mode",
+  "news-briefing",
+  "wind-down",
+  "origami-guide",
+  "knot-tying",
+  "weather-explain",
+  "guitar-chord",
+  "handwriting-tips",
+  "interior-decor",
+  "laundry-guide",
+  "sewing-basic",
+  "bike-repair",
+  "fishing-tips",
+  "makeup-look",
+  "hairstyle-idea",
+  "drawing-basic",
+  "wine-basic",
+  "feng-shui",
+  "karaoke-mode",
+  "dance-practice"
+ ],
+ "user_pool_rejected": [
+  {
+   "id": "meal-plan-week",
+   "errors": [
+    "ตัวอย่าง “วางเมนูอาหารเย็นทั้งสัปดาห์” เป็นงานของสกิลเดิม (recipe-idea)",
+    "ตัวอย่าง “จัดเมนูสำหรับครอบครัว 4 คน” เป็นงานของสกิลเดิม (recipe-idea)"
+   ]
+  },
+  {
+   "id": "grocery-from-menu",
+   "errors": [
+    "ตัวอย่าง “ทำรายการซื้อของจากเมนูนี้” เป็นงานของสกิลเดิม (recipe-idea)"
+   ]
+  },
+  {
+   "id": "baking-convert",
+   "errors": [
+    "ตัวอย่าง “แปลงสูตรนี้เป็นกรัมให้หน่อย” เป็นงานของสกิลเดิม (recipe-substitute)"
+   ]
+  },
+  {
+   "id": "running-pace",
+   "errors": [
+    "แย่งประโยคของสกิลเดิม: ท่ายืดก่อนวิ่ง (เดิมคือ คุยทั่วไป)"
+   ]
+  },
+  {
+   "id": "skincare-routine",
+   "errors": [
+    "แย่งประโยคของสกิลเดิม: เพลงก่อนหน้า (เดิมคือ คุยทั่วไป)",
+    "แย่งประโยคของสกิลเดิม: กรอไปข้างหน้า (เดิมคือ คุยทั่วไป)",
+    "แย่งประโยคของสกิลเดิม: ข้ามไปข้างหน้า (เดิมคือ คุยทั่วไป)"
+   ]
+  },
+  {
+   "id": "expense-categorize",
+   "errors": [
+    "ตัวอย่าง “ค่ากาแฟค่าข้าวจัดหมวดไหน” เป็นงานของสกิลเดิม (coffee-brew)"
+   ]
+  },
+  {
+   "id": "packing-list",
+   "errors": [
+    "ตัวอย่าง “ลิสต์ของไปเที่ยวหน้าหนาว” เป็นงานของสกิลเดิม (travel-itinerary)"
+   ]
+  },
+  {
+   "id": "local-food-rec",
+   "errors": [
+    "ตัวอย่าง “เมนูเด็ดของอีสาน” เป็นงานของสกิลเดิม (recipe-idea)"
+   ]
+  },
+  {
+   "id": "pet-name",
+   "errors": [
+    "ตัวอย่าง “ตั้งชื่อแมวสีส้มให้หน่อย” เป็นงานของสกิลเดิม (cat-care)",
+    "ตัวอย่าง “ขอชื่อน้องหมาตัวเมีย” เป็นงานของสกิลเดิม (dog-care)"
+   ]
+  },
+  {
+   "id": "plant-diagnose",
+   "errors": [
+    "ตัวอย่าง “ต้นไม้เฉาทั้งที่รดน้ำแล้ว” เป็นงานของสกิลเดิม (plant-care)"
+   ]
+  },
+  {
+   "id": "color-palette",
+   "errors": [
+    "ตัวอย่าง “ขอชุดสีโทนอบอุ่นสำหรับร้านกาแฟ” เป็นงานของสกิลเดิม (coffee-brew)",
+    "ตัวอย่าง “โทนสีห้องนอนให้ผ่อนคลาย” เป็นงานของสกิลเดิม (meditation-guide)"
+   ]
+  },
+  {
+   "id": "book-recommend",
+   "errors": [
+    "ตัวอย่าง “แนะนำหนังสือพัฒนาตัวเอง” เป็นงานของสกิลเดิม (movie-by-mood)",
+    "ตัวอย่าง “หนังสือสำหรับมือใหม่ลงทุน” เป็นงานของสกิลเดิม (movie-by-mood)"
+   ]
+  },
+  {
+   "id": "playlist-idea",
+   "errors": [
+    "ตัวอย่าง “เพลงสำหรับปาร์ตี้” เป็นงานของสกิลเดิม (party-plan)"
+   ]
+  },
+  {
+   "id": "video-title-idea",
+   "errors": [
+    "ตัวอย่าง “คิดชื่อคลิปรีวิวร้านกาแฟ” เป็นงานของสกิลเดิม (coffee-brew)",
+    "ตัวอย่าง “ตั้งชื่อคลิป vlog เที่ยว” เป็นงานของสกิลเดิม (travel-itinerary)"
+   ]
+  },
+  {
+   "id": "product-desc",
+   "errors": [
+    "ตัวอย่าง “เขียนโพสต์ขายต้นไม้” เป็นงานของสกิลเดิม (plant-care)"
+   ]
+  },
+  {
+   "id": "coding-regex",
+   "errors": [
+    "ตัวอย่าง “regex นี้แปลว่าอะไร” เป็นงานของสกิลเดิม (translate)"
+   ]
+  },
+  {
+   "id": "excel-formula",
+   "errors": [
+    "ตัวอย่าง “รวมยอดเฉพาะเดือนนี้ใช้สูตรอะไร” เป็นงานของสกิลเดิม (recipe-substitute)"
+   ]
+  },
+  {
+   "id": "english-phrases",
+   "errors": [
+    "ตัวอย่าง “ประโยคสั่งอาหารเป็นภาษาอังกฤษ” เป็นงานของสกิลเดิม (calorie-estimate)"
+   ]
+  },
+  {
+   "id": "riddle-gen",
+   "errors": [
+    "ตัวอย่าง “ปริศนาสำหรับเด็ก” เป็นงานของสกิลเดิม (kids-story)"
+   ]
+  },
+  {
+   "id": "study-flashcard",
+   "errors": [
+    "ตัวอย่าง “สร้างคำถามท่องศัพท์” เป็นงานของสกิลเดิม (trivia-quiz)"
+   ]
+  },
+  {
+   "id": "habit-tracker",
+   "errors": [
+    "ตัวอย่าง “ช่วยวางแผนอ่านหนังสือทุกวัน” เป็นงานของสกิลเดิม (movie-by-mood)"
+   ]
+  },
+  {
+   "id": "workout-mode",
+   "errors": [
+    "ตัวอย่าง “เข้าโหมดออกกำลังกาย” เป็นงานของสกิลเดิม (workout-plan)",
+    "ตัวอย่าง “จะออกกำลังกายแล้ว” เป็นงานของสกิลเดิม (workout-plan)",
+    "ตัวอย่าง “เปิดโหมดฟิต” เป็นงานของสกิลเดิม (workout-plan)"
+   ]
+  },
+  {
+   "id": "cooking-mode",
+   "errors": [
+    "ตัวอย่าง “เข้าโหมดทำอาหาร” เป็นงานของสกิลเดิม (recipe-idea)"
+   ]
+  },
+  {
+   "id": "relax-evening",
+   "errors": [
+    "ตัวอย่าง “โหมดผ่อนคลาย” เป็นงานของสกิลเดิม (meditation-guide)"
+   ]
+  },
+  {
+   "id": "yoga-mode",
+   "errors": [
+    "ตัวอย่าง “เปิดโหมดยืดเหยียด” เป็นงานของสกิลเดิม (stretch-routine)"
+   ]
+  },
+  {
+   "id": "movie-solo",
+   "errors": [
+    "ตัวอย่าง “เข้าโหมดดูหนังคนเดียว” เป็นงานของสกิลเดิม (movie-by-mood)",
+    "ตัวอย่าง “อยากดูหนังเงียบ ๆ” เป็นงานของสกิลเดิม (movie-by-mood)",
+    "ตัวอย่าง “โหมดดูหนังส่วนตัว” เป็นงานของสกิลเดิม (movie-by-mood)"
+   ]
+  },
+  {
+   "id": "study-music",
+   "errors": [
+    "ตัวอย่าง “เข้าโหมดอ่านหนังสือมีเพลง” เป็นงานของสกิลเดิม (movie-by-mood)",
+    "ตัวอย่าง “เปิดเพลงตอนอ่านหนังสือ” เป็นงานของสกิลเดิม (movie-by-mood)"
+   ]
+  },
+  {
+   "id": "car-care",
+   "errors": [
+    "ตัวอย่าง “ไฟเตือนบนหน้าปัดคืออะไร” เป็นงานของสกิลเดิม (reminder)"
+   ]
+  },
+  {
+   "id": "photo-tips",
+   "errors": [
+    "ตัวอย่าง “ถ่ายอาหารให้น่ากินยังไง” เป็นงานของสกิลเดิม (calorie-estimate)"
+   ]
+  },
+  {
+   "id": "stargazing",
+   "errors": [
+    "ตัวอย่าง “เล่าเรื่องกลุ่มดาวนายพราน” เป็นงานของสกิลเดิม (kids-story)"
+   ]
+  },
+  {
+   "id": "chess-strategy",
+   "errors": [
+    "ตัวอย่าง “เปิดเกมหมากรุกยังไงดี” เป็นงานของสกิลเดิม (dog-care)"
+   ]
+  },
+  {
+   "id": "stain-removal",
+   "errors": [
+    "ตัวอย่าง “คราบกาแฟบนเสื้อออกยังไง” เป็นงานของสกิลเดิม (coffee-brew)"
+   ]
+  },
+  {
+   "id": "birdwatching",
+   "errors": [
+    "ตัวอย่าง “นกอะไรร้องตอนเช้ามืด” เป็นงานของสกิลเดิม (news-briefing)"
+   ]
+  },
+  {
+   "id": "rubiks-solve",
+   "errors": [
+    "ตัวอย่าง “สอนสูตรรูบิคชั้นแรก” เป็นงานของสกิลเดิม (recipe-substitute)",
+    "ตัวอย่าง “จำสูตรรูบิคไม่ได้ทำไง” เป็นงานของสกิลเดิม (recipe-substitute)"
+   ]
+  },
+  {
+   "id": "dream-meaning",
+   "errors": [
+    "ตัวอย่าง “ฝันว่าฟันหลุดหมายความว่าอะไร” เป็นงานของสกิลเดิม (dog-care)"
+   ]
+  },
+  {
+   "id": "baby-name",
+   "errors": [
+    "ตัวอย่าง “ขอชื่อลูกสาวความหมายดี ๆ” เป็นงานของสกิลเดิม (dog-care)"
+   ]
+  },
+  {
+   "id": "etiquette-guide",
+   "errors": [
+    "ตัวอย่าง “มารยาทบนโต๊ะอาหารฝรั่งมีอะไรบ้าง” เป็นงานของสกิลเดิม (calorie-estimate)",
+    "ตัวอย่าง “ไปงานเลี้ยงควรวางตัวยังไง” เป็นงานของสกิลเดิม (party-plan)"
+   ]
+  },
+  {
+   "id": "slang-explain",
+   "errors": [
+    "ตัวอย่าง “ตัวย่อ FYI หมายถึงอะไร” เป็นงานของสกิลเดิม (dog-care)"
+   ]
+  },
+  {
+   "id": "magic-trick",
+   "errors": [
+    "ตัวอย่าง “มายากลเล่นให้เด็กดู” เป็นงานของสกิลเดิม (kids-story)"
+   ]
+  }
+ ],
+ "machine": {
+  "board": "Raspberry Pi 5 Model B Rev 1.0",
+  "ram_mb": 8058,
+  "temp_c": 83.15,
+  "throttled": 917512,
+  "commit": "32ee01385a7599f4bf5d2d2ad71b6a5c02a8bbf9",
+  "dirty": true
+ }
+}

@@ -40,7 +40,7 @@ def tearDownModule():
 
 
 try:
-    from PySide6.QtCore import QCoreApplication, QEventLoop, QObject, QTimer
+    from PySide6.QtCore import Q_ARG, QCoreApplication, QEventLoop, QMetaObject, QObject, QTimer
 
     from aipc.ui import app as uiapp
 except ImportError:  # pragma: no cover
@@ -140,6 +140,40 @@ class ChatInputTest(unittest.TestCase):
             # ข้อความของผู้ใช้ 1 + ประกาศจากระบบว่ายังไม่มีโมเดล 1
             self.assertEqual(chat_list.property("count"), 2, "Enter ต้องส่ง")
             self.assertEqual(chat_input.property("text"), "")
+            self.assertEqual(warnings, [])
+            win.close()
+            uiapp.shutdown(engine)
+
+    def test_arrow_keys_choose_and_enter_answers_the_confirm_card(self):
+        """Pakon 2026-10-27: การ์ดใช่/ไม่ใช่ เลือกด้วยลูกศร · Enter ยืนยัน (ช่องพิมพ์ว่าง)."""
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+
+        with tempfile.TemporaryDirectory() as tmp:
+            opts = uiapp.Options(screen="shell", software=True, settings_path=Path(tmp) / "ui.json")
+            app, engine, warnings = uiapp.build(opts)
+            settle()
+            win = engine.rootObjects()[0]
+            win.resize(1280, 800)  # ให้รายการแชทสูงพอ สร้างการ์ดจริง
+            chat_input = win.findChild(QObject, "chatInput")
+            page = find_all(win, "workspace")[0]
+            chat_input.forceActiveFocus()
+            settle(100)
+            chat_input.setProperty("text", "ปิดเครื่อง")  # การ์ดยืนยันเสมอ (หน้าต่างพัฒนาไม่ปิดจริง)
+            QTest.keyClick(win, Qt.Key.Key_Return)
+            settle(200)
+            self.assertTrue(page.property("keyToken"), "มีการ์ดรอตอบ")
+            self.assertEqual(page.property("keyChoice"), 0)  # เริ่มที่ "ใช่" (ปุ่มสีหลักเดิม)
+            QTest.keyClick(win, Qt.Key.Key_Right)
+            settle(100)
+            self.assertEqual(page.property("keyChoice"), 1)
+            no = [b.property("kind") for b in find_items(win, "confirmNo")]  # รวมการ์ดในรายการแชท
+            self.assertIn("primary", no, "ปุ่มที่เลือกต้องมีสี")
+            QTest.keyClick(win, Qt.Key.Key_Return)  # Enter = ตอบ "ไม่ใช่"
+            settle(200)
+            self.assertEqual(page.property("keyToken"), "", "ตอบแล้ว ไม่มีการ์ดรอ")
+            titles = [((i or {}).get("card") or {}).get("title", "") for i in items_of(page)]
+            self.assertIn("ยกเลิกแล้ว ไม่ได้ทำอะไร", titles)
             self.assertEqual(warnings, [])
             win.close()
             uiapp.shutdown(engine)
@@ -449,6 +483,71 @@ class ShellCardTest(unittest.TestCase):
             self.assertTrue(chat_list.property("atYEnd"), f"ข้อความที่ {i}: ต้องเห็นข้อความล่าสุด")
         self.assertEqual(warnings, [])
 
+    def test_chat_stays_where_the_user_scrolled(self):
+        # พบบน Pi 5 2026-10-27 (Pakon): เลื่อนแชทขึ้นไม่ได้ ถูกดึงกลับล่างสุดทุกครั้ง ·
+        # สาเหตุ: ความสูงเนื้อหาเปลี่ยนระหว่างวาดข้อความเก่า → onContentHeightChanged เลื่อนลงล่างสุดเสมอ
+        _, win, warnings = self.open_shell()
+        win.resize(1280, 800)
+        page = find_all(win, "workspace")[0]
+        chat_list = find_all(win, "chatList")[0]
+        items = []
+        for i in range(12):
+            items += [
+                {"user": True, "text": f"ถาม {i} " + "คำถาม " * 30},
+                {"ai": True, "text": f"คำตอบ {i} " + "ข้อความ " * 150, "note": "", "done": True},
+            ]
+        page.setProperty("items", items)
+        settle(300)
+        self.assertTrue(chat_list.property("atYEnd"))
+        # ผู้ใช้ปัดขึ้น (ท่าเดียวกับนิ้ว/ล้อเมาส์ · เกิด movementStarted/Ended)
+        QMetaObject.invokeMethod(chat_list, "flick", Q_ARG(float, 0.0), Q_ARG(float, 6000.0))
+        settle(2500)
+        self.assertFalse(chat_list.property("atYEnd"), "เลื่อนขึ้นแล้วต้องอยู่ที่เดิม ไม่ถูกดึงลงล่างสุด")
+        # คำตอบกำลังพิมพ์ (จำนวนข้อความเท่าเดิม) ระหว่างผู้ใช้อ่านข้างบน → ไม่ดึงลง
+        items[-1] = {**items[-1], "text": items[-1]["text"] + " ต่อ"}
+        page.setProperty("items", items)
+        settle(300)
+        self.assertFalse(chat_list.property("atYEnd"), "อ่านข้างบนอยู่ คำตอบที่ยาวขึ้นต้องไม่ดึงลง")
+        page.setProperty("items", items + [{"user": True, "text": "ถามใหม่"}])  # ส่งข้อความใหม่
+        settle(300)
+        self.assertTrue(chat_list.property("atYEnd"), "ข้อความใหม่ = ไปล่างสุดเหมือนเดิม")
+        self.assertEqual(warnings, [])
+
+    def test_history_button_toggles_and_shows_the_open_chat(self):
+        # Pakon ที่จอ 2026-10-27: กดประวัติแล้วกดปิดไม่ได้ · อยากเห็นสีว่ากดอันไหน
+        engine, win, warnings = self.open_shell()
+        button = find_all(win, "historyButton")[0]
+        popup = find_all(win, "historyPopup")[0]
+        button.clicked.emit()
+        settle()
+        self.assertTrue(popup.property("opened"))
+        self.assertEqual(button.property("kind"), "primary")  # เปิดอยู่ = มีสี
+        button.clicked.emit()  # กดซ้ำ = ปิด
+        settle(400)
+        self.assertFalse(popup.property("opened"))
+        self.assertEqual(button.property("kind"), "secondary")
+        settle(400)
+        button.clicked.emit()
+        settle()
+        find_all(win, "historyClose")[0].clicked.emit()  # ปุ่ม ✕
+        settle(400)
+        self.assertFalse(popup.property("opened"))
+        # คลิกเมาส์จริงที่ปุ่ม (การกดนอกหน้าต่างปิดมันก่อน แล้วปุ่มเคยเปิดใหม่ทันที = ปิดไม่ได้)
+        from PySide6.QtCore import QPointF, Qt
+        from PySide6.QtTest import QTest
+
+        settle(400)
+        at = button.mapToScene(QPointF(button.width() / 2, button.height() / 2)).toPoint()
+        QTest.mouseClick(win, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, at)
+        settle(400)
+        self.assertTrue(popup.property("opened"))
+        QTest.mouseClick(win, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, at)
+        settle(400)
+        self.assertFalse(popup.property("opened"), "คลิกปุ่มประวัติซ้ำต้องปิด")
+        chat = engine.rootContext().contextProperty("chat")
+        self.assertTrue(chat.property("currentId"))  # บทสนทนาที่เปิดอยู่ให้หน้าประวัติไฮไลต์
+        self.assertEqual(warnings, [])
+
     def test_ai_answers_draw_without_warnings(self):
         """การ์ด 0013: ข้อความ AI (กำลังตอบ / จบ / หยุด) วาดได้โดยไม่มี warning
         · พบ 2026-09-28: ข้อความ AI ไม่มีช่อง user ทำให้ binding ได้ undefined."""
@@ -679,6 +778,68 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(banner[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_rate_bar_shows_for_local_results_and_hides(self):
+        """การ์ด 0085 D1: ปุ่มชอบ/ไม่ชอบใต้ผลของ AI ในเครื่อง (คำตอบ + การ์ด) · ไม่ใต้คำตอบ Claude /
+        การ์ดกำลังสร้าง · กดแล้วหาย · ไม่กด = หายเองเมื่อหมดเวลา."""
+        # ห้ามเรียก Claude จริง: โน้ตบุ๊กที่ติดตั้ง claude ไว้ หน้าต่างนี้จะมีตัวสร้างสกิลจริง
+        # (พบ 2026-11-22: ไม่ตั้งตัวนี้ = กดไม่ชอบรอบจริงแล้วส่ง claude -p จริง 1 ครั้ง)
+        self.enterContext(mock.patch.dict(os.environ, {"AIPC_CLOUD": "0"}))
+        engine, win, warnings = self.open_shell()
+        page = find_all(win, "workspace")[0]
+        base = {"chips": [], "lines": ["x"], "confirmToken": "", "page": "", "badge": {}}
+        far = time.time() * 1000 + 60_000
+        page.setProperty("items", [
+            {"ai": True, "text": "ตอบในเครื่อง", "note": "", "done": True, "skill": "",
+             "turnId": "t1", "rateUntil": far},
+            {"ai": True, "text": "Claude ตอบ", "note": "ตอบโดย Claude (cloud) · …", "done": True,
+             "skill": ""},
+            {"user": False, "card": {**base, "kind": "clock", "title": "ตอนนี้ 10:00 น.",
+                                     "turnId": "t2"}, "rateUntil": far},
+            {"user": False, "card": {**base, "kind": "forging", "title": "กำลังให้ Claude ตรวจ…"}},
+        ])  # fmt: skip
+        settle(150)
+
+        def shown(name):
+            return [b for b in find_items(win, name) if b.property("visible")]
+
+        self.assertEqual(len(shown("dislikeResult")), 2)
+        self.assertEqual(len(shown("likeResult")), 2)
+        shown("dislikeResult")[0].clicked.emit()
+        settle(150)
+        self.assertEqual(len(shown("dislikeResult")), 1, "กดแล้วแถวนั้นหาย ไม่ให้กดซ้ำ")
+        self.assertEqual(find_all(win, "chatList")[0].property("count"), 5)  # การ์ดผลต่อท้าย
+        soon = time.time() * 1000 + 200
+        page.setProperty("items", [
+            {"ai": True, "text": "ตอบ", "note": "", "done": True, "skill": "", "turnId": "t9",
+             "rateUntil": soon},
+        ])  # fmt: skip
+        settle(100)
+        self.assertEqual(len(shown("dislikeResult")), 1)
+        settle(500)
+        self.assertEqual(shown("dislikeResult"), [], "หมดเวลา = หายเอง")
+        # สกิลที่ Claude สร้าง: ปุ่ม "ตรงใจ" เดิม (การ์ด 0078) ซ้ำกับ "ชอบ" → ซ่อนเมื่อการ์ดมีแถบใหม่
+        forged = {"name": "โหมดทำงาน", "reason": "r", "worker": "โค้ด", "forgedId": "work-mode",
+                  "forgedVersion": 1}  # fmt: skip
+        page.setProperty("items", [
+            {"user": False, "card": {**base, "kind": "steps", "title": "ทำแล้ว", "badge": forged,
+                                     "turnId": "t5"}, "rateUntil": far},
+        ])  # fmt: skip
+        settle(150)
+        self.assertEqual(shown("likeSkillButton"), [])
+        self.assertEqual(len(shown("likeResult")), 1)
+        # ส่งตอนนี้ไม่ได้ (หน้าต่างพัฒนาไม่มี Claude) = ปุ่มยังอยู่ ให้กดใหม่ได้ (รีวิวโค้ด 2026-11-22)
+        skills = engine.rootContext().contextProperty("skills")
+        real = skills.handle("กี่โมงแล้ว")["turnId"]
+        page.setProperty("items", [
+            {"ai": True, "text": "ตอบ", "note": "", "done": True, "skill": "", "turnId": real,
+             "rateUntil": far},
+        ])  # fmt: skip
+        settle(100)
+        shown("dislikeResult")[0].clicked.emit()
+        settle(150)
+        self.assertEqual(len(shown("dislikeResult")), 1, "ยังส่งไม่ได้ = ปุ่มไม่หาย")
+        self.assertEqual(warnings, [])
+
     def test_undo_button_shows_once_and_reports(self):
         """ปุ่มย้อนกลับ (ข้อเสนอ 2026-10-03): ขึ้นเฉพาะการ์ดที่มี undoToken · กดแล้วหาย และขึ้นการ์ดผล."""
         _, win, warnings = self.open_shell()
@@ -755,6 +916,165 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(skills.userSkills, [])
         self.assertEqual(warnings, [])
 
+    def test_skill_manager_controls(self):
+        """การ์ด 0078: แก้เอง (ตรวจระหว่างพิมพ์) · เปลี่ยนชื่อ · หมวด · ฟอร์มสร้างในเครื่อง · ไม่มี warning."""
+        from aipc.skills import manifest, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        root = Path(__file__).resolve().parent.parent
+        md = (root / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md").read_text(
+            encoding="utf-8"
+        )
+        store = userskills.UserSkills(Path(os.environ["XDG_DATA_HOME"]) / "aipc" / "skills")
+        store.install(md, manifest.load_builtin(), request="คิดเมนูจากตู้เย็น")
+        skills._user = store
+        skills._reload()
+        settle(100)
+        find_items(win, "editSkillButton")[0].clicked.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "skillEditor")[0].property("visible"))
+        editor = find_items(win, "skillEditorText")[0]
+        self.assertEqual(editor.property("text"), md)
+        editor.setProperty("text", "ไม่ใช่ไฟล์สกิล")
+        settle(600)  # รอตัวตรวจหลังหยุดพิมพ์
+        self.assertFalse(find_items(win, "saveSkillEdit")[0].property("enabled"))
+        editor.setProperty("text", md.replace("2–3 อย่าง", "1 อย่าง"))
+        settle(600)
+        save = find_items(win, "saveSkillEdit")[0]
+        self.assertTrue(save.property("enabled"))
+        save.clicked.emit()
+        settle(50)
+        self.assertEqual(skills.userSkills[0]["version"], 2)
+        self.assertFalse(find_items(win, "skillEditor")[0].property("visible"))
+        find_items(win, "renameSkillButton")[0].clicked.emit()
+        settle(50)
+        find_items(win, "renameField")[0].setProperty("text", "เมนูเย็นนี้")
+        find_items(win, "renameSave")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(skills.userSkills[0]["name"], "เมนูเย็นนี้")
+        skills.setSkillCategory(skills.userSkills[0]["id"], "งานบ้าน")
+        settle(50)
+        self.assertTrue(find_items(win, "skillCat_งานบ้าน")[0].property("visible"))
+        find_items(win, "openSkillForm")[0].clicked.emit()
+        settle(50)
+        for name, text in (("formWhat", "ช่วยวางแผนออกกำลังกายที่บ้าน 20 นาที"),
+                           ("formEx1", "วันนี้ออกกำลังกายอะไรดี"), ("formEx2", "อยากเล่นท้องที่บ้าน"),
+                           ("formEx3", "จัดตารางวิ่งเบา ๆ ให้หน่อย")):  # fmt: skip
+            find_items(win, name)[0].setProperty("text", text)
+        settle(50)
+        find_items(win, "createFromForm")[0].clicked.emit()
+        settle(100)
+        self.assertEqual(len(skills.userSkills), 2)
+        self.assertFalse(find_items(win, "skillForm")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
+    def test_share_by_number_asks_first_then_shows_number_and_qr(self):
+        """การ์ด 0080 รอบ 2: กดแชร์เป็นเลข → ถามก่อน ยังไม่ส่ง · ยืนยันแล้วเห็นเลขและ QR."""
+        from aipc.skills import manifest, share, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        md = (
+            Path(__file__).resolve().parent.parent
+            / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md"
+        ).read_text(encoding="utf-8")
+        store = userskills.UserSkills(tmp / "aipc" / "skills")
+        store.install(md, manifest.load_builtin(), request="คิดเมนู")
+        skills._user = store
+        self.enterContext(mock.patch.object(share, "server_url", return_value="https://share.test"))
+        upload = self.enterContext(mock.patch.object(share, "upload", return_value="12345678"))
+        self.enterContext(mock.patch.dict(os.environ, {"HOME": str(tmp), "USERPROFILE": str(tmp)}))
+        skills._reload()
+        settle(100)
+        find_items(win, "shareCodeButton")[0].clicked.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "shareConfirmCard")[0].property("visible"))
+        upload.assert_not_called()
+        find_items(win, "shareConfirmSend")[0].clicked.emit()
+        end = time.monotonic() + 5
+        code = find_items(win, "skillShareCode")[0]
+        while code.property("text") == "" and time.monotonic() < end:
+            settle(50)
+        self.assertEqual(code.property("text"), "1234 5678")
+        upload.assert_called_once()
+        self.assertTrue(find_items(win, "skillQrCard")[0].property("visible"))
+        self.assertFalse(find_items(win, "shareConfirmCard")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
+    def test_number_controls_are_hidden_without_a_server(self):
+        """H5: ยังไม่มีเซิร์ฟเวอร์ = ไม่โชว์ทางเลข.
+
+        ต้องบอกเองว่าไม่มีเซิร์ฟเวอร์ (eb28b62 ตั้งที่อยู่จริงแล้ว · เดิมผ่านเฉพาะเมื่อตั้ง AIPC_CLOUD=0 · พบ 2026-11-22)
+        """
+        from aipc.skills import share
+
+        self.enterContext(mock.patch.object(share, "server_url", return_value=""))
+        _, win, warnings = self.open_shell("skills")
+        self.assertFalse(find_items(win, "receiveSkillCard")[0].property("visible"))
+        self.assertEqual(warnings, [])
+
+    def test_receive_by_number_shows_result_then_installs(self):
+        from aipc.skills import share, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        md = (
+            Path(__file__).resolve().parent.parent
+            / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md"
+        ).read_text(encoding="utf-8")
+        store = userskills.UserSkills(tmp / "aipc" / "skills")
+        skills._user = store
+        self.enterContext(mock.patch.object(share, "server_url", return_value="https://share.test"))
+        self.enterContext(mock.patch.object(share, "download", return_value=md))
+        skills._reload()
+        settle(100)
+        self.assertTrue(find_items(win, "receiveSkillCard")[0].property("visible"))
+        find_items(win, "receiveCodeField")[0].setProperty("text", "1234 5678")
+        settle(50)
+        find_items(win, "receiveCodeButton")[0].clicked.emit()
+        end = time.monotonic() + 5
+        install = find_items(win, "installReceivedButton")[0]
+        while not install.property("visible") and time.monotonic() < end:
+            settle(50)
+        self.assertTrue(install.property("visible"))
+        self.assertEqual(store.load_all(), [], "ตรวจก่อน ยังไม่ติดตั้ง")
+        install.clicked.emit()
+        settle(100)
+        self.assertEqual(len(store.load_all()), 1)
+        self.assertIn("ติดตั้งสกิล", find_items(win, "receiveMessage")[0].property("text"))
+        self.assertEqual(warnings, [])
+
+    def test_share_skill_as_qr_shows_image(self):
+        """การ์ด 0080: กด "แชร์เป็น QR" → รูป QR ขึ้นในหน้า Skill (โหลดได้จริง) · ไม่มี warning."""
+        from aipc.skills import manifest, userskills
+
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        md = (
+            Path(__file__).resolve().parent.parent
+            / "docs/benchmarks/2026-09-30-skill-author/claude/l3.md"
+        ).read_text(encoding="utf-8")
+        store = userskills.UserSkills(tmp / "aipc" / "skills")
+        store.install(md, manifest.load_builtin(), request="คิดเมนู")
+        skills._user = store
+        skills._reload()
+        settle(100)
+        self.enterContext(mock.patch.dict(os.environ, {"HOME": str(tmp), "USERPROFILE": str(tmp)}))
+        find_items(win, "shareQrButton")[0].clicked.emit()
+        end = time.monotonic() + 5
+        img = find_items(win, "skillQrImage")[0]
+        # (PySide อ่าน Image.status ไม่ได้ → ดูขนาดรูปที่โหลดแล้วแทน)
+        while img.property("implicitWidth") <= 0 and time.monotonic() < end:
+            settle(50)
+        self.assertTrue(find_items(win, "skillQrCard")[0].property("visible"))
+        self.assertGreater(img.property("implicitWidth"), 100, img.property("source"))
+        self.assertTrue((tmp / "สกิลที่ส่งออก" / "fridge-menu-qr.png").exists())
+        self.assertEqual(warnings, [])
+
     def test_backup_card_backs_up_to_a_drive(self):
         """ฟีเจอร์ข้อ 7: การ์ดสำรองในหน้าตั้งค่า · ไดรฟ์ปลอม (โฟลเดอร์) · สำรองในเธรด แล้วบอกผล."""
         engine, win, warnings = self.open_shell("settings")
@@ -776,11 +1096,30 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(ctl.drives[0]["count"], 1)
         self.assertEqual(warnings, [])
 
+    def test_memory_card_lists_and_clears(self):
+        """การ์ด 0079: "จำไว้ว่า…" ในแชท → ขึ้นในการ์ดความจำ · ลบทั้งหมดต้องกดสองครั้ง · ไม่มี warning."""
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "privacy")
+        ctl = engine.rootContext().contextProperty("memoryCtl")
+        skills = engine.rootContext().contextProperty("skills")
+        self.assertTrue(find_items(win, "memoryCard")[0].property("visible"))
+        self.assertEqual(skills.handle("จำไว้ว่าฉันชอบกาแฟดำ")["title"], "จำไว้แล้ว")
+        ctl.search("")  # หน้าจอโหลดรายการใหม่
+        settle(50)
+        self.assertEqual(len(find_items(win, "memoryRow")), 1)
+        btn = find_items(win, "clearMemory")[0]
+        btn.clicked.emit()
+        settle(20)
+        self.assertEqual(ctl.count, 1, "กดครั้งแรก = ถามยืนยันเท่านั้น")
+        btn.clicked.emit()
+        settle(50)
+        self.assertEqual((ctl.count, len(find_items(win, "memoryRow"))), (0, 0))
+        self.assertEqual(warnings, [])
+
     def test_outbound_card_lists_what_left_the_machine(self):
         """บันทึกสิ่งที่ส่งออกนอกเครื่อง: การ์ดในหน้าตั้งค่าแสดงข้อความที่ส่งจริง · ล้างต้องกดสองครั้ง."""
         from datetime import datetime
 
-        from aipc.cloud.budget import Budget
         from aipc.cloud.ledger import Ledger
 
         engine, win, warnings = self.open_shell("settings")
@@ -789,7 +1128,7 @@ class ShellCardTest(unittest.TestCase):
         tmp = Path(os.environ["XDG_DATA_HOME"])
         led = Ledger(tmp / "outbound-test.json", now=lambda: datetime(2026, 10, 1, 14, 5))
         led.record("ask", "คำถาม:\nอากาศเชียงใหม่วันนี้", 0.021)
-        usage._b, usage._ledger, usage._available = Budget(tmp / "usage-test.json"), led, True
+        usage._ledger, usage._available = led, True
         usage.changed.emit()
         settle(50)
         card = find_items(win, "outboundCard")[0]
@@ -994,6 +1333,224 @@ class ShellCardTest(unittest.TestCase):
         self.assertFalse(find_items(win, "claudeGuide")[0].property("visible"))
         self.assertEqual(warnings, [])
 
+    def test_claude_logout_button(self):
+        """การ์ด 0070 L1: กดสองครั้ง · รัน claude auth logout · ออกแล้วปิดถาม Claude + เห็นปุ่มเชื่อมต่อ."""
+        import subprocess
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        ran = []
+
+        def fake_run(argv, **kw):
+            ran.append(argv)
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        usage._run, usage._find, usage._available = fake_run, lambda: "/x/claude", True
+        usage.changed.emit()
+        engine._backends["uiSettings"].setUseClaude(True)
+        settle(50)
+        btn = find_items(win, "claudeLogoutButton")[0]
+        self.assertTrue(btn.isVisible())
+        btn.clicked.emit()
+        settle(50)
+        self.assertEqual(ran, [])  # กดครั้งแรก = ถามยืนยัน
+        self.assertIn("อีกครั้ง", btn.property("text"))
+        btn.clicked.emit()
+        for _ in range(100):
+            settle(20)
+            if usage.logoutState != "busy":
+                break
+        self.assertEqual(ran, [["/x/claude", "auth", "logout"]])
+        self.assertEqual(usage.logoutState, "done")
+        self.assertFalse(engine._backends["uiSettings"].useClaude)
+        self.assertFalse(btn.isVisible())
+        self.assertTrue(find_items(win, "claudeGuideButton")[0].isVisible())
+        self.assertIn("ออกจาก Claude แล้ว", find_items(win, "claudeLogoutText")[0].property("text"))
+        # Pakon 2026-10-28: เข้าใหม่ผ่านหน้าต่างคำสั่งในเครื่องได้จากหน้าตั้งค่าเลย (มี lxterminal เท่านั้น)
+        here = find_items(win, "settingsConnectHere")[0]
+        usage._terminal = ""  # ไม่มี lxterminal (Pi มีจริง · วินโดวส์ไม่มี) = ไม่มีปุ่ม
+        usage.guideChanged.emit()
+        settle(50)
+        self.assertFalse(here.isVisible())
+        usage._terminal = "/usr/bin/lxterminal"
+        usage.guideChanged.emit()
+        settle(50)
+        self.assertTrue(here.isVisible())
+        self.assertEqual(warnings, [])
+
+    def test_local_model_picker(self):
+        """การ์ด 0076: การ์ดเลือก AI ในเครื่อง 3 ตัว · ตัวที่ไม่ได้ติดตั้ง = กดไม่ได้ · กดแล้วต้องยืนยันก่อนเริ่มใหม่."""
+        from aipc.chat import localmodels as lm
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        ctl = engine.rootContext().contextProperty("localModels")
+        tmp = Path(os.environ["XDG_DATA_HOME"]) / "models"
+        tmp.mkdir(exist_ok=True)
+        (tmp / "Qwen3.5-2B-Q4_K_M.gguf").write_bytes(b"x")
+        picked = []
+        ctl._dir, ctl._active, ctl._machine = tmp, True, "gemma-4-E2B-it-Q4_K_M.gguf"
+        ctl._choice_path = tmp / "llm-model"
+        ctl._restart = lambda: picked.append(lm.chosen(tmp / "llm-model")) or True
+        ctl.changed.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "localModelCard")[0].isVisible())
+        two = find_items(win, "pickModel_qwen3.5-2b")[0]
+        four = find_items(win, "pickModel_qwen3.5-4b")[0]
+        self.assertTrue(two.property("enabled"))
+        self.assertFalse(four.property("enabled"), "ยังไม่ติดตั้ง = กดไม่ได้ (H5)")
+        two.clicked.emit()
+        settle(50)
+        self.assertEqual(picked, [], "ต้องยืนยันก่อน")
+        find_items(win, "confirmModel")[0].clicked.emit()
+        settle(50)
+        self.assertEqual(picked, ["qwen3.5-2b"])
+        self.assertTrue([m for m in ctl.models if m["key"] == "qwen3.5-2b"][0]["current"])
+        self.assertEqual(warnings, [])
+
+    def test_claude_card_has_no_daily_limit(self):
+        """การ์ด 0084 C3: ไม่มีเพดานรายวัน (ระดับ/แถบ %) · นับครั้งวันนี้จาก ledger · การ์ด Claude ยังแสดง.
+
+        แทนเทสต์ระดับต่อวันของ Pakon 2026-10-28 (Pakon ตัดสินให้ลบ 2026-11-18 · บัญชี Pro)."""
+        from datetime import datetime, timedelta
+
+        from aipc.cloud.ledger import Ledger
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        now = datetime.now()
+        when = iter([now, now, now - timedelta(days=1), now])
+        led = Ledger(tmp / "outbound-calls.json", now=lambda: next(when))
+        led.record("ask", "คำถาม", 3.0)  # "ค่าใช้จ่าย" สูงก็ไม่มีผลอะไรแล้ว
+        led.record("skill", "สร้างสกิล", 3.0)
+        led.record("ask", "เมื่อวาน", 3.0)  # เมื่อวาน = ไม่นับ
+        led.record("weather", "เชียงใหม่")  # ไม่ได้ไปหา Claude = ไม่นับ
+        usage._ledger, usage._available = led, True
+        engine._backends["uiSettings"].setUseClaude(True)
+        usage.changed.emit()
+        settle(50)
+        self.assertEqual(usage.callsToday, 2)
+        self.assertTrue(find_items(win, "cloudUsageCard")[0].isVisible())
+        self.assertIn("2 ครั้ง", find_items(win, "cloudCallsText")[0].property("text"))
+        self.assertEqual(find_items(win, "cloudLevelText"), [])
+        names, stack = [], [win.contentItem()]
+        while stack:
+            item = stack.pop()
+            names.append(item.objectName())
+            stack.extend(item.childItems())
+        self.assertFalse([n for n in names if n.startswith("cloudLevel")], "ไม่มีปุ่มระดับ/แถบ % แล้ว")
+        self.assertEqual(warnings, [])
+
+    def test_calls_today_without_ledger_is_zero(self):
+        """หน้า Login ไม่มี ledger → 0 ไม่ล้ม (การ์ด 0084)."""
+        from aipc.ui.backend import CloudUsage
+
+        self.assertEqual(CloudUsage(available=True).callsToday, 0)
+
+    def test_old_usage_file_is_left_alone(self):
+        """การ์ด 0084 C4 (H2): ไฟล์เพดานเดิมของผู้ใช้ไม่ถูกลบหรือแก้เมื่อเปิดแอป."""
+        old = Path(os.environ["XDG_DATA_HOME"]) / "aipc" / "cloud-usage.json"
+        old.parent.mkdir(parents=True, exist_ok=True)
+        body = b'{"limit_usd": 1.0, "days": {"2026-11-17": {"usd": 0.3, "calls": 2}}}'
+        old.write_bytes(body)
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        settle(50)
+        self.assertEqual(old.read_bytes(), body)
+
+    def test_budget_module_is_gone(self):
+        """การ์ด 0084: ระบบไม่มีเพดานของตัวเอง (ขีดจำกัดเดียว = ของบัญชี Claude)."""
+        import importlib.util
+
+        self.assertIsNone(importlib.util.find_spec("aipc.cloud.budget"))
+
+    def test_gmail_card_connects_read_only(self):
+        """การ์ด 0072 G1: ไม่มีไฟล์ OAuth client = บอกตรง ๆ ไม่มีปุ่ม · มี = กดเชื่อมต่อ (Google ปลอม) ·
+        เลิกเชื่อมต่อต้องกดสองครั้ง."""
+        from aipc.cloud import gmail_api
+
+        engine, win, warnings = self.open_shell("settings")
+        show_section(win, "ai")
+        link = engine.rootContext().contextProperty("gmailLink")
+        tmp = Path(os.environ["XDG_DATA_HOME"])
+        state = {"linked": False, "opened": []}
+
+        class Api:
+            GmailError = gmail_api.GmailError
+            client = tmp / "no-client.json"
+
+            def client_path(self):
+                return self.client
+
+            def connected(self):
+                return state["linked"]
+
+            def connect(self, opener):
+                opener("https://accounts.google.com/o/oauth2/auth?scope=gmail.readonly")
+                state["linked"] = True
+
+            def disconnect(self):
+                state["linked"] = False
+
+        api = Api()
+        link._api, link._active, link._open_url = api, True, state["opened"].append
+        link.changed.emit()
+        settle(50)
+        self.assertTrue(find_items(win, "gmailMissing")[0].isVisible())
+        self.assertFalse(find_items(win, "gmailConnect")[0].isVisible())
+        api.client = tmp / "google_credentials.json"
+        api.client.write_text("{}", "utf-8")
+        link.changed.emit()
+        settle(50)
+        btn = find_items(win, "gmailConnect")[0]
+        self.assertTrue(btn.isVisible())
+        btn.clicked.emit()
+        for _ in range(100):
+            settle(20)
+            if not link.busy:
+                break
+        self.assertEqual(len(state["opened"]), 1)
+        self.assertIn("เชื่อมต่อ Gmail แล้ว", find_items(win, "gmailText")[0].property("text"))
+        off = find_items(win, "gmailDisconnect")[0]
+        self.assertTrue(off.isVisible())
+        off.clicked.emit()
+        settle(30)
+        self.assertTrue(state["linked"])  # กดครั้งแรก = ถามยืนยัน
+        off.clicked.emit()
+        settle(30)
+        self.assertFalse(state["linked"])
+        self.assertTrue(find_items(win, "gmailConnect")[0].isVisible())
+        self.assertEqual(warnings, [])
+
+    def test_claude_logout_failure_says_so(self):
+        """การ์ด 0070 L1: คำสั่งล้ม = บอกไม่สำเร็จ ไม่เปลี่ยนค่าอื่น (H5)."""
+        import subprocess
+
+        engine, win, warnings = self.open_shell("settings")
+        usage = engine.rootContext().contextProperty("cloudUsage")
+        usage._find = lambda: "/x/claude"
+
+        def boom(argv, **kw):
+            raise subprocess.TimeoutExpired(argv, 20)
+
+        usage._run = boom
+        engine._backends["uiSettings"].setUseClaude(True)
+        usage.logout()
+        for _ in range(100):
+            settle(20)
+            if usage.logoutState != "busy":
+                break
+        self.assertEqual(usage.logoutState, "failed")
+        self.assertIn("ไม่สำเร็จ", usage.logoutText)
+        self.assertTrue(engine._backends["uiSettings"].useClaude)
+        usage._find = lambda: None
+        usage.logout()
+        self.assertIn("ไม่พบโปรแกรม Claude", usage.logoutText)
+        self.assertEqual(warnings, [])
+
     def test_claude_connect_card_on_assistant_page(self):
         """การ์ด 0021 เกณฑ์ข้อ 3ข: หน้าผู้ช่วยมีแถบเชื่อมต่อใต้คำทักทาย · กดแล้วขั้นตอนขึ้นกลางจอ ·
         "ไว้ทีหลัง" ซ่อน · มี claude แล้วไม่แสดง."""
@@ -1067,12 +1624,31 @@ class ShellCardTest(unittest.TestCase):
         self.assertTrue(inner.endswith("-m aipc.cloud.connect"))
         self.assertIn(Path(sys.executable).name, inner)
         self.assertFalse(btn.property("enabled"))
+        import subprocess
+
         usage._find = lambda: "/home/pakon/.local/bin/claude"
+        status = []
+
+        def auth(argv, **kw):
+            status.append(argv)
+            return subprocess.CompletedProcess(argv, 0, f'{{"loggedIn": {logged}}}', "")
+
+        logged, usage._run = "false", auth  # ปิดหน้าต่างโดยยังไม่เข้า = ยังไม่เชื่อมต่อ (H5)
         proc.done = True
         usage._check_connect()
         settle(30)
+        self.assertFalse(usage.connectedNow)
+        self.assertEqual(status, [["/home/pakon/.local/bin/claude", "auth", "status"]])
+        usage._proc, logged = proc, "true"
+        # Pakon 2026-10-28: "เชื่อมต่อแล้วต้องใช้ได้เลย" · ไม่ต้องออกจากระบบ
+        made = []
+        usage._on_connected = lambda: made.append(1) or True
+        usage._check_connect()
+        settle(30)
         self.assertTrue(usage.connectedNow)
+        self.assertEqual((made, usage.available), ([1], True))
         self.assertTrue(find_items(win, "claudeConnectedNow")[0].isVisible())
+        self.assertIn("ใช้ได้เลย", find_items(win, "claudeConnectedNow")[0].property("text"))
         self.assertTrue(btn.property("enabled"))
         usage._terminal = ""  # ไม่มีเทอร์มินัล = เหลือทาง SSH
         usage.guideChanged.emit()

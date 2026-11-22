@@ -84,9 +84,12 @@ def greeting(dt: datetime) -> str:
     return "สวัสดีตอนค่ำ"
 
 
-def long_date(dt: datetime) -> str:
-    """เช่น 'วันพุธที่ 23 กันยายน 2569' · อังกฤษ 'Wednesday, 23 September 2026'."""
-    if _en():
+def long_date(dt: datetime, en: bool | None = None) -> str:
+    """เช่น 'วันพุธที่ 23 กันยายน 2569' · อังกฤษ 'Wednesday, 23 September 2026'.
+
+    en=None = ตามภาษาของบัญชี · True = อังกฤษเสมอ (หน้า Login เลือก English · การ์ด 0075)
+    """
+    if _en() if en is None else en:
         return f"{EN_DAYS[dt.weekday()]}, {dt.day} {EN_MONTHS[dt.month - 1]} {dt.year}"
     return f"วัน{DAYS[dt.weekday()]}ที่ {dt.day} {MONTHS[dt.month - 1]} {dt.year + BE_OFFSET}"
 

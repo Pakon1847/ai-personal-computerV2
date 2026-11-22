@@ -72,7 +72,7 @@ Rectangle {
         }
         AppText {
             Layout.alignment: Qt.AlignHCenter
-            text: system.longDate; color: Theme.inkMuted; oneLine: true
+            text: Tr.loginLang === "en" ? system.longDateEn : system.longDate; color: Theme.inkMuted; oneLine: true
         }
 
         // วงกล้อง · สีขอบบอกสถานะ (เขียว = จำได้, ส้ม = ไม่รู้จัก, คราม = กำลังสแกน)
@@ -276,7 +276,11 @@ Rectangle {
         // สมัครจริงผ่านตัวช่วย root · สมัครเสรี ไม่ต้องมีผู้ดูแลอนุมัติ (การ์ด 0012)
         AppButton { text: Tr.both("สมัครบัญชี"); kind: "secondary"; iconPath: Icons.userPlus
                     onClicked: AppState.go("signup") }
-        AppButton { text: Tr.both("ภาษา: ไทย"); kind: "secondary"; iconPath: Icons.globe; enabled: false }
+        // การ์ด 0075: กดวน สองภาษา → English → ไทย · ป้ายเขียนด้วยภาษาถัดไปเอง (อ่านภาษาปัจจุบันไม่ออกก็หาเจอ)
+        AppButton { objectName: "loginLang"; kind: "secondary"; iconPath: Icons.globe
+                    text: ({ both: "English", en: "ภาษาไทย", th: "ไทย · English" })[Tr.loginLang]
+                    Accessible.name: "ภาษา · Language"
+                    onClicked: Tr.nextLoginLang() }
         // การ์ด 0052: ปิด/รีสตาร์ตเครื่องอย่างปลอดภัยจากหน้า Login (แทนการดึงปลั๊ก) · ถามยืนยันก่อน
         AppButton { objectName: "loginReboot"; text: Tr.both("รีสตาร์ตเครื่อง"); kind: "secondary"; iconPath: Icons.restart
                     onClicked: powerDialog.ask("reboot") }

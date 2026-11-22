@@ -2,12 +2,15 @@
 
 รันในหน้าต่างคำสั่งที่แอปเปิดให้ (`lxterminal --command="python -m aipc.cloud.connect"`) ·
 คำสั่งตายตัว ไม่ใช่ shell ทั่วไป:
-ไม่มี claude → ตัวติดตั้งทางการ → รัน claude ให้ผู้ใช้เข้าสู่ระบบ (หน้าเข้าสู่ระบบเปิดใน Chromium ของเครื่องนี้) →
-ผู้ใช้พิมพ์ /exit → บอกผล แล้วรอ Enter ก่อนปิดหน้าต่าง · การเข้าสู่ระบบเก็บใน home ของบัญชีนี้เท่านั้น
+ไม่มี claude → ตัวติดตั้งทางการ → `claude auth login` (หน้าเข้าสู่ระบบเปิดใน Chromium ของเครื่องนี้ ·
+ไม่ต้องพิมพ์ /exit · Pakon 2026-10-28: "ทำให้เข้าผ่านเทอร์มินัลในเครื่องได้เลย จะได้ง่าย") →
+ตรวจด้วย `claude auth status` → บอกผลตามจริง
+แล้วรอ Enter ก่อนปิดหน้าต่าง · การเข้าสู่ระบบเก็บใน home ของบัญชีนี้เท่านั้น
 """
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 
@@ -20,6 +23,15 @@ def _wait(ask) -> None:
         ask("\nกด Enter เพื่อปิดหน้าต่างนี้ ")
     except EOFError:
         pass
+
+
+def logged_in(exe: str, run=subprocess.run) -> bool:
+    """`claude auth status` บอก loggedIn: true · อ่านไม่ได้ = ถือว่ายังไม่เข้า (H5)."""
+    try:
+        r = run([exe, "auth", "status"], capture_output=True, text=True, timeout=20)
+        return bool(json.loads(r.stdout or "{}").get("loggedIn"))
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return False
 
 
 def main(find=find_claude, run=subprocess.run, out=print, ask=input) -> int:
@@ -37,17 +49,16 @@ def main(find=find_claude, run=subprocess.run, out=print, ask=input) -> int:
     else:
         out("ขั้น 1/2 · มี Claude Code ในบัญชีนี้แล้ว ข้ามการติดตั้ง\n")
     out("ขั้น 2/2 · เข้าสู่ระบบ Claude")
-    out("  - ถ้ามีคำถามอื่นขึ้นก่อน (เช่น เลือกสี) กด Enter ผ่านไปได้")
-    out("  - เลือกเข้าสู่ระบบด้วยบัญชี Claude → หน้าเข้าสู่ระบบจะเปิดใน Chromium → กดอนุญาต")
-    out("  - ถ้า Chromium ให้รหัสมา ให้คัดลอกมาวางในหน้าต่างนี้")
-    out("  - เสร็จแล้วพิมพ์ /exit แล้วกด Enter\n")
-    run([exe])
-    if find() is None:
-        out("\nไม่พบ Claude Code · ลองกดปุ่มเชื่อมต่อใหม่")
+    out("  - หน้าเข้าสู่ระบบ Claude จะเปิดใน Chromium → เข้าสู่ระบบ → กด Authorize (อนุญาต)")
+    out("  - ถ้าหน้านั้นให้รหัสมา: กด Copy Code → กลับมาหน้าต่างนี้")
+    out("    → กด Ctrl+Shift+V (หรือคลิกขวา → Paste) → กด Enter")
+    out("  - ถ้า Chromium ไม่เปิดเอง: กด Enter ตามที่หน้าต่างนี้บอก หรือคัดลอกลิงก์ที่ขึ้นไปเปิดใน Chromium\n")
+    run([exe, "auth", "login"])
+    if not logged_in(exe, run):
+        out('\nยังไม่ได้เข้าสู่ระบบ Claude · ปิดหน้าต่างนี้แล้วกดปุ่ม "เชื่อมต่อที่เครื่องนี้" ใหม่')
         _wait(ask)
         return 1
-    out("\nเสร็จแล้ว · ออกจากระบบแล้วเข้าใหม่ หน้าผู้ช่วยจะใช้ Claude ได้")
-    out("ถ้าถาม Claude แล้วยังไม่ได้ = ยังไม่ได้เข้าสู่ระบบ · กดปุ่มเชื่อมต่อใหม่แล้วทำขั้น 2 อีกครั้ง")
+    out("\nเข้าสู่ระบบ Claude แล้ว · กด Enter ปิดหน้าต่างนี้ แล้วใช้ Claude ได้เลย")
     _wait(ask)
     return 0
 
