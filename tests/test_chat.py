@@ -97,6 +97,15 @@ class FakeLlama(BaseHTTPRequestHandler):
         self.wfile.write(b"data: " + json.dumps(done).encode() + b"\n\ndata: [DONE]\n\n")
 
 
+def last_chat() -> dict:
+    """คำขอแชทล่าสุด ไม่นับการอุ่นแคช (client.warm ส่ง stream: false จากเธรดเบื้องหลัง).
+
+    การอุ่นแคชมาถึงเมื่อไหร่ก็ได้ · พบ 2026-11-18: มาถึงหลังคำขอสกิลแต่ก่อนบรรทัดตรวจ → seen[-1] เป็นการอุ่นแคช
+    (รันทั้งชุดพัง ~1/100 · หน่วง warm 0.05 วิ พัง 18/20)
+    """
+    return [b for b in FakeLlama.seen if b.get("stream") is not False][-1]
+
+
 class ServerCase(unittest.TestCase):
     def setUp(self):
         FakeLlama.mode, FakeLlama.seen, FakeLlama.slots, FakeLlama.slot_ok = "ok", [], [], False
@@ -304,7 +313,7 @@ class ControllerTest(ServerCase):
         pump(lambda: done)
         c.send("แปล: สวัสดี", "แปลข้อความ")
         pump(lambda: len(done) == 2)
-        msgs = FakeLlama.seen[-1]["messages"]
+        msgs = last_chat()["messages"]
         self.assertEqual([m["role"] for m in msgs], ["system", "user"])
         self.assertEqual(msgs[0]["content"], "แปลข้อความ")
 
@@ -355,7 +364,7 @@ class ControllerTest(ServerCase):
         FakeLlama.mode = "ok"
         c.send("คอมหน่วงมาก เป็นอะไร", "อธิบายสถานะเครื่อง")
         pump(lambda: done)
-        self.assertNotIn("tools", FakeLlama.seen[-1])
+        self.assertNotIn("tools", last_chat())
 
     def forced_tools(self):
         """สกิลในตัว 1 ตัว + สกิลผู้ใช้ 1 ตัวเมื่อข้อความใกล้ (แบบ SkillsController.tool_catalog)."""
@@ -422,7 +431,7 @@ class ControllerTest(ServerCase):
         self.assertEqual(warm["tools"], tools)
         c.send("ทำไมเครื่องช้า", "")
         pump(lambda: done)
-        real = FakeLlama.seen[-1]
+        real = last_chat()
         self.assertEqual(real["messages"][0], warm["messages"][0], "ส่วนต้นตรงกันทุกตัวอักษร แคชจึงใช้ได้")
 
     def test_hybrid_hands_hard_questions_to_claude(self):
