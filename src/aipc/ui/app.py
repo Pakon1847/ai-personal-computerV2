@@ -377,6 +377,7 @@ def build(opts: Options, argv: list[str] | None = None):
             chat_switch=_chat_switch(chat, ui_settings),
             memory=memory,
             turns=turns,
+            ledger=ledger,
         ),
         "memoryCtl": MemoryCtl(memory),
         "jobs": JobsCtl(active=in_session, chat=chat),  # งานข้ามคืน (การ์ด 0081)

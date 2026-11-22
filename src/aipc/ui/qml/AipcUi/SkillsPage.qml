@@ -24,6 +24,34 @@ ColumnLayout {
         const r = skills.shareSkillQr(id)
         page.message = r.message
         page.qrPath = r.path
+        page.shareCode = ""
+    }
+    // การ์ด 0080 รอบ 2: แชร์ด้วยเลข 8 หลัก + รับด้วยเลขหรือกล้อง
+    property string confirmShare: ""    // สกิลที่รอกดยืนยันก่อนส่งออกจากเครื่อง
+    property string shareCode: ""       // เลขที่เพิ่งได้ ("" = กำลังแสดง QR ทั้งไฟล์)
+    property bool shareBusy: false
+    property bool receiveBusy: false
+    property bool receiveReady: false
+    property string receiveMessage: ""
+    function startReceive(note) {
+        page.receiveBusy = true
+        page.receiveReady = false
+        page.receiveMessage = note
+    }
+    Connections {
+        target: skills
+        function onShareCodeDone(r) {
+            page.shareBusy = false
+            page.confirmShare = ""
+            page.message = r.message
+            page.shareCode = r.code
+            page.qrPath = r.path
+        }
+        function onSkillReceived(r) {
+            page.receiveBusy = false
+            page.receiveReady = r.ready
+            page.receiveMessage = r.message
+        }
     }
     readonly property var shownUserSkills: skills.userSkills.filter(
         u => u.site === "" && (page.catFilter === "" || u.category === page.catFilter))
@@ -275,7 +303,7 @@ ColumnLayout {
     // ---------- QR ของสกิล (การ์ด 0080) · เพื่อนถ่ายรูปจอนี้ หรือรับไฟล์ PNG ไปเปิดในไฟล์ของฉัน ----------
     Card {
         objectName: "skillQrCard"
-        visible: page.qrPath !== ""
+        visible: page.qrPath !== "" || page.shareCode !== ""
         Layout.fillWidth: true
         Layout.preferredHeight: qcol.implicitHeight + 28
         radius: Theme.radiusCard
@@ -286,8 +314,16 @@ ColumnLayout {
             anchors.top: parent.top
             anchors.margins: 14
             spacing: 8
+            AppText {
+                objectName: "skillShareCode"
+                visible: page.shareCode !== ""
+                text: page.shareCode
+                size: Theme.fontTitle; strong: true; oneLine: true
+                Layout.alignment: Qt.AlignHCenter
+            }
             Image {
                 objectName: "skillQrImage"
+                visible: page.qrPath !== ""
                 source: page.qrPath === "" ? "" : "file:///" + page.qrPath.replace(/\\/g, "/").replace(/^\/+/, "")
                 cache: false
                 fillMode: Image.PreserveAspectFit
@@ -297,10 +333,114 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
             }
             AppText {
-                text: Tr.t("ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง · ไม่มีอะไรส่งออกทางอินเทอร์เน็ต")
+                text: page.shareCode !== ""
+                      ? Tr.t("ให้เพื่อนพิมพ์เลขนี้หรือสแกน QR ในหน้า Skill ภายใน 24 ชั่วโมง · ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง")
+                      : Tr.t("ผู้รับต้องกดติดตั้งเอง และผ่านการตรวจก่อนติดตั้งทุกครั้ง · ไม่มีอะไรส่งออกทางอินเทอร์เน็ต")
                 Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
             }
-            AppButton { text: Tr.t("ปิด"); kind: "ghost"; onClicked: page.qrPath = "" }
+            AppButton { text: Tr.t("ปิด"); kind: "ghost"; onClicked: { page.qrPath = ""; page.shareCode = "" } }
+        }
+    }
+    // ---------- ถามก่อนส่ง เพราะไฟล์จะออกจากเครื่อง (การ์ด 0080 รอบ 2 · H3) ----------
+    Card {
+        objectName: "shareConfirmCard"
+        visible: page.confirmShare !== ""
+        Layout.fillWidth: true
+        Layout.preferredHeight: shareConfirmCol.implicitHeight + 28
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: shareConfirmCol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 14
+            spacing: 8
+            AppText { text: Tr.t("ส่งไฟล์สกิลนี้ออกจากเครื่องไหม"); strong: true; Layout.fillWidth: true }
+            AppText {
+                text: Tr.t("ไฟล์จะไปฝากที่เซิร์ฟเวอร์ 24 ชั่วโมง ใครมีเลขก็โหลดได้ · ถ้าไม่อยากให้ไฟล์ออกจากเครื่อง ใช้ “แชร์เป็น QR” แทน")
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.inkMuted
+            }
+            RowLayout {
+                spacing: 8
+                AppButton {
+                    objectName: "shareConfirmSend"
+                    text: page.shareBusy ? Tr.t("กำลังส่ง…") : Tr.t("ส่งและขอเลข")
+                    enabled: !page.shareBusy
+                    onClicked: { page.shareBusy = true; skills.shareSkillCode(page.confirmShare) }
+                }
+                AppButton {
+                    objectName: "shareConfirmCancel"
+                    text: Tr.t("ยกเลิก"); kind: "ghost"
+                    enabled: !page.shareBusy
+                    onClicked: page.confirmShare = ""
+                }
+            }
+        }
+    }
+    // ---------- รับสกิลจากเพื่อน: พิมพ์เลข หรือสแกน QR · ผ่านด่านเดียวกับไฟล์ก่อนติดตั้ง ----------
+    Card {
+        objectName: "receiveSkillCard"
+        visible: skills.shareServerReady || skills.cameraScanReady
+        Layout.fillWidth: true
+        Layout.preferredHeight: receiveCol.implicitHeight + 28
+        radius: Theme.radiusCard
+        ColumnLayout {
+            id: receiveCol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 14
+            spacing: 8
+            AppText { text: Tr.t("รับสกิลจากเพื่อน"); strong: true; Layout.fillWidth: true }
+            RowLayout {
+                visible: skills.shareServerReady
+                Layout.fillWidth: true
+                spacing: 8
+                AppField {
+                    id: receiveCode
+                    objectName: "receiveCodeField"
+                    Layout.fillWidth: true
+                    label: Tr.t("เลข 8 หลักจากเพื่อน")
+                    placeholder: "1234 5678"
+                    field.enabled: !page.receiveBusy
+                }
+                AppButton {
+                    objectName: "receiveCodeButton"
+                    Layout.alignment: Qt.AlignBottom
+                    text: Tr.t("ตรวจสกิล"); kind: "secondary"
+                    enabled: !page.receiveBusy && receiveCode.text.trim() !== ""
+                    onClicked: {
+                        page.startReceive(Tr.t("กำลังโหลดและตรวจสกิล…"))
+                        skills.receiveSkillCode(receiveCode.text)
+                    }
+                }
+            }
+            AppButton {
+                objectName: "scanSkillQrButton"
+                visible: skills.cameraScanReady
+                text: Tr.t("สแกน QR ด้วยกล้อง"); kind: "secondary"
+                enabled: !page.receiveBusy
+                onClicked: {
+                    page.startReceive(Tr.t("กล้องเปิดอยู่ · ถือ QR ให้เห็นทั้งรูป (ไม่เกิน 20 วินาที) · ระบบไม่เก็บภาพ"))
+                    skills.scanSkillQr()
+                }
+            }
+            AppText {
+                objectName: "receiveMessage"
+                visible: page.receiveMessage !== ""
+                text: page.receiveMessage
+                Layout.fillWidth: true; size: Theme.fontSmall; color: Theme.warnInk
+            }
+            AppButton {
+                objectName: "installReceivedButton"
+                visible: page.receiveReady
+                text: Tr.t("ติดตั้งสกิลนี้")
+                onClicked: {
+                    page.receiveMessage = skills.installReceivedSkill()
+                    page.receiveReady = false
+                    receiveCode.text = ""
+                }
+            }
         }
     }
     // ---------- ตัวแก้ไฟล์สกิล (การ์ด 0078) · ตรวจด้วยด่านเดียวกับตอนบันทึก (backend ตัดสิน · H7) ----------
@@ -616,6 +756,12 @@ ColumnLayout {
                         objectName: "shareQrButton"
                         text: Tr.t("แชร์เป็น QR"); kind: "secondary"
                         onClicked: page.showQr(uc.modelData.id)
+                    }
+                    AppButton {
+                        objectName: "shareCodeButton"
+                        visible: skills.shareServerReady
+                        text: Tr.t("แชร์เป็นเลข 8 หลัก"); kind: "secondary"
+                        onClicked: page.confirmShare = uc.modelData.id
                     }
                     AppButton {
                         objectName: "deleteSkillButton"
