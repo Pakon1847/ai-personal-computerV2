@@ -942,7 +942,13 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(warnings, [])
 
     def test_number_controls_are_hidden_without_a_server(self):
-        """H5: ยังไม่มีเซิร์ฟเวอร์ = ไม่โชว์ทางเลข."""
+        """H5: ยังไม่มีเซิร์ฟเวอร์ = ไม่โชว์ทางเลข.
+
+        ต้องบอกเองว่าไม่มีเซิร์ฟเวอร์ (eb28b62 ตั้งที่อยู่จริงแล้ว · เดิมผ่านเฉพาะเมื่อตั้ง AIPC_CLOUD=0 · พบ 2026-11-22)
+        """
+        from aipc.skills import share
+
+        self.enterContext(mock.patch.object(share, "server_url", return_value=""))
         _, win, warnings = self.open_shell("skills")
         self.assertFalse(find_items(win, "receiveSkillCard")[0].property("visible"))
         self.assertEqual(warnings, [])
