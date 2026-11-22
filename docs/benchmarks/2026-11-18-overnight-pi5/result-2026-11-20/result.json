@@ -1,0 +1,202 @@
+[
+ {
+  "started": "2026-11-20T17:08:28",
+  "ended": "2026-11-20T20:19:28",
+  "seconds": 11460,
+  "job_id": "20261120-170828",
+  "state": "done",
+  "status": "done",
+  "note": "",
+  "retries": 0,
+  "rest_seconds": 512,
+  "skipped": [],
+  "result_file": "/home/aipc2030/overnight-1118/out/summaries/ทดสอบข้ามคืน-20261120-170828.md",
+  "j1": {
+   "files": [
+    {
+     "name": "0051-lock-theme-devices.md",
+     "state": "done",
+     "chunks": 5,
+     "summaries": 5,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0052-power-buttons.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0053-chat-modes.md",
+     "state": "done",
+     "chunks": 3,
+     "summaries": 3,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0054-missing-app.md",
+     "state": "done",
+     "chunks": 3,
+     "summaries": 3,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0055-lock-screen-v2.md",
+     "state": "done",
+     "chunks": 3,
+     "summaries": 3,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0056-mic-near-voice.md",
+     "state": "done",
+     "chunks": 4,
+     "summaries": 4,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0057-youtube-open.md",
+     "state": "done",
+     "chunks": 3,
+     "summaries": 3,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0058-face-to-speak.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0060-mouse-speed.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0061-settings-sections.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0062-polish-all-pages.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0063-wifi-picker.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0064-voice-account-window.md",
+     "state": "done",
+     "chunks": 4,
+     "summaries": 4,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0065-web-new-tab.md",
+     "state": "done",
+     "chunks": 5,
+     "summaries": 5,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0066-site-alias.md",
+     "state": "done",
+     "chunks": 4,
+     "summaries": 4,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0067-skill-groups-calendar-link.md",
+     "state": "done",
+     "chunks": 3,
+     "summaries": 3,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0068-move-reminder.md",
+     "state": "done",
+     "chunks": 1,
+     "summaries": 1,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0069-click-by-text.md",
+     "state": "done",
+     "chunks": 3,
+     "summaries": 3,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0070-claude-logout.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    },
+    {
+     "name": "0071-gmail-read.md",
+     "state": "done",
+     "chunks": 2,
+     "summaries": 2,
+     "empty": 0,
+     "failed": [],
+     "note": ""
+    }
+   ],
+   "complete": 20,
+   "total": 20,
+   "overall_done": true
+  }
+ }
+]
