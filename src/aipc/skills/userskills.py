@@ -27,6 +27,8 @@ AUTO_DENY_APPS = frozenset({"terminal"})
 USER_WORKERS = frozenset({"code", "code+llm", "llm"})
 # หมวดที่ผู้ใช้เลือกเองในหน้า Skill (การ์ด 0078) · "" = ยังไม่เลือก
 CATEGORIES = ("งานเรียน", "งานบ้าน", "สุขภาพ", "บันเทิง", "งาน", "อื่น ๆ")
+# สกิลในตัวที่ผู้ใช้ปิด (การ์ด 0086) · ไฟล์แยกจาก index.json (index เป็น id ของสกิลผู้ใช้ทั้งไฟล์)
+BUILTIN_OFF_FILE = "builtin-off.json"
 EDIT_TAG = "แก้เอง"  # ที่มาของรุ่นที่ผู้ใช้แก้เอง (index.json "edited_by")
 
 
@@ -219,6 +221,21 @@ class UserSkills:
         self._write(
             self.folder / "index.json", json.dumps(self._index, ensure_ascii=False, indent=1)
         )
+
+    # ---------- สกิลในตัวที่ปิด (การ์ด 0086) ----------
+    def builtin_off(self) -> set[str]:
+        """id สกิลในตัวที่ผู้ใช้ปิด · ไม่มีไฟล์ / ไฟล์เสีย = เปิดทุกตัว (ระบบทำงานตามเดิม)."""
+        try:
+            data = json.loads((self.folder / BUILTIN_OFF_FILE).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return set()
+        return {x for x in data if isinstance(x, str)} if isinstance(data, list) else set()
+
+    def set_builtin(self, skill_id: str, on: bool) -> bool:
+        off = self.builtin_off()
+        off = off - {skill_id} if on else off | {skill_id}
+        self._write(self.folder / BUILTIN_OFF_FILE, json.dumps(sorted(off), ensure_ascii=False))
+        return True
 
     def info(self, skill_id: str) -> dict:
         e = self._index.get(skill_id) or {}

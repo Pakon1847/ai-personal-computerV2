@@ -2647,8 +2647,12 @@ class SkillsController(QObject):
         self._voice_forges: set[str] = set()  # การ์ด 0030: คำขอที่เริ่มจากเสียง (ไม่สำเร็จ = ไม่ส่งต่อ)
         self._site_learns: dict[str, str] = {}  # การ์ด 0046: คำขอ → ประโยคที่ขอให้เพิ่ม (ตรวจว่าเพิ่มจริงไหม)
         self._user = user_skills
-        self._builtin = manifest.load_builtin()
-        self._skills = self._builtin + (user_skills.load() if user_skills is not None else [])
+        self._builtin = manifest.load_builtin()  # ครบทุกตัวเสมอ (ใช้แยกสกิลในตัวกับสกิลผู้ใช้)
+        # การ์ด 0086: สกิลในตัวที่ผู้ใช้คนนี้ปิด · _skills (ตัวคัดสกิล + เครื่องมือของ AI) ไม่มีตัวที่ปิด
+        self._off = user_skills.builtin_off() if user_skills is not None else set()
+        self._skills = [b for b in self._builtin if b.id not in self._off] + (
+            user_skills.load() if user_skills is not None else []
+        )
         self._forged.connect(self._on_forged)
         self._exec = executor or actions.Executor()
         self._root = root
@@ -2969,7 +2973,7 @@ class SkillsController(QObject):
         sites: dict[
             str, list
         ] = {}  # การ์ด 0067: สกิลประจำเว็บ = ไทล์เดียวต่อเว็บ (ตำแหน่งของสกิลแรกของเว็บนั้น)
-        for s in self._skills:
+        for s in self._all_skills():  # การ์ด 0086: สกิลในตัวที่ปิดยังอยู่ในหน้า Skill (เปิดคืนได้)
             if s.site:
                 if s.site not in sites:
                     sites[s.site] = []
@@ -2984,6 +2988,7 @@ class SkillsController(QObject):
                 "permissions": [tr(p) for p in s.permission_labels()],
                 "ready": not missing, "missing": [tr(self.NEED_LABEL[n]) for n in missing],
                 "byClaude": self._is_user(s.id),
+                "enabled": s.id not in self._off,
                 "examples": self._tile_examples(s),
                 "commands": [self._command_text(c) for c in s.commands],  # สกิลประจำเว็บ (การ์ด 0046)
             })  # fmt: skip
@@ -3044,8 +3049,11 @@ class SkillsController(QObject):
             if own:
                 groups.append({"title": tr("ของเว็บนี้"), "lines": lines(own)})
             count = len(opened) + len(own) + sum(len(s.commands) for s in mine)
+            # การ์ด 0086: สกิลประจำเว็บที่มากับระบบ ปิด/เปิดได้ที่แถวของเว็บนั้น
+            builtin = [{"id": b.id, "name": tr(b.name), "enabled": b.id not in self._off}
+                       for b in self._builtin if b.site == site]  # fmt: skip
             rows.append({"key": site, "name": tr(name), "groups": groups, "mine": len(mine),
-                         "count": count})  # fmt: skip
+                         "count": count, "builtin": builtin})  # fmt: skip
         return rows
 
     @Property(str, notify=skillsChanged)  # เปลี่ยนภาษา = อ่านใหม่พร้อมไทล์
@@ -4033,8 +4041,29 @@ class SkillsController(QObject):
         self.forgeDone.emit(card, text)
 
     def _reload(self) -> None:
-        self._skills = self._builtin + self._user.load()
+        self._off = self._user.builtin_off()
+        self._skills = [b for b in self._builtin if b.id not in self._off] + self._user.load()
         self.skillsChanged.emit()
+
+    # ---------- เปิด/ปิดสกิลในตัว (การ์ด 0086) ----------
+    def _all_skills(self) -> list:
+        """สกิลในตัวครบทุกตัว + สกิลผู้ใช้ที่เปิด · ใช้ดูว่าข้อความเป็นงานของสกิลไหน (รวมตัวที่ปิด)."""
+        return self._builtin + [s for s in self._skills if self._is_user(s.id)]
+
+    def _off_card(self, skill) -> dict:
+        """งานของสกิลในตัวที่ปิด = บอกตรง ๆ (H5) · ไม่ส่งให้ AI เดาแทน ไม่ทำเงียบ ๆ."""
+        return self._plain("skill-off", tr("ปิดสกิล “{name}” ไว้", name=tr(skill.name)),
+                           [tr("เปิดได้ที่หน้า Skill › สกิลในเครื่อง")],
+                           [{"text": tr("ปิดอยู่"), "kind": "neutral"}])  # fmt: skip
+
+    def _off_route(self, text: str):
+        """ข้อความนี้เป็นงานของสกิลในตัวที่ปิดไหม (ตัวคัดแบบกฎ · ไม่ใช้ AI) · คืนสกิลนั้น หรือ None."""
+        from aipc.skills import router
+
+        if not self._off:
+            return None
+        r = router.route(text, self._all_skills(), self.available())
+        return r.skill if r.skill is not None and r.skill.id in self._off else None
 
     def _record(self, skill, ok: bool) -> None:
         if self._is_user(skill.id) and self._user.record(skill.id, ok):
@@ -4519,7 +4548,12 @@ class SkillsController(QObject):
 
     @Slot(str, bool)
     def setSkillEnabled(self, skill_id: str, on: bool) -> None:  # noqa: N802
-        if self._is_user(skill_id):
+        if self._user is None:
+            return
+        if any(b.id == skill_id for b in self._builtin):  # การ์ด 0086: สกิลในตัวปิดได้ต่อผู้ใช้
+            self._user.set_builtin(skill_id, on)
+            self._reload()
+        elif self._is_user(skill_id):
             self._user.set_enabled(skill_id, on)
             self._reload()
 
@@ -4654,7 +4688,7 @@ class SkillsController(QObject):
 
         text = english.to_thai(text) or text
         t = re.sub(r"\s+", "", text.strip())
-        by_id = {s.id: s for s in self._skills}
+        by_id = {s.id: s for s in self._all_skills()}  # รวมตัวที่ปิด: ผู้เรียกบอกว่าปิดไว้ (การ์ด 0086)
         # งานที่ใช้ AI ก่อน: ประโยคร่างจดหมายมักมีวันที่ ("ร่างอีเมลขอลางานพรุ่งนี้" เคยไปทางตั้งเตือน · รอบ 1)
         want = {"translate": "translate", "summarize": "summarize-text"}
         lang = want.get(lang_intent(text) or "", "")
@@ -4682,6 +4716,10 @@ class SkillsController(QObject):
         if card := self.voiceAnswer(text):
             return card
         t0 = time.monotonic()
+        if "reminder" in self._off:  # การ์ด 0086
+            return self._why(
+                self._off_card(next(b for b in self._builtin if b.id == "reminder")), t0
+            )
         card = self._handle_as("reminder", english.to_thai(text) or text)
         if card.get("badge"):  # _handle_as เขียนว่า "AI ในเครื่องเลือก" · ทางนี้กฎเป็นคนเลือก (H5)
             card["badge"] = {**card["badge"], "reason": "คำสั่งเสียง · กฎตรวจว่าเป็นการตั้งเตือน"}
@@ -4695,9 +4733,11 @@ class SkillsController(QObject):
 
         t0 = time.monotonic()
         want = self.voiceIntent(text)
-        skill = next((s for s in self._skills if "llm:" + s.id == want), None)
+        skill = next((s for s in self._all_skills() if "llm:" + s.id == want), None)
         if skill is None:
             return {}
+        if skill.id in self._off:  # การ์ด 0086
+            return self._why(self._off_card(skill), t0)
         thai = english.to_thai(text) or text
         self._counter += 1
         token = f"c{self._counter}"
@@ -4959,6 +4999,9 @@ class SkillsController(QObject):
         """AI ในเครื่องเลือกสกิลนี้ → ทำทางเดียวกับที่ตัวคัดสกิลเลือก (ยืนยันก่อนถ้าเป็นงานที่แตะเครื่อง)."""
         t0 = time.monotonic()
         self._turns.clear_skill()
+        off = next((b for b in self._builtin if b.id == skill_id and b.id in self._off), None)
+        if off is not None:
+            return self._why(self._off_card(off), t0)
         return self._rateable(self._why(self._handle_as(skill_id, text), t0), text)
 
     def _handle_as(self, skill_id: str, text: str) -> dict:
@@ -5027,6 +5070,8 @@ class SkillsController(QObject):
 
         t0 = time.monotonic()
         self._turns.clear_skill()  # ข้อความใหม่ = บันทึกสกิลภาษาของข้อความก่อนหมดอายุ
+        if off := self._off_route(english.to_thai(text) or text):  # การ์ด 0086
+            return self._why(self._off_card(off), t0)
         # คำสั่งอังกฤษ → รูปไทยให้ตัวแปลเดิม (การ์ด 0039 ระยะ C) · แปลงแล้วยังไปจบที่ AI = ส่งข้อความเดิม
         # ให้ AI แทน (AI ตอบอังกฤษตามภาษาคำถาม) · ไม่ใช่คำสั่ง = to_thai คืน None ไม่แตะอะไร
         th = english.to_thai(text)

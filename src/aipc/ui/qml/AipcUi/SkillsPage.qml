@@ -192,6 +192,16 @@ ColumnLayout {
                             }
                         }
                     }
+                    Repeater {   // การ์ด 0086: สกิลประจำเว็บที่มากับระบบ ปิด/เปิดได้
+                        model: wr.open ? (wr.modelData.builtin || []) : []
+                        AppButton {
+                            required property var modelData
+                            objectName: "webBuiltinToggle"
+                            text: (modelData.enabled ? Tr.t("ปิดคำสั่งของ “") : Tr.t("เปิดคำสั่งของ “")) + modelData.name + "”"
+                            kind: "secondary"
+                            onClicked: skills.setSkillEnabled(modelData.id, !modelData.enabled)
+                        }
+                    }
                     AppText {
                         visible: wr.open && wr.modelData.mine > 0
                         text: Tr.t("ที่คุณสอน (Claude สร้าง)")
@@ -591,8 +601,10 @@ ColumnLayout {
                         Item { Layout.fillWidth: true }
                         Chip {
                             objectName: "skillReady"
-                            text: sc.modelData.ready ? Tr.t("ใช้ได้แล้ว") : Tr.t("ยังไม่พร้อม")
-                            kind: sc.modelData.ready ? "ok" : "neutral"; dot: true
+                            // การ์ด 0086: ผู้ใช้ปิดไว้ = บอกก่อนเรื่องพร้อม/ไม่พร้อม
+                            text: sc.modelData.enabled === false ? Tr.t("ปิดอยู่")
+                                  : sc.modelData.ready ? Tr.t("ใช้ได้แล้ว") : Tr.t("ยังไม่พร้อม")
+                            kind: sc.modelData.enabled !== false && sc.modelData.ready ? "ok" : "neutral"; dot: true
                         }
                     }
                     AppText { text: sc.modelData.name; strong: true; size: Theme.px(17); Layout.fillWidth: true; maximumLineCount: 2; elide: Text.ElideRight }
@@ -631,6 +643,14 @@ ColumnLayout {
                             spacing: 6
                             Chip { text: sc.modelData.worker }
                             Repeater { model: sc.modelData.permissions; Chip { required property string modelData; text: modelData; kind: "warn" } }
+                        }
+                        // การ์ด 0086: ปิด/เปิดสกิลในตัว (มีผลเฉพาะบัญชีนี้ · ไฟล์สกิลไม่ถูกแตะ)
+                        AppButton {
+                            objectName: "builtinToggle"
+                            visible: sc.modelData.enabled !== undefined
+                            text: sc.modelData.enabled === false ? Tr.t("เปิดใช้สกิลนี้") : Tr.t("ปิดสกิลนี้")
+                            kind: "secondary"
+                            onClicked: skills.setSkillEnabled(sc.modelData.id, sc.modelData.enabled === false)
                         }
                     }
                 }

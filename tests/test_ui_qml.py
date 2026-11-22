@@ -916,6 +916,27 @@ class ShellCardTest(unittest.TestCase):
         self.assertEqual(skills.userSkills, [])
         self.assertEqual(warnings, [])
 
+    def test_builtin_skill_toggle(self):
+        """การ์ด 0086: ไทล์สกิลในตัวมีปุ่มปิด/เปิด · กดแล้ว Python ปิดจริง · เปิดคืนได้."""
+        self.enterContext(mock.patch.dict(os.environ, {"AIPC_CLOUD": "0"}))
+        engine, win, warnings = self.open_shell("skills")
+        skills = engine.rootContext().contextProperty("skills")
+        page = find_items(win, "skillsPage")[0] if find_items(win, "skillsPage") else None
+        tile = next(t for t in find_items(win, "skillTile")
+                    if t.property("modelData")["id"] == "translate")  # fmt: skip
+        tile.clicked.emit()
+        settle(100)
+        button = next(b for b in find_items(win, "builtinToggle") if b.property("visible"))
+        button.clicked.emit()
+        settle(100)
+        state = {t["id"]: t["enabled"] for t in skills.property("skills") if "enabled" in t}
+        self.assertFalse(state["translate"])
+        self.assertEqual(skills.handle("แปลว่า good morning")["kind"], "skill-off")
+        skills.setSkillEnabled("translate", True)
+        self.assertNotEqual(skills.handle("แปลว่า good morning")["kind"], "skill-off")
+        del page
+        self.assertEqual(warnings, [])
+
     def test_skill_manager_controls(self):
         """การ์ด 0078: แก้เอง (ตรวจระหว่างพิมพ์) · เปลี่ยนชื่อ · หมวด · ฟอร์มสร้างในเครื่อง · ไม่มี warning."""
         from aipc.skills import manifest, userskills

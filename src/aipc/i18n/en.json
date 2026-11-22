@@ -1207,5 +1207,11 @@
   "กล้องเปิดอยู่ · ถือ QR ให้เห็นทั้งรูป (ไม่เกิน 20 วินาที) · ระบบไม่เก็บภาพ": "Camera is on · hold the whole QR in view (up to 20 seconds) · no images are kept",
   "ติดตั้งสกิลนี้": "Install this skill",
   "แชร์เป็นเลข 8 หลัก": "Share as 8-digit number",
-  "ฝากไฟล์สกิลไว้ที่เซิร์ฟเวอร์ 24 ชม. (แชร์ด้วยเลข 8 หลัก)": "Skill file kept on a server for 24 hours (shared by 8-digit number)"
+  "ฝากไฟล์สกิลไว้ที่เซิร์ฟเวอร์ 24 ชม. (แชร์ด้วยเลข 8 หลัก)": "Skill file kept on a server for 24 hours (shared by 8-digit number)",
+  "เปิดใช้สกิลนี้": "Turn this skill on",
+  "ปิดสกิลนี้": "Turn this skill off",
+  "ปิดคำสั่งของ “": "Turn off commands of “",
+  "เปิดคำสั่งของ “": "Turn on commands of “",
+  "ปิดสกิล “{name}” ไว้": "The “{name}” skill is turned off",
+  "เปิดได้ที่หน้า Skill › สกิลในเครื่อง": "Turn it on in Skill › Built-in skills"
 }
