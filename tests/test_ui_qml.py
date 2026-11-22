@@ -1030,8 +1030,11 @@ class ShellCardTest(unittest.TestCase):
         ต้องบอกเองว่าไม่มีเซิร์ฟเวอร์ (eb28b62 ตั้งที่อยู่จริงแล้ว · เดิมผ่านเฉพาะเมื่อตั้ง AIPC_CLOUD=0 · พบ 2026-11-22)
         """
         from aipc.skills import share
+        from aipc.vision import client as vision_client
 
         self.enterContext(mock.patch.object(share, "server_url", return_value=""))
+        # การ์ดรับสกิลขึ้นเมื่อมีกล้องสแกน QR ด้วย · Pi 5 มี visiond = การ์ดขึ้นเสมอ (พบบน Pi 2026-11-22)
+        self.enterContext(mock.patch.object(vision_client, "available", return_value=False))
         _, win, warnings = self.open_shell("skills")
         self.assertFalse(find_items(win, "receiveSkillCard")[0].property("visible"))
         self.assertEqual(warnings, [])
