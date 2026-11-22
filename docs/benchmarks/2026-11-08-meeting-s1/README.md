@@ -21,6 +21,20 @@ pw-record --rate 16000 --channels 1 --format s16 ~/s1-a.wav     # กด Ctrl+C 
 cd ~/aipc-0082 && PYTHONPATH=src ~/aipc/.venv/bin/python -m aipc.spikes.meeting_s1 run --audio ~/s1-a.wav --ref docs/benchmarks/2026-11-08-meeting-s1/script-a.txt --label A-1m --out ~/s1-a.json
 ```
 
+## ชุด P · ชุดเสียงสาธารณะ Porjai (เพิ่มก่อนวัด 2026-11-22 · Pakon ตัดสิน "ใช้ชุดเสียงสาธารณะ Porjai")
+
+แทนชุด A/B เป็น**ชุดหลัก** (จอไม่มีลำโพง · ไม่ต้องอัดเสียงคน) · ชุด A/B ยังทำเพิ่มได้ถ้า Pakon อยากวัดผ่านไมค์จริง
+
+| ข้อ | ค่า |
+|---|---|
+| ที่มา | [CMKL/Porjai-Thai-voice-dataset-central](https://huggingface.co/datasets/CMKL/Porjai-Thai-voice-dataset-central) · **CC BY-SA 4.0** · Suwanbandit et al., INTERSPEECH 2023 · split train 335,674 ประโยค |
+| เลือกประโยค | `porjai_s1.offsets()` = 30 กลุ่ม × 10 ประโยคติดกัน · จุดเริ่มห่างเท่ากันทั้งชุด (0, 11,188, 22,376, …) · ได้ชุดเดิมทุกครั้ง · ผู้วัดไม่เปิดฟัง/อ่านก่อนรัน |
+| ต่อเสียง | ffmpeg → 16 kHz mono 16 bit · คั่นประโยคละ 0.4 วิ · ไฟล์เดียว ~15–25 นาที (ยาวจริงจดในผล) · ไฟล์เสียงอยู่นอก git |
+| เฉลย | ข้อความ `sentence` ของแต่ละประโยค (บรรทัดละประโยค) · CER คิดเฉพาะตัวอักษรไทยเหมือนเดิม |
+| เครื่องมือ | `python -m aipc.spikes.porjai_s1 --out ~/s1-porjai` แล้ว `meeting_s1 run --label P1` (คำสั่งเต็มในหัวไฟล์ `src/aipc/spikes/porjai_s1.py`) |
+| ข้อจำกัดที่รู้ก่อน | เป็นการอ่านประโยคสั้นต่อกัน ไม่ใช่ประชุมจริง (ไม่มีคนพูดแทรก ไม่มีเสียงห้อง) · ไม่ผ่านไมค์ของเครื่อง → ผลนี้คือ "เพดานบน" ของความแม่น · ต้องเขียนในเล่มแบบนี้ |
+| เครื่อง | Pi 5 · **วัดหลังตรวจพัดลมแล้ว** (2026-11-22 ระบบหาพัดลมไม่เจอ · เวลาถอดขึ้นกับความร้อน) · จด `vcgencmd get_throttled` ก่อน/หลัง |
+
 ## เกณฑ์ (ประกาศก่อนวัด · รันชุดละครั้ง)
 
 | ผล | ทำอะไรต่อ |
