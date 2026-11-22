@@ -31,6 +31,19 @@ Rectangle {
         NavItem { text: Tr.t("ตั้งค่า"); iconPath: Icons.sliders; pageName: "settings" }
         Item { Layout.fillHeight: true }
 
+        // การ์ด 0075 (กรรมการข้อ 4): เปลี่ยนภาษาได้จากทุกหน้า กดครั้งเดียว · ป้าย = ภาษาที่จะเปลี่ยนไป เขียนด้วยภาษานั้นเอง
+        // จำไว้ในค่าตั้งของบัญชีนี้ (uiSettings) แบบเดียวกับปุ่มในหน้าตั้งค่า
+        AppButton {
+            objectName: "langToggle"
+            Layout.alignment: Qt.AlignHCenter
+            kind: "ghost"; iconPath: Icons.globe
+            text: uiSettings.language === "en" ? "ไทย" : "EN"
+            Accessible.name: "ภาษา · Language"
+            ToolTip.visible: hovered
+            ToolTip.text: uiSettings.language === "en" ? "เปลี่ยนเป็นภาษาไทย" : "Switch to English"
+            onClicked: uiSettings.setLanguage(uiSettings.language === "en" ? "th" : "en")
+        }
+
         // ปิด/รีสตาร์ตเครื่อง (การ์ด 0052) · ถามยืนยันก่อนเสมอ (PowerDialog)
         AppButton {
             objectName: "rebootButton"
