@@ -26,6 +26,7 @@ class PipeClient:
         self._lock = threading.Lock()
         self._next = 0
         self._waiting: dict[int, list] = {}
+        self._events: dict = {}  # ชื่อเหตุการณ์ → ตัวรับ(params, session) · ทำงานบนเธรดอ่าน ห้ามเรียก call
         self.closed = False
         threading.Thread(target=self._read, daemon=True).start()
 
@@ -41,14 +42,23 @@ class PipeClient:
                     except ValueError:
                         continue
                     slot = self._waiting.get(msg.get("id", -1))
-                    if slot is not None:  # เหตุการณ์ (ไม่มี id) ไม่ได้ใช้
+                    if slot is not None:
                         slot[1] = msg
                         slot[0].set()
+                    elif handler := self._events.get(msg.get("method", "")):
+                        handler(msg.get("params", {}), msg.get("sessionId", ""))
         except (OSError, ValueError):  # ValueError = เราปิดไฟล์เองระหว่างอ่าน (close())
             pass
         self.closed = True
         for slot in list(self._waiting.values()):  # Chromium ปิด = ปลุกทุกคนที่รออยู่
             slot[0].set()
+
+    def on_event(self, method: str, handler) -> None:
+        """รับเหตุการณ์ของเบราว์เซอร์ (การ์ด 0048) · handler = None เลิกรับ."""
+        if handler is None:
+            self._events.pop(method, None)
+        else:
+            self._events[method] = handler
 
     def call(self, method: str, params: dict | None = None, session: str = "", timeout=15.0):
         if self.closed:

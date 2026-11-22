@@ -1192,5 +1192,6 @@
   "ความคืบหน้างานข้ามคืน": "Overnight job progress",
   "พักไว้ก่อน": "Pause",
   "ทำต่อ": "Continue",
-  "ยกเลิกงาน": "Cancel job"
+  "ยกเลิกงาน": "Cancel job",
+  "กำลังบันทึก · ทำให้ดูได้เลย · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …": "Recording · show me now · when done say: finished, name it …"
 }

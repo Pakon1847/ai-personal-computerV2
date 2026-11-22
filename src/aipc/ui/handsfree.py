@@ -246,6 +246,9 @@ class BrowserController(QObject):
     pageRequested = Signal(str)  # noqa: N815 · "กลับไปหน้าผู้ช่วย" = ย่อเบราว์เซอร์แล้วให้แอปไปหน้านั้น
     busyChanged = Signal()  # noqa: N815
     _done = Signal(str, bool, bool)
+    # การ์ด 0048: จบการสาธิต (ชื่อคำสั่ง, ขั้นที่จด, เว็บ) · หน้าจอส่งต่อให้ skills.siteDemo
+    demoReady = Signal(str, "QVariantList", str)  # noqa: N815
+    _demo_done = Signal(object)
 
     def __init__(self, active: bool = True, control=None, ledger=None, skill_match=None,
                  profile=None, gmail=None, summarize=None):  # fmt: skip
@@ -260,6 +263,8 @@ class BrowserController(QObject):
         self._profile = profile
         self._ledger = ledger
         self._skill_match = skill_match  # การ์ด 0028: SkillsController.voiceSkill (app.py ต่อให้)
+        self._demo_site = ""  # เว็บของการสาธิตที่กำลังจด (การ์ด 0048)
+        self._demo_done.connect(self._on_demo_done)
         self._intent = None  # การ์ด 0042: SkillsController.voiceIntent (app.py ต่อให้)
         self._busy = False
         self._queued = None  # การ์ด 0057 รอบ 2: คำสั่งที่พูดระหว่างกำลังทำคำสั่งก่อนหน้า
@@ -327,15 +332,58 @@ class BrowserController(QObject):
         from aipc.skills import sitecmd
         from aipc.skills.browse import BrowseCommand
 
-        if not self._active or self._busy or kind not in ("key", "click", "click_text", "system"):
+        allowed = ("key", "click", "click_text", "system", "steps")
+        if not self._active or self._busy or kind not in allowed:
             return False
         if self._control is None or not self._control.running:
             return False
+        if kind == "steps":  # การ์ด 0048: ตรวจซ้ำตอนทำ · n=1 = รอปุ่มของขั้นนี้ขึ้นก่อน · ไม่ลองปุ่มอื่นแทน
+            steps, problems = sitecmd.parse_steps(arg)
+            if problems or not steps:
+                return False
+            return self._start([BrowseCommand(k, query=a, site=site, n=1) for k, a in steps])
         if kind == "system":  # ตรวจซ้ำตอนทำ ไม่เชื่อไฟล์อย่างเดียว (H7) · แปลด้วยตัวเดียวกับเสียง (H6)
             cmds, why = sitecmd.alias_commands(arg)
             return self._start(cmds) if not why else False
         back = words if kind in ("click", "click_text") else ""
         return self._start([BrowseCommand(kind, query=arg, site=site, direction=back)])
+
+    @Slot(str, result="QVariantMap")
+    def demoCommand(self, text: str) -> dict:  # noqa: N802
+        """สอนด้วยการทำให้ดู (การ์ด 0048): "เริ่มบันทึก" · "เสร็จแล้ว ตั้งชื่อว่า …" · "ยกเลิกการบันทึก".
+        {"started": True} = กำลังทำ (ผลมาทาง finished/demoReady) · {"say": …} = เหตุผล · {} = ไม่ใช่."""
+        from aipc.browser import demo
+        from aipc.skills.browse import BrowseCommand
+
+        what, name = demo.intent(text)
+        if not what or not self._active or self._control is None or not self._control.running:
+            return {}
+        recording = self._control.demo_active
+        if what == "start":
+            if recording:
+                return {"say": "กำลังบันทึกอยู่แล้ว · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …"}
+            site = demo.site_of(str(self._control.current().get("url", "")))
+            if not site:
+                return {"say": "บันทึกได้เฉพาะเว็บในรายการที่ผู้ช่วยคุมได้"}
+            self._demo_site = site
+            self._start([BrowseCommand("demo_start", site=site)])
+            return {"started": True}
+        if not recording:  # "เสร็จแล้ว" ตอนไม่ได้บันทึก = คำพูดธรรมดา
+            return {}
+        if what == "done":
+            return {"say": "ตั้งชื่อคำสั่งด้วย เช่น พูดว่า เสร็จแล้ว ตั้งชื่อว่า ซูมเข้าสองที"}
+        if what == "stop":
+            self._start([BrowseCommand("demo_stop", query=name[:40])])
+            return {"started": True}
+        if what == "cancel":
+            self._start([BrowseCommand("demo_stop", direction="cancel")])
+            return {"started": True}
+        return {}
+
+    @Slot(object)
+    def _on_demo_done(self, r: tuple) -> None:
+        name, steps = r
+        self.demoReady.emit(name, steps, self._demo_site)
 
     @Slot(str, result="QVariantMap")
     def clickText(self, text: str) -> dict:  # noqa: N802
@@ -548,9 +596,14 @@ class BrowserController(QObject):
         # try/finally: เกิดข้อผิดพลาดกลางทางก็ต้องส่ง _done เสมอ · เดิมไม่ส่ง → busy ค้าง ทุกคำสั่งเสียงตอบ
         # "ยังทำคำสั่งก่อนหน้าอยู่" จนออกจากระบบ (ตรวจทั้งระบบ 2026-10-18 ข้อ 2.8)
         says, ok = [], True
+        multi = len(cmds) > 1 and all(c.n == 1 for c in cmds)  # คำสั่งหลายขั้น (การ์ด 0048)
         try:
-            for c in cmds:
+            for i, c in enumerate(cmds, start=1):
                 r = self._ctl().run(c)
+                if c.kind == "demo_stop" and r.ok and c.direction != "cancel":
+                    self._demo_done.emit((c.query, [s.to_dict() for s in r.steps]))
+                    says.append(f"จดคำสั่ง “{c.query}” แล้ว {len(r.steps)} ขั้น")
+                    continue
                 if c.kind in ("search", "site_search") and self._ledger is not None:
                     # คำค้นออกไป Google/DuckDuckGo หรือบริการที่พูดชื่อ (การ์ด 0036) = ส่งออกนอกเครื่อง
                     where = "ค้นเว็บ" if c.kind == "search" else f"ค้นใน {SITES[c.site][0]}"
@@ -565,7 +618,11 @@ class BrowserController(QObject):
                     self._page_next = c.query
                 if not r.ok:
                     ok = False
+                    if multi:  # H5: บอกตรง ๆ ว่าหยุดที่ขั้นไหน
+                        says = [f"ขั้นที่ {i} จาก {len(cmds)} ไม่สำเร็จ จึงหยุด ไม่ทำขั้นถัดไป · {r.say}"]
                     break
+            if multi and ok:
+                says = [f"ทำครบ {len(cmds)} ขั้นแล้ว"]
         except Exception as e:  # noqa: BLE001 · ทุกแบบต้องจบด้วยการบอกผู้ใช้ ไม่ค้างเงียบ
             ok = False
             says.append(f"ทำไม่สำเร็จ: {type(e).__name__}")

@@ -57,7 +57,9 @@ def google_login_page(url: str) -> bool:
 
 # คำสั่งที่ต้องมีหน้าเว็บเปิดอยู่ก่อน · เบราว์เซอร์ยังไม่เปิด = ไม่ใช่งานของเรา ส่งประโยคไปทางเดิมของแอป
 NEEDS_PAGE = {"open", "back", "forward", "reload", "scroll", "close", "app", "media", "fullscreen",
-              "skip_ad", "key", "click", "click_text"}  # fmt: skip
+              "skip_ad", "key", "click", "click_text", "demo_start", "demo_stop"}  # fmt: skip
+# คำสั่งหลายขั้น (การ์ด 0048): รอให้เมนูของขั้นก่อนเปิดก่อนจะบอกว่าไม่มีปุ่ม
+STEP_WAIT_S = 3.0
 # ปุ่ม/ลิงก์ที่มองเห็นในจอ + ป้ายของมัน (การ์ด 0069 · aipc.browser.textclick เทียบคำ) · เรียงบนลงล่าง ซ้ายไปขวา ·
 # ติดเลขไว้ที่ data-aipc-t ให้ CLICK_TEXT_JS กดตัวที่เลือก · ไม่อ่านช่องกรอก/ช่องรหัสผ่าน
 BUTTONS_JS = r"""(() => {
@@ -404,6 +406,7 @@ class Result:
     say: str  # ประโยคสั้น ๆ ให้อ่านออกเสียง/แสดงในการ์ด
     handled: bool = True  # False = ไม่ใช่งานเบราว์เซอร์ตอนนี้ → ส่งประโยคไปทางเดิมของแอป
     url: str = ""
+    steps: tuple = ()  # ขั้นที่จดจากการสาธิต (การ์ด 0048)
 
 
 def default_profile() -> Path:
@@ -469,6 +472,7 @@ class BrowserControl:
         self._mark = 0
         self._login_proc = None  # หน้าต่างเข้าสู่ระบบแบบไม่คุม (ใช้โปรไฟล์เดียวกัน)
         self._google_blocked = False  # เจอ /sorry/ แล้ว = ค้นด้วย DuckDuckGo ตรง ๆ จนปิดเบราว์เซอร์
+        self._demo = None  # การสาธิตที่กำลังจดอยู่ (การ์ด 0048 · aipc.browser.demo.Recording)
         self._mail_wait = 20.0  # วินาทีที่รอรายการเมลขึ้นหลังเปิด Gmail (การ์ด 0071 · Gmail บน Pi โหลดช้า)
 
     # ---------- เปิด / ต่อ ----------
@@ -506,6 +510,7 @@ class BrowserControl:
         self._profile.mkdir(parents=True, exist_ok=True)
         self._proc, self._cdp = self._launch(self._argv(url))
         self._session = self._target = ""
+        self._demo = None
         self._cdp.call("Browser.getVersion", timeout=30)  # รอจนพร้อม (เปิดครั้งแรกบน Pi ~1–3 วิ)
 
     def _pages(self) -> list[dict]:
@@ -915,7 +920,12 @@ class BrowserControl:
 
         if bad := self._site_check(cmd):
             return bad
-        state = self._eval(f"{SELECTOR_CLICK_JS}({json.dumps(cmd.query)})", userGesture=True)
+        end = time.monotonic() + (STEP_WAIT_S if cmd.n else 0)
+        while True:
+            state = self._eval(f"{SELECTOR_CLICK_JS}({json.dumps(cmd.query)})", userGesture=True)
+            if state != "none" or time.monotonic() >= end:
+                break
+            time.sleep(0.2)
         if state == "ok":
             time.sleep(0.3)
             return Result(True, "ทำแล้ว")
@@ -925,14 +935,67 @@ class BrowserControl:
             return Result(False, "สกิลเขียนตัวเลือกปุ่มผิดรูป · ให้ Claude แก้สกิล")
         return Result(False, "หน้านี้ไม่มีปุ่มนั้น (เว็บอาจเปลี่ยนหน้าตา) · ไม่ได้กดอะไร")
 
+    @property
+    def demo_active(self) -> bool:
+        return self._demo is not None
+
+    def _do_demo_start(self, cmd: BrowseCommand) -> Result:
+        """เริ่มจดสิ่งที่ผู้ใช้ทำในแท็บนี้ (การ์ด 0048) · หน้าเว็บขึ้นแถบสีแดงตลอดเวลาที่จด (H3)."""
+        from aipc.browser import demo
+        from aipc.i18n import tr
+
+        if self._demo is not None:
+            return Result(False, "กำลังบันทึกอยู่แล้ว · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …")
+        session = self._page()
+        rec = demo.Recording(session)
+        script = demo.recorder_js(tr("กำลังบันทึก · ทำให้ดูได้เลย · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …"))
+        self._cdp.on_event("Runtime.bindingCalled", rec.on_binding)
+        self._cdp.call("Runtime.enable", session=session)
+        self._cdp.call("Runtime.addBinding", {"name": demo.BINDING}, session=session)
+        self._cdp.call("Page.enable", session=session)
+        rec.script = self._cdp.call(
+            "Page.addScriptToEvaluateOnNewDocument", {"source": script}, session=session
+        )["identifier"]
+        self._eval(script)
+        self._demo = rec
+        return Result(True, "เริ่มบันทึกแล้ว · ทำให้ดูได้เลย · จบแล้วพูดว่า เสร็จแล้ว ตั้งชื่อว่า …")
+
+    def _do_demo_stop(self, cmd: BrowseCommand) -> Result:
+        """เลิกจด · คืนขั้นที่จดได้ · แท็บถูกปิดไปแล้ว = ขั้นที่จดไว้ยังใช้ได้."""
+        from aipc.browser import demo
+
+        rec, self._demo = self._demo, None
+        if rec is None:
+            return Result(False, "ยังไม่ได้เริ่มบันทึก")
+        self._cdp.on_event("Runtime.bindingCalled", None)
+        url = ""
+        try:
+            self._cdp.call(
+                "Page.removeScriptToEvaluateOnNewDocument", {"identifier": rec.script},
+                session=rec.session,
+            )  # fmt: skip
+            self._cdp.call("Runtime.removeBinding", {"name": demo.BINDING}, session=rec.session)
+            self._eval(demo.STOP_JS)
+            url = self._url()
+        except cdp.CdpError:
+            pass
+        if cmd.direction == "cancel":
+            return Result(True, "ยกเลิกการบันทึกแล้ว ไม่ได้เก็บอะไรไว้", url=url)
+        return Result(True, "", url=url, steps=rec.steps)
+
     def _do_click_text(self, cmd: BrowseCommand) -> Result:
         """กดปุ่มที่มองเห็นและป้ายตรงกับคำ (การ์ด 0069) · query = คำ (คั่น "|" ได้) · ไม่ชัด/เสี่ยง = ไม่กด."""
         from aipc.browser import textclick
 
         if cmd.site and (bad := self._site_check(cmd)):
             return bad
-        items = self._eval(BUTTONS_JS) or []
-        pick = textclick.choose(cmd.query, items)
+        end = time.monotonic() + (STEP_WAIT_S if cmd.n else 0)
+        while True:
+            items = self._eval(BUTTONS_JS) or []
+            pick = textclick.choose(cmd.query, items)
+            if pick.item is not None or pick.choices or time.monotonic() >= end:
+                break
+            time.sleep(0.2)
         if pick.item is None and not pick.choices and cmd.direction:
             pick = textclick.choose(cmd.direction, items)  # ป้ายที่สกิลเขียนไม่มีในหน้า → คำพูดของคำสั่งนี้
         if why := textclick.refuse_text(cmd.query, pick):

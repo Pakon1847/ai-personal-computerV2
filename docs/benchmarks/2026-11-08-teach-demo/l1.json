@@ -1,0 +1,365 @@
+[
+ {
+  "id": "T01",
+  "site": "youtube",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องค้นหาของเว็บ",
+  "want": [
+   {
+    "kind": "click",
+    "x": 649,
+    "y": 372,
+    "tag": "button",
+    "aria": "Settings",
+    "id": "",
+    "text": ""
+   },
+   {
+    "kind": "click",
+    "x": 575.796875,
+    "y": 336,
+    "tag": "div",
+    "aria": "",
+    "id": "",
+    "text": "Playback speed"
+   },
+   {
+    "kind": "click",
+    "x": 592.5,
+    "y": 311,
+    "tag": "button",
+    "aria": "",
+    "id": "",
+    "text": "1.5"
+   }
+  ],
+  "got": [
+   "click",
+   "click",
+   "click"
+  ],
+  "steps": [
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "button",
+    "id": "",
+    "testid": "",
+    "aria": "Settings",
+    "role": "",
+    "text": "",
+    "css": "#movie_player > div:nth-of-type(26) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(4)"
+   },
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "div",
+    "id": "",
+    "testid": "",
+    "aria": "",
+    "role": "menuitem",
+    "text": "Playback speed Normal",
+    "css": "#ytp-id-5 > div:nth-of-type(2) > div > div > div:nth-of-type(5)"
+   },
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "button",
+    "id": "",
+    "testid": "",
+    "aria": "",
+    "role": "",
+    "text": "1.5",
+    "css": "div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(3) > button"
+   }
+  ],
+  "lines": [
+   "คลิก “Settings”",
+   "คลิก “Playback speed Normal”",
+   "คลิก “1.5”"
+  ],
+  "secret_leaked": false,
+  "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "right": true
+ },
+ {
+  "id": "T02",
+  "site": "youtube",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องค้นหาของเว็บ",
+  "want": [
+   {
+    "kind": "click",
+    "x": 697,
+    "y": 372,
+    "tag": "button",
+    "aria": "Cinema mode (t)",
+    "id": "",
+    "text": ""
+   }
+  ],
+  "got": [
+   "click"
+  ],
+  "steps": [
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "button",
+    "id": "",
+    "testid": "",
+    "aria": "Cinema mode (t)",
+    "role": "",
+    "text": "",
+    "css": "#movie_player > div:nth-of-type(26) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > button:nth-of-type(1)"
+   }
+  ],
+  "lines": [
+   "คลิก “Cinema mode (t)”"
+  ],
+  "secret_leaked": false,
+  "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "right": true
+ },
+ {
+  "id": "T03",
+  "site": "youtube",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องค้นหาของเว็บ",
+  "want": [
+   {
+    "kind": "key",
+    "key": "c"
+   }
+  ],
+  "got": [
+   "key"
+  ],
+  "steps": [
+   {
+    "kind": "key",
+    "key": "c",
+    "tag": "",
+    "id": "",
+    "testid": "",
+    "aria": "",
+    "role": "",
+    "text": "",
+    "css": ""
+   }
+  ],
+  "lines": [
+   "กดคีย์ c"
+  ],
+  "secret_leaked": false,
+  "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "right": true
+ },
+ {
+  "id": "T05",
+  "site": "wikipedia",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องทดสอบที่ตัววัดใส่",
+  "want": [
+   {
+    "kind": "click",
+    "x": 34,
+    "y": 33,
+    "tag": "input",
+    "aria": "เมนูหลัก",
+    "id": "vector-main-menu-dropdown-checkbox",
+    "text": ""
+   },
+   {
+    "kind": "click",
+    "x": 70.6484375,
+    "y": 213.15625,
+    "tag": "a",
+    "aria": "",
+    "id": "",
+    "text": "สุ่มบทความ"
+   }
+  ],
+  "got": [
+   "click",
+   "click"
+  ],
+  "steps": [
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "input",
+    "id": "vector-main-menu-dropdown-checkbox",
+    "testid": "",
+    "aria": "เมนูหลัก",
+    "role": "button",
+    "text": "",
+    "css": "#vector-main-menu-dropdown-checkbox"
+   },
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "a",
+    "id": "",
+    "testid": "",
+    "aria": "",
+    "role": "",
+    "text": "สุ่มบทความ",
+    "css": "#n-randompage > a"
+   }
+  ],
+  "lines": [
+   "คลิก “เมนูหลัก”",
+   "คลิก “สุ่มบทความ”"
+  ],
+  "secret_leaked": false,
+  "url": "https://th.wikipedia.org/wiki/%E0%B8%AA%E0%B8%96%E0%B8%B2%E0%B8%99%E0%B8%B5%E0%B8%A3%E0%B8%96%E0%B9%84%E0%B8%9F%E0%B9%82%E0%B8%AD%E0%B8%A2%E0%B8%B2%E0%B8%A1%E0%B8%B0",
+  "right": true
+ },
+ {
+  "id": "T06",
+  "site": "wikipedia",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องทดสอบที่ตัววัดใส่",
+  "want": [
+   {
+    "kind": "click",
+    "x": 676.3515625,
+    "y": 150.046875,
+    "tag": "a",
+    "aria": "",
+    "id": "",
+    "text": "ดูประวัติ"
+   }
+  ],
+  "got": [
+   "click"
+  ],
+  "steps": [
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "a",
+    "id": "",
+    "testid": "",
+    "aria": "",
+    "role": "",
+    "text": "ดูประวัติ",
+    "css": "#ca-history > a"
+   }
+  ],
+  "lines": [
+   "คลิก “ดูประวัติ”"
+  ],
+  "secret_leaked": false,
+  "url": "https://th.wikipedia.org/w/index.php?title=%E0%B8%AA%E0%B8%96%E0%B8%B2%E0%B8%99%E0%B8%B5%E0%B8%A3%E0%B8%96%E0%B9%84%E0%B8%9F%E0%B9%82%E0%B8%AD%E0%B8%A2%E0%B8%B2%E0%B8%A1%E0%B8%B0&action=history",
+  "right": true
+ },
+ {
+  "id": "T08",
+  "site": "maps",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องทดสอบที่ตัววัดใส่",
+  "want": [
+   {
+    "kind": "click",
+    "x": 765.5,
+    "y": 417.5,
+    "tag": "button",
+    "aria": "Zoom in",
+    "id": "",
+    "text": ""
+   },
+   {
+    "kind": "click",
+    "x": 765.5,
+    "y": 417.5,
+    "tag": "button",
+    "aria": "Zoom in",
+    "id": "",
+    "text": ""
+   }
+  ],
+  "got": [
+   "click",
+   "click"
+  ],
+  "steps": [
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "button",
+    "id": "",
+    "testid": "",
+    "aria": "Zoom in",
+    "role": "",
+    "text": "",
+    "css": "div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div > div:nth-of-type(1) > button"
+   },
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "button",
+    "id": "",
+    "testid": "",
+    "aria": "Zoom in",
+    "role": "",
+    "text": "",
+    "css": "div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div > div:nth-of-type(1) > button"
+   }
+  ],
+  "lines": [
+   "คลิก “Zoom in”",
+   "คลิก “Zoom in”"
+  ],
+  "secret_leaked": false,
+  "url": "https://www.google.com/maps/@13.7563,100.5018,16z?entry=ttu&g_ep=EgoyMDI2MTEwMy4wIKXMDSoASAFQAw%3D%3D",
+  "right": true
+ },
+ {
+  "id": "T09",
+  "site": "maps",
+  "ok": true,
+  "typed": true,
+  "typed_where": "ช่องทดสอบที่ตัววัดใส่",
+  "want": [
+   {
+    "kind": "click",
+    "x": 59.5,
+    "y": 453.5,
+    "tag": "button",
+    "aria": "",
+    "id": "",
+    "text": ""
+   }
+  ],
+  "got": [
+   "click"
+  ],
+  "steps": [
+   {
+    "kind": "click",
+    "key": "",
+    "tag": "button",
+    "id": "",
+    "testid": "",
+    "aria": "",
+    "role": "",
+    "text": "",
+    "css": "div:nth-of-type(9) > div:nth-of-type(18) > div:nth-of-type(4) > div > div > button"
+   }
+  ],
+  "lines": [
+   "คลิกปุ่มในหน้าเว็บ (button)"
+  ],
+  "secret_leaked": false,
+  "url": "https://www.google.com/maps/@13.7563,100.5018,1189m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI2MTEwMy4wIKXMDSoASAFQAw%3D%3D",
+  "right": true
+ }
+]
