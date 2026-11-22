@@ -96,6 +96,20 @@ class LedgerTest(unittest.TestCase):
         e = self.l.entries()[0]
         self.assertEqual((e["kind"], e["sent"]), ("review", "ข้อความที่ส่งตรวจ"))
 
+    def test_review_ledger_includes_user_skill_file_sent(self):
+        """รีวิวโค้ดข้อ 7: ไฟล์สกิลของผู้ใช้ที่ส่งไปด้วย ต้องอยู่ในสมุดบัญชีตามตัวอักษร."""
+        from aipc.skills import forge
+        from aipc.ui import app
+
+        made = forge.Proposal(False, "x", outcome="none", note="ok")
+        with mock.patch("aipc.cloud.ask.find_claude", return_value="claude"), \
+             mock.patch("aipc.skills.forge.forge", return_value=made), \
+             mock.patch("aipc.skills.forge.run_process", return_value=(0, "2.1", "")):  # fmt: skip
+            app._skill_forge(self.l)(
+                "x", review="ข้อความตรวจ", revise=("---\nid: a\n---\nเนื้อสกิล", "ไม่ชอบ")
+            )
+        self.assertIn("เนื้อสกิล", self.l.entries()[0]["sent"])
+
 
 if __name__ == "__main__":
     unittest.main()

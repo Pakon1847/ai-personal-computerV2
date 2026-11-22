@@ -183,6 +183,14 @@ class ReviewTest(unittest.TestCase):
                         review=REVIEW, revise=(SUMMARY_MD, "ผู้ใช้กดไม่ชอบผลนี้"))  # fmt: skip
         self.assertEqual((p.outcome, p.skill_id), ("revise", "summarize"))
 
+    def test_review_of_user_skill_may_return_new_id(self):
+        """รีวิวโค้ดข้อ 2: โหมดตรวจไม่บังคับ id เดิม · id ใหม่ = สร้างสกิลแยก."""
+        other = SUMMARY_MD.replace("id: summarize", "id: news-summary")
+        p = forge.forge("สรุปข่าวนี้", skills=[s for s in base() if s.id != "summarize"],
+                        runner=FakeClaude(answer(other)), claude="claude", today=date(2026, 11, 20),
+                        review=REVIEW, revise=(SUMMARY_MD, "ผู้ใช้กดไม่ชอบผลนี้"))  # fmt: skip
+        self.assertEqual((p.outcome, p.skill_id), ("create", "news-summary"))
+
     def test_plain_forge_has_no_outcome_and_no_review_section(self):
         fake = FakeClaude(answer())
         p = run(fake)

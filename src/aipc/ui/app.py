@@ -137,7 +137,11 @@ def _skill_forge(ledger=None):
             note = {"none": "Claude บอกว่าไม่ต้องแก้", "revise": "Claude แก้สกิล",
                     "create": "Claude สร้างสกิลใหม่"}.get(p.outcome, "ตรวจไม่สำเร็จ")  # fmt: skip
             note += " · พร้อมแม่แบบคำสั่งของระบบและรายชื่อสกิลในเครื่อง"
-            ledger.record("review", kw["review"], p.cost_usd, ok=not p.errors, note=note)
+            sent = kw["review"]
+            revise = kw.get("revise")
+            if revise and revise[0]:  # ไฟล์สกิลของผู้ใช้ที่ส่งไปให้ Claude แก้ = ข้อมูลของผู้ใช้ จดตามตัวอักษร
+                sent += "\n--- ไฟล์สกิลที่ส่งไปด้วย ---\n" + revise[0]
+            ledger.record("review", sent, p.cost_usd, ok=not p.errors, note=note)
         elif ledger is not None:
             revise = kw.get("revise")
             sent = request + (f"\nคำติ: {revise[1]}" if revise else "")

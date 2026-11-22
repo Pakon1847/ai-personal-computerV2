@@ -781,7 +781,10 @@ class ShellCardTest(unittest.TestCase):
     def test_rate_bar_shows_for_local_results_and_hides(self):
         """การ์ด 0085 D1: ปุ่มชอบ/ไม่ชอบใต้ผลของ AI ในเครื่อง (คำตอบ + การ์ด) · ไม่ใต้คำตอบ Claude /
         การ์ดกำลังสร้าง · กดแล้วหาย · ไม่กด = หายเองเมื่อหมดเวลา."""
-        _, win, warnings = self.open_shell()
+        # ห้ามเรียก Claude จริง: โน้ตบุ๊กที่ติดตั้ง claude ไว้ หน้าต่างนี้จะมีตัวสร้างสกิลจริง
+        # (พบ 2026-11-22: ไม่ตั้งตัวนี้ = กดไม่ชอบรอบจริงแล้วส่ง claude -p จริง 1 ครั้ง)
+        self.enterContext(mock.patch.dict(os.environ, {"AIPC_CLOUD": "0"}))
+        engine, win, warnings = self.open_shell()
         page = find_all(win, "workspace")[0]
         base = {"chips": [], "lines": ["x"], "confirmToken": "", "page": "", "badge": {}}
         far = time.time() * 1000 + 60_000
@@ -824,6 +827,17 @@ class ShellCardTest(unittest.TestCase):
         settle(150)
         self.assertEqual(shown("likeSkillButton"), [])
         self.assertEqual(len(shown("likeResult")), 1)
+        # ส่งตอนนี้ไม่ได้ (หน้าต่างพัฒนาไม่มี Claude) = ปุ่มยังอยู่ ให้กดใหม่ได้ (รีวิวโค้ด 2026-11-22)
+        skills = engine.rootContext().contextProperty("skills")
+        real = skills.handle("กี่โมงแล้ว")["turnId"]
+        page.setProperty("items", [
+            {"ai": True, "text": "ตอบ", "note": "", "done": True, "skill": "", "turnId": real,
+             "rateUntil": far},
+        ])  # fmt: skip
+        settle(100)
+        shown("dislikeResult")[0].clicked.emit()
+        settle(150)
+        self.assertEqual(len(shown("dislikeResult")), 1, "ยังส่งไม่ได้ = ปุ่มไม่หาย")
         self.assertEqual(warnings, [])
 
     def test_undo_button_shows_once_and_reports(self):

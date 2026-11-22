@@ -105,11 +105,14 @@ Item {
         if (card.page) AppState.page = card.page   // เช่น "เปิดหน้าตั้งค่า"
     }
     // ชอบ = นับเท่านั้น (ไม่มีอะไรขึ้นจอ) · ไม่ชอบ = การ์ดจาก Python (กำลังให้ Claude ตรวจ / ต้องเปิด Claude / ถามก่อนส่ง)
+    // ซ่อนปุ่มเมื่อ Python บอกว่ารอบนี้จบแล้ว (rateDone) · ส่งไม่ได้ตอนนี้ (ปิด Claude · กำลังทำงานอื่น · รอยืนยัน) = ปุ่มยังอยู่
     function rate(turnId, liked) {
-        const r = Object.assign({}, rated)
-        r[turnId] = true
-        rated = r
         const card = skills.rateResult(turnId, liked)
+        if (liked || card.rateDone === true) {
+            const r = Object.assign({}, rated)
+            r[turnId] = true
+            rated = r
+        }
         if (!liked) showCard(card)
     }
     function send() {

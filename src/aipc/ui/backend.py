@@ -3882,12 +3882,17 @@ class SkillsController(QObject):
             return self._plain("forging", "กำลังสร้างสกิลอื่นอยู่ รอสักครู่แล้วสั่งใหม่")
         self._forging = True
         others = [s for s in self._skills if s.id != revise_id]
+        everything = list(self._skills)
         revise = (self._user.current_md(revise_id), feedback) if revise_id else None
 
         def work():
             try:
 
                 def check(md):
+                    if review and revise_id:  # การ์ด 0085: Claude อาจสร้างสกิลแยก (id ใหม่) แทนการแก้
+                        m, _ = userskills.check_md(md)
+                        if m is not None and m.id != revise_id:
+                            return userskills.gate(md, everything)[1]
                     return userskills.gate(md, others, revise_id)[1]
 
                 extra = {"review": review} if review else {}  # การ์ด 0085: โหมดตรวจ
@@ -3912,7 +3917,7 @@ class SkillsController(QObject):
     def _on_reviewed(self, p, text: str, revise_id: str) -> None:
         """ผลการตรวจ (การ์ด 0085) · ติดตั้งด้วยด่านเดิม · **ไม่สั่งงานเดิมซ้ำเอง** (อาจเป็นคำสั่งเครื่อง)
         · ไม่สำเร็จ = ไม่ให้ Claude ตอบแทน (จะเป็นการเรียก Claude ครั้งที่ 2)."""
-        from aipc.skills import manifest
+        from aipc.skills import manifest, userskills
 
         errors = [str(p)] if isinstance(p, Exception) else list(p.errors)
         if not isinstance(p, Exception) and p.outcome == "none":
@@ -3922,10 +3927,15 @@ class SkillsController(QObject):
             self.forgeDone.emit(self._plain("review", "Claude ตรวจแล้ว: ไม่ต้องแก้สกิล", lines), text)
             return
         new = None
+        # id ใหม่ = สกิลแยก ติดตั้งเพิ่ม ไม่แทนสกิลเดิม (รีวิวโค้ด 2026-11-22)
+        replacing = ""
+        if revise_id and not isinstance(p, Exception) and p.skill_md:
+            m, _ = userskills.check_md(p.skill_md)  # อ่าน id จากไฟล์ที่ Claude ส่งมาจริง
+            replacing = revise_id if m is not None and m.id == revise_id else ""
         if not isinstance(p, Exception) and p.skill_md:
             try:
                 new = self._user.install(p.skill_md, self._skills, request=text, model=p.model,
-                                         cost_usd=p.cost_usd, replacing=revise_id)  # fmt: skip
+                                         cost_usd=p.cost_usd, replacing=replacing)  # fmt: skip
             except manifest.InvalidSkill as e:
                 errors = list(e.errors)
             except OSError as e:
@@ -3937,7 +3947,7 @@ class SkillsController(QObject):
             self.forgeDone.emit(card, text)
             return
         self._reload()
-        if revise_id:
+        if replacing:
             v = self._user.info(new.id)["version"]
             title = f"แก้สกิล “{new.name}” แล้ว (รุ่น {v})"
             lines = ["สั่งใหม่ได้เลย · ย้อนรุ่นได้ที่หน้า Skill"]
@@ -4147,13 +4157,18 @@ class SkillsController(QObject):
     # ---------- ปุ่มชอบ/ไม่ชอบใต้ผลของ AI ในเครื่อง (การ์ด 0085) ----------
     NO_RATE = frozenset({"forging", "forge-failed", "forge-ask", "needs", "review"})
 
-    def _rateable(self, card: dict, text: str) -> dict:
-        """ผลของ AI ในเครื่อง → จำรอบ + card["turnId"] · การ์ดที่รอยืนยัน / ส่งต่อแชท / ของระบบ ไม่จำ."""
+    def _rateable(self, card: dict, text: str, skill_hint: str = "") -> dict:
+        """ผลของ AI ในเครื่อง → จำรอบ + card["turnId"] · การ์ดที่รอยืนยัน / ส่งต่อแชท / ของระบบ ไม่จำ.
+
+        skill_hint = สกิลของการ์ดยืนยันก่อนหน้า (การ์ดผลหลังยืนยันบางทางไม่มี badge)
+        """
         from aipc.skills import feedback
 
         badge = card.get("badge") or {}
         if card.get("confirmToken"):
-            self._token_text[card["confirmToken"]] = text
+            self._token_text[card["confirmToken"]] = (text, badge.get("id", ""))
+            while len(self._token_text) > feedback.KEEP:  # การ์ดที่ไม่ตอบ ไม่สะสมข้อความผู้ใช้ไม่จำกัด
+                del self._token_text[next(iter(self._token_text))]
             return card
         if card.get("llm"):  # แชทเป็นคนตอบ · บอกแชทว่าใช้สกิลไหน (route)
             if badge.get("id"):
@@ -4162,10 +4177,13 @@ class SkillsController(QObject):
         kind = card.get("kind", "")
         if kind in self.NO_RATE or not text.strip():
             return card
-        sid = badge.get("id", "")
+        sid = badge.get("id", "") or skill_hint
+        skill = next((s for s in self._skills if s.id == sid), None)
+        # ขั้น "บอกนัด" = ผลมีนัดของผู้ใช้ (ในเครื่อง + Google) → ข้อมูลส่วนตัว ถามก่อนส่ง
+        agenda = skill is not None and any(st.kind == "agenda" for st in skill.steps)
         turn = feedback.Turn(request=text, answer=feedback.card_text(card),
                              route=f"skill:{sid}" if sid else f"rule:{kind}", skill_id=sid,
-                             private=kind in feedback.PRIVATE_KINDS)  # fmt: skip
+                             private=kind in feedback.PRIVATE_KINDS or agenda)  # fmt: skip
         card["turnId"] = self._turns.add(turn)
         return card
 
@@ -4181,17 +4199,12 @@ class SkillsController(QObject):
             if turn is not None and self._live_user_skill(turn.skill_id):
                 self._user.liked(turn.skill_id)
                 self.skillsChanged.emit()
-            return {"kind": "rated"}
+            return {"kind": "rated", "rateDone": True}
         if turn is None:
-            return self._plain("command", "ตรวจไม่ได้: รอบนี้เก่าเกินไปหรือส่งตรวจไปแล้ว")
-        if self._forge is not None and self._user is not None and not self._claude_on():
-            why = "เปิดได้ที่หน้าตั้งค่า › Claude · ระหว่างปิด ไม่มีข้อมูลออกไป Anthropic"
-            return self._plain("needs", "ให้ Claude ตรวจไม่ได้: ปิดการใช้ Claude ไว้", [why])
-        if not self.canForge:
-            return self._plain("needs", "ให้ Claude ตรวจไม่ได้: เครื่องนี้ยังไม่มี Claude",
-                               ["ติดตั้งและเข้าสู่ระบบ Claude Code ก่อน (การ์ด 0016)"])  # fmt: skip
-        if self._forging:
-            return self._plain("forging", "กำลังให้ Claude ทำงานอื่นอยู่ รอสักครู่แล้วกดใหม่")
+            return self._gone()
+        blocked = self._review_blocked()
+        if blocked is not None:
+            return blocked
         if turn.private:
             self._counter += 1
             token = f"v{self._counter}"
@@ -4200,22 +4213,47 @@ class SkillsController(QObject):
                                ["รอบนี้มีข้อมูลส่วนตัว (เช่น นัด หรือไฟล์) ในผลของเครื่อง",
                                 f"จะส่ง: คำสั่ง “{turn.request}” + ผลที่เห็นบนจอ (ไม่เกิน 1,500 ตัวอักษร)"],
                                [{"text": "ส่งออกนอกเครื่อง", "kind": "warn"}])  # fmt: skip
-            card["confirmToken"] = token
+            card.update(confirmToken=token, rateDone=False)
             return card
         return self._send_review(turn_id)
+
+    def _gone(self) -> dict:
+        card = self._plain("command", "ตรวจไม่ได้: รอบนี้เก่าเกินไปหรือส่งตรวจไปแล้ว")
+        card["rateDone"] = True
+        return card
+
+    def _review_blocked(self) -> dict | None:
+        """ส่งตอนนี้ไม่ได้ = การ์ดบอกเหตุ (rateDone false: รอบยังอยู่ กดใหม่ได้) · ส่งได้ = None."""
+        if self._forge is not None and self._user is not None and not self._claude_on():
+            why = "เปิดได้ที่หน้าตั้งค่า › Claude · ระหว่างปิด ไม่มีข้อมูลออกไป Anthropic"
+            card = self._plain("needs", "ให้ Claude ตรวจไม่ได้: ปิดการใช้ Claude ไว้", [why])
+        elif not self.canForge:
+            card = self._plain("needs", "ให้ Claude ตรวจไม่ได้: เครื่องนี้ยังไม่มี Claude",
+                               ["ติดตั้งและเข้าสู่ระบบ Claude Code ก่อน (การ์ด 0016)"])  # fmt: skip
+        elif self._forging:
+            card = self._plain("forging", "กำลังให้ Claude ทำงานอื่นอยู่ รอสักครู่แล้วกดใหม่")
+        else:
+            return None
+        card["rateDone"] = False
+        return card
 
     def _send_review(self, turn_id: str) -> dict:
         from aipc.skills import feedback
 
+        if self._turns.get(turn_id) is None:
+            return self._gone()
+        blocked = self._review_blocked()  # ตรวจก่อนเอารอบออก: ส่งไม่ได้ = รอบไม่หาย ไม่นับไม่ชอบ
+        if blocked is not None:
+            return blocked
         turn = self._turns.take(turn_id)
-        if turn is None:
-            return self._plain("command", "ตรวจไม่ได้: รอบนี้เก่าเกินไปหรือส่งตรวจไปแล้ว")
         # สกิลในตัว: Claude ไม่แก้ (สร้างสกิลผู้ใช้แทนได้) · สกิลผู้ใช้ที่ลบไปแล้ว = สร้างใหม่
         revise_id = turn.skill_id if self._live_user_skill(turn.skill_id) else ""
         if revise_id:
             self._user.disliked(revise_id)
-        return self._start_forge(turn.request, revise_id, "ผู้ใช้กดไม่ชอบผลนี้",
+        card = self._start_forge(turn.request, revise_id, "ผู้ใช้กดไม่ชอบผลนี้",
                                  review=feedback.review_text(turn))  # fmt: skip
+        card["rateDone"] = True
+        return card
 
     @Slot(str, result="QVariantMap")
     def regenerateSkill(self, skill_id: str) -> dict:  # noqa: N802
@@ -4920,6 +4958,7 @@ class SkillsController(QObject):
     def handleAs(self, skill_id: str, text: str) -> dict:  # noqa: N802
         """AI ในเครื่องเลือกสกิลนี้ → ทำทางเดียวกับที่ตัวคัดสกิลเลือก (ยืนยันก่อนถ้าเป็นงานที่แตะเครื่อง)."""
         t0 = time.monotonic()
+        self._turns.clear_skill()
         return self._rateable(self._why(self._handle_as(skill_id, text), t0), text)
 
     def _handle_as(self, skill_id: str, text: str) -> dict:
@@ -4987,6 +5026,7 @@ class SkillsController(QObject):
         from aipc.skills import english
 
         t0 = time.monotonic()
+        self._turns.clear_skill()  # ข้อความใหม่ = บันทึกสกิลภาษาของข้อความก่อนหมดอายุ
         # คำสั่งอังกฤษ → รูปไทยให้ตัวแปลเดิม (การ์ด 0039 ระยะ C) · แปลงแล้วยังไปจบที่ AI = ส่งข้อความเดิม
         # ให้ AI แทน (AI ตอบอังกฤษตามภาษาคำถาม) · ไม่ใช่คำสั่ง = to_thai คืน None ไม่แตะอะไร
         th = english.to_thai(text)
@@ -5234,9 +5274,9 @@ class SkillsController(QObject):
     @Slot(str, bool, result="QVariantMap")
     def confirm(self, token: str, yes: bool) -> dict:
         t0 = time.monotonic()
-        text = self._token_text.pop(token, "")
+        text, sid = self._token_text.pop(token, ("", ""))
         card = self._why(self._confirm(token, yes), t0)
-        return self._rateable(card, text) if yes and text else card
+        return self._rateable(card, text, sid) if yes and text else card
 
     def _confirm(self, token: str, yes: bool) -> dict:
         plan = self._pending.pop(token, None)
@@ -5256,7 +5296,7 @@ class SkillsController(QObject):
         elif isinstance(plan, tuple) and plan[0] == "review":  # การ์ด 0085: รอบที่มีข้อมูลส่วนตัว
             if yes:
                 return self._send_review(plan[1])
-            card.update(kind="review", title="ไม่ได้ส่งอะไร · รอบนี้ยังกดไม่ชอบใหม่ได้")
+            card.update(kind="review", title="ไม่ได้ส่งอะไร · รอบนี้ยังกดไม่ชอบใหม่ได้", rateDone=False)
         elif isinstance(plan, tuple) and plan[0] in ("app-install", "app-web"):
             # การ์ด 0054 · ตอบ "ไม่" ไม่ได้แปลว่ายกเลิกทันที แต่ถามข้อถัดไป (เปิดผ่านเว็บ)
             return self._missing_app_answer(plan[0], plan[1], yes)
@@ -5681,7 +5721,9 @@ class ChatController(QObject):
             )
             messages = [self._for_local(m) for m in messages]
         # การ์ด 0085: ไฟล์แนบ / ความจำของผู้ใช้อยู่ในบริบท = รอบนี้มีข้อมูลส่วนตัว (ถามก่อนส่งให้ Claude ตรวจ)
-        private = bool(self._conv["messages"][-1].get("file") or memory)
+        # เนื้อหาไฟล์จากรอบก่อนยังอยู่ในบทสนทนา (ส่งให้ AI ทุกรอบ) → ทั้งบทสนทนาถือว่ามีข้อมูลส่วนตัว
+        with_file = any(m.get("file") for m in self._conv["messages"])
+        private = bool(with_file or memory)
         self._turn_req = {"text": text, "skill": self._turns.pop_skill(text), "private": private}
         self._trimmed = trimmed and not prompt
         self._busy, self._stream_text = True, ""

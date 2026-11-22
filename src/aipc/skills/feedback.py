@@ -34,7 +34,9 @@ class TurnLog:
     def __init__(self) -> None:
         self._turns: dict[str, Turn] = {}  # dict เรียงตามลำดับที่ใส่ → ตัวแรก = เก่าสุด
         self._ids = count(1)
-        self._skill_for: dict[str, str] = {}  # ข้อความ → สกิลภาษาที่ส่งต่อให้แชท (เช่น แปล)
+        # สกิลภาษาที่ส่งต่อให้แชท (เช่น แปล) ของข้อความล่าสุด · ช่องเดียว: ข้อความใหม่ล้างของเก่า
+        # (แชทไม่ได้ส่งจริง = ไม่ค้างไปติดรอบอื่น · รีวิวโค้ด 2026-11-22)
+        self._skill_for: tuple[str, str] = ("", "")
 
     def add(self, turn: Turn) -> str:
         tid = f"t{next(self._ids)}"
@@ -51,10 +53,15 @@ class TurnLog:
         return self._turns.pop(tid, None)
 
     def note_skill(self, text: str, skill_id: str) -> None:
-        self._skill_for[text] = skill_id
+        self._skill_for = (text, skill_id)
+
+    def clear_skill(self) -> None:
+        self._skill_for = ("", "")
 
     def pop_skill(self, text: str) -> str:
-        return self._skill_for.pop(text, "")
+        noted, sid = self._skill_for
+        self._skill_for = ("", "")
+        return sid if noted == text else ""
 
 
 def card_text(card: dict) -> str:
